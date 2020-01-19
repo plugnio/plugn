@@ -1,0 +1,76 @@
+<?php
+
+use yii\db\Migration;
+
+/**
+ * Handles the creation of table `{{%restaurant}}`.
+ */
+class m200119_140530_create_restaurant_table extends Migration {
+
+    /**
+     * {@inheritdoc}
+     */
+    public function safeUp() {
+        $tableOptions = null;
+        if ($this->db->driverName === 'mysql') {
+            // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
+            $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
+        }
+
+        $this->createTable('{{%restaurant}}', [
+            'restaurant_uuid' => $this->char(36)->unique(),
+            'vendor_id' => $this->integer()->notNull(),
+            'name' => $this->string(255)->notNull(),
+            'name_ar' => $this->string(255)->null(),
+            'tagline' => ' varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci',
+            'tagline_ar' => ' varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci',
+            'status' => $this->smallInteger(1)->notNull(),
+            'thumbnail_image' => $this->string()->notNull(),
+            'logo' => $this->string(255)->notNull(),
+            'support_delivery' => $this->tinyInteger(1)->notNull(),
+            'support_pick_up' => $this->tinyInteger(1)->notNull(),
+            'min_delivery_time' => $this->time(),
+            'min_pickup_time' => $this->time(),
+            'operating_from' => $this->time(),
+            'operating_to' => $this->time(),
+            'delivery_fee' => $this->float()->defaultValue(0)->notNull(),
+            'min_charge' => $this->float()->defaultValue(0)->notNull(),
+            'min_order' => $this->float()->defaultValue(0)->notNull(),
+            'location' => $this->string(),
+            'location_ar' => $this->string(),
+            'location_latitude' => $this->decimal(),
+            'location_longitude' => $this->decimal(),
+            'phone_number' => $this->string(255)
+         ], $tableOptions);
+
+        $this->addPrimaryKey('PK', 'restaurant', 'restaurant_uuid');
+
+        // creates index for column `vendor_id`
+        $this->createIndex(
+                'idx-restaurant-vendor_id',
+                'restaurant', 
+                'vendor_id'
+        );
+
+        // add foreign key for table `vendor`
+        $this->addForeignKey(
+                'fk-restaurant-vendor_id',
+                'restaurant', 
+                'vendor_id',
+                'vendor',
+                'vendor_id',
+                'CASCADE'
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function safeDown() {
+        $this->dropForeignKey('fk-restaurant-vendor_id', 'restaurant');
+        $this->dropIndex('idx-restaurant-vendor_id', 'restaurant');
+        
+        $this->dropTable('{{%restaurant}}');
+    }
+
+}
