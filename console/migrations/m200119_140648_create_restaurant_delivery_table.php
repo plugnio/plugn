@@ -12,10 +12,17 @@ class m200119_140648_create_restaurant_delivery_table extends Migration
      */
     public function safeUp()
     {
+        $tableOptions = null;
+        if ($this->db->driverName === 'mysql') {
+            // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
+            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
+        }
+
+        
         $this->createTable('{{%restaurant_delivery}}', [
             'restaurant_uuid' => $this->char(36)->notNull(),
             'area_id' => $this->integer()->notNull(),
-        ]);
+        ],$tableOptions);
         
         $this->addPrimaryKey('PK', 'restaurant_delivery', ['restaurant_uuid','area_id']);
 

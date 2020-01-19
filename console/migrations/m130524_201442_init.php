@@ -6,11 +6,13 @@ class m130524_201442_init extends Migration
 {
     public function up()
     {
-      $tableOptions = null;
-      if ($this->db->driverName === 'mysql') {
-          // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
-          $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
-      }
+        
+        $tableOptions = null;
+        if ($this->db->driverName === 'mysql') {
+            // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
+            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
+        }
+
       /**
        * Create Admin Table
        */
@@ -45,6 +47,7 @@ class m130524_201442_init extends Migration
          */
         $this->createTable('{{%vendor}}', [
             'vendor_id' => $this->primaryKey(),
+            'restaurant_uuid' => $this->char(36),
             'vendor_name' => $this->string()->notNull(),
             'vendor_email' => $this->string()->notNull()->unique(),
             'vendor_auth_key' => $this->string(32)->notNull(),
@@ -54,8 +57,7 @@ class m130524_201442_init extends Migration
             'vendor_created_at' => $this->datetime()->notNull(),
             'vendor_updated_at' => $this->datetime()->notNull(),
         ], $tableOptions);
-
-
+ 
     }
 
     public function down()

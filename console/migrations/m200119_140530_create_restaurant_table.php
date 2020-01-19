@@ -11,11 +11,13 @@ class m200119_140530_create_restaurant_table extends Migration {
      * {@inheritdoc}
      */
     public function safeUp() {
-        $tableOptions = null;
+        
+          $tableOptions = null;
         if ($this->db->driverName === 'mysql') {
             // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
-            $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
+            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
         }
+
 
         $this->createTable('{{%restaurant}}', [
             'restaurant_uuid' => $this->char(36)->unique(),
@@ -35,12 +37,13 @@ class m200119_140530_create_restaurant_table extends Migration {
             'operating_to' => $this->time(),
             'delivery_fee' => $this->float()->defaultValue(0)->notNull(),
             'min_charge' => $this->float()->defaultValue(0)->notNull(),
-            'min_order' => $this->float()->defaultValue(0)->notNull(),
             'location' => $this->string(),
             'location_ar' => $this->string(),
             'location_latitude' => $this->decimal(),
             'location_longitude' => $this->decimal(),
-            'phone_number' => $this->string(255)
+            'phone_number' => $this->string(255),
+            'restaurant_created_at' => $this->dateTime(),
+            'restaurant_updated_at' => $this->dateTime(),
          ], $tableOptions);
 
         $this->addPrimaryKey('PK', 'restaurant', 'restaurant_uuid');

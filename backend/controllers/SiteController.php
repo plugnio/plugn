@@ -5,13 +5,15 @@ use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-use common\models\LoginForm;
+use backend\models\LoginForm;
 
 /**
  * Site controller
  */
 class SiteController extends Controller
 {
+    public $enableCsrfValidation = false;
+
     /**
      * {@inheritdoc}
      */
@@ -60,7 +62,18 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $totalVendors = 1;
+        $totalVerified = 1;
+//        $totalVendors = \common\models\Investor::find()->count();
+//        $totalVerified = \common\models\Investor::find()->where([
+//            'investor_email_verified' => \common\models\Investor::EMAIL_VERIFIED
+//        ])->count();
+
+        return $this->render('index', [
+            'totalVendors' => $totalVendors,
+            'verifiedVendors' => $totalVerified,
+//            'unverifiedInvestors' => $totalVendors - $totalVerified,
+        ]);
     }
 
     /**

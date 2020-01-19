@@ -41,10 +41,20 @@ AppAsset::register($this);
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
     } else {
+        $menuItems = [
+            ['label' => 'Admins', 'url' => ['/admin/index']],
+            ['label' => 'Vendors', 'url' => ['/vendor/index']],
+            ['label' => 'Cities', 'url' => ['/city/index']],
+            ['label' => 'Areas', 'url' => ['/area/index']],
+            ['label' => 'Cuisine', 'url' => ['/cuisine/index']],
+            ['label' => 'Payments Method', 'url' => ['/payment-method/index']],
+            ['label' => 'Restaurants', 'url' => ['/restaurant/index']]
+        ];
+        
         $menuItems[] = '<li>'
             . Html::beginForm(['/site/logout'], 'post')
             . Html::submitButton(
-                'Logout (' . Yii::$app->user->identity->username . ')',
+                'Logout (' . Yii::$app->user->identity->admin_name . ')',
                 ['class' => 'btn btn-link logout']
             )
             . Html::endForm()
