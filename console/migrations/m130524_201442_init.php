@@ -38,6 +38,8 @@ class m130524_201442_init extends Migration
           admin_created_at = "2018-08-21 19:20:58",
           admin_updated_at = "2018-08-21 19:40:58"';
 
+        Yii::$app->db->createCommand($sql)->execute();
+           
           /**
          * Create Vendor Table
          */
