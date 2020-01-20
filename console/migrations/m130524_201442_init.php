@@ -47,7 +47,7 @@ class m130524_201442_init extends Migration
          */
         $this->createTable('{{%vendor}}', [
             'vendor_id' => $this->primaryKey(),
-            'restaurant_uuid' => $this->char(36),
+            'restaurant_uuid' => $this->char(60),
             'vendor_name' => $this->string()->notNull(),
             'vendor_email' => $this->string()->notNull()->unique(),
             'vendor_auth_key' => $this->string(32)->notNull(),

@@ -31,7 +31,7 @@ class RestaurantDelivery extends \yii\db\ActiveRecord
         return [
             [['restaurant_uuid', 'area_id'], 'required'],
             [['area_id'], 'integer'],
-            [['restaurant_uuid'], 'string', 'max' => 36],
+            [['restaurant_uuid'], 'string', 'max' => 60],
             [['restaurant_uuid', 'area_id'], 'unique', 'targetAttribute' => ['restaurant_uuid', 'area_id']],
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],

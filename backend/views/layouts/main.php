@@ -46,7 +46,6 @@ AppAsset::register($this);
             ['label' => 'Vendors', 'url' => ['/vendor/index']],
             ['label' => 'Cities', 'url' => ['/city/index']],
             ['label' => 'Areas', 'url' => ['/area/index']],
-            ['label' => 'Cuisine', 'url' => ['/cuisine/index']],
             ['label' => 'Payments Method', 'url' => ['/payment-method/index']],
             ['label' => 'Restaurants', 'url' => ['/restaurant/index']]
         ];

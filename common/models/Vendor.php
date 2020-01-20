@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "vendor".
@@ -40,7 +42,7 @@ class Vendor extends \yii\db\ActiveRecord {
             [['vendor_name', 'vendor_email'], 'required'],
             [['vendor_status'], 'integer'],
             [['vendor_created_at', 'vendor_updated_at'], 'safe'],
-            [['restaurant_uuid'], 'string', 'max' => 36],
+            [['restaurant_uuid'], 'string', 'max' => 60],
             [['vendor_name', 'vendor_email', 'vendor_password_hash', 'vendor_password_reset_token'], 'string', 'max' => 255],
             [['vendor_auth_key'], 'string', 'max' => 32],
             [['vendor_email'], 'unique'],
@@ -64,6 +66,17 @@ class Vendor extends \yii\db\ActiveRecord {
             'vendor_status' => 'Vendor Status',
             'vendor_created_at' => 'Vendor Created At',
             'vendor_updated_at' => 'Vendor Updated At',
+        ];
+    }
+
+    public function behaviors() {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'createdAtAttribute' => 'vendor_created_at',
+                'updatedAtAttribute' => 'vendor_updated_at',
+                'value' => new Expression('NOW()'),
+            ],
         ];
     }
 

@@ -16,7 +16,7 @@ use yii\behaviors\AttributeBehavior;
  * @property string|null $name_ar
  * @property string|null $tagline
  * @property string|null $tagline_ar
- * @property int $status
+ * @property int $restaurant_status
  * @property string $thumbnail_image
  * @property string $logo
  * @property int $support_delivery
@@ -38,8 +38,6 @@ use yii\behaviors\AttributeBehavior;
  *
  * @property Item[] $items
  * @property Vendor $vendor
- * @property RestaurantCuisine[] $restaurantCuisines
- * @property Cuisine[] $cuisines
  * @property RestaurantDelivery[] $restaurantDeliveries
  * @property Area[] $areas
  * @property RestaurantPaymentMethod[] $restaurantPaymentMethods
@@ -47,10 +45,13 @@ use yii\behaviors\AttributeBehavior;
  */
 class Restaurant extends \yii\db\ActiveRecord {
 
-    //Values for `status`
+    //Values for `restaurant_status`
     const RESTAURANT_STATUS_OPEN = 1;
     const RESTAURANT_STATUS_BUSY = 2;
     const RESTAURANT_STATUS_CLOSED = 3;
+
+    public $restaurant_delivery_area;
+    public $restaurant_payments_method;
 
     /**
      * {@inheritdoc}
@@ -64,21 +65,22 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['restaurant_uuid', 'vendor_id', 'name', 'status', 'thumbnail_image', 'logo', 'support_delivery', 'support_pick_up', 'restaurant_uuid'], 'required'],
+            [['vendor_id', 'name', 'thumbnail_image', 'logo', 'support_delivery', 'support_pick_up','restaurant_payments_method', 'restaurant_delivery_area'], 'required'],
             ['min_delivery_time', 'required', 'when' => function ($model) {
                     return $model->support_delivery == 1;
-                        }, 'whenClient' => "function (attribute, value) {
+                }, 'whenClient' => "function (attribute, value) {
                 return $('#supportDeliveryInput').val() == 1;
             }"],
             ['min_pickup_time', 'required', 'when' => function ($model) {
                     return $model->support_pick_up == 1;
-                        }, 'whenClient' => "function (attribute, value) {
+                }, 'whenClient' => "function (attribute, value) {
                 return $('#supportPickupInput').val() == 1;
             }"],
-            [['vendor_id', 'status', 'support_delivery', 'support_pick_up'], 'integer'],
+            [['restaurant_delivery_area','restaurant_payments_method'], 'safe'],
+            [['vendor_id', 'restaurant_status', 'support_delivery', 'support_pick_up'], 'integer'],
             [['min_delivery_time', 'min_pickup_time', 'operating_from', 'operating_to', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
             [['delivery_fee', 'min_charge', 'location_latitude', 'location_longitude'], 'number'],
-            [['restaurant_uuid'], 'string', 'max' => 36],
+            [['restaurant_uuid'], 'string', 'max' => 60],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'location', 'location_ar', 'phone_number'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'unique'],
             [['vendor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Vendor::className(), 'targetAttribute' => ['vendor_id' => 'vendor_id']],
@@ -96,7 +98,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             'name_ar' => 'Name Ar',
             'tagline' => 'Tagline',
             'tagline_ar' => 'Tagline Ar',
-            'status' => 'Status',
+            'restaurant_status' => 'Restaurant Status',
             'thumbnail_image' => 'Thumbnail Image',
             'logo' => 'Logo',
             'support_delivery' => 'Support Delivery',
@@ -107,6 +109,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             'operating_to' => 'Operating To',
             'delivery_fee' => 'Delivery Fee',
             'min_charge' => 'Min Charge',
+            'restaurant_delivery_area' => 'Delivery Areas',
             'location' => 'Location',
             'location_ar' => 'Location Ar',
             'location_latitude' => 'Location Latitude',
@@ -117,6 +120,10 @@ class Restaurant extends \yii\db\ActiveRecord {
         ];
     }
 
+    /**
+     * 
+     * @return type
+     */
     public function behaviors() {
         return [
             [
@@ -141,6 +148,80 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Returns String value of current status
+     * @return string
+     */
+    public function getStatus() {
+        switch ($this->restaurant_status) {
+            case self::RESTAURANT_STATUS_OPEN:
+                return "Open";
+                break;
+            case self::RESTAURANT_STATUS_BUSY:
+                return "Busy";
+                break;
+            case self::RESTAURANT_STATUS_CLOSED:
+                return "Closed";
+                break;
+        }
+
+        return "Couldnt find a status";
+    }
+
+    /**
+     * Promotes current restaurant to open restaurant while disabling rest
+     */
+    public function promoteToOpenRestaurant() {
+        $this->restaurant_status = Restaurant::RESTAURANT_STATUS_OPEN;
+        $this->save(false);
+    }
+
+    /**
+     * Promotes current restaurant to close restaurant while disabling rest
+     */
+    public function promoteToCloseRestaurant() {
+        $this->restaurant_status = Restaurant::RESTAURANT_STATUS_CLOSED;
+        $this->save(false);
+    }
+
+    /**
+     * Promotes current restaurant to busy restaurant while disabling rest
+     */
+    public function promoteToBusyRestaurant() {
+        $this->restaurant_status = Restaurant::RESTAURANT_STATUS_BUSY;
+        $this->save(false);
+    }
+
+    /**
+     * save restaurant delivery areas
+     */
+    public function saveRestaurantDeliveryArea($delivery_areas) {
+        
+        RestaurantDelivery::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
+        
+        foreach ($delivery_areas as $area_id) {
+            $delivery_area = new RestaurantDelivery();
+            $delivery_area->area_id = $area_id;
+            $delivery_area->restaurant_uuid = $this->restaurant_uuid;
+            $delivery_area->save();
+        }
+    }
+    
+    /**
+     * save restaurant payment method
+     */
+    public function saveRestaurantPaymentMethod($payments_method) {
+        
+        RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
+        
+        foreach ($payments_method as $payment_method_id) {
+            $payments_method = new RestaurantPaymentMethod();
+            $payments_method->payment_method_id = $payment_method_id;
+            $payments_method->restaurant_uuid = $this->restaurant_uuid;
+            $payments_method->save();
+        }
+    }
+
+    /**
      * Gets query for [[Items]].
      *
      * @return \yii\db\ActiveQuery
@@ -156,24 +237,6 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getVendor() {
         return $this->hasOne(Vendor::className(), ['vendor_id' => 'vendor_id']);
-    }
-
-    /**
-     * Gets query for [[RestaurantCuisines]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getRestaurantCuisines() {
-        return $this->hasMany(RestaurantCuisine::className(), ['restaurant_uuid' => 'restaurant_uuid']);
-    }
-
-    /**
-     * Gets query for [[Cuisines]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCuisines() {
-        return $this->hasMany(Cuisine::className(), ['cuisine_id' => 'cuisine_id'])->viaTable('restaurant_cuisine', ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**

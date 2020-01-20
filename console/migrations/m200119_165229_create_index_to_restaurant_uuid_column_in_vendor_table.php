@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Handles adding columns to table `{{%vendor}}`.
  */
-class m200119_165229_add_restaurant_uuid_column_to_vendor_table extends Migration
+class m200119_165229_create_index_to_restaurant_uuid_column_in_vendor_table extends Migration
 {
     /**
      * {@inheritdoc}

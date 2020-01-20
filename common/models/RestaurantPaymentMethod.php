@@ -31,7 +31,7 @@ class RestaurantPaymentMethod extends \yii\db\ActiveRecord
         return [
             [['restaurant_uuid', 'payment_method_id'], 'required'],
             [['payment_method_id'], 'integer'],
-            [['restaurant_uuid'], 'string', 'max' => 36],
+            [['restaurant_uuid'], 'string', 'max' => 60],
             [['restaurant_uuid', 'payment_method_id'], 'unique', 'targetAttribute' => ['restaurant_uuid', 'payment_method_id']],
             [['payment_method_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],

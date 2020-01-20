@@ -6,6 +6,10 @@ use kartik\time\TimePicker;
 use backend\models\Vendor;
 use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
+use common\models\Area;
+use common\models\RestaurantDelivery;
+use common\models\RestaurantPaymentMethod;
+use common\models\PaymentMethod;
 
 $js = "
 let supportDeliveryInput = $('#supportDeliveryInput');
@@ -46,17 +50,76 @@ $this->registerJs($js);
     $vendorQuery = Vendor::find()->asArray()->all();
     $vendorArray = ArrayHelper::map($vendorQuery, 'vendor_id', 'vendor_name');
 
+    $areaQuery = Area::find()->asArray()->all();
+    $restaurantDeliveryArray = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
+    
+    $paymentMethodQuery = PaymentMethod::find()->asArray()->all();
+    $paymentMethodArray = ArrayHelper::map($paymentMethodQuery, 'payment_method_id', 'payment_method_name');
+
+    $sotredRestaurantDeliveryAreas = [];
+    if ($model->restaurant_uuid != null) {
+        
+        $sotredRestaurantDeliveryAreas = RestaurantDelivery::find()
+                ->select('area_id')
+                ->asArray()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->all();
+
+        $sotredRestaurantDeliveryAreas = ArrayHelper::getColumn($sotredRestaurantDeliveryAreas, 'area_id');
+        
+        
+        $sotredRestaurantPaymentMethod = RestaurantPaymentMethod::find()
+                ->select('payment_method_id')
+                ->asArray()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->all();
+
+        $sotredRestaurantPaymentMethod = ArrayHelper::getColumn($sotredRestaurantPaymentMethod, 'payment_method_id');
+  
+    }
+
+
     $form = ActiveForm::begin();
     ?>
 
     <?=
-        $form->field($model, 'vendor_id')->widget(Select2::classname(), [
-            'data' => $vendorArray,
-            'options' => ['placeholder' => 'Select a vendor ...'],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ]);
+    $form->field($model, 'vendor_id')->widget(Select2::classname(), [
+        'data' => $vendorArray,
+        'options' => ['placeholder' => 'Select a vendor ...'],
+        'pluginOptions' => [
+            'allowClear' => true
+        ],
+    ]);
+    ?>
+
+    <?=
+    $form->field($model, 'restaurant_delivery_area')->widget(Select2::classname(), [
+        'data' => $restaurantDeliveryArray,
+        'options' => [
+            'placeholder' => 'Select delivery area ...',
+            'multiple' => true,
+            'value' => $sotredRestaurantDeliveryAreas
+        ],
+        'pluginOptions' => [
+            'tags' => true,
+            'tokenSeparators' => [',', ' '],
+        ],
+    ]);
+    ?>
+    
+    <?=
+    $form->field($model, 'restaurant_payments_method')->widget(Select2::classname(), [
+        'data' => $paymentMethodArray,
+        'options' => [
+            'placeholder' => 'Select payment method ...',
+            'multiple' => true,
+            'value' => $sotredRestaurantPaymentMethod
+        ],
+        'pluginOptions' => [
+            'tags' => true,
+            'tokenSeparators' => [',', ' '],
+        ],
+    ]);
     ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
@@ -99,6 +162,8 @@ $this->registerJs($js);
             'pluginOptions' => [
                 'autoclose' => true,
                 'defaultTime' => false,
+                'showSeconds' => true,
+                'showMeridian' => false,
             ]
         ]);
         ?>
@@ -106,11 +171,13 @@ $this->registerJs($js);
 
     <div id='minPickupTime' style='<?= $model->isNewRecord || ($model->support_pick_up == 0) ? "display:none" : "" ?>'>
         <?=
-        $form->field($model, 'support_pick_up')->widget(TimePicker::classname(), [
+        $form->field($model, 'min_pickup_time')->widget(TimePicker::classname(), [
             'options' => ['placeholder' => 'Enter event time ...'],
             'pluginOptions' => [
                 'autoclose' => true,
-                'defaultTime' => false
+                'defaultTime' => false,
+                'showSeconds' => true,
+                'showMeridian' => false,
             ]
         ]);
         ?>
@@ -122,7 +189,9 @@ $this->registerJs($js);
         'options' => ['placeholder' => 'Enter event time ...'],
         'pluginOptions' => [
             'autoclose' => true,
-            'defaultTime' => false
+            'defaultTime' => false,
+            'showSeconds' => true,
+            'showMeridian' => false
         ]
     ]);
     ?>
@@ -132,8 +201,9 @@ $this->registerJs($js);
         'options' => ['placeholder' => 'Enter event time ...'],
         'pluginOptions' => [
             'autoclose' => true,
-            'defaultTime' => false
-
+            'defaultTime' => false,
+            'showSeconds' => true,
+            'showMeridian' => false
         ]
     ]);
     ?>

@@ -13,13 +13,12 @@ use yii\filters\AccessControl;
 /**
  * RestaurantController implements the CRUD actions for Restaurant model.
  */
-class RestaurantController extends Controller
-{
+class RestaurantController extends Controller {
+
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -43,14 +42,13 @@ class RestaurantController extends Controller
      * Lists all Restaurant models.
      * @return mixed
      */
-    public function actionIndex()
-    {
+    public function actionIndex() {
         $searchModel = new RestaurantSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+                    'searchModel' => $searchModel,
+                    'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -60,10 +58,9 @@ class RestaurantController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
-    {
+    public function actionView($id) {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+                    'model' => $this->findModel($id),
         ]);
     }
 
@@ -72,16 +69,22 @@ class RestaurantController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
-    {
+    public function actionCreate() {
         $model = new Restaurant();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
+
+            if (($model->restaurant_delivery_area)) {
+                $model->saveRestaurantDeliveryArea($model->restaurant_delivery_area);
+                $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
+            }
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+            }
         }
 
         return $this->render('create', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
@@ -92,17 +95,64 @@ class RestaurantController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
+    public function actionUpdate($id) {
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+        $model = $this->findModel($id);
+        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
+
+            if (($model->restaurant_delivery_area)) {
+                $model->saveRestaurantDeliveryArea($model->restaurant_delivery_area);
+                $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
+            }
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+            }else{
+                return print_r($model->errors);
+            }
         }
 
         return $this->render('update', [
-            'model' => $model,
+                    'model' => $model,
         ]);
+    }
+
+    /**
+     * Change restaurant status to become open
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionPromoteToOpen($id) {
+        $model = $this->findModel($id);
+        $model->promoteToOpenRestaurant();
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
+
+    /**
+     * Change restaurant status to become busy
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionPromoteToBusy($id) {
+        $model = $this->findModel($id);
+        $model->promoteToBusyRestaurant();
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
+
+    /**
+     * Change restaurant status to become close
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionPromoteToClose($id) {
+        $model = $this->findModel($id);
+        $model->promoteToCloseRestaurant();
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
     }
 
     /**
@@ -112,8 +162,7 @@ class RestaurantController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
-    {
+    public function actionDelete($id) {
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
@@ -126,12 +175,12 @@ class RestaurantController extends Controller
      * @return Restaurant the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
-    {
+    protected function findModel($id) {
         if (($model = Restaurant::findOne($id)) !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
 }

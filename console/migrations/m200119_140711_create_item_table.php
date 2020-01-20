@@ -21,7 +21,7 @@ class m200119_140711_create_item_table extends Migration
         
         $this->createTable('{{%item}}', [
             'item_uuid' => $this->string(300)->unique(),
-            'restaurant_uuid' => $this->char(36)->notNull(),
+            'restaurant_uuid' => $this->char(60)->notNull(),
             'item_name' => $this->string(255),
             'item_name_ar' => $this->string(255),
             'item_description' => $this->string(1000),

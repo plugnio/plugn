@@ -20,13 +20,13 @@ class m200119_140530_create_restaurant_table extends Migration {
 
 
         $this->createTable('{{%restaurant}}', [
-            'restaurant_uuid' => $this->char(36)->unique(),
+            'restaurant_uuid' => $this->char(60)->unique(),
             'vendor_id' => $this->integer()->notNull(),
             'name' => $this->string(255)->notNull(),
             'name_ar' => $this->string(255)->null(),
             'tagline' => ' varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci',
             'tagline_ar' => ' varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci',
-            'status' => $this->smallInteger(1)->notNull(),
+            'restaurant_status' => $this->smallInteger(1)->defaultValue(1)->notNull(),
             'thumbnail_image' => $this->string()->notNull(),
             'logo' => $this->string(255)->notNull(),
             'support_delivery' => $this->tinyInteger(1)->notNull(),

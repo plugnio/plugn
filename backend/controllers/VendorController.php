@@ -82,8 +82,6 @@ class VendorController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             
             return $this->redirect(['view', 'id' => $model->vendor_id]);
-        }else{
-            return print_r($model->errors);
         }
 
         return $this->render('create', [

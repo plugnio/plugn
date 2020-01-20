@@ -20,7 +20,7 @@ class m200119_140601_create_restaurant_payment_method_table extends Migration
 
         
         $this->createTable('{{%restaurant_payment_method}}', [
-            'restaurant_uuid' => $this->char(36)->notNull(),
+            'restaurant_uuid' => $this->char(60)->notNull(),
             'payment_method_id' => $this->integer()->notNull(),
         ],$tableOptions);
         
