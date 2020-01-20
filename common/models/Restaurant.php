@@ -65,7 +65,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['vendor_id', 'name', 'logo', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_delivery_area'], 'required'],
+            [['vendor_id', 'name', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_delivery_area'], 'required'],
             ['min_delivery_time', 'required', 'when' => function ($model) {
                     return $model->support_delivery == 1;
                 }, 'whenClient' => "function (attribute, value) {
@@ -76,7 +76,12 @@ class Restaurant extends \yii\db\ActiveRecord {
                 }, 'whenClient' => "function (attribute, value) {
                 return $('#supportPickupInput').val() == 1;
             }"],
-            [['thumbnail_image'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
+            ['delivery_fee', 'required', 'when' => function ($model) {
+                    return $model->support_delivery == 1;
+                }, 'whenClient' => "function (attribute, value) {
+                return $('#supportDeliveryInput').val() == 1;
+            }"],
+            [['thumbnail_image', 'logo'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['vendor_id', 'restaurant_status', 'support_delivery', 'support_pick_up'], 'integer'],
             [['min_delivery_time', 'min_pickup_time', 'operating_from', 'operating_to', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
@@ -169,6 +174,31 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Upload restaurant's logo  to cloudinary
+     * @param type $imageURL
+     */
+    public function uploadLogo($imageURL) {
+
+        $filename = Yii::$app->security->generateRandomString();
+        $restaurantName = str_replace(' ', '', $this->name);
+
+        try {
+            $result = Yii::$app->cloudinaryManager->upload(
+                    $imageURL, [
+                'public_id' => "restaurants/" . $restaurantName . "/logo/" . $filename
+                    ]
+            );
+
+            if ($result || count($result) > 0) {
+                $this->logo = basename($result['url']);
+                $this->save();
+            }
+        } catch (\Cloudinary\Error $err) {
+            Yii::error('Error when uploading venue photos to Cloudinry: ' . json_encode($err));
+        }
+    }
+
+    /**
      * Upload thumbnailImage  to cloudinary
      * @param type $imageURL
      */
@@ -193,17 +223,49 @@ class Restaurant extends \yii\db\ActiveRecord {
         }
     }
 
+    /**
+     * 
+     * @param type $insert
+     * @param type $changedAttributes
+     */
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
-                    Yii::error(json_encode($changedAttributes));
 
-        if(!$insert && isset($changedAttributes['thumbnail_image'])){
-            if($changedAttributes['thumbnail_image']){
-              $this->deleteRestaurantThumbnailImage($changedAttributes['thumbnail_image']);
+        if (!$insert && isset($changedAttributes['thumbnail_image'])) {
+            if ($changedAttributes['thumbnail_image']) {
+                $this->deleteRestaurantThumbnailImage($changedAttributes['thumbnail_image']);
+            }
+        }
+
+        if (!$insert && isset($changedAttributes['logo'])) {
+            if ($changedAttributes['logo']) {
+                $this->deleteRestaurantLogo($changedAttributes['logo']);
             }
         }
     }
-    
+
+    /**
+     * Return Logo url to dispaly it on backend
+     * @return string
+     */
+    public function getLogo() {
+        $photo_url = [];
+
+        if ($this->logo) {
+            $restaurantName = str_replace(' ', '', $this->name);
+            $url = 'https://res.cloudinary.com/vendor/image/upload/v1579525808/restaurants/'
+                    . $restaurantName . '/logo/'
+                    . $this->logo;
+            $photo_url = $url;
+        }
+
+        return $photo_url;
+    }
+
+    /**
+     *  Return ThumbnailImage url to dispaly it on backend
+     * @return string
+     */
     public function getThumbnailImage() {
         $photo_url = [];
 
@@ -219,27 +281,52 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Delete Restaurant's logo
+     */
+    public function deleteRestaurantLogo($logo = null) {
+
+        if (!$logo)
+            $logo = $this->logo;
+
+        $restaurantName = str_replace(' ', '', $this->name);
+        $imageURL = "restaurants/" . $restaurantName . "/logo/" . $logo;
+
+        try {
+            Yii::$app->cloudinaryManager->delete($imageURL);
+        } catch (\Cloudinary\Error $err) {
+            Yii::error('Error when uploading venue photos to Cloudinry: ' . json_encode($err));
+        }
+    }
+
+    /**
      * Delete Restaurant's Thumbnail Image
      */
     public function deleteRestaurantThumbnailImage($thumbnail_image = null) {
-        
-        if(!$thumbnail_image)
+
+        if (!$thumbnail_image)
             $thumbnail_image = $this->thumbnail_image;
-        
+
         $restaurantName = str_replace(' ', '', $this->name);
         $imageURL = "restaurants/" . $restaurantName . "/thumbnail-image/" . $thumbnail_image;
-        
+
         try {
             Yii::$app->cloudinaryManager->delete($imageURL);
-
         } catch (\Cloudinary\Error $err) {
             Yii::error('Error when uploading venue photos to Cloudinry: ' . json_encode($err));
         }
     }
 
     public function beforeDelete() {
-        $this->deleteAllRestaurantThumbnailImage();
-        return parent::beforeDelete();
+    
+  
+        if (!parent::beforeDelete()) {
+            return false;
+        }
+
+        $this->deleteRestaurantThumbnailImage();
+        $this->deleteRestaurantLogo();
+
+        return true;
     }
 
     /**
@@ -285,7 +372,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      * save restaurant payment method
      */
     public function saveRestaurantPaymentMethod($payments_method) {
-
+        
         RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
 
         foreach ($payments_method as $payment_method_id) {

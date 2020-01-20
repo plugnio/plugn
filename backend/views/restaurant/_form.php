@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\time\TimePicker;
-use backend\models\Vendor;
+use common\models\Vendor;
 use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
 use common\models\Area;
@@ -22,8 +22,10 @@ supportDeliveryInput.change(function(){
     let selection = $(this).val();
     if(selection == 0){ // Dont support delivery
         $('#minDeliveryTime').hide();
-    }else{ // Reward based
+        $('#deliveryFeeInput').hide();
+    }else{ // Support delivery
         $('#minDeliveryTime').show();
+        $('#deliveryFeeInput').show();
     }
 });
 
@@ -35,6 +37,8 @@ supportPickupInput.change(function(){
         $('#minPickupTime').show();
     }
 });
+
+
 ";
 
 
@@ -147,8 +151,19 @@ $this->registerJs($js);
         ]
     ]);
     ?>
-
-    <?= $form->field($model, 'logo')->textInput(['maxlength' => true]) ?>
+    <?=
+    $form->field($model, 'logo')->widget(FileInput::classname(), [
+        'options' => ['accept' => 'image/*', 'multiple' => false
+        ],
+        'pluginOptions' => [
+            'showUpload' => false,
+             'initialPreview' => $model->getLogo(),
+             'initialPreviewAsData' => true,
+             'overwriteInitial' => true,
+            'maxFileSize' => 2800
+        ]
+    ]);
+    ?>
 
 
     <?=
@@ -223,8 +238,10 @@ $this->registerJs($js);
         ]
     ]);
     ?>
-
-    <?= $form->field($model, 'delivery_fee')->input('number', ['maxlength' => true, 'placeholder' => '0.500']) ?>
+    
+    <div id='deliveryFeeInput' style='<?= $model->isNewRecord || ($model->support_delivery == 0) ? "display:none" : "" ?>'>
+        <?= $form->field($model, 'delivery_fee')->input('number', ['maxlength' => true, 'placeholder' => '0.500']) ?>
+    </div>
 
     <?= $form->field($model, 'min_charge')->input('number', ['maxlength' => true, 'placeholder' => '5']) ?>
 

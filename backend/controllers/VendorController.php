@@ -4,12 +4,12 @@ namespace backend\controllers;
 
 use Yii;
 use yii\filters\AccessControl;
-use backend\models\Vendor;
+use common\models\Vendor;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use backend\models\VendorSearch;
+use common\models\VendorSearch;
 
 /**
  * VendorController implements the CRUD actions for Vendor model.

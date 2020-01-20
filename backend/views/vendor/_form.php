@@ -7,7 +7,7 @@ use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\Vendor */
+/* @var $model common\models\Vendor */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 

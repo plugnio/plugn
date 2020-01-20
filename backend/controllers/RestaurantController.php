@@ -74,14 +74,24 @@ class RestaurantController extends Controller {
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
 
-            if (($model->restaurant_delivery_area)) {
-                $model->saveRestaurantDeliveryArea($model->restaurant_delivery_area);
-                $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
-            }
+
             if ($model->save()) {
+
+                if ($model->restaurant_delivery_area)
+                    $model->saveRestaurantDeliveryArea($model->restaurant_delivery_area);
+
+                if ($model->restaurant_payments_method)
+                    $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
+
                 $thumbnail_image = \yii\web\UploadedFile::getInstances($model, 'thumbnail_image');
-                if($thumbnail_image)
+                $logo = \yii\web\UploadedFile::getInstances($model, 'logo');
+
+                if ($thumbnail_image)
                     $model->uploadThumbnailImage($thumbnail_image[0]->tempName);
+
+                if ($logo)
+                    $model->uploadLogo($logo[0]->tempName);
+
                 return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
             }
         }
@@ -103,15 +113,24 @@ class RestaurantController extends Controller {
         $model = $this->findModel($id);
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
 
-            if (($model->restaurant_delivery_area)) {
+            if ($model->restaurant_delivery_area)
                 $model->saveRestaurantDeliveryArea($model->restaurant_delivery_area);
-                $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
-            }
+
+            if ($model->restaurant_payments_method)
+                $model->saveRestaurantDeliveryArea($model->restaurant_delivery_area);
+
+
             if ($model->save()) {
+
                 $thumbnail_image = \yii\web\UploadedFile::getInstances($model, 'thumbnail_image');
-                
-                if($thumbnail_image)
+                $logo = \yii\web\UploadedFile::getInstances($model, 'logo');
+
+                if ($thumbnail_image)
                     $model->uploadThumbnailImage($thumbnail_image[0]->tempName);
+
+                if ($logo)
+                    $model->uploadLogo($logo[0]->tempName);
+
                 return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
             }
         }
