@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\models;
 
 use Yii;
@@ -8,20 +9,17 @@ use common\models\Vendor;
 /**
  * Login form
  */
-class LoginForm extends Model
-{
+class LoginForm extends Model {
+
     public $email;
     public $password;
     public $rememberMe = true;
-
     private $_vendor = false;
-
 
     /**
      * @inheritdoc
      */
-    public function rules()
-    {
+    public function rules() {
         return [
             // email and password are both required
             [['email', 'password'], 'required'],
@@ -41,8 +39,7 @@ class LoginForm extends Model
      * @param string $attribute the attribute currently being validated
      * @param array $params the additional name-value pairs given in the rule
      */
-    public function validatePassword($attribute, $params)
-    {
+    public function validatePassword($attribute, $params) {
         if (!$this->hasErrors()) {
             $vendor = $this->getVendor();
             if (!$vendor || !$vendor->validatePassword($this->password)) {
@@ -56,10 +53,11 @@ class LoginForm extends Model
      *
      * @return boolean whether the vendor is logged in successfully
      */
-    public function login()
-    {
+    public function login() {
         if ($this->validate()) {
-            return Yii::$app->user->login($this->getVendor(), $this->rememberMe ? 3600 * 24 * 30 : 0);
+            $loggedInVendor = $this->getVendor();
+            if ($loggedInVendor->restaurant_uuid != NULL)
+                return Yii::$app->user->login($loggedInVendor, $this->rememberMe ? 3600 * 24 * 30 : 0);
         }
 
         return false;
@@ -70,12 +68,12 @@ class LoginForm extends Model
      *
      * @return Vendor|null
      */
-    public function getVendor()
-    {
+    public function getVendor() {
         if ($this->_vendor === false) {
             $this->_vendor = Vendor::findByEmail($this->email);
         }
 
         return $this->_vendor;
     }
+
 }
