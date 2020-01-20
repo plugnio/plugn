@@ -179,12 +179,6 @@ class Restaurant extends \yii\db\ActiveRecord {
 
         try {
             Yii::error(' thumbnail_image-> ' . $this->thumbnail_image);
-
-            if($this->thumbnail_image){
-                Yii::error('enter if thumbnail_image ');
-                //TODO
-                $this->deleteRestaurantThumbnailImage();
-            }
             
             $result = Yii::$app->cloudinaryManager->upload(
                     $imageURL, [
@@ -201,6 +195,15 @@ class Restaurant extends \yii\db\ActiveRecord {
         }
     }
 
+    public function afterSave($insert, $changedAttributes) {
+        parent::afterSave($insert, $changedAttributes);
+                    Yii::error('aftersave');
+
+//        if(isset($changedAttributes['thumbnail_image']){
+//            Yii::error('aftersave');
+//        }
+    }
+    
     public function getThumbnailImage() {
         $photo_url = [];
 

@@ -80,7 +80,8 @@ class RestaurantController extends Controller {
             }
             if ($model->save()) {
                 $thumbnail_image = \yii\web\UploadedFile::getInstances($model, 'thumbnail_image');
-                $model->uploadThumbnailImage($thumbnail_image[0]->tempName);
+                if($thumbnail_image)
+                    $model->uploadThumbnailImage($thumbnail_image[0]->tempName);
                 return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
             }
         }
@@ -108,7 +109,9 @@ class RestaurantController extends Controller {
             }
             if ($model->save()) {
                 $thumbnail_image = \yii\web\UploadedFile::getInstances($model, 'thumbnail_image');
-                $model->uploadThumbnailImage($thumbnail_image[0]->tempName);
+                
+                if($thumbnail_image)
+                    $model->uploadThumbnailImage($thumbnail_image[0]->tempName);
                 return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
             }
         }
