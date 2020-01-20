@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "beef3147c3e6828c94b7ad7a7f286ad1",
+    "content-hash": "24b19e2d5a2532a473d40f348f80018c",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -17,7 +17,8 @@
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/twbs/bootstrap/zipball/68b0d231a13201eb14acd3dc84e51543d16e5f7e",
-                "reference": "68b0d231a13201eb14acd3dc84e51543d16e5f7e"
+                "reference": "68b0d231a13201eb14acd3dc84e51543d16e5f7e",
+                "shasum": null
             },
             "require": {
                 "bower-asset/jquery": ">=1.9.1,<4.0"
@@ -38,7 +39,8 @@
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/RobinHerbots/Inputmask/zipball/5e670ad62f50c738388d4dcec78d2888505ad77b",
-                "reference": "5e670ad62f50c738388d4dcec78d2888505ad77b"
+                "reference": "5e670ad62f50c738388d4dcec78d2888505ad77b",
+                "shasum": null
             },
             "require": {
                 "bower-asset/jquery": ">=1.7"
@@ -59,7 +61,8 @@
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/jquery/jquery-dist/zipball/15bc73803f76bc53b654b9fdbbbc096f56d7c03d",
-                "reference": "15bc73803f76bc53b654b9fdbbbc096f56d7c03d"
+                "reference": "15bc73803f76bc53b654b9fdbbbc096f56d7c03d",
+                "shasum": null
             },
             "type": "bower-asset",
             "license": [
@@ -77,7 +80,8 @@
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/bestiejs/punycode.js/zipball/38c8d3131a82567bfef18da09f7f4db68c84f8a3",
-                "reference": "38c8d3131a82567bfef18da09f7f4db68c84f8a3"
+                "reference": "38c8d3131a82567bfef18da09f7f4db68c84f8a3",
+                "shasum": null
             },
             "type": "bower-asset"
         },
@@ -92,7 +96,8 @@
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/yiisoft/jquery-pjax/zipball/aef7b953107264f00234902a3880eb50dafc48be",
-                "reference": "aef7b953107264f00234902a3880eb50dafc48be"
+                "reference": "aef7b953107264f00234902a3880eb50dafc48be",
+                "shasum": null
             },
             "require": {
                 "bower-asset/jquery": ">=1.8"
@@ -161,6 +166,58 @@
                 "markdown-extra"
             ],
             "time": "2018-03-26T11:24:36+00:00"
+        },
+        {
+            "name": "cloudinary/cloudinary_php",
+            "version": "1.16.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cloudinary/cloudinary_php.git",
+                "reference": "e33619e48ea8fa0350c007d640777091bfa4fdbc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cloudinary/cloudinary_php/zipball/e33619e48ea8fa0350c007d640777091bfa4fdbc",
+                "reference": "e33619e48ea8fa0350c007d640777091bfa4fdbc",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.8.*"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src"
+                ],
+                "files": [
+                    "src/Helpers.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Cloudinary",
+                    "homepage": "https://github.com/cloudinary/cloudinary_php/graphs/contributors"
+                }
+            ],
+            "description": "Cloudinary PHP SDK",
+            "homepage": "https://github.com/cloudinary/cloudinary_php",
+            "keywords": [
+                "cdn",
+                "cloud",
+                "cloudinary",
+                "image management",
+                "sdk"
+            ],
+            "time": "2019-11-28T15:57:33+00:00"
         },
         {
             "name": "doctrine/lexer",

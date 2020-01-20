@@ -140,9 +140,9 @@ $this->registerJs($js);
         ],
         'pluginOptions' => [
             'showUpload' => false,
-            // 'initialPreview' => $model->getVenuePhotosURL(),
-            // 'initialPreviewAsData' => true,
-            // 'overwriteInitial' => true,
+             'initialPreview' => $model->getThumbnailImage(),
+             'initialPreviewAsData' => true,
+             'overwriteInitial' => true,
             'maxFileSize' => 2800
         ]
     ]);

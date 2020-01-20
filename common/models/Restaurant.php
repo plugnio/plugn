@@ -65,7 +65,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['vendor_id', 'name', 'logo', 'support_delivery', 'support_pick_up','restaurant_payments_method', 'restaurant_delivery_area'], 'required'],
+            [['vendor_id', 'name', 'logo', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_delivery_area'], 'required'],
             ['min_delivery_time', 'required', 'when' => function ($model) {
                     return $model->support_delivery == 1;
                 }, 'whenClient' => "function (attribute, value) {
@@ -77,7 +77,7 @@ class Restaurant extends \yii\db\ActiveRecord {
                 return $('#supportPickupInput').val() == 1;
             }"],
             [['thumbnail_image'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
-            [['restaurant_delivery_area','restaurant_payments_method'], 'safe'],
+            [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['vendor_id', 'restaurant_status', 'support_delivery', 'support_pick_up'], 'integer'],
             [['min_delivery_time', 'min_pickup_time', 'operating_from', 'operating_to', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
             [['delivery_fee', 'min_charge', 'location_latitude', 'location_longitude'], 'number'],
@@ -173,42 +173,68 @@ class Restaurant extends \yii\db\ActiveRecord {
      * @param type $imageURL
      */
     public function uploadThumbnailImage($imageURL) {
-        Yii::error('enter uploadThumbnailImage');
-        
+
         $filename = Yii::$app->security->generateRandomString();
         $restaurantName = str_replace(' ', '', $this->name);
 
         try {
+            Yii::error(' thumbnail_image-> ' . $this->thumbnail_image);
+
+            if($this->thumbnail_image){
+                Yii::error('enter if thumbnail_image ');
+                //TODO
+                $this->deleteRestaurantThumbnailImage();
+            }
+            
             $result = Yii::$app->cloudinaryManager->upload(
                     $imageURL, [
-                      'public_id' => "restaurants/" . $restaurantName . "/thumbnail-image/" . $filename
+                'public_id' => "restaurants/" . $restaurantName . "/thumbnail-image/" . $filename
                     ]
             );
 
             if ($result || count($result) > 0) {
-
                 $this->thumbnail_image = basename($result['url']);
                 $this->save();
             }
-        } catch (\Exception $ex) {
-            Yii::error('Error when uploading venue photos to Cloudinry: ' . json_encode($ex));
+        } catch (\Cloudinary\Error $err) {
+            Yii::error('Error when uploading venue photos to Cloudinry: ' . json_encode($err));
         }
+    }
+
+    public function getThumbnailImage() {
+        $photo_url = [];
+
+        if ($this->thumbnail_image) {
+            $restaurantName = str_replace(' ', '', $this->name);
+            $url = 'https://res.cloudinary.com/vendor/image/upload/v1579525808/restaurants/'
+                    . $restaurantName . '/thumbnail-image/'
+                    . $this->thumbnail_image;
+            $photo_url = $url;
+        }
+
+        return $photo_url;
     }
 
     /**
      * Delete Restaurant's Thumbnail Image
      */
     public function deleteRestaurantThumbnailImage() {
-      $restaurantName = str_replace(' ', '', $this->name);
-      $imageURL =  "restaurants/" . $restaurantName . "/thumbnail-image/" . $this->thumbnail_image;
-      Yii::$app->cloudinaryManager->delete($imageURL);
+        Yii::error('enter deleteRestaurantThumbnailImage');
+        
+        $restaurantName = str_replace(' ', '', $this->name);
+        $imageURL = "restaurants/" . $restaurantName . "/thumbnail-image/" . $this->thumbnail_image;
+        try {
+            Yii::$app->cloudinaryManager->delete($imageURL);
+
+        } catch (\Cloudinary\Error $err) {
+            Yii::error('Error when uploading venue photos to Cloudinry: ' . json_encode($err));
+        }
     }
 
     public function beforeDelete() {
         $this->deleteAllRestaurantThumbnailImage();
         return parent::beforeDelete();
     }
-
 
     /**
      * Promotes current restaurant to open restaurant while disabling rest
