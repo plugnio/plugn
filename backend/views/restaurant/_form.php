@@ -10,6 +10,8 @@ use common\models\Area;
 use common\models\RestaurantDelivery;
 use common\models\RestaurantPaymentMethod;
 use common\models\PaymentMethod;
+use kartik\file\FileInput;
+
 
 $js = "
 let supportDeliveryInput = $('#supportDeliveryInput');
@@ -52,13 +54,15 @@ $this->registerJs($js);
 
     $areaQuery = Area::find()->asArray()->all();
     $restaurantDeliveryArray = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
-    
+
     $paymentMethodQuery = PaymentMethod::find()->asArray()->all();
     $paymentMethodArray = ArrayHelper::map($paymentMethodQuery, 'payment_method_id', 'payment_method_name');
 
     $sotredRestaurantDeliveryAreas = [];
+    $sotredRestaurantPaymentMethod = [];
+
     if ($model->restaurant_uuid != null) {
-        
+
         $sotredRestaurantDeliveryAreas = RestaurantDelivery::find()
                 ->select('area_id')
                 ->asArray()
@@ -66,8 +70,8 @@ $this->registerJs($js);
                 ->all();
 
         $sotredRestaurantDeliveryAreas = ArrayHelper::getColumn($sotredRestaurantDeliveryAreas, 'area_id');
-        
-        
+
+
         $sotredRestaurantPaymentMethod = RestaurantPaymentMethod::find()
                 ->select('payment_method_id')
                 ->asArray()
@@ -75,7 +79,7 @@ $this->registerJs($js);
                 ->all();
 
         $sotredRestaurantPaymentMethod = ArrayHelper::getColumn($sotredRestaurantPaymentMethod, 'payment_method_id');
-  
+
     }
 
 
@@ -89,7 +93,7 @@ $this->registerJs($js);
         'pluginOptions' => [
             'allowClear' => true
         ],
-    ]);
+    ])->label('Vendor');
     ?>
 
     <?=
@@ -106,7 +110,7 @@ $this->registerJs($js);
         ],
     ]);
     ?>
-    
+
     <?=
     $form->field($model, 'restaurant_payments_method')->widget(Select2::classname(), [
         'data' => $paymentMethodArray,
@@ -130,7 +134,19 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'tagline_ar')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'thumbnail_image')->textInput(['maxlength' => true]) ?>
+    <?=
+    $form->field($model, 'thumbnail_image')->widget(FileInput::classname(), [
+        'options' => ['accept' => 'image/*', 'multiple' => false
+        ],
+        'pluginOptions' => [
+            'showUpload' => false,
+            // 'initialPreview' => $model->getVenuePhotosURL(),
+            // 'initialPreviewAsData' => true,
+            // 'overwriteInitial' => true,
+            'maxFileSize' => 2800
+        ]
+    ]);
+    ?>
 
     <?= $form->field($model, 'logo')->textInput(['maxlength' => true]) ?>
 

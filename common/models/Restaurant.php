@@ -65,7 +65,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['vendor_id', 'name', 'thumbnail_image', 'logo', 'support_delivery', 'support_pick_up','restaurant_payments_method', 'restaurant_delivery_area'], 'required'],
+            [['vendor_id', 'name', 'logo', 'support_delivery', 'support_pick_up','restaurant_payments_method', 'restaurant_delivery_area'], 'required'],
             ['min_delivery_time', 'required', 'when' => function ($model) {
                     return $model->support_delivery == 1;
                 }, 'whenClient' => "function (attribute, value) {
@@ -76,6 +76,7 @@ class Restaurant extends \yii\db\ActiveRecord {
                 }, 'whenClient' => "function (attribute, value) {
                 return $('#supportPickupInput').val() == 1;
             }"],
+            [['thumbnail_image'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['restaurant_delivery_area','restaurant_payments_method'], 'safe'],
             [['vendor_id', 'restaurant_status', 'support_delivery', 'support_pick_up'], 'integer'],
             [['min_delivery_time', 'min_pickup_time', 'operating_from', 'operating_to', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
@@ -121,7 +122,7 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
-     * 
+     *
      * @return type
      */
     public function behaviors() {
@@ -168,6 +169,48 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Upload thumbnailImage  to cloudinary
+     * @param type $imageURL
+     */
+    public function uploadThumbnailImage($imageURL) {
+        Yii::error('enter uploadThumbnailImage');
+        
+        $filename = Yii::$app->security->generateRandomString();
+        $restaurantName = str_replace(' ', '', $this->name);
+
+        try {
+            $result = Yii::$app->cloudinaryManager->upload(
+                    $imageURL, [
+                      'public_id' => "restaurants/" . $restaurantName . "/thumbnail-image/" . $filename
+                    ]
+            );
+
+            if ($result || count($result) > 0) {
+
+                $this->thumbnail_image = basename($result['url']);
+                $this->save();
+            }
+        } catch (\Exception $ex) {
+            Yii::error('Error when uploading venue photos to Cloudinry: ' . json_encode($ex));
+        }
+    }
+
+    /**
+     * Delete Restaurant's Thumbnail Image
+     */
+    public function deleteRestaurantThumbnailImage() {
+      $restaurantName = str_replace(' ', '', $this->name);
+      $imageURL =  "restaurants/" . $restaurantName . "/thumbnail-image/" . $this->thumbnail_image;
+      Yii::$app->cloudinaryManager->delete($imageURL);
+    }
+
+    public function beforeDelete() {
+        $this->deleteAllRestaurantThumbnailImage();
+        return parent::beforeDelete();
+    }
+
+
+    /**
      * Promotes current restaurant to open restaurant while disabling rest
      */
     public function promoteToOpenRestaurant() {
@@ -195,9 +238,9 @@ class Restaurant extends \yii\db\ActiveRecord {
      * save restaurant delivery areas
      */
     public function saveRestaurantDeliveryArea($delivery_areas) {
-        
+
         RestaurantDelivery::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
-        
+
         foreach ($delivery_areas as $area_id) {
             $delivery_area = new RestaurantDelivery();
             $delivery_area->area_id = $area_id;
@@ -205,14 +248,14 @@ class Restaurant extends \yii\db\ActiveRecord {
             $delivery_area->save();
         }
     }
-    
+
     /**
      * save restaurant payment method
      */
     public function saveRestaurantPaymentMethod($payments_method) {
-        
+
         RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
-        
+
         foreach ($payments_method as $payment_method_id) {
             $payments_method = new RestaurantPaymentMethod();
             $payments_method->payment_method_id = $payment_method_id;
