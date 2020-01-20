@@ -178,8 +178,6 @@ class Restaurant extends \yii\db\ActiveRecord {
         $restaurantName = str_replace(' ', '', $this->name);
 
         try {
-            Yii::error(' thumbnail_image-> ' . $this->thumbnail_image);
-            
             $result = Yii::$app->cloudinaryManager->upload(
                     $imageURL, [
                 'public_id' => "restaurants/" . $restaurantName . "/thumbnail-image/" . $filename
@@ -197,11 +195,13 @@ class Restaurant extends \yii\db\ActiveRecord {
 
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
-                    Yii::error('aftersave');
+                    Yii::error(json_encode($changedAttributes));
 
-//        if(isset($changedAttributes['thumbnail_image']){
-//            Yii::error('aftersave');
-//        }
+        if(!$insert && isset($changedAttributes['thumbnail_image'])){
+            if($changedAttributes['thumbnail_image']){
+              $this->deleteRestaurantThumbnailImage($changedAttributes['thumbnail_image']);
+            }
+        }
     }
     
     public function getThumbnailImage() {
@@ -221,11 +221,14 @@ class Restaurant extends \yii\db\ActiveRecord {
     /**
      * Delete Restaurant's Thumbnail Image
      */
-    public function deleteRestaurantThumbnailImage() {
-        Yii::error('enter deleteRestaurantThumbnailImage');
+    public function deleteRestaurantThumbnailImage($thumbnail_image = null) {
+        
+        if(!$thumbnail_image)
+            $thumbnail_image = $this->thumbnail_image;
         
         $restaurantName = str_replace(' ', '', $this->name);
-        $imageURL = "restaurants/" . $restaurantName . "/thumbnail-image/" . $this->thumbnail_image;
+        $imageURL = "restaurants/" . $restaurantName . "/thumbnail-image/" . $thumbnail_image;
+        
         try {
             Yii::$app->cloudinaryManager->delete($imageURL);
 
