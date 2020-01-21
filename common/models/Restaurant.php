@@ -224,7 +224,7 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
-     * 
+     *
      * @param type $insert
      * @param type $changedAttributes
      */
@@ -294,7 +294,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         try {
             Yii::$app->cloudinaryManager->delete($imageURL);
         } catch (\Cloudinary\Error $err) {
-            Yii::error('Error when uploading venue photos to Cloudinry: ' . json_encode($err));
+            Yii::error('Error when uploading logo photos to Cloudinry: ' . json_encode($err));
         }
     }
 
@@ -312,13 +312,13 @@ class Restaurant extends \yii\db\ActiveRecord {
         try {
             Yii::$app->cloudinaryManager->delete($imageURL);
         } catch (\Cloudinary\Error $err) {
-            Yii::error('Error when uploading venue photos to Cloudinry: ' . json_encode($err));
+            Yii::error('Error when uploading thumbnail image to Cloudinry: ' . json_encode($err));
         }
     }
 
     public function beforeDelete() {
-    
-  
+
+
         if (!parent::beforeDelete()) {
             return false;
         }
@@ -372,7 +372,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      * save restaurant payment method
      */
     public function saveRestaurantPaymentMethod($payments_method) {
-        
+
         RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
 
         foreach ($payments_method as $payment_method_id) {

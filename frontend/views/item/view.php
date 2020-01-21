@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Item */
@@ -17,16 +18,19 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Update', ['update', 'id' => $model->item_uuid], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->item_uuid], [
+        <?=
+        Html::a('Delete', ['delete', 'id' => $model->item_uuid], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
                 'method' => 'post',
             ],
-        ]) ?>
+        ])
+        ?>
     </p>
 
-    <?= DetailView::widget([
+    <?=
+    DetailView::widget([
         'model' => $model,
         'attributes' => [
             'item_uuid',
@@ -41,6 +45,26 @@ $this->params['breadcrumbs'][] = $this->title;
             'item_created_at',
             'item_updated_at',
         ],
-    ]) ?>
+    ])
+    ?>
+
+    <h2>Options</h2>
+
+    <p>
+        <?= Html::a('Create Option', ['option/create' , 'item_uuid' => $model->item_uuid], ['class' => 'btn btn-success']) ?>
+    </p>
+
+    <?=
+    GridView::widget([
+        'dataProvider' => $itemOptionsDataProvider,
+        'columns' => [
+            'option_name',
+            'option_name_ar',
+            ['class' => 'yii\grid\ActionColumn', 'controller' => 'option'],
+        ],
+    ]);
+    ?>
+
+
 
 </div>

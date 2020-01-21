@@ -12,13 +12,12 @@ use yii\filters\VerbFilter;
 /**
  * ItemController implements the CRUD actions for Item model.
  */
-class ItemController extends Controller
-{
+class ItemController extends Controller {
+
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -33,14 +32,13 @@ class ItemController extends Controller
      * Lists all Item models.
      * @return mixed
      */
-    public function actionIndex()
-    {
+    public function actionIndex() {
         $searchModel = new ItemSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+                    'searchModel' => $searchModel,
+                    'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -50,10 +48,18 @@ class ItemController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
-    {
+    public function actionView($id) {
+
+        $item_model = $this->findModel($id);
+
+        // Item options
+        $itemOptionsDataProvider = new \yii\data\ActiveDataProvider([
+            'query' => $item_model->getOptions(),
+        ]);
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+                    'model' => $this->findModel($id),
+                    'itemOptionsDataProvider' => $itemOptionsDataProvider,
         ]);
     }
 
@@ -62,16 +68,27 @@ class ItemController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
-    {
+    public function actionCreate() {
         $model = new Item();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->item_uuid]);
-        }
+        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
 
+            if ($model->save()) {
+
+                $item_image = \yii\web\UploadedFile::getInstances($model, 'item_image');
+
+                if ($item_image)
+                    $model->uploadItemImage($item_image[0]->tempName);
+
+                if ($model->items_category)
+                    $model->saveItemsCategory($model->items_category);
+
+                return $this->redirect(['view', 'id' => $model->item_uuid]);
+            }
+        }
+        
         return $this->render('create', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
@@ -82,16 +99,28 @@ class ItemController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
-    {
+    public function actionUpdate($id) {
+        
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->item_uuid]);
+        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
+
+            if ($model->save()) {
+
+                $item_image = \yii\web\UploadedFile::getInstances($model, 'item_image');
+
+                if ($item_image)
+                    $model->uploadItemImage($item_image[0]->tempName);
+
+                if ($model->items_category)
+                    $model->saveItemsCategory($model->items_category);
+
+                return $this->redirect(['view', 'id' => $model->item_uuid]);
+            }
         }
 
         return $this->render('update', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
@@ -102,8 +131,7 @@ class ItemController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
-    {
+    public function actionDelete($id) {
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
@@ -116,12 +144,12 @@ class ItemController extends Controller
      * @return Item the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
-    {
+    protected function findModel($id) {
         if (($model = Item::findOne($id)) !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
 }

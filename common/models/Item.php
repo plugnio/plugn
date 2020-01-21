@@ -25,10 +25,12 @@ use yii\behaviors\TimestampBehavior;
  *
  * @property CategoryItem[] $categoryItems
  * @property Category[] $categories
- * @property Restaurant $restaurantUu
+ * @property Restaurant $restaurant
  * @property Option[] $options
  */
 class Item extends \yii\db\ActiveRecord {
+
+    public $items_category;
 
     /**
      * {@inheritdoc}
@@ -42,10 +44,11 @@ class Item extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['item_name'], 'required'],
+            [['item_name', 'items_category'], 'required'],
             [['sort_number', 'stock_qty'], 'integer'],
             [['price'], 'number'],
-            [['item_created_at', 'item_updated_at'], 'safe'],
+            [['item_image'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
+            [['item_created_at', 'item_updated_at', 'items_category'], 'safe'],
             [['item_uuid'], 'string', 'max' => 300],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['item_name', 'item_name_ar', 'item_image'], 'string', 'max' => 255],
@@ -70,6 +73,7 @@ class Item extends \yii\db\ActiveRecord {
             'stock_qty' => 'Stock Qty',
             'item_image' => 'Item Image',
             'price' => 'Price',
+            'items_category' => 'Category',
             'item_created_at' => 'Item Created At',
             'item_updated_at' => 'Item Updated At',
         ];
@@ -104,10 +108,118 @@ class Item extends \yii\db\ActiveRecord {
 
     public function beforeSave($insert) {
 
-        if($insert)
+        if ($insert)
             $this->restaurant_uuid = Yii::$app->user->identity->restaurant_uuid;
 
         return parent::beforeSave($insert);
+    }
+
+    /**
+     * save items category
+     */
+    public function saveItemsCategory($items_categories) {
+
+        CategoryItem::deleteAll(['item_uuid' => $this->item_uuid]);
+
+        foreach ($items_categories as $category_id) {
+            $item_category = new CategoryItem();
+            $item_category->category_id = $category_id;
+            $item_category->item_uuid = $this->item_uuid;
+            $item_category->save();
+        }
+    }
+
+    /**
+     * Upload item image  to cloudinary
+     * @param type $imageURL
+     */
+    public function uploadItemImage($imageURL) {
+
+        $filename = Yii::$app->security->generateRandomString();
+        $restaurantName = str_replace(' ', '', $this->restaurant->name);
+        $itemName = str_replace(' ', '', $this->item_name);
+
+        try {
+            $result = Yii::$app->cloudinaryManager->upload(
+                    $imageURL, [
+                'public_id' => "restaurants/" . $restaurantName . "/items/" . $filename
+                    ]
+            );
+
+            if ($result || count($result) > 0) {
+                $this->item_image = basename($result['url']);
+                $this->save();
+            }
+        } catch (\Cloudinary\Error $err) {
+            Yii::error('Error when uploading venue photos to Cloudinry: ' . json_encode($err));
+        }
+    }
+
+    /**
+     * Return item image url to dispaly it on backend
+     * @return string
+     */
+    public function getItemImage() {
+        $photo_url = [];
+
+        if ($this->item_image) {
+            $restaurantName = str_replace(' ', '', $this->restaurant->name);
+            $url = 'https://res.cloudinary.com/vendor/image/upload/v1579555687/restaurants/'
+                    . $restaurantName . '/items/'
+                    . $this->item_image;
+            $photo_url = $url;
+        }
+
+        return $photo_url;
+    }
+
+    /**
+     * Delete Item's image
+     */
+    public function deleteItemImage($item_image = null) {
+
+        if (!$item_image)
+            $item_image = $this->item_image;
+
+        $restaurantName = str_replace(' ', '', $this->restaurant->name);
+        $imageURL = "restaurants/" . $restaurantName . "/items/" . $item_image;
+
+        try {
+            Yii::$app->cloudinaryManager->delete($imageURL);
+        } catch (\Cloudinary\Error $err) {
+            Yii::error('Error when uploading item image to Cloudinry: ' . json_encode($err));
+        }
+    }
+
+    /**
+     * 
+     * @param type $insert
+     * @param type $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes) {
+        parent::afterSave($insert, $changedAttributes);
+
+        if (!$insert && isset($changedAttributes['item_image'])) {
+            if ($changedAttributes['item_image']) {
+                $this->deleteItemImage($changedAttributes['item_image']);
+            }
+        }
+    }
+
+    /**
+     * 
+     * @return boolean
+     */
+    public function beforeDelete() {
+
+
+        if (!parent::beforeDelete()) {
+            return false;
+        }
+
+        $this->deleteItemImage();
+
+        return true;
     }
 
     /**
@@ -133,7 +245,7 @@ class Item extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantUu() {
+    public function getRestaurant() {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
