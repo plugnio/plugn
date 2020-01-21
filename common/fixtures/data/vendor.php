@@ -2,14 +2,14 @@
 
 return [
     'vendor0' => [
-        'vendor_id' => 2,
-        'vendor_name' => 'Gudrun',
-        'vendor_auth_key' => 'VgL7eKHUtbVVm8IFln3SsRjl1b5P6Mns',
-        'vendor_password_hash' => '$2y$13$nfquaGENwecvUQRPiEvjge7YHjkIuEgKJzz/Tt9ksIbN8W3QrXKfm',
-        'vendor_password_reset_token' => '02uCXROti0bv4pnByNIXVAc9wgDxn1hT',
-        'vendor_email' => 'shanahan.valentina@heidenreich.com',
+        'vendor_id' => 47,
+        'vendor_name' => 'Verdie',
+        'vendor_auth_key' => 'lWQ4YuWauor3nii-ESHrUV1F25vWFJKC',
+        'vendor_password_hash' => '$2y$13$ylbaIlXdrRmeyT7ro3oc1.kH14NENWAVWGkG9kxJ3fvkj8sYaM3V6',
+        'vendor_password_reset_token' => 'q8pGbgrsp8sg-3HcoPJydns-87lM6JcE',
+        'vendor_email' => 'sterling73@cartwright.com',
         'vendor_status' => 10,
-        'vendor_created_at' => '2007-06-16 09:52:55',
-        'vendor_updated_at' => '2017-05-08 22:54:30',
+        'vendor_created_at' => '2010-11-29 21:03:55',
+        'vendor_updated_at' => '2007-12-09 14:39:05',
     ],
 ];

@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'vendor_id' => $faker->randomDigit,
+    'vendor_id' => $faker->numberBetween(0,100),
     'vendor_name' => $faker->firstName,
     'vendor_auth_key' => Yii::$app->getSecurity()->generateRandomString(32),
     'vendor_password_hash' => Yii::$app->getSecurity()->generatePasswordHash('123456'),

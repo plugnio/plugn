@@ -1,7 +1,8 @@
 <?php
 
-$index1 = $index % 50;//faker->unique()->numberBetween(0, 50);
-$vendor_id = Yii::$app->db->createCommand('SELECT vendor_id from vendor limit '.$index1.',1')->queryScalar();
+$index1 = $index % 5;//faker->unique()->numberBetween(0, 50);
+
+$vendor_id = Yii::$app->db->createCommand('SELECT vendor_id from vendor')->queryScalar();
 
 $area = Yii::$app->db->createCommand('SELECT * from area limit '.$index1.',1')->queryOne();
 

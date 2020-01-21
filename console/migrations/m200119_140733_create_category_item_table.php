@@ -21,12 +21,11 @@ class m200119_140733_create_category_item_table extends Migration
 
         
         $this->createTable('{{%category_item}}', [
+            'category_item_id' => $this->primaryKey(),
             'category_id' => $this->integer()->notNull(),
             'item_uuid' => $this->string(300)->notNull(),
         ],$tableOptions);
         
-       $this->addPrimaryKey('PK', 'category_item', ['category_id','item_uuid']);
-
         // creates index for column `item_uuid`
         $this->createIndex(
             'idx-category_item-item_uuid',

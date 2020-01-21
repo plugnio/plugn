@@ -4,11 +4,11 @@ $index1 = $index % 500; //faker->unique()->numberBetween(0, 500);
 $index2 = $index % 50; //faker->unique()->numberBetween(0, 50);
 
 
-$restaurant= Yii::$app->db->createCommand('SELECT * from restaurant')->queryOne();
+$restaurant_uuid = Yii::$app->db->createCommand('SELECT restaurant_uuid from restaurant')->queryScalar();
 $area_id = Yii::$app->db->createCommand('SELECT area_id from area limit ' . $index2 . ',1')->queryScalar();
 
 return [
     'area_id' => $area_id,
-    'restaurant_uuid' => $restaurant['restaurant_uuid'],
+    'restaurant_uuid' => $restaurant_uuid,
 ];
 
