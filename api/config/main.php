@@ -52,8 +52,10 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'restaurant-menu',
+                        'GET detail' => 'item-data',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options',
                     ]
                 ],
             ],

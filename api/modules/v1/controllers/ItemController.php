@@ -63,24 +63,38 @@ class ItemController extends Controller {
 
         $restaurantMenu = Category::find()
                 ->where(['restaurant_uuid' => $restaurant_uuid])
-                ->with('items')
+                ->with('items', 'items.options', 'items.options.extraOptions')
                 ->orderBy(['sort_number' => SORT_ASC])
                 ->asArray()
                 ->all();
-        
-        
+
+
         foreach ($restaurantMenu as $item) {
             unset($item['categoryItems']);
         }
-        
+
         foreach ($restaurantMenu as $key => $item) {
-             unset($restaurantMenu[$key]['categoryItems']);
+            unset($restaurantMenu[$key]['categoryItems']);
         }
-        
+
         return [
             'restaurant' => $restaurant,
             'restaurantMenu' => $restaurantMenu
         ];
+    }
+
+    /**
+     * Return item's data
+     */
+    public function actionItemData() {
+        $item_uuid = Yii::$app->request->get("item_uuid");
+        $item_model = Item::find()
+                ->where(['item_uuid' => $item_uuid])
+                ->with('options', 'options.extraOptions','restaurant')
+                ->asArray()
+                ->one();
+ 
+        return $item_model;
     }
 
 }
