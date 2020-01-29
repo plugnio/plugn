@@ -58,13 +58,23 @@ class RestaurantDelivery extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Area::className(), ['area_id' => 'area_id']);
     }
+    
+    /**
+     * Gets query for [[City]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCity()
+    {
+        return $this->hasOne(City::className(), ['city_id' => 'city_id'])->via('area');
+    }
 
     /**
      * Gets query for [[RestaurantUu]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantUu()
+    public function getRestaurant()
     {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }

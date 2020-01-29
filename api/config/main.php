@@ -58,6 +58,16 @@ return [
                         'OPTIONS detail' => 'options',
                     ]
                 ],
+                [ // CityController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/city',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                    ]
+                ],
             ],
         ],
     ],

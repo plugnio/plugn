@@ -57,7 +57,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             'extra_option_name',
             'extra_option_name_ar',
-            ['class' => 'yii\grid\ActionColumn', 'controller' => 'option'],
+            ['class' => 'yii\grid\ActionColumn', 'controller' => 'extra-option'],
         ],
     ]);
     ?>
