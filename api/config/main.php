@@ -60,7 +60,7 @@ return [
                 ],
                 [ // CityController
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/city',
+                    'controller' => 'v1/restaurant-delivery',
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',

@@ -55,4 +55,17 @@ class City extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Area::className(), ['city_id' => 'city_id']);
     }
+    
+        /**
+     * Gets query for [[RestaurantDeliveries]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurantDeliveries()
+    {
+        return $this->hasMany(RestaurantDelivery::className(), ['area_id' => 'area_id'])->via('areas');
+    }
+
+    
+    
 }

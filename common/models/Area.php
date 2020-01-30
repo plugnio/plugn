@@ -64,7 +64,7 @@ class Area extends \yii\db\ActiveRecord
      */
     public function getCity()
     {
-        return $this->hasOne(City::className(), ['city_id' => 'city_id'])->where(['city_id'=>1]);
+        return $this->hasOne(City::className(), ['city_id' => 'city_id']);
     }
 
     /**

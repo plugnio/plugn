@@ -6,8 +6,9 @@ use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use common\models\City;
+use common\models\RestaurantDelivery;
 
-class CityController extends Controller {
+class RestaurantDeliveryController extends Controller {
 
     public function behaviors() {
         $behaviors = parent::behaviors();
@@ -50,16 +51,32 @@ class CityController extends Controller {
         return $actions;
     }
 
-
     /**
      * Return City list
      */
     public function actionList() {
-       $query = \common\models\Area::find()->with('restaurantDelivery');
- 
-        return new ActiveDataProvider([
-            'query' => $query->asArray()
-        ]);
+
+
+        $allCitiesData = City::find()
+                ->asArray()
+                ->all();
+
+        $restaurantDeliveryAreas = RestaurantDelivery::find()
+                ->asArray()
+                ->with('area')
+                ->all();
+
+
+        foreach ($restaurantDeliveryAreas as $key => $delivery_area) {
+            foreach ($allCitiesData as $key => $city) {
+                if ($city['city_id'] == $delivery_area['area']['city_id']) {
+                    $allCitiesData[$key]['areas'][] = $delivery_area['area'];
+                }
+            }
+        }
+
+        return $allCitiesData;
+
     }
 
 }
