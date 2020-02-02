@@ -45,6 +45,7 @@ AppAsset::register($this);
         ['label' => 'Restaurant', 'url' => ['/restaurant/index']],
         ['label' => 'Category', 'url' => ['/category/index']],
         ['label' => 'Items', 'url' => ['/item/index']],
+        ['label' => 'Orders', 'url' => ['/order/index']],
       ];
 
         $menuItems[] = '<li>'
