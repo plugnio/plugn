@@ -38,7 +38,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'payment_method_id')->textInput() ?>
 
-    <?= $form->field($model, 'payment_method')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'payment_method_name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'order_status')->textInput() ?>
 

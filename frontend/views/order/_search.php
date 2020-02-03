@@ -43,7 +43,7 @@ use yii\widgets\ActiveForm;
 
     <?php // echo $form->field($model, 'payment_method_id') ?>
 
-    <?php // echo $form->field($model, 'payment_method') ?>
+    <?php // echo $form->field($model, 'payment_method_name') ?>
 
     <?php // echo $form->field($model, 'order_status') ?>
 

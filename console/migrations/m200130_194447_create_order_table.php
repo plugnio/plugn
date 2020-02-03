@@ -22,6 +22,7 @@ class m200130_194447_create_order_table extends Migration {
         
         $this->createTable('{{%order}}', [
             'order_id' => $this->bigPrimaryKey(),
+            'restaurant_uuid' => $this->char(60),
             'area_id' => $this->integer()->notNull(),
             'area_name' => $this->string(255)->notNull(),
             'area_name_ar' => $this->string(255)->notNull(),
@@ -35,10 +36,27 @@ class m200130_194447_create_order_table extends Migration {
             'customer_phone_number' => $this->string(255)->notNull(),
             'customer_email' => $this->string(255),
             'payment_method_id' => $this->integer()->notNull(),
-            'payment_method' => $this->string()->notNull(),
+            'payment_method_name' => $this->string()->notNull(),
             'order_status' => $this->tinyInteger(1),
         ],$tableOptions);
 
+        
+        // creates index for column `restaurant_uuid`
+        $this->createIndex(
+                'idx-order-restaurant_uuid',
+                'order', 
+                'restaurant_uuid'
+        );
+        
+        // add foreign key for table `order`
+        $this->addForeignKey(
+                'fk-order-restaurant_uuid',
+                'order', 
+                'restaurant_uuid',
+                'restaurant',
+                'restaurant_uuid',
+                'CASCADE'
+        );
         
         // creates index for column `area_id`
         $this->createIndex(
@@ -79,12 +97,11 @@ class m200130_194447_create_order_table extends Migration {
         $this->createTable('{{%order_item}}', [
             'order_item_id' => $this->bigPrimaryKey(),
             'order_id' => $this->bigInteger()->notNull(),
-            'item_uuid' => $this->string(300)->notNull(),
+            'item_uuid' => $this->string(300),
             'item_name' => $this->string(255)->notNull(),
             'item_price' => $this->float()->notNull(),
             'qty' => $this->integer(),
-            'instructions' => $this->string(255),
-            'order_status' => $this->tinyInteger(1),
+            'instructions' => $this->string(255)
         ],$tableOptions);
 
         // creates index for column `order_id`
@@ -118,13 +135,14 @@ class m200130_194447_create_order_table extends Migration {
                 'item_uuid', 
                 'item',
                 'item_uuid',
-                'CASCADE'
+                'SET NULL',
+                'SET NULL'
         );
 
         $this->createTable('{{%order_item_extra_options}}', [
             'order_item_extra_options_id' => $this->bigPrimaryKey()->notNull(),
             'order_item_id' => $this->bigInteger()->notNull(),
-            'extra_option_id' => $this->integer()->notNull(),
+            'extra_option_id' => $this->integer(),
             'extra_option_name' => $this->string(255)->notNull(),
             'extra_option_name_ar' => $this->string(255)->notNull()->notNull(),
             'extra_option_price' => $this->float()->notNull(),
@@ -163,7 +181,8 @@ class m200130_194447_create_order_table extends Migration {
                 'extra_option_id', 
                 'extra_option',
                 'extra_option_id',
-                'CASCADE'
+                'SET NULL',
+                'SET NULL'
         );
         
     }

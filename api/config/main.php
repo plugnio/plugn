@@ -1,10 +1,7 @@
 <?php
 
 $params = array_merge(
-    require(__DIR__ . '/../../common/config/params.php'),
-    require(__DIR__ . '/../../common/config/params-local.php'),
-    require(__DIR__ . '/params.php'),
-    require(__DIR__ . '/params-local.php')
+        require(__DIR__ . '/../../common/config/params.php'), require(__DIR__ . '/../../common/config/params-local.php'), require(__DIR__ . '/params.php'), require(__DIR__ . '/params-local.php')
 );
 
 return [
@@ -46,7 +43,7 @@ return [
             'enableStrictParsing' => false,
             'showScriptName' => false,
             'rules' => [
-                [ // ItemController
+                [// ItemController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/item',
                     'pluralize' => false,
@@ -58,7 +55,7 @@ return [
                         'OPTIONS detail' => 'options',
                     ]
                 ],
-                [ // CityController
+                [// CityController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/restaurant-delivery',
                     'pluralize' => false,
@@ -66,6 +63,32 @@ return [
                         'GET' => 'list',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                    ]
+                ],
+                [// PaymentMethodController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/payment-method',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET <id>' => 'list-all-restaurants-payment-method',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options',
+                    ]
+                ],
+                [// OrderController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/order',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'POST <id>' => 'create-an-order',
+                        'POST item/<id>' => 'add-item-to-the-cart',
+                        'POST extra-option/<id>' => 'add-extra-option-to-the-cart',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options',
+                        'OPTIONS item/<id>' => 'options',
+                        'OPTIONS extra-option/<id>' => 'options',
                     ]
                 ],
             ],

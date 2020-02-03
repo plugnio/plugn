@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "order".
  *
  * @property int $order_id
+ * @property string|null $restaurant_uuid 
  * @property int $area_id
  * @property string $area_name
  * @property string $area_name_ar
@@ -21,11 +22,12 @@ use Yii;
  * @property string $customer_phone_number
  * @property string|null $customer_email
  * @property int $payment_method_id
- * @property string $payment_method
+ * @property string $payment_method_name
  * @property int|null $order_status
  *
  * @property Area $area
  * @property PaymentMethod $paymentMethod
+ * @property Restaurant $restaurant
  * @property OrderItem[] $orderItems
  */
 class Order extends \yii\db\ActiveRecord {
@@ -42,11 +44,14 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['area_id', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'house_number', 'customer_name', 'customer_phone_number', 'payment_method_id', 'payment_method'], 'required'],
+            [['area_id', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'house_number', 'customer_name', 'customer_phone_number', 'payment_method_id', 'payment_method_name'], 'required'],
             [['area_id', 'payment_method_id', 'order_status'], 'integer'],
-            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method'], 'string', 'max' => 255],
+            [['restaurant_uuid'], 'string', 'max' => 60],
+            [['customer_phone_number'], 'number'],
+            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
             [['payment_method_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
+            [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
 
@@ -56,6 +61,7 @@ class Order extends \yii\db\ActiveRecord {
     public function attributeLabels() {
         return [
             'order_id' => 'Order ID',
+            'restaurant_uuid' => 'Restaurant Uuid',
             'area_id' => 'Area ID',
             'area_name' => 'Area Name',
             'area_name_ar' => 'Area Name Ar',
@@ -69,9 +75,18 @@ class Order extends \yii\db\ActiveRecord {
             'customer_phone_number' => 'Customer Phone Number',
             'customer_email' => 'Customer Email',
             'payment_method_id' => 'Payment Method ID',
-            'payment_method' => 'Payment Method',
+            'payment_method_name' => 'Payment Method Name',
             'order_status' => 'Order Status',
         ];
+    }
+
+    /**
+     * Gets query for [[Restaurant]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurant() {
+        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**

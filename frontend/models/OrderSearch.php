@@ -18,7 +18,7 @@ class OrderSearch extends Order
     {
         return [
             [['order_id', 'area_id', 'payment_method_id', 'order_status'], 'integer'],
-            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method'], 'safe'],
+            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name'], 'safe'],
         ];
     }
 

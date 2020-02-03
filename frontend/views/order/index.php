@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'customer_phone_number',
             //'customer_email:email',
             //'payment_method_id',
-            //'payment_method',
+            //'payment_method_name',
             //'order_status',
 
             ['class' => 'yii\grid\ActionColumn'],

@@ -14,7 +14,6 @@ use Yii;
  * @property float $item_price
  * @property int|null $qty
  * @property string|null $instructions
- * @property int|null $order_status
  *
  * @property Item $itemUu
  * @property Order $order
@@ -37,7 +36,7 @@ class OrderItem extends \yii\db\ActiveRecord
     {
         return [
             [['order_id', 'item_uuid', 'item_name', 'item_price'], 'required'],
-            [['order_id', 'qty', 'order_status'], 'integer'],
+            [['order_id', 'qty'], 'integer'],
             [['item_price'], 'number'],
             [['item_uuid'], 'string', 'max' => 300],
             [['item_name', 'instructions'], 'string', 'max' => 255],
@@ -59,7 +58,6 @@ class OrderItem extends \yii\db\ActiveRecord
             'item_price' => 'Item Price',
             'qty' => 'Qty',
             'instructions' => 'Instructions',
-            'order_status' => 'Order Status',
         ];
     }
 
