@@ -15,7 +15,7 @@ use Yii;
  * @property int|null $qty
  * @property string|null $instructions
  *
- * @property Item $itemUu
+ * @property Item $item
  * @property Order $order
  * @property OrderItemExtraOptions[] $orderItemExtraOptions
  */
@@ -66,9 +66,9 @@ class OrderItem extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItemUu()
+    public function getItem()
     {
-        return $this->hasOne(Item::className(), ['item_uuid' => 'item_uuid'])->inverseOf('orderItems');
+        return $this->hasOne(Item::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -78,7 +78,7 @@ class OrderItem extends \yii\db\ActiveRecord
      */
     public function getOrder()
     {
-        return $this->hasOne(Order::className(), ['order_id' => 'order_id'])->inverseOf('orderItems');
+        return $this->hasOne(Order::className(), ['order_id' => 'order_id']);
     }
 
     /**
@@ -88,6 +88,6 @@ class OrderItem extends \yii\db\ActiveRecord
      */
     public function getOrderItemExtraOptions()
     {
-        return $this->hasMany(OrderItemExtraOptions::className(), ['order_item_id' => 'order_item_id'])->inverseOf('orderItem');
+        return $this->hasMany(OrderItemExtraOptions::className(), ['order_item_id' => 'order_item_id']);
     }
 }

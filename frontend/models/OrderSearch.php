@@ -75,7 +75,7 @@ class OrderSearch extends Order
             ->andFilterWhere(['like', 'customer_name', $this->customer_name])
             ->andFilterWhere(['like', 'customer_phone_number', $this->customer_phone_number])
             ->andFilterWhere(['like', 'customer_email', $this->customer_email])
-            ->andFilterWhere(['like', 'payment_method', $this->payment_method]);
+            ->andFilterWhere(['like', 'payment_method_name', $this->payment_method_name]);
 
         return $dataProvider;
     }

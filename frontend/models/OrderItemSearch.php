@@ -17,7 +17,7 @@ class OrderItemSearch extends OrderItem
     public function rules()
     {
         return [
-            [['order_item_id', 'order_id', 'qty', 'order_status'], 'integer'],
+            [['order_item_id', 'order_id', 'qty'], 'integer'],
             [['item_uuid', 'item_name', 'instructions'], 'safe'],
             [['item_price'], 'number'],
         ];
@@ -63,7 +63,6 @@ class OrderItemSearch extends OrderItem
             'order_id' => $this->order_id,
             'item_price' => $this->item_price,
             'qty' => $this->qty,
-            'order_status' => $this->order_status,
         ]);
 
         $query->andFilterWhere(['like', 'item_uuid', $this->item_uuid])

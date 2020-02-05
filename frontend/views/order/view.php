@@ -46,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'customer_name',
             'customer_phone_number',
             'customer_email:email',
-            'payment_method_id',
+//            'payment_method_id',
             'payment_method_name',
             'order_status',
         ],
@@ -55,28 +55,17 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h2>Items</h2>
 
-    <?=
-    GridView::widget([
-        'dataProvider' => $orderItems,
-        'columns' => [
-            'item_name',
-            'qty',
-            'instructions',
-            ['class' => 'yii\grid\ActionColumn', 'controller' => 'option'],
-        ],
-    ]);
-    ?>
-    
-
-    <h2>Extra options</h2>
 
     <?=
     GridView::widget([
         'dataProvider' => $itemsExtraOpitons,
         'columns' => [
+            'orderItem.item.item_name',
+            'orderItem.qty',
+            'orderItem.item_price:currency',
+            'orderItem.instructions',
             'extra_option_name',
-            'extra_option_name_ar',
-            ['class' => 'yii\grid\ActionColumn', 'controller' => 'option'],
+            ['class' => 'yii\grid\ActionColumn', 'controller' => 'order-item-extra-options'],
         ],
     ]);
     ?>

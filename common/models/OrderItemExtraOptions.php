@@ -58,6 +58,16 @@ class OrderItemExtraOptions extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[Order]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrder()
+    {
+        return $this->hasOne(Order::className(), ['order_id' => 'order_id'])->via('orderItem');
+    }
+    
+    /**
      * Gets query for [[ExtraOption]].
      *
      * @return \yii\db\ActiveQuery
