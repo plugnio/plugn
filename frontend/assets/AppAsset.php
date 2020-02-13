@@ -31,6 +31,11 @@ use yii\web\AssetBundle;
        'css/webarch.css',
      ];
      public $js = [
+       'http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js',
+       'assets/plugins/jquery-morris-chart/js/morris.min.js',
+       'assets/plugins/jquery-easy-pie-chart/js/jquery.easypiechart.min.js',
+       'assets/plugins/jquery-flot/jquery.flot.animator.min.js',
+       'assets/js/charts.js',
        'assets/plugins/pace/pace.min.js',
        'assets/plugins/jquery/jquery-1.11.3.min.js',
        'assets/plugins/bootstrapv3/js/bootstrap.min.js',

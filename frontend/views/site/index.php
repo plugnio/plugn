@@ -4,50 +4,135 @@
 
 $this->title = 'My Yii Application';
 ?>
-<div class="site-index">
+<?php
 
-    <div class="jumbotron">
-        <h1>Congratulations!</h1>
+/* @var $this yii\web\View */
 
-        <p class="lead">You have successfully created your Yii-powered application.</p>
-
-        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
-    </div>
-
-    <div class="body-content">
-
-        <div class="row">
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
+$this->title = 'My Yii Application';
+?>
+<div class="row">
+            <div class="col-md-4 col-vlg-3 col-sm-6">
+              <div class="tiles green m-b-10">
+                <div class="tiles-body">
+                  <div class="controller">
+                    <a href="javascript:;" class="reload"></a>
+                    <a href="javascript:;" class="remove"></a>
+                  </div>
+                  <div class="tiles-title text-black">OVERALL SALES </div>
+                  <div class="widget-stats">
+                    <div class="wrapper transparent">
+                      <span class="item-title">Overall Visits</span> <span class="item-count animate-number semi-bold" data-value="2415" data-animation-duration="700">2,415</span>
+                    </div>
+                  </div>
+                  <div class="widget-stats">
+                    <div class="wrapper transparent">
+                      <span class="item-title">Today's</span> <span class="item-count animate-number semi-bold" data-value="751" data-animation-duration="700">751</span>
+                    </div>
+                  </div>
+                  <div class="widget-stats ">
+                    <div class="wrapper last">
+                      <span class="item-title">Monthly</span> <span class="item-count animate-number semi-bold" data-value="1547" data-animation-duration="700">1,547</span>
+                    </div>
+                  </div>
+                  <div class="progress transparent progress-small no-radius m-t-20" style="width:90%">
+                    <div class="progress-bar progress-bar-white animate-progress-bar" data-percentage="64.8%" style="width: 64.8%;"></div>
+                  </div>
+                  <div class="description"> <span class="text-white mini-description ">4% higher <span class="blend">than last month</span></span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
+            <div class="col-md-4 col-vlg-3 col-sm-6">
+              <div class="tiles blue m-b-10">
+                <div class="tiles-body">
+                  <div class="controller">
+                    <a href="javascript:;" class="reload"></a>
+                    <a href="javascript:;" class="remove"></a>
+                  </div>
+                  <div class="tiles-title text-black">OVERALL VISITS </div>
+                  <div class="widget-stats">
+                    <div class="wrapper transparent">
+                      <span class="item-title">Overall Visits</span> <span class="item-count animate-number semi-bold" data-value="15489" data-="" animation-duration="700">15,489</span>
+                    </div>
+                  </div>
+                  <div class="widget-stats">
+                    <div class="wrapper transparent">
+                      <span class="item-title">Today's</span> <span class="item-count animate-number semi-bold" data-value="551" data-animation-duration="700">551</span>
+                    </div>
+                  </div>
+                  <div class="widget-stats ">
+                    <div class="wrapper last">
+                      <span class="item-title">Monthly</span> <span class="item-count animate-number semi-bold" data-value="1450" data-animation-duration="700">1,450</span>
+                    </div>
+                  </div>
+                  <div class="progress transparent progress-small no-radius m-t-20" style="width:90%">
+                    <div class="progress-bar progress-bar-white animate-progress-bar" data-percentage="54%" style="width: 54%;"></div>
+                  </div>
+                  <div class="description"> <span class="text-white mini-description ">4% higher <span class="blend">than last month</span></span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
+            <div class="col-md-4 col-vlg-3 col-sm-6">
+              <div class="tiles purple m-b-10">
+                <div class="tiles-body">
+                  <div class="controller">
+                    <a href="javascript:;" class="reload"></a>
+                    <a href="javascript:;" class="remove"></a>
+                  </div>
+                  <div class="tiles-title text-black">SERVER LOAD </div>
+                  <div class="widget-stats">
+                    <div class="wrapper transparent">
+                      <span class="item-title">Overall Load</span> <span class="item-count animate-number semi-bold" data-value="5695" data-animation-duration="700">5,695</span>
+                    </div>
+                  </div>
+                  <div class="widget-stats">
+                    <div class="wrapper transparent">
+                      <span class="item-title">Today's</span> <span class="item-count animate-number semi-bold" data-value="568" data-animation-duration="700">568</span>
+                    </div>
+                  </div>
+                  <div class="widget-stats ">
+                    <div class="wrapper last">
+                      <span class="item-title">Monthly</span> <span class="item-count animate-number semi-bold" data-value="12459" data-animation-duration="700">12,459</span>
+                    </div>
+                  </div>
+                  <div class="progress transparent progress-small no-radius m-t-20" style="width:90%">
+                    <div class="progress-bar progress-bar-white animate-progress-bar" data-percentage="90%" style="width: 90%;"></div>
+                  </div>
+                  <div class="description"> <span class="text-white mini-description ">4% higher <span class="blend">than last month</span></span>
+                  </div>
+                </div>
+              </div>
             </div>
-        </div>
-
-    </div>
-</div>
+            <div class="col-md-4 col-vlg-3 visible-xlg visible-sm col-sm-6">
+              <div class="tiles red m-b-10">
+                <div class="tiles-body">
+                  <div class="controller">
+                    <a href="javascript:;" class="reload"></a>
+                    <a href="javascript:;" class="remove"></a>
+                  </div>
+                  <div class="tiles-title text-black">OVERALL SALES </div>
+                  <div class="widget-stats">
+                    <div class="wrapper transparent">
+                      <span class="item-title">Overall Sales</span> <span class="item-count animate-number semi-bold" data-value="5669" data-animation-duration="700">5,669</span>
+                    </div>
+                  </div>
+                  <div class="widget-stats">
+                    <div class="wrapper transparent">
+                      <span class="item-title">Today's</span> <span class="item-count animate-number semi-bold" data-value="751" data-animation-duration="700">751</span>
+                    </div>
+                  </div>
+                  <div class="widget-stats ">
+                    <div class="wrapper last">
+                      <span class="item-title">Monthly</span> <span class="item-count animate-number semi-bold" data-value="1547" data-animation-duration="700">1,547</span>
+                    </div>
+                  </div>
+                  <div class="progress transparent progress-small no-radius m-t-20" style="width:90%">
+                    <div class="progress-bar progress-bar-white animate-progress-bar" data-percentage="64.8%" style="width: 64.8%;"></div>
+                  </div>
+                  <div class="description"> <span class="text-white mini-description ">4% higher <span class="blend">than last month</span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
