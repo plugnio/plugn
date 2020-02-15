@@ -13,7 +13,11 @@ use yii\web\AssetBundle;
      public $baseUrl = '@web';
      public $css = [
        'assets/plugins/font-awesome/css/font-awesome.css',
+       'assets/plugins/pace/pace-theme-flash.css',
        'assets/plugins/jquery-metrojs/MetroJs.css',
+       'assets/plugins/bootstrap-select2/select2.css',
+       'assets/plugins/jquery-datatable/css/jquery.dataTables.css',
+       'assets/plugins/datatables-responsive/css/datatables.responsive.css',
        'css/demo.css',
        'css/component.css',
        'css/owl.carousel.css',

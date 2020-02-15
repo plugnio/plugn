@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel frontend\models\CategorySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Categories';
+$this->title = 'Manage Categories';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="category-index">
@@ -24,10 +24,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'sort_number',
-            'category_name',
+            [
+                'label' => 'Order',
+                'value' => 'sort_number'
+            ],
+            'category_name', 
             'category_name_ar',
 
             ['class' => 'yii\grid\ActionColumn'],

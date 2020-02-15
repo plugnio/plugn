@@ -161,10 +161,17 @@ AppAsset::register($this);
       <!-- END MINI-PROFILE -->
       <!-- BEGIN SIDEBAR MENU -->
       <ul>
-        <li class="start  open active "> <a href="index.html"><i class="fa fa-gift"></i> <span class="title">Dashboard</span> <span class="selected"></span> <span class="arrow  open "></span> </a>
+        <li class="start  open active "> <a href="index.html"><i class="fa fa-gift"></i> <span class="title">Items</span> <span class="selected"></span> <span class="arrow  open "></span> </a>
           <ul class="sub-menu">
-            <li> <a href="dashboard_v1.html"> Dashboard v1 </a> </li>
-            <li class=""> <a href="index.html "> Dashboard v2 <span class=" label label-info pull-right m-r-30">NEW</span></a></li>
+            <li>
+                <?= Html::a('Categories', ['category/index']);  ?>
+            </li>
+            <li>
+                <?= Html::a('All Items', ['item/index']);  ?>
+            </li>
+            <li>
+                <?= Html::a('Item options', ['option/index']);  ?>
+            </li>
           </ul>
         </li>
       </ul>
