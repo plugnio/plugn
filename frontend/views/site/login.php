@@ -1,5 +1,4 @@
 <?php
-
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model \common\models\LoginForm */
@@ -10,24 +9,56 @@ use yii\bootstrap\ActiveForm;
 $this->title = 'Login';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="site-login">
-    <h1><?= Html::encode($this->title) ?></h1>
+<div class="login-box" style="margin-bottom: 100%;">
+    <div class="login-logo">
+        <a href="../../index2.html"><b>Admin</b>LTE</a>
+    </div>
+    <!-- /.login-logo -->
+    <div class="card">
+        <div class="card-body login-card-body">
+            <p class="login-box-msg">Sign in to start your session</p>
+            <?php
+            $form = ActiveForm::begin([
+                        'id' => 'login-form',
+                        'enableClientScript' => false
+            ]);
+            ?>
 
-    <p>Please fill out the following fields to login:</p>
+            <?=
+            $form->field($model, 'email', ['options' => [
+                    'tag' => 'div',
+                    'class' => 'form-group field-loginform has-feedback required'
+                ],
+                'template' => '{input}{error}{hint}'
+            ])->textInput(['type' => 'email', 'placeholder' => 'Email'])
+            ?>
 
-    <div class="row">
-        <div class="col-lg-5">
-            <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
+            <?=
+            $form->field($model, 'password', ['options' => [
+                    'tag' => 'div',
+                    'class' => 'form-group field-loginform has-feedback required'
+                ],
+                'template' => '{input}{error}{hint}'
+            ])->passwordInput(['placeholder' => 'Password'])
+            ?>
 
-                <?= $form->field($model, 'email')->input('email', ['autofocus' => true]) ?>
-
-                <?= $form->field($model, 'password')->passwordInput() ?>
-
-                <?= $form->field($model, 'rememberMe')->checkbox() ?>
-
-                <div class="form-group">
-                    <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+            <div class="row">
+                <div class="col-8">
+                    <div class="icheck-primary">
+                        <?=
+                        $form->field($model, 'rememberMe', ['options' => [
+                                'tag' => 'div',
+                                'class' => 'icheck-primary'
+                    ]])->checkbox()
+                        ?>
+                    </div>
                 </div>
+                <!-- /.col -->
+                <div class="col-4">
+                    <?= Html::submitButton('Login', ['class' => 'btn btn-primary btn-block', 'name' => 'login-button']) ?>
+                </div>
+                <!-- /.col -->
+            </div>
 
             <?php ActiveForm::end(); ?>
         </div>
