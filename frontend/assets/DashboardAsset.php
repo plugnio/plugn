@@ -12,6 +12,7 @@ class DashboardAsset extends AssetBundle {
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
+         'plugins/datatables-bs4/css/dataTables.bootstrap4.css',
         'plugins/fontawesome-free/css/all.min.css',
         'https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css',
         'plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css',
@@ -22,6 +23,7 @@ class DashboardAsset extends AssetBundle {
         'plugins/daterangepicker/daterangepicker.css',
         'plugins/summernote/summernote-bs4.css',
         'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700',
+
     ];
     public $js = [
         'dist/js/pages/dashboard.js',
