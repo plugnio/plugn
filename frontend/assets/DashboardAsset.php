@@ -12,7 +12,8 @@ class DashboardAsset extends AssetBundle {
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
-         'plugins/datatables-bs4/css/dataTables.bootstrap4.css',
+        'css/site.css',
+        'plugins/datatables-bs4/css/dataTables.bootstrap4.css',
         'plugins/fontawesome-free/css/all.min.css',
         'https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css',
         'plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css',
@@ -44,7 +45,7 @@ class DashboardAsset extends AssetBundle {
         'plugins/jquery-knob/jquery.knob.min.js',
     ];
     public $depends = [
-        'yii\web\YiiAsset',
+        'yii\web\YiiAsset'
     ];
 
 }

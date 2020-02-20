@@ -12,7 +12,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="page-title"> <i class="icon-custom-left"></i>
-    <h3><?= Html::encode($this->title) ?></h3>
     <p>
         <?= Html::a('Create Category', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
@@ -24,6 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'summaryOptions' => ['class' => "card-header"],
+        'tableOptions' => ['class' => 'table table-bordered table-hover'],
         'columns' => [
             'sort_number',
             'category_name',
@@ -32,14 +32,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 'class' => 'yii\grid\ActionColumn',
                 'template' => ' {view} {update} {delete}',
                 'buttons' => [
-                    'view' => function ($url) {
-                        return Html::a(
-                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', $url, [
-                                    'title' => 'View',
-                                    'data-pjax' => '0',
-                                        ]
-                        );
-                    },
+//                    'view' => function ($url) {
+//                        return Html::a(
+//                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', $url, [
+//                                    'title' => 'View',
+//                                    'data-pjax' => '0',
+//                                        ]
+//                        );
+//                    },
                     'update' => function ($url) {
                         return Html::a(
                                         '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', $url, [
@@ -52,9 +52,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         return Html::a(
                                         '<span style="margin-right: 20px;" class="nav-icon fas fa-trash"></span>', $url, [
                                     'title' => 'Delete',
-                                    'data-pjax' => '0',
-                                        ]
-                        );
+                                    'data' => [
+                                        'confirm' => 'Are you absolutely sure ? You will lose all the information about this user with this action.',
+                                        'method' => 'post',
+                                    ],
+                        ]);
                     },
                 ],
             ],

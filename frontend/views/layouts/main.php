@@ -34,10 +34,10 @@ DashboardAsset::register($this);
                     <li class="nav-item">
                         <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
                     </li>
-               
+
                 </ul>
 
-    
+
             </nav>
             <!-- /.navbar -->
 
@@ -75,7 +75,7 @@ DashboardAsset::register($this);
                                         Html::tag('i', '', ['class' => 'nav-icon fas fa-box']) .
                                         Html::tag('p', '
                                       Items
-                                      <i class="fas fa-angle-left right"></i>'), ['item/index'], ['class' => 'nav-link']
+                                      <i class="fas fa-angle-left right"></i>'), [''], ['class' => 'nav-link']
                                 )
                                 ?>
                                 <ul class="nav nav-treeview">
@@ -101,13 +101,31 @@ DashboardAsset::register($this);
             <!-- Content Wrapper. Contains page content -->
             <div class="content-wrapper">
                 <!-- Content Header (Page header) -->
-                <div class="content-header">
-                </div>
+                <section class="content-header">
+                    <div class="container-fluid">
+                        <div class="row mb-2">
+                            <div class="col-sm-6">
+                                <h1><?= $this->title ?></h1>
+                            </div>
+                            <div class="col-sm-6">
+                                <?=
+                                Breadcrumbs::widget([
+                                    'itemTemplate' => "<li class='breadcrumb-item'><i>{link}</i></li>\n", // template for all links
+                                    'activeItemTemplate' => "<li class='breadcrumb-item'><i>{link}</i></li>\n", // template for all links
+                                    'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+                                    'options' => ['class' => 'breadcrumb float-sm-right']
+                                ])
+                                ?>
+                            </div>
+                        </div>
+                    </div><!-- /.container-fluid -->
+                </section>
                 <!-- /.content-header -->
 
                 <!-- Main content -->
                 <section class="content">
                     <div class="container-fluid">
+                        <?= Alert::widget() ?>
                         <?= $content ?>
                     </div>
                 </section>
