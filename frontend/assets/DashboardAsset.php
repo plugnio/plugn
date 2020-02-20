@@ -26,8 +26,8 @@ class DashboardAsset extends AssetBundle {
 
     ];
     public $js = [
-        'dist/js/pages/dashboard.js',
-        'plugins/jquery/jquery.min.js',
+//        'dist/js/pages/dashboard.js',
+//        'plugins/jquery/jquery.min.js',
         'plugins/moment/moment.min.js',
         'plugins/daterangepicker/daterangepicker.js',
         'plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js',
@@ -38,9 +38,9 @@ class DashboardAsset extends AssetBundle {
         'plugins/jquery-ui/jquery-ui.min.js',
         'plugins/bootstrap/js/bootstrap.bundle.min.js',
         'plugins/chart.js/Chart.min.js',
-        'plugins/sparklines/sparkline.js',
-        'plugins/jqvmap/jquery.vmap.min.js',
-        'plugins/jqvmap/maps/jquery.vmap.usa.js',
+//        'plugins/sparklines/sparkline.js',
+//        'plugins/jqvmap/jquery.vmap.min.js',
+//        'plugins/jqvmap/maps/jquery.vmap.usa.js',
         'plugins/jquery-knob/jquery.knob.min.js',
     ];
     public $depends = [
