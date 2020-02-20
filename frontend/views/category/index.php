@@ -28,7 +28,36 @@ $this->params['breadcrumbs'][] = $this->title;
             'sort_number',
             'category_name',
             'category_name_ar',
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => ' {view} {update} {delete}',
+                'buttons' => [
+                    'view' => function ($url) {
+                        return Html::a(
+                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', $url, [
+                                    'title' => 'View',
+                                    'data-pjax' => '0',
+                                        ]
+                        );
+                    },
+                    'update' => function ($url) {
+                        return Html::a(
+                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', $url, [
+                                    'title' => 'Update',
+                                    'data-pjax' => '0',
+                                        ]
+                        );
+                    },
+                    'delete' => function ($url) {
+                        return Html::a(
+                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-trash"></span>', $url, [
+                                    'title' => 'Delete',
+                                    'data-pjax' => '0',
+                                        ]
+                        );
+                    },
+                ],
+            ],
         ],
         'layout' => '{summary}<div class="card-body">{items}{pager}</div>',
         'tableOptions' => ['class' => 'table table-bordered table-hover'],
