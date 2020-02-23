@@ -14,8 +14,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="extra-option-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
         <?= Html::a('Update', ['update', 'id' => $model->extra_option_id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Delete', ['delete', 'id' => $model->extra_option_id], [
@@ -34,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'option_id',
             'extra_option_name',
             'extra_option_name_ar',
-            'price',
+            'extra_option_price:currency',
         ],
     ]) ?>
 
