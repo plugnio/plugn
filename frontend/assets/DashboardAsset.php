@@ -45,7 +45,6 @@ class DashboardAsset extends AssetBundle {
 //        'plugins/jqvmap/maps/jquery.vmap.usa.js',
         'plugins/jquery-knob/jquery.knob.min.js',
         'plugins/select2/js/select2.full.min.js',
-        'dist/js/adminlte.min.js',
         'dist/js/demo.js',
         'plugins/bootstrap-switch/js/bootstrap-switch.min.js',
         'plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js',
