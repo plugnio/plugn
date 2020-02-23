@@ -22,8 +22,6 @@ $this->params['breadcrumbs'][] = $this->title;
     GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
-        'summaryOptions' => ['class' => "card-header"],
-        'tableOptions' => ['class' => 'table table-bordered table-hover'],
         'columns' => [
             'sort_number',
             'category_name',
@@ -32,14 +30,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'class' => 'yii\grid\ActionColumn',
                 'template' => ' {view} {update} {delete}',
                 'buttons' => [
-//                    'view' => function ($url) {
-//                        return Html::a(
-//                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', $url, [
-//                                    'title' => 'View',
-//                                    'data-pjax' => '0',
-//                                        ]
-//                        );
-//                    },
                     'update' => function ($url) {
                         return Html::a(
                                         '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', $url, [
@@ -53,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         '<span style="margin-right: 20px;" class="nav-icon fas fa-trash"></span>', $url, [
                                     'title' => 'Delete',
                                     'data' => [
-                                        'confirm' => 'Are you absolutely sure ? You will lose all the information about this user with this action.',
+                                        'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',
                                         'method' => 'post',
                                     ],
                         ]);
@@ -63,6 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
         'layout' => '{summary}<div class="card-body">{items}{pager}</div>',
         'tableOptions' => ['class' => 'table table-bordered table-hover'],
+        'summaryOptions' => ['class' => "card-header"],
     ]);
     ?>
 

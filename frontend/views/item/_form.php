@@ -32,23 +32,14 @@ use kartik\file\FileInput;
         $itemCategoryValues = ArrayHelper::getColumn($itemCategoryValues, 'category_id');
     }
 
-    $form = ActiveForm::begin();
-    ?>
-
-    <?=
-    $form->field($model, 'items_category')->widget(Select2::classname(), [
-        'data' => $categoryArray,
-        'options' => [
-            'placeholder' => 'Select items category ...',
-            'multiple' => true,
-            'value' => $itemCategoryValues
-        ],
-        'pluginOptions' => [
-            'tags' => true,
-            'tokenSeparators' => [',', ' '],
-        ],
+    $form = ActiveForm::begin([
+                'enableClientScript' => false,
     ]);
     ?>
+
+
+    <?= $form->field($model, 'items_category[]')->dropDownList($categoryArray); ?>
+
 
     <?= $form->field($model, 'item_name')->textInput(['maxlength' => true]) ?>
 
@@ -62,27 +53,28 @@ use kartik\file\FileInput;
 
     <?= $form->field($model, 'stock_qty')->textInput() ?>
 
-    <?=
-    $form->field($model, 'item_image')->widget(FileInput::classname(), [
-        'options' => ['accept' => 'image/*', 'multiple' => false
-        ],
-        'pluginOptions' => [
-            'showUpload' => false,
-            'initialPreview' => $model->getItemImage(),
-            'initialPreviewAsData' => true,
-            'overwriteInitial' => true,
-            'maxFileSize' => 2800
-        ]
-    ]);
-    ?>
 
-    <?= $form->field($model, 'price')->textInput() ?>
+    <div style="margin-bottom: 16px">
+               <?=
+        $form->field($model, 'item_image', [
+            'labelOptions' => ['class' => 'custom-file-label'],
+            'options' => ['class' => 'custom-file']
+        ])->fileInput([
+            'multiple' => false,
+            'accept' => 'image/*',
+            'class' => 'custom-file-input'
+        ])
+        ?>
+    </div>
+ 
+
+        <?= $form->field($model, 'price')->textInput() ?>
 
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+    <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>
 
-    <?php ActiveForm::end(); ?>
+<?php ActiveForm::end(); ?>
 
 </div>

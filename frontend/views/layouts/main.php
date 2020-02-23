@@ -89,6 +89,15 @@ DashboardAsset::register($this);
                                         ?>
 
                                     </li>
+                                    <li class="nav-item">
+                                        <?=
+                                        Html::a(
+                                                Html::tag('i', '', ['class' => 'nav-icon fas fa-box']) .
+                                                Html::tag('p', 'All Items'), ['item/index'], ['class' => 'nav-link']
+                                        )
+                                        ?>
+
+                                    </li>
                                 </ul>
                             </li>
                         </ul>

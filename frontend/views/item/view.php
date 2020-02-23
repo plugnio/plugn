@@ -14,8 +14,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
         <?= Html::a('Update', ['update', 'id' => $model->item_uuid], ['class' => 'btn btn-primary']) ?>
         <?=
@@ -51,20 +49,57 @@ $this->params['breadcrumbs'][] = $this->title;
     <h2>Options</h2>
 
     <p>
-        <?= Html::a('Create Option', ['option/create' , 'item_uuid' => $model->item_uuid], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Option', ['option/create', 'item_uuid' => $model->item_uuid], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?=
-    GridView::widget([
-        'dataProvider' => $itemOptionsDataProvider,
-        'columns' => [
-            'option_name',
-            'option_name_ar',
-            ['class' => 'yii\grid\ActionColumn', 'controller' => 'option'],
-        ],
-    ]);
-    ?>
 
+    <div class="card">
+        <?=
+        GridView::widget([
+            'dataProvider' => $itemOptionsDataProvider,
+            'columns' => [
+                'option_name',
+                'option_name_ar',
+                [
+                    'class' => 'yii\grid\ActionColumn',
+                    'controller' => 'option',
+                    'template' => ' {view} {update} {delete}',
+                    'buttons' => [
+                        'view' => function ($url) {
+                            return Html::a(
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', $url, [
+                                        'title' => 'View',
+                                        'data-pjax' => '0',
+                                            ]
+                            );
+                        },
+                        'update' => function ($url) {
+                            return Html::a(
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', $url, [
+                                        'title' => 'Update',
+                                        'data-pjax' => '0',
+                                            ]
+                            );
+                        },
+                        'delete' => function ($url) {
+                            return Html::a(
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-trash"></span>', $url, [
+                                        'title' => 'Delete',
+                                        'data' => [
+                                            'confirm' => 'Are you absolutely sure ? You will lose all the information about this option with this action.',
+                                            'method' => 'post',
+                                        ],
+                            ]);
+                        },
+                    ],
+                ],
+            ],
+            'layout' => '{summary}<div class="card-body">{items}{pager}</div>',
+            'tableOptions' => ['class' => 'table table-bordered table-hover'],
+            'summaryOptions' => ['class' => "card-header"],
+        ]);
+        ?>
 
+    </div>
 
 </div>

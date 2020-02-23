@@ -10,39 +10,68 @@ use yii\grid\GridView;
 $this->title = 'Items';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="item-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
+<div class="page-title"> <i class="icon-custom-left"></i>
     <p>
         <?= Html::a('Create Item', ['create'], ['class' => 'btn btn-success']) ?>
+
     </p>
+</div>
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <?= GridView::widget([
+<div class="card">
+    <?=
+    GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-            [
-              'label' => 'Order',
-              'value' => 'sort_number'
-            ],
-            'item_name',
-            'item_name_ar',
-            'item_description',
-            //'item_description_ar',
             'sort_number',
-            //'stock_qty',
-            //'item_image',
-            //'price',
-            //'item_created_at',
-            //'item_updated_at',
-
-            ['class' => 'yii\grid\ActionColumn'],
+            'item_image',
+            'item_name',
+//            'item_name_ar',
+            'item_description',
+//            'item_description_ar',
+            'stock_qty',
+            'price:currency',
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => ' {view} {update} {delete}',
+                'buttons' => [
+                    'view' => function ($url) {
+                        return Html::a(
+                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', $url, [
+                                    'title' => 'View',
+                                    'data-pjax' => '0',
+                                        ]
+                        );
+                    },
+                    'update' => function ($url) {
+                        return Html::a(
+                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', $url, [
+                                    'title' => 'Update',
+                                    'data-pjax' => '0',
+                                        ]
+                        );
+                    },
+                    'delete' => function ($url) {
+                        return Html::a(
+                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-trash"></span>', $url, [
+                                    'title' => 'Delete',
+                                    'data' => [
+                                        'confirm' => 'Are you absolutely sure ? You will lose all the information about this item with this action.',
+                                        'method' => 'post',
+                                    ],
+                        ]);
+                    },
+                ],
+            ],
         ],
-    ]); ?>
+        'layout' => '{summary}<div class="card-body">{items}{pager}</div>',
+        'tableOptions' => ['class' => 'table table-bordered table-hover'],
+        'summaryOptions' => ['class' => "card-header"],
+
+    ]);
+    ?>
 
 
 </div>

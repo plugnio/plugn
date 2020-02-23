@@ -24,7 +24,8 @@ class DashboardAsset extends AssetBundle {
         'plugins/daterangepicker/daterangepicker.css',
         'plugins/summernote/summernote-bs4.css',
         'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700',
-
+        'plugins/select2/css/select2.min.css',
+        'plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css',
     ];
     public $js = [
 //        'dist/js/pages/dashboard.js',
@@ -43,6 +44,13 @@ class DashboardAsset extends AssetBundle {
 //        'plugins/jqvmap/jquery.vmap.min.js',
 //        'plugins/jqvmap/maps/jquery.vmap.usa.js',
         'plugins/jquery-knob/jquery.knob.min.js',
+        'plugins/select2/js/select2.full.min.js',
+        'dist/js/adminlte.min.js',
+        'dist/js/demo.js',
+        'plugins/bootstrap-switch/js/bootstrap-switch.min.js',
+        'plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js',
+        'plugins/bootstrap/js/bootstrap.bundle.min.js',
+
     ];
     public $depends = [
         'yii\web\YiiAsset'
