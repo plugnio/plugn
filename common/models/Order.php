@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "order".
@@ -24,6 +26,7 @@ use Yii;
  * @property int $payment_method_id
  * @property string $payment_method_name
  * @property int|null $order_status
+ * @property datetime $order_created_at
  *
  * @property Area $area
  * @property PaymentMethod $paymentMethod
@@ -51,7 +54,7 @@ class Order extends \yii\db\ActiveRecord {
         return [
             [['area_id', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'house_number', 'customer_name', 'customer_phone_number', 'payment_method_id', 'payment_method_name'], 'required'],
             [['area_id', 'payment_method_id', 'order_status'], 'integer'],
-            ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE],],
+            ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE],],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['customer_phone_number'], 'number'],
             [['customer_phone_number'], 'unique'],
@@ -60,6 +63,20 @@ class Order extends \yii\db\ActiveRecord {
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
             [['payment_method_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors() {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'createdAtAttribute' => 'order_created_at',
+                'updatedAtAttribute' => null,
+                'value' => new Expression('NOW()'),
+            ],
         ];
     }
 
@@ -85,6 +102,7 @@ class Order extends \yii\db\ActiveRecord {
             'payment_method_id' => 'Payment Method ID',
             'payment_method_name' => 'Payment Method Name',
             'order_status' => 'Order Status',
+            'order_created_at' => 'Order Created At',
         ];
     }
 
@@ -92,13 +110,13 @@ class Order extends \yii\db\ActiveRecord {
      * @return string text explaining Order Status
      */
     public function getOrderStatus() {
-        if ($this->order_status == self::STATUS_SUBMITTED) 
+        if ($this->order_status == self::STATUS_SUBMITTED)
             return 'Order Submitted';
-        else if($this->order_status == self::STATUS_BEING_PREPARED)
+        else if ($this->order_status == self::STATUS_BEING_PREPARED)
             return 'Order Being Prepared';
-        else if($this->order_status == self::STATUS_OUT_FOR_DELIVERY)
+        else if ($this->order_status == self::STATUS_OUT_FOR_DELIVERY)
             return 'Out for Delivery';
-        else if($this->order_status == self::STATUS_COMPLETE)
+        else if ($this->order_status == self::STATUS_COMPLETE)
             return 'Complete';
     }
 
