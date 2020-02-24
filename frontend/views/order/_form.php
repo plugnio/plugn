@@ -2,6 +2,9 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use common\models\Area;
+use common\models\PaymentMethod;
+use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Order */
@@ -10,13 +13,17 @@ use yii\widgets\ActiveForm;
 
 <div class="order-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php
+    $areaQuery = Area::find()->asArray()->all();
+    $areaList = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
 
-    <?= $form->field($model, 'area_id')->textInput() ?>
+    $paymentQuery = PaymentMethod::find()->asArray()->all();
+    $paymentList = ArrayHelper::map($paymentQuery, 'payment_method_id', 'payment_method_name');
 
-    <?= $form->field($model, 'area_name')->textInput(['maxlength' => true]) ?>
+    $form = ActiveForm::begin();
+    ?>
 
-    <?= $form->field($model, 'area_name_ar')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'area_id')->dropDownList($areaList)->label('Area'); ?>
 
     <?= $form->field($model, 'unit_type')->textInput(['maxlength' => true]) ?>
 
@@ -36,11 +43,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'customer_email')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'payment_method_id')->textInput() ?>
+    <?= $form->field($model, 'payment_method_id')->dropDownList($paymentList)->label('Payment Method'); ?>
 
-    <?= $form->field($model, 'payment_method_name')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'order_status')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

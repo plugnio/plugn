@@ -37,7 +37,7 @@ class m200130_194447_create_order_table extends Migration {
             'customer_email' => $this->string(255),
             'payment_method_id' => $this->integer()->notNull(),
             'payment_method_name' => $this->string()->notNull(),
-            'order_status' => $this->tinyInteger(1),
+            'order_status' => $this->tinyInteger(1)->defaultValue(1),
         ],$tableOptions);
 
         

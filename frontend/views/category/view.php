@@ -24,18 +24,20 @@ $this->params['breadcrumbs'][] = $this->title;
         ])
         ?>
     </p>
-
-    <?=
-    DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'sort_number',
-            'category_name',
-            'category_name_ar',
-        ],
-//        'options' => ['class' => 'table table-bordered table-hover'],
-
-    ])
-    ?>
+    <div class="card">
+        <div class="card-body">
+            <?=
+            DetailView::widget([
+                'model' => $model,
+                'attributes' => [
+                    'sort_number',
+                    'category_name',
+                    'category_name_ar',
+                ],
+            'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
+            ])
+            ?>
+        </div>
+    </div>
 
 </div>

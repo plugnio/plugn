@@ -12,13 +12,12 @@ use yii\filters\VerbFilter;
 /**
  * OrderController implements the CRUD actions for Order model.
  */
-class OrderController extends Controller
-{
+class OrderController extends Controller {
+
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -42,14 +41,13 @@ class OrderController extends Controller
      * Lists all Order models.
      * @return mixed
      */
-    public function actionIndex()
-    {
+    public function actionIndex() {
         $searchModel = new OrderSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+                    'searchModel' => $searchModel,
+                    'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -59,26 +57,25 @@ class OrderController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
-    {
-        
+    public function actionView($id) {
+
         $order_model = $this->findModel($id);
 
         // Item 
         $orderItems = new \yii\data\ActiveDataProvider([
             'query' => $order_model->getOrderItems()
         ]);
-        
+
         // Item extra optn
         $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
             'query' => $order_model->getOrderItemExtraOptions()
         ]);
 
-        
+
         return $this->render('view', [
-            'model' => $order_model,
-            'orderItems' => $orderItems,
-            'itemsExtraOpitons' => $itemsExtraOpitons,
+                    'model' => $order_model,
+                    'orderItems' => $orderItems,
+                    'itemsExtraOpitons' => $itemsExtraOpitons,
         ]);
     }
 
@@ -87,16 +84,20 @@ class OrderController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
-    {
+    public function actionCreate() {
         $model = new Order();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->order_id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $model->area_name = $model->area->area_name;
+            $model->area_name_ar = $model->area->area_name_ar;
+            $model->payment_method_name = $model->paymentMethod->payment_method_name;
+
+            if ($model->save())
+                return $this->redirect(['view', 'id' => $model->order_id]);
         }
 
         return $this->render('create', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
@@ -107,8 +108,7 @@ class OrderController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
-    {
+    public function actionUpdate($id) {
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -116,7 +116,7 @@ class OrderController extends Controller
         }
 
         return $this->render('update', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
@@ -127,8 +127,7 @@ class OrderController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
-    {
+    public function actionDelete($id) {
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
@@ -141,12 +140,12 @@ class OrderController extends Controller
      * @return Order the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
-    {
+    protected function findModel($id) {
         if (($model = Order::findOne($id)) !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
 }

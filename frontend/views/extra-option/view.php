@@ -16,24 +16,32 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Update', ['update', 'id' => $model->extra_option_id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->extra_option_id], [
+        <?=
+        Html::a('Delete', ['delete', 'id' => $model->extra_option_id], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
                 'method' => 'post',
             ],
-        ]) ?>
+        ])
+        ?>
     </p>
-
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'extra_option_id',
-            'option_id',
-            'extra_option_name',
-            'extra_option_name_ar',
-            'extra_option_price:currency',
-        ],
-    ]) ?>
-
+    <div class="card">
+        <div class="card-body">
+            <?=
+            DetailView::widget([
+                'model' => $model,
+                'attributes' => [
+                    'extra_option_id',
+                    'option_id',
+                    'extra_option_name',
+                    'extra_option_name_ar',
+                    'extra_option_price:currency',
+                ],
+                'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
+            ])
+            ?>
+        </div>
+    </div>
+    
 </div>

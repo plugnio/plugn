@@ -37,7 +37,6 @@ DashboardAsset::register($this);
 
                 </ul>
 
-
             </nav>
             <!-- /.navbar -->
 
@@ -99,6 +98,14 @@ DashboardAsset::register($this);
 
                                     </li>
                                 </ul>
+                            </li>
+                            <li class="nav-item has-treeview">
+                                   <?=
+                                Html::a(
+                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-shopping-cart']) .
+                                        Html::tag('p','Customer orders'), ['order/index'], ['class' => 'nav-link']
+                                )
+                                ?>
                             </li>
                         </ul>
                     </nav>

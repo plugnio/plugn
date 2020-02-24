@@ -29,29 +29,34 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
     </p>
 
-    <?=
-    DetailView::widget([
-        'model' => $model,
-        'attributes' => [
+    <div class="card">
+        <div class="card-body">
+            <?=
+            DetailView::widget([
+                'model' => $model,
+                'attributes' => [
 //            'order_id',
 //            'area_id',
-            'area_name',
-            'area_name_ar',
-            'unit_type',
-            'block',
-            'street',
-            'avenue',
-            'house_number',
-            'special_directions',
-            'customer_name',
-            'customer_phone_number',
-            'customer_email:email',
+                    'area_name',
+                    'area_name_ar',
+                    'unit_type',
+                    'block',
+                    'street',
+                    'avenue',
+                    'house_number',
+                    'special_directions',
+                    'customer_name',
+                    'customer_phone_number',
+                    'customer_email:email',
 //            'payment_method_id',
-            'payment_method_name',
-            'order_status',
-        ],
-    ])
-    ?>
+                    'payment_method_name',
+                    'order_status',
+                ],
+                'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
+            ])
+            ?>
+        </div>
+    </div>
 
     <h2>Items</h2>
 
