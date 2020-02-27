@@ -8,6 +8,7 @@ use frontend\models\OrderSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use common\models\Customer;
 
 /**
  * OrderController implements the CRUD actions for Order model.
@@ -63,7 +64,8 @@ class OrderController extends Controller {
 
         // Item 
         $orderItems = new \yii\data\ActiveDataProvider([
-            'query' => $order_model->getOrderItems()
+            'query' => $order_model->getOrderItems(),
+            'sort' => false
         ]);
 
         // Item extra optn
@@ -91,6 +93,15 @@ class OrderController extends Controller {
             $model->area_name = $model->area->area_name;
             $model->area_name_ar = $model->area->area_name_ar;
             $model->payment_method_name = $model->paymentMethod->payment_method_name;
+            
+            $customer_model = new Customer();
+            $customer_model->customer_name = $model->customer_name;
+            $customer_model->customer_phone_number = $model->customer_phone_number;
+            if($model->customer_email != null)
+                $customer_model->customer_email = $model->customer_email;
+            
+            $customer_model->save();
+            $model->customer_id = $customer_model->customer_id;
 
             if ($model->save())
                 return $this->redirect(['view', 'id' => $model->order_id]);

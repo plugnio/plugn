@@ -18,10 +18,18 @@ class m200130_194447_create_order_table extends Migration {
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
         }
 
-        
+        $this->createTable('{{%customer}}', [
+            'customer_id' => $this->bigPrimaryKey(),
+            'customer_name' => $this->string()->notNull(),
+            'customer_phone_number' => $this->string()->notNull(),
+            'customer_email' => $this->string(),
+            'customer_created_at' => $this->dateTime()->notNull(),
+            'customer_updated_at' => $this->dateTime()->notNull(),
+        ],$tableOptions);
         
         $this->createTable('{{%order}}', [
             'order_id' => $this->bigPrimaryKey(),
+            'customer_id' => $this->bigInteger()->notNull(),
             'restaurant_uuid' => $this->char(60),
             'area_id' => $this->integer()->notNull(),
             'area_name' => $this->string(255)->notNull(),
@@ -41,6 +49,23 @@ class m200130_194447_create_order_table extends Migration {
             'order_created_at' => $this->dateTime()->notNull(),
         ],$tableOptions);
 
+        
+        // creates index for column `customer_id`
+        $this->createIndex(
+                'idx-order-customer_id',
+                'order', 
+                'customer_id'
+        );
+        
+        // add foreign key for table `order`
+        $this->addForeignKey(
+                'fk-order-customer_id',
+                'order', 
+                'customer_id',
+                'customer',
+                'customer_id',
+                'CASCADE'
+        );
         
         // creates index for column `restaurant_uuid`
         $this->createIndex(

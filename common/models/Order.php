@@ -10,6 +10,7 @@ use yii\db\Expression;
  * This is the model class for table "order".
  *
  * @property int $order_id
+ * @property int $customer_id
  * @property string|null $restaurant_uuid 
  * @property int $area_id
  * @property string $area_name
@@ -52,8 +53,8 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['area_id', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'house_number', 'customer_name', 'customer_phone_number', 'payment_method_id', 'payment_method_name'], 'required'],
-            [['area_id', 'payment_method_id', 'order_status'], 'integer'],
+            [['area_id', 'customer_id' ,'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'house_number', 'customer_name', 'customer_phone_number', 'payment_method_id', 'payment_method_name'], 'required'],
+            [['area_id', 'payment_method_id', 'order_status','customer_id'], 'integer'],
             ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE],],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['customer_phone_number'], 'number'],
@@ -61,6 +62,7 @@ class Order extends \yii\db\ActiveRecord {
             [['customer_email'], 'unique'],
             [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
+            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']], 
             [['payment_method_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
@@ -93,6 +95,7 @@ class Order extends \yii\db\ActiveRecord {
             'unit_type' => 'Unit Type',
             'block' => 'Block',
             'street' => 'Street',
+            'customer_id' => 'Customer ID', 
             'avenue' => 'Avenue',
             'house_number' => 'House Number',
             'special_directions' => 'Special Directions',
@@ -119,6 +122,7 @@ class Order extends \yii\db\ActiveRecord {
         else if ($this->order_status == self::STATUS_COMPLETE)
             return 'Complete';
     }
+    
 
     /**
      * Gets query for [[Restaurant]].
@@ -153,16 +157,28 @@ class Order extends \yii\db\ActiveRecord {
      * @return \yii\db\ActiveQuery
      */
     public function getOrderItemExtraOptions() {
-        return $this->hasMany(OrderItemExtraOptions::className(), ['order_item_id' => 'order_item_id'])->via('orderItems');
+        return $this->hasMany(OrderItemExtraOptions::className(), ['order_item_id' => 'order_item_id']);
     }
 
-    /**
+   /**
      * Gets query for [[OrderItems]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderItems() {
+    public function getOrderItems()
+    {
         return $this->hasMany(OrderItem::className(), ['order_id' => 'order_id']);
     }
+    
+    /** 
+    * Gets query for [[Customer]]. 
+    * 
+    * @return \yii\db\ActiveQuery 
+    */ 
+   public function getCustomer() 
+   { 
+       return $this->hasOne(Customer::className(), ['customer_id' => 'customer_id']); 
+   }
+
 
 }
