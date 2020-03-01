@@ -82,7 +82,19 @@ $this->params['breadcrumbs'][] = $this->title;
                     'item_name',
                     'order_id',
                     'instructions',
-                    'orderItemExtraOptions.extra_option_name',
+                    [
+                        'label' => 'Extra Options',
+                        'value' => function ($data) {
+                            $extraOptions = '';
+                            
+                            foreach ($data->orderItemExtraOptions as $value) {
+                              $extraOptions .= $value['extra_option_name'];
+                            }
+                            
+                            return $extraOptions;
+                           },
+                        'format' => 'raw'
+                    ],
                     [
                         'label' => 'Subtotal',
                         'value' => 'item_price',
