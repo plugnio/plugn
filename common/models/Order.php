@@ -27,6 +27,7 @@ use yii\db\Expression;
  * @property int $payment_method_id
  * @property string $payment_method_name
  * @property int|null $order_status
+ * @property int $order_mode
  * @property datetime $order_created_at
  *
  * @property Area $area
@@ -40,6 +41,8 @@ class Order extends \yii\db\ActiveRecord {
     const STATUS_BEING_PREPARED = 2;
     const STATUS_OUT_FOR_DELIVERY = 3;
     const STATUS_COMPLETE = 4;
+    const ORDER_MODE_DELIVERY = 1;
+    const ORDER_MODE_PICK_UP = 2;
 
     /**
      * {@inheritdoc}
@@ -53,16 +56,18 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['area_id', 'customer_id' ,'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'house_number', 'customer_name', 'customer_phone_number', 'payment_method_id', 'payment_method_name'], 'required'],
-            [['area_id', 'payment_method_id', 'order_status','customer_id'], 'integer'],
-            ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE],],
+            [['area_id', 'customer_id', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'house_number', 'customer_name', 'customer_phone_number', 'payment_method_id', 'payment_method_name', 'order_mode'], 'required'],
+            [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer'],
+            ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE]],
+            ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
+            ['order_mode', 'validateOrderMode'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['customer_phone_number'], 'number'],
             [['customer_phone_number'], 'unique'],
             [['customer_email'], 'unique'],
             [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
-            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']], 
+            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
             [['payment_method_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
@@ -83,6 +88,18 @@ class Order extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Validate order mode attribute
+     * @param type $attribute
+     */
+    public function validateOrderMode($attribute) {
+        if ($this->$attribute == static::ORDER_MODE_DELIVERY && !$this->restaurant->support_delivery)
+            $this->addError($attribute, "Restaurant doesn't accept delviery");
+
+        else if ($this->$attribute == static::ORDER_MODE_PICK_UP && !$this->restaurant->support_pick_up)
+            $this->addError($attribute, "Restaurant doesn't accept pick up");
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function attributeLabels() {
@@ -95,7 +112,7 @@ class Order extends \yii\db\ActiveRecord {
             'unit_type' => 'Unit Type',
             'block' => 'Block',
             'street' => 'Street',
-            'customer_id' => 'Customer ID', 
+            'customer_id' => 'Customer ID',
             'avenue' => 'Avenue',
             'house_number' => 'House Number',
             'special_directions' => 'Special Directions',
@@ -122,7 +139,18 @@ class Order extends \yii\db\ActiveRecord {
         else if ($this->order_status == self::STATUS_COMPLETE)
             return 'Complete';
     }
-    
+
+    /**
+     * Calculate order item's total price
+     */
+    public function calculateOrderItemsTotalPrice() {
+        $totalPrice = 0;
+
+        foreach ($this->getOrderItems()->all() as $item)
+            $totalPrice += $item->calculateOrderItemPrice();
+
+        return $totalPrice;
+    }
 
     /**
      * Gets query for [[Restaurant]].
@@ -160,25 +188,22 @@ class Order extends \yii\db\ActiveRecord {
         return $this->hasMany(OrderItemExtraOptions::className(), ['order_item_id' => 'order_item_id']);
     }
 
-   /**
+    /**
      * Gets query for [[OrderItems]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderItems()
-    {
+    public function getOrderItems() {
         return $this->hasMany(OrderItem::className(), ['order_id' => 'order_id']);
     }
-    
-    /** 
-    * Gets query for [[Customer]]. 
-    * 
-    * @return \yii\db\ActiveQuery 
-    */ 
-   public function getCustomer() 
-   { 
-       return $this->hasOne(Customer::className(), ['customer_id' => 'customer_id']); 
-   }
 
+    /**
+     * Gets query for [[Customer]]. 
+     * 
+     * @return \yii\db\ActiveQuery 
+     */
+    public function getCustomer() {
+        return $this->hasOne(Customer::className(), ['customer_id' => 'customer_id']);
+    }
 
 }

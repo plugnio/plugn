@@ -115,6 +115,14 @@ DashboardAsset::register($this);
                                 )
                                 ?>
                             </li>
+                            <li class="nav-item has-treeview">
+                                   <?=
+                                Html::a(
+                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-cogs']) .
+                                        Html::tag('p','Settings'), ['restaurant/index'], ['class' => 'nav-link']
+                                )
+                                ?>
+                            </li>
                         </ul>
                     </nav>
                     <!-- /.sidebar-menu -->

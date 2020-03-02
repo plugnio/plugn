@@ -19,21 +19,19 @@ use Yii;
  * @property Order $order
  * @property OrderItemExtraOptions[] $orderItemExtraOptions
  */
-class OrderItem extends \yii\db\ActiveRecord
-{
+class OrderItem extends \yii\db\ActiveRecord {
+
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'order_item';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
-    {
+    public function rules() {
         return [
             [['order_id', 'item_uuid', 'item_name', 'item_price'], 'required'],
             [['order_id', 'qty'], 'integer'],
@@ -48,8 +46,7 @@ class OrderItem extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'order_item_id' => 'Order Item ID',
             'order_id' => 'Order ID',
@@ -62,12 +59,23 @@ class OrderItem extends \yii\db\ActiveRecord
     }
 
     /**
+     * Calculate order item total price => (item price + extra optns price)
+     */
+    public function calculateOrderItemPrice() {
+        $totalPrice = $this->item_price;
+
+        foreach ($this->getOrderItemExtraOptions()->asArray()->all() as $extraOption)
+            $totalPrice += $extraOption['extra_option_price'];
+
+        return $totalPrice;
+    }
+
+    /**
      * Gets query for [[ItemUu]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItem()
-    {
+    public function getItem() {
         return $this->hasOne(Item::className(), ['item_uuid' => 'item_uuid']);
     }
 
@@ -76,8 +84,7 @@ class OrderItem extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrder()
-    {
+    public function getOrder() {
         return $this->hasOne(Order::className(), ['order_id' => 'order_id']);
     }
 
@@ -86,8 +93,8 @@ class OrderItem extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderItemExtraOptions()
-    {
+    public function getOrderItemExtraOptions() {
         return $this->hasMany(OrderItemExtraOptions::className(), ['order_item_id' => 'order_item_id']);
     }
+
 }

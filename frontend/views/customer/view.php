@@ -2,6 +2,8 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use yii\grid\GridView;
+use common\models\Order;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Customer */
@@ -43,4 +45,70 @@ $this->params['breadcrumbs'][] = $this->title;
             ?>
 
         </div>
+    </div>
+
+    
+    <h2>Orders</h2>
+    <div class="card">
+
+        <?=
+        GridView::widget([
+            'dataProvider' => $customersOrdersData,
+            'columns' => [
+                'area_name',
+                'customer_name',
+                'customer_phone_number',
+                [
+                    'attribute' => 'order_status',
+                    'format' => "raw",
+                    'value' => function($model) {
+                        if ($model->order_status == Order::STATUS_SUBMITTED || $model->order_status == Order::STATUS_OUT_FOR_DELIVERY)
+                            return '<span class="badge bg-warning" >' . $model->orderStatus . '</span>';
+                        else if ($model->order_status == Order::STATUS_BEING_PREPARED)
+                            return '<span class="badge bg-primary" >' . $model->orderStatus . '</span>';
+                        else if ($model->order_status == Order::STATUS_COMPLETE)
+                            return '<span class="badge bg-success" >' . $model->orderStatus . '</span>';
+                    }
+                ],
+                [
+                    'class' => 'yii\grid\ActionColumn',
+                    'template' => ' {view} {update} {delete}',
+                    'controller' => 'order',
+                    'buttons' => [
+                        'view' => function ($url) {
+                            return Html::a(
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', $url, [
+                                        'title' => 'View',
+                                        'data-pjax' => '0',
+                                            ]
+                            );
+                        },
+                        'update' => function ($url) {
+                            return Html::a(
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', $url, [
+                                        'title' => 'Update',
+                                        'data-pjax' => '0',
+                                            ]
+                            );
+                        },
+                        'delete' => function ($url) {
+                            return Html::a(
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-trash"></span>', $url, [
+                                        'title' => 'Delete',
+                                        'data' => [
+                                            'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',
+                                            'method' => 'post',
+                                        ],
+                            ]);
+                        },
+                    ],
+                ],
+            ],
+            'layout' => '{summary}<div class="card-body">{items}{pager}</div>',
+            'tableOptions' => ['class' => 'table table-bordered table-hover'],
+            'summaryOptions' => ['class' => "card-header"],
+        ]);
+        ?>
+
+
     </div>

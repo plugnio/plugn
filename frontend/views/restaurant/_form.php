@@ -89,34 +89,34 @@ $this->registerJs($js);
     ?>
 
 
-    <?=
-    $form->field($model, 'restaurant_delivery_area')->widget(Select2::classname(), [
-        'data' => $restaurantDeliveryArray,
-        'options' => [
-            'placeholder' => 'Select delivery area ...',
-            'multiple' => true,
-            'value' => $sotredRestaurantDeliveryAreas
-        ],
-        'pluginOptions' => [
-            'tags' => true,
-            'tokenSeparators' => [',', ' '],
-        ],
-    ]);
+    <?php
+//    $form->field($model, 'restaurant_delivery_area')->widget(Select2::classname(), [
+//        'data' => $restaurantDeliveryArray,
+//        'options' => [
+//            'placeholder' => 'Select delivery area ...',
+//            'multiple' => true,
+//            'value' => $sotredRestaurantDeliveryAreas
+//        ],
+//        'pluginOptions' => [
+//            'tags' => true,
+//            'tokenSeparators' => [',', ' '],
+//        ],
+//    ]);
     ?>
 
-    <?=
-    $form->field($model, 'restaurant_payments_method')->widget(Select2::classname(), [
-        'data' => $paymentMethodArray,
-        'options' => [
-            'placeholder' => 'Select payment method ...',
-            'multiple' => true,
-            'value' => $sotredRestaurantPaymentMethod
-        ],
-        'pluginOptions' => [
-            'tags' => true,
-            'tokenSeparators' => [',', ' '],
-        ],
-    ]);
+    <?php
+//    $form->field($model, 'restaurant_payments_method')->widget(Select2::classname(), [
+//        'data' => $paymentMethodArray,
+//        'options' => [
+//            'placeholder' => 'Select payment method ...',
+//            'multiple' => true,
+//            'value' => $sotredRestaurantPaymentMethod
+//        ],
+//        'pluginOptions' => [
+//            'tags' => true,
+//            'tokenSeparators' => [',', ' '],
+//        ],
+//    ]);
     ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
@@ -127,31 +127,31 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'tagline_ar')->textInput(['maxlength' => true]) ?>
 
-    <?=
-    $form->field($model, 'thumbnail_image')->widget(FileInput::classname(), [
-        'options' => ['accept' => 'image/*', 'multiple' => false
-        ],
-        'pluginOptions' => [
-            'showUpload' => false,
-             'initialPreview' => $model->getThumbnailImage(),
-             'initialPreviewAsData' => true,
-             'overwriteInitial' => true,
-            'maxFileSize' => 2800
-        ]
-    ]);
+    <?php
+//    $form->field($model, 'thumbnail_image')->widget(FileInput::classname(), [
+//        'options' => ['accept' => 'image/*', 'multiple' => false
+//        ],
+//        'pluginOptions' => [
+//            'showUpload' => false,
+//             'initialPreview' => $model->getThumbnailImage(),
+//             'initialPreviewAsData' => true,
+//             'overwriteInitial' => true,
+//            'maxFileSize' => 2800
+//        ]
+//    ]);
     ?>
-    <?=
-    $form->field($model, 'logo')->widget(FileInput::classname(), [
-        'options' => ['accept' => 'image/*', 'multiple' => false
-        ],
-        'pluginOptions' => [
-            'showUpload' => false,
-             'initialPreview' => $model->getLogo(),
-             'initialPreviewAsData' => true,
-             'overwriteInitial' => true,
-            'maxFileSize' => 2800
-        ]
-    ]);
+    <?php
+//    $form->field($model, 'logo')->widget(FileInput::classname(), [
+//        'options' => ['accept' => 'image/*', 'multiple' => false
+//        ],
+//        'pluginOptions' => [
+//            'showUpload' => false,
+//             'initialPreview' => $model->getLogo(),
+//             'initialPreviewAsData' => true,
+//             'overwriteInitial' => true,
+//            'maxFileSize' => 2800
+//        ]
+//    ]);
     ?>
 
 
@@ -176,56 +176,56 @@ $this->registerJs($js);
     ?>
 
     <div id='minDeliveryTime' style='<?= $model->isNewRecord || ($model->support_delivery == 0) ? "display:none" : "" ?>'>
-        <?=
-        $form->field($model, 'min_delivery_time')->widget(TimePicker::classname(), [
-            'options' => ['placeholder' => 'Enter event time ...'],
-            'pluginOptions' => [
-                'autoclose' => true,
-                'defaultTime' => false,
-                'showSeconds' => true,
-                'showMeridian' => false,
-            ]
-        ]);
+        <?php
+//        $form->field($model, 'min_delivery_time')->widget(TimePicker::classname(), [
+//            'options' => ['placeholder' => 'Enter event time ...'],
+//            'pluginOptions' => [
+//                'autoclose' => true,
+//                'defaultTime' => false,
+//                'showSeconds' => true,
+//                'showMeridian' => false,
+//            ]
+//        ]);
         ?>
     </div>
 
     <div id='minPickupTime' style='<?= $model->isNewRecord || ($model->support_pick_up == 0) ? "display:none" : "" ?>'>
-        <?=
-        $form->field($model, 'min_pickup_time')->widget(TimePicker::classname(), [
-            'options' => ['placeholder' => 'Enter event time ...'],
-            'pluginOptions' => [
-                'autoclose' => true,
-                'defaultTime' => false,
-                'showSeconds' => true,
-                'showMeridian' => false,
-            ]
-        ]);
+        <?php
+//        $form->field($model, 'min_pickup_time')->widget(TimePicker::classname(), [
+//            'options' => ['placeholder' => 'Enter event time ...'],
+//            'pluginOptions' => [
+//                'autoclose' => true,
+//                'defaultTime' => false,
+//                'showSeconds' => true,
+//                'showMeridian' => false,
+//            ]
+//        ]);
         ?>
     </div>
 
 
-    <?=
-    $form->field($model, 'operating_from')->widget(TimePicker::classname(), [
-        'options' => ['placeholder' => 'Enter event time ...'],
-        'pluginOptions' => [
-            'autoclose' => true,
-            'defaultTime' => false,
-            'showSeconds' => true,
-            'showMeridian' => false
-        ]
-    ]);
+    <?php
+//    $form->field($model, 'operating_from')->widget(TimePicker::classname(), [
+//        'options' => ['placeholder' => 'Enter event time ...'],
+//        'pluginOptions' => [
+//            'autoclose' => true,
+//            'defaultTime' => false,
+//            'showSeconds' => true,
+//            'showMeridian' => false
+//        ]
+//    ]);
     ?>
 
-    <?=
-    $form->field($model, 'operating_to')->widget(TimePicker::classname(), [
-        'options' => ['placeholder' => 'Enter event time ...'],
-        'pluginOptions' => [
-            'autoclose' => true,
-            'defaultTime' => false,
-            'showSeconds' => true,
-            'showMeridian' => false
-        ]
-    ]);
+    <?php
+//    $form->field($model, 'operating_to')->widget(TimePicker::classname(), [
+//        'options' => ['placeholder' => 'Enter event time ...'],
+//        'pluginOptions' => [
+//            'autoclose' => true,
+//            'defaultTime' => false,
+//            'showSeconds' => true,
+//            'showMeridian' => false
+//        ]
+//    ]);
     ?>
     
     <div id='deliveryFeeInput' style='<?= $model->isNewRecord || ($model->support_delivery == 0) ? "display:none" : "" ?>'>

@@ -8,11 +8,17 @@ use common\models\Order;
 /* @var $this yii\web\View */
 /* @var $model common\models\Order */
 
-$this->title = $model->area_name;
+$this->title = 'Order #' . $model->order_id;
 $this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
+<div class="page-title"> <i class="icon-custom-left"></i>
+    <p>
+        <?= Html::a('Mark it as paid', ['create'], ['class' => 'btn btn-success']) ?>
+
+    </p>
+</div>
 
 <!-- Main content -->
 <div class="invoice p-3 mb-3">
@@ -30,12 +36,13 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="row invoice-info">
         <div class="col-sm-4 invoice-col">
             <address>
-                <strong><?= $model->customer_name ?> </strong><br>
+                <b>Customer Name:</b> <?= $model->customer_name ?> <br>
                 <b>Phone:</b> <?= $model->customer_phone_number ?> <br>
                 <?php if ($model->customer_email) { ?>
                     <b>Email:</b> <?= $model->customer_email ?> <br>
                 <?php } ?>
-                <b>Expected Delivery:</b>TODO <br>
+                <b>Expected Delivery:</b> TODO <br>
+                <b>Payment Method:</b> <?= $model->paymentMethod->payment_method_name ?> <br>
             </address>
         </div>
         <!-- /.col -->
@@ -43,6 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <b>Order ID:</b> <?= $model->order_id ?><br>
             <b>Order Placed:</b> <?= \Yii::$app->formatter->asDatetime($model->order_created_at) ?> <br>
             <b>Invoice Date:</b> <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy') ?> <br>
+            <b>Invoice Status:</b> <?= $model->getOrderStatus() ?> <br>
         </div>
         <!-- /.col -->
     </div>
@@ -61,10 +69,10 @@ $this->params['breadcrumbs'][] = $this->title;
             <address>
                 <h3>Billing Address: </h3>
                 <section style="display: inline-flex;">
-                    <p style="margin-right: 20px;">Area: <?= $model->area_name ?></p>
-                    <p style="margin-right: 20px;">Block: <?= $model->block ?></p>
-                    <p style="margin-right: 20px;">Street: <?= $model->street ?> </p>
-                    <p>House: <?= $model->house_number ?></p>
+                    <p style="margin-right: 20px;">Area: <br><?= $model->area_name ?></p>
+                    <p style="margin-right: 20px;">Block: <br><?= $model->block ?></p>
+                    <p style="margin-right: 20px;">Street:<br> <?= $model->street ?> </p>
+                    <p>House: <br><?= $model->house_number ?></p>
                 </section>
             </address>
         </div>
@@ -86,20 +94,26 @@ $this->params['breadcrumbs'][] = $this->title;
                         'label' => 'Extra Options',
                         'value' => function ($data) {
                             $extraOptions = '';
-                            
-                            foreach ($data->orderItemExtraOptions as $value) {
-                              $extraOptions .= $value['extra_option_name'];
+
+                            foreach ($data->orderItemExtraOptions as $key => $extraOption) {
+
+                                if ($key == 0)
+                                    $extraOptions .= $extraOption['extra_option_name'];
+                                else
+                                    $extraOptions .= ', ' . $extraOption['extra_option_name'];
                             }
-                            
+
                             return $extraOptions;
-                           },
+                        },
                         'format' => 'raw'
                     ],
                     [
                         'label' => 'Subtotal',
-                        'value' => 'item_price',
+                        'value' => function ($item) {
+                            return $item->calculateOrderItemPrice();
+                        },
                         'format' => 'currency'
-                    ]
+                    ],
                 ],
                 'layout' => '{items}{pager} '
             ]);
@@ -126,7 +140,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <table class="table">
                     <tr>
                         <th style="width:50%">Subtotal:</th>
-                        <td>TODO</td>
+                        <td><?= \Yii::$app->formatter->asCurrency($model->calculateOrderItemsTotalPrice()) ?> </td>
                     </tr>
                     <tr>
                         <th>Delivery:</th>

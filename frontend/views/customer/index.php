@@ -31,6 +31,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 'class' => 'yii\grid\ActionColumn',
                 'template' => ' {view} {update} {delete}',
                 'buttons' => [
+                    'view' => function ($url) {
+                        return Html::a(
+                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', $url, [
+                                    'title' => 'View',
+                                    'data-pjax' => '0',
+                                        ]
+                        );
+                    },
                     'update' => function ($url) {
                         return Html::a(
                                         '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', $url, [

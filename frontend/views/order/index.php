@@ -26,16 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-//            'order_id',
-//            'area_id',
             'area_name',
-//            'area_name_ar',
-//            'unit_type',
-            //'block',
-            //'street',
-            //'avenue',
-            //'house_number',
-            //'special_directions',
             'customer_name',
             'customer_phone_number',
             [
@@ -50,10 +41,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     return '<span class="badge bg-success" >' . $model->orderStatus . '</span>';
                 }
             ],
-            //'customer_email:email',
-            //'payment_method_id',
-            //'payment_method_name',
-            //'order_status',
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template' => ' {view} {update} {delete}',

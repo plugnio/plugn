@@ -13,21 +13,13 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="restaurant-view">
 
-    <h1>
-        <?= Html::encode($this->title) ?>
-        <span class="badge">
-            <?= $model->status ?>
-        </span>
-
-    </h1>
-
     <p>
-        <?= Html::a('Update', ['update', 'id' => Yii::$app->user->identity->restaurant_uuid ], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Update', ['update', 'id' => Yii::$app->user->identity->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
 
 
         <?php if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_OPEN) { ?>
             <?=
-            Html::a('Open', ['promote-to-open', 'id' => Yii::$app->user->identity->restaurant_uuid ], [
+            Html::a('Open', ['promote-to-open', 'id' => Yii::$app->user->identity->restaurant_uuid], [
                 'class' => 'btn btn-success',
                 'data' => [
                     'confirm' => 'Are you sure you want to change restaurant status to open?',
@@ -36,10 +28,10 @@ $this->params['breadcrumbs'][] = $this->title;
             ])
             ?>
         <?php } ?>
-        
+
         <?php if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_BUSY) { ?>
             <?=
-            Html::a('Busy', ['promote-to-busy', 'id' => Yii::$app->user->identity->restaurant_uuid ], [
+            Html::a('Busy', ['promote-to-busy', 'id' => Yii::$app->user->identity->restaurant_uuid], [
                 'class' => 'btn btn-warning',
                 'data' => [
                     'confirm' => 'Are you sure you want to change restaurant status to busy?',
@@ -48,10 +40,10 @@ $this->params['breadcrumbs'][] = $this->title;
             ])
             ?>
         <?php } ?>
-        
+
         <?php if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_CLOSED) { ?>
             <?=
-            Html::a('Close', ['promote-to-close', 'id' => Yii::$app->user->identity->restaurant_uuid ], [
+            Html::a('Close', ['promote-to-close', 'id' => Yii::$app->user->identity->restaurant_uuid], [
                 'class' => 'btn btn-danger',
                 'data' => [
                     'confirm' => 'Are you sure you want to promote this project to close?',
@@ -67,7 +59,6 @@ $this->params['breadcrumbs'][] = $this->title;
     DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'restaurant_uuid',
             'vendor.vendor_name',
             'name',
             'name_ar',
@@ -76,8 +67,20 @@ $this->params['breadcrumbs'][] = $this->title;
             'status',
             'thumbnail_image',
             'logo',
-            'support_delivery',
-            'support_pick_up',
+            [
+                'label' => 'Support Delivery',
+                'value' => function ($data) {
+                    return $data->support_delivery ? 'Yes' : 'No';
+                },
+                'format' => 'raw'
+            ],
+            [
+                'label' => 'Support Pick up',
+                'value' => function ($data) {
+                    return $data->support_pick_up ? 'Yes' : 'No';
+                },
+                'format' => 'raw'
+            ],
             'min_delivery_time',
             'min_pickup_time',
             'operating_from',

@@ -9,6 +9,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use common\models\Customer;
+use common\models\Restaurant;
 
 /**
  * OrderController implements the CRUD actions for Order model.
@@ -88,11 +89,18 @@ class OrderController extends Controller {
      */
     public function actionCreate() {
         $model = new Order();
-
+        $model->restaurant_uuid =  Yii::$app->user->identity->restaurant_uuid;
+        
+        
         if ($model->load(Yii::$app->request->post())) {
             $model->area_name = $model->area->area_name;
             $model->area_name_ar = $model->area->area_name_ar;
             $model->payment_method_name = $model->paymentMethod->payment_method_name;
+            
+            if($model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->support_delivery == false)
+                $model->order_mode = null;
+            else if ($model->order_mode == Order::ORDER_MODE_PICK_UP &&  $model->restaurant->support_pick_up == false)
+                 $model->order_mode = null;
             
             $customer_model = new Customer();
             $customer_model->customer_name = $model->customer_name;
