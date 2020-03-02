@@ -18,41 +18,32 @@ class DashboardAsset extends AssetBundle {
         'https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css',
         'plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css',
         'plugins/icheck-bootstrap/icheck-bootstrap.min.css',
-        'plugins/jqvmap/jqvmap.min.css',
         'dist/css/adminlte.min.css',
         'plugins/overlayScrollbars/css/OverlayScrollbars.min.css',
         'plugins/daterangepicker/daterangepicker.css',
         'plugins/summernote/summernote-bs4.css',
         'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700',
-        'plugins/select2/css/select2.min.css',
+        'css/select2.css',
+        'css/select2.min.css',
         'plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css',
     ];
     public $js = [
-//        'dist/js/pages/dashboard.js',
 //        'plugins/jquery/jquery.min.js',
-        'plugins/moment/moment.min.js',
-        'plugins/daterangepicker/daterangepicker.js',
-        'plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js',
-        'plugins/summernote/summernote-bs4.min.js',
-        'plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js',
-        'dist/js/adminlte.js',
-        'dist/js/demo.js',
-        'plugins/jquery-ui/jquery-ui.min.js',
         'plugins/bootstrap/js/bootstrap.bundle.min.js',
-        'plugins/chart.js/Chart.min.js',
-//        'plugins/sparklines/sparkline.js',
-//        'plugins/jqvmap/jquery.vmap.min.js',
-//        'plugins/jqvmap/maps/jquery.vmap.usa.js',
-        'plugins/jquery-knob/jquery.knob.min.js',
         'plugins/select2/js/select2.full.min.js',
-        'dist/js/demo.js',
-        'plugins/bootstrap-switch/js/bootstrap-switch.min.js',
+        'plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js',
+        'plugins/moment/moment.min.js',
+        'plugins/inputmask/min/jquery.inputmask.bundle.min.js',
+        'plugins/daterangepicker/daterangepicker.js',
+        'plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js',
         'plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js',
-        'plugins/bootstrap/js/bootstrap.bundle.min.js',
-
+        'plugins/bootstrap-switch/js/bootstrap-switch.min.js',
+        'dist/js/adminlte.min.js',
+        'dist/js/demo.js',
     ];
     public $depends = [
-        'yii\web\YiiAsset'
+                'yii\web\YiiAsset',
+
     ];
 
 }
