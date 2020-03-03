@@ -9,9 +9,11 @@ use Yii;
  *
  * @property string $restaurant_uuid
  * @property int $area_id
+ * @property int $min_delivery_time
  *
  * @property Area $area
- * @property Restaurant $restaurantUu
+ * @property City $city
+ * @property Restaurant $restaurant
  */
 class RestaurantDelivery extends \yii\db\ActiveRecord
 {
@@ -30,7 +32,7 @@ class RestaurantDelivery extends \yii\db\ActiveRecord
     {
         return [
             [['restaurant_uuid', 'area_id'], 'required'],
-            [['area_id'], 'integer'],
+            [['area_id','min_delivery_time'], 'integer'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['restaurant_uuid', 'area_id'], 'unique', 'targetAttribute' => ['restaurant_uuid', 'area_id']],
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
@@ -46,6 +48,7 @@ class RestaurantDelivery extends \yii\db\ActiveRecord
         return [
             'restaurant_uuid' => 'Restaurant Uuid',
             'area_id' => 'Area ID',
+            'min_delivery_time' => 'Min Delivery time',
         ];
     }
 
@@ -66,7 +69,7 @@ class RestaurantDelivery extends \yii\db\ActiveRecord
      */
     public function getCity()
     {
-        return $this->hasOne(City::className(), ['city_id' => 'city_id'])->via('area');
+        return $this->hasOne(City::className(), ['city_id' => 'city_id'])->via('area')->distinct();
     }
 
     /**

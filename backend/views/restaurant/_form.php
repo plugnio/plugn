@@ -245,14 +245,6 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'min_charge')->input('number', ['maxlength' => true, 'placeholder' => '5']) ?>
 
-    <?= $form->field($model, 'location')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'location_ar')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'location_latitude')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'location_longitude')->textInput(['maxlength' => true]) ?>
-
     <?= $form->field($model, 'phone_number')->textInput(['maxlength' => true]) ?>
 
 

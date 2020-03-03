@@ -28,10 +28,6 @@ use yii\behaviors\AttributeBehavior;
  * @property float $delivery_fee
  * @property float $min_charge
  * @property float $min_order
- * @property string|null $location
- * @property string|null $location_ar
- * @property float|null $location_latitude
- * @property float|null $location_longitude
  * @property string|null $phone_number
  * @property string|null $restaurant_created_at
  * @property string|null $restaurant_updated_at
@@ -85,9 +81,9 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['vendor_id', 'restaurant_status', 'support_delivery', 'support_pick_up'], 'integer'],
             [['min_delivery_time', 'min_pickup_time', 'operating_from', 'operating_to', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
-            [['delivery_fee', 'min_charge', 'location_latitude', 'location_longitude'], 'number'],
+            [['delivery_fee', 'min_charge'], 'number'],
             [['restaurant_uuid'], 'string', 'max' => 60],
-            [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'location', 'location_ar', 'phone_number'], 'string', 'max' => 255],
+            [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'phone_number'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'unique'],
             [['vendor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Vendor::className(), 'targetAttribute' => ['vendor_id' => 'vendor_id']],
         ];
@@ -116,10 +112,6 @@ class Restaurant extends \yii\db\ActiveRecord {
             'delivery_fee' => 'Delivery Fee',
             'min_charge' => 'Min Charge',
             'restaurant_delivery_area' => 'Delivery Areas',
-            'location' => 'Location',
-            'location_ar' => 'Location Ar',
-            'location_latitude' => 'Location Latitude',
-            'location_longitude' => 'Location Longitude',
             'phone_number' => 'Phone Number',
             'restaurant_created_at' => 'Restaurant Created At',
             'restaurant_updated_at' => 'Restaurant Updated At',

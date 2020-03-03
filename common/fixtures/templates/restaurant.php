@@ -2,13 +2,11 @@
 
 $index1 = $index % 5;//faker->unique()->numberBetween(0, 50);
 
-$vendor_id = Yii::$app->db->createCommand('SELECT vendor_id from vendor')->queryScalar();
-
-$area = Yii::$app->db->createCommand('SELECT * from area limit '.$index1.',1')->queryOne();
+$vendor = Yii::$app->db->createCommand('SELECT * from  vendor')->queryOne();
 
 return [
     'restaurant_uuid' => 'rest_'.$faker->uuid,
-    'vendor_id' => $vendor_id,
+    'vendor_id' => $vendor['vendor_id'],
     'name' => $faker->firstName,
     'name_ar' => $faker->firstName,
     'tagline' => $faker->sentence(4, true),  // generate a sentence with 7 words,
@@ -20,12 +18,7 @@ return [
     'support_pick_up' => 0,
     'delivery_fee' => $faker->numberBetween(1, 2),
     'min_charge' => $faker->numberBetween(1, 3),
-    'location' => $area['area_name'],
-    'location_ar' => $area['area_name_ar'],
-    'location_latitude' => $area['latitude'],
-    'location_longitude' => $area['longitude'],
     'phone_number' => $faker->phoneNumber,
     'restaurant_created_at' => $faker->date('Y-m-d H:i:s'),
     'restaurant_updated_at' => $faker->date('Y-m-d H:i:s'),
 ];
-

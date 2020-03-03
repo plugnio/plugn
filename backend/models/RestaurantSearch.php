@@ -17,9 +17,9 @@ class RestaurantSearch extends Restaurant
     public function rules()
     {
         return [
-            [['restaurant_uuid', 'name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'min_delivery_time', 'min_pickup_time', 'operating_from', 'operating_to', 'location', 'location_ar', 'phone_number', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
+            [['restaurant_uuid', 'name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'min_delivery_time', 'min_pickup_time', 'operating_from', 'operating_to', 'phone_number', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
             [['vendor_id', 'status', 'support_delivery', 'support_pick_up'], 'integer'],
-            [['delivery_fee', 'min_charge', 'location_latitude', 'location_longitude'], 'number'],
+            [['delivery_fee', 'min_charge'], 'number'],
         ];
     }
 
@@ -69,8 +69,6 @@ class RestaurantSearch extends Restaurant
             'operating_to' => $this->operating_to,
             'delivery_fee' => $this->delivery_fee,
             'min_charge' => $this->min_charge,
-            'location_latitude' => $this->location_latitude,
-            'location_longitude' => $this->location_longitude,
             'restaurant_created_at' => $this->restaurant_created_at,
             'restaurant_updated_at' => $this->restaurant_updated_at,
         ]);
@@ -82,8 +80,6 @@ class RestaurantSearch extends Restaurant
             ->andFilterWhere(['like', 'tagline_ar', $this->tagline_ar])
             ->andFilterWhere(['like', 'thumbnail_image', $this->thumbnail_image])
             ->andFilterWhere(['like', 'logo', $this->logo])
-            ->andFilterWhere(['like', 'location', $this->location])
-            ->andFilterWhere(['like', 'location_ar', $this->location_ar])
             ->andFilterWhere(['like', 'phone_number', $this->phone_number]);
 
         return $dataProvider;

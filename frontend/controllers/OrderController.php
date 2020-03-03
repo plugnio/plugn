@@ -89,26 +89,35 @@ class OrderController extends Controller {
      */
     public function actionCreate() {
         $model = new Order();
-        $model->restaurant_uuid =  Yii::$app->user->identity->restaurant_uuid;
-        
-        
+        $model->restaurant_uuid = Yii::$app->user->identity->restaurant_uuid;
+
+
         if ($model->load(Yii::$app->request->post())) {
             $model->area_name = $model->area->area_name;
             $model->area_name_ar = $model->area->area_name_ar;
             $model->payment_method_name = $model->paymentMethod->payment_method_name;
-            
-            if($model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->support_delivery == false)
+
+            if ($model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->support_delivery == false)
                 $model->order_mode = null;
-            else if ($model->order_mode == Order::ORDER_MODE_PICK_UP &&  $model->restaurant->support_pick_up == false)
-                 $model->order_mode = null;
-            
-            $customer_model = new Customer();
-            $customer_model->customer_name = $model->customer_name;
-            $customer_model->customer_phone_number = $model->customer_phone_number;
-            if($model->customer_email != null)
-                $customer_model->customer_email = $model->customer_email;
-            
-            $customer_model->save();
+            else if ($model->order_mode == Order::ORDER_MODE_PICK_UP && $model->restaurant->support_pick_up == false)
+                $model->order_mode = null;
+
+
+
+            $customer_model = Customer::find()->where(['customer_phone_number' => $model->customer_phone_number])->one();
+
+
+            if (!$customer_model) {
+                
+                $customer_model = new Customer();
+                $customer_model->customer_name = $model->customer_name;
+                $customer_model->customer_phone_number = $model->customer_phone_number;
+                if ($model->customer_email != null)
+                    $customer_model->customer_email = $model->customer_email;
+
+                $customer_model->save();
+            }
+
             $model->customer_id = $customer_model->customer_id;
 
             if ($model->save())

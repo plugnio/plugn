@@ -22,6 +22,7 @@ class m200119_140648_create_restaurant_delivery_table extends Migration
         $this->createTable('{{%restaurant_delivery}}', [
             'restaurant_uuid' => $this->char(60)->notNull(),
             'area_id' => $this->integer()->notNull(),
+            'min_delivery_time' => $this->integer()->notNull(),
         ],$tableOptions);
         
         $this->addPrimaryKey('PK', 'restaurant_delivery', ['restaurant_uuid','area_id']);

@@ -9,6 +9,6 @@ return [
     'option_id' => $option_id,
     'extra_option_name' => $faker->firstname,
     'extra_option_name_ar' => $faker->firstname,
-    'price' => $faker->numberBetween(1,5),
+    'extra_option_price' => $faker->numberBetween(1,5),
 ];
 

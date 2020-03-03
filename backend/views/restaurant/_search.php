@@ -50,14 +50,6 @@ use yii\widgets\ActiveForm;
     <?php // echo $form->field($model, 'min_charge') ?>
 
 
-    <?php // echo $form->field($model, 'location') ?>
-
-    <?php // echo $form->field($model, 'location_ar') ?>
-
-    <?php // echo $form->field($model, 'location_latitude') ?>
-
-    <?php // echo $form->field($model, 'location_longitude') ?>
-
     <?php // echo $form->field($model, 'phone_number') ?>
 
     <?php // echo $form->field($model, 'restaurant_created_at') ?>

@@ -100,28 +100,60 @@ DashboardAsset::register($this);
                                 </ul>
                             </li>
                             <li class="nav-item has-treeview">
-                                   <?=
+                                <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'nav-icon fas fa-shopping-cart']) .
-                                        Html::tag('p','Customer orders'), ['order/index'], ['class' => 'nav-link']
+                                        Html::tag('p', 'Customer orders'), ['order/index'], ['class' => 'nav-link']
                                 )
                                 ?>
                             </li>
                             <li class="nav-item has-treeview">
-                                   <?=
+                                <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'nav-icon fas fa-user']) .
-                                        Html::tag('p','Customers'), ['customer/index'], ['class' => 'nav-link']
+                                        Html::tag('p', 'Customers'), ['customer/index'], ['class' => 'nav-link']
                                 )
                                 ?>
                             </li>
                             <li class="nav-item has-treeview">
-                                   <?=
+                                <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'nav-icon fas fa-cogs']) .
-                                        Html::tag('p','Settings'), ['restaurant/index'], ['class' => 'nav-link']
+                                        Html::tag('p', '
+                                      Settings
+                                      <i class="fas fa-angle-left right"></i>'), [''], ['class' => 'nav-link']
                                 )
                                 ?>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+
+                                        <?=
+                                        Html::a(
+                                                Html::tag('i', '', ['class' => 'nav-icon fas fa-store']) .
+                                                Html::tag('p', 'Restaurant Info'), ['restaurant/index'], ['class' => 'nav-link']
+                                        )
+                                        ?>
+
+                                    </li>
+                                    <li class="nav-item">
+                                        <?=
+                                        Html::a(
+                                                Html::tag('i', '', ['class' => 'nav-icon fas fa-truck']) .
+                                                Html::tag('p', 'Delivery Zone by Area'), ['restaurant-delivery/index'], ['class' => 'nav-link']
+                                        )
+                                        ?>
+
+                                    </li>
+                                    <li class="nav-item">
+                                        <?=
+                                        Html::a(
+                                                Html::tag('i', '', ['class' => 'nav-icon fas fa-truck']) .
+                                                Html::tag('p', 'Delivery Zone by City'), ['restaurant-delivery/index-by-city'], ['class' => 'nav-link']
+                                        )
+                                        ?>
+
+                                    </li>
+                                </ul>
                             </li>
                         </ul>
                     </nav>

@@ -43,10 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
             //'operating_to',
             //'delivery_fee',
             //'min_charge',
-            //'location',
-            //'location_ar',
-            //'location_latitude',
-            //'location_longitude',
+
             //'phone_number',
             //'restaurant_created_at',
             //'restaurant_updated_at',

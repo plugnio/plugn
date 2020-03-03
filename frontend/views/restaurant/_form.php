@@ -58,10 +58,11 @@ $(function () {
     $('#reservation').daterangepicker()
     //Date range picker with time picker
     $('#reservationtime').daterangepicker({
-      timePicker: true,
+      operatingFromTimepicker: true,
+      operatingToTimepicker: true,
       timePickerIncrement: 30,
       locale: {
-        format: 'MM/DD/YYYY hh:mm A'
+        format: 'MM/DD/YYYY H:mm '
       }
     })
     //Date range as a button
@@ -84,8 +85,11 @@ $(function () {
     )
 
     //Timepicker
-    $('#timepicker').datetimepicker({
-      format: 'LT'
+    $('#operatingFromTimepicker').datetimepicker({
+        format:'H:mm'
+    })
+    $('#operatingToTimepicker').datetimepicker({
+       format:'H:mm'
     })
     
     //Bootstrap Duallistbox
@@ -154,36 +158,28 @@ $this->registerJs($js);
     $form = ActiveForm::begin();
     ?>
 
-
-    <?php
-//    $form->field($model, 'restaurant_delivery_area')->widget(Select2::classname(), [
-//        'data' => $restaurantDeliveryArray,
-//        'options' => [
-//            'placeholder' => 'Select delivery area ...',
-//            'multiple' => true,
-//            'value' => $sotredRestaurantDeliveryAreas
-//        ],
-//        'pluginOptions' => [
-//            'tags' => true,
-//            'tokenSeparators' => [',', ' '],
-//        ],
-//    ]);
+    <?=
+    $form->field($model, 'restaurant_delivery_area')->dropDownList(
+            $restaurantDeliveryArray, [
+        'class' => 'select2',
+        'multiple' => 'multiple',
+                'value' => $sotredRestaurantDeliveryAreas
+            ]
+    );
     ?>
 
-    <?php
-//    $form->field($model, 'restaurant_payments_method')->widget(Select2::classname(), [
-//        'data' => $paymentMethodArray,
-//        'options' => [
-//            'placeholder' => 'Select payment method ...',
-//            'multiple' => true,
-//            'value' => $sotredRestaurantPaymentMethod
-//        ],
-//        'pluginOptions' => [
-//            'tags' => true,
-//            'tokenSeparators' => [',', ' '],
-//        ],
-//    ]);
+    <?=
+    $form->field($model, 'restaurant_payments_method')->dropDownList(
+            $paymentMethodArray, [
+        'class' => 'select2',
+        'multiple' => 'multiple',
+                                'value' => $sotredRestaurantPaymentMethod
+
+            ]
+    );
     ?>
+
+
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
@@ -193,33 +189,34 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'tagline_ar')->textInput(['maxlength' => true]) ?>
 
-    <?php
-//    $form->field($model, 'thumbnail_image')->widget(FileInput::classname(), [
-//        'options' => ['accept' => 'image/*', 'multiple' => false
-//        ],
-//        'pluginOptions' => [
-//            'showUpload' => false,
-//             'initialPreview' => $model->getThumbnailImage(),
-//             'initialPreviewAsData' => true,
-//             'overwriteInitial' => true,
-//            'maxFileSize' => 2800
-//        ]
-//    ]);
-    ?>
-    <?php
-//    $form->field($model, 'logo')->widget(FileInput::classname(), [
-//        'options' => ['accept' => 'image/*', 'multiple' => false
-//        ],
-//        'pluginOptions' => [
-//            'showUpload' => false,
-//             'initialPreview' => $model->getLogo(),
-//             'initialPreviewAsData' => true,
-//             'overwriteInitial' => true,
-//            'maxFileSize' => 2800
-//        ]
-//    ]);
-    ?>
 
+    <div style="margin-bottom: 20px;">
+
+
+        <?=
+        $form->field($model, 'thumbnail_image', [
+            'labelOptions' => ['class' => 'custom-file-label'],
+            'options' => ['class' => 'custom-file'],
+        ])->fileInput([
+            'multiple' => false,
+            'accept' => 'image/*',
+            'class' => 'custom-file-input'
+        ])
+        ?>
+    </div>
+    <div style="margin-bottom: 20px;">
+
+        <?=
+        $form->field($model, 'logo', [
+            'labelOptions' => ['class' => 'custom-file-label'],
+            'options' => ['class' => 'custom-file']
+        ])->fileInput([
+            'multiple' => false,
+            'accept' => 'image/*',
+            'class' => 'custom-file-input'
+        ])
+        ?>
+    </div>
 
     <?=
     $form->field($model, 'support_delivery')->dropDownList(
@@ -227,7 +224,7 @@ $this->registerJs($js);
         1 => 'Yes',
         0 => 'No',
             ]
-            , ['prompt' => 'Choose...', 'id' => 'supportDeliveryInput']
+            , ['prompt' => 'Choose...', 'id' => 'supportDeliveryInput', 'class' => 'select2']
     );
     ?>
 
@@ -237,12 +234,13 @@ $this->registerJs($js);
         1 => 'Yes',
         0 => 'No',
             ]
-            , ['prompt' => 'Choose...', 'id' => 'supportPickupInput']
+            , ['prompt' => 'Choose...', 'id' => 'supportPickupInput', 'class' => 'select2']
     );
     ?>
 
     <div id='minDeliveryTime' style='<?= $model->isNewRecord || ($model->support_delivery == 0) ? "display:none" : "" ?>'>
-    <?php
+
+        <?php
 //        $form->field($model, 'min_delivery_time')->widget(TimePicker::classname(), [
 //            'options' => ['placeholder' => 'Enter event time ...'],
 //            'pluginOptions' => [
@@ -252,11 +250,11 @@ $this->registerJs($js);
 //                'showMeridian' => false,
 //            ]
 //        ]);
-    ?>
+        ?>
     </div>
 
     <div id='minPickupTime' style='<?= $model->isNewRecord || ($model->support_pick_up == 0) ? "display:none" : "" ?>'>
-<?php
+        <?php
 //        $form->field($model, 'min_pickup_time')->widget(TimePicker::classname(), [
 //            'options' => ['placeholder' => 'Enter event time ...'],
 //            'pluginOptions' => [
@@ -266,55 +264,40 @@ $this->registerJs($js);
 //                'showMeridian' => false,
 //            ]
 //        ]);
-?>
+        ?>
     </div>
 
 
-<?php
-//    $form->field($model, 'operating_from')->widget(TimePicker::classname(), [
-//        'options' => ['placeholder' => 'Enter event time ...'],
-//        'pluginOptions' => [
-//            'autoclose' => true,
-//            'defaultTime' => false,
-//            'showSeconds' => true,
-//            'showMeridian' => false
-//        ]
-//    ]);
-?>
+    <?=
+    $form->field($model, 'operating_from', [
+        'labelOptions' => ['class' => 'control-label'],
+        'options' => ['class' => 'form-group input-group float-right'],
+        'template' => '{label}<div class="input-group date" id="operatingFromTimepicker" data-target-input="nearest"> {input} <div class="input-group-append" data-target="#operatingFromTimepicker" data-toggle="datetimepicker"> <div class="input-group-text"><i class="far fa-clock"></i></div> </div> </div>'
+    ])->input(['text'])
+    ?>
 
-    <?php
-//    $form->field($model, 'operating_to')->widget(TimePicker::classname(), [
-//        'options' => ['placeholder' => 'Enter event time ...'],
-//        'pluginOptions' => [
-//            'autoclose' => true,
-//            'defaultTime' => false,
-//            'showSeconds' => true,
-//            'showMeridian' => false
-//        ]
-//    ]);
+    <?=
+    $form->field($model, 'operating_to', [
+        'labelOptions' => ['class' => 'control-label'],
+        'options' => ['class' => 'form-group  input-group float-right'],
+        'template' => '{label}<div class="input-group date" id="operatingToTimepicker" data-target-input="nearest"> {input} <div class="input-group-append" data-target="#operatingToTimepicker" data-toggle="datetimepicker"> <div class="input-group-text"><i class="far fa-clock"></i></div> </div> </div>'
+    ])->input(['text'])
     ?>
 
     <div id='deliveryFeeInput' style='<?= $model->isNewRecord || ($model->support_delivery == 0) ? "display:none" : "" ?>'>
-    <?= $form->field($model, 'delivery_fee')->input('number', ['maxlength' => true, 'placeholder' => '0.500']) ?>
+        <?= $form->field($model, 'delivery_fee')->input('number', ['maxlength' => true, 'placeholder' => '0.500']) ?>
     </div>
 
-        <?= $form->field($model, 'min_charge')->input('number', ['maxlength' => true, 'placeholder' => '5']) ?>
+    <?= $form->field($model, 'min_charge')->input('number', ['maxlength' => true, 'placeholder' => '5']) ?>
 
-    <?= $form->field($model, 'location')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'location_ar')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'location_latitude')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'location_longitude')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'phone_number')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'phone_number')->input('number') ?>
 
 
     <div class="form-group">
-<?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>
 
-        <?php ActiveForm::end(); ?>
+    <?php ActiveForm::end(); ?>
 
 </div>
