@@ -48,13 +48,23 @@ class RestaurantDeliveryController extends Controller {
      */
     public function actionIndexByCity() {
 
-        $model = new \yii\data\ActiveDataProvider([
-            'query' => RestaurantDelivery::find()->where(['restaurant_uuid' => Yii::$app->user->identity->restaurant_uuid]),
-            'sort' => false
-        ]);
+        $restaurantDeliveryAreas = \common\models\RestaurantDelivery::find(['restaurant_uuid' => 'rest_d3d860ff-76ed-3978-a64a-0f208fbd3044'])->all();
+        $citiesList = \common\models\City::find()->all();
+        
+        $restaurantDeliveryAreasIndexedByCity = [];
+        foreach ($citiesList as $city) {
+            foreach ($restaurantDeliveryAreas as $restaurantDeliveryArea) {
+                if($restaurantDeliveryArea->area->city_id == $city->city_id)
+                    array_push($restaurantDeliveryAreasIndexedByCity, $restaurantDeliveryArea);
+            }
+        }
+        
+        $restaurantDeliveryAreasIndexedByCity = \yii\helpers\ArrayHelper::index($restaurantDeliveryAreasIndexedByCity, null,'area.city.city_name');
+
+
 
         return $this->render('city_index', [
-                    'dataProvider' => $model,
+                    'dataProvider' => $restaurantDeliveryAreasIndexedByCity,
         ]);
     }
 

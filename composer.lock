@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0c495f02956549a710a20f2b83638bc3",
+    "content-hash": "16dff993f545fe9ba258ac02d17633f3",
     "packages": [
         {
             "name": "2amigos/yii2-twilio-component",
@@ -163,6 +163,46 @@
             "license": [
                 "MIT"
             ]
+        },
+        {
+            "name": "bower-asset/jquery-treegrid",
+            "version": "0.3.0",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:maxazan/jquery-treegrid.git",
+                "reference": "c8ba9e9604620002155d01a947cceffe18d4428c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/maxazan/jquery-treegrid/zipball/c8ba9e9604620002155d01a947cceffe18d4428c",
+                "reference": "c8ba9e9604620002155d01a947cceffe18d4428c"
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.9.1",
+                "bower-asset/jquery.cookie": ">=1.4.1"
+            },
+            "type": "bower-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "bower-asset/jquery.cookie",
+            "version": "v1.4.1",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:carhartl/jquery-cookie.git",
+                "reference": "7f88a4e631aba8a8c688fd8999ce6b9bcfd50718"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/carhartl/jquery-cookie/zipball/7f88a4e631aba8a8c688fd8999ce6b9bcfd50718",
+                "reference": "7f88a4e631aba8a8c688fd8999ce6b9bcfd50718"
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.2"
+            },
+            "type": "bower-asset"
         },
         {
             "name": "bower-asset/punycode",
@@ -921,6 +961,58 @@
                 "yii2"
             ],
             "time": "2018-10-09T11:58:19+00:00"
+        },
+        {
+            "name": "leandrogehlen/yii2-treegrid",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/leandrogehlen/yii2-treegrid.git",
+                "reference": "a98305d934335780e35aadd5791d635048b4fad7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/leandrogehlen/yii2-treegrid/zipball/a98305d934335780e35aadd5791d635048b4fad7",
+                "reference": "a98305d934335780e35aadd5791d635048b4fad7",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/jquery-treegrid": "0.3.0",
+                "yiisoft/yii2": "~2.0.13"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "leandrogehlen\\treegrid\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Leandro Guindani Gehlen",
+                    "email": "leandrogehlen@gmail.com"
+                }
+            ],
+            "description": "Extension for Yii2 Framework to work with jQuery TreeGrid",
+            "keywords": [
+                "interface",
+                "tree",
+                "treegrid",
+                "treeview",
+                "yii2"
+            ],
+            "time": "2018-01-16T10:34:41+00:00"
         },
         {
             "name": "nikic/php-parser",

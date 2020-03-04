@@ -13,51 +13,44 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 
-<div class="card">
-
-
-    <?=
-    GridView::widget([
-        'dataProvider' => $dataProvider,
-        'columns' => [
-            'city.city_name',
-            'min_delivery_time',
-            'delivery_fee',
-          
-            [
-                'class' => 'yii\grid\ActionColumn',
-                'template' => ' {view} {update} {delete}',
-                'buttons' => [
-                  
-                    'update' => function ($url ,$model) {
-                        $url = Url::to(['restaurant-delivery/update-delivery-time-for-city', 'area_id' => $model->area_id, 'city_id' => $model->area->city_id]);
-                        return Html::a(
-                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', $url, [
-                                    'title' => 'Update',
-                                    'data-pjax' => '0',
-                                        ]
-                        );
-                    },
-                    'delete' => function ($url) {
-                        return Html::a(
-                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-trash"></span>', $url, [
-                                    'title' => 'Delete',
-                                    'data' => [
-                                        'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',
-                                        'method' => 'post',
-                                    ],
-                        ]);
-                    },
-                ],
-            ],
-        ],
-        'layout' => '{summary}<div class="card-body">{items}{pager}</div>',
-        'tableOptions' => ['class' => 'table table-bordered table-hover'],
-        'summaryOptions' => ['class' => "card-header"],
-    ]);
+<?php
+foreach ($dataProvider as $key => $city) {
     ?>
+    <div>
+        <div class="card card-default">
+            <div class="card-header">
+                <h1 class="card-title"><?= $key ?></h1>
 
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-remove"></i></button>
+                </div>
+            </div>
+            <div class="card-body">
 
-</div>
+                <table class="table table-hover text-nowrap">
+                    <thead>
+                        <tr>
+                            <th>Area</th>
+                            <th>Min Delivery Time</th>
+                            <th>Delivery Fee</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        foreach ($city as $restaurantDeliveryArea) {
+                            ?>
+                            <tr>
+                                <td><?= $restaurantDeliveryArea->area->area_name ?></td>
+                                <td><?= $restaurantDeliveryArea->min_delivery_time ?>
+                                <td><?= $restaurantDeliveryArea->delivery_fee ?></td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-
+<?php }
+?>

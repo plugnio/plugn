@@ -72,7 +72,7 @@ class RestaurantDelivery extends \yii\db\ActiveRecord
      */
     public function getCity()
     {
-        return $this->hasOne(City::className(), ['city_id' => 'city_id'])->via('area')->distinct();
+        return $this->hasOne(City::className(), ['city_id' => 'city_id'])->via('area');
     }
 
     /**
