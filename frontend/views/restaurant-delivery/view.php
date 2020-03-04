@@ -32,6 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'restaurant_uuid',
             'area_id',
             'min_delivery_time:datetime',
+            'delivery_fee:currency'
         ],
     ]) ?>
 

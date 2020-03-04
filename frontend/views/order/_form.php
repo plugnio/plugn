@@ -108,7 +108,8 @@ $this->registerJs($js);
 
 
     if (is_array($orderModeOptions) && sizeof($orderModeOptions) > 0)
-        echo $form->field($model, 'order_mode')->dropDownList($orderModeOptions, ['prompt' => 'Choose...','class' => 'select2']);
+         echo $form->field($model, 'order_mode')->dropDownList($orderModeOptions, ['prompt' => 'Choose...','class' => 'select2']);
+
     ?>
     
     <?= $form->field($model, 'area_id')->dropDownList($areaList,['class' => 'select2'])->label('Area'); ?>

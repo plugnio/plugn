@@ -24,6 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'city.city_name',
             'area.area_name',
             'min_delivery_time',
+            'delivery_fee:currency',
           
             [
                 'class' => 'yii\grid\ActionColumn',

@@ -21,7 +21,6 @@ use yii\behaviors\AttributeBehavior;
  * @property string $logo
  * @property int $support_delivery
  * @property int $support_pick_up
- * @property string|null $min_delivery_time
  * @property string|null $min_pickup_time
  * @property string|null $operating_from
  * @property string|null $operating_to
@@ -62,11 +61,6 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['vendor_id', 'name', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_delivery_area'], 'required'],
-            ['min_delivery_time', 'required', 'when' => function ($model) {
-                    return $model->support_delivery == 1;
-                }, 'whenClient' => "function (attribute, value) {
-                return $('#supportDeliveryInput').val() == 1;
-            }"],
             ['min_pickup_time', 'required', 'when' => function ($model) {
                     return $model->support_pick_up == 1;
                 }, 'whenClient' => "function (attribute, value) {
@@ -80,7 +74,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['thumbnail_image', 'logo'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['vendor_id', 'restaurant_status', 'support_delivery', 'support_pick_up'], 'integer'],
-            [['min_delivery_time', 'min_pickup_time', 'operating_from', 'operating_to', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
+            [['min_pickup_time', 'operating_from', 'operating_to', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
             [['delivery_fee', 'min_charge'], 'number'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'phone_number'], 'string', 'max' => 255],
@@ -105,7 +99,6 @@ class Restaurant extends \yii\db\ActiveRecord {
             'logo' => 'Logo',
             'support_delivery' => 'Support Delivery',
             'support_pick_up' => 'Support Pick Up',
-            'min_delivery_time' => 'Min Delivery Time',
             'min_pickup_time' => 'Min Pickup Time',
             'operating_from' => 'Operating From',
             'operating_to' => 'Operating To',
