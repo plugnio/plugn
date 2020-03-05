@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <?php
 foreach ($dataProvider->query as $city) {
-    if($city->restaurantDeliveries){
+    if($city->restaurantDeliveryAreas){
     ?>
     <div>
         <div class="card card-default">
@@ -26,9 +26,9 @@ foreach ($dataProvider->query as $city) {
                
                 <div class="card-tools">
                         <?php
-//                            echo Html::a(
-//                                    '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['option/create', 'item_uuid' => $model->item_uuid]
-//                            );
+                            echo Html::a(
+                                    '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['restaurant-delivery/update-delivery-time-for-city', 'city_id' => $city->city_id]
+                            );
                             ?>
                     <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
                     <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-remove"></i></button>
@@ -47,7 +47,7 @@ foreach ($dataProvider->query as $city) {
                     </thead>
                     <tbody>
                         <?php
-                        foreach ($city->restaurantDeliveries as $restaurantDeliveryArea) {
+                        foreach ($city->restaurantDeliveryAreas as $restaurantDeliveryArea) {
                             $form = ActiveForm::begin([
                                         'enableClientScript' => false,
                             ]);
@@ -58,7 +58,7 @@ foreach ($dataProvider->query as $city) {
                                 <td>    <?= $form->field($restaurantDeliveryArea, 'delivery_fee')->input('float') ?></td>
                                 <td style="padding-top: 43px">   
                                     <div class="form-group">
-                                        <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'name' => $restaurantDeliveryArea->area->area_name]) ?>
+                                        <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'name' => $restaurantDeliveryArea->area->area_id]) ?>
                                     </div>
                                 </td>
                             </tr>

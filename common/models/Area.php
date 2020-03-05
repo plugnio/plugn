@@ -15,8 +15,8 @@ use Yii;
  * @property float|null $longitude
  *
  * @property City $city
- * @property RestaurantDelivery[] $restaurantDeliveries
- * @property Restaurant[] $restaurantUus
+ * @property RestaurantDelivery[] $restaurantDeliveryAreas
+ * @property Restaurant[] $restaurant
  */
 class Area extends \yii\db\ActiveRecord
 {
@@ -68,11 +68,11 @@ class Area extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[RestaurantDeliveries]].
+     * Gets query for [[RestaurantDeliveryAreas]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantDeliveries()
+    public function getRestaurantDeliveryAreas()
     {
         return $this->hasMany(RestaurantDelivery::className(), ['area_id' => 'area_id']);
     }
@@ -82,7 +82,7 @@ class Area extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantUus()
+    public function getRestaurant()
     {
         return $this->hasMany(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->viaTable('restaurant_delivery', ['area_id' => 'area_id']);
     }

@@ -33,7 +33,7 @@ use yii\behaviors\AttributeBehavior;
  *
  * @property Item[] $items
  * @property Vendor $vendor
- * @property RestaurantDelivery[] $restaurantDeliveries
+ * @property RestaurantDelivery[] $restaurantDeliveryAreas
  * @property Area[] $areas
  * @property RestaurantPaymentMethod[] $restaurantPaymentMethods
  * @property PaymentMethod[] $paymentMethods
@@ -387,11 +387,11 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
-     * Gets query for [[RestaurantDeliveries]].
+     * Gets query for [[RestaurantDeliveryAreas]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantDeliveries() {
+    public function getRestaurantDeliveryAreas() {
         return $this->hasMany(RestaurantDelivery::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 

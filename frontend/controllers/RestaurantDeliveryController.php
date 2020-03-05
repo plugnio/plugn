@@ -11,6 +11,7 @@ use yii\filters\VerbFilter;
 use frontend\models\City;
 use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
+use frontend\models\DeliveryZoneForm;
 
 /**
  * RestaurantDeliveryController implements the CRUD actions for RestaurantDelivery model.
@@ -37,18 +38,19 @@ class RestaurantDeliveryController extends Controller {
      */
     public function actionIndex() {
 
-        $query = City::find()->with('restaurantDeliveries')->all();
+        $query = City::find()->with('restaurantDeliveryAreas')->all();
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
 
         foreach ($dataProvider->query as $city) {
-            foreach ($city->restaurantDeliveries as $restaurantDeliveries) {
-                if (isset($_POST[$restaurantDeliveries->area->area_name])) {
-                    $restaurantDeliveries->delivery_fee = $_POST['RestaurantDelivery']['delivery_fee'];
-                    $restaurantDeliveries->min_delivery_time = $_POST['RestaurantDelivery']['min_delivery_time'];
-                    $restaurantDeliveries->save();
+            foreach ($city->restaurantDeliveryAreas as $restaurantDeliveryAreas) {             
+
+                if (isset($_POST[$restaurantDeliveryAreas->area->area_id])) {
+                    $restaurantDeliveryAreas->delivery_fee = $_POST['RestaurantDelivery']['delivery_fee'];
+                    $restaurantDeliveryAreas->min_delivery_time = $_POST['RestaurantDelivery']['min_delivery_time'];
+                    $restaurantDeliveryAreas->save(false);
                 }
             }
         }
@@ -77,31 +79,17 @@ class RestaurantDeliveryController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdateDeliveryTimeForCity($city_id, $area_id) {
+    public function actionUpdateDeliveryTimeForCity($city_id) {
 
-        $model = $this->findModel(Yii::$app->user->identity->restaurant_uuid, $area_id);
+        $model = new DeliveryZoneForm;
+        $model->city_id = $city_id;
 
-        if ($model->load(Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->post()) && $model->applyTimingAndDeliveryFeeForAllAreasBelongsToThisCity()) {
 
-            //bring all restaurant delivery area that match city_id
-            $allAreasInCity = RestaurantDelivery::find()->joinWith('area')->where(['area.city_id' => $city_id])->all();
-
-            foreach ($allAreasInCity as $area) {
-                $area->min_delivery_time = $model->min_delivery_time;
-                $area->save();
-            }
-
-            $model = new \yii\data\ActiveDataProvider([
-                'query' => RestaurantDelivery::find()->where(['restaurant_uuid' => Yii::$app->user->identity->restaurant_uuid]),
-                'sort' => false
-            ]);
-
-            return $this->render('city_index', [
-                        'dataProvider' => $model,
-            ]);
+            return $this->redirect(['index']);
         }
 
-        return $this->render('update', [
+        return $this->render('update-delivery-zone', [
                     'model' => $model,
         ]);
     }

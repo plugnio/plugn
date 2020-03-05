@@ -100,7 +100,6 @@ $this->registerJs($js);
     ?>
 
 
-    
     <?php
     $orderModeOptions = [];
     $model->restaurant->support_delivery ? $orderModeOptions[Order::ORDER_MODE_DELIVERY] = 'Delivery' : null;
@@ -109,20 +108,19 @@ $this->registerJs($js);
 
     if (is_array($orderModeOptions) && sizeof($orderModeOptions) > 0)
          echo $form->field($model, 'order_mode')->dropDownList($orderModeOptions, ['prompt' => 'Choose...','class' => 'select2']);
-
     ?>
     
     <?= $form->field($model, 'area_id')->dropDownList($areaList,['class' => 'select2'])->label('Area'); ?>
 
     <?= $form->field($model, 'unit_type')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'block')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'block')->input('number') ?>
 
-    <?= $form->field($model, 'street')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'street')->input('number') ?>
 
-    <?= $form->field($model, 'avenue')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'avenue')->input('number') ?>
 
-    <?= $form->field($model, 'house_number')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'house_number')->input('number') ?>
 
     <?= $form->field($model, 'special_directions')->textInput(['maxlength' => true]) ?>
 
@@ -130,8 +128,7 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'customer_phone_number')->textInput(['maxlength' => true]) ?>
 
-
-    <?= $form->field($model, 'customer_email')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'customer_email')->input('email') ?>
 
     <?= $form->field($model, 'payment_method_id')->dropDownList($paymentList,['class' => 'select2'])->label('Payment Method'); ?>
 
