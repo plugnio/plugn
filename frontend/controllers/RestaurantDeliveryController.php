@@ -8,7 +8,7 @@ use frontend\models\RestaurantDeliverySearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use common\models\City;
+use frontend\models\City;
 use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 
@@ -45,7 +45,7 @@ class RestaurantDeliveryController extends Controller {
 
         foreach ($dataProvider->query as $city) {
             foreach ($city->restaurantDeliveries as $restaurantDeliveries) {
-                if (isset($_POST[$restaurantDeliveries->area_id])) {
+                if (isset($_POST[$restaurantDeliveries->area->area_name])) {
                     $restaurantDeliveries->delivery_fee = $_POST['RestaurantDelivery']['delivery_fee'];
                     $restaurantDeliveries->min_delivery_time = $_POST['RestaurantDelivery']['min_delivery_time'];
                     $restaurantDeliveries->save();
