@@ -8,6 +8,9 @@ use frontend\models\RestaurantDeliverySearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use common\models\City;
+use yii\helpers\ArrayHelper;
+use yii\data\ActiveDataProvider;
 
 /**
  * RestaurantDeliveryController implements the CRUD actions for RestaurantDelivery model.
@@ -33,38 +36,25 @@ class RestaurantDeliveryController extends Controller {
      * @return mixed
      */
     public function actionIndex() {
-        $searchModel = new RestaurantDeliverySearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
-                    'searchModel' => $searchModel,
-                    'dataProvider' => $dataProvider,
+        $query = City::find()->with('restaurantDeliveries')->all();
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
         ]);
-    }
 
-    /**
-     * Lists all RestaurantDelivery models.
-     * @return mixed
-     */
-    public function actionIndexByCity() {
-
-        $restaurantDeliveryAreas = \common\models\RestaurantDelivery::find(['restaurant_uuid' => 'rest_d3d860ff-76ed-3978-a64a-0f208fbd3044'])->all();
-        $citiesList = \common\models\City::find()->all();
-        
-        $restaurantDeliveryAreasIndexedByCity = [];
-        foreach ($citiesList as $city) {
-            foreach ($restaurantDeliveryAreas as $restaurantDeliveryArea) {
-                if($restaurantDeliveryArea->area->city_id == $city->city_id)
-                    array_push($restaurantDeliveryAreasIndexedByCity, $restaurantDeliveryArea);
+        foreach ($dataProvider->query as $city) {
+            foreach ($city->restaurantDeliveries as $restaurantDeliveries) {
+                if (isset($_POST[$restaurantDeliveries->area_id])) {
+                    $restaurantDeliveries->delivery_fee = $_POST['RestaurantDelivery']['delivery_fee'];
+                    $restaurantDeliveries->min_delivery_time = $_POST['RestaurantDelivery']['min_delivery_time'];
+                    $restaurantDeliveries->save();
+                }
             }
         }
-        
-        $restaurantDeliveryAreasIndexedByCity = \yii\helpers\ArrayHelper::index($restaurantDeliveryAreasIndexedByCity, null,'area.city.city_name');
 
-
-
-        return $this->render('city_index', [
-                    'dataProvider' => $restaurantDeliveryAreasIndexedByCity,
+        return $this->render('index', [
+                    'dataProvider' => $dataProvider
         ]);
     }
 

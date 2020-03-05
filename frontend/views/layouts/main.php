@@ -126,7 +126,6 @@ DashboardAsset::register($this);
                                 ?>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
-
                                         <?=
                                         Html::a(
                                                 Html::tag('i', '', ['class' => 'nav-icon fas fa-store']) .
@@ -139,16 +138,7 @@ DashboardAsset::register($this);
                                         <?=
                                         Html::a(
                                                 Html::tag('i', '', ['class' => 'nav-icon fas fa-truck']) .
-                                                Html::tag('p', 'Delivery Zone by Area'), ['restaurant-delivery/index'], ['class' => 'nav-link']
-                                        )
-                                        ?>
-
-                                    </li>
-                                    <li class="nav-item">
-                                        <?=
-                                        Html::a(
-                                                Html::tag('i', '', ['class' => 'nav-icon fas fa-truck']) .
-                                                Html::tag('p', 'Delivery Zone by City'), ['restaurant-delivery/index-by-city'], ['class' => 'nav-link']
+                                                Html::tag('p', 'Delivery Zone'), ['restaurant-delivery/index'], ['class' => 'nav-link']
                                         )
                                         ?>
 
