@@ -27,7 +27,6 @@ class DeliveryZoneForm extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['delivery_fee', 'min_delivery_time'], 'required'],
             [['min_delivery_time'], 'integer'],
             [['delivery_fee'], 'number'],
             [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::className(), 'targetAttribute' => ['city_id' => 'city_id']],
@@ -58,8 +57,13 @@ class DeliveryZoneForm extends \yii\db\ActiveRecord {
 
         foreach ($restaurantDeliveryAreas as $restaurantDeliveryArea) {
             if ($restaurantDeliveryArea->area->city_id == $this->city_id) {
-                $restaurantDeliveryArea->delivery_fee = $this->delivery_fee;
-                $restaurantDeliveryArea->min_delivery_time = $this->min_delivery_time;
+                
+                if($this->delivery_fee != null)
+                    $restaurantDeliveryArea->delivery_fee = $this->delivery_fee;
+                
+                if($this->min_delivery_time != null)
+                    $restaurantDeliveryArea->min_delivery_time = $this->min_delivery_time;
+                
                 $restaurantDeliveryArea->save(false);
             }
         }

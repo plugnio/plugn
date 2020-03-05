@@ -31,6 +31,7 @@ use yii\db\Expression;
  * @property datetime $order_created_at
  *
  * @property Area $area
+ * @property Customer $customer 
  * @property PaymentMethod $paymentMethod
  * @property Restaurant $restaurant
  * @property OrderItem[] $orderItems
@@ -138,18 +139,6 @@ class Order extends \yii\db\ActiveRecord {
             return 'Out for Delivery';
         else if ($this->order_status == self::STATUS_COMPLETE)
             return 'Complete';
-    }
-
-    /**
-     * Calculate order item's total price
-     */
-    public function calculateOrderItemsTotalPrice() {
-        $totalPrice = 0;
-
-        foreach ($this->getOrderItems()->all() as $item)
-            $totalPrice += $item->calculateOrderItemPrice();
-
-        return $totalPrice;
     }
 
     /**

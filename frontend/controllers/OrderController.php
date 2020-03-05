@@ -3,7 +3,7 @@
 namespace frontend\controllers;
 
 use Yii;
-use common\models\Order;
+use frontend\models\Order;
 use frontend\models\OrderSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -73,8 +73,7 @@ class OrderController extends Controller {
         $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
             'query' => $order_model->getOrderItemExtraOptions()
         ]);
-
-
+             
         return $this->render('view', [
                     'model' => $order_model,
                     'orderItems' => $orderItems,
@@ -82,7 +81,7 @@ class OrderController extends Controller {
         ]);
     }
 
-    /**
+    /** 
      * Creates a new Order model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed

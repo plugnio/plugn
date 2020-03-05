@@ -12,7 +12,7 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'delivery_fee')->input('number') ?>
+    <?= $form->field($model, 'delivery_fee')->input('float') ?>
     
     <?= $form->field($model, 'min_delivery_time')->input('number') ?>
 

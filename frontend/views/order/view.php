@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\grid\GridView;
-use common\models\Order;
+use frontend\models\Order;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Order */
@@ -15,8 +15,9 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="page-title"> <i class="icon-custom-left"></i>
     <p>
-        <?= Html::a('Mark it as paid', ['create'], ['class' => 'btn btn-success']) ?>
-
+        <?= Html::a('Mark it as BEING_PREPARED (TODO)', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Mark it as OUT_FOR_DELIVERY (TODO)', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Mark it as completed (TODO)', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 </div>
 
@@ -26,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="row">
         <div class="col-12">
             <h4>
-                <i class="fas fa-globe"></i> AdminLTE, Inc.
+                <i class="fas fa-globe"></i> <?= $model->restaurant->name ?>
                 <small class="float-right">Date: <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy') ?></small>
             </h4>
         </div>
@@ -41,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php if ($model->customer_email) { ?>
                     <b>Email:</b> <?= $model->customer_email ?> <br>
                 <?php } ?>
-                <b>Expected Delivery:</b> TODO <br>
+                <b>Expected Delivery:</b> <?= Yii::$app->formatter->asDuration($model->restaurantDelivery->min_delivery_time * 60 ) ?> <br>
                 <b>Payment Method:</b> <?= $model->paymentMethod->payment_method_name ?> <br>
             </address>
         </div>
@@ -144,11 +145,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     </tr>
                     <tr>
                         <th>Delivery:</th>
-                        <td>TODO</td>
+                        <td><?= \Yii::$app->formatter->asCurrency($model->restaurantDelivery->delivery_fee) ?> </td>
                     </tr>
                     <tr>
                         <th>Total:</th>
-                        <td>TODO</td>
+                        <td><?= \Yii::$app->formatter->asCurrency($model->calculateOrderTotalPrice()) ?> </td>
                     </tr>
                 </table>
             </div>
