@@ -78,14 +78,19 @@ $js = "$(function () {
       $(this).bootstrapSwitch('state', $(this).prop('checked'));
     });
 
-  })
+  });
+  
+
+  $(document).ready(function () {
+     bsCustomFileInput.init();
+  });
+
 ";
 
 
 
 
 $this->registerJs($js);
-
 ?>
 
 <div class="item-form">
@@ -113,7 +118,7 @@ $this->registerJs($js);
     ?>
 
 
-    <?= $form->field($model, 'items_category[]')->dropDownList($categoryArray,['class' => 'select2']); ?>
+    <?= $form->field($model, 'items_category[]')->dropDownList($categoryArray, ['class' => 'select2']); ?>
 
 
     <?= $form->field($model, 'item_name')->textInput(['maxlength' => true]) ?>
@@ -128,28 +133,30 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'stock_qty')->textInput() ?>
 
+    <?=
+    $form->field($model, 'item_image', [
+        'template' => "{label}"
+        . "            <div class='input-group'>"
+        . "             <div class='custom-file'>"
+        . "                 {input}"
+        . "                 <label class='custom-file-label' for='exampleInputFile'>Choose file</label>"
+        . "             </div>"
+        . "            </div>"
+    ])->fileInput([
+        'multiple' => false,
+        'accept' => 'image/*',
+        'class' => 'custom-file-input',
+    ])
+    ?>
 
-    <div style="margin-bottom: 16px">
-               <?=
-        $form->field($model, 'item_image', [
-            'labelOptions' => ['class' => 'custom-file-label'],
-            'options' => ['class' => 'custom-file']
-        ])->fileInput([
-            'multiple' => false,
-            'accept' => 'image/*',
-            'class' => 'custom-file-input'
-        ])
-        ?>
-    </div>
- 
 
-        <?= $form->field($model, 'price')->textInput() ?>
+    <?= $form->field($model, 'price')->textInput() ?>
 
 
     <div class="form-group">
-    <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>
 
-<?php ActiveForm::end(); ?>
+    <?php ActiveForm::end(); ?>
 
 </div>

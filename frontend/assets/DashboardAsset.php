@@ -33,6 +33,7 @@ class DashboardAsset extends AssetBundle {
     public $js = [
 //        'plugins/jquery/jquery.min.js',
         'plugins/bootstrap/js/bootstrap.bundle.min.js',
+        'plugins/bs-custom-file-input/bs-custom-file-input.min.js',
         'plugins/select2/js/select2.full.min.js',
         'plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js',
         'plugins/moment/moment.min.js',

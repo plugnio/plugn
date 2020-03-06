@@ -16,9 +16,9 @@ return [
         ],
         'cloudinaryManager' => [
             'class' => 'common\components\CloudinaryManager',
-            'cloud_name' => 'vendor',
-            'api_key' => '533686683298673',
-            'api_secret' => 'MTpkOszwAgcSR-yFPneAdLWDkZs'
+            'cloud_name' => 'plugn',
+            'api_key' => '699963168546398',
+            'api_secret' => 'SH2PbVsEsRT9Db257Pn9ZDgHGAU'
         ],
     ],
 ];

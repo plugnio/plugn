@@ -109,6 +109,11 @@ $(function () {
     });
 
   })
+  
+    $(document).ready(function () {
+      bsCustomFileInput.init();
+    });
+
 ";
 
 
@@ -163,7 +168,7 @@ $this->registerJs($js);
             $restaurantDeliveryArray, [
         'class' => 'select2',
         'multiple' => 'multiple',
-                'value' => $sotredRestaurantDeliveryAreas
+        'value' => $sotredRestaurantDeliveryAreas
             ]
     );
     ?>
@@ -173,8 +178,7 @@ $this->registerJs($js);
             $paymentMethodArray, [
         'class' => 'select2',
         'multiple' => 'multiple',
-                                'value' => $sotredRestaurantPaymentMethod
-
+        'value' => $sotredRestaurantPaymentMethod
             ]
     );
     ?>
@@ -190,33 +194,38 @@ $this->registerJs($js);
     <?= $form->field($model, 'tagline_ar')->textInput(['maxlength' => true]) ?>
 
 
-    <div style="margin-bottom: 20px;">
+    <?=
+    $form->field($model, 'thumbnail_image', [
+        'template' => "{label}"
+        . "            <div class='input-group'>"
+        . "             <div class='custom-file'>"
+        . "                 {input}"
+        . "                 <label class='custom-file-label' for='exampleInputFile'>Choose file</label>"
+        . "             </div>"
+        . "            </div>"
+    ])->fileInput([
+        'multiple' => false,
+        'accept' => 'image/*',
+        'class' => 'custom-file-input',
+    ])
+    ?>
 
 
-        <?=
-        $form->field($model, 'thumbnail_image', [
-            'labelOptions' => ['class' => 'custom-file-label'],
-            'options' => ['class' => 'custom-file'],
-        ])->fileInput([
-            'multiple' => false,
-            'accept' => 'image/*',
-            'class' => 'custom-file-input'
-        ])
-        ?>
-    </div>
-    <div style="margin-bottom: 20px;">
-
-        <?=
-        $form->field($model, 'logo', [
-            'labelOptions' => ['class' => 'custom-file-label'],
-            'options' => ['class' => 'custom-file']
-        ])->fileInput([
-            'multiple' => false,
-            'accept' => 'image/*',
-            'class' => 'custom-file-input'
-        ])
-        ?>
-    </div>
+    <?=
+    $form->field($model, 'logo', [
+        'template' => "{label}"
+        . "            <div class='input-group'>"
+        . "             <div class='custom-file'>"
+        . "                 {input}"
+        . "                 <label class='custom-file-label' for='exampleInputFile'>Choose file</label>"
+        . "             </div>"
+        . "            </div>"
+    ])->fileInput([
+        'multiple' => false,
+        'accept' => 'image/*',
+        'class' => 'custom-file-input',
+    ])
+    ?>
 
     <?=
     $form->field($model, 'support_delivery')->dropDownList(
@@ -240,7 +249,7 @@ $this->registerJs($js);
 
 
 
-        <?php
+    <?php
 //        $form->field($model, 'min_pickup_time')->widget(TimePicker::classname(), [
 //            'options' => ['placeholder' => 'Enter event time ...'],
 //            'pluginOptions' => [
@@ -250,7 +259,7 @@ $this->registerJs($js);
 //                'showMeridian' => false,
 //            ]
 //        ]);
-        ?>
+    ?>
 
 
     <?=

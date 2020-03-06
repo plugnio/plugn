@@ -9,6 +9,16 @@ use yii\grid\GridView;
 
 $this->title = 'Items';
 $this->params['breadcrumbs'][] = $this->title;
+
+$css ="
+    td{
+        vertical-align: middle !important;
+        text-align: center;
+      }";
+
+$this->registerCss($css);
+
+
 ?>
 
 <div class="page-title"> <i class="icon-custom-left"></i>
@@ -26,7 +36,13 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             'sort_number',
-            'item_image',
+            [
+                'attribute' => 'Image',
+                'format' => 'html',
+                'value' => function ($data) {
+                    return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/Lavina/items/" . $data->item_image);
+                },
+            ],
             'item_name',
 //            'item_name_ar',
 //            'item_description',
@@ -69,7 +85,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'layout' => '{summary}<div class="card-body">{items}{pager}</div>',
         'tableOptions' => ['class' => 'table table-bordered table-hover'],
         'summaryOptions' => ['class' => "card-header"],
-
     ]);
     ?>
 
