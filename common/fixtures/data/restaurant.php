@@ -13,8 +13,6 @@ return [
         'logo' => 'logo',
         'support_delivery' => 0,
         'support_pick_up' => 0,
-        'delivery_fee' => 2,
-        'min_charge' => 1,
         'phone_number' => '+1-979-705-0703',
         'restaurant_created_at' => '1991-05-01 09:24:51',
         'restaurant_updated_at' => '1976-08-12 23:31:27',

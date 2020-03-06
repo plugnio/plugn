@@ -16,8 +16,6 @@ return [
     'logo' => 'logo',  // generate a sentence with 7 words,
     'support_delivery' => 0,
     'support_pick_up' => 0,
-    'delivery_fee' => $faker->numberBetween(1, 2),
-    'min_charge' => $faker->numberBetween(1, 3),
     'phone_number' => $faker->phoneNumber,
     'restaurant_created_at' => $faker->date('Y-m-d H:i:s'),
     'restaurant_updated_at' => $faker->date('Y-m-d H:i:s'),

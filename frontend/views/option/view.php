@@ -34,7 +34,13 @@ $this->params['breadcrumbs'][] = $this->title;
             DetailView::widget([
                 'model' => $model,
                 'attributes' => [
-                    'is_required',
+                    [
+                        'attribute' => 'is_required',
+                        'value' => function ($data) {
+                            return $data->is_required ? 'Yes' : 'No';
+                        },
+                        'format' => 'raw'
+                    ],
                     'max_qty',
                     'option_name',
                     'option_name_ar',

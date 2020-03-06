@@ -13,20 +13,7 @@ use common\models\PaymentMethod;
 use kartik\file\FileInput;
 
 $js = "
-let supportDeliveryInput = $('#supportDeliveryInput');
 let supportPickupInput = $('#supportPickupInput');
-
-// On Change of project type input
-supportDeliveryInput.change(function(){
-    let selection = $(this).val();
-    if(selection == 0){ // Dont support delivery
-        $('#minDeliveryTime').hide();
-        $('#deliveryFeeInput').hide();
-    }else{ // Support delivery
-        $('#minDeliveryTime').show();
-        $('#deliveryFeeInput').show();
-    }
-});
 
 supportPickupInput.change(function(){
     let selection = $(this).val();
@@ -277,12 +264,6 @@ $this->registerJs($js);
         'template' => '{label}<div class="input-group date" id="operatingToTimepicker" data-target-input="nearest"> {input} <div class="input-group-append" data-target="#operatingToTimepicker" data-toggle="datetimepicker"> <div class="input-group-text"><i class="far fa-clock"></i></div> </div> </div>'
     ])->input(['text'])
     ?>
-
-    <div id='deliveryFeeInput' style='<?= $model->isNewRecord || ($model->support_delivery == 0) ? "display:none" : "" ?>'>
-        <?= $form->field($model, 'delivery_fee')->input('number', ['maxlength' => true, 'placeholder' => '0.500']) ?>
-    </div>
-
-    <?= $form->field($model, 'min_charge')->input('number', ['maxlength' => true, 'placeholder' => '5']) ?>
 
 
     <?= $form->field($model, 'phone_number')->input('number') ?>

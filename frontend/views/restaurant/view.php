@@ -65,8 +65,20 @@ $this->params['breadcrumbs'][] = $this->title;
             'tagline',
             'tagline_ar',
             'status',
-            'thumbnail_image',
-            'logo',
+            [
+                'attribute' => 'thumbnail_image',
+                'format' => 'html',
+                'value' => function ($data) {
+                    return Html::img("https://res.cloudinary.com/plugn/image/upload/restaurants/" . $data->name . "/thumbnail-image/" . $data->thumbnail_image);
+                },
+            ],
+            [
+                'attribute' => 'logo',
+                'format' => 'html',
+                'value' => function ($data) {
+                    return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/" . $data->name . "/logo/" . $data->logo);
+                },
+            ],
             [
                 'label' => 'Support Delivery',
                 'value' => function ($data) {
@@ -84,8 +96,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'min_pickup_time',
             'operating_from',
             'operating_to',
-            'delivery_fee:currency',
-            'min_charge:currency',
             'phone_number',
             'restaurant_created_at',
             'restaurant_updated_at',

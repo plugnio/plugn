@@ -47,7 +47,7 @@ class DashboardAsset extends AssetBundle {
         'dist/js/demo.js',
     ];
     public $depends = [
-      'yii\web\YiiAsset'
+      'yii\web\YiiAsset',
     ];
 
 }

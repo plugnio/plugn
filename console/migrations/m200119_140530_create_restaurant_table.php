@@ -34,8 +34,6 @@ class m200119_140530_create_restaurant_table extends Migration {
             'min_pickup_time' => $this->time(),
             'operating_from' => $this->time(),
             'operating_to' => $this->time(),
-            'delivery_fee' => $this->float()->defaultValue(0),
-            'min_charge' => $this->float()->defaultValue(0),
             'phone_number' => $this->string(255),
             'restaurant_created_at' => $this->dateTime(),
             'restaurant_updated_at' => $this->dateTime(),

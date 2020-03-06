@@ -29,28 +29,33 @@ $this->params['breadcrumbs'][] = $this->title;
     </p>
 
     <div class="card">
-    <div class="card-body">
-        <?=
-        DetailView::widget([
-            'model' => $model,
-            'attributes' => [
-                'item_uuid',
-                'item_name',
-                'item_name_ar',
-                'item_description',
-                'item_description_ar',
-                'sort_number',
-                'stock_qty',
-                'item_image',
-                'price',
-                'item_created_at',
-                'item_updated_at',
-            ],
-            'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
-        ])
-        ?>
+        <div class="card-body">
+            <?=
+            DetailView::widget([
+                'model' => $model,
+                'attributes' => [
+                    'item_name',
+                    'item_name_ar',
+                    'item_description',
+                    'item_description_ar',
+                    'sort_number',
+                    'stock_qty',
+                    [
+                        'attribute' => 'Image',
+                        'format' => 'html',
+                        'value' => function ($data) {
+                            return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/". $data->restaurant->name ."/items/" . $data->item_image);
+                        },
+                    ],
+                    'price:currency',
+                    'item_created_at',
+                    'item_updated_at',
+                ],
+                'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
+            ])
+            ?>
 
-    </div>
+        </div>
     </div>
 
     <h2>Options</h2>

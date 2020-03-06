@@ -24,9 +24,6 @@ use yii\behaviors\AttributeBehavior;
  * @property string|null $min_pickup_time
  * @property string|null $operating_from
  * @property string|null $operating_to
- * @property float $delivery_fee
- * @property float $min_charge
- * @property float $min_order
  * @property string|null $phone_number
  * @property string|null $restaurant_created_at
  * @property string|null $restaurant_updated_at
@@ -66,16 +63,10 @@ class Restaurant extends \yii\db\ActiveRecord {
                 }, 'whenClient' => "function (attribute, value) {
                 return $('#supportPickupInput').val() == 1;
             }"],
-            ['delivery_fee', 'required', 'when' => function ($model) {
-                    return $model->support_delivery == 1;
-                }, 'whenClient' => "function (attribute, value) {
-                return $('#supportDeliveryInput').val() == 1;
-            }"],
             [['thumbnail_image', 'logo'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['vendor_id', 'restaurant_status', 'support_delivery', 'support_pick_up'], 'integer'],
             [['min_pickup_time', 'operating_from', 'operating_to', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
-            [['delivery_fee', 'min_charge'], 'number'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'phone_number'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'unique'],
@@ -102,8 +93,6 @@ class Restaurant extends \yii\db\ActiveRecord {
             'min_pickup_time' => 'Min Pickup Time',
             'operating_from' => 'Operating From',
             'operating_to' => 'Operating To',
-            'delivery_fee' => 'Delivery Fee',
-            'min_charge' => 'Min Charge',
             'restaurant_delivery_area' => 'Delivery Areas',
             'phone_number' => 'Phone Number',
             'restaurant_created_at' => 'Restaurant Created At',

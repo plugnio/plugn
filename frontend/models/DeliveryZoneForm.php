@@ -11,7 +11,8 @@ use Yii;
  * @property string $restaurant_uuid
  * @property int $area_id
  * @property int|null $min_delivery_time
- * @property float|null $delivery_fee
+ * @property float $delivery_fee
+ * @property float $min_charge
  *
  * @property Area $area
  * @property Restaurant $restaurantUu
@@ -21,6 +22,7 @@ class DeliveryZoneForm extends \yii\db\ActiveRecord {
     public $delivery_fee;
     public $min_delivery_time;
     public $city_id;
+    public $min_charge;
     
     /**
      * {@inheritdoc}
@@ -28,7 +30,7 @@ class DeliveryZoneForm extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['min_delivery_time'], 'integer'],
-            [['delivery_fee'], 'number'],
+            [['delivery_fee','min_charge'], 'number'],
             [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::className(), 'targetAttribute' => ['city_id' => 'city_id']],
         ];
     }
@@ -40,6 +42,7 @@ class DeliveryZoneForm extends \yii\db\ActiveRecord {
         return [
             'min_delivery_time' => 'Min Delivery Time',
             'delivery_fee' => 'Delivery Fee',
+            'min_charge' => 'Min Charge',
         ];
     }
 
@@ -63,6 +66,9 @@ class DeliveryZoneForm extends \yii\db\ActiveRecord {
                 
                 if($this->min_delivery_time != null)
                     $restaurantDeliveryArea->min_delivery_time = $this->min_delivery_time;
+                
+                if($this->min_charge != null)
+                    $restaurantDeliveryArea->min_charge = $this->min_charge;
                 
                 $restaurantDeliveryArea->save(false);
             }
