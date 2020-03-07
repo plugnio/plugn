@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "16dff993f545fe9ba258ac02d17633f3",
+    "content-hash": "923e1f5c89261c4eb0399e4b43cb7baa",
     "packages": [
         {
             "name": "2amigos/yii2-twilio-component",
@@ -209,7 +209,7 @@
             "version": "v1.3.2",
             "source": {
                 "type": "git",
-                "url": "git@github.com:bestiejs/punycode.js.git",
+                "url": "https://github.com/bestiejs/punycode.js.git",
                 "reference": "38c8d3131a82567bfef18da09f7f4db68c84f8a3"
             },
             "dist": {
@@ -1013,6 +1013,50 @@
                 "yii2"
             ],
             "time": "2018-01-16T10:34:41+00:00"
+        },
+        {
+            "name": "liyunfang/yii2-widget-linkpager",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpyii/yii2-widget-linkpager.git",
+                "reference": "2811a2b7a9bd9f0ccc087d5455d282b08001614f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpyii/yii2-widget-linkpager/zipball/2811a2b7a9bd9f0ccc087d5455d282b08001614f",
+                "reference": "2811a2b7a9bd9f0ccc087d5455d282b08001614f",
+                "shasum": ""
+            },
+            "require": {
+                "yiisoft/yii2": "*",
+                "yiisoft/yii2-bootstrap": "*"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "liyunfang\\pager\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "liyunfang",
+                    "email": "381296986@qq.com"
+                }
+            ],
+            "description": "yii2 Widget for LinkPager",
+            "homepage": "https://github.com/liyunfang/yii2-widget-linkpager",
+            "keywords": [
+                "extension",
+                "linkpager",
+                "yii2",
+                "yii2-widget-linkpager"
+            ],
+            "time": "2015-09-24T04:23:54+00:00"
         },
         {
             "name": "nikic/php-parser",

@@ -82,7 +82,7 @@ $this->registerCss($css);
                 ],
             ],
         ],
-        'layout' => '{summary}<div class="card-body">{items}{pager}</div>',
+        'layout' => '{summary}<div class="card-body">{items}<div class="card-footer clearfix">{pager}</div>',
         'tableOptions' => ['class' => 'table table-bordered table-hover'],
         'summaryOptions' => ['class' => "card-header"],
     ]);

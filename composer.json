@@ -26,7 +26,8 @@
         "2amigos/yii2-twilio-component": "^1.0",
         "almasaeed2010/adminlte": "~3.0",
         "yiisoft/yii2-shell": "^2.0",
-        "leandrogehlen/yii2-treegrid": "*"
+        "leandrogehlen/yii2-treegrid": "*",
+        "liyunfang/yii2-widget-linkpager": "^1.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
