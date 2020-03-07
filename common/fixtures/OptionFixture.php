@@ -6,4 +6,8 @@ use yii\test\ActiveFixture;
 class OptionFixture extends ActiveFixture
 {
     public $modelClass = 'common\models\Option';
+    public $depends = [
+        'common\fixtures\ItemFixture',
+    ];
+
 }

@@ -4,12 +4,12 @@ namespace frontend\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\OrderItemExtraOptions;
+use common\models\OrderItemExtraOption;
 
 /**
- * OrderItemExtraOptionsSearch represents the model behind the search form of `common\models\OrderItemExtraOptions`.
+ * OrderItemExtraOptionSearch represents the model behind the search form of `common\models\OrderItemExtraOption`.
  */
-class OrderItemExtraOptionsSearch extends OrderItemExtraOptions
+class OrderItemExtraOptionSearch extends OrderItemExtraOption
 {
     /**
      * {@inheritdoc}
@@ -17,7 +17,7 @@ class OrderItemExtraOptionsSearch extends OrderItemExtraOptions
     public function rules()
     {
         return [
-            [['order_item_extra_options_id', 'order_item_id', 'extra_option_id'], 'integer'],
+            [['order_item_extra_option_id', 'order_item_id', 'extra_option_id'], 'integer'],
             [['extra_option_name', 'extra_option_name_ar'], 'safe'],
             [['extra_option_price'], 'number'],
         ];
@@ -41,7 +41,7 @@ class OrderItemExtraOptionsSearch extends OrderItemExtraOptions
      */
     public function search($params)
     {
-        $query = OrderItemExtraOptions::find();
+        $query = OrderItemExtraOption::find();
 
         // add conditions that should always apply here
 
@@ -59,7 +59,7 @@ class OrderItemExtraOptionsSearch extends OrderItemExtraOptions
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'order_item_extra_options_id' => $this->order_item_extra_options_id,
+            'order_item_extra_option_id' => $this->order_item_extra_option_id,
             'order_item_id' => $this->order_item_id,
             'extra_option_id' => $this->extra_option_id,
             'extra_option_price' => $this->extra_option_price,

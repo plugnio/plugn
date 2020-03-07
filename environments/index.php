@@ -43,6 +43,7 @@ return [
         'setExecutable' => [
             'yii',
             'yii_test',
+            'fixture-generate-and-load'
         ],
         'setCookieValidationKey' => [
             'backend/config/main-local.php',

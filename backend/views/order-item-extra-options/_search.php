@@ -4,18 +4,18 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\OrderItemExtraOptionsSearch */
+/* @var $model backend\models\OrderItemExtraOptionSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="order-item-extra-options-search">
+<div class="order-item-extra-option-search">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
         'method' => 'get',
     ]); ?>
 
-    <?= $form->field($model, 'order_item_extra_options_id') ?>
+    <?= $form->field($model, 'order_item_extra_option_id') ?>
 
     <?= $form->field($model, 'order_item_id') ?>
 

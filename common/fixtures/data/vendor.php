@@ -2,14 +2,15 @@
 
 return [
     'vendor0' => [
-        'vendor_id' => 647,
-        'vendor_name' => 'Willa',
-        'vendor_auth_key' => '44gpQdnPmvsT6IjWhhCypR9zTHzdcwB9',
-        'vendor_password_hash' => '$2y$13$bMtZgV15CSWR4BStUazVou7PLdVmcolyB1sdSSX..0y7kYPBUTwxm',
-        'vendor_password_reset_token' => 'b9iKCdptlipmTTLRE1xX8LofQsJZdthI',
-        'vendor_email' => 'zkemmer@cummings.com',
+        'vendor_id' => 999,
+        'restaurant_uuid' => 'rest_fdb95572-1b66-36be-93d4-9853a5e50a60',
+        'vendor_name' => 'Shayna',
+        'vendor_auth_key' => 'MZFJF1-MZBGlgVFViZNkTF7twVkSOHNg',
+        'vendor_password_hash' => '$2y$13$c05aOTfxTQcLTRIMB2IB/.GH4KvDTzvP.5QU0KtqI2yUEDMwsoVem',
+        'vendor_password_reset_token' => 'JkclPo7IE3A1RpL6ZmxQJSBSgd5i1X6L',
+        'vendor_email' => 'saoud@bawes.net',
         'vendor_status' => 10,
-        'vendor_created_at' => '2017-07-31 07:50:39',
-        'vendor_updated_at' => '2000-11-08 18:33:47',
+        'vendor_created_at' => '1997-12-06 01:21:40',
+        'vendor_updated_at' => '2007-08-04 20:31:38',
     ],
 ];

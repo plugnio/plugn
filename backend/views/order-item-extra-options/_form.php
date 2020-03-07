@@ -4,11 +4,11 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\OrderItemExtraOptions */
+/* @var $model common\models\OrderItemExtraOption */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="order-item-extra-options-form">
+<div class="order-item-extra-option-form">
 
     <?php $form = ActiveForm::begin(); ?>
 

@@ -3,16 +3,16 @@
 namespace backend\controllers;
 
 use Yii;
-use common\models\OrderItemExtraOptions;
-use backend\models\OrderItemExtraOptionsSearch;
+use common\models\OrderItemExtraOption;
+use backend\models\OrderItemExtraOptionSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * OrderItemExtraOptionsController implements the CRUD actions for OrderItemExtraOptions model.
+ * OrderItemExtraOptionController implements the CRUD actions for OrderItemExtraOption model.
  */
-class OrderItemExtraOptionsController extends Controller
+class OrderItemExtraOptionController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -30,12 +30,12 @@ class OrderItemExtraOptionsController extends Controller
     }
 
     /**
-     * Lists all OrderItemExtraOptions models.
+     * Lists all OrderItemExtraOption models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new OrderItemExtraOptionsSearch();
+        $searchModel = new OrderItemExtraOptionSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -45,7 +45,7 @@ class OrderItemExtraOptionsController extends Controller
     }
 
     /**
-     * Displays a single OrderItemExtraOptions model.
+     * Displays a single OrderItemExtraOption model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -58,16 +58,16 @@ class OrderItemExtraOptionsController extends Controller
     }
 
     /**
-     * Creates a new OrderItemExtraOptions model.
+     * Creates a new OrderItemExtraOption model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new OrderItemExtraOptions();
+        $model = new OrderItemExtraOption();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->order_item_extra_options_id]);
+            return $this->redirect(['view', 'id' => $model->order_item_extra_option_id]);
         }
 
         return $this->render('create', [
@@ -76,7 +76,7 @@ class OrderItemExtraOptionsController extends Controller
     }
 
     /**
-     * Updates an existing OrderItemExtraOptions model.
+     * Updates an existing OrderItemExtraOption model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -87,7 +87,7 @@ class OrderItemExtraOptionsController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->order_item_extra_options_id]);
+            return $this->redirect(['view', 'id' => $model->order_item_extra_option_id]);
         }
 
         return $this->render('update', [
@@ -96,7 +96,7 @@ class OrderItemExtraOptionsController extends Controller
     }
 
     /**
-     * Deletes an existing OrderItemExtraOptions model.
+     * Deletes an existing OrderItemExtraOption model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -110,15 +110,15 @@ class OrderItemExtraOptionsController extends Controller
     }
 
     /**
-     * Finds the OrderItemExtraOptions model based on its primary key value.
+     * Finds the OrderItemExtraOption model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return OrderItemExtraOptions the loaded model
+     * @return OrderItemExtraOption the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = OrderItemExtraOptions::findOne($id)) !== null) {
+        if (($model = OrderItemExtraOption::findOne($id)) !== null) {
             return $model;
         }
 

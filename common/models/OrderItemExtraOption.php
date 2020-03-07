@@ -5,9 +5,9 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "order_item_extra_options".
+ * This is the model class for table "order_item_extra_option".
  *
- * @property int $order_item_extra_options_id
+ * @property int $order_item_extra_option_id
  * @property int $order_item_id
  * @property int $extra_option_id
  * @property string $extra_option_name
@@ -17,14 +17,14 @@ use Yii;
  * @property ExtraOption $extraOption
  * @property OrderItem $orderItem
  */
-class OrderItemExtraOptions extends \yii\db\ActiveRecord
+class OrderItemExtraOption extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'order_item_extra_options';
+        return 'order_item_extra_option';
     }
 
     /**
@@ -48,7 +48,7 @@ class OrderItemExtraOptions extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'order_item_extra_options_id' => 'Order Item Extra Options ID',
+            'order_item_extra_option_id' => 'Order Item Extra Option ID',
             'order_item_id' => 'Order Item ID',
             'extra_option_id' => 'Extra Option ID',
             'extra_option_name' => 'Extra Option Name',
@@ -74,7 +74,7 @@ class OrderItemExtraOptions extends \yii\db\ActiveRecord
      */
     public function getExtraOption()
     {
-        return $this->hasOne(ExtraOption::className(), ['extra_option_id' => 'extra_option_id'])->inverseOf('orderItemExtraOptions');
+        return $this->hasOne(ExtraOption::className(), ['extra_option_id' => 'extra_option_id'])->inverseOf('orderItemExtraOption');
     }
 
     /**
@@ -84,6 +84,6 @@ class OrderItemExtraOptions extends \yii\db\ActiveRecord
      */
     public function getOrderItem()
     {
-        return $this->hasOne(OrderItem::className(), ['order_item_id' => 'order_item_id'])->inverseOf('orderItemExtraOptions');
+        return $this->hasOne(OrderItem::className(), ['order_item_id' => 'order_item_id'])->inverseOf('orderItemExtraOption');
     }
 }

@@ -6,4 +6,7 @@ use yii\test\ActiveFixture;
 class RestaurantDeliveryFixture extends ActiveFixture
 {
     public $modelClass = 'common\models\RestaurantDelivery';
+    public $depends = [
+        'common\fixtures\RestaurantFixture',
+    ];
 }

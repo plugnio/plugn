@@ -59,12 +59,12 @@ class ExtraOption extends \yii\db\ActiveRecord {
     }
 
     /**
-     * Gets query for [[OrderItemExtraOptions]]. 
+     * Gets query for [[OrderItemExtraOption]]. 
      * 
      * @return \yii\db\ActiveQuery 
      */
     public function getOrderItemExtraOptions() {
-        return $this->hasMany(OrderItemExtraOptions::className(), ['extra_option_id' => 'extra_option_id']);
+        return $this->hasMany(OrderItemExtraOption::className(), ['extra_option_id' => 'extra_option_id']);
     }
 
 }

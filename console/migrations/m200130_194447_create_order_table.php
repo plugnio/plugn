@@ -166,8 +166,8 @@ class m200130_194447_create_order_table extends Migration {
                 'SET NULL'
         );
 
-        $this->createTable('{{%order_item_extra_options}}', [
-            'order_item_extra_options_id' => $this->bigPrimaryKey()->notNull(),
+        $this->createTable('{{%order_item_extra_option}}', [
+            'order_item_extra_option_id' => $this->bigPrimaryKey()->notNull(),
             'order_item_id' => $this->bigInteger()->notNull(),
             'extra_option_id' => $this->integer(),
             'extra_option_name' => $this->string(255)->notNull(),
@@ -178,15 +178,15 @@ class m200130_194447_create_order_table extends Migration {
         
        // creates index for column `order_item_id`
         $this->createIndex(
-                'idx-order_item_extra_options-order_item_id',
-                'order_item_extra_options',
+                'idx-order_item_extra_option-order_item_id',
+                'order_item_extra_option',
                 'order_item_id'
         );
 
-        // add foreign key for table `order_item_extra_options`
+        // add foreign key for table `order_item_extra_option`
         $this->addForeignKey(
-                'fk-order_item_extra_options-order_item_id',
-                'order_item_extra_options', 
+                'fk-order_item_extra_option-order_item_id',
+                'order_item_extra_option', 
                 'order_item_id', 
                 'order_item',
                 'order_item_id',
@@ -196,15 +196,15 @@ class m200130_194447_create_order_table extends Migration {
         
        // creates index for column `extra_option_id`
         $this->createIndex(
-                'idx-order_item_extra_options-extra_option_id',
-                'order_item_extra_options',
+                'idx-order_item_extra_option-extra_option_id',
+                'order_item_extra_option',
                 'extra_option_id'
         );
 
         // add foreign key for table `item`
         $this->addForeignKey(
-                'fk-order_item_extra_options-extra_option_id',
-                'order_item_extra_options', 
+                'fk-order_item_extra_option-extra_option_id',
+                'order_item_extra_option', 
                 'extra_option_id', 
                 'extra_option',
                 'extra_option_id',

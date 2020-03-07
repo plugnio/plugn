@@ -94,7 +94,7 @@ class OrderItem extends \yii\db\ActiveRecord {
      * @return \yii\db\ActiveQuery
      */
     public function getOrderItemExtraOptions() {
-        return $this->hasMany(OrderItemExtraOptions::className(), ['order_item_id' => 'order_item_id']);
+        return $this->hasMany(OrderItemExtraOption::className(), ['order_item_id' => 'order_item_id']);
     }
 
 }

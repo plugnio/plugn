@@ -7,7 +7,7 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use common\models\Order;
 use common\models\OrderItem;
-use common\models\OrderItemExtraOptions;
+use common\models\OrderItemExtraOption;
 
 
 class OrderController extends Controller {
@@ -131,19 +131,19 @@ class OrderController extends Controller {
      */
     public function actionAddExtraOptionToTheCart($id) {
 
-        $orderItemExtraOptions = new OrderItemExtraOptions();
+        $orderItemExtraOption = new OrderItemExtraOption();
    
-        $orderItemExtraOptions->order_item_id = (int) $id;
-        $orderItemExtraOptions->extra_option_id =  Yii::$app->request->getBodyParam("extra_option_id");
-        $orderItemExtraOptions->extra_option_name = Yii::$app->request->getBodyParam("extra_option_name");
-        $orderItemExtraOptions->extra_option_name_ar =  Yii::$app->request->getBodyParam("extra_option_name_ar");
-        $orderItemExtraOptions->extra_option_price = (int) Yii::$app->request->getBodyParam("extra_option_price");
+        $orderItemExtraOption->order_item_id = (int) $id;
+        $orderItemExtraOption->extra_option_id =  Yii::$app->request->getBodyParam("extra_option_id");
+        $orderItemExtraOption->extra_option_name = Yii::$app->request->getBodyParam("extra_option_name");
+        $orderItemExtraOption->extra_option_name_ar =  Yii::$app->request->getBodyParam("extra_option_name_ar");
+        $orderItemExtraOption->extra_option_price = (int) Yii::$app->request->getBodyParam("extra_option_price");
 
         
-        if (!$orderItemExtraOptions->save()) {
+        if (!$orderItemExtraOption->save()) {
             return [
                 'operation' => 'error',
-                'message' => $orderItemExtraOptions->getErrors()
+                'message' => $orderItemExtraOption->getErrors()
             ];
         }
 
