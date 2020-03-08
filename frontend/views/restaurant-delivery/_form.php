@@ -12,9 +12,14 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
+    <?= $form->errorSummary($model); ?>
+
+
     <?= $form->field($model, 'delivery_fee')->input('float') ?>
-    
+
     <?= $form->field($model, 'min_delivery_time')->input('number') ?>
+
+    <?= $form->field($model, 'min_charge')->input('number') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

@@ -99,6 +99,9 @@ $this->registerJs($js);
     $form = ActiveForm::begin();
     ?>
 
+    
+    <?= $form->errorSummary($model); ?>
+
 
     <?php
     $orderModeOptions = [];

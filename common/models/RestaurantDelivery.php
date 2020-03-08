@@ -11,7 +11,7 @@ use Yii;
  * @property int $area_id
  * @property int $min_delivery_time
  * @property int $delivery_fee
- * @property int $min_charge
+ * @property float $min_charge
  *
  * @property Area $area
  * @property City $city

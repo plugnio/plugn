@@ -2,9 +2,9 @@
 
 return [
     'customer0' => [
-        'customer_id' => 77549,
-        'customer_name' => 'Hailee',
-        'customer_phone_number' => '615.926.0843',
-        'customer_email' => 'stoltenberg.nyah@wolff.com',
+        'customer_id' => 809555,
+        'customer_name' => 'Zoie',
+        'customer_phone_number' => '+1-393-527-3466',
+        'customer_email' => 'sfriesen@torp.com',
     ],
 ];

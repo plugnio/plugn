@@ -87,6 +87,7 @@ $this->registerJs($js);
 
     <?php $form = ActiveForm::begin(); ?>
 
+    <?= $form->errorSummary($model); ?>
 
 
     <?= $form->field($model, 'option_name')->textInput(['maxlength' => true]) ?>

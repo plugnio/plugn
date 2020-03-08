@@ -17,8 +17,7 @@ class OrderItemExtraOptionController extends Controller
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -66,23 +65,6 @@ class OrderItemExtraOptionController extends Controller
         ]);
     }
 
-    /**
-     * Creates a new OrderItemExtraOption model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new OrderItemExtraOption();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->order_item_extra_options_id]);
-        }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
-    }
 
     /**
      * Updates an existing OrderItemExtraOption model.

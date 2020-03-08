@@ -25,6 +25,15 @@ class CustomerController extends Controller {
                     'delete' => ['POST'],
                 ],
             ],
+            'access' => [
+                'class' => \yii\filters\AccessControl::className(),
+                'rules' => [
+                    [//allow authenticated users only
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -63,22 +72,6 @@ class CustomerController extends Controller {
         ]);
     }
 
-    /**
-     * Creates a new Customer model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate() {
-        $model = new Customer();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->customer_id]);
-        }
-
-        return $this->render('create', [
-                    'model' => $model,
-        ]);
-    }
 
     /**
      * Updates an existing Customer model.

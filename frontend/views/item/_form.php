@@ -117,6 +117,7 @@ $this->registerJs($js);
     ]);
     ?>
 
+    <?= $form->errorSummary($model); ?>
 
     <?= $form->field($model, 'items_category[]')->dropDownList($categoryArray, ['class' => 'select2']); ?>
 

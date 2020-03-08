@@ -56,6 +56,7 @@ foreach ($dataProvider->query as $city) {
                                 <td><?= $restaurantDeliveryArea->area->area_name ?></td>
                                 <td>    <?= $form->field($restaurantDeliveryArea, 'min_delivery_time')->input('number') ?></td>
                                 <td>    <?= $form->field($restaurantDeliveryArea, 'delivery_fee')->input('float') ?></td>
+                                <td>    <?= $form->field($restaurantDeliveryArea, 'min_charge')->input('float') ?></td>
                                 <td style="padding-top: 43px">   
                                     <div class="form-group">
                                         <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'name' => $restaurantDeliveryArea->area->area_id]) ?>

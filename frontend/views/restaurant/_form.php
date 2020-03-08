@@ -150,6 +150,9 @@ $this->registerJs($js);
     $form = ActiveForm::begin();
     ?>
 
+    <?= $form->errorSummary($model); ?>
+
+
     <?=
     $form->field($model, 'restaurant_delivery_area')->dropDownList(
             $restaurantDeliveryArray, [

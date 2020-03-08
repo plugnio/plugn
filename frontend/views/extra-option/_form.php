@@ -11,6 +11,8 @@ use yii\widgets\ActiveForm;
 <div class="extra-option-form">
 
     <?php $form = ActiveForm::begin(); ?>
+    
+    <?= $form->errorSummary($model); ?>
 
     <?= $form->field($model, 'extra_option_name')->textInput(['maxlength' => true]) ?>
 

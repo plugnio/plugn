@@ -5,6 +5,7 @@ namespace common\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
+use common\models\Customer;
 
 /**
  * This is the model class for table "order".
@@ -34,6 +35,7 @@ use yii\db\Expression;
  * @property Customer $customer 
  * @property PaymentMethod $paymentMethod
  * @property Restaurant $restaurant
+ * @property RestaurantDelivery $restaurantDelivery
  * @property OrderItem[] $orderItems
  */
 class Order extends \yii\db\ActiveRecord {
@@ -42,8 +44,6 @@ class Order extends \yii\db\ActiveRecord {
     const STATUS_BEING_PREPARED = 2;
     const STATUS_OUT_FOR_DELIVERY = 3;
     const STATUS_COMPLETE = 4;
-    
-    
     const ORDER_MODE_DELIVERY = 1;
     const ORDER_MODE_PICK_UP = 2;
 
@@ -59,15 +59,13 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['area_id', 'customer_id', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'house_number', 'customer_name', 'customer_phone_number', 'payment_method_id', 'payment_method_name', 'order_mode'], 'required'],
+            [['area_id', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'house_number', 'customer_name', 'customer_phone_number', 'payment_method_id', 'payment_method_name', 'order_mode'], 'required'],
             [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer'],
             ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE]],
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
             ['order_mode', 'validateOrderMode'],
             [['restaurant_uuid'], 'string', 'max' => 60],
-            [['customer_phone_number'], 'number'],
-            [['customer_phone_number'], 'unique'],
-            [['customer_email'], 'unique'],
+            [['customer_phone_number', 'total_price'], 'number'],
             [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
@@ -125,6 +123,7 @@ class Order extends \yii\db\ActiveRecord {
             'payment_method_id' => 'Payment Method ID',
             'payment_method_name' => 'Payment Method Name',
             'order_status' => 'Order Status',
+            'total_price' => 'Total Price',
             'order_created_at' => 'Order Created At',
         ];
     }
@@ -144,12 +143,79 @@ class Order extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Calculate order item's total price
+     */
+    public function calculateOrderItemsTotalPrice() {
+        $totalPrice = 0;
+
+        foreach ($this->getOrderItems()->all() as $item)
+            $totalPrice += $item->calculateOrderItemPrice();
+
+        return $totalPrice;
+    }
+
+    /**
+     * Calculate order's total price
+     */
+    public function calculateOrderTotalPrice() {
+        $totalPrice = 0;
+
+        foreach ($this->getOrderItems()->all() as $item)
+            $totalPrice += $item->calculateOrderItemPrice();
+
+        $totalPrice += $this->restaurantDelivery->delivery_fee;
+
+        return $totalPrice;
+    }
+
+    public function beforeSave($insert) {
+        parent::beforeSave($insert);
+
+        if ($this->calculateOrderTotalPrice() < $this->restaurantDelivery->min_charge)
+            return $this->addError('min_charge', "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency($this->restaurantDelivery->min_charge));
+
+        //On Update
+        if (!$insert) {
+            $this->total_price = $this->calculateOrderTotalPrice();
+        }
+
+
+
+        $customer_model = Customer::find()->where(['customer_phone_number' => $this->customer_phone_number])->one();
+
+
+        if (!$customer_model) {
+            $customer_model = new Customer();
+            $customer_model->customer_name = $this->customer_name;
+            $customer_model->customer_phone_number = $this->customer_phone_number;
+            if ($this->customer_email != null)
+                $customer_model->customer_email = $this->customer_email;
+
+            $customer_model->save();
+        }else{
+            $this->customer_id = $customer_model->customer_id;
+        }
+
+
+        return true;
+    }
+
+    /**
      * Gets query for [[Restaurant]].
      *
      * @return \yii\db\ActiveQuery
      */
     public function getRestaurant() {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * Gets query for [[RestaurantDelivery]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurantDelivery() {
+        return $this->hasOne(RestaurantDelivery::className(), ['area_id' => 'area_id'])->via('area')->andWhere(['restaurant_uuid' => \Yii::$app->user->identity->restaurant_uuid]);
     }
 
     /**

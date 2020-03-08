@@ -12,6 +12,8 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
+    <?= $form->errorSummary($model); ?>
+
     <?= $form->field($model, 'order_item_id')->textInput() ?>
 
     <?= $form->field($model, 'extra_option_id')->textInput() ?>

@@ -3,7 +3,7 @@
 namespace frontend\controllers;
 
 use Yii;
-use frontend\models\Order;
+use common\models\Order;
 use frontend\models\OrderSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -81,52 +81,6 @@ class OrderController extends Controller {
         ]);
     }
 
-    /** 
-     * Creates a new Order model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate() {
-        $model = new Order();
-        $model->restaurant_uuid = Yii::$app->user->identity->restaurant_uuid;
-
-
-        if ($model->load(Yii::$app->request->post())) {
-            $model->area_name = $model->area->area_name;
-            $model->area_name_ar = $model->area->area_name_ar;
-            $model->payment_method_name = $model->paymentMethod->payment_method_name;
-
-            if ($model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->support_delivery == false)
-                $model->order_mode = null;
-            else if ($model->order_mode == Order::ORDER_MODE_PICK_UP && $model->restaurant->support_pick_up == false)
-                $model->order_mode = null;
-
-
-
-            $customer_model = Customer::find()->where(['customer_phone_number' => $model->customer_phone_number])->one();
-
-
-            if (!$customer_model) {
-                
-                $customer_model = new Customer();
-                $customer_model->customer_name = $model->customer_name;
-                $customer_model->customer_phone_number = $model->customer_phone_number;
-                if ($model->customer_email != null)
-                    $customer_model->customer_email = $model->customer_email;
-
-                $customer_model->save();
-            }
-
-            $model->customer_id = $customer_model->customer_id;
-
-            if ($model->save())
-                return $this->redirect(['view', 'id' => $model->order_id]);
-        }
-
-        return $this->render('create', [
-                    'model' => $model,
-        ]);
-    }
 
     /**
      * Updates an existing Order model.
