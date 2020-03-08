@@ -82,6 +82,13 @@ wait
 
 wait 
 
+./yii fixture/generate customer --interactive=0 --count=1
+
+wait
+
+./yii fixture/load Customer --interactive=0
+
+wait
 ./yii fixture/generate order --interactive=0 --count=1
 
 wait

@@ -10,6 +10,7 @@ class OrderFixture extends ActiveFixture {
     public $depends = [
         'common\fixtures\ExtraOptionFixture',
         'common\fixtures\RestaurantDeliveryFixture',
+        'common\fixtures\CustomerFixture',
     ];
 
 }
