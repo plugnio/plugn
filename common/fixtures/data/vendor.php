@@ -2,15 +2,15 @@
 
 return [
     'vendor0' => [
-        'vendor_id' => 955,
+        'vendor_id' => 164,
         'restaurant_uuid' => 'rest_fdb95572-1b66-36be-93d4-9853a5e50a60',
-        'vendor_name' => 'Carley',
-        'vendor_auth_key' => 'BbPaHlAz-Y3-He6FX-zUyjYFoV1yBbq_',
-        'vendor_password_hash' => '$2y$13$kBghQAxCIGtRiNvD45At1eBmF0e5pHlLQSVLg3MzBiK27otsCGIE6',
-        'vendor_password_reset_token' => 'm9PkXvH-90xQ6H7KSxgFrGVFxsesna5E',
+        'vendor_name' => 'Lamont',
+        'vendor_auth_key' => 'iCAiehM3Xqdr23aZenfR7NImjqlkou3U',
+        'vendor_password_hash' => '$2y$13$y7AJ1.VCs2ryzJROzZXb7ebQHMNMN8EXbIWx1lvqtcRrvqVNtWxZK',
+        'vendor_password_reset_token' => '-ZzjzhZO79NnEKycyZqWsZLRSc8XsZ-F',
         'vendor_email' => 'saoud@bawes.net',
         'vendor_status' => 10,
-        'vendor_created_at' => '2008-12-02 11:22:56',
-        'vendor_updated_at' => '2011-09-24 16:40:36',
+        'vendor_created_at' => '2002-08-22 18:14:54',
+        'vendor_updated_at' => '1976-03-27 13:06:06',
     ],
 ];

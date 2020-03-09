@@ -98,8 +98,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'sorter' => false,
                 'columns' => [
                     'item_name',
-                    'order_id',
                     'instructions',
+                    'qty',
                     [
                         'label' => 'Extra Options',
                         'value' => function ($data) {

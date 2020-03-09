@@ -185,7 +185,7 @@ $this->registerJs($js);
 
 
     <?=
-    $form->field($model, 'thumbnail_image', [
+    $form->field($model, 'restaurant_thumbnail_image', [
         'template' => "{label}"
         . "            <div class='input-group'>"
         . "             <div class='custom-file'>"
@@ -202,7 +202,7 @@ $this->registerJs($js);
 
 
     <?=
-    $form->field($model, 'logo', [
+    $form->field($model, 'restaurant_logo', [
         'template' => "{label}"
         . "            <div class='input-group'>"
         . "             <div class='custom-file'>"
@@ -237,19 +237,6 @@ $this->registerJs($js);
     );
     ?>
 
-
-
-    <?php
-//        $form->field($model, 'min_pickup_time')->widget(TimePicker::classname(), [
-//            'options' => ['placeholder' => 'Enter event time ...'],
-//            'pluginOptions' => [
-//                'autoclose' => true,
-//                'defaultTime' => false,
-//                'showSeconds' => true,
-//                'showMeridian' => false,
-//            ]
-//        ]);
-    ?>
 
 
     <?=

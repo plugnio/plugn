@@ -31,6 +31,7 @@ use yii\behaviors\TimestampBehavior;
 class Item extends \yii\db\ActiveRecord {
 
     public $items_category;
+    public $image;
 
     /**
      * {@inheritdoc}
@@ -47,7 +48,7 @@ class Item extends \yii\db\ActiveRecord {
             [['item_name', 'items_category'], 'required'],
             [['sort_number', 'stock_qty'], 'integer'],
             [['price'], 'number'],
-            [['item_image'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
+            [['image'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['item_created_at', 'item_updated_at', 'items_category'], 'safe'],
             [['item_uuid'], 'string', 'max' => 300],
             [['restaurant_uuid'], 'string', 'max' => 60],
@@ -72,6 +73,7 @@ class Item extends \yii\db\ActiveRecord {
             'sort_number' => 'Sort Number',
             'stock_qty' => 'Stock Qty',
             'item_image' => 'Item Image',
+            'image' => 'Item Image',
             'price' => 'Price',
             'items_category' => 'Category',
             'item_created_at' => 'Item Created At',
@@ -106,12 +108,27 @@ class Item extends \yii\db\ActiveRecord {
         ];
     }
 
+    
     public function beforeSave($insert) {
 
         if ($insert)
             $this->restaurant_uuid = Yii::$app->user->identity->restaurant_uuid;
 
         return parent::beforeSave($insert);
+    }
+
+    /**
+     * @param type $insert
+     * @param type $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes) {
+        parent::afterSave($insert, $changedAttributes);
+
+        if (!$insert && isset($changedAttributes['item_image']) && $this->image) {
+            if ($changedAttributes['item_image']) {
+                $this->deleteItemImage($changedAttributes['item_image']);
+            }
+        }
     }
 
     /**
@@ -193,21 +210,6 @@ class Item extends \yii\db\ActiveRecord {
 
     /**
      * 
-     * @param type $insert
-     * @param type $changedAttributes
-     */
-    public function afterSave($insert, $changedAttributes) {
-        parent::afterSave($insert, $changedAttributes);
-
-        if (!$insert && isset($changedAttributes['item_image'])) {
-            if ($changedAttributes['item_image']) {
-                $this->deleteItemImage($changedAttributes['item_image']);
-            }
-        }
-    }
-
-    /**
-     * 
      * @return boolean
      */
     public function beforeDelete() {
@@ -257,17 +259,14 @@ class Item extends \yii\db\ActiveRecord {
     public function getOptions() {
         return $this->hasMany(Option::className(), ['item_uuid' => 'item_uuid']);
     }
-    
-    
-    /** 
-    * Gets query for [[OrderItems]]. 
-    * 
-    * @return \yii\db\ActiveQuery 
-    */ 
-   public function getOrderItems() 
-   { 
-       return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid']); 
-   } 
 
+    /**
+     * Gets query for [[OrderItems]]. 
+     * 
+     * @return \yii\db\ActiveQuery 
+     */
+    public function getOrderItems() {
+        return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid']);
+    }
 
 }

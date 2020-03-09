@@ -45,6 +45,9 @@ class Restaurant extends \yii\db\ActiveRecord {
     public $restaurant_delivery_area;
     public $restaurant_payments_method;
 
+    public $restaurant_logo;
+    public $restaurant_thumbnail_image;
+    
     /**
      * {@inheritdoc}
      */
@@ -63,7 +66,7 @@ class Restaurant extends \yii\db\ActiveRecord {
                 }, 'whenClient' => "function (attribute, value) {
                 return $('#supportPickupInput').val() == 1;
             }"],
-            [['thumbnail_image', 'logo'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
+            [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['vendor_id', 'restaurant_status', 'support_delivery', 'support_pick_up'], 'integer'],
             [['min_pickup_time', 'operating_from', 'operating_to', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
@@ -88,6 +91,8 @@ class Restaurant extends \yii\db\ActiveRecord {
             'restaurant_status' => 'Restaurant Status',
             'thumbnail_image' => 'Thumbnail Image',
             'logo' => 'Logo',
+            'restaurant_thumbnail_image' => 'Thumbnail Image',
+            'restaurant_logo' => 'Logo',
             'support_delivery' => 'Support Delivery',
             'support_pick_up' => 'Support Pick Up',
             'min_pickup_time' => 'Min Pickup Time',
@@ -205,13 +210,13 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-        if (!$insert && isset($changedAttributes['thumbnail_image'])) {
+        if (!$insert && isset($changedAttributes['thumbnail_image']) && $this->restaurant_thumbnail_image) {
             if ($changedAttributes['thumbnail_image']) {
                 $this->deleteRestaurantThumbnailImage($changedAttributes['thumbnail_image']);
             }
         }
 
-        if (!$insert && isset($changedAttributes['logo'])) {
+        if (!$insert && isset($changedAttributes['logo']) && $this->restaurant_logo) {
             if ($changedAttributes['logo']) {
                 $this->deleteRestaurantLogo($changedAttributes['logo']);
             }

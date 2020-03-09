@@ -70,8 +70,8 @@ class RestaurantController extends Controller {
 
             if ($model->save()) {
 
-                $thumbnail_image = \yii\web\UploadedFile::getInstances($model, 'thumbnail_image');
-                $logo = \yii\web\UploadedFile::getInstances($model, 'logo');
+                $thumbnail_image = \yii\web\UploadedFile::getInstances($model, 'restaurant_thumbnail_image');
+                $logo = \yii\web\UploadedFile::getInstances($model, 'restaurant_logo');
 
                 if ($thumbnail_image)
                     $model->uploadThumbnailImage($thumbnail_image[0]->tempName);

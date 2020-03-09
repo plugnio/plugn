@@ -135,7 +135,7 @@ $this->registerJs($js);
     <?= $form->field($model, 'stock_qty')->textInput() ?>
 
     <?=
-    $form->field($model, 'item_image', [
+    $form->field($model, 'image', [
         'template' => "{label}"
         . "            <div class='input-group'>"
         . "             <div class='custom-file'>"

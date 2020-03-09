@@ -115,10 +115,10 @@ class ItemController extends Controller {
 
             if ($model->save()) {
 
-                $item_image = \yii\web\UploadedFile::getInstances($model, 'item_image');
+                $image = \yii\web\UploadedFile::getInstances($model, 'image');
 
-                if ($item_image)
-                    $model->uploadItemImage($item_image[0]->tempName);
+                if ($image)
+                    $model->uploadItemImage($image[0]->tempName);
 
                 if ($model->items_category)
                     $model->saveItemsCategory($model->items_category);
