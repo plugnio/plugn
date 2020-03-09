@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\grid\GridView;
-use frontend\models\Order;
+use common\models\Order;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Order */
@@ -15,9 +15,18 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="page-title"> <i class="icon-custom-left"></i>
     <p>
-        <?= Html::a('Mark it as BEING_PREPARED (TODO)', ['create'], ['class' => 'btn btn-success']) ?>
-        <?= Html::a('Mark it as OUT_FOR_DELIVERY (TODO)', ['create'], ['class' => 'btn btn-success']) ?>
-        <?= Html::a('Mark it as completed (TODO)', ['create'], ['class' => 'btn btn-success']) ?>
+        <?php
+        
+        if ($model->order_status != Order::STATUS_BEING_PREPARED)
+            echo Html::a('Being Prepared', ['change-order-status', 'id' => $model->order_id, 'status' => Order::STATUS_BEING_PREPARED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-warning']);
+
+        if ($model->order_status != Order::STATUS_OUT_FOR_DELIVERY)
+            echo Html::a('Out for Delivery', ['change-order-status', 'id' => $model->order_id, 'status' => Order::STATUS_OUT_FOR_DELIVERY], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-primary']);
+
+        if ($model->order_status != Order::STATUS_COMPLETE)
+            echo Html::a('Mark as Complete', ['change-order-status', 'id' => $model->order_id, 'status' => Order::STATUS_COMPLETE], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
+       
+        ?>
     </p>
 </div>
 

@@ -70,6 +70,15 @@ class OrderItem extends \yii\db\ActiveRecord {
         return $totalPrice;
     }
 
+    
+    public function beforeSave($insert) {
+        parent::beforeSave($insert);
+        
+        if($this->qty > $this->item->stock_qty){
+            return $this->addError('qty', "The requested quantity for " . $this->item->item_name . " is not available.: ");
+        }
+        return true;
+    }
     /**
      * Gets query for [[ItemUu]].
      *

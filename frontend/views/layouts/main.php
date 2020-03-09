@@ -36,7 +36,23 @@ DashboardAsset::register($this);
                     </li>
                 </ul>
 
+                <!-- Right navbar links -->
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <?=
+                        Html::a('<i style="font-size: 21px;" class="fas fa-sign-out-alt"></i>', ['site/logout'], ['class' => 'nav-link',
+                            'data' => [
+                                'method' => 'post',
+                            ]
+                        ])
+                        ?>
+                    </li>
+                </ul>
+
+
             </nav>
+
+
             <!-- /.navbar -->
 
             <!-- Main Sidebar Container -->
@@ -55,12 +71,11 @@ DashboardAsset::register($this);
                     <!-- Sidebar user panel (optional) -->
                     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                         <div class="image">
-                            <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                            <img src="img/avatar.jpg" class="img-circle elevation-2" alt="User Image">
                         </div>
                         <div class="info">
-                            <a href="#" class="d-block">
-                                <?= Yii::$app->user->identity->vendor_name ?>
-                            </a>
+                            <?= Html::a(Yii::$app->user->identity->vendor_name, ['vendor/index']) ?>
+
                         </div>
                     </div>
 

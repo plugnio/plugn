@@ -53,6 +53,15 @@ class OrderController extends Controller {
         ]);
     }
 
+   public function actionChangeOrderStatus($id ,$status){
+      $order_model = $this->findModel($id);
+
+      $order_model->order_status = $status;
+      $order_model->save(false);
+
+      return $this->redirect(['view', 'id' => $order_model->order_id]);
+   }
+    
     /**
      * Displays a single Order model.
      * @param integer $id
