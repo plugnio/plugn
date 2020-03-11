@@ -33,7 +33,7 @@ class OrderItem extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['order_id', 'item_uuid', 'item_name', 'item_price'], 'required'],
+            [['order_id', 'item_uuid'], 'required'],
             [['order_id', 'qty'], 'integer'],
             [['item_price'], 'number'],
             [['item_uuid'], 'string', 'max' => 300],
@@ -72,15 +72,29 @@ class OrderItem extends \yii\db\ActiveRecord {
         return $totalPrice;
     }
 
-    
     public function beforeSave($insert) {
         parent::beforeSave($insert);
-        
-        if($this->qty > $this->item->stock_qty){
+
+        if ($this->qty > $this->item->stock_qty) {
             return $this->addError('qty', "The requested quantity for " . $this->item->item_name . " is not available.: ");
         }
+
+        $item_model = Item::findOne($this->item_uuid);
+        
+        if ($item_model) {
+            $this->item_name = $item_model->item_name;
+            $this->item_price = $item_model->item_price;
+            
+            //update stock_qty
+            $item_model->stock_qty--;
+            $item_model->save(false);
+        } else
+            return false;
+
+
         return true;
     }
+
     /**
      * Gets query for [[ItemUu]].
      *

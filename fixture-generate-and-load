@@ -88,27 +88,28 @@ wait
 
 ./yii fixture/load Customer --interactive=0
 
-wait
-./yii fixture/generate order --interactive=0 --count=1
+#wait
 
-wait
-
-./yii fixture/load Order --interactive=0
-
-wait 
-
-./yii fixture/generate order_item --interactive=0 --count=5
-
-wait
-
-./yii fixture/load OrderItem --interactive=0
-
-wait 
-
-./yii fixture/generate order_item_extra_option --interactive=0 --count=5
-
-wait
-
-./yii fixture/load OrderItemExtraOption --interactive=0
+#./yii fixture/generate order --interactive=0 --count=1
+#
+#wait
+#
+#./yii fixture/load Order --interactive=0
+#
+#wait 
+#
+#./yii fixture/generate order_item --interactive=0 --count=5
+#
+#wait
+#
+#./yii fixture/load OrderItem --interactive=0
+#
+#wait 
+#
+#./yii fixture/generate order_item_extra_option --interactive=0 --count=5
+#
+#wait
+#
+#./yii fixture/load OrderItemExtraOption --interactive=0
 
 echo "Done generating all fixtures"

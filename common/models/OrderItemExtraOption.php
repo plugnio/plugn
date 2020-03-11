@@ -33,7 +33,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['order_item_id', 'extra_option_id', 'extra_option_name', 'extra_option_name_ar', 'extra_option_price'], 'required'],
+            [['order_item_id'], 'required'],
             [['order_item_id', 'extra_option_id'], 'integer'],
             [['extra_option_price'], 'number'],
             [['extra_option_name', 'extra_option_name_ar'], 'string', 'max' => 255],
@@ -55,6 +55,24 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord
             'extra_option_name_ar' => 'Extra Option Name Ar',
             'extra_option_price' => 'Extra Option Price',
         ];
+    }
+    
+    
+    public function beforeSave($insert) {
+        parent::beforeSave($insert);
+        
+        $extra_option_model = ExtraOption::findOne($this->extra_option_id);
+        
+        if($extra_option_model){
+                    $this->extra_option_name = $extra_option_model->extra_option_name;
+        $this->extra_option_name_ar = $extra_option_model->extra_option_name_ar;
+        $this->extra_option_price = $extra_option_model->extra_option_price;
+        
+        }else
+            return false;
+        
+        return true;
+
     }
 
     /**

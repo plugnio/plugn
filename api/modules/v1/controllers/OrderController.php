@@ -9,7 +9,6 @@ use common\models\Order;
 use common\models\OrderItem;
 use common\models\OrderItemExtraOption;
 
-
 class OrderController extends Controller {
 
     public function behaviors() {
@@ -56,101 +55,99 @@ class OrderController extends Controller {
     /**
      * Place an order
      */
-    public function actionCreateAnOrder($id) {
+    public function actionPlaceAnOrder($id) {
+
+        $response = [];
 
         $order = new Order();
         //TODO if restaurant_uuid not exist
         $order->restaurant_uuid = $id;
-        
+
         //Save Customer Info
-        $order->customer_name = Yii::$app->request->getBodyParam("name");
+        $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
         $order->customer_phone_number = Yii::$app->request->getBodyParam("phone_number");
-        $order->customer_email = Yii::$app->request->getBodyParam("email");//optional
-        
+        $order->customer_email = Yii::$app->request->getBodyParam("email"); //optional
         //payment method
         $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
-        $order->payment_method_name = Yii::$app->request->getBodyParam("payment_method_name");
-        
+
         //save Customer address
         $order->area_id = Yii::$app->request->getBodyParam("area_id");
-        $order->area_name = Yii::$app->request->getBodyParam("area_name");
-        $order->area_name_ar = Yii::$app->request->getBodyParam("area_name_ar");
         $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
         $order->block = Yii::$app->request->getBodyParam("block");
         $order->street = Yii::$app->request->getBodyParam("street");
         $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
         $order->house_number = Yii::$app->request->getBodyParam("house_number");
-        $order->special_directions = Yii::$app->request->getBodyParam("special_directions");//optional
-        
-        if (!$order->save()) {
-            return [
+        $order->special_directions = Yii::$app->request->getBodyParam("special_directions"); //optional
+        $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
+
+
+        if ($order->save()) {
+
+            $items = Yii::$app->request->getBodyParam("items");
+            
+            //Save items to the above order 
+            $orderItem = new OrderItem;
+            
+            $orderItem->order_id = $order->order_id;
+            $orderItem->item_uuid = $items["item_uuid"];
+            $orderItem->qty = (int) $items["qty"];
+            
+            //optional field
+            if(array_key_exists("instructions", $items)  && $items["instructions"] != null)
+                $orderItem->instructions = $items["instructions"];
+
+            if ($items['extra_options']) {
+                $extra_options = $items['extra_options'];
+            }
+
+
+            if ($orderItem->save()) {
+
+                if ($extra_options) {
+                    $orderItemExtraOption = new OrderItemExtraOption;
+                    $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
+                    $orderItemExtraOption->extra_option_id = $extra_options["extra_option_id"];
+
+                    if (!$orderItemExtraOption->save()) {
+                        $response = [
+                            'operation' => 'error',
+                            'message' => $orderItemExtraOption->getErrors()
+                        ];
+                    }
+                }
+                
+            } else {
+
+                $response = [
+                    'operation' => 'error',
+                    'message' => $orderItem->getErrors()
+                ];
+            }
+        } else {
+
+            $response = [
                 'operation' => 'error',
                 'message' => $order->getErrors()
             ];
         }
 
-        return [
-            'operation' => 'success',
-            'order_id' => $order->order_id,
-            'message' => 'Order created successfully'
-        ];
-
-    }
-
-    /**
-     * save an item to order_item table as record 
-     */
-    public function actionAddItemToTheCart($id) {
-
-        $orderItem = new OrderItem();
-   
-        $orderItem->order_id = (int) $id;
-        $orderItem->item_uuid =  Yii::$app->request->getBodyParam("item_uuid");
-        $orderItem->item_name = Yii::$app->request->getBodyParam("item_name");
-        $orderItem->item_price = (int) Yii::$app->request->getBodyParam("item_price");
-        $orderItem->qty = (int) Yii::$app->request->getBodyParam("qty");
-        $orderItem->instructions = Yii::$app->request->getBodyParam("instructions");
-
         
-        if (!$orderItem->save()) {
-            return [
-                'operation' => 'error',
-                'message' => $orderItem->getErrors()
+        if ($response == null) {
+            
+            $order->delivery_fee = $order->restaurantDelivery->delivery_fee;
+            $order->total_items_price = $order->calculateOrderItemsTotalPrice();
+            $order->total_price = $order->calculateOrderTotalPrice();
+            
+            $order->save();
+            
+            $response = [
+                'operation' => 'success',
+                'order_id' => $order->order_id,
+                'message' => 'Order created successfully'
             ];
         }
 
-        return [
-            'operation' => 'success',
-            'order_item_id' => $orderItem->order_item_id
-        ];
-
-    }
-    
-    /**
-     * save an extraOption to order_extra_option table as record 
-     */
-    public function actionAddExtraOptionToTheCart($id) {
-
-        $orderItemExtraOption = new OrderItemExtraOption();
-   
-        $orderItemExtraOption->order_item_id = (int) $id;
-        $orderItemExtraOption->extra_option_id =  Yii::$app->request->getBodyParam("extra_option_id");
-        $orderItemExtraOption->extra_option_name = Yii::$app->request->getBodyParam("extra_option_name");
-        $orderItemExtraOption->extra_option_name_ar =  Yii::$app->request->getBodyParam("extra_option_name_ar");
-        $orderItemExtraOption->extra_option_price = (int) Yii::$app->request->getBodyParam("extra_option_price");
-
-        
-        if (!$orderItemExtraOption->save()) {
-            return [
-                'operation' => 'error',
-                'message' => $orderItemExtraOption->getErrors()
-            ];
-        }
-
-        return [
-            'operation' => 'success'
-        ];
-
+        return $response;
     }
 
 }

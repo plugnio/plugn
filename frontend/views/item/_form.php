@@ -151,7 +151,7 @@ $this->registerJs($js);
     ?>
 
 
-    <?= $form->field($model, 'price')->textInput() ?>
+    <?= $form->field($model, 'extra_option_price')->textInput() ?>
 
 
     <div class="form-group">

@@ -120,7 +120,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     [
                         'label' => 'Subtotal',
                         'value' => function ($item) {
-                            return $item->calculateOrderItemPrice();
+                            return $item->order->total_items_price;
                         },
                         'format' => 'currency'
                     ],
@@ -150,15 +150,15 @@ $this->params['breadcrumbs'][] = $this->title;
                 <table class="table">
                     <tr>
                         <th style="width:50%">Subtotal:</th>
-                        <td><?= \Yii::$app->formatter->asCurrency($model->calculateOrderItemsTotalPrice()) ?> </td>
+                        <td><?= \Yii::$app->formatter->asCurrency($model->total_items_price) ?> </td>
                     </tr>
                     <tr>
                         <th>Delivery:</th>
-                        <td><?= \Yii::$app->formatter->asCurrency($model->restaurantDelivery->delivery_fee) ?> </td>
+                        <td><?= \Yii::$app->formatter->asCurrency($model->delivery_fee) ?> </td>
                     </tr>
                     <tr>
                         <th>Total:</th>
-                        <td><?= \Yii::$app->formatter->asCurrency($model->calculateOrderTotalPrice()) ?> </td>
+                        <td><?= \Yii::$app->formatter->asCurrency($model->total_price) ?> </td>
                     </tr>
                 </table>
             </div>

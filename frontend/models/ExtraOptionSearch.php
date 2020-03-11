@@ -19,7 +19,7 @@ class ExtraOptionSearch extends ExtraOption
         return [
             [['extra_option_id', 'option_id'], 'integer'],
             [['extra_option_name', 'extra_option_name_ar'], 'safe'],
-            [['price'], 'number'],
+            [['extra_option_price'], 'number'],
         ];
     }
 

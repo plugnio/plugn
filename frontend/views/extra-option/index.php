@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'option_id',
             'extra_option_name',
             'extra_option_name_ar',
-            'price',
+            'extra_option_price',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

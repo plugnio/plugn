@@ -81,14 +81,10 @@ return [
                     'controller' => 'v1/order',
                     'pluralize' => false,
                     'patterns' => [
-                        'POST <id>' => 'create-an-order',
-                        'POST item/<id>' => 'add-item-to-the-cart',
-                        'POST extra-option/<id>' => 'add-extra-option-to-the-cart',
+                        'POST <id>' => 'place-an-order',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS <id>' => 'options',
-                        'OPTIONS item/<id>' => 'options',
-                        'OPTIONS extra-option/<id>' => 'options',
                     ]
                 ],
             ],

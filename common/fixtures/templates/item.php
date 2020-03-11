@@ -15,7 +15,7 @@ return [
     'sort_number' => $faker->numberBetween(1, 5),
     'stock_qty' => $faker->numberBetween(1, 15),
     'item_image' => '8e1lUGUnUKbjFbq2ZNbd80Pg9xYkLrLs.png',
-    'price' => $faker->numberBetween(1, 5),
+    'item_price' => $faker->numberBetween(1, 5),
     'item_created_at' => $faker->date('Y-m-d H:i:s'),
     'item_updated_at' => $faker->date('Y-m-d H:i:s')
  ];

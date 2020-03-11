@@ -48,7 +48,7 @@ $this->registerCss($css);
 //            'item_description',
 //            'item_description_ar',
             'stock_qty',
-            'price:currency',
+            'item_price:currency',
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template' => ' {view} {update} {delete}',

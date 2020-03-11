@@ -23,7 +23,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'extra_option_name_ar') ?>
 
-    <?= $form->field($model, 'price') ?>
+    <?= $form->field($model, 'extra_option_price') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>

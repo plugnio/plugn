@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/". $data->restaurant->name ."/items/" . $data->item_image);
                         },
                     ],
-                    'price:currency',
+                    'item_price:currency',
                     'item_created_at',
                     'item_updated_at',
                 ],

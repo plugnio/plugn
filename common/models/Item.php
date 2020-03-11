@@ -47,7 +47,7 @@ class Item extends \yii\db\ActiveRecord {
         return [
             [['item_name', 'items_category'], 'required'],
             [['sort_number', 'stock_qty'], 'integer'],
-            [['price'], 'number'],
+            [['item_price'], 'number'],
             [['image'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['item_created_at', 'item_updated_at', 'items_category'], 'safe'],
             [['item_uuid'], 'string', 'max' => 300],
@@ -74,7 +74,7 @@ class Item extends \yii\db\ActiveRecord {
             'stock_qty' => 'Stock Qty',
             'item_image' => 'Item Image',
             'image' => 'Item Image',
-            'price' => 'Price',
+            'item_price' => 'Price',
             'items_category' => 'Category',
             'item_created_at' => 'Item Created At',
             'item_updated_at' => 'Item Updated At',

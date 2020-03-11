@@ -33,7 +33,7 @@ use yii\widgets\ActiveForm;
 
     <?php // echo $form->field($model, 'item_image') ?>
 
-    <?php // echo $form->field($model, 'price') ?>
+    <?php // echo $form->field($model, 'extra_option_price') ?>
 
     <?php // echo $form->field($model, 'item_created_at') ?>
 

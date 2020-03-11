@@ -4,51 +4,51 @@ return [
     'restaurant_delivery0' => [
         'area_id' => '1',
         'restaurant_uuid' => 'rest_fdb95572-1b66-36be-93d4-9853a5e50a60',
-        'min_delivery_time' => 21,
+        'min_delivery_time' => 47,
     ],
     'restaurant_delivery1' => [
         'area_id' => '2',
         'restaurant_uuid' => 'rest_fdb95572-1b66-36be-93d4-9853a5e50a60',
-        'min_delivery_time' => 43,
+        'min_delivery_time' => 45,
     ],
     'restaurant_delivery2' => [
         'area_id' => '3',
         'restaurant_uuid' => 'rest_fdb95572-1b66-36be-93d4-9853a5e50a60',
-        'min_delivery_time' => 8,
+        'min_delivery_time' => 30,
     ],
     'restaurant_delivery3' => [
         'area_id' => '4',
         'restaurant_uuid' => 'rest_fdb95572-1b66-36be-93d4-9853a5e50a60',
-        'min_delivery_time' => 12,
+        'min_delivery_time' => 3,
     ],
     'restaurant_delivery4' => [
         'area_id' => '5',
         'restaurant_uuid' => 'rest_fdb95572-1b66-36be-93d4-9853a5e50a60',
-        'min_delivery_time' => 32,
+        'min_delivery_time' => 23,
     ],
     'restaurant_delivery5' => [
         'area_id' => '6',
         'restaurant_uuid' => 'rest_fdb95572-1b66-36be-93d4-9853a5e50a60',
-        'min_delivery_time' => 34,
+        'min_delivery_time' => 26,
     ],
     'restaurant_delivery6' => [
         'area_id' => '8',
         'restaurant_uuid' => 'rest_fdb95572-1b66-36be-93d4-9853a5e50a60',
-        'min_delivery_time' => 57,
+        'min_delivery_time' => 28,
     ],
     'restaurant_delivery7' => [
         'area_id' => '9',
         'restaurant_uuid' => 'rest_fdb95572-1b66-36be-93d4-9853a5e50a60',
-        'min_delivery_time' => 25,
+        'min_delivery_time' => 44,
     ],
     'restaurant_delivery8' => [
         'area_id' => '10',
         'restaurant_uuid' => 'rest_fdb95572-1b66-36be-93d4-9853a5e50a60',
-        'min_delivery_time' => 57,
+        'min_delivery_time' => 19,
     ],
     'restaurant_delivery9' => [
         'area_id' => '11',
         'restaurant_uuid' => 'rest_fdb95572-1b66-36be-93d4-9853a5e50a60',
-        'min_delivery_time' => 60,
+        'min_delivery_time' => 30,
     ],
 ];

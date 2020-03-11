@@ -29,7 +29,7 @@ class m200119_140711_create_item_table extends Migration
             'sort_number' => $this->integer(),
             'stock_qty' => $this->integer(),
             'item_image' => $this->string(255),
-            'price' => $this->float(),
+            'item_price' => $this->float(),
             'item_created_at' => $this->dateTime(),
             'item_updated_at' => $this->dateTime(),
         ], $tableOptions);

@@ -32,5 +32,6 @@ return [
     'payment_method_id' => $restaurantPaymentMethod['payment_method_id'],
     'payment_method_name' => $paymentMethod['payment_method_name'],
     'order_created_at' => $faker->date('Y-m-d H:i:s'),
+    'order_updated_at' => $faker->date('Y-m-d H:i:s'),
 ];
 

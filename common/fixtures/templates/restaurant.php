@@ -14,7 +14,7 @@ return [
     'restaurant_status' => 1,  // generate a sentence with 7 words,
     'thumbnail_image' => 'uiAiNXR9gxH7LzPB2D4JJGVGAaQaoYE9.jpg',
     'logo' => 'lG8AZqroaynHiHYSnMJ-ZZsF_bc0C6KY.jpg',
-    'support_delivery' => 0,
+    'support_delivery' => 1,
     'support_pick_up' => 0,
     'phone_number' => $faker->phoneNumber,
     'restaurant_created_at' => $faker->date('Y-m-d H:i:s'),
