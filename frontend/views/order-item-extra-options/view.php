@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model common\models\OrderItemExtraOptions */
 
 $this->title = $model->orderItem->item_name;
-$this->params['breadcrumbs'][] = ['label' => $model->order->area_name, 'url' => ['order/view', 'id' => $model->order->order_id]];
+$this->params['breadcrumbs'][] = ['label' => $model->order->area_name, 'url' => ['order/view', 'id' => $model->order->order_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'order.order_id',
+            'order.order_uuid',
             'orderItem.item_name',
             'orderItem.item_price',
             'orderItem.instructions',

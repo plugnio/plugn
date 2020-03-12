@@ -138,8 +138,8 @@ class RestaurantDeliveryController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($restaurant_uuid, $area_id) {
-        $this->findModel($restaurant_uuid, $area_id)->delete();
+    public function actionDelete($area_id) {
+        $this->findModel(Yii::$app->user->identity->restaurant_uuid, $area_id)->delete();
 
         return $this->redirect(['index']);
     }

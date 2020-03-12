@@ -8,7 +8,7 @@ use common\models\Order;
 /* @var $this yii\web\View */
 /* @var $model common\models\Order */
 
-$this->title = 'Order #' . $model->order_id;
+$this->title = 'Order #' . $model->order_uuid;
 $this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -18,13 +18,13 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php
         
         if ($model->order_status != Order::STATUS_BEING_PREPARED)
-            echo Html::a('Being Prepared', ['change-order-status', 'id' => $model->order_id, 'status' => Order::STATUS_BEING_PREPARED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-warning']);
+            echo Html::a('Being Prepared', ['change-order-status', 'id' => $model->order_uuid, 'status' => Order::STATUS_BEING_PREPARED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-warning']);
 
         if ($model->order_status != Order::STATUS_OUT_FOR_DELIVERY)
-            echo Html::a('Out for Delivery', ['change-order-status', 'id' => $model->order_id, 'status' => Order::STATUS_OUT_FOR_DELIVERY], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-primary']);
+            echo Html::a('Out for Delivery', ['change-order-status', 'id' => $model->order_uuid, 'status' => Order::STATUS_OUT_FOR_DELIVERY], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-primary']);
 
         if ($model->order_status != Order::STATUS_COMPLETE)
-            echo Html::a('Mark as Complete', ['change-order-status', 'id' => $model->order_id, 'status' => Order::STATUS_COMPLETE], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
+            echo Html::a('Mark as Complete', ['change-order-status', 'id' => $model->order_uuid, 'status' => Order::STATUS_COMPLETE], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
        
         ?>
     </p>
@@ -57,7 +57,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
         <!-- /.col -->
         <div class="col-sm-4 invoice-col">
-            <b>Order ID:</b> <?= $model->order_id ?><br>
+            <b>Order ID:</b> <?= $model->order_uuid ?><br>
             <b>Order Placed:</b> <?= \Yii::$app->formatter->asDatetime($model->order_created_at) ?> <br>
             <b>Invoice Date:</b> <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy') ?> <br>
             <b>Invoice Status:</b> <?= $model->getOrderStatus() ?> <br>

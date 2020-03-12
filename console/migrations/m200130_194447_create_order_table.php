@@ -28,7 +28,7 @@ class m200130_194447_create_order_table extends Migration {
                 ], $tableOptions);
 
         $this->createTable('{{%order}}', [
-            'order_id' => $this->bigPrimaryKey(),
+            'order_uuid' => $this->char(40)->notNull(),
             'customer_id' => $this->bigInteger()->notNull(),
             'customer_name' => $this->string(255)->notNull(),
             'customer_phone_number' => $this->string(255)->notNull(),
@@ -55,6 +55,10 @@ class m200130_194447_create_order_table extends Migration {
         ], $tableOptions);
 
 
+        $this->addPrimaryKey('PK', 'order', 'order_uuid');
+
+                
+                
         // creates index for column `customer_id`
         $this->createIndex(
                 'idx-order-customer_id', 'order', 'customer_id'
@@ -99,7 +103,7 @@ class m200130_194447_create_order_table extends Migration {
 
         $this->createTable('{{%order_item}}', [
             'order_item_id' => $this->bigPrimaryKey(),
-            'order_id' => $this->bigInteger()->notNull(),
+            'order_uuid' => $this->char(40)->notNull(),
             'item_uuid' => $this->string(300),
             'item_name' => $this->string(255)->notNull(),
             'item_price' => $this->float()->notNull(),
@@ -107,14 +111,14 @@ class m200130_194447_create_order_table extends Migration {
             'instructions' => $this->string(255)
                 ], $tableOptions);
 
-        // creates index for column `order_id`
+        // creates index for column `order_uuid`
         $this->createIndex(
-                'idx-order_item-order_id', 'order_item', 'order_id'
+                'idx-order_item-order_uuid', 'order_item', 'order_uuid'
         );
 
         // add foreign key for table `order`
         $this->addForeignKey(
-                'fk-order_item-order_id', 'order_item', 'order_id', 'order', 'order_id', 'CASCADE'
+                'fk-order_item-order_uuid', 'order_item', 'order_uuid', 'order', 'order_uuid', 'CASCADE'
         );
 
         // creates index for column `item_uuid`

@@ -13,7 +13,7 @@ $paymentMethod = Yii::$app->db->createCommand('SELECT * from payment_method wher
 $customer = Yii::$app->db->createCommand('SELECT * from customer')->queryOne();
 
 return [
-    'order_id' => $faker->numberBetween(1, 100000),
+    'order_uuid' => $faker->numberBetween(1, 100000),
     'customer_id' => $customer['customer_id'],
     'customer_phone_number' => $customer['customer_phone_number'],
     'customer_email' => $customer['customer_email'],

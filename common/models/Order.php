@@ -6,11 +6,12 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use common\models\Customer;
+use yii\behaviors\AttributeBehavior;
 
 /**
  * This is the model class for table "order".
  *
- * @property int $order_id
+ * @property string $order_uuid
  * @property int $customer_id
  * @property string|null $restaurant_uuid 
  * @property int $area_id
@@ -61,9 +62,12 @@ class Order extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['area_id', 'unit_type', 'block', 'street', 'house_number', 'customer_name', 'customer_phone_number', 'payment_method_id', 'order_mode'], 'required'],
+            [['order_uuid'], 'string', 'max' => 36],
+            [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer'],
             ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE]],
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
+            ['area_id', 'validateArea'],
             ['order_mode', 'validateOrderMode'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['customer_phone_number', 'total_price', 'delivery_fee', 'total_items_price'], 'number'],
@@ -82,12 +86,52 @@ class Order extends \yii\db\ActiveRecord {
     public function behaviors() {
         return [
             [
+                'class' => AttributeBehavior::className(),
+                'attributes' => [
+                    \yii\db\ActiveRecord::EVENT_BEFORE_INSERT => 'order_uuid',
+                ],
+                'value' => function() {
+                    if (!$this->order_uuid) {
+                        // Get a unique uuid from payment table
+                        $this->order_uuid = Order::getUniqueOrderUuid();
+                    }
+
+                    return $this->order_uuid;
+                }
+            ],
+            [
                 'class' => TimestampBehavior::className(),
                 'createdAtAttribute' => 'order_created_at',
                 'updatedAtAttribute' => 'order_updated_at',
                 'value' => new Expression('NOW()'),
-            ],
+            ]
         ];
+    }
+
+    /**
+     * Get a unique alphanumeric uuid to be used for a payment
+     * @return string uuid
+     */
+    private static function getUniqueOrderUuid($length = 6) {
+        $uuid = \ShortCode\Random::get($length);
+
+        $isNotUnique = static::find()->where(['order_uuid' => $uuid])->exists();
+
+        // If not unique, try again recursively
+        if ($isNotUnique) {
+            return static::getUniqueOrderUuid($length);
+        }
+
+        return $uuid;
+    }
+
+    /**
+     * Check if the selected area delivery by the restaurant or no
+     * @param type $attribute
+     */
+    public function validateArea($attribute) {
+        if (!RestaurantDelivery::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'area_id' => $this->area_id])->one())
+            $this->addError($attribute, "Restaurant does not deliver to this Area.");
     }
 
     /**
@@ -107,7 +151,7 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'order_id' => 'Order ID',
+            'order_uuid' => 'Order UUID',
             'restaurant_uuid' => 'Restaurant Uuid',
             'area_id' => 'Area ID',
             'area_name' => 'Area Name',
@@ -267,7 +311,7 @@ class Order extends \yii\db\ActiveRecord {
      * @return \yii\db\ActiveQuery
      */
     public function getOrderItems() {
-        return $this->hasMany(OrderItem::className(), ['order_id' => 'order_id']);
+        return $this->hasMany(OrderItem::className(), ['order_uuid' => 'order_uuid']);
     }
 
     /**

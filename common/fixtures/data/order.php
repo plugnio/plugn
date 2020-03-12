@@ -2,7 +2,7 @@
 
 return [
     'order0' => [
-        'order_id' => 64770,
+        'order_uuid' => 64770,
         'customer_id' => '572490',
         'customer_phone_number' => '(268) 923-7588 x7546',
         'customer_email' => 'dovie.conn@bartell.info',

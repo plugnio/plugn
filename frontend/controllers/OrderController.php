@@ -59,7 +59,7 @@ class OrderController extends Controller {
       $order_model->order_status = $status;
       $order_model->save(false);
 
-      return $this->redirect(['view', 'id' => $order_model->order_id]);
+      return $this->redirect(['view', 'id' => $order_model->order_uuid]);
    }
     
     /**
@@ -102,7 +102,7 @@ class OrderController extends Controller {
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->order_id]);
+            return $this->redirect(['view', 'id' => $model->order_uuid]);
         }
 
         return $this->render('update', [

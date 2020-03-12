@@ -17,7 +17,7 @@ class OrderSearch extends Order
     public function rules()
     {
         return [
-            [['order_id', 'area_id', 'payment_method_id', 'order_status'], 'integer'],
+            [['order_uuid', 'area_id', 'payment_method_id', 'order_status'], 'integer'],
             [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name'], 'safe'],
         ];
     }
@@ -58,7 +58,7 @@ class OrderSearch extends Order
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'order_id' => $this->order_id,
+            'order_uuid' => $this->order_uuid,
             'area_id' => $this->area_id,
             'payment_method_id' => $this->payment_method_id,
             'order_status' => $this->order_status,

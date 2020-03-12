@@ -6,7 +6,7 @@ $order = Yii::$app->db->createCommand('SELECT * from `order`')->queryOne();
 
 return [
     'order_item_id' => $faker->numberBetween(1,100000),
-    'order_id' => $order['order_id'],
+    'order_uuid' => $order['order_uuid'],
     'item_uuid' => $item[0]['item_uuid'],
     'item_name' => $item[0]['item_name'],
     'item_price' => $item[0]['price'],

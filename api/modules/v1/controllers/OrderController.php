@@ -84,67 +84,80 @@ class OrderController extends Controller {
         if ($order->save()) {
 
             $items = Yii::$app->request->getBodyParam("items");
-            
-            //Save items to the above order 
-            $orderItem = new OrderItem;
-            
-            $orderItem->order_id = $order->order_id;
-            $orderItem->item_uuid = $items["item_uuid"];
-            $orderItem->qty = (int) $items["qty"];
-            
-            //optional field
-            if(array_key_exists("instructions", $items)  && $items["instructions"] != null)
-                $orderItem->instructions = $items["instructions"];
-
-            if ($items['extra_options']) {
-                $extra_options = $items['extra_options'];
-            }
 
 
-            if ($orderItem->save()) {
+            if ($items) {
+                //Save items to the above order 
+                $orderItem = new OrderItem;
 
-                if ($extra_options) {
-                    $orderItemExtraOption = new OrderItemExtraOption;
-                    $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
-                    $orderItemExtraOption->extra_option_id = $extra_options["extra_option_id"];
+                $orderItem->order_uuid = $order->order_uuid;
+                $orderItem->item_uuid = $items["item_uuid"];
+                $orderItem->qty = (int) $items["qty"];
 
-                    if (!$orderItemExtraOption->save()) {
-                        $response = [
-                            'operation' => 'error',
-                            'message' => $orderItemExtraOption->getErrors()
-                        ];
-                    }
+                //optional field
+                if (array_key_exists("instructions", $items) && $items["instructions"] != null)
+                    $orderItem->instructions = $items["instructions"];
+
+                if (array_key_exists('extra_options', $items)) {
+                    $extra_options = $items['extra_options'];
                 }
-                
-            } else {
 
-                $response = [
+
+                if ($orderItem->save()) {
+
+                    if (isset($extra_options)) {
+                        $orderItemExtraOption = new OrderItemExtraOption;
+                        $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
+                        $orderItemExtraOption->extra_option_id = $extra_options["extra_option_id"];
+
+                        if (!$orderItemExtraOption->save()) {
+                            $response = [
+                                'operation' => 'error',
+                                'message' => $orderItemExtraOption->getErrors()
+                            ];
+                        }
+                    }
+                } else {
+
+                    $response = [
+                        'operation' => 'error',
+                        'message' => $orderItem->getErrors()
+                    ];
+                }
+            } else {
+                Order::deleteAll(['order_uuid' => $order]);
+                return [
                     'operation' => 'error',
-                    'message' => $orderItem->getErrors()
+                    'message' => 'Item Uuid is invalid.'
                 ];
             }
         } else {
-
-            $response = [
+            return [
                 'operation' => 'error',
                 'message' => $order->getErrors()
             ];
         }
 
-        
+
         if ($response == null) {
-            
+
             $order->delivery_fee = $order->restaurantDelivery->delivery_fee;
             $order->total_items_price = $order->calculateOrderItemsTotalPrice();
             $order->total_price = $order->calculateOrderTotalPrice();
-            
-            $order->save();
-            
-            $response = [
-                'operation' => 'success',
-                'order_id' => $order->order_id,
-                'message' => 'Order created successfully'
-            ];
+
+            if (!$order->save()) {
+                $response = [
+                    'operation' => 'error',
+                    'message' => $order->getErrors()
+                ];
+            } else {
+
+                $response = [
+                    'operation' => 'success',
+                    'order_uuid' => $order->order_uuid,
+                    'message' => 'Order created successfully'
+                ];
+            }
         }
 
         return $response;

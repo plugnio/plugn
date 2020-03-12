@@ -2,15 +2,15 @@
 
 return [
     'payment_method0' => [
-        'payment_method_id' => 460,
-        'payment_method_name' => 'Wallace',
+        'payment_method_id' => 253,
+        'payment_method_name' => 'Cooper',
     ],
     'payment_method1' => [
-        'payment_method_id' => 221,
-        'payment_method_name' => 'Jackie',
+        'payment_method_id' => 194,
+        'payment_method_name' => 'Alaina',
     ],
     'payment_method2' => [
-        'payment_method_id' => 157,
-        'payment_method_name' => 'Emmalee',
+        'payment_method_id' => 427,
+        'payment_method_name' => 'Loyal',
     ],
 ];
