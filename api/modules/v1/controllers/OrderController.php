@@ -60,6 +60,7 @@ class OrderController extends Controller {
         $response = [];
 
         $order = new Order();
+
         //TODO if restaurant_uuid not exist
         $order->restaurant_uuid = $id;
 
@@ -132,13 +133,15 @@ class OrderController extends Controller {
 
 
         if ($response == null) {
-
+            
             $order->delivery_fee = $order->restaurantDelivery->delivery_fee;
             $order->total_items_price = $order->calculateOrderItemsTotalPrice();
             $order->total_price = $order->calculateOrderTotalPrice();
             
+            
             if (!$order->save()) {
                return [
+                    'operation' => 'error',
                     'operation' => 'error',
                     'message' => $order->errors
                 ];

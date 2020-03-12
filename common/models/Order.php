@@ -93,6 +93,17 @@ class Order extends \yii\db\ActiveRecord {
     }
 
     /**
+     * @inheritdoc
+     */
+    public function scenarios() {
+        $scenarios = parent::scenarios();
+
+        $scenarios['update-order-by-admin'] = ['area_id', 'unit_type', 'block', 'street', 'house_number', 'customer_name', 'customer_phone_number', 'payment_method_id', 'total_items_price', 'order_mode'];
+
+        return $scenarios;
+    }
+
+    /**
      * Validate order mode attribute
      * @param type $attribute
      */
@@ -205,7 +216,7 @@ class Order extends \yii\db\ActiveRecord {
 
 
         $area_model = Area::findOne($this->area_id);
-        
+
         if ($area_model) {
             $this->area_name = $area_model->area_name;
             $this->area_name_ar = $area_model->area_name_ar;
@@ -220,6 +231,20 @@ class Order extends \yii\db\ActiveRecord {
 
 
         return true;
+    }
+
+    public function afterSave($insert, $changedAttributes) {
+        parent::afterSave($insert, $changedAttributes);
+
+        if (!$insert  && $this->getScenario() == 'default') {
+                
+                foreach ($this->getOrderItems() as $orderItem) {
+                    //update stock_qty
+                    $item_model = Item::findOne($orderItem->item_uuid);
+                    $item_model->stock_qty -= $orderItem->qty;
+                    $item_model->save(false);
+                }
+        }
     }
 
     /**

@@ -53,15 +53,16 @@ class OrderController extends Controller {
         ]);
     }
 
-   public function actionChangeOrderStatus($id ,$status){
-      $order_model = $this->findModel($id);
+    public function actionChangeOrderStatus($id, $status) {
+        $order_model = $this->findModel($id);
+        $order_model->setScenario('update-order-by-admin');
 
-      $order_model->order_status = $status;
-      $order_model->save(false);
+        $order_model->order_status = $status;
+        $order_model->save(false);
 
-      return $this->redirect(['view', 'id' => $order_model->order_id]);
-   }
-    
+        return $this->redirect(['view', 'id' => $order_model->order_id]);
+    }
+
     /**
      * Displays a single Order model.
      * @param integer $id
@@ -82,14 +83,13 @@ class OrderController extends Controller {
         $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
             'query' => $order_model->getOrderItemExtraOptions()
         ]);
-             
+
         return $this->render('view', [
                     'model' => $order_model,
                     'orderItems' => $orderItems,
                     'itemsExtraOpitons' => $itemsExtraOpitons,
         ]);
     }
-
 
     /**
      * Updates an existing Order model.
@@ -100,6 +100,7 @@ class OrderController extends Controller {
      */
     public function actionUpdate($id) {
         $model = $this->findModel($id);
+        $model->setScenario('update-order-by-admin');
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->order_id]);
