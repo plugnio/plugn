@@ -15,7 +15,7 @@ use Yii;
  * @property float $min_charge
  *
  * @property Area $area
- * @property Restaurant $restaurantUu
+ * @property Restaurant $restaurant
  */
 class DeliveryZoneForm extends \yii\db\ActiveRecord {
 
@@ -46,6 +46,8 @@ class DeliveryZoneForm extends \yii\db\ActiveRecord {
         ];
     }
 
+    
+    
     /**
      * Apply the input user entered for all areas belongs to this city
      *

@@ -99,36 +99,11 @@ class RestaurantDeliveryController extends Controller {
             return $this->redirect(['index']);
         }
 
-        return $this->render('update-delivery-zone', [
-                    'model' => $model,
-        ]);
-    }
-
-    /**
-     * Updates an existing RestaurantDelivery model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param string $restaurant_uuid
-     * @param integer $area_id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($restaurant_uuid, $area_id) {
-        $model = $this->findModel($restaurant_uuid, $area_id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            $searchModel = new RestaurantDeliverySearch();
-            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-            return $this->render('index', [
-                        'searchModel' => $searchModel,
-                        'dataProvider' => $dataProvider,
-            ]);
-        }
-
         return $this->render('update', [
                     'model' => $model,
         ]);
     }
+
 
     /**
      * Deletes an existing RestaurantDelivery model.
