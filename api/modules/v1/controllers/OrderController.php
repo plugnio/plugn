@@ -84,16 +84,16 @@ class OrderController extends Controller {
         if ($order->save()) {
 
             $items = Yii::$app->request->getBodyParam("items");
-            
+
             //Save items to the above order 
             $orderItem = new OrderItem;
-            
+
             $orderItem->order_id = $order->order_id;
             $orderItem->item_uuid = $items["item_uuid"];
             $orderItem->qty = (int) $items["qty"];
-            
+
             //optional field
-            if(array_key_exists("instructions", $items)  && $items["instructions"] != null)
+            if (array_key_exists("instructions", $items) && $items["instructions"] != null)
                 $orderItem->instructions = $items["instructions"];
 
             if ($items['extra_options']) {
@@ -115,7 +115,6 @@ class OrderController extends Controller {
                         ];
                     }
                 }
-                
             } else {
 
                 $response = [
@@ -131,18 +130,26 @@ class OrderController extends Controller {
             ];
         }
 
-        
+
         if ($response == null) {
-            
+
             $order->delivery_fee = $order->restaurantDelivery->delivery_fee;
             $order->total_items_price = $order->calculateOrderItemsTotalPrice();
             $order->total_price = $order->calculateOrderTotalPrice();
             
-            $order->save();
-            
+            if (!$order->save()) {
+               return [
+                    'operation' => 'error',
+                    'message' => $order->errors
+                ];
+            }
+
+
             $response = [
                 'operation' => 'success',
                 'order_id' => $order->order_id,
+                'min_charge' => $order->restaurantDelivery->min_charge,
+                'total_price' => $order->total_price,
                 'message' => 'Order created successfully'
             ];
         }

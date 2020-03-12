@@ -12,11 +12,6 @@ $this->title = 'Orders';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<div class="page-title"> <i class="icon-custom-left"></i>
-    <p>
-        <?= Html::a('Create Order', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-</div>
 <div class="card">
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>

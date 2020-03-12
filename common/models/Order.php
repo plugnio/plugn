@@ -29,6 +29,8 @@ use common\models\Customer;
  * @property string $payment_method_name
  * @property int|null $order_status
  * @property int $order_mode
+ * @property int $total_items_price
+ * @property int $total_price
  * @property datetime $order_created_at
  * @property datetime $order_updated_at
  *
@@ -60,13 +62,13 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['area_id', 'unit_type', 'block', 'street', 'house_number', 'customer_name', 'customer_phone_number', 'payment_method_id', 'order_mode'], 'required'],
+            [['area_id', 'unit_type', 'block', 'street', 'house_number', 'customer_name', 'customer_phone_number', 'payment_method_id',], 'required'],
             [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer'],
             ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE]],
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
-            ['order_mode', 'validateOrderMode'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['customer_phone_number', 'total_price', 'delivery_fee', 'total_items_price'], 'number'],
+            ['total_items_price', 'validateMinCharge'],
             [['customer_email'], 'email'],
             [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
@@ -100,6 +102,17 @@ class Order extends \yii\db\ActiveRecord {
 
         else if ($this->$attribute == static::ORDER_MODE_PICK_UP && !$this->restaurant->support_pick_up)
             $this->addError($attribute, "Restaurant doesn't accept pick up");
+    }
+
+    /**
+     * Validates min charge
+     * This method serves as the inline validation for min_charge.
+     *
+     * @param string $attribute the attribute currently being validated
+     */
+    public function validateMinCharge($attribute) {
+        if ($this->restaurantDelivery->min_charge > $this->$attribute)
+            $this->addError($attribute, "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency($this->restaurantDelivery->min_charge));
     }
 
     /**
@@ -174,14 +187,6 @@ class Order extends \yii\db\ActiveRecord {
     public function beforeSave($insert) {
         parent::beforeSave($insert);
 
-        if ($this->calculateOrderTotalPrice() < $this->restaurantDelivery->min_charge)
-            return $this->addError('min_charge', "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency($this->restaurantDelivery->min_charge));
-
-        //On Update
-        if (!$insert) {
-            $this->total_price = $this->calculateOrderTotalPrice();
-        }
-
 
         //Save Customer data
         $customer_model = Customer::find()->where(['customer_phone_number' => $this->customer_phone_number])->one();
@@ -200,6 +205,7 @@ class Order extends \yii\db\ActiveRecord {
 
 
         $area_model = Area::findOne($this->area_id);
+        
         if ($area_model) {
             $this->area_name = $area_model->area_name;
             $this->area_name_ar = $area_model->area_name_ar;

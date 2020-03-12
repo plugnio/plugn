@@ -18,7 +18,7 @@ wait
 
 wait 
 
-./yii fixture/generate payment_method  --interactive=0 --count=3
+./yii fixture/generate payment_method  --interactive=0 --count=2
 
 wait
 
