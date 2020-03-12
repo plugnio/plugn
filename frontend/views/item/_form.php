@@ -134,6 +134,8 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'stock_qty')->textInput() ?>
 
+    <?= $form->field($model, 'item_price')->textInput() ?>
+
     <?=
     $form->field($model, 'image', [
         'template' => "{label}"
@@ -151,7 +153,6 @@ $this->registerJs($js);
     ?>
 
 
-    <?= $form->field($model, 'extra_option_price')->textInput() ?>
 
 
     <div class="form-group">

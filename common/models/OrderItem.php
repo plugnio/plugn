@@ -97,9 +97,6 @@ class OrderItem extends \yii\db\ActiveRecord {
         if ($item_model) {
             $this->item_name = $item_model->item_name;
             $this->item_price = $item_model->item_price;
-
-            //update stock_qty
-            $item_model->stock_qty--;
             $item_model->save(false);
         } else
             return false;
@@ -107,6 +104,7 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         return true;
     }
+
 
     /**
      * Gets query for [[ItemUu]].

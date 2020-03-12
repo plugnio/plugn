@@ -13,7 +13,7 @@ use yii\behaviors\AttributeBehavior;
  *
  * @property string $order_uuid
  * @property int $customer_id
- * @property string|null $restaurant_uuid 
+ * @property string|null $restaurant_uuid
  * @property int $area_id
  * @property string $area_name
  * @property string $area_name_ar
@@ -30,11 +30,13 @@ use yii\behaviors\AttributeBehavior;
  * @property string $payment_method_name
  * @property int|null $order_status
  * @property int $order_mode
+ * @property int $total_items_price
+ * @property int $total_price
  * @property datetime $order_created_at
  * @property datetime $order_updated_at
  *
  * @property Area $area
- * @property Customer $customer 
+ * @property Customer $customer
  * @property PaymentMethod $paymentMethod
  * @property Restaurant $restaurant
  * @property RestaurantDelivery $restaurantDelivery
@@ -71,6 +73,7 @@ class Order extends \yii\db\ActiveRecord {
             ['order_mode', 'validateOrderMode'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['customer_phone_number', 'total_price', 'delivery_fee', 'total_items_price'], 'number'],
+            ['total_items_price', 'validateMinCharge'],
             [['customer_email'], 'email'],
             [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
@@ -147,6 +150,17 @@ class Order extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Validates min charge
+     * This method serves as the inline validation for min_charge.
+     *
+     * @param string $attribute the attribute currently being validated
+     */
+    public function validateMinCharge($attribute) {
+        if ($this->restaurantDelivery->min_charge > $this->$attribute)
+            $this->addError($attribute, "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency($this->restaurantDelivery->min_charge));
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function attributeLabels() {
@@ -218,14 +232,6 @@ class Order extends \yii\db\ActiveRecord {
     public function beforeSave($insert) {
         parent::beforeSave($insert);
 
-        if ($this->calculateOrderTotalPrice() < $this->restaurantDelivery->min_charge)
-            return $this->addError('min_charge', "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency($this->restaurantDelivery->min_charge));
-
-        //On Update
-        if (!$insert) {
-            $this->total_price = $this->calculateOrderTotalPrice();
-        }
-
 
         //Save Customer data
         $customer_model = Customer::find()->where(['customer_phone_number' => $this->customer_phone_number])->one();
@@ -244,6 +250,7 @@ class Order extends \yii\db\ActiveRecord {
 
 
         $area_model = Area::findOne($this->area_id);
+
         if ($area_model) {
             $this->area_name = $area_model->area_name;
             $this->area_name_ar = $area_model->area_name_ar;
@@ -258,6 +265,20 @@ class Order extends \yii\db\ActiveRecord {
 
 
         return true;
+    }
+
+    public function afterSave($insert, $changedAttributes) {
+        parent::afterSave($insert, $changedAttributes);
+
+        if (!$insert  && $this->getScenario() == 'default') {
+
+                foreach ($this->getOrderItems() as $orderItem) {
+                    //update stock_qty
+                    $item_model = Item::findOne($orderItem->item_uuid);
+                    $item_model->stock_qty -= $orderItem->qty;
+                    $item_model->save(false);
+                }
+        }
     }
 
     /**
@@ -315,9 +336,9 @@ class Order extends \yii\db\ActiveRecord {
     }
 
     /**
-     * Gets query for [[Customer]]. 
-     * 
-     * @return \yii\db\ActiveQuery 
+     * Gets query for [[Customer]].
+     *
+     * @return \yii\db\ActiveQuery
      */
     public function getCustomer() {
         return $this->hasOne(Customer::className(), ['customer_id' => 'customer_id']);

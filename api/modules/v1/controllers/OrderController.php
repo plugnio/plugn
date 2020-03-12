@@ -60,6 +60,7 @@ class OrderController extends Controller {
         $response = [];
 
         $order = new Order();
+
         //TODO if restaurant_uuid not exist
         $order->restaurant_uuid = $id;
 
@@ -87,7 +88,7 @@ class OrderController extends Controller {
 
 
             if ($items) {
-                //Save items to the above order 
+                //Save items to the above order
                 $orderItem = new OrderItem;
 
                 $orderItem->order_uuid = $order->order_uuid;
