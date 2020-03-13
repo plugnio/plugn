@@ -66,7 +66,7 @@ class Order extends \yii\db\ActiveRecord {
             [['area_id', 'unit_type', 'block', 'street', 'house_number', 'customer_name', 'customer_phone_number', 'payment_method_id', 'order_mode'], 'required'],
             [['order_uuid'], 'string', 'max' => 36],
             [['order_uuid'], 'unique'],
-            [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer'],
+            [['area_id', 'payment_method_id', 'order_status', 'customer_id', 'delivery_time'], 'integer'],
             ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE]],
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
             ['area_id', 'validateArea'],
@@ -75,6 +75,7 @@ class Order extends \yii\db\ActiveRecord {
             [['customer_phone_number', 'total_price', 'delivery_fee', 'total_items_price'], 'number'],
             ['total_items_price', 'validateMinCharge'],
             [['customer_email'], 'email'],
+            ['estimated_time_of_arrival', 'safe'],
             [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
@@ -270,13 +271,21 @@ class Order extends \yii\db\ActiveRecord {
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-        if (!$insert  && $this->getScenario() == 'default') {
-                foreach ($this->orderItems as $orderItem) {
-                    //update stock_qty
-                    $item_model = Item::findOne($orderItem->item_uuid);
-                    $item_model->stock_qty -= $orderItem->qty;
-                    $item_model->save(false);
-                }
+        if (!$insert && $this->getScenario() == 'default') {
+            foreach ($this->orderItems as $orderItem) {
+                //update stock_qty
+                $item_model = Item::findOne($orderItem->item_uuid);
+                $item_model->stock_qty -= $orderItem->qty;
+                $item_model->save(false);
+            }
+        }
+
+        if ($insert) {
+
+            //set ETA value
+//            $this->estimated_time_of_arrival = $this->order_created_at;
+//            $this->delivery_time = $this->restaurantDelivery->min_delivery_time;
+//            $this->save(false);
         }
     }
 

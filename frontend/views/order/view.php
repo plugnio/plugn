@@ -52,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <b>Email:</b> <?= $model->customer_email ?> <br>
                 <?php } ?>
                 <b>Expected Delivery:</b> <?= Yii::$app->formatter->asDuration($model->restaurantDelivery->min_delivery_time * 60 ) ?> <br>
-                <b>Payment Method:</b> <?= $model->paymentMethod->payment_method_name ?> <br>
+                <b>Payment Method:</b> <?= $model->payment_method_name ?> <br>
             </address>
         </div>
         <!-- /.col -->
@@ -60,7 +60,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <b>Order ID:</b> <?= $model->order_uuid ?><br>
             <b>Order Placed:</b> <?= \Yii::$app->formatter->asDatetime($model->order_created_at) ?> <br>
             <b>Invoice Date:</b> <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy') ?> <br>
-            <b>Invoice Status:</b> <?= $model->getOrderStatus() ?> <br>
+            <b>Order Status:</b> <?= $model->getOrderStatus() ?> <br>
         </div>
         <!-- /.col -->
     </div>

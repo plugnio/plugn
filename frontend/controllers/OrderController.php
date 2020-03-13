@@ -63,9 +63,6 @@ class OrderController extends Controller {
         return $this->redirect(['view', 'id' => $order_model->order_id]);
     }
 
-      return $this->redirect(['view', 'id' => $order_model->order_uuid]);
-   }
-
     /**
      * Displays a single Order model.
      * @param integer $id

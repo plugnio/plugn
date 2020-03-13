@@ -13,6 +13,7 @@ return [
         'formatter' => [
             'currencyCode' => 'KWD',
             'defaultTimeZone' => 'Asia/Kuwait',
+            'timeFormat' => 'h:i:s'
         ],
         'cloudinaryManager' => [
             'class' => 'common\components\CloudinaryManager',

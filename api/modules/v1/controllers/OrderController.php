@@ -146,6 +146,11 @@ class OrderController extends Controller {
             $order->total_items_price = $order->calculateOrderItemsTotalPrice();
             $order->total_price = $order->calculateOrderTotalPrice();
 
+            
+            $order->estimated_time_of_arrival = time('h:i',strtotime(date('H:i').'+1hour'));
+
+                        
+                        
             if (!$order->save()) {
                 $response = [
                     'operation' => 'error',
@@ -156,6 +161,7 @@ class OrderController extends Controller {
                 $response = [
                     'operation' => 'success',
                     'order_uuid' => $order->order_uuid,
+                    'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
                     'message' => 'Order created successfully'
                 ];
             }

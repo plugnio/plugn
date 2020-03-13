@@ -50,6 +50,8 @@ class m200130_194447_create_order_table extends Migration {
             'delivery_fee' => $this->float(),
             'order_status' => $this->tinyInteger(1)->defaultValue(1),
             'order_mode' => $this->tinyInteger(1)->notNull(),
+            'estimated_time_of_arrival' => $this->time(),
+            'delivery_time' => $this->integer(),
             'order_created_at' => $this->dateTime()->notNull(),
             'order_updated_at' => $this->dateTime()->notNull(),
         ], $tableOptions);
