@@ -89,7 +89,7 @@ class OrderItem extends \yii\db\ActiveRecord {
         parent::beforeSave($insert);
 
         if ($this->qty > $this->item->stock_qty) {
-            return $this->addError('qty', "The requested quantity for " . $this->item->item_name . " is not available.: ");
+            return $this->addError('qty', "The requested quantity for " . $this->item->item_name . " is not available.");
         }
 
         $item_model = Item::findOne($this->item_uuid);

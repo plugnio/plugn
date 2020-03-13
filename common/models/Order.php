@@ -271,8 +271,7 @@ class Order extends \yii\db\ActiveRecord {
         parent::afterSave($insert, $changedAttributes);
 
         if (!$insert  && $this->getScenario() == 'default') {
-
-                foreach ($this->getOrderItems() as $orderItem) {
+                foreach ($this->orderItems as $orderItem) {
                     //update stock_qty
                     $item_model = Item::findOne($orderItem->item_uuid);
                     $item_model->stock_qty -= $orderItem->qty;

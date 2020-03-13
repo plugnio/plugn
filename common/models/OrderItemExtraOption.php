@@ -61,6 +61,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
     public function checkIfExtraOptionBelongToItem($attribute) {
         $extra_option_model = ExtraOption::findOne($this->extra_option_id);
 
+        if ($this->orderItem->item_uuid != $extra_option_model->option->item_uuid)
             $this->addError($attribute, 'Extra Option Uuid is invalid');
     }
 
