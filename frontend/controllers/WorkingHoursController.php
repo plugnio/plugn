@@ -66,7 +66,8 @@ class WorkingHoursController extends Controller
     public function actionCreate()
     {
         $model = new WorkingHours();
-
+        $model->restaurant_uuid = Yii::$app->user->identity->restaurant_uuid;
+        
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'working_day_id' => $model->working_day_id, 'restaurant_uuid' => $model->restaurant_uuid]);
         }
@@ -84,9 +85,9 @@ class WorkingHoursController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($working_day_id, $restaurant_uuid)
+    public function actionUpdate($working_day_id)
     {
-        $model = $this->findModel($working_day_id, $restaurant_uuid);
+        $model = $this->findModel($working_day_id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'working_day_id' => $model->working_day_id, 'restaurant_uuid' => $model->restaurant_uuid]);
@@ -122,7 +123,7 @@ class WorkingHoursController extends Controller
      */
     protected function findModel($working_day_id, $restaurant_uuid)
     {
-        if (($model = WorkingHours::findOne(['working_day_id' => $working_day_id, 'restaurant_uuid' => $restaurant_uuid])) !== null) {
+        if (($model = WorkingHours::findOne(['working_day_id' => $working_day_id, 'restaurant_uuid' => Yii::$app->user->identity->restaurant_uuid])) !== null) {
             return $model;
         }
 

@@ -20,7 +20,6 @@ class DashboardAsset extends AssetBundle {
         'plugins/fontawesome-free/css/all.min.css',
         'https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css',
         'plugins/daterangepicker/daterangepicker.css',
-        'plugins/icheck-bootstrap/icheck-bootstrap.min.css',
         'plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css',
         'plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css',
         'css/select2.min.css',
@@ -28,7 +27,9 @@ class DashboardAsset extends AssetBundle {
         'css/select2-bootstrap4.min.css',
         'plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css',
         'dist/css/adminlte.min.css',
-        'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700'
+        'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700',
+        
+        
     ];
     public $js = [
 //        'plugins/jquery/jquery.min.js',

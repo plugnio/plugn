@@ -160,7 +160,7 @@ DashboardAsset::register($this);
                                     <li class="nav-item">
                                         <?=
                                         Html::a(
-                                                Html::tag('i', '', ['class' => 'nav-icon fas fa-truck']) .
+                                                Html::tag('i', '', ['class' => 'nav-icon fas fa-clock']) .
                                                 Html::tag('p', 'Working Hours'), ['working-hours/index'], ['class' => 'nav-link']
                                         )
                                         ?>

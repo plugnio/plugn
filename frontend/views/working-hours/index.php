@@ -12,13 +12,10 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="working-hours-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
         <?= Html::a('Create Working Hours', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -26,8 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'working_day_id',
-            'restaurant_uuid',
+            'working_day.name',
             'operating_from',
             'operating_to',
 
