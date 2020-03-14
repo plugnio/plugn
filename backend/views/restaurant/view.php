@@ -91,8 +91,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'support_pick_up',
             'min_delivery_time',
             'min_pickup_time',
-            'operating_from',
-            'operating_to',
             'delivery_fee:currency',
             'min_charge:currency',
             'phone_number',

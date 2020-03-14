@@ -239,23 +239,6 @@ $this->registerJs($js);
 
 
 
-    <?=
-    $form->field($model, 'operating_from', [
-        'labelOptions' => ['class' => 'control-label'],
-        'options' => ['class' => 'form-group input-group float-right'],
-        'template' => '{label}<div class="input-group date" id="operatingFromTimepicker" data-target-input="nearest"> {input} <div class="input-group-append" data-target="#operatingFromTimepicker" data-toggle="datetimepicker"> <div class="input-group-text"><i class="far fa-clock"></i></div> </div> </div>'
-    ])->input(['text'])
-    ?>
-
-    <?=
-    $form->field($model, 'operating_to', [
-        'labelOptions' => ['class' => 'control-label'],
-        'options' => ['class' => 'form-group  input-group float-right'],
-        'template' => '{label}<div class="input-group date" id="operatingToTimepicker" data-target-input="nearest"> {input} <div class="input-group-append" data-target="#operatingToTimepicker" data-toggle="datetimepicker"> <div class="input-group-text"><i class="far fa-clock"></i></div> </div> </div>'
-    ])->input(['text'])
-    ?>
-
-
     <?= $form->field($model, 'phone_number')->input('number') ?>
 
 

@@ -22,8 +22,6 @@ use yii\behaviors\AttributeBehavior;
  * @property int $support_delivery
  * @property int $support_pick_up
  * @property string|null $min_pickup_time
- * @property string|null $operating_from
- * @property string|null $operating_to
  * @property string|null $phone_number
  * @property string|null $restaurant_created_at
  * @property string|null $restaurant_updated_at
@@ -69,7 +67,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['vendor_id', 'restaurant_status', 'support_delivery', 'support_pick_up'], 'integer'],
-            [['min_pickup_time', 'operating_from', 'operating_to', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
+            [['min_pickup_time', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'phone_number'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'unique'],
@@ -96,8 +94,6 @@ class Restaurant extends \yii\db\ActiveRecord {
             'support_delivery' => 'Support Delivery',
             'support_pick_up' => 'Support Pick Up',
             'min_pickup_time' => 'Min Pickup Time',
-            'operating_from' => 'Operating From',
-            'operating_to' => 'Operating To',
             'restaurant_delivery_area' => 'Delivery Areas',
             'phone_number' => 'Phone Number',
             'restaurant_created_at' => 'Restaurant Created At',

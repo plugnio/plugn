@@ -12,7 +12,7 @@ class m200119_140530_create_restaurant_table extends Migration {
      */
     public function safeUp() {
         
-          $tableOptions = null;
+        $tableOptions = null;
         if ($this->db->driverName === 'mysql') {
             // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
@@ -32,8 +32,6 @@ class m200119_140530_create_restaurant_table extends Migration {
             'support_delivery' => $this->tinyInteger(1)->notNull(),
             'support_pick_up' => $this->tinyInteger(1)->notNull(),
             'min_pickup_time' => $this->time(),
-            'operating_from' => $this->time(),
-            'operating_to' => $this->time(),
             'phone_number' => $this->string(255),
             'restaurant_created_at' => $this->dateTime(),
             'restaurant_updated_at' => $this->dateTime(),

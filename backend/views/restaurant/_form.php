@@ -214,30 +214,6 @@ $this->registerJs($js);
         ?>
     </div>
 
-
-    <?=
-    $form->field($model, 'operating_from')->widget(TimePicker::classname(), [
-        'options' => ['placeholder' => 'Enter event time ...'],
-        'pluginOptions' => [
-            'autoclose' => true,
-            'defaultTime' => false,
-            'showSeconds' => true,
-            'showMeridian' => false
-        ]
-    ]);
-    ?>
-
-    <?=
-    $form->field($model, 'operating_to')->widget(TimePicker::classname(), [
-        'options' => ['placeholder' => 'Enter event time ...'],
-        'pluginOptions' => [
-            'autoclose' => true,
-            'defaultTime' => false,
-            'showSeconds' => true,
-            'showMeridian' => false
-        ]
-    ]);
-    ?>
     
     <div id='deliveryFeeInput' style='<?= $model->isNewRecord || ($model->support_delivery == 0) ? "display:none" : "" ?>'>
         <?= $form->field($model, 'delivery_fee')->input('number', ['maxlength' => true, 'placeholder' => '0.500']) ?>
