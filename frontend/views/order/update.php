@@ -77,7 +77,7 @@ $this->params['breadcrumbs'][] = 'Update';
                         },
                         'delete' => function ($url) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-trash"></span>', $url, [
+                                            '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', $url, [
                                         'title' => 'Delete',
                                         'data' => [
                                             'confirm' => 'Are you absolutely sure ? You will lose all the information about this option with this action.',

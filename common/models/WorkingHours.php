@@ -35,7 +35,7 @@ class WorkingHours extends \yii\db\ActiveRecord
             [['working_day_id'], 'integer'],
             [['operating_from', 'operating_to'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
-            [['working_day_id', 'restaurant_uuid'], 'unique', 'targetAttribute' => ['working_day_id', 'restaurant_uuid']],
+            [['working_day_id', 'restaurant_uuid'], 'unique', 'targetAttribute' => ['working_day_id', 'restaurant_uuid'],'message'=> '{attribute} has already been taken'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
             [['working_day_id'], 'exist', 'skipOnError' => true, 'targetClass' => WorkingDay::className(), 'targetAttribute' => ['working_day_id' => 'working_day_id']],
         ];

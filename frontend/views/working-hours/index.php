@@ -44,7 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                     'delete' => function ($url, $model) {
                         return Html::a(
-                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-trash"></span>', ['delete', 'working_day_id' => $model->working_day_id], [
+                                        '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete', 'working_day_id' => $model->working_day_id], [
                                     'title' => 'Delete',
                                     'data' => [
                                         'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',

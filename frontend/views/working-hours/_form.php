@@ -38,7 +38,7 @@ $this->registerJs($js);
     ?>
 
 
-    <?= $form->field($model, 'working_day_id')->dropDownList($workingDayArray) ?>
+    <?= $form->field($model, 'working_day_id')->dropDownList($workingDayArray)->label('Day') ?>
 
     <?=
         $form->field($model, 'operating_from', [
