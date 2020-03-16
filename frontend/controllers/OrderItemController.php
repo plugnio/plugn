@@ -46,9 +46,8 @@ class OrderItemController extends Controller {
      * @return mixed
      */
     public function actionCreate($id) {
-        $order_model = Order::findOne($id);
 
-        if ($order_model) {
+        if (Order::find()->where(['order_uuid' => $id])->exists()) {
 
             $model = new OrderItem();
             $model->order_uuid = $id;
@@ -78,8 +77,18 @@ class OrderItemController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($id) {
+
+        $model = $this->findModel($id);
+        
+        // Item extra optn
+        $orderItemsExtraOpiton = new \yii\data\ActiveDataProvider([
+            'query' => $model->getOrderItemExtraOptions()
+        ]);
+
+
         return $this->render('view', [
-                    'model' => $this->findModel($id),
+                    'model' => $model,
+                    'orderItemsExtraOpiton' => $orderItemsExtraOpiton
         ]);
     }
 

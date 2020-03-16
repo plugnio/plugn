@@ -14,6 +14,7 @@ use Yii;
  * @property float|null $extra_option_price
  *
  * @property Option $option
+ * @property OrderItemExtraOption[] $orderItemExtraOptions 
  */
 class ExtraOption extends \yii\db\ActiveRecord {
 

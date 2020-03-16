@@ -8,12 +8,15 @@ use frontend\models\OrderItemExtraOptionSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use common\models\OrderItem;
+use common\models\ExtraOption;
+use yii\helpers\ArrayHelper;
 
 /**
  * OrderItemExtraOptionController implements the CRUD actions for OrderItemExtraOption model.
  */
-class OrderItemExtraOptionController extends Controller
-{
+class OrderItemExtraOptionController extends Controller {
+
     /**
      * {@inheritdoc}
      */
@@ -38,18 +41,31 @@ class OrderItemExtraOptionController extends Controller
     }
 
     /**
-     * Lists all OrderItemExtraOption models.
+     * Creates a new OrderItemExtraOption model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionIndex()
-    {
-        $searchModel = new OrderItemExtraOptionSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+    public function actionCreate($id) {
+        if (OrderItem::find()->where(['order_item_id' => $id])->exists()) {
+            $model = new OrderItemExtraOption();
+            $model->order_item_id = $id;
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+            //Get item's extra options to retrieve it on create-form page
+            //todo retrieve item's extra optn only
+            $extraOptions = ExtraOption::find()->asArray()->all();
+            $extraOptionsQuery = ArrayHelper::map($extraOptions, 'extra_option_id', 'extra_option_name');
+
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->order_item_extra_option_id]);
+            }
+
+            return $this->render('create', [
+                        'model' => $model,
+                        'extraOptionsQuery' => $extraOptionsQuery
+            ]);
+        } else {
+            return $this->redirect(Yii::$app->request->referrer);
+        }
     }
 
     /**
@@ -58,13 +74,11 @@ class OrderItemExtraOptionController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
-    {
+    public function actionView($id) {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+                    'model' => $this->findModel($id),
         ]);
     }
-
 
     /**
      * Updates an existing OrderItemExtraOption model.
@@ -73,16 +87,15 @@ class OrderItemExtraOptionController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
-    {
+    public function actionUpdate($id) {
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->order_item_extra_options_id]);
+            return $this->redirect(['view', 'id' => $model->order_item_extra_option_id]);
         }
 
         return $this->render('update', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
@@ -93,11 +106,14 @@ class OrderItemExtraOptionController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
-    {
+    public function actionDelete($id) {
+
+        $model = $this->findModel($id);
+        $order_item_id = $model->order_item_id;
+
         $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['order-item/view', 'id' => $order_item_id]);
     }
 
     /**
@@ -107,12 +123,12 @@ class OrderItemExtraOptionController extends Controller
      * @return OrderItemExtraOption the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
-    {
+    protected function findModel($id) {
         if (($model = OrderItemExtraOption::findOne($id)) !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
 }

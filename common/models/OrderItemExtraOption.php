@@ -55,6 +55,27 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
         ];
     }
 
+    public function afterSave($insert, $changedAttributes) {
+
+        $order_model = Order::findOne($this->orderItem->order_uuid);
+
+        if ($order_model)
+            $order_model->updateOrderTotalPrice();
+
+
+        return parent::afterSave($insert, $changedAttributes);
+    }
+
+    public function afterDelete() {
+        $order_model = Order::findOne($this->orderItem->order_uuid);
+
+        if ($order_model) {
+            return $order_model->updateOrderTotalPrice();
+        }
+
+        return false;
+    }
+
     /**
      * @param type $attribute
      */

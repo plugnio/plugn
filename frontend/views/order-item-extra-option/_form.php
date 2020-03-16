@@ -2,12 +2,6 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use common\models\Item;
-use yii\helpers\ArrayHelper;
-
-/* @var $this yii\web\View */
-/* @var $model common\models\OrderItem */
-/* @var $form yii\widgets\ActiveForm */
 
 
 $js = "$(function () {
@@ -91,7 +85,7 @@ $js = "$(function () {
 $this->registerJs($js);
 ?>
 
-<div class="order-item-form">
+<div class="order-item-extra-options-form">
 
     <?php
     $form = ActiveForm::begin();
@@ -100,20 +94,16 @@ $this->registerJs($js);
     <?= $form->errorSummary($model); ?>
 
     <?php
-    if (isset($restaurantsItems)) {
-        echo $form->field($model, 'item_uuid')->dropDownList($restaurantsItems, ['class' => 'select2'])->label('Item');
+    if (isset($extraOptionsQuery)) {
+        echo $form->field($model, 'extra_option_id')->dropDownList($extraOptionsQuery, ['class' => 'select2'])->label('Extra Option');
     }
     ?>
 
 
-    <?= $form->field($model, 'qty')->textInput() ?>
-
-    <?= $form->field($model, 'instructions')->textInput(['maxlength' => true]) ?>
-
     <div class="form-group">
-    <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>
 
-<?php ActiveForm::end(); ?>
+    <?php ActiveForm::end(); ?>
 
 </div>
