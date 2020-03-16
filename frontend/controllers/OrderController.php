@@ -102,12 +102,19 @@ class OrderController extends Controller {
         $model = $this->findModel($id);
         $model->setScenario('update-order-by-admin');
 
+         // order's Item 
+        $ordersItemDataProvider = new \yii\data\ActiveDataProvider([
+            'query' => $model->getOrderItems()
+        ]);
+        
+        
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->order_uuid]);
         }
 
         return $this->render('update', [
                     'model' => $model,
+                    'ordersItemDataProvider' => $ordersItemDataProvider
         ]);
     }
 

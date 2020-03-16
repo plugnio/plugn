@@ -8,12 +8,15 @@ use frontend\models\OrderItemSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use common\models\Order;
+use common\models\Item;
+use yii\helpers\ArrayHelper;
 
 /**
  * OrderItemController implements the CRUD actions for OrderItem model.
  */
-class OrderItemController extends Controller
-{
+class OrderItemController extends Controller {
+
     /**
      * {@inheritdoc}
      */
@@ -38,18 +41,34 @@ class OrderItemController extends Controller
     }
 
     /**
-     * Lists all OrderItem models.
+     * Creates a new OrderItem model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionIndex()
-    {
-        $searchModel = new OrderItemSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+    public function actionCreate($id) {
+        $order_model = Order::findOne($id);
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+        if ($order_model) {
+
+            $model = new OrderItem();
+            $model->order_uuid = $id;
+
+            //Get restaurant's items to retrieve it on create-form page
+            $itemQuery = Item::find()->where(['restaurant_uuid' => Yii::$app->user->identity->restaurant_uuid])->asArray()->all();
+            $restaurantsItems = ArrayHelper::map($itemQuery, 'item_uuid', 'item_name');
+
+
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['order/update', 'id' => $model->order_uuid]);
+            }
+
+            return $this->render('create', [
+                        'model' => $model,
+                        'restaurantsItems' => $restaurantsItems
+            ]);
+        } else {
+            return $this->redirect(Yii::$app->request->referrer);
+        }
     }
 
     /**
@@ -58,10 +77,9 @@ class OrderItemController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
-    {
+    public function actionView($id) {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+                    'model' => $this->findModel($id),
         ]);
     }
 
@@ -72,16 +90,17 @@ class OrderItemController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
-    {
+    public function actionUpdate($id) {
         $model = $this->findModel($id);
+
+        $order_model = Order::findOne($model->order_uuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->order_item_id]);
         }
 
         return $this->render('update', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
@@ -92,11 +111,13 @@ class OrderItemController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
+    public function actionDelete($id) {
+        $order_item_model = $this->findModel($id);
+        $order_uuid = $order_item_model->order_uuid;
 
-        return $this->redirect(['index']);
+        $order_item_model->delete();
+
+        return $this->redirect(['order/update', 'id' => $order_uuid]);
     }
 
     /**
@@ -106,12 +127,12 @@ class OrderItemController extends Controller
      * @return OrderItem the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
-    {
+    protected function findModel($id) {
         if (($model = OrderItem::findOne($id)) !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
 }

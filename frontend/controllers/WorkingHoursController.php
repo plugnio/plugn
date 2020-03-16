@@ -12,18 +12,26 @@ use yii\filters\VerbFilter;
 /**
  * WorkingHoursController implements the CRUD actions for WorkingHours model.
  */
-class WorkingHoursController extends Controller
-{
+class WorkingHoursController extends Controller {
+
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                ],
+            ],
+            'access' => [
+                'class' => \yii\filters\AccessControl::className(),
+                'rules' => [
+                    [//allow authenticated users only
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
                 ],
             ],
         ];
@@ -33,28 +41,13 @@ class WorkingHoursController extends Controller
      * Lists all WorkingHours models.
      * @return mixed
      */
-    public function actionIndex()
-    {
+    public function actionIndex() {
         $searchModel = new WorkingHoursSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    /**
-     * Displays a single WorkingHours model.
-     * @param integer $working_day_id
-     * @param string $restaurant_uuid
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($working_day_id, $restaurant_uuid)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($working_day_id, $restaurant_uuid),
+                    'searchModel' => $searchModel,
+                    'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -63,17 +56,16 @@ class WorkingHoursController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
-    {
+    public function actionCreate() {
         $model = new WorkingHours();
         $model->restaurant_uuid = Yii::$app->user->identity->restaurant_uuid;
-        
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'working_day_id' => $model->working_day_id, 'restaurant_uuid' => $model->restaurant_uuid]);
+            return $this->redirect(['index']);
         }
 
         return $this->render('create', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
@@ -85,16 +77,15 @@ class WorkingHoursController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($working_day_id)
-    {
+    public function actionUpdate($working_day_id) {
         $model = $this->findModel($working_day_id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'working_day_id' => $model->working_day_id, 'restaurant_uuid' => $model->restaurant_uuid]);
+            return $this->redirect(['index']);
         }
 
         return $this->render('update', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
@@ -106,9 +97,8 @@ class WorkingHoursController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($working_day_id, $restaurant_uuid)
-    {
-        $this->findModel($working_day_id, $restaurant_uuid)->delete();
+    public function actionDelete($working_day_id) {
+        $this->findModel($working_day_id)->delete();
 
         return $this->redirect(['index']);
     }
@@ -121,12 +111,12 @@ class WorkingHoursController extends Controller
      * @return WorkingHours the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($working_day_id, $restaurant_uuid)
-    {
+    protected function findModel($working_day_id) {
         if (($model = WorkingHours::findOne(['working_day_id' => $working_day_id, 'restaurant_uuid' => Yii::$app->user->identity->restaurant_uuid])) !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
 }

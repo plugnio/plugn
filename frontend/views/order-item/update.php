@@ -5,14 +5,11 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\OrderItem */
 
-$this->title = 'Update Order Item: ' . $model->order_item_id;
-$this->params['breadcrumbs'][] = ['label' => 'Order Items', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->order_item_id, 'url' => ['view', 'id' => $model->order_item_id]];
+$this->title = 'Update Order Item: ' . $model->item_name;
+$this->params['breadcrumbs'][] = ['label' => 'Order #' . $model->order_uuid, 'url' => ['order/update','id' => $model->order_uuid]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
 <div class="order-item-update">
-
-    <h1><?= Html::encode($this->title) ?></h1>
 
     <?= $this->render('_form', [
         'model' => $model,

@@ -141,30 +141,15 @@ class OrderController extends Controller {
 
 
         if ($response == null) {
-
-            $order->delivery_fee = $order->restaurantDelivery->delivery_fee;
-            $order->total_items_price = $order->calculateOrderItemsTotalPrice();
-            $order->total_price = $order->calculateOrderTotalPrice();
-
             
-            $order->estimated_time_of_arrival = time('h:i',strtotime(date('H:i').'+1hour'));
+            $order->updateOrderTotalPrice();
 
-                        
-                        
-            if (!$order->save()) {
-                $response = [
-                    'operation' => 'error',
-                    'message' => $order->getErrors()
-                ];
-            } else {
-
-                $response = [
+            $response = [
                     'operation' => 'success',
                     'order_uuid' => $order->order_uuid,
                     'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
                     'message' => 'Order created successfully'
                 ];
-            }
         }
 
         return $response;

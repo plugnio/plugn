@@ -45,7 +45,7 @@ class Item extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['item_name', 'items_category'], 'required'],
+            [['item_name', 'items_category'], 'required', 'on' => 'create'],
             [['sort_number', 'stock_qty'], 'integer'],
             [['item_price'], 'number'],
             [['image'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
@@ -108,7 +108,24 @@ class Item extends \yii\db\ActiveRecord {
         ];
     }
 
-    
+    /**
+     * increase stock_qty
+     * @param type $qty
+     */
+    public function increaseStockQty($qty) {
+        $this->stock_qty += $qty;
+        $this->save(false);
+    }
+
+    /**
+     * decrease stock_qty
+     * @param type $qty
+     */
+    public function decreaseStockQty($qty) {
+        $this->stock_qty -= $qty;
+       $this->save(false);
+    }
+
     public function beforeSave($insert) {
 
         if ($insert)

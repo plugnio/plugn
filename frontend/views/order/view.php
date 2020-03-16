@@ -16,7 +16,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="page-title"> <i class="icon-custom-left"></i>
     <p>
         <?php
-        
         if ($model->order_status != Order::STATUS_BEING_PREPARED)
             echo Html::a('Being Prepared', ['change-order-status', 'id' => $model->order_uuid, 'status' => Order::STATUS_BEING_PREPARED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-warning']);
 
@@ -25,7 +24,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
         if ($model->order_status != Order::STATUS_COMPLETE)
             echo Html::a('Mark as Complete', ['change-order-status', 'id' => $model->order_uuid, 'status' => Order::STATUS_COMPLETE], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
-       
         ?>
     </p>
 </div>
@@ -48,10 +46,10 @@ $this->params['breadcrumbs'][] = $this->title;
             <address>
                 <b>Customer Name:</b> <?= $model->customer_name ?> <br>
                 <b>Phone:</b> <?= $model->customer_phone_number ?> <br>
-                <?php if ($model->customer_email) { ?>
+<?php if ($model->customer_email) { ?>
                     <b>Email:</b> <?= $model->customer_email ?> <br>
                 <?php } ?>
-                <b>Expected Delivery:</b> <?= Yii::$app->formatter->asDuration($model->restaurantDelivery->min_delivery_time * 60 ) ?> <br>
+                <b>Expected Delivery:</b> <?= Yii::$app->formatter->asDuration($model->restaurantDelivery->min_delivery_time * 60) ?> <br>
                 <b>Payment Method:</b> <?= $model->payment_method_name ?> <br>
             </address>
         </div>
@@ -92,42 +90,43 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <div class="col-12 table-responsive">
             <h5 style="margin-bottom: 30px;">Your Order:</h5>
-            <?=
-            GridView::widget([
-                'dataProvider' => $orderItems,
-                'sorter' => false,
-                'columns' => [
-                    'item_name',
-                    'instructions',
-                    'qty',
-                    [
-                        'label' => 'Extra Options',
-                        'value' => function ($data) {
-                            $extraOptions = '';
+<?=
+GridView::widget([
+    'dataProvider' => $orderItems,
+    'sorter' => false,
+    'columns' => [
+        'item_name',
+        'instructions',
+        'qty',
+        [
+            'label' => 'Extra Options',
+            'value' => function ($data) {
+                $extraOptions = '';
 
-                            foreach ($data->orderItemExtraOptions as $key => $extraOption) {
+                foreach ($data->orderItemExtraOptions as $key => $extraOption) {
 
-                                if ($key == 0)
-                                    $extraOptions .= $extraOption['extra_option_name'];
-                                else
-                                    $extraOptions .= ', ' . $extraOption['extra_option_name'];
-                            }
+                    if ($key == 0)
+                        $extraOptions .= $extraOption['extra_option_name'];
+                    else
+                        $extraOptions .= ', ' . $extraOption['extra_option_name'];
+                }
 
-                            return $extraOptions;
-                        },
-                        'format' => 'raw'
-                    ],
-                    [
-                        'label' => 'Subtotal',
-                        'value' => function ($item) {
-                            return $item->order->total_items_price;
-                        },
-                        'format' => 'currency'
-                    ],
-                ],
-                'layout' => '{items}{pager} '
-            ]);
-            ?>
+                return $extraOptions;
+            },
+            'format' => 'raw'
+        ],
+        [
+            'label' => 'Subtotal',
+            'value' => function ($item) {
+                return $item->calculateOrderItemPrice();
+            },
+            'format' => 'currency'
+        ],
+    ],
+    'layout' => '{items}{pager} ',
+    'tableOptions' => ['class' => 'table table-bordered table-hover'],
+]);
+?>
 
         </div>
         <!-- /.col -->

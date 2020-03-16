@@ -33,7 +33,7 @@ class OrderItem extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['order_uuid', 'item_uuid'], 'required'],
+            [['order_uuid', 'item_uuid', 'qty'], 'required'],
             [['qty'], 'integer'],
             [['order_uuid'], 'string', 'max' => 36],
             [['item_price'], 'number'],
@@ -75,7 +75,10 @@ class OrderItem extends \yii\db\ActiveRecord {
      * Calculate order item total price => (item price + extra optns price)
      */
     public function calculateOrderItemPrice() {
-        $totalPrice = $this->item_price; //5
+
+        $totalPrice = $this->item->item_price; //5
+
+
 
         foreach ($this->getOrderItemExtraOptions()->asArray()->all() as $extraOption)
             $totalPrice += $extraOption['extra_option_price']; //1
@@ -85,26 +88,63 @@ class OrderItem extends \yii\db\ActiveRecord {
         return $totalPrice;
     }
 
+    public function beforeDelete() {
+
+        $item_model = Item::findOne($this->item_uuid);
+        $order_model = Order::findOne($this->order_uuid);
+
+        $item_model->increaseStockQty($this->qty);
+
+        return parent::beforeDelete();
+    }
+
+    public function afterDelete() {
+        $order_model = Order::findOne($this->order_uuid);
+
+        if ($order_model) {
+            return $order_model->updateOrderTotalPrice();
+        }
+
+        return false;
+    }
+
     public function beforeSave($insert) {
+
         parent::beforeSave($insert);
+        $item_model = Item::findOne($this->item_uuid);
+        $order_model = Order::findOne($this->order_uuid);
 
         if ($this->qty > $this->item->stock_qty) {
             return $this->addError('qty', "The requested quantity for " . $this->item->item_name . " is not available.");
         }
 
-        $item_model = Item::findOne($this->item_uuid);
 
         if ($item_model) {
             $this->item_name = $item_model->item_name;
             $this->item_price = $item_model->item_price;
-            $item_model->save(false);
         } else
             return false;
-
 
         return true;
     }
 
+    public function afterSave($insert, $changedAttributes) {
+
+        $item_model = Item::findOne($this->item_uuid);
+
+        if (!$insert && $changedAttributes['qty']) {
+            $item_model->increaseStockQty($changedAttributes['qty']);
+        }
+
+        $item_model->decreaseStockQty($this->qty);
+
+        $order_model = Order::findOne($this->order_uuid);
+
+        if ($order_model)
+            $order_model->updateOrderTotalPrice();
+
+        return parent::afterSave($insert, $changedAttributes);
+    }
 
     /**
      * Gets query for [[ItemUu]].

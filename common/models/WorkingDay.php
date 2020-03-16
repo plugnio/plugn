@@ -41,7 +41,7 @@ class WorkingDay extends \yii\db\ActiveRecord
     {
         return [
             'working_day_id' => 'Working Day ID',
-            'name' => 'Name',
+            'name' => 'Day',
             'name_ar' => 'Name Ar',
         ];
     }

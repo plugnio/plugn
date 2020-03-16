@@ -66,7 +66,7 @@ class Order extends \yii\db\ActiveRecord {
             [['area_id', 'unit_type', 'block', 'street', 'house_number', 'customer_name', 'customer_phone_number', 'payment_method_id', 'order_mode'], 'required'],
             [['order_uuid'], 'string', 'max' => 36],
             [['order_uuid'], 'unique'],
-            [['area_id', 'payment_method_id', 'order_status', 'customer_id', 'delivery_time'], 'integer'],
+            [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer'],
             ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE]],
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
             ['area_id', 'validateArea'],
@@ -191,6 +191,17 @@ class Order extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Update order total price and items total price
+     */
+    public function updateOrderTotalPrice() {
+        $this->delivery_fee = $this->restaurantDelivery->delivery_fee;
+        $this->total_items_price = $this->calculateOrderItemsTotalPrice();
+        $this->total_price = $this->calculateOrderTotalPrice();
+
+        return $this->save();
+    }
+
+    /**
      * @return string text explaining Order Status
      */
     public function getOrderStatus() {
@@ -210,8 +221,11 @@ class Order extends \yii\db\ActiveRecord {
     public function calculateOrderItemsTotalPrice() {
         $totalPrice = 0;
 
-        foreach ($this->getOrderItems()->all() as $item)
-            $totalPrice += $item->calculateOrderItemPrice();
+        foreach ($this->getOrderItems()->all() as $item) {
+            if ($item) {
+                $totalPrice += $item->calculateOrderItemPrice();
+            }
+        }
 
         return $totalPrice;
     }
@@ -222,8 +236,11 @@ class Order extends \yii\db\ActiveRecord {
     public function calculateOrderTotalPrice() {
         $totalPrice = 0;
 
-        foreach ($this->getOrderItems()->all() as $item)
-            $totalPrice += $item->calculateOrderItemPrice();
+        foreach ($this->getOrderItems()->all() as $item) {
+            if ($item) {
+                $totalPrice += $item->calculateOrderItemPrice();
+            }
+        }
 
         $totalPrice += $this->restaurantDelivery->delivery_fee;
 
@@ -250,7 +267,7 @@ class Order extends \yii\db\ActiveRecord {
         $this->customer_id = $customer_model->customer_id;
 
 
-        $area_model = Area::findOne($this->area_id);
+        $area_model = Area::findOne($this->area_id);    
 
         if ($area_model) {
             $this->area_name = $area_model->area_name;
@@ -259,6 +276,7 @@ class Order extends \yii\db\ActiveRecord {
             return false;
 
         $payment_method_model = PaymentMethod::findOne($this->payment_method_id);
+
         if ($payment_method_model)
             $this->payment_method_name = $payment_method_model->payment_method_name;
         else
@@ -270,18 +288,20 @@ class Order extends \yii\db\ActiveRecord {
 
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
-
-        if (!$insert && $this->getScenario() == 'default') {
-            foreach ($this->orderItems as $orderItem) {
-                //update stock_qty
-                $item_model = Item::findOne($orderItem->item_uuid);
-                $item_model->stock_qty -= $orderItem->qty;
-                $item_model->save(false);
-            }
-        }
+        
+//        die($changedAttributes['orderItem.qty']);
+//
+//        if (!$insert && $this->getScenario() != 'update-order-by-admin') {
+//            foreach ($this->orderItems as $orderItem) {
+//                $item_model = Item::findOne($orderItem->item_uuid);
+//                if ($item_model) {
+//               
+//                }
+//            }
+//        }
 
         if ($insert) {
-
+//            die('afterSave insert');
             //set ETA value
 //            $this->estimated_time_of_arrival = $this->order_created_at;
 //            $this->delivery_time = $this->restaurantDelivery->min_delivery_time;

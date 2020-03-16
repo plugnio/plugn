@@ -47,7 +47,7 @@ class m200130_194447_create_order_table extends Migration {
             'payment_method_name' => $this->string()->notNull(),
             'total_price' => $this->float()->defaultValue(0),
             'total_items_price' => $this->float()->defaultValue(0),
-            'delivery_fee' => $this->float(),
+            'delivery_fee' => $this->float()->defaultValue(0),
             'order_status' => $this->tinyInteger(1)->defaultValue(1),
             'order_mode' => $this->tinyInteger(1)->notNull(),
             'estimated_time_of_arrival' => $this->time(),
