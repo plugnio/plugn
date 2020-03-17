@@ -301,23 +301,13 @@ class Order extends \yii\db\ActiveRecord {
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-//        die($changedAttributes['orderItem.qty']);
-//
-//        if (!$insert && $this->getScenario() != 'update-order-by-admin') {
-//            foreach ($this->orderItems as $orderItem) {
-//                $item_model = Item::findOne($orderItem->item_uuid);
-//                if ($item_model) {
-//               
-//                }
-//            }
-//        }
-
-        if ($insert) {
-//            die('afterSave insert');
+        if ($insert && $this->order_mode == static::ORDER_MODE_DELIVERY) {
+            
             //set ETA value
-//            $this->estimated_time_of_arrival = $this->order_created_at;
-//            $this->delivery_time = $this->restaurantDelivery->min_delivery_time;
-//            $this->save(false);
+            \Yii::$app->timeZone = 'Asia/Kuwait';
+            $this->estimated_time_of_arrival = date('h:i', \Yii::$app->getFormatter()->asTimestamp(time() + ($this->restaurantDelivery->min_delivery_time * 60)));
+            $this->delivery_time = $this->restaurantDelivery->min_delivery_time;
+            $this->save(false);
         }
     }
 

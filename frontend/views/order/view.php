@@ -49,7 +49,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php if ($model->customer_email) { ?>
                     <b>Email:</b> <?= $model->customer_email ?> <br>
                 <?php } ?>
-                <b>Expected Delivery:</b> <?= Yii::$app->formatter->asDuration($model->restaurantDelivery->min_delivery_time * 60) ?> <br>
+                <?php if($model->order_mode == Order::ORDER_MODE_DELIVERY){ ?>
+                    <b>Expected Delivery Time:</b> <?= $model->estimated_time_of_arrival ?> <br>
+                <?php } ?>
                 <b>Payment Method:</b> <?= $model->payment_method_name ?> <br>
             </address>
         </div>
