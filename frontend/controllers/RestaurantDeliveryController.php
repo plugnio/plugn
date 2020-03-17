@@ -12,6 +12,7 @@ use frontend\models\City;
 use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 use frontend\models\DeliveryZoneForm;
+use common\models\Restaurant;
 
 /**
  * RestaurantDeliveryController implements the CRUD actions for RestaurantDelivery model.
@@ -54,7 +55,7 @@ class RestaurantDeliveryController extends Controller {
         ]);
 
         foreach ($dataProvider->query as $city) {
-            foreach ($city->restaurantDeliveryAreas as $restaurantDeliveryAreas) {             
+            foreach ($city->restaurantDeliveryAreas as $restaurantDeliveryAreas) {
 
                 if (isset($_POST[$restaurantDeliveryAreas->area->area_id])) {
                     $restaurantDeliveryAreas->delivery_fee = $_POST['RestaurantDelivery']['delivery_fee'];
@@ -62,11 +63,33 @@ class RestaurantDeliveryController extends Controller {
                     $restaurantDeliveryAreas->min_charge = $_POST['RestaurantDelivery']['min_charge'];
                     $restaurantDeliveryAreas->save(false);
                 }
-            }
+         
+                }
+        }
+
+        $restaurant_model = Restaurant::findOne(Yii::$app->user->identity->restaurant_uuid);
+        
+        if (Yii::$app->request->isPost && $restaurant_model->load(Yii::$app->request->post())) {
+
+            if ($restaurant_model->restaurant_delivery_area)
+                $restaurant_model->saveRestaurantDeliveryArea($restaurant_model->restaurant_delivery_area);
+
+                return $this->redirect(['index']);
+        }
+
+        $restaurant_model = Restaurant::findOne(Yii::$app->user->identity->restaurant_uuid);
+        
+        if (Yii::$app->request->isPost && $restaurant_model->load(Yii::$app->request->post())) {
+
+            if ($restaurant_model->restaurant_delivery_area)
+                $restaurant_model->saveRestaurantDeliveryArea($restaurant_model->restaurant_delivery_area);
+
+                return $this->redirect(['index']);
         }
 
         return $this->render('index', [
-                    'dataProvider' => $dataProvider
+                    'dataProvider' => $dataProvider,
+                    'restaurant_model' => $restaurant_model
         ]);
     }
 
@@ -103,7 +126,6 @@ class RestaurantDeliveryController extends Controller {
                     'model' => $model,
         ]);
     }
-
 
     /**
      * Deletes an existing RestaurantDelivery model.

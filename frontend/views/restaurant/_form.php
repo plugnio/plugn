@@ -117,24 +117,13 @@ $this->registerJs($js);
 <div class="restaurant-form">
 
     <?php
-    $areaQuery = Area::find()->asArray()->all();
-    $restaurantDeliveryArray = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
-
+    
     $paymentMethodQuery = PaymentMethod::find()->asArray()->all();
     $paymentMethodArray = ArrayHelper::map($paymentMethodQuery, 'payment_method_id', 'payment_method_name');
 
-    $sotredRestaurantDeliveryAreas = [];
     $sotredRestaurantPaymentMethod = [];
 
     if ($model->restaurant_uuid != null) {
-
-        $sotredRestaurantDeliveryAreas = RestaurantDelivery::find()
-                ->select('area_id')
-                ->asArray()
-                ->where(['restaurant_uuid' => $model->restaurant_uuid])
-                ->all();
-
-        $sotredRestaurantDeliveryAreas = ArrayHelper::getColumn($sotredRestaurantDeliveryAreas, 'area_id');
 
 
         $sotredRestaurantPaymentMethod = RestaurantPaymentMethod::find()
@@ -152,16 +141,6 @@ $this->registerJs($js);
 
     <?= $form->errorSummary($model); ?>
 
-
-    <?=
-    $form->field($model, 'restaurant_delivery_area')->dropDownList(
-            $restaurantDeliveryArray, [
-        'class' => 'select2',
-        'multiple' => 'multiple',
-        'value' => $sotredRestaurantDeliveryAreas
-            ]
-    );
-    ?>
 
     <?=
     $form->field($model, 'restaurant_payments_method')->dropDownList(
