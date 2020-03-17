@@ -38,7 +38,6 @@ $this->params['breadcrumbs'][] = $this->title;
             //'support_delivery',
             //'support_pick_up',
             //'min_delivery_time',
-            //'min_pickup_time',
             //'delivery_fee',
             //'min_charge',
 

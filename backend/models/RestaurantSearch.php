@@ -17,7 +17,7 @@ class RestaurantSearch extends Restaurant
     public function rules()
     {
         return [
-            [['restaurant_uuid', 'name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'min_delivery_time', 'min_pickup_time', 'phone_number', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
+            [['restaurant_uuid', 'name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'min_delivery_time', 'phone_number', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
             [['vendor_id', 'status', 'support_delivery', 'support_pick_up'], 'integer'],
             [['delivery_fee', 'min_charge'], 'number'],
         ];
@@ -64,7 +64,6 @@ class RestaurantSearch extends Restaurant
             'support_delivery' => $this->support_delivery,
             'support_pick_up' => $this->support_pick_up,
             'min_delivery_time' => $this->min_delivery_time,
-            'min_pickup_time' => $this->min_pickup_time,
             'delivery_fee' => $this->delivery_fee,
             'min_charge' => $this->min_charge,
             'restaurant_created_at' => $this->restaurant_created_at,

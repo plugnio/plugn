@@ -31,7 +31,6 @@ class m200119_140530_create_restaurant_table extends Migration {
             'logo' => $this->string(255)->notNull(),
             'support_delivery' => $this->tinyInteger(1)->notNull(),
             'support_pick_up' => $this->tinyInteger(1)->notNull(),
-            'min_pickup_time' => $this->time(),
             'phone_number' => $this->string(255),
             'restaurant_created_at' => $this->dateTime(),
             'restaurant_updated_at' => $this->dateTime(),

@@ -200,20 +200,6 @@ $this->registerJs($js);
         ?>
     </div>
 
-    <div id='minPickupTime' style='<?= $model->isNewRecord || ($model->support_pick_up == 0) ? "display:none" : "" ?>'>
-        <?=
-        $form->field($model, 'min_pickup_time')->widget(TimePicker::classname(), [
-            'options' => ['placeholder' => 'Enter event time ...'],
-            'pluginOptions' => [
-                'autoclose' => true,
-                'defaultTime' => false,
-                'showSeconds' => true,
-                'showMeridian' => false,
-            ]
-        ]);
-        ?>
-    </div>
-
     
     <div id='deliveryFeeInput' style='<?= $model->isNewRecord || ($model->support_delivery == 0) ? "display:none" : "" ?>'>
         <?= $form->field($model, 'delivery_fee')->input('number', ['maxlength' => true, 'placeholder' => '0.500']) ?>

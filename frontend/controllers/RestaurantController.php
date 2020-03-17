@@ -61,10 +61,6 @@ class RestaurantController extends Controller {
         $model = $this->findModel($id);
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
 
-            if ($model->restaurant_payments_method)
-                $model->saveRestaurantDeliveryArea($model->restaurant_delivery_area);
-
-
             if ($model->save()) {
 
                 $thumbnail_image = \yii\web\UploadedFile::getInstances($model, 'restaurant_thumbnail_image');

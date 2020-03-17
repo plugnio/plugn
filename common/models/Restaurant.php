@@ -21,17 +21,19 @@ use yii\behaviors\AttributeBehavior;
  * @property string $logo
  * @property int $support_delivery
  * @property int $support_pick_up
- * @property string|null $min_pickup_time
  * @property string|null $phone_number
  * @property string|null $restaurant_created_at
  * @property string|null $restaurant_updated_at
  *
  * @property Item[] $items
- * @property Vendor $vendor
  * @property RestaurantDelivery[] $restaurantDeliveryAreas
+ * @property RestaurantBranch[] $restaurantBranches
  * @property Area[] $areas
  * @property RestaurantPaymentMethod[] $restaurantPaymentMethods
  * @property PaymentMethod[] $paymentMethods
+ * @property Vendor[] $vendors 
+ * @property WorkingHours[] $workingHours 
+ * @property WorkingDay[] $workingDays 
  */
 class Restaurant extends \yii\db\ActiveRecord {
 
@@ -42,10 +44,9 @@ class Restaurant extends \yii\db\ActiveRecord {
 
     public $restaurant_delivery_area;
     public $restaurant_payments_method;
-
     public $restaurant_logo;
     public $restaurant_thumbnail_image;
-    
+
     /**
      * {@inheritdoc}
      */
@@ -58,16 +59,11 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['vendor_id', 'name', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_delivery_area'], 'required'],
-            ['min_pickup_time', 'required', 'when' => function ($model) {
-                    return $model->support_pick_up == 1;
-                }, 'whenClient' => "function (attribute, value) {
-                return $('#supportPickupInput').val() == 1;
-            }"],
+            [['vendor_id', 'name', 'support_delivery', 'support_pick_up', 'restaurant_payments_method'], 'required'],
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['vendor_id', 'restaurant_status', 'support_delivery', 'support_pick_up'], 'integer'],
-            [['min_pickup_time', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
+            [['restaurant_created_at', 'restaurant_updated_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'phone_number'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'unique'],
@@ -93,7 +89,6 @@ class Restaurant extends \yii\db\ActiveRecord {
             'restaurant_logo' => 'Logo',
             'support_delivery' => 'Support Delivery',
             'support_pick_up' => 'Support Pick Up',
-            'min_pickup_time' => 'Min Pickup Time',
             'restaurant_delivery_area' => 'Delivery Areas',
             'phone_number' => 'Phone Number',
             'restaurant_created_at' => 'Restaurant Created At',
@@ -386,6 +381,15 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Gets query for [[RestaurantBranches]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurantBranches() {
+        return $this->hasMany(RestaurantBranch::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
      * Gets query for [[Areas]].
      *
      * @return \yii\db\ActiveQuery
@@ -410,6 +414,24 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getPaymentMethods() {
         return $this->hasMany(PaymentMethod::className(), ['payment_method_id' => 'payment_method_id'])->viaTable('restaurant_payment_method', ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * Gets query for [[WorkingHours]]. 
+     * 
+     * @return \yii\db\ActiveQuery 
+     */
+    public function getWorkingHours() {
+        return $this->hasMany(WorkingHours::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * Gets query for [[WorkingDays]]. 
+     * 
+     * @return \yii\db\ActiveQuery 
+     */
+    public function getWorkingDays() {
+        return $this->hasMany(WorkingDay::className(), ['working_day_id' => 'working_day_id'])->viaTable('working_hours', ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
 }

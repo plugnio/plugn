@@ -80,6 +80,7 @@ class OrderController extends Controller {
         $order->house_number = Yii::$app->request->getBodyParam("house_number");
         $order->special_directions = Yii::$app->request->getBodyParam("special_directions"); //optional
         $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
+        $order->restaurant_branch_id = Yii::$app->request->getBodyParam("restaurant_branch_id");
 
 
         if ($order->save()) {

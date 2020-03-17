@@ -32,10 +32,12 @@ use yii\behaviors\AttributeBehavior;
  * @property int $order_mode
  * @property int $total_items_price
  * @property int $total_price
+ * @property int $restaurant_branch_id
  * @property datetime $order_created_at
  * @property datetime $order_updated_at
  *
  * @property Area $area
+ * @property RestaurantBranch $restaurantBranch
  * @property Customer $customer
  * @property PaymentMethod $paymentMethod
  * @property Restaurant $restaurant
@@ -48,6 +50,7 @@ class Order extends \yii\db\ActiveRecord {
     const STATUS_BEING_PREPARED = 2;
     const STATUS_OUT_FOR_DELIVERY = 3;
     const STATUS_COMPLETE = 4;
+    
     const ORDER_MODE_DELIVERY = 1;
     const ORDER_MODE_PICK_UP = 2;
 
@@ -63,24 +66,33 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['area_id', 'unit_type', 'block', 'street', 'house_number', 'customer_name', 'customer_phone_number', 'payment_method_id', 'order_mode'], 'required'],
-            [['order_uuid'], 'string', 'max' => 36],
-            [['order_uuid'], 'unique'],
-            [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer'],
-            ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE]],
-            ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
-            ['area_id', 'validateArea'],
-            ['order_mode', 'validateOrderMode'],
-            [['restaurant_uuid'], 'string', 'max' => 60],
-            [['customer_phone_number', 'total_price', 'delivery_fee', 'total_items_price'], 'number'],
-            ['total_items_price', 'validateMinCharge'],
-            [['customer_email'], 'email'],
-            ['estimated_time_of_arrival', 'safe'],
-            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name'], 'string', 'max' => 255],
-            [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
-            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
-            [['payment_method_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
-            [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
+        [['customer_name', 'customer_phone_number', 'payment_method_id', 'order_mode'], 'required'],
+        [['order_uuid'], 'string', 'max' => 36],
+        [['order_uuid'], 'unique'],
+        [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer'],
+        ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE]],
+        ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
+        ['restaurant_branch_id', 'required', 'when' => function($model) {
+            return $model->order_mode == static::ORDER_MODE_PICK_UP;
+        }],
+        [['area_id','unit_type', 'block', 'street', 'house_number'], 'required', 'when' => function($model) {
+            return $model->order_mode == static::ORDER_MODE_DELIVERY;
+        }],
+        [['area_id','unit_type', 'block', 'street', 'house_number'], 'validateArea', 'when' => function($model) {
+            return $model->order_mode == static::ORDER_MODE_DELIVERY;
+        }],
+        ['order_mode', 'validateOrderMode'],
+        [['restaurant_uuid'], 'string', 'max' => 60],
+        [['customer_phone_number', 'total_price', 'delivery_fee', 'total_items_price'], 'number'],
+        ['total_items_price', 'validateMinCharge'],
+        [['customer_email'], 'email'],
+        ['estimated_time_of_arrival', 'safe'],
+        [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name'], 'string', 'max' => 255],
+        [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
+        [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
+        [['payment_method_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
+        [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
+        [['restaurant_branch_id'], 'exist', 'skipOnError' => false, 'targetClass' => RestaurantBranch::className(), 'targetAttribute' => ['restaurant_branch_id' => 'restaurant_branch_id']],
         ];
     }
 
@@ -267,7 +279,7 @@ class Order extends \yii\db\ActiveRecord {
         $this->customer_id = $customer_model->customer_id;
 
 
-        $area_model = Area::findOne($this->area_id);    
+        $area_model = Area::findOne($this->area_id);
 
         if ($area_model) {
             $this->area_name = $area_model->area_name;
@@ -288,7 +300,7 @@ class Order extends \yii\db\ActiveRecord {
 
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
-        
+
 //        die($changedAttributes['orderItem.qty']);
 //
 //        if (!$insert && $this->getScenario() != 'update-order-by-admin') {
@@ -370,6 +382,15 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function getCustomer() {
         return $this->hasOne(Customer::className(), ['customer_id' => 'customer_id']);
+    }
+
+    /**
+     * Gets query for [[RestaurantBranch]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurantBranch() {
+        return $this->hasOne(RestaurantBranch::className(), ['restaurant_branch_id' => 'restaurant_branch_id']);
     }
 
 }

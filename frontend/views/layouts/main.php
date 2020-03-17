@@ -166,6 +166,15 @@ DashboardAsset::register($this);
                                         ?>
 
                                     </li>
+                                    <li class="nav-item">
+                                        <?=
+                                        Html::a(
+                                                Html::tag('i', '', ['class' => 'nav-icon fas fa-store']) .
+                                                Html::tag('p', "Restaurant's Branches"), ['restaurant-branch/index'], ['class' => 'nav-link']
+                                        )
+                                        ?>
+
+                                    </li>
                                 </ul>
                             </li>
                         </ul>

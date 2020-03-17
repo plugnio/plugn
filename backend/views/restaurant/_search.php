@@ -39,8 +39,6 @@ use yii\widgets\ActiveForm;
 
     <?php // echo $form->field($model, 'min_delivery_time') ?>
 
-    <?php // echo $form->field($model, 'min_pickup_time') ?>
-
     <?php // echo $form->field($model, 'delivery_fee') ?>
 
     <?php // echo $form->field($model, 'min_charge') ?>

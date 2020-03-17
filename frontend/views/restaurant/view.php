@@ -93,7 +93,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'format' => 'raw'
             ],
-            'min_pickup_time',
             'phone_number',
             'restaurant_created_at',
             'restaurant_updated_at',
