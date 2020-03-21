@@ -61,12 +61,12 @@ class OrderController extends Controller {
         if (Restaurant::find()->where(['restaurant_uuid' => $id])->exists()) {
 
             $order = new Order();
-            
+
             $order->restaurant_uuid = $id;
 
             //Save Customer Info
             $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
-            $order->customer_phone_number = Yii::$app->request->getBodyParam("phone_number");
+            $order->customer_phone_number = strval(Yii::$app->request->getBodyParam("phone_number"));
             $order->customer_email = Yii::$app->request->getBodyParam("email"); //optional
             //payment method
             $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
@@ -91,42 +91,54 @@ class OrderController extends Controller {
 
 
                 if ($items) {
-                    //Save items to the above order
-                    $orderItem = new OrderItem;
 
-                    $orderItem->order_uuid = $order->order_uuid;
-                    $orderItem->item_uuid = $items["item_uuid"];
-                    $orderItem->qty = (int) $items["qty"];
+                    foreach ($items as $item) {
 
-                    //optional field
-                    if (array_key_exists("instructions", $items) && $items["instructions"] != null)
-                        $orderItem->instructions = $items["instructions"];
+                        //Save items to the above order
+                        $orderItem = new OrderItem;
 
-                    if (array_key_exists('extra_options', $items)) {
-                        $extra_options = $items['extra_options'];
-                    }
+                        $orderItem->order_uuid = $order->order_uuid;
+                        $orderItem->item_uuid = $item["item_uuid"];
+                        $orderItem->qty = (int) $item["qty"];
 
 
-                    if ($orderItem->save()) {
+                        //optional field
+                        if (array_key_exists("instructions", $item) && $item["instructions"] != null)
+                            $orderItem->instructions = $item["instructions"];
 
-                        if (isset($extra_options)) {
-                            $orderItemExtraOption = new OrderItemExtraOption;
-                            $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
-                            $orderItemExtraOption->extra_option_id = $extra_options["extra_option_id"];
+                        if ($orderItem->save()) {
 
-                            if (!$orderItemExtraOption->save()) {
-                                $response = [
-                                    'operation' => 'error',
-                                    'message' => $orderItemExtraOption->getErrors()
-                                ];
+                            if (array_key_exists('extraOptions', $item)) {
+
+
+                                $extraOptionsArray = $item['extraOptions'];
+
+
+                                if (isset($extraOptionsArray) && count($extraOptionsArray) > 0) {
+
+                                    foreach ($extraOptionsArray as $key => $extraOption) {
+
+                                        $orderItemExtraOption = new OrderItemExtraOption;
+                                        $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
+                                        $orderItemExtraOption->extra_option_id = $extraOption['extra_option_id'];
+
+                                        if (!$orderItemExtraOption->save()) {
+
+                                            $response = [
+                                                'operation' => 'errors',
+                                                'message' => $orderItemExtraOption->errors,
+                                            ];
+                                        }
+                                    }
+                                }
                             }
-                        }
-                    } else {
+                        } else {
 
-                        $response = [
-                            'operation' => 'error',
-                            'message' => $orderItem->getErrors()
-                        ];
+                            $response = [
+                                'operation' => 'error',
+                                'message' => $orderItem->getErrors()
+                            ];
+                        }
                     }
                 } else {
                     Order::deleteAll(['order_uuid' => $order]);
@@ -136,9 +148,9 @@ class OrderController extends Controller {
                     ];
                 }
             } else {
-                return [
+               $response = [
                     'operation' => 'error',
-                    'message' => $order->getErrors()
+                    'message' => $order->getErrors(),
                 ];
             }
 

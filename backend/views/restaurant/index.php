@@ -37,8 +37,6 @@ $this->params['breadcrumbs'][] = $this->title;
             //'logo',
             //'support_delivery',
             //'support_pick_up',
-            //'min_delivery_time',
-            //'delivery_fee',
             //'min_charge',
 
             //'phone_number',

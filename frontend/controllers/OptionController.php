@@ -117,9 +117,14 @@ class OptionController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionDelete($id) {
+
+        $model = $this->findModel($id);
+        $item_uuid = $model->item_uuid;
+
         $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['item/view', 'id' => $item_uuid]);
+        
     }
 
     /**

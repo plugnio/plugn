@@ -16,7 +16,6 @@ $this->title = 'Delivery Zones';
 $this->params['breadcrumbs'][] = $this->title;
 
 
-
 $js = "
 
 $(function () {
@@ -26,7 +25,6 @@ $(function () {
   })
 
 ";
-
 
 
     $this->registerJs($js);
@@ -114,7 +112,7 @@ foreach ($dataProvider->query as $city) {
                                     <td>
                                         <?= $restaurantDeliveryArea->area->area_name ?></td>
                                     <td>
-                                        <?= $form->field($restaurantDeliveryArea, 'min_delivery_time')->input('number') ?></td>
+                                        <?= $form->field($restaurantDeliveryArea, 'delivery_time')->input('number') ?></td>
                                     <td>
                                         <?= $form->field($restaurantDeliveryArea, 'delivery_fee')->input('float') ?></td>
                                     <td>

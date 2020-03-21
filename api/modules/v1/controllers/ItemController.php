@@ -61,26 +61,33 @@ class ItemController extends Controller {
 
         $restaurant = Restaurant::findOne($restaurant_uuid);
 
-        $restaurantMenu = Category::find()
-                ->where(['restaurant_uuid' => $restaurant_uuid])
-                ->with('items', 'items.options', 'items.options.extraOptions')
-                ->orderBy(['sort_number' => SORT_ASC])
-                ->asArray()
-                ->all();
+        if ($restaurant) {
+            $restaurantMenu = Category::find()
+                    ->where(['restaurant_uuid' => $restaurant_uuid])
+                    ->with('items', 'items.options', 'items.options.extraOptions')
+                    ->orderBy(['sort_number' => SORT_ASC])
+                    ->asArray()
+                    ->all();
 
 
-        foreach ($restaurantMenu as $item) {
-            unset($item['categoryItems']);
+            foreach ($restaurantMenu as $item) {
+                unset($item['categoryItems']);
+            }
+
+            foreach ($restaurantMenu as $key => $item) {
+                unset($restaurantMenu[$key]['categoryItems']);
+            }
+
+            return [
+                'restaurant' => $restaurant,
+                'restaurantMenu' => $restaurantMenu
+            ];
+        } else {
+            return [
+                'operation' => 'error',
+                'message' => 'Restaurant Uuid is invalid'
+            ];
         }
-
-        foreach ($restaurantMenu as $key => $item) {
-            unset($restaurantMenu[$key]['categoryItems']);
-        }
-
-        return [
-            'restaurant' => $restaurant,
-            'restaurantMenu' => $restaurantMenu
-        ];
     }
 
     /**
@@ -90,11 +97,18 @@ class ItemController extends Controller {
         $item_uuid = Yii::$app->request->get("item_uuid");
         $item_model = Item::find()
                 ->where(['item_uuid' => $item_uuid])
-                ->with('options', 'options.extraOptions','restaurant')
+                ->with('options', 'options.extraOptions', 'restaurant')
                 ->asArray()
                 ->one();
- 
-        return $item_model;
+
+        if ($item_model)
+            return $item_model;
+        else {
+            return [
+                'operation' => 'error',
+                'message' => 'Item Uuid is invalid'
+            ];
+        }
     }
 
 }

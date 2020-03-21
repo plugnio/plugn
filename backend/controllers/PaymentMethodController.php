@@ -18,8 +18,7 @@ class PaymentMethodController extends Controller
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -28,7 +27,7 @@ class PaymentMethodController extends Controller
                 ],
             ],
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => \yii\filters\AccessControl::className(),
                 'rules' => [
                     [//allow authenticated users only
                         'allow' => true,

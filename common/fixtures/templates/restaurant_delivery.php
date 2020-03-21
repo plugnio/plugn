@@ -10,6 +10,8 @@ $area_id = Yii::$app->db->createCommand('SELECT area_id from area limit ' . $ind
 return [
     'area_id' => $area_id,
     'restaurant_uuid' => $restaurant_uuid,
-    'min_delivery_time' => $faker->numberBetween(0,60),
+    'delivery_time' => $faker->numberBetween(0,60),
+    'delivery_fee' => $faker->numberBetween(0,60),
+    'min_charge' => $faker->numberBetween(0,60),
 ];
 

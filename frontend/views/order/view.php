@@ -53,6 +53,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     <b>Expected Delivery Time:</b> <?= $model->estimated_time_of_arrival ?> <br>
                 <?php } ?>
                 <b>Payment Method:</b> <?= $model->payment_method_name ?> <br>
+                <?php if ($model->order_mode == Order::ORDER_MODE_PICK_UP) { ?>
+                   <b>Pickup from:</b> <?= $model->restaurantBranch->branch_name_en ?> <br>
+                   <b>Preparation time:</b> <?=  \Yii::$app->formatter->asDuration($model->restaurantBranch->prep_time * 60 ) ?> <br>
+                <?php } ?>
             </address>
         </div>
         <!-- /.col -->
@@ -74,6 +78,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
     <!-- /.row -->
+    <?php if ($model->order_mode == Order::ORDER_MODE_DELIVERY) { ?>
     <div class="row invoice-info"  style="margin-top: 50px;     margin-bottom: 30px;">
         <div class="col-sm-4 invoice-col">
             <address>
@@ -87,6 +92,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </address>
         </div>
     </div>
+    <?php } ?>
     <!-- Table row -->
     <div class="row">
 

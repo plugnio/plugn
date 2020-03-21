@@ -87,7 +87,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
     }
 
     public function beforeSave($insert) {
-        parent::beforeSave($insert);
+        
 
         $extra_option_model = ExtraOption::findOne($this->extra_option_id);
 
@@ -98,7 +98,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
         } else
             return false;
 
-        return true;
+        return parent::beforeSave($insert);
     }
 
     /**

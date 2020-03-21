@@ -13,15 +13,14 @@ use yii\filters\VerbFilter;
 /**
  * AdminController implements the CRUD actions for Admin model.
  */
-class AdminController extends Controller
-{
+class AdminController extends Controller {
+
     public $enableCsrfValidation = false;
-    
+
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -30,7 +29,7 @@ class AdminController extends Controller
                 ],
             ],
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => \yii\filters\AccessControl::className(),
                 'rules' => [
                     [//allow authenticated users only
                         'allow' => true,
@@ -45,14 +44,13 @@ class AdminController extends Controller
      * Lists all Admin models.
      * @return mixed
      */
-    public function actionIndex()
-    {
+    public function actionIndex() {
         $dataProvider = new ActiveDataProvider([
             'query' => Admin::find(),
         ]);
 
         return $this->render('index', [
-            'dataProvider' => $dataProvider,
+                    'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -62,10 +60,9 @@ class AdminController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
-    {
+    public function actionView($id) {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+                    'model' => $this->findModel($id),
         ]);
     }
 
@@ -74,20 +71,19 @@ class AdminController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
-    {
+    public function actionCreate() {
         $model = new Admin();
         $model->scenario = "create";
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
-            Yii::info('[Admin Added > '.$model->admin_name.'] By '. Yii::$app->user->identity->admin_name, __METHOD__);
+            Yii::info('[Admin Added > ' . $model->admin_name . '] By ' . Yii::$app->user->identity->admin_name, __METHOD__);
 
             return $this->redirect(['view', 'id' => $model->admin_id]);
         }
 
         return $this->render('create', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
@@ -98,19 +94,18 @@ class AdminController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
-    {
+    public function actionUpdate($id) {
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
-            Yii::info('[Admin Updated > '.$model->admin_name.'] By '. Yii::$app->user->identity->admin_name, __METHOD__);
+            Yii::info('[Admin Updated > ' . $model->admin_name . '] By ' . Yii::$app->user->identity->admin_name, __METHOD__);
 
             return $this->redirect(['view', 'id' => $model->admin_id]);
         }
 
         return $this->render('update', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
@@ -121,11 +116,10 @@ class AdminController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
-    {
+    public function actionDelete($id) {
         $model = $this->findModel($id);
 
-        Yii::info('[Admin Deleted > '.$model->admin_name.'] By '. Yii::$app->user->identity->admin_name, __METHOD__);
+        Yii::info('[Admin Deleted > ' . $model->admin_name . '] By ' . Yii::$app->user->identity->admin_name, __METHOD__);
 
         $model->delete();
 
@@ -139,12 +133,12 @@ class AdminController extends Controller
      * @return Admin the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
-    {
+    protected function findModel($id) {
         if (($model = Admin::findOne($id)) !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
 }

@@ -15,13 +15,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Update', ['update', 'id' => $model->restaurant_branch_id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->restaurant_branch_id], [
+        <?=
+        Html::a('Delete', ['delete', 'id' => $model->restaurant_branch_id], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
                 'method' => 'post',
             ],
-        ]) ?>
+        ])
+        ?>
     </p>
 
     <div class="card">
@@ -30,8 +32,14 @@ $this->params['breadcrumbs'][] = $this->title;
             DetailView::widget([
                 'model' => $model,
                 'attributes' => [
-               'branch_name_en',
-            'branch_name_ar',
+                    'branch_name_en',
+                    'branch_name_ar',
+                    [
+                        'attribute' => 'prep_time',
+                        'value' => function ($data) {
+                            return Yii::$app->formatter->asDuration($data->prep_time * 60);
+                        },
+                    ]
                 ],
                 'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
             ])
@@ -39,6 +47,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
         </div>
     </div>
-    
-    
+
+
 </div>

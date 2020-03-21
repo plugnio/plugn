@@ -44,8 +44,25 @@ $this->params['breadcrumbs'][] = $this->title;
                         'attribute' => 'Image',
                         'format' => 'html',
                         'value' => function ($data) {
-                            return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/". $data->restaurant->name ."/items/" . $data->item_image);
+                            return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/" . $data->restaurant->name . "/items/" . $data->item_image);
                         },
+                    ],
+                    [
+                        'attribute' => 'category_item',
+                        'value' => function ($data) {
+                            $itemCategoryValues = '';
+
+                            foreach ($data->categoryItems as $key => $itemCategoryValue) {
+
+                                if ($key == 0)
+                                    $itemCategoryValues .= $itemCategoryValue->category->category_name;
+                                else
+                                    $itemCategoryValues .= ', ' . $itemCategoryValue->category->category_name;
+                            }
+
+                            return $itemCategoryValues;
+                        },
+                        'format' => 'raw'
                     ],
                     'item_price:currency',
                     'item_created_at',
@@ -72,6 +89,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'columns' => [
                 'option_name',
                 'option_name_ar',
+                'max_qty',
                 [
                     'class' => 'yii\grid\ActionColumn',
                     'controller' => 'option',

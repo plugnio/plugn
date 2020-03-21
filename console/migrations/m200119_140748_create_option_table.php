@@ -22,7 +22,7 @@ class m200119_140748_create_option_table extends Migration
         $this->createTable('{{%option}}', [
             'option_id' => $this->primaryKey(),
             'item_uuid' => $this->string(300)->notNull(),
-            'is_required' => $this->tinyInteger(1),
+            'is_required' => $this->tinyInteger(1)->defaultValue(0),
             'max_qty' => $this->integer(), //max number of selection user can make for each optn
             'option_name' => $this->string(255),
             'option_name_ar' => $this->string(255),

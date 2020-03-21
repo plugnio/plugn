@@ -6,7 +6,8 @@ use yii\helpers\Html;
 /* @var $model common\models\ExtraOption */
 
 $this->title = 'Create Extra Option';
-$this->params['breadcrumbs'][] = ['label' => 'Extra Options', 'url' => ['index']];
+$option_model = \common\models\Option::findOne($model->option_id);
+$this->params['breadcrumbs'][] = ['label' => $option_model->option_name, 'url' => ['option/view', 'id' => $model->option_id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="extra-option-create">

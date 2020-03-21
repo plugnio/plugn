@@ -50,7 +50,6 @@ class Order extends \yii\db\ActiveRecord {
     const STATUS_BEING_PREPARED = 2;
     const STATUS_OUT_FOR_DELIVERY = 3;
     const STATUS_COMPLETE = 4;
-    
     const ORDER_MODE_DELIVERY = 1;
     const ORDER_MODE_PICK_UP = 2;
 
@@ -66,33 +65,36 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-        [['customer_name', 'customer_phone_number', 'payment_method_id', 'order_mode'], 'required'],
-        [['order_uuid'], 'string', 'max' => 36],
-        [['order_uuid'], 'unique'],
-        [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer'],
-        ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE]],
-        ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
-        ['restaurant_branch_id', 'required', 'when' => function($model) {
-            return $model->order_mode == static::ORDER_MODE_PICK_UP;
-        }],
-        [['area_id','unit_type', 'block', 'street', 'house_number'], 'required', 'when' => function($model) {
-            return $model->order_mode == static::ORDER_MODE_DELIVERY;
-        }],
-        [['area_id','unit_type', 'block', 'street', 'house_number'], 'validateArea', 'when' => function($model) {
-            return $model->order_mode == static::ORDER_MODE_DELIVERY;
-        }],
-        ['order_mode', 'validateOrderMode'],
-        [['restaurant_uuid'], 'string', 'max' => 60],
-        [['customer_phone_number', 'total_price', 'delivery_fee', 'total_items_price'], 'number'],
-        ['total_items_price', 'validateMinCharge'],
-        [['customer_email'], 'email'],
-        ['estimated_time_of_arrival', 'safe'],
-        [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name'], 'string', 'max' => 255],
-        [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
-        [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
-        [['payment_method_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
-        [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
-        [['restaurant_branch_id'], 'exist', 'skipOnError' => false, 'targetClass' => RestaurantBranch::className(), 'targetAttribute' => ['restaurant_branch_id' => 'restaurant_branch_id']],
+            [['customer_name', 'customer_phone_number', 'payment_method_id', 'order_mode'], 'required'],
+            [['order_uuid'], 'string', 'max' => 36],
+            [['order_uuid'], 'unique'],
+            [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer'],
+            ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE]],
+            ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
+            ['restaurant_branch_id', 'required', 'when' => function($model) {
+                    return $model->order_mode == static::ORDER_MODE_PICK_UP;
+                }],
+            [['area_id', 'unit_type', 'block', 'street', 'house_number'], 'required', 'when' => function($model) {
+                    return $model->order_mode == static::ORDER_MODE_DELIVERY;
+                }],
+            [['area_id', 'unit_type', 'block', 'street', 'house_number'], 'validateArea', 'when' => function($model) {
+                    return $model->order_mode == static::ORDER_MODE_DELIVERY;
+                }],
+            ['order_mode', 'validateOrderMode'],
+            [['restaurant_uuid'], 'string', 'max' => 60],
+            [['customer_phone_number'], 'string', 'min' => 8, 'max' => 8],
+            [['customer_phone_number', 'total_price', 'delivery_fee', 'total_items_price'], 'number'],
+            ['total_items_price', 'validateMinCharge', 'when' => function($model) {
+                    return $model->order_mode == static::ORDER_MODE_DELIVERY;
+                }],
+            [['customer_email'], 'email'],
+            ['estimated_time_of_arrival', 'safe'],
+            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name'], 'string', 'max' => 255],
+            [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
+            [['customer_id'], 'exist', 'skipOnError' => false, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
+            [['payment_method_id'], 'exist', 'skipOnError' => false, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
+            [['restaurant_uuid'], 'exist', 'skipOnError' => false, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
+            [['restaurant_branch_id'], 'exist', 'skipOnError' => false, 'targetClass' => RestaurantBranch::className(), 'targetAttribute' => ['restaurant_branch_id' => 'restaurant_branch_id']],
         ];
     }
 
@@ -206,7 +208,10 @@ class Order extends \yii\db\ActiveRecord {
      * Update order total price and items total price
      */
     public function updateOrderTotalPrice() {
-        $this->delivery_fee = $this->restaurantDelivery->delivery_fee;
+        if ($this->order_mode == static::ORDER_MODE_DELIVERY)
+            $this->delivery_fee = $this->restaurantDelivery->delivery_fee;
+
+
         $this->total_items_price = $this->calculateOrderItemsTotalPrice();
         $this->total_price = $this->calculateOrderTotalPrice();
 
@@ -254,59 +259,62 @@ class Order extends \yii\db\ActiveRecord {
             }
         }
 
-        $totalPrice += $this->restaurantDelivery->delivery_fee;
+        if ($this->order_mode == static::ORDER_MODE_DELIVERY)
+            $totalPrice += $this->restaurantDelivery->delivery_fee;
 
         return $totalPrice;
-    }
-
-    public function beforeSave($insert) {
-        parent::beforeSave($insert);
-
-
-        //Save Customer data
-        $customer_model = Customer::find()->where(['customer_phone_number' => $this->customer_phone_number])->one();
-
-        if (!$customer_model) {
-            $customer_model = new Customer();
-            $customer_model->customer_name = $this->customer_name;
-            $customer_model->customer_phone_number = $this->customer_phone_number;
-            if ($this->customer_email != null)
-                $customer_model->customer_email = $this->customer_email;
-
-            $customer_model->save();
-        }
-
-        $this->customer_id = $customer_model->customer_id;
-
-
-        $area_model = Area::findOne($this->area_id);
-
-        if ($area_model) {
-            $this->area_name = $area_model->area_name;
-            $this->area_name_ar = $area_model->area_name_ar;
-        } else
-            return false;
-
-        $payment_method_model = PaymentMethod::findOne($this->payment_method_id);
-
-        if ($payment_method_model)
-            $this->payment_method_name = $payment_method_model->payment_method_name;
-        else
-            return false;
-
-
-        return true;
     }
 
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-        if ($insert && $this->order_mode == static::ORDER_MODE_DELIVERY) {
-            
-            //set ETA value
-            \Yii::$app->timeZone = 'Asia/Kuwait';
-            $this->estimated_time_of_arrival = date('h:i', \Yii::$app->getFormatter()->asTimestamp(time() + ($this->restaurantDelivery->min_delivery_time * 60)));
-            $this->delivery_time = $this->restaurantDelivery->min_delivery_time;
+        if ($insert) {
+
+
+            if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
+                //set ETA value
+                \Yii::$app->timeZone = 'Asia/Kuwait';
+                $this->estimated_time_of_arrival = date('h:i', \Yii::$app->getFormatter()->asTimestamp(time() + ($this->restaurantDelivery->delivery_time * 60)));
+                $this->delivery_time = $this->restaurantDelivery->delivery_time;
+                $this->save(false);
+            } else {
+                //set ETA value
+                \Yii::$app->timeZone = 'Asia/Kuwait';
+                $this->estimated_time_of_arrival = date('h:i', \Yii::$app->getFormatter()->asTimestamp(time() + ($this->restaurantBranch->prep_time * 60)));
+                $this->delivery_time = $this->restaurantBranch->prep_time;
+            }
+
+
+
+
+            //Save Customer data
+            $customer_model = Customer::find()->where(['customer_phone_number' => $this->customer_phone_number])->one();
+
+            if (!$customer_model) {
+                $customer_model = new Customer();
+                $customer_model->customer_name = $this->customer_name;
+                $customer_model->customer_phone_number = $this->customer_phone_number;
+                if ($this->customer_email != null)
+                    $customer_model->customer_email = $this->customer_email;
+
+                $customer_model->save();
+            }
+
+
+            $this->customer_id = $customer_model->customer_id;
+
+
+            if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
+                $area_model = Area::findOne($this->area_id);
+                $this->area_name = $area_model->area_name;
+                $this->area_name_ar = $area_model->area_name_ar;
+            }
+
+            $payment_method_model = PaymentMethod::findOne($this->payment_method_id);
+
+            if ($payment_method_model)
+                $this->payment_method_name = $payment_method_model->payment_method_name;
+
             $this->save(false);
         }
     }

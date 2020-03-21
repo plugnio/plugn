@@ -18,7 +18,7 @@ class RestaurantDeliverySearch extends RestaurantDelivery
     {
         return [
             [['restaurant_uuid'], 'safe'],
-            [['area_id', 'min_delivery_time'], 'integer'],
+            [['area_id', 'delivery_time'], 'integer'],
         ];
     }
 
@@ -59,7 +59,7 @@ class RestaurantDeliverySearch extends RestaurantDelivery
         // grid filtering conditions
         $query->andFilterWhere([
             'area_id' => $this->area_id,
-            'min_delivery_time' => $this->min_delivery_time,
+            'delivery_time' => $this->delivery_time,
         ]);
 
         $query->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid]);

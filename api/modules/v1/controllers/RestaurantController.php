@@ -6,9 +6,9 @@ use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use common\models\City;
-use common\models\RestaurantDelivery;
+use common\models\RestaurantBranch;
 
-class RestaurantDeliveryController extends Controller {
+class RestaurantController extends Controller {
 
     public function behaviors() {
         $behaviors = parent::behaviors();
@@ -52,44 +52,21 @@ class RestaurantDeliveryController extends Controller {
     }
 
     /**
-     * Return City list
+     * Return Restaurant's branches
      */
-    public function actionGetDeliveredAreaData($id) {
+    public function actionListAllRestaurantsBranches($id) {
 
+        $restaurantBranches = RestaurantBranch::find()
+                        ->where(['restaurant_uuid' => $id])->all();
 
-        $restaurantDeliveryArea = RestaurantDelivery::find()
-                ->where(['area_id' => $id])
-                ->one();
-
-        $restaurantDeliveryArea->delivery_time = Yii::$app->formatter->asDuration($restaurantDeliveryArea->delivery_time * 60);
-
-        return $restaurantDeliveryArea;
-    }
-
-    /**
-     * Return City list
-     */
-    public function actionListAllCities() {
-
-
-        $allCitiesData = City::find()
-                ->asArray()
-                ->all();
-
-        $restaurantDeliveryAreas = RestaurantDelivery::find()
-                ->asArray()
-                ->with('area')
-                ->all();
-
-        foreach ($restaurantDeliveryAreas as $key => $delivery_area) {
-            foreach ($allCitiesData as $key => $city) {
-                if ($city['city_id'] == $delivery_area['area']['city_id']) {
-                    $allCitiesData[$key]['areas'][] = $delivery_area['area'];
-                }
-            }
+        if ($restaurantBranches) {
+            return $restaurantBranches;
+        } else {
+            return [
+                'operation' => 'error',
+                'message' => 'Restaurant Uuid is invalid'
+            ];
         }
-
-        return $allCitiesData;
     }
 
 }

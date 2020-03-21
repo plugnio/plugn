@@ -79,7 +79,6 @@ class OrderItem extends \yii\db\ActiveRecord {
         $totalPrice = $this->item->item_price; //5
 
 
-
         foreach ($this->getOrderItemExtraOptions()->asArray()->all() as $extraOption)
             $totalPrice += $extraOption['extra_option_price']; //1
 

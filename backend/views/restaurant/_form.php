@@ -22,10 +22,8 @@ supportDeliveryInput.change(function(){
     let selection = $(this).val();
     if(selection == 0){ // Dont support delivery
         $('#minDeliveryTime').hide();
-        $('#deliveryFeeInput').hide();
     }else{ // Support delivery
         $('#minDeliveryTime').show();
-        $('#deliveryFeeInput').show();
     }
 });
 
@@ -185,27 +183,6 @@ $this->registerJs($js);
             , ['prompt' => 'Choose...', 'id' => 'supportPickupInput']
     );
     ?>
-
-    <div id='minDeliveryTime' style='<?= $model->isNewRecord || ($model->support_delivery == 0) ? "display:none" : "" ?>'>
-        <?=
-        $form->field($model, 'min_delivery_time')->widget(TimePicker::classname(), [
-            'options' => ['placeholder' => 'Enter event time ...'],
-            'pluginOptions' => [
-                'autoclose' => true,
-                'defaultTime' => false,
-                'showSeconds' => true,
-                'showMeridian' => false,
-            ]
-        ]);
-        ?>
-    </div>
-
-    
-    <div id='deliveryFeeInput' style='<?= $model->isNewRecord || ($model->support_delivery == 0) ? "display:none" : "" ?>'>
-        <?= $form->field($model, 'delivery_fee')->input('number', ['maxlength' => true, 'placeholder' => '0.500']) ?>
-    </div>
-
-    <?= $form->field($model, 'min_charge')->input('number', ['maxlength' => true, 'placeholder' => '5']) ?>
 
     <?= $form->field($model, 'phone_number')->textInput(['maxlength' => true]) ?>
 

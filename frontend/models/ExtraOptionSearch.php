@@ -61,7 +61,7 @@ class ExtraOptionSearch extends ExtraOption
         $query->andFilterWhere([
             'extra_option_id' => $this->extra_option_id,
             'option_id' => $this->option_id,
-            'price' => $this->price,
+            'extra_option_price' => $this->extra_option_price,
         ]);
 
         $query->andFilterWhere(['like', 'extra_option_name', $this->extra_option_name])

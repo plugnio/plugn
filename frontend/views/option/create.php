@@ -6,12 +6,11 @@ use yii\helpers\Html;
 /* @var $model common\models\Option */
 
 $this->title = 'Create Option';
-$this->params['breadcrumbs'][] = ['label' => 'Options', 'url' => ['index']];
+$item_model = \common\models\Item::findOne($model->item_uuid);
+$this->params['breadcrumbs'][] = ['label' => $item_model->item_name, 'url' => ['item/view', 'id' => $model->item_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="option-create">
-
-    <h1><?= Html::encode($this->title) ?></h1>
 
     <?= $this->render('_form', [
         'model' => $model,

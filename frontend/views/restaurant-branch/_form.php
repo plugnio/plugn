@@ -15,6 +15,8 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'branch_name_en')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'branch_name_ar')->textInput(['maxlength' => true]) ?>
+    
+    <?= $form->field($model, 'prep_time')->textInput(['maxlength' => true]) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

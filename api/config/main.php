@@ -55,14 +55,26 @@ return [
                         'OPTIONS detail' => 'options',
                     ]
                 ],
+                  [// RestaurantController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/restaurant',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET branches/<id>' => 'list-all-restaurants-branches',
+                        // OPTIONS VERBS
+                        'OPTIONS branches/<id>' => 'options',
+                    ]
+                ],
                 [// CityController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/restaurant-delivery',
                     'pluralize' => false,
                     'patterns' => [
-                        'GET' => 'list',
+                        'GET' => 'list-all-cities',
+                        'GET <id>' => 'get-delivered-area-data',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options',
                     ]
                 ],
                 [// PaymentMethodController

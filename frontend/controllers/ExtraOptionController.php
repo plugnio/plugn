@@ -113,9 +113,12 @@ class ExtraOptionController extends Controller
      */
     public function actionDelete($id)
     {
+        $model = $this->findModel($id);
+        $option_id = $model->option_id;
+
         $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['option/view', 'id' => $option_id]);
     }
 
     /**

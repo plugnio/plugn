@@ -19,7 +19,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'area_id') ?>
 
-    <?= $form->field($model, 'min_delivery_time') ?>
+    <?= $form->field($model, 'delivery_time') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>

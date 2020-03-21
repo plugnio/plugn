@@ -24,6 +24,7 @@ class m200317_125607_create_restaurant_branch_table extends Migration
             'restaurant_uuid' => $this->char(60),
             'branch_name_en' => $this->string(),
             'branch_name_ar' => $this->string(),
+            'prep_time' => $this->integer(),
 
         ],$tableOptions);
         

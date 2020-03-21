@@ -11,8 +11,9 @@ use Yii;
  * @property string|null $restaurant_uuid
  * @property string|null $branch_name_en
  * @property string|null $branch_name_ar
+ * @property int $prep_time
  *
- * @property Restaurant $restaurantUu
+ * @property Restaurant $restaurant
  */
 class RestaurantBranch extends \yii\db\ActiveRecord
 {
@@ -31,6 +32,7 @@ class RestaurantBranch extends \yii\db\ActiveRecord
     {
         return [
             [['restaurant_uuid'], 'string', 'max' => 60],
+            [['prep_time'], 'integer'],
             [['branch_name_en', 'branch_name_ar'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
@@ -46,6 +48,7 @@ class RestaurantBranch extends \yii\db\ActiveRecord
             'restaurant_uuid' => 'Restaurant Uuid',
             'branch_name_en' => 'Branch Name En',
             'branch_name_ar' => 'Branch Name Ar',
+            'prep_time' => 'Preparation time',
         ];
     }
 
@@ -54,7 +57,7 @@ class RestaurantBranch extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantUu()
+    public function getRestaurant()
     {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }

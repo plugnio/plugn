@@ -64,7 +64,7 @@ class CategoryItem extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItemUu()
+    public function getItem()
     {
         return $this->hasOne(Item::className(), ['item_uuid' => 'item_uuid']);
     }

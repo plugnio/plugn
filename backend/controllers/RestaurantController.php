@@ -27,7 +27,7 @@ class RestaurantController extends Controller {
                 ],
             ],
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => \yii\filters\AccessControl::className(),
                 'rules' => [
                     [//allow authenticated users only
                         'allow' => true,

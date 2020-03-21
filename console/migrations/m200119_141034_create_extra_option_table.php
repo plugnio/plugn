@@ -23,7 +23,7 @@ class m200119_141034_create_extra_option_table extends Migration
             'option_id' => $this->integer(),
             'extra_option_name' => $this->string(255),
             'extra_option_name_ar' => $this->string(255),
-            'extra_option_price' => $this->float(),
+            'extra_option_price' => $this->float()->defaultValue(0),
         ], $tableOptions);
 
         

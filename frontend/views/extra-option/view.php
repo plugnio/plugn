@@ -32,8 +32,6 @@ $this->params['breadcrumbs'][] = $this->title;
             DetailView::widget([
                 'model' => $model,
                 'attributes' => [
-                    'extra_option_id',
-                    'option_id',
                     'extra_option_name',
                     'extra_option_name_ar',
                     'extra_option_price:currency',

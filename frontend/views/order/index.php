@@ -21,7 +21,16 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            'area_name',
+              [
+                'label' => 'Order Type',
+                "format" => "raw",
+                "value" => function($model) {
+                    if( $model->order_mode == Order::ORDER_MODE_DELIVERY)
+                    return 'Delivery';
+                    else
+                    return 'Pickup';
+                }
+            ],
             'customer_name',
             'customer_phone_number',
             [
