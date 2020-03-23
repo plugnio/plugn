@@ -18,7 +18,7 @@ class OrderItemSearch extends OrderItem
     {
         return [
             [['order_item_id', 'order_uuid', 'qty'], 'integer'],
-            [['item_uuid', 'item_name', 'instructions'], 'safe'],
+            [['item_uuid', 'item_name', 'customer_instruction'], 'safe'],
             [['item_price'], 'number'],
         ];
     }
@@ -67,7 +67,7 @@ class OrderItemSearch extends OrderItem
 
         $query->andFilterWhere(['like', 'item_uuid', $this->item_uuid])
             ->andFilterWhere(['like', 'item_name', $this->item_name])
-            ->andFilterWhere(['like', 'instructions', $this->instructions]);
+            ->andFilterWhere(['like', 'customer_instruction',customer_instructionructions]);
 
         return $dataProvider;
     }

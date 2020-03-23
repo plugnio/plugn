@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'order.order_uuid',
                     'orderItem.item_name',
                     'orderItem.item_price',
-                    'orderItem.instructions',
+                    'orderItem.customer_instruction',
                     'extra_option_name',
                     'extra_option_price:currency',
                 ],

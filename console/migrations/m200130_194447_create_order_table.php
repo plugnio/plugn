@@ -45,6 +45,7 @@ class m200130_194447_create_order_table extends Migration {
             'special_directions' => $this->string(255),
             'payment_method_id' => $this->integer()->notNull(),
             'payment_method_name' => $this->string(),
+            'payment_method_name_ar' => $this->string(),
             'total_price' => $this->float()->defaultValue(0),
             'total_items_price' => $this->float()->defaultValue(0),
             'delivery_fee' => $this->float()->defaultValue(0),
@@ -110,7 +111,7 @@ class m200130_194447_create_order_table extends Migration {
             'item_name' => $this->string(255)->notNull(),
             'item_price' => $this->float()->notNull(),
             'qty' => $this->integer(),
-            'instructions' => $this->string(255)
+            'customer_instruction' => $this->string(255)
                 ], $tableOptions);
 
         // creates index for column `order_uuid`

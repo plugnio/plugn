@@ -13,7 +13,7 @@ use Yii;
  * @property string $item_name
  * @property float $item_price
  * @property int|null $qty
- * @property string|null $instructions
+ * @property string|null $customer_instruction
  *
  * @property Item $item
  * @property Order $order
@@ -39,7 +39,7 @@ class OrderItem extends \yii\db\ActiveRecord {
             [['item_price'], 'number'],
             [['item_uuid'], 'checkIfItemBelongToRestaurant'],
             [['item_uuid'], 'string', 'max' => 300],
-            [['item_name', 'instructions'], 'string', 'max' => 255],
+            [['item_name', 'customer_instruction'], 'string', 'max' => 255],
             [['item_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_uuid' => 'item_uuid']],
             [['order_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_uuid' => 'order_uuid']],
         ];
@@ -56,7 +56,7 @@ class OrderItem extends \yii\db\ActiveRecord {
             'item_name' => 'Item Name',
             'item_price' => 'Item Price',
             'qty' => 'Qty',
-            'instructions' => 'Instructions',
+            'customer_instruction' => 'Instructions',
         ];
     }
 

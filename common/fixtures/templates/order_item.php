@@ -11,5 +11,5 @@ return [
     'item_name' => $item[0]['item_name'],
     'item_price' => $item[0]['price'],
     'qty' => $faker->numberBetween(1,10),
-    'instructions' => $faker->firstname,
+    'customer_instruction' => $faker->firstname,
 ];

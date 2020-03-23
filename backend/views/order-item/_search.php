@@ -27,7 +27,7 @@ use yii\widgets\ActiveForm;
 
     <?php // echo $form->field($model, 'qty') ?>
 
-    <?php // echo $form->field($model, 'instructions') ?>
+    <?php // echo $form->field($model, 'customer_instruction') ?>
 
     <?php // echo $form->field($model, 'order_status') ?>
 

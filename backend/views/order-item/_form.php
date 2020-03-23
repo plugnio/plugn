@@ -22,7 +22,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'qty')->textInput() ?>
 
-    <?= $form->field($model, 'instructions')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'customer_instruction')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'order_status')->textInput() ?>
 

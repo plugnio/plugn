@@ -18,7 +18,7 @@ class PaymentMethodSearch extends PaymentMethod
     {
         return [
             [['payment_method_id'], 'integer'],
-            [['payment_method_name'], 'safe'],
+            [['payment_method_name' , 'payment_method_name_ar'], 'safe'],
         ];
     }
 
@@ -61,7 +61,8 @@ class PaymentMethodSearch extends PaymentMethod
             'payment_method_id' => $this->payment_method_id,
         ]);
 
-        $query->andFilterWhere(['like', 'payment_method_name', $this->payment_method_name]);
+        $query->andFilterWhere(['like', 'payment_method_name', $this->payment_method_name])
+              ->andFilterWhere(['like', 'payment_method_name_ar', $this->payment_method_name_ar]);
 
         return $dataProvider;
     }

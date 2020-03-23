@@ -18,6 +18,8 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'payment_method_id') ?>
 
     <?= $form->field($model, 'payment_method_name') ?>
+    
+    <?= $form->field($model, 'payment_method_name_ar') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>

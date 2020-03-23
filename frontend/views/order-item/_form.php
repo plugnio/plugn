@@ -108,7 +108,7 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'qty')->textInput() ?>
 
-    <?= $form->field($model, 'instructions')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'customer_instruction')->textInput(['maxlength' => true]) ?>
 
     <div class="form-group">
     <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

@@ -18,7 +18,7 @@ class OrderSearch extends Order
     {
         return [
             [['order_uuid', 'area_id', 'payment_method_id', 'order_status'], 'integer'],
-            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name'], 'safe'],
+            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name' , 'payment_method_name_ar'], 'safe'],
         ];
     }
 
@@ -75,7 +75,8 @@ class OrderSearch extends Order
             ->andFilterWhere(['like', 'customer_name', $this->customer_name])
             ->andFilterWhere(['like', 'customer_phone_number', $this->customer_phone_number])
             ->andFilterWhere(['like', 'customer_email', $this->customer_email])
-            ->andFilterWhere(['like', 'payment_method_name', $this->payment_method_name]);
+            ->andFilterWhere(['like', 'payment_method_name', $this->payment_method_name])
+            ->andFilterWhere(['like', 'payment_method_name_ar', $this->payment_method_name_ar]);
 
         return $dataProvider;
     }

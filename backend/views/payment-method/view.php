@@ -31,6 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'payment_method_id',
             'payment_method_name',
+            'payment_method_name_ar',
         ],
     ]) ?>
 

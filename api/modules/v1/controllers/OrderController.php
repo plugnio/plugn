@@ -58,7 +58,9 @@ class OrderController extends Controller {
      */
     public function actionPlaceAnOrder($id) {
 
-        if (Restaurant::find()->where(['restaurant_uuid' => $id])->exists()) {
+        $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $id])->one();
+        
+        if ($restaurant_model && $restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) {
 
             $order = new Order();
 
@@ -103,8 +105,8 @@ class OrderController extends Controller {
 
 
                         //optional field
-                        if (array_key_exists("instructions", $item) && $item["instructions"] != null)
-                            $orderItem->instructions = $item["instructions"];
+                        if (array_key_exists("customer_instruction", $item) && $item["customer_instruction"] != null)
+                            $orderItem->customer_instruction = $item["customer_instruction"];
 
                         if ($orderItem->save()) {
 
@@ -125,7 +127,7 @@ class OrderController extends Controller {
                                         if (!$orderItemExtraOption->save()) {
 
                                             $response = [
-                                                'operation' => 'errors',
+                                                'operation' => 'error',
                                                 'message' => $orderItemExtraOption->errors,
                                             ];
                                         }
@@ -141,14 +143,13 @@ class OrderController extends Controller {
                         }
                     }
                 } else {
-                    Order::deleteAll(['order_uuid' => $order]);
-                    return [
+                    $response = [
                         'operation' => 'error',
                         'message' => 'Item Uuid is invalid.'
                     ];
                 }
             } else {
-               $response = [
+                $response = [
                     'operation' => 'error',
                     'message' => $order->getErrors(),
                 ];
@@ -173,6 +174,10 @@ class OrderController extends Controller {
             ];
         }
 
+        
+        if ($response['operation'] == 'error'){
+           Order::deleteAll(['order_uuid' => $order->order_uuid]);
+        }
 
         return $response;
     }

@@ -28,6 +28,7 @@ use yii\behaviors\AttributeBehavior;
  * @property string|null $customer_email
  * @property int $payment_method_id
  * @property string $payment_method_name
+ * @property string $payment_method_name_ar
  * @property int|null $order_status
  * @property int $order_mode
  * @property int $total_items_price
@@ -89,7 +90,7 @@ class Order extends \yii\db\ActiveRecord {
                 }],
             [['customer_email'], 'email'],
             ['estimated_time_of_arrival', 'safe'],
-            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name'], 'string', 'max' => 255],
+            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name','payment_method_name_ar'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
             [['customer_id'], 'exist', 'skipOnError' => false, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
             [['payment_method_id'], 'exist', 'skipOnError' => false, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
@@ -197,6 +198,7 @@ class Order extends \yii\db\ActiveRecord {
             'customer_email' => 'Customer Email',
             'payment_method_id' => 'Payment Method ID',
             'payment_method_name' => 'Payment Method Name',
+            'payment_method_name_ar' => 'Payment Method Name [Arabic]',
             'order_status' => 'Order Status',
             'total_price' => 'Total Price',
             'order_created_at' => 'Order Created At',
@@ -312,8 +314,11 @@ class Order extends \yii\db\ActiveRecord {
 
             $payment_method_model = PaymentMethod::findOne($this->payment_method_id);
 
-            if ($payment_method_model)
+            if ($payment_method_model){
                 $this->payment_method_name = $payment_method_model->payment_method_name;
+                $this->payment_method_name_ar = $payment_method_model->payment_method_name_ar;
+
+            }
 
             $this->save(false);
         }

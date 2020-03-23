@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'item_name',
             'item_price:currency',
             'qty',
-            'instructions',
+            'customer_instruction',
                 ],
                 'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
             ])

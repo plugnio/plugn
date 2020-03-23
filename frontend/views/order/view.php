@@ -104,7 +104,7 @@ GridView::widget([
     'sorter' => false,
     'columns' => [
         'item_name',
-        'instructions',
+        'customer_instruction',
         'qty',
         [
             'label' => 'Extra Options',
