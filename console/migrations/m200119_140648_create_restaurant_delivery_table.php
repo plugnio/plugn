@@ -22,7 +22,7 @@ class m200119_140648_create_restaurant_delivery_table extends Migration
         $this->createTable('{{%restaurant_delivery}}', [
             'restaurant_uuid' => $this->char(60)->notNull(),
             'area_id' => $this->integer()->notNull(),
-            'delivery_time' => $this->integer()->unsigned()->defaultValue(0),
+            'delivery_time' => $this->integer()->unsigned()->defaultValue(60),
             'delivery_fee' => $this->float()->unsigned()->defaultValue(0),
             'min_charge' => $this->float()->unsigned()->defaultValue(0),
         ],$tableOptions);
