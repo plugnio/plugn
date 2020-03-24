@@ -61,7 +61,7 @@ class RestaurantDeliveryController extends Controller {
                     $restaurantDeliveryAreas->delivery_fee = $_POST['RestaurantDelivery']['delivery_fee'];
                     $restaurantDeliveryAreas->delivery_time = $_POST['RestaurantDelivery']['delivery_time'];
                     $restaurantDeliveryAreas->min_charge = $_POST['RestaurantDelivery']['min_charge'];
-                    $restaurantDeliveryAreas->save(false);
+                    $restaurantDeliveryAreas->save();
                 }
          
                 }

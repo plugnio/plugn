@@ -31,7 +31,7 @@ class ExtraOption extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['option_id'], 'integer'],
-            [['extra_option_price'], 'number'],
+            [['extra_option_price'], 'number' , 'min'=> 0],
             [['extra_option_name', 'extra_option_name_ar'], 'string', 'max' => 255],
             [['option_id'], 'exist', 'skipOnError' => true, 'targetClass' => Option::className(), 'targetAttribute' => ['option_id' => 'option_id']],
         ];

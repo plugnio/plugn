@@ -29,8 +29,8 @@ class DeliveryZoneForm extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['delivery_time'], 'integer'],
-            [['delivery_fee','min_charge'], 'number'],
+            [['delivery_time'], 'integer','min' => 0],
+            [['delivery_fee','min_charge'], 'number' ,'min' => 0],
             [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::className(), 'targetAttribute' => ['city_id' => 'city_id']],
         ];
     }

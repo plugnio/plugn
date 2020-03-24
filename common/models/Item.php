@@ -46,8 +46,8 @@ class Item extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['item_name', 'items_category'], 'required', 'on' => 'create'],
-            [['sort_number', 'stock_qty'], 'integer'],
-            [['item_price'], 'number'],
+            [['sort_number', 'stock_qty'], 'integer' , 'min'=> 0],
+            [['item_price'], 'number', 'min'=> 0],
             [['image'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['item_created_at', 'item_updated_at', 'items_category'], 'safe'],
             [['item_uuid'], 'string', 'max' => 300],

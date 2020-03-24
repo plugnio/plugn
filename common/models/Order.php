@@ -69,7 +69,7 @@ class Order extends \yii\db\ActiveRecord {
             [['customer_name', 'customer_phone_number', 'payment_method_id', 'order_mode'], 'required'],
             [['order_uuid'], 'string', 'max' => 36],
             [['order_uuid'], 'unique'],
-            [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer'],
+            [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer' , 'min'=> 0],
             ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE]],
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
             ['restaurant_branch_id', 'required', 'when' => function($model) {
@@ -84,7 +84,8 @@ class Order extends \yii\db\ActiveRecord {
             ['order_mode', 'validateOrderMode'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['customer_phone_number'], 'string', 'min' => 8, 'max' => 8],
-            [['customer_phone_number', 'total_price', 'delivery_fee', 'total_items_price'], 'number'],
+            [['customer_phone_number'], 'number'],
+            [['total_price', 'delivery_fee', 'total_items_price'], 'number' , 'min'=> 0],
             ['total_items_price', 'validateMinCharge', 'when' => function($model) {
                     return $model->order_mode == static::ORDER_MODE_DELIVERY;
                 }],

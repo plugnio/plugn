@@ -34,9 +34,9 @@ class OrderItem extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['order_uuid', 'item_uuid', 'qty'], 'required'],
-            [['qty'], 'integer'],
+            [['qty'], 'integer' , 'min'=> 0],
             [['order_uuid'], 'string', 'max' => 36],
-            [['item_price'], 'number'],
+            [['item_price'], 'number', 'min'=> 0],
             [['item_uuid'], 'checkIfItemBelongToRestaurant'],
             [['item_uuid'], 'string', 'max' => 300],
             [['item_name', 'customer_instruction'], 'string', 'max' => 255],

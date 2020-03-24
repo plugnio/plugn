@@ -34,7 +34,7 @@ class Option extends \yii\db\ActiveRecord
     {
         return [
             [['item_uuid'], 'required'],
-            [['is_required', 'max_qty'], 'integer'],
+            [['is_required', 'max_qty'], 'integer' , 'min'=> 0],
             [['item_uuid'], 'string', 'max' => 300],
             [['option_name', 'option_name_ar'], 'string', 'max' => 255],
             [['item_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_uuid' => 'item_uuid']],

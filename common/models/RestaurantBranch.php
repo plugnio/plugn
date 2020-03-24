@@ -32,7 +32,7 @@ class RestaurantBranch extends \yii\db\ActiveRecord
     {
         return [
             [['restaurant_uuid'], 'string', 'max' => 60],
-            [['prep_time'], 'integer'],
+            [['prep_time'], 'integer' , 'min'=> 0],
             [['branch_name_en', 'branch_name_ar'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];

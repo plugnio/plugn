@@ -30,7 +30,7 @@ class Category extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['sort_number'], 'integer'],
+            [['sort_number'], 'integer', 'min'=> 0],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['category_name', 'category_name_ar'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],

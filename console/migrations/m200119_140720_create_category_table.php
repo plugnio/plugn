@@ -25,7 +25,7 @@ class m200119_140720_create_category_table extends Migration {
             'restaurant_uuid' => $this->char(60),
             'category_name' => $this->string(),
             'category_name_ar' => $this->string(),
-            'sort_number' => $this->integer(),
+            'sort_number' => $this->integer()->unsigned(),
         ],$tableOptions);
         
         // creates index for column `restaurant_uuid`

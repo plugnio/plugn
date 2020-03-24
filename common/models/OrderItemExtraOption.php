@@ -32,9 +32,9 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['order_item_id'], 'required'],
-            [['order_item_id', 'extra_option_id'], 'integer'],
+            [['order_item_id', 'extra_option_id'], 'integer' , 'min'=> 0],
             [['extra_option_id'], 'checkIfExtraOptionBelongToItem'],
-            [['extra_option_price'], 'number'],
+            [['extra_option_price'], 'number', 'min'=> 0],
             [['extra_option_name', 'extra_option_name_ar'], 'string', 'max' => 255],
             [['extra_option_id'], 'exist', 'skipOnError' => false, 'targetClass' => ExtraOption::className(), 'targetAttribute' => ['extra_option_id' => 'extra_option_id']],
             [['order_item_id'], 'exist', 'skipOnError' => true, 'targetClass' => OrderItem::className(), 'targetAttribute' => ['order_item_id' => 'order_item_id']],

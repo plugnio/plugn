@@ -10,11 +10,7 @@ use yii\grid\GridView;
 $this->title = 'Customers';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="page-title"> <i class="icon-custom-left"></i>
-    <p>
-        <?= Html::a('Create Customer', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-</div>
+
 <div class="card">
 
     <?=

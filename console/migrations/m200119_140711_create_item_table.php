@@ -26,10 +26,10 @@ class m200119_140711_create_item_table extends Migration
             'item_name_ar' => $this->string(255),
             'item_description' => $this->string(1000),
             'item_description_ar' => $this->string(1000),
-            'sort_number' => $this->integer(),
-            'stock_qty' => $this->integer(),
+            'sort_number' => $this->integer()->unsigned(),
+            'stock_qty' => $this->integer()->unsigned(),
             'item_image' => $this->string(255),
-            'item_price' => $this->float(),
+            'item_price' => $this->float()->unsigned(),
             'item_created_at' => $this->dateTime(),
             'item_updated_at' => $this->dateTime(),
         ], $tableOptions);
