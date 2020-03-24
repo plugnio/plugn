@@ -17,7 +17,7 @@ class OptionSearch extends Option
     public function rules()
     {
         return [
-            [['option_id', 'is_required', 'max_qty'], 'integer'],
+            [['option_id', 'min_qty', 'max_qty'], 'integer'],
             [['item_uuid', 'option_name', 'option_name_ar'], 'safe'],
         ];
     }
@@ -59,7 +59,7 @@ class OptionSearch extends Option
         // grid filtering conditions
         $query->andFilterWhere([
             'option_id' => $this->option_id,
-            'is_required' => $this->is_required,
+            'min_qty' => $this->min_qty,
             'max_qty' => $this->max_qty,
         ]);
 

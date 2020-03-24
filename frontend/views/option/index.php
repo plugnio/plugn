@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'option_id',
             'item_uuid',
-            'is_required',
+            'min_qty',
             'max_qty',
             'option_name',
             //'option_name_ar',

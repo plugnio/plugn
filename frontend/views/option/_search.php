@@ -19,7 +19,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'item_uuid') ?>
 
-    <?= $form->field($model, 'is_required') ?>
+    <?= $form->field($model, 'min_qty') ?>
 
     <?= $form->field($model, 'max_qty') ?>
 

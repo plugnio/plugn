@@ -4,7 +4,7 @@ return [
     'option0' => [
         'option_id' => 3333,
         'item_uuid' => '177298',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 1,
         'option_name' => 'Santina',
         'option_name_ar' => 'Nicholaus',
@@ -12,7 +12,7 @@ return [
     'option1' => [
         'option_id' => 50773,
         'item_uuid' => '207144',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 1,
         'option_name' => 'Alvina',
         'option_name_ar' => 'Halie',
@@ -20,7 +20,7 @@ return [
     'option2' => [
         'option_id' => 55528,
         'item_uuid' => '209638',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 3,
         'option_name' => 'Benedict',
         'option_name_ar' => 'Tony',
@@ -28,7 +28,7 @@ return [
     'option3' => [
         'option_id' => 51710,
         'item_uuid' => '261412',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 6,
         'option_name' => 'Kristopher',
         'option_name_ar' => 'Vernon',
@@ -36,7 +36,7 @@ return [
     'option4' => [
         'option_id' => 34608,
         'item_uuid' => '287818',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 9,
         'option_name' => 'Amaya',
         'option_name_ar' => 'Kellie',
@@ -44,7 +44,7 @@ return [
     'option5' => [
         'option_id' => 61030,
         'item_uuid' => '293931',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 9,
         'option_name' => 'Jayme',
         'option_name_ar' => 'Art',
@@ -52,7 +52,7 @@ return [
     'option6' => [
         'option_id' => 44915,
         'item_uuid' => '348776',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 9,
         'option_name' => 'Meta',
         'option_name_ar' => 'Aimee',
@@ -60,7 +60,7 @@ return [
     'option7' => [
         'option_id' => 9231,
         'item_uuid' => '448063',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 7,
         'option_name' => 'Shakira',
         'option_name_ar' => 'Pasquale',
@@ -68,7 +68,7 @@ return [
     'option8' => [
         'option_id' => 48994,
         'item_uuid' => '463329',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 2,
         'option_name' => 'Tracey',
         'option_name_ar' => 'Tomasa',
@@ -76,7 +76,7 @@ return [
     'option9' => [
         'option_id' => 10138,
         'item_uuid' => '526263',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 2,
         'option_name' => 'Johnathon',
         'option_name_ar' => 'Leif',
@@ -84,7 +84,7 @@ return [
     'option10' => [
         'option_id' => 48356,
         'item_uuid' => '544113',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 5,
         'option_name' => 'Eleonore',
         'option_name_ar' => 'Shana',
@@ -92,7 +92,7 @@ return [
     'option11' => [
         'option_id' => 21467,
         'item_uuid' => '544960',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 1,
         'option_name' => 'Amya',
         'option_name_ar' => 'Adrain',
@@ -100,7 +100,7 @@ return [
     'option12' => [
         'option_id' => 81726,
         'item_uuid' => '585047',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 8,
         'option_name' => 'Jeramy',
         'option_name_ar' => 'Kacey',
@@ -108,7 +108,7 @@ return [
     'option13' => [
         'option_id' => 71753,
         'item_uuid' => '597606',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 4,
         'option_name' => 'Murl',
         'option_name_ar' => 'Morton',
@@ -116,7 +116,7 @@ return [
     'option14' => [
         'option_id' => 70537,
         'item_uuid' => '67861',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 5,
         'option_name' => 'Merle',
         'option_name_ar' => 'Carmel',
@@ -124,7 +124,7 @@ return [
     'option15' => [
         'option_id' => 21787,
         'item_uuid' => '686730',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 4,
         'option_name' => 'Janiya',
         'option_name_ar' => 'Megane',
@@ -132,7 +132,7 @@ return [
     'option16' => [
         'option_id' => 71610,
         'item_uuid' => '69762',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 3,
         'option_name' => 'London',
         'option_name_ar' => 'Bella',
@@ -140,7 +140,7 @@ return [
     'option17' => [
         'option_id' => 82831,
         'item_uuid' => '709760',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 7,
         'option_name' => 'Garland',
         'option_name_ar' => 'Nyah',
@@ -148,7 +148,7 @@ return [
     'option18' => [
         'option_id' => 61248,
         'item_uuid' => '733301',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 5,
         'option_name' => 'Rodrigo',
         'option_name_ar' => 'Wilmer',
@@ -156,7 +156,7 @@ return [
     'option19' => [
         'option_id' => 56980,
         'item_uuid' => '735812',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 10,
         'option_name' => 'Michelle',
         'option_name_ar' => 'Keshawn',
@@ -164,7 +164,7 @@ return [
     'option20' => [
         'option_id' => 99612,
         'item_uuid' => '177298',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 3,
         'option_name' => 'Coty',
         'option_name_ar' => 'Ansel',
@@ -172,7 +172,7 @@ return [
     'option21' => [
         'option_id' => 98977,
         'item_uuid' => '207144',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 9,
         'option_name' => 'Carole',
         'option_name_ar' => 'Retta',
@@ -180,7 +180,7 @@ return [
     'option22' => [
         'option_id' => 62142,
         'item_uuid' => '209638',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 2,
         'option_name' => 'Llewellyn',
         'option_name_ar' => 'Sammie',
@@ -188,7 +188,7 @@ return [
     'option23' => [
         'option_id' => 71857,
         'item_uuid' => '261412',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 7,
         'option_name' => 'Thaddeus',
         'option_name_ar' => 'Cayla',
@@ -196,7 +196,7 @@ return [
     'option24' => [
         'option_id' => 86975,
         'item_uuid' => '287818',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 5,
         'option_name' => 'Judge',
         'option_name_ar' => 'Avis',
@@ -204,7 +204,7 @@ return [
     'option25' => [
         'option_id' => 19522,
         'item_uuid' => '293931',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 10,
         'option_name' => 'Kenya',
         'option_name_ar' => 'Jarred',
@@ -212,7 +212,7 @@ return [
     'option26' => [
         'option_id' => 4659,
         'item_uuid' => '348776',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 3,
         'option_name' => 'Hugh',
         'option_name_ar' => 'Celine',
@@ -220,7 +220,7 @@ return [
     'option27' => [
         'option_id' => 55023,
         'item_uuid' => '448063',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 9,
         'option_name' => 'Lelah',
         'option_name_ar' => 'Werner',
@@ -228,7 +228,7 @@ return [
     'option28' => [
         'option_id' => 16125,
         'item_uuid' => '463329',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 10,
         'option_name' => 'Nicola',
         'option_name_ar' => 'Eulalia',
@@ -236,7 +236,7 @@ return [
     'option29' => [
         'option_id' => 35508,
         'item_uuid' => '526263',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 5,
         'option_name' => 'Valentine',
         'option_name_ar' => 'Michel',
@@ -244,7 +244,7 @@ return [
     'option30' => [
         'option_id' => 15585,
         'item_uuid' => '544113',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 7,
         'option_name' => 'Dora',
         'option_name_ar' => 'Mohamed',
@@ -252,7 +252,7 @@ return [
     'option31' => [
         'option_id' => 51373,
         'item_uuid' => '544960',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 2,
         'option_name' => 'Holly',
         'option_name_ar' => 'Emmy',
@@ -260,7 +260,7 @@ return [
     'option32' => [
         'option_id' => 33270,
         'item_uuid' => '585047',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 10,
         'option_name' => 'Jeffrey',
         'option_name_ar' => 'Werner',
@@ -268,7 +268,7 @@ return [
     'option33' => [
         'option_id' => 33149,
         'item_uuid' => '597606',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 5,
         'option_name' => 'Emilia',
         'option_name_ar' => 'Sabina',
@@ -276,7 +276,7 @@ return [
     'option34' => [
         'option_id' => 3662,
         'item_uuid' => '67861',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 6,
         'option_name' => 'Braulio',
         'option_name_ar' => 'Sasha',
@@ -284,7 +284,7 @@ return [
     'option35' => [
         'option_id' => 66120,
         'item_uuid' => '686730',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 1,
         'option_name' => 'Guiseppe',
         'option_name_ar' => 'Damaris',
@@ -292,7 +292,7 @@ return [
     'option36' => [
         'option_id' => 75032,
         'item_uuid' => '69762',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 7,
         'option_name' => 'Jordyn',
         'option_name_ar' => 'Larissa',
@@ -300,7 +300,7 @@ return [
     'option37' => [
         'option_id' => 73543,
         'item_uuid' => '709760',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 4,
         'option_name' => 'Rocio',
         'option_name_ar' => 'Javier',
@@ -308,7 +308,7 @@ return [
     'option38' => [
         'option_id' => 36538,
         'item_uuid' => '733301',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 5,
         'option_name' => 'Derick',
         'option_name_ar' => 'Wilma',
@@ -316,7 +316,7 @@ return [
     'option39' => [
         'option_id' => 18818,
         'item_uuid' => '735812',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 5,
         'option_name' => 'Baylee',
         'option_name_ar' => 'Schuyler',
@@ -324,7 +324,7 @@ return [
     'option40' => [
         'option_id' => 51958,
         'item_uuid' => '177298',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 2,
         'option_name' => 'Max',
         'option_name_ar' => 'Valerie',
@@ -332,7 +332,7 @@ return [
     'option41' => [
         'option_id' => 93182,
         'item_uuid' => '207144',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 2,
         'option_name' => 'Shanie',
         'option_name_ar' => 'Ludie',
@@ -340,7 +340,7 @@ return [
     'option42' => [
         'option_id' => 58231,
         'item_uuid' => '209638',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 3,
         'option_name' => 'Ulises',
         'option_name_ar' => 'Syble',
@@ -348,7 +348,7 @@ return [
     'option43' => [
         'option_id' => 80168,
         'item_uuid' => '261412',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 4,
         'option_name' => 'Lizzie',
         'option_name_ar' => 'Agnes',
@@ -356,7 +356,7 @@ return [
     'option44' => [
         'option_id' => 85624,
         'item_uuid' => '287818',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 6,
         'option_name' => 'Lesly',
         'option_name_ar' => 'Andreane',
@@ -364,7 +364,7 @@ return [
     'option45' => [
         'option_id' => 14502,
         'item_uuid' => '293931',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 9,
         'option_name' => 'Roosevelt',
         'option_name_ar' => 'Maynard',
@@ -372,7 +372,7 @@ return [
     'option46' => [
         'option_id' => 22796,
         'item_uuid' => '348776',
-        'is_required' => 0,
+        'min_qty' => 0,
         'max_qty' => 3,
         'option_name' => 'Noble',
         'option_name_ar' => 'Grady',
@@ -380,7 +380,7 @@ return [
     'option47' => [
         'option_id' => 65269,
         'item_uuid' => '448063',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 3,
         'option_name' => 'May',
         'option_name_ar' => 'Dagmar',
@@ -388,7 +388,7 @@ return [
     'option48' => [
         'option_id' => 52588,
         'item_uuid' => '463329',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 2,
         'option_name' => 'Rodger',
         'option_name_ar' => 'Janet',
@@ -396,7 +396,7 @@ return [
     'option49' => [
         'option_id' => 83944,
         'item_uuid' => '526263',
-        'is_required' => 1,
+        'min_qty' => 1,
         'max_qty' => 2,
         'option_name' => 'Emory',
         'option_name_ar' => 'Lelia',
