@@ -10,22 +10,19 @@ use yii\grid\GridView;
 $this->title = 'Working Hours';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="working-hours-index">
-
-    <p>
-        <?= Html::a('Create Working Hours', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-</div>
 
 
 <div class="card">
-
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?=
     GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+        'showOnEmpty' => false,
+        'emptyText' => '<div style="padding: 70px 0; text-align: center;">'
+                        . '  <h4>You currently do not have working hours set.</h4>'
+                        .    Html::a('Create Working Hours', ['create'], ['class' => 'btn btn-success'])
+                        . '</div>',
         'columns' => [
             'workingDay.name',
             'operating_from',

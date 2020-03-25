@@ -52,6 +52,7 @@ class RestaurantDelivery extends \yii\db\ActiveRecord {
             'area_id' => 'Area ID',
             'delivery_time' => 'Delivery time',
             'delivery_fee' => 'Delivery fee',
+            'restaurant_delivery_area_array' => 'Delivery Areas',
             'min_charge' => 'Min Charge',
         ];
     }

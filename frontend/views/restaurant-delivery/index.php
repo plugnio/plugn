@@ -121,9 +121,9 @@ if ($dataProvider) { ?>
         }
     }
 } else {
-    echo'<div style="padding: 70px 0; text-align: center;">'
+    echo'<div class="card"><div style="padding: 70px 0; text-align: center;">'
     . '     <h4>You currently do not have any places you deliver to</h4>'
     . Html::a('Setup Delivery Zones', ['create'], ['class' => 'btn btn-success'])
-    . '</div>';
+    . '</div></div>';
 }
 ?>
