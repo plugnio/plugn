@@ -2,11 +2,31 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use common\models\Area;
+use yii\helpers\ArrayHelper;
+use common\models\RestaurantDelivery;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\RestaurantDelivery */
 /* @var $form yii\widgets\ActiveForm */
+
+
+$js = "
+
+$(function () {
+    //Initialize Select2 Elements
+    $('.select2').select2()
+
+  })
+
+";
+
+
+
+$this->registerJs($js);
+
 ?>
+
 
 <div class="restaurant-delivery-form">
 
@@ -30,7 +50,7 @@ use yii\widgets\ActiveForm;
 
     echo $form->errorSummary($model);
 
-    echo $form->field($model, 'restaurant_delivery_area')->dropDownList(
+    echo $form->field($model, 'restaurant_delivery_area_array')->dropDownList(
             $restaurantDeliveryArray, [
         'class' => 'select2',
         'multiple' => 'multiple',

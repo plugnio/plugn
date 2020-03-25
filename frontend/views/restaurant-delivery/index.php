@@ -17,7 +17,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 $js = "
-
 $(function () {
     //Initialize Select2 Elements
     $('.select2').select2()
@@ -27,48 +26,12 @@ $(function () {
 ";
 
 
-$this->registerJs($js);
-
-//    $areaQuery = Area::find()->asArray()->all();
-//    $restaurantDeliveryArray = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
-//
-//    if ($restaurant_model->restaurant_uuid != null) {
-//
-//        $sotredRestaurantDeliveryAreas = RestaurantDelivery::find()
-//                ->select('area_id')
-//                ->asArray()
-//                ->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
-//                ->all();
-//
-//        $sotredRestaurantDeliveryAreas = ArrayHelper::getColumn($sotredRestaurantDeliveryAreas, 'area_id');
-//    }
-//    
-//    $form = ActiveForm::begin();
-//
-//    echo $form->errorSummary($restaurant_model);
-//
-//    echo $form->field($restaurant_model, 'restaurant_delivery_area')->dropDownList(
-//            $restaurantDeliveryArray, [
-//                'class' => 'select2',
-//                'multiple' => 'multiple',
-//                'value' => $sotredRestaurantDeliveryAreas
-//            ]
-//    );
-?>
-
-<!--<div class="form-group">-->
-<?php
-//        Html::submitButton('Save', ['class' => 'btn btn-success']) 
-?>
-<!--    </div>-->
-
-<?php
-//    ActiveForm::end();
-?>
-
-
-<?php
-if ($dataProvider) {
+if ($dataProvider) { ?> 
+        <p>
+        <?= Html::a('Edit Delivery Zones', ['update'], ['class' => 'btn btn-success']) ?>
+    </p>
+    
+    <?php 
     foreach ($dataProvider as $city) {
         if ($city->restaurantDeliveryAreas) {
             ?>

@@ -70,13 +70,14 @@ class RestaurantDelivery extends \yii\db\ActiveRecord {
                 RestaurantDelivery::deleteAll(['restaurant_uuid' => $this->restaurant_uuid, 'area_id' => $restaurant_delivery_area->area_id]);
             }
         }
-
+        
         foreach ($delivery_areas as $area_id) {
             $delivery_area = new RestaurantDelivery();
             $delivery_area->area_id = $area_id;
             $delivery_area->restaurant_uuid = $this->restaurant_uuid;
-            return $delivery_area->save();
+            $delivery_area->save();
         }
+        
         return true;
     }
 

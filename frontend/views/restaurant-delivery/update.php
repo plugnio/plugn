@@ -5,11 +5,11 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\RestaurantDelivery */
 
-$this->title = 'Create Restaurant Delivery';
+$this->title = 'Edit Delivery Zone';
 $this->params['breadcrumbs'][] = ['label' => 'Delivery Zone', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = 'Edit Delivery Zone';
 ?>
-<div class="restaurant-delivery-create">
+<div class="restaurant-delivery-update">
 
     <?= $this->render('_form', [
         'model' => $model,

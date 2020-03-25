@@ -68,6 +68,10 @@ class RestaurantDeliveryController extends Controller {
                 unset($dataProvider->query[$key]);
             }
         }
+
+        return $this->render('index', [
+                    'dataProvider' => $dataProvider->query
+        ]);
     }
 
     /**
@@ -77,14 +81,14 @@ class RestaurantDeliveryController extends Controller {
      */
     public function actionCreate() {
         $model = new RestaurantDelivery();
-        $model->restaurant_uuid = Yii::$app->user->identity->restaurant_uuid ;
+        $model->restaurant_uuid = Yii::$app->user->identity->restaurant_uuid;
 
         if ($model->load(Yii::$app->request->post())) {
 
             if ($model->restaurant_delivery_area_array)
                 $model->saveRestaurantDeliveryArea($model->restaurant_delivery_area_array);
 
-            return $this->render(['index']);
+            return $this->redirect(['index']);
         }
         return $this->render('create', [
                     'model' => $model,
@@ -107,9 +111,9 @@ class RestaurantDeliveryController extends Controller {
             if ($model->restaurant_delivery_area_array)
                 $model->saveRestaurantDeliveryArea($model->restaurant_delivery_area_array);
 
-            return $this->render(['index']);
+            return $this->redirect(['index']);
         }
-        
+
         return $this->render('update', [
                     'model' => $model,
         ]);
