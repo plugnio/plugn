@@ -110,6 +110,9 @@ class RestaurantDeliveryController extends Controller {
 
             if ($model->restaurant_delivery_area_array)
                 $model->saveRestaurantDeliveryArea($model->restaurant_delivery_area_array);
+            //empty array so we goona del all restaurant delivery areas
+            else
+                RestaurantDelivery::deleteAll(['restaurant_uuid' => Yii::$app->user->identity->restaurant_uuid]);
 
             return $this->redirect(['index']);
         }
