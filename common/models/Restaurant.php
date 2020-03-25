@@ -341,21 +341,6 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
-     * save restaurant payment method
-     */
-    public function saveRestaurantPaymentMethod($payments_method) {
-
-        RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
-
-        foreach ($payments_method as $payment_method_id) {
-            $payments_method = new RestaurantPaymentMethod();
-            $payments_method->payment_method_id = $payment_method_id;
-            $payments_method->restaurant_uuid = $this->restaurant_uuid;
-            $payments_method->save();
-        }
-    }
-
-    /**
      * Gets query for [[Items]].
      *
      * @return \yii\db\ActiveQuery

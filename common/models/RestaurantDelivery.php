@@ -17,25 +17,23 @@ use Yii;
  * @property City $city
  * @property Restaurant $restaurant
  */
-class RestaurantDelivery extends \yii\db\ActiveRecord
-{
+class RestaurantDelivery extends \yii\db\ActiveRecord {
+
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'restaurant_delivery';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
-    {
+    public function rules() {
         return [
             [['restaurant_uuid', 'area_id'], 'required'],
-            [['area_id','delivery_time'], 'integer' , 'min'=> 0],
-            [['delivery_fee','min_charge'], 'number', 'min'=> 0],
+            [['area_id', 'delivery_time'], 'integer', 'min' => 0],
+            [['delivery_fee', 'min_charge'], 'number', 'min' => 0],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['restaurant_uuid', 'area_id'], 'unique', 'targetAttribute' => ['restaurant_uuid', 'area_id']],
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
@@ -46,8 +44,7 @@ class RestaurantDelivery extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'restaurant_uuid' => 'Restaurant Uuid',
             'area_id' => 'Area ID',
@@ -56,14 +53,21 @@ class RestaurantDelivery extends \yii\db\ActiveRecord
             'min_charge' => 'Min Charge',
         ];
     }
-    
-    
+
     /**
      * save restaurant delivery areas
      */
     public function saveRestaurantDeliveryArea($delivery_areas) {
+        
+        $stored_restaurant_delivery_areas = RestaurantDelivery::find()
+                ->where(['restaurant_uuid' => $this->restaurant_uuid])
+                ->all();
 
-        RestaurantDelivery::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
+        foreach ($stored_restaurant_delivery_areas as $restaurant_delivery_area) {
+            if (!in_array($restaurant_delivery_area->area_id, $delivery_areas)) {
+                RestaurantDelivery::deleteAll(['restaurant_uuid' => $this->restaurant_uuid, 'area_id' => $restaurant_delivery_area->area_id]);
+            }
+        }
 
         foreach ($delivery_areas as $area_id) {
             $delivery_area = new RestaurantDelivery();
@@ -78,18 +82,16 @@ class RestaurantDelivery extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getArea()
-    {
+    public function getArea() {
         return $this->hasOne(Area::className(), ['area_id' => 'area_id']);
     }
-    
+
     /**
      * Gets query for [[City]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCity()
-    {
+    public function getCity() {
         return $this->hasOne(City::className(), ['city_id' => 'city_id'])->via('area');
     }
 
@@ -98,8 +100,8 @@ class RestaurantDelivery extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
-    {
+    public function getRestaurant() {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
 }
