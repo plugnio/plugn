@@ -185,6 +185,9 @@ $this->registerJs($js);
     ?>
 
     <?= $form->field($model, 'phone_number')->textInput(['maxlength' => true]) ?>
+    
+    
+    <?= $form->field($model, 'restaurant_api_key')->textInput(['maxlength' => true]) ?>
 
 
     <div class="form-group">
