@@ -15,7 +15,6 @@ use common\models\RestaurantDelivery;
 $this->title = 'Delivery Zones';
 $this->params['breadcrumbs'][] = $this->title;
 
-
 $js = "
 $(function () {
     //Initialize Select2 Elements
