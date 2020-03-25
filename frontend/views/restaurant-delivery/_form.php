@@ -10,16 +10,34 @@ use yii\widgets\ActiveForm;
 
 <div class="restaurant-delivery-form">
 
-    <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->errorSummary($model); ?>
+    <?php
+    $areaQuery = Area::find()->asArray()->all();
+    $restaurantDeliveryArray = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
 
+    if ($restaurant_model->restaurant_uuid != null) {
 
-    <?= $form->field($model, 'delivery_fee')->input('float') ?>
+        $sotredRestaurantDeliveryAreas = RestaurantDelivery::find()
+                ->select('area_id')
+                ->asArray()
+                ->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
+                ->all();
 
-    <?= $form->field($model, 'delivery_time')->input('number') ?>
+        $sotredRestaurantDeliveryAreas = ArrayHelper::getColumn($sotredRestaurantDeliveryAreas, 'area_id');
+    }
 
-    <?= $form->field($model, 'min_charge')->input('number') ?>
+    $form = ActiveForm::begin();
+
+    echo $form->errorSummary($restaurant_model);
+
+    echo $form->field($restaurant_model, 'restaurant_delivery_area')->dropDownList(
+            $restaurantDeliveryArray, [
+        'class' => 'select2',
+        'multiple' => 'multiple',
+        'value' => $sotredRestaurantDeliveryAreas
+            ]
+    );
+    ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

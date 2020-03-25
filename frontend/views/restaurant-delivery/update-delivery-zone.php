@@ -12,7 +12,7 @@ $this->params['breadcrumbs'][] = 'Update';
 <div class="restaurant-delivery-update">
 
 
-    <?= $this->render('_form', [
+    <?= $this->render('_form-delivery-zone', [
         'model' => $model,
     ]) ?>
 

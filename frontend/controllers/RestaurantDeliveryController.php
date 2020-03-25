@@ -54,7 +54,9 @@ class RestaurantDeliveryController extends Controller {
             'query' => $query,
         ]);
 
-        foreach ($dataProvider->query as $city) {
+                
+        foreach ($dataProvider->query as $key => $city) {
+            if($city->restaurantDeliveryAreas)
             foreach ($city->restaurantDeliveryAreas as $restaurantDeliveryAreas) {
 
                 if (isset($_POST[$restaurantDeliveryAreas->area->area_id])) {
@@ -63,36 +65,15 @@ class RestaurantDeliveryController extends Controller {
                     $restaurantDeliveryAreas->min_charge = $_POST['RestaurantDelivery']['min_charge'];
                     $restaurantDeliveryAreas->save();
                 }
-         
-                }
+            }
+            
+            else{
+             unset($dataProvider->query[$key]);
+            }
         }
-
-        $restaurant_model = Restaurant::findOne(Yii::$app->user->identity->restaurant_uuid);
-        
-        if (Yii::$app->request->isPost && $restaurant_model->load(Yii::$app->request->post())) {
-
-            if ($restaurant_model->restaurant_delivery_area)
-                $restaurant_model->saveRestaurantDeliveryArea($restaurant_model->restaurant_delivery_area);
-
-                return $this->redirect(['index']);
-        }
-
-        $restaurant_model = Restaurant::findOne(Yii::$app->user->identity->restaurant_uuid);
-        
-        if (Yii::$app->request->isPost && $restaurant_model->load(Yii::$app->request->post())) {
-
-            if ($restaurant_model->restaurant_delivery_area)
-                $restaurant_model->saveRestaurantDeliveryArea($restaurant_model->restaurant_delivery_area);
-
-                return $this->redirect(['index']);
-        }
-
-        return $this->render('index', [
-                    'dataProvider' => $dataProvider,
-                    'restaurant_model' => $restaurant_model
-        ]);
     }
 
+    
     /**
      * Displays a single RestaurantDelivery model.
      * @param string $restaurant_uuid
@@ -103,6 +84,45 @@ class RestaurantDeliveryController extends Controller {
     public function actionView($restaurant_uuid, $area_id) {
         return $this->render('view', [
                     'model' => $this->findModel($restaurant_uuid, $area_id),
+        ]);
+    }
+    
+        /**
+     * Creates a new RestaurantDelivery model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreate()
+    {
+        $model = new RestaurantDelivery();
+
+        if ($model->load(Yii::$app->request->post())) {
+            return $this->redirect(['view', 'restaurant_uuid' => $model->restaurant_uuid, 'area_id' => $model->area_id]);
+        }
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * Updates an existing RestaurantDelivery model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param string $restaurant_uuid
+     * @param integer $area_id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionUpdate($restaurant_uuid, $area_id)
+    {
+        $model = $this->findModel($restaurant_uuid, $area_id);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'restaurant_uuid' => $model->restaurant_uuid, 'area_id' => $model->area_id]);
+        }
+
+        return $this->render('update', [
+            'model' => $model,
         ]);
     }
 
@@ -122,7 +142,7 @@ class RestaurantDeliveryController extends Controller {
             return $this->redirect(['index']);
         }
 
-        return $this->render('update', [
+        return $this->render('update-delivery-zone', [
                     'model' => $model,
         ]);
     }

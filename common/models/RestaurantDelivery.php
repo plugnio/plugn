@@ -56,6 +56,22 @@ class RestaurantDelivery extends \yii\db\ActiveRecord
             'min_charge' => 'Min Charge',
         ];
     }
+    
+    
+    /**
+     * save restaurant delivery areas
+     */
+    public function saveRestaurantDeliveryArea($delivery_areas) {
+
+        RestaurantDelivery::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
+
+        foreach ($delivery_areas as $area_id) {
+            $delivery_area = new RestaurantDelivery();
+            $delivery_area->area_id = $area_id;
+            $delivery_area->restaurant_uuid = $this->restaurant_uuid;
+            $delivery_area->save();
+        }
+    }
 
     /**
      * Gets query for [[Area]].
