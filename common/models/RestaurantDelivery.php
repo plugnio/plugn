@@ -19,6 +19,7 @@ use Yii;
  */
 class RestaurantDelivery extends \yii\db\ActiveRecord {
 
+    public $restaurant_delivery_area_array;
     /**
      * {@inheritdoc}
      */
@@ -32,6 +33,7 @@ class RestaurantDelivery extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['restaurant_uuid', 'area_id'], 'required'],
+            [['restaurant_delivery_area_array'], 'safe'],
             [['area_id', 'delivery_time'], 'integer', 'min' => 0],
             [['delivery_fee', 'min_charge'], 'number', 'min' => 0],
             [['restaurant_uuid'], 'string', 'max' => 60],
@@ -73,8 +75,9 @@ class RestaurantDelivery extends \yii\db\ActiveRecord {
             $delivery_area = new RestaurantDelivery();
             $delivery_area->area_id = $area_id;
             $delivery_area->restaurant_uuid = $this->restaurant_uuid;
-            $delivery_area->save();
+            return $delivery_area->save();
         }
+        return true;
     }
 
     /**

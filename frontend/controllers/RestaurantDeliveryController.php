@@ -54,75 +54,64 @@ class RestaurantDeliveryController extends Controller {
             'query' => $query,
         ]);
 
-                
         foreach ($dataProvider->query as $key => $city) {
-            if($city->restaurantDeliveryAreas)
-            foreach ($city->restaurantDeliveryAreas as $restaurantDeliveryAreas) {
+            if ($city->restaurantDeliveryAreas)
+                foreach ($city->restaurantDeliveryAreas as $restaurantDeliveryAreas) {
 
-                if (isset($_POST[$restaurantDeliveryAreas->area->area_id])) {
-                    $restaurantDeliveryAreas->delivery_fee = $_POST['RestaurantDelivery']['delivery_fee'];
-                    $restaurantDeliveryAreas->delivery_time = $_POST['RestaurantDelivery']['delivery_time'];
-                    $restaurantDeliveryAreas->min_charge = $_POST['RestaurantDelivery']['min_charge'];
-                    $restaurantDeliveryAreas->save();
-                }
-            }
-            
-            else{
-             unset($dataProvider->query[$key]);
+                    if (isset($_POST[$restaurantDeliveryAreas->area->area_id])) {
+                        $restaurantDeliveryAreas->delivery_fee = $_POST['RestaurantDelivery']['delivery_fee'];
+                        $restaurantDeliveryAreas->delivery_time = $_POST['RestaurantDelivery']['delivery_time'];
+                        $restaurantDeliveryAreas->min_charge = $_POST['RestaurantDelivery']['min_charge'];
+                        $restaurantDeliveryAreas->save();
+                    }
+                } else {
+                unset($dataProvider->query[$key]);
             }
         }
     }
 
-    
     /**
-     * Displays a single RestaurantDelivery model.
-     * @param string $restaurant_uuid
-     * @param integer $area_id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($restaurant_uuid, $area_id) {
-        return $this->render('view', [
-                    'model' => $this->findModel($restaurant_uuid, $area_id),
-        ]);
-    }
-    
-        /**
      * Creates a new RestaurantDelivery model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
+     * If creation is successful, the browser will be redirected to the 'index' page.
      * @return mixed
      */
-    public function actionCreate()
-    {
+    public function actionCreate() {
         $model = new RestaurantDelivery();
+        $model->restaurant_uuid = Yii::$app->user->identity->restaurant_uuid ;
 
         if ($model->load(Yii::$app->request->post())) {
-            return $this->redirect(['view', 'restaurant_uuid' => $model->restaurant_uuid, 'area_id' => $model->area_id]);
-        }
 
+            if ($model->restaurant_delivery_area_array)
+                $model->saveRestaurantDeliveryArea($model->restaurant_delivery_area_array);
+
+            return $this->render(['index']);
+        }
         return $this->render('create', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
     /**
      * Updates an existing RestaurantDelivery model.
-     * If update is successful, the browser will be redirected to the 'view' page.
+     * If update is successful, the browser will be redirected to the 'index' page.
      * @param string $restaurant_uuid
      * @param integer $area_id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($restaurant_uuid, $area_id)
-    {
-        $model = $this->findModel($restaurant_uuid, $area_id);
+    public function actionUpdate() {
+        $model = RestaurantDelivery::findOne(['restaurant_uuid' => Yii::$app->user->identity->restaurant_uuid]);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'restaurant_uuid' => $model->restaurant_uuid, 'area_id' => $model->area_id]);
+        if ($model->load(Yii::$app->request->post())) {
+
+            if ($model->restaurant_delivery_area_array)
+                $model->saveRestaurantDeliveryArea($model->restaurant_delivery_area_array);
+
+            return $this->render(['index']);
         }
-
+        
         return $this->render('update', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
