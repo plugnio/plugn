@@ -18,38 +18,38 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
         <?php if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_OPEN) { ?>
-            <?=
-            Html::a('Open', ['promote-to-open', 'id' => Yii::$app->user->identity->restaurant_uuid], [
-                'class' => 'btn btn-success',
-                'data' => [
-                    'confirm' => 'Are you sure you want to change restaurant status to open?',
-                    'method' => 'post',
-                ],
-            ])
+            <?php
+//            Html::a('Open', ['promote-to-open', 'id' => Yii::$app->user->identity->restaurant_uuid], [
+//                'class' => 'btn btn-success',
+//                'data' => [
+//                    'confirm' => 'Are you sure you want to change restaurant status to open?',
+//                    'method' => 'post',
+//                ],
+//            ])
             ?>
         <?php } ?>
 
         <?php if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_BUSY) { ?>
-            <?=
-            Html::a('Busy', ['promote-to-busy', 'id' => Yii::$app->user->identity->restaurant_uuid], [
-                'class' => 'btn btn-warning',
-                'data' => [
-                    'confirm' => 'Are you sure you want to change restaurant status to busy?',
-                    'method' => 'post',
-                ],
-            ])
+            <?php
+//            Html::a('Busy', ['promote-to-busy', 'id' => Yii::$app->user->identity->restaurant_uuid], [
+//                'class' => 'btn btn-warning',
+//                'data' => [
+//                    'confirm' => 'Are you sure you want to change restaurant status to busy?',
+//                    'method' => 'post',
+//                ],
+//            ]);
             ?>
         <?php } ?>
 
         <?php if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_CLOSED) { ?>
-            <?=
-            Html::a('Close', ['promote-to-close', 'id' => Yii::$app->user->identity->restaurant_uuid], [
-                'class' => 'btn btn-danger',
-                'data' => [
-                    'confirm' => 'Are you sure you want to promote this project to close?',
-                    'method' => 'post',
-                ],
-            ])
+            <?php
+//            Html::a('Close', ['promote-to-close', 'id' => Yii::$app->user->identity->restaurant_uuid], [
+//                'class' => 'btn btn-danger',
+//                'data' => [
+//                    'confirm' => 'Are you sure you want to promote this project to close?',
+//                    'method' => 'post',
+//                ],
+//            ])
             ?>
         <?php } ?>
 

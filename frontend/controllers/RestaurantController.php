@@ -83,50 +83,6 @@ class RestaurantController extends Controller {
         ]);
     }
 
-    /**
-     * Change restaurant status to become open
-     * @param integer $id => restaurant_uuid
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionPromoteToOpen($id) {
-        $model = $this->findModel($id);
-        $model->promoteToOpenRestaurant();
-
-        return $this->render('view', [
-                    'model' => $this->findModel($id),
-        ]);
-    }
-
-    /**
-     * Change restaurant status to become busy
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionPromoteToBusy($id) {
-        $model = $this->findModel($id);
-        $model->promoteToBusyRestaurant();
-
-        return $this->render('view', [
-                    'model' => $this->findModel($id),
-        ]);
-    }
-
-    /**
-     * Change restaurant status to become close
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionPromoteToClose($id) {
-        $model = $this->findModel($id);
-        $model->promoteToCloseRestaurant();
-
-        return $this->render('view', [
-                    'model' => $this->findModel($id),
-        ]);
-    }
 
     /**
      * Finds the Restaurant model based on its primary key value.
