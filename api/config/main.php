@@ -94,6 +94,7 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'POST <id>' => 'place-an-order',
+                        'GET <id>' => 'order-look-up',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS <id>' => 'options',

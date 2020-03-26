@@ -58,113 +58,145 @@ class OrderController extends Controller {
      */
     public function actionPlaceAnOrder($id) {
 
-        $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $id])->one();
-        
-        if ($restaurant_model && $restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) {
-
-            $order = new Order();
-
-            $order->restaurant_uuid = $id;
-
-            //Save Customer Info
-            $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
-            $order->customer_phone_number = strval(Yii::$app->request->getBodyParam("phone_number"));
-            $order->customer_email = Yii::$app->request->getBodyParam("email"); //optional
-            //payment method
-            $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
-
-            //save Customer address
-            $order->area_id = Yii::$app->request->getBodyParam("area_id");
-            $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
-            $order->block = Yii::$app->request->getBodyParam("block");
-            $order->street = Yii::$app->request->getBodyParam("street");
-            $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
-            $order->house_number = Yii::$app->request->getBodyParam("house_number");
-            $order->special_directions = Yii::$app->request->getBodyParam("special_directions"); //optional
-            $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
-            $order->restaurant_branch_id = Yii::$app->request->getBodyParam("restaurant_branch_id");
+        $restaurant_model = Restaurant::findOne($id);
 
 
-            $response = [];
+        if ($restaurant_model) {
 
-            if ($order->save()) {
-
-                $items = Yii::$app->request->getBodyParam("items");
+            if ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) {
 
 
-                if ($items) {
+                $order = new Order();
 
-                    foreach ($items as $item) {
+                $order->restaurant_uuid = $id;
 
-                        //Save items to the above order
-                        $orderItem = new OrderItem;
+                //Save Customer Info
+                $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
+                $order->customer_phone_number = strval(Yii::$app->request->getBodyParam("phone_number"));
+                $order->customer_email = Yii::$app->request->getBodyParam("email"); //optional
+                //payment method
+                $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
 
-                        $orderItem->order_uuid = $order->order_uuid;
-                        $orderItem->item_uuid = $item["item_uuid"];
-                        $orderItem->qty = (int) $item["qty"];
+                //save Customer address
+                $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
+
+                //if the order mode = 1 => Delivery
+                if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
+                    $order->area_id = Yii::$app->request->getBodyParam("area_id");
+                    $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
+                    $order->block = Yii::$app->request->getBodyParam("block");
+                    $order->street = Yii::$app->request->getBodyParam("street");
+                    $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
+                    $order->house_number = Yii::$app->request->getBodyParam("house_number");
+                    $order->special_directions = Yii::$app->request->getBodyParam("special_directions"); //optional
+                } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
+                    $order->restaurant_branch_id = Yii::$app->request->getBodyParam("restaurant_branch_id");
+                }
 
 
-                        //optional field
-                        if (array_key_exists("customer_instruction", $item) && $item["customer_instruction"] != null)
-                            $orderItem->customer_instruction = $item["customer_instruction"];
+                $response = [];
 
-                        if ($orderItem->save()) {
+                if ($order->save()) {
 
-                            if (array_key_exists('extraOptions', $item)) {
+                    $items = Yii::$app->request->getBodyParam("items");
 
 
-                                $extraOptionsArray = $item['extraOptions'];
+                    if ($items) {
+
+                        foreach ($items as $item) {
+
+                            //Save items to the above order
+                            $orderItem = new OrderItem;
+
+                            $orderItem->order_uuid = $order->order_uuid;
+                            $orderItem->item_uuid = $item["item_uuid"];
+                            $orderItem->qty = (int) $item["qty"];
 
 
-                                if (isset($extraOptionsArray) && count($extraOptionsArray) > 0) {
+                            //optional field
+                            if (array_key_exists("customer_instruction", $item) && $item["customer_instruction"] != null)
+                                $orderItem->customer_instruction = $item["customer_instruction"];
 
-                                    foreach ($extraOptionsArray as $key => $extraOption) {
+                            if ($orderItem->save()) {
 
-                                        $orderItemExtraOption = new OrderItemExtraOption;
-                                        $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
-                                        $orderItemExtraOption->extra_option_id = $extraOption['extra_option_id'];
+                                if (array_key_exists('extraOptions', $item)) {
 
-                                        if (!$orderItemExtraOption->save()) {
 
-                                            $response = [
-                                                'operation' => 'error',
-                                                'message' => $orderItemExtraOption->errors,
-                                            ];
+                                    $extraOptionsArray = $item['extraOptions'];
+
+
+                                    if (isset($extraOptionsArray) && count($extraOptionsArray) > 0) {
+
+                                        foreach ($extraOptionsArray as $key => $extraOption) {
+
+                                            $orderItemExtraOption = new OrderItemExtraOption;
+                                            $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
+                                            $orderItemExtraOption->extra_option_id = $extraOption['extra_option_id'];
+
+                                            if (!$orderItemExtraOption->save()) {
+
+                                                $response = [
+                                                    'operation' => 'error',
+                                                    'message' => $orderItemExtraOption->errors,
+                                                ];
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        } else {
+                            } else {
 
-                            $response = [
-                                'operation' => 'error',
-                                'message' => $orderItem->getErrors()
-                            ];
+                                $response = [
+                                    'operation' => 'error',
+                                    'message' => $orderItem->getErrors()
+                                ];
+                            }
                         }
+                    } else {
+                        $response = [
+                            'operation' => 'error',
+                            'message' => 'Item Uuid is invalid.'
+                        ];
                     }
                 } else {
                     $response = [
                         'operation' => 'error',
-                        'message' => 'Item Uuid is invalid.'
+                        'message' => $order->getErrors(),
                     ];
                 }
-            } else {
+
+                if ($response == null) {
+
+                    $order->updateOrderTotalPrice();
+
+                    if ($order->customer_email) {
+                        \Yii::$app->mailer->compose([
+                                    'html' => 'order-confirmation-html',
+                                    'text' => 'order-confirmation-text'
+                                        ], [
+                                    'order' => $order
+                                ])
+                                ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+                                ->setTo($order->customer_email)
+                                ->setSubject('Your order from ' . $order->restaurant->name)
+                                ->send();
+                    }
+
+                    $response = [
+                        'operation' => 'success',
+                        'order_uuid' => $order->order_uuid,
+                        'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
+                        'message' => 'Order created successfully',
+                    ];
+                }
+
+
+                if ($response['operation'] == 'error') {
+                    Order::deleteAll(['order_uuid' => $order->order_uuid]);
+                }
+            } else if ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_CLOSE) {
                 $response = [
                     'operation' => 'error',
-                    'message' => $order->getErrors(),
-                ];
-            }
-
-
-            if ($response == null) {
-
-                $order->updateOrderTotalPrice();
-
-                $response = [
-                    'operation' => 'success',
-                    'order_uuid' => $order->order_uuid,
-                    'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
-                    'message' => 'Order created successfully'
+                    'message' => 'Restaurant is close',
                 ];
             }
         } else {
@@ -174,12 +206,27 @@ class OrderController extends Controller {
             ];
         }
 
-        
-        if ($response['operation'] == 'error'){
-           Order::deleteAll(['order_uuid' => $order->order_uuid]);
-        }
 
         return $response;
+    }
+
+    /**
+     * Get order status
+     */
+    public function actionOrderLookUp($id) {
+        $model = Order::findOne($id);
+
+        if (!$model) {
+            return [
+                'operation' => 'error',
+                'message' => 'Please insert a valid Order Code'
+            ];
+        }
+
+        return [
+            'operation' => 'success',
+            'body' => $model
+        ];
     }
 
 }

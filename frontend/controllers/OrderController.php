@@ -60,7 +60,7 @@ class OrderController extends Controller {
         $order_model->order_status = $status;
         $order_model->save(false);
 
-        return $this->redirect(['view', 'id' => $order_model->order_id]);
+        return $this->redirect(['view', 'id' => $order_model->order_uuid]);
     }
 
     /**

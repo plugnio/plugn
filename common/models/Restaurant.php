@@ -41,7 +41,7 @@ class Restaurant extends \yii\db\ActiveRecord {
     //Values for `restaurant_status`
     const RESTAURANT_STATUS_OPEN = 1;
     const RESTAURANT_STATUS_BUSY = 2;
-    const RESTAURANT_STATUS_CLOSED = 3;
+    const RESTAURANT_STATUS_CLOSE = 3;
 
     public $restaurant_delivery_area;
     public $restaurant_payments_method;
@@ -63,12 +63,12 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['vendor_id', 'name', 'support_delivery', 'support_pick_up', 'restaurant_payments_method'], 'required'],
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
-            [['vendor_id', 'restaurant_status', 'support_delivery', 'support_pick_up'], 'integer' , 'min'=> 0],
+            [['vendor_id', 'restaurant_status', 'support_delivery', 'support_pick_up'], 'integer', 'min' => 0],
             [['restaurant_created_at', 'restaurant_updated_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
-            [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo','restaurant_api_key'], 'string', 'max' => 255],
+            [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_api_key'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 8, 'max' => 8],
-            [['phone_number'], 'integer' , 'min' => 0],
+            [['phone_number'], 'integer', 'min' => 0],
             [['restaurant_uuid'], 'unique'],
             [['vendor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Vendor::className(), 'targetAttribute' => ['vendor_id' => 'vendor_id']],
         ];
@@ -139,7 +139,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             case self::RESTAURANT_STATUS_BUSY:
                 return "Busy";
                 break;
-            case self::RESTAURANT_STATUS_CLOSED:
+            case self::RESTAURANT_STATUS_CLOSE:
                 return "Closed";
                 break;
         }
@@ -315,7 +315,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      * Promotes current restaurant to close restaurant while disabling rest
      */
     public function promoteToCloseRestaurant() {
-        $this->restaurant_status = Restaurant::RESTAURANT_STATUS_CLOSED;
+        $this->restaurant_status = Restaurant::RESTAURANT_STATUS_CLOSE;
         $this->save(false);
     }
 
@@ -341,6 +341,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             $delivery_area->save();
         }
     }
+
 
     /**
      * Gets query for [[Items]].

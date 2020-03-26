@@ -10,7 +10,7 @@ $this->title = 'My Yii Application';
 <div class="site-index">
 
     <div class="jumbotron">
-        <?php if ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_CLOSED) { ?>
+        <?php if ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_CLOSE) { ?>
             <h1>You're restaurant is closed!</h1>
             <p>
                 <?=

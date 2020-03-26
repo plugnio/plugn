@@ -60,7 +60,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ?>
         <?php } ?>
         
-        <?php if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_CLOSED) { ?>
+        <?php if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_CLOSE) { ?>
             <?=
             Html::a('Close', ['promote-to-close', 'id' => $model->restaurant_uuid], [
                 'class' => 'btn btn-danger',
