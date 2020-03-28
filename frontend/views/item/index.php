@@ -7,6 +7,8 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\ItemSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+
 $this->title = 'Items';
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -23,7 +25,7 @@ $this->registerCss($css);
 
 <div class="page-title"> <i class="icon-custom-left"></i>
     <p>
-        <?= Html::a('Create Item', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Item', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
 
     </p>
 </div>
@@ -53,25 +55,25 @@ $this->registerCss($css);
                 'class' => 'yii\grid\ActionColumn',
                 'template' => ' {view} {update} {delete}',
                 'buttons' => [
-                    'view' => function ($url) {
+                    'view' => function ($url, $model) {
                         return Html::a(
-                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', $url, [
+                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['view','id'=> $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
                                     'title' => 'View',
                                     'data-pjax' => '0',
                                         ]
                         );
                     },
-                    'update' => function ($url) {
+                    'update' => function ($url, $model) {
                         return Html::a(
-                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', $url, [
+                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['update', 'id' => $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
                                     'title' => 'Update',
                                     'data-pjax' => '0',
                                         ]
                         );
                     },
-                    'delete' => function ($url) {
+                    'delete' => function ($url, $model) {
                         return Html::a(
-                                        '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', $url, [
+                                        '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete','id' => $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
                                     'title' => 'Delete',
                                     'data' => [
                                         'confirm' => 'Are you absolutely sure ? You will lose all the information about this item with this action.',

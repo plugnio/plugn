@@ -38,28 +38,14 @@ class OptionController extends Controller {
     }
 
     /**
-     * Lists all Option models.
-     * @return mixed
-     */
-    public function actionIndex() {
-        $searchModel = new OptionSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
-                    'searchModel' => $searchModel,
-                    'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    /**
      * Displays a single Option model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id) {
+    public function actionView($id, $restaurantUuid) {
         
-        $option_model = $this->findModel($id);
+        $option_model = $this->findModel($id, $restaurantUuid);
 
         // extra options
         $itemExtraOptionsDataProvider = new \yii\data\ActiveDataProvider([
@@ -68,7 +54,8 @@ class OptionController extends Controller {
 
         return $this->render('view', [
                     'model' => $option_model,
-                    'itemExtraOptionsDataProvider' => $itemExtraOptionsDataProvider
+                    'itemExtraOptionsDataProvider' => $itemExtraOptionsDataProvider,
+                    'restaurantUuid' => $restaurantUuid
         ]);
     }
 
@@ -77,16 +64,17 @@ class OptionController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($item_uuid) {
+    public function actionCreate($item_uuid, $restaurantUuid) {
         $model = new Option();
         $model->item_uuid = $item_uuid;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->option_id]);
+            return $this->redirect(['view', 'id' => $model->option_id,'restaurantUuid' => $restaurantUuid]);
         }
 
         return $this->render('create', [
                     'model' => $model,
+                    'restaurantUuid' => $restaurantUuid
         ]);
     }
 
@@ -97,15 +85,16 @@ class OptionController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id) {
-        $model = $this->findModel($id);
+    public function actionUpdate($id, $restaurantUuid) {
+        $model = $this->findModel($id, $restaurantUuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->option_id]);
+            return $this->redirect(['view', 'id' => $model->option_id,'restaurantUuid' => $restaurantUuid]);
         }
 
         return $this->render('update', [
                     'model' => $model,
+                    'restaurantUuid' => $restaurantUuid
         ]);
     }
 
@@ -116,14 +105,14 @@ class OptionController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id) {
+    public function actionDelete($id, $restaurantUuid) {
 
-        $model = $this->findModel($id);
+        $model = $this->findModel($id, $restaurantUuid);
         $item_uuid = $model->item_uuid;
 
-        $this->findModel($id)->delete();
+        $model->delete();
 
-        return $this->redirect(['item/view', 'id' => $item_uuid]);
+        return $this->redirect(['item/view', 'id' => $item_uuid,'restaurantUuid' => $restaurantUuid]);
         
     }
 
@@ -134,8 +123,9 @@ class OptionController extends Controller {
      * @return Option the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id) {
+    protected function findModel($id,$restaurantUuid) {
         if (($model = Option::findOne($id)) !== null) {
+            if($model->item->restaurant_uuid == Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid)->restaurant_uuid)
             return $model;
         }
 

@@ -50,8 +50,9 @@ class m200119_141034_create_extra_option_table extends Migration
      */
     public function safeDown()
     {
-         $this->dropForeignKey('fk-extra_option-option_id', 'extra_option');
+        $this->dropForeignKey('fk-extra_option-option_id', 'extra_option');
         $this->dropIndex('idx-extra_option-option_id', 'extra_option');
+        
         $this->dropTable('{{%extra_option}}');
     }
 }

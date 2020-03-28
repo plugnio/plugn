@@ -22,5 +22,8 @@ return [
             'api_key' => '699963168546398',
             'api_secret' => 'SH2PbVsEsRT9Db257Pn9ZDgHGAU'
         ],
+       'ownedAccountManager' => [ //Component for agent to manage Owned Restaurant
+            'class' => 'common\components\OwnedAccountManager',
+        ],
     ],
 ];

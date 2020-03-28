@@ -60,12 +60,12 @@ DashboardAsset::register($this);
                 <!-- Brand Logo -->
 
 
-                <?=
-                Html::a('<img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">'
-                        . '<span class="brand-text font-weight-light">'
-                            . Yii::$app->user->identity->restaurant->name
-                        . '</span>'
-                        , ['site/index'], ['class' => 'brand-link']);
+                <?php
+                //todo
+//                Html::a('<img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">'
+//                        . '<span class="brand-text font-weight-light">'
+//                        . '</span>'
+//                        , ['site/index'], ['class' => 'brand-link']);
                 ?>
 
                 <!-- Sidebar -->
@@ -76,7 +76,7 @@ DashboardAsset::register($this);
                             <img src="img/avatar.jpg" class="img-circle elevation-2" alt="User Image">
                         </div>
                         <div class="info">
-                            <?= Html::a(Yii::$app->user->identity->vendor_name, ['vendor/index']) ?>
+                            <?= Html::a(Yii::$app->user->identity->agent_name, ['agent/index']) ?>
 
                         </div>
                     </div>
@@ -89,7 +89,7 @@ DashboardAsset::register($this);
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'nav-icon fas fa-box']) .
                                         Html::tag('p', '
-                                      Items
+                                        Items
                                       <i class="fas fa-angle-left right"></i>'), [''], ['class' => 'nav-link']
                                 )
                                 ?>
@@ -99,7 +99,7 @@ DashboardAsset::register($this);
                                         <?=
                                         Html::a(
                                                 Html::tag('i', '', ['class' => 'nav-icon fas fa-th']) .
-                                                Html::tag('p', 'Categories'), ['category/index'], ['class' => 'nav-link']
+                                                Html::tag('p', 'Categories'), ['category/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
                                         )
                                         ?>
 
@@ -108,7 +108,7 @@ DashboardAsset::register($this);
                                         <?=
                                         Html::a(
                                                 Html::tag('i', '', ['class' => 'nav-icon fas fa-box']) .
-                                                Html::tag('p', 'All Items'), ['item/index'], ['class' => 'nav-link']
+                                                Html::tag('p', 'All Items'), ['item/index' , 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
                                         )
                                         ?>
 
@@ -119,7 +119,7 @@ DashboardAsset::register($this);
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'nav-icon fas fa-shopping-cart']) .
-                                        Html::tag('p', 'Customer orders'), ['order/index'], ['class' => 'nav-link']
+                                        Html::tag('p', 'Customer orders'), ['order/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
                                 )
                                 ?>
                             </li>
@@ -127,7 +127,7 @@ DashboardAsset::register($this);
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'nav-icon fas fa-user']) .
-                                        Html::tag('p', 'Customers'), ['customer/index'], ['class' => 'nav-link']
+                                        Html::tag('p', 'Customers'), ['customer/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
                                 )
                                 ?>
                             </li>
@@ -145,7 +145,7 @@ DashboardAsset::register($this);
                                         <?=
                                         Html::a(
                                                 Html::tag('i', '', ['class' => 'nav-icon fas fa-store']) .
-                                                Html::tag('p', 'Restaurant Info'), ['restaurant/index'], ['class' => 'nav-link']
+                                                Html::tag('p', 'Restaurant Info'), ['restaurant/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
                                         )
                                         ?>
 
@@ -154,7 +154,7 @@ DashboardAsset::register($this);
                                         <?=
                                         Html::a(
                                                 Html::tag('i', '', ['class' => 'nav-icon fas fa-truck']) .
-                                                Html::tag('p', 'Delivery Zone'), ['restaurant-delivery/index'], ['class' => 'nav-link']
+                                                Html::tag('p', 'Delivery Zone'), ['restaurant-delivery/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
                                         )
                                         ?>
 
@@ -163,7 +163,7 @@ DashboardAsset::register($this);
                                         <?=
                                         Html::a(
                                                 Html::tag('i', '', ['class' => 'nav-icon fas fa-clock']) .
-                                                Html::tag('p', 'Working Hours'), ['working-hours/index'], ['class' => 'nav-link']
+                                                Html::tag('p', 'Working Hours'), ['working-hours/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
                                         )
                                         ?>
 
@@ -172,7 +172,7 @@ DashboardAsset::register($this);
                                         <?=
                                         Html::a(
                                                 Html::tag('i', '', ['class' => 'nav-icon fas fa-store']) .
-                                                Html::tag('p', "Restaurant's Branches"), ['restaurant-branch/index'], ['class' => 'nav-link']
+                                                Html::tag('p', "Restaurant's Branches"), ['restaurant-branch/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
                                         )
                                         ?>
 

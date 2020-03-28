@@ -14,6 +14,7 @@ use Yii;
  * @property float|null $extra_option_price
  *
  * @property Option $option
+ * @property Item $item
  * @property OrderItemExtraOption[] $orderItemExtraOptions 
  */
 class ExtraOption extends \yii\db\ActiveRecord {
@@ -57,6 +58,15 @@ class ExtraOption extends \yii\db\ActiveRecord {
      */
     public function getOption() {
         return $this->hasOne(Option::className(), ['option_id' => 'option_id']);
+    }
+
+    /**
+     * Gets query for [[Item]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItem() {
+        return $this->hasOne(Item::className(), ['item_uuid' => 'item_uuid'])->via('option');
     }
 
     /**

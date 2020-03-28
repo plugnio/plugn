@@ -18,7 +18,7 @@ class RestaurantSearch extends Restaurant
     {
         return [
             [['restaurant_uuid', 'name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'phone_number', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
-            [['vendor_id', 'status', 'support_delivery', 'support_pick_up'], 'integer'],
+            [['agent_id', 'status', 'support_delivery', 'support_pick_up'], 'integer'],
         ];
     }
 
@@ -58,7 +58,7 @@ class RestaurantSearch extends Restaurant
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'vendor_id' => $this->vendor_id,
+            'agent_id' => $this->agent_id,
             'status' => $this->status,
             'support_delivery' => $this->support_delivery,
             'support_pick_up' => $this->support_pick_up,

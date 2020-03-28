@@ -11,7 +11,7 @@ use yii\behaviors\AttributeBehavior;
  * This is the model class for table "restaurant".
  *
  * @property string $restaurant_uuid
- * @property int $vendor_id
+ * @property int $agent_id
  * @property string $name
  * @property string|null $name_ar
  * @property string|null $tagline
@@ -26,15 +26,18 @@ use yii\behaviors\AttributeBehavior;
  * @property string|null $restaurant_created_at
  * @property string|null $restaurant_updated_at
  *
+ * @property AgentAssignment[] $agentAssignments
+ * @property Agent[] $agents
+ * @property Agent $agent
  * @property Item[] $items
  * @property RestaurantDelivery[] $restaurantDeliveryAreas
  * @property RestaurantBranch[] $restaurantBranches
  * @property Area[] $areas
  * @property RestaurantPaymentMethod[] $restaurantPaymentMethods
  * @property PaymentMethod[] $paymentMethods
- * @property Vendor[] $vendors 
- * @property WorkingHours[] $workingHours 
- * @property WorkingDay[] $workingDays 
+ * @property Agent[] $agents 
+ * @property WorkingHours[] $workingHours
+ * @property WorkingDay[] $workingDays
  */
 class Restaurant extends \yii\db\ActiveRecord {
 
@@ -60,17 +63,17 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['vendor_id', 'name', 'support_delivery', 'support_pick_up', 'restaurant_payments_method'], 'required'],
+            [['name', 'support_delivery', 'support_pick_up', 'restaurant_payments_method'], 'required'],
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
-            [['vendor_id', 'restaurant_status', 'support_delivery', 'support_pick_up'], 'integer', 'min' => 0],
+            [['agent_id', 'restaurant_status', 'support_delivery', 'support_pick_up'], 'integer', 'min' => 0],
             [['restaurant_created_at', 'restaurant_updated_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_api_key'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 8, 'max' => 8],
             [['phone_number'], 'integer', 'min' => 0],
             [['restaurant_uuid'], 'unique'],
-            [['vendor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Vendor::className(), 'targetAttribute' => ['vendor_id' => 'vendor_id']],
+            [['agent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Agent::className(), 'targetAttribute' => ['agent_id' => 'agent_id']],
         ];
     }
 
@@ -80,7 +83,7 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function attributeLabels() {
         return [
             'restaurant_uuid' => 'Restaurant Uuid',
-            'vendor_id' => 'Vendor ID',
+            'agent_id' => 'Agent ID',
             'name' => 'Name',
             'name_ar' => 'Name Ar',
             'tagline' => 'Tagline',
@@ -227,7 +230,7 @@ class Restaurant extends \yii\db\ActiveRecord {
 
         if ($this->logo) {
             $restaurantName = str_replace(' ', '', $this->name);
-            $url = 'https://res.cloudinary.com/vendor/image/upload/v1579525808/restaurants/'
+            $url = 'https://res.cloudinary.com/agent/image/upload/v1579525808/restaurants/'
                     . $restaurantName . '/logo/'
                     . $this->logo;
             $photo_url = $url;
@@ -245,7 +248,7 @@ class Restaurant extends \yii\db\ActiveRecord {
 
         if ($this->thumbnail_image) {
             $restaurantName = str_replace(' ', '', $this->name);
-            $url = 'https://res.cloudinary.com/vendor/image/upload/v1579525808/restaurants/'
+            $url = 'https://res.cloudinary.com/agent/image/upload/v1579525808/restaurants/'
                     . $restaurantName . '/thumbnail-image/'
                     . $this->thumbnail_image;
             $photo_url = $url;
@@ -353,14 +356,32 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
-     * Gets query for [[Vendor]].
-     *
+     * Get Agent Assignment Records
      * @return \yii\db\ActiveQuery
      */
-    public function getVendor() {
-        return $this->hasOne(Vendor::className(), ['vendor_id' => 'vendor_id']);
+    public function getAgentAssignments()
+    {
+        return $this->hasMany(AgentAssignment::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    /**
+     * Get Agents assigned to this Restaurant
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAgents()
+    {
+        return $this->hasMany(Agent::className(), ['agent_id' => 'agent_id'])
+                    ->via('agentAssignments');
+    }
+
+    /**
+     * The Agent owning this account
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAgent()
+    {
+        return $this->hasOne(Agent::className(), ['agent_id' => 'agent_id']);
+    }
     /**
      * Gets query for [[RestaurantDeliveryAreas]].
      *
@@ -407,18 +428,18 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
-     * Gets query for [[WorkingHours]]. 
-     * 
-     * @return \yii\db\ActiveQuery 
+     * Gets query for [[WorkingHours]].
+     *
+     * @return \yii\db\ActiveQuery
      */
     public function getWorkingHours() {
         return $this->hasMany(WorkingHours::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
-     * Gets query for [[WorkingDays]]. 
-     * 
-     * @return \yii\db\ActiveQuery 
+     * Gets query for [[WorkingDays]].
+     *
+     * @return \yii\db\ActiveQuery
      */
     public function getWorkingDays() {
         return $this->hasMany(WorkingDay::className(), ['working_day_id' => 'working_day_id'])->viaTable('working_hours', ['restaurant_uuid' => 'restaurant_uuid']);

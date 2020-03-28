@@ -126,13 +126,6 @@ class Item extends \yii\db\ActiveRecord {
        $this->save(false);
     }
 
-    public function beforeSave($insert) {
-
-        if ($insert)
-            $this->restaurant_uuid = Yii::$app->user->identity->restaurant_uuid;
-
-        return parent::beforeSave($insert);
-    }
 
     /**
      * @param type $insert
@@ -198,7 +191,7 @@ class Item extends \yii\db\ActiveRecord {
 
         if ($this->item_image) {
             $restaurantName = str_replace(' ', '', $this->restaurant->name);
-            $url = 'https://res.cloudinary.com/vendor/image/upload/v1579555687/restaurants/'
+            $url = 'https://res.cloudinary.com/plugn/image/upload/v1579555687/restaurants/'
                     . $restaurantName . '/items/'
                     . $this->item_image;
             $photo_url = $url;
@@ -226,7 +219,7 @@ class Item extends \yii\db\ActiveRecord {
     }
 
     /**
-     * 
+     *
      * @return boolean
      */
     public function beforeDelete() {
@@ -278,9 +271,9 @@ class Item extends \yii\db\ActiveRecord {
     }
 
     /**
-     * Gets query for [[OrderItems]]. 
-     * 
-     * @return \yii\db\ActiveQuery 
+     * Gets query for [[OrderItems]].
+     *
+     * @return \yii\db\ActiveQuery
      */
     public function getOrderItems() {
         return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid']);

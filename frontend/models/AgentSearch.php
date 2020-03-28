@@ -4,12 +4,12 @@ namespace frontend\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\Vendor;
+use common\models\Agent;
 
 /**
- * VendorSearch represents the model behind the search form of `common\models\Vendor`.
+ * AgentSearch represents the model behind the search form of `common\models\Agent`.
  */
-class VendorSearch extends Vendor
+class AgentSearch extends Agent
 {
     /**
      * {@inheritdoc}
@@ -17,8 +17,8 @@ class VendorSearch extends Vendor
     public function rules()
     {
         return [
-            [['vendor_id', 'vendor_status'], 'integer'],
-            [['restaurant_uuid', 'vendor_name', 'vendor_email', 'vendor_auth_key', 'vendor_password_hash', 'vendor_password_reset_token', 'vendor_created_at', 'vendor_updated_at'], 'safe'],
+            [['agent_id', 'agent_status'], 'integer'],
+            [['restaurant_uuid', 'agent_name', 'agent_email', 'agent_auth_key', 'agent_password_hash', 'agent_password_reset_token', 'agent_created_at', 'agent_updated_at'], 'safe'],
         ];
     }
 
@@ -40,7 +40,7 @@ class VendorSearch extends Vendor
      */
     public function search($params)
     {
-        $query = Vendor::find();
+        $query = Agent::find();
 
         // add conditions that should always apply here
 
@@ -58,18 +58,18 @@ class VendorSearch extends Vendor
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'vendor_id' => $this->vendor_id,
-            'vendor_status' => $this->vendor_status,
-            'vendor_created_at' => $this->vendor_created_at,
-            'vendor_updated_at' => $this->vendor_updated_at,
+            'agent_id' => $this->agent_id,
+            'agent_status' => $this->agent_status,
+            'agent_created_at' => $this->agent_created_at,
+            'agent_updated_at' => $this->agent_updated_at,
         ]);
 
         $query->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
-            ->andFilterWhere(['like', 'vendor_name', $this->vendor_name])
-            ->andFilterWhere(['like', 'vendor_email', $this->vendor_email])
-            ->andFilterWhere(['like', 'vendor_auth_key', $this->vendor_auth_key])
-            ->andFilterWhere(['like', 'vendor_password_hash', $this->vendor_password_hash])
-            ->andFilterWhere(['like', 'vendor_password_reset_token', $this->vendor_password_reset_token]);
+            ->andFilterWhere(['like', 'agent_name', $this->agent_name])
+            ->andFilterWhere(['like', 'agent_email', $this->agent_email])
+            ->andFilterWhere(['like', 'agent_auth_key', $this->agent_auth_key])
+            ->andFilterWhere(['like', 'agent_password_hash', $this->agent_password_hash])
+            ->andFilterWhere(['like', 'agent_password_reset_token', $this->agent_password_reset_token]);
 
         return $dataProvider;
     }

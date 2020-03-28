@@ -40,13 +40,17 @@ class ItemController extends Controller {
      * Lists all Item models.
      * @return mixed
      */
-    public function actionIndex() {
-        $searchModel = new ItemSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+    public function actionIndex($restaurantUuid) {
+        
+        $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
 
+        $searchModel = new ItemSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
+        
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
+                    'restaurant_model' => $restaurant_model
         ]);
     }
 
@@ -56,9 +60,9 @@ class ItemController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id) {
+    public function actionView($id, $restaurantUuid) {
 
-        $item_model = $this->findModel($id);
+        $item_model = $this->findModel($id, $restaurantUuid);
 
         // Item options
         $itemOptionsDataProvider = new \yii\data\ActiveDataProvider([
@@ -66,8 +70,9 @@ class ItemController extends Controller {
         ]);
 
         return $this->render('view', [
-                    'model' => $this->findModel($id),
+                    'model' => $this->findModel($id, $restaurantUuid),
                     'itemOptionsDataProvider' => $itemOptionsDataProvider,
+                    'restaurantUuid' => $restaurantUuid
         ]);
     }
 
@@ -76,9 +81,13 @@ class ItemController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate() {
+    public function actionCreate($restaurantUuid) {
+        
+        $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
         $model = new Item();
-
+        
+        $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
+        
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
 
             if ($model->save()) {
@@ -91,12 +100,13 @@ class ItemController extends Controller {
                 if ($model->items_category)
                     $model->saveItemsCategory($model->items_category);
 
-                return $this->redirect(['view', 'id' => $model->item_uuid]);
+                return $this->redirect(['view', 'id' => $model->item_uuid, 'restaurantUuid' => $restaurantUuid]);
             }
         }
         
         return $this->render('create', [
                     'model' => $model,
+                    'restaurantUuid' => $restaurant_model->restaurant_uuid
         ]);
     }
 
@@ -107,9 +117,9 @@ class ItemController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id) {
+    public function actionUpdate($id, $restaurantUuid) {
         
-        $model = $this->findModel($id);
+        $model = $this->findModel($id, $restaurantUuid);
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
 
@@ -123,12 +133,13 @@ class ItemController extends Controller {
                 if ($model->items_category)
                     $model->saveItemsCategory($model->items_category);
 
-                return $this->redirect(['view', 'id' => $model->item_uuid]);
+                return $this->redirect(['view', 'id' => $model->item_uuid, 'restaurantUuid' => $restaurantUuid]);
             }
         }
 
         return $this->render('update', [
                     'model' => $model,
+                    'restaurantUuid' => $restaurantUuid
         ]);
     }
 
@@ -139,10 +150,10 @@ class ItemController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id) {
-        $this->findModel($id)->delete();
+    public function actionDelete($id, $restaurantUuid) {
+        $this->findModel($id, $restaurantUuid)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['index','restaurantUuid' => $restaurantUuid]);
     }
 
     /**
@@ -152,8 +163,8 @@ class ItemController extends Controller {
      * @return Item the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id) {
-        if (($model = Item::findOne($id)) !== null) {
+    protected function findModel($id , $restaurantUuid) {
+        if (($model = Item::find()->where(['item_uuid' => $id, 'restaurant_uuid' => Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
             return $model;
         }
 

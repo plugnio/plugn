@@ -2,13 +2,13 @@
 
 echo "Starting generation of fixtures for all configured templates"
 
-./yii fixture/generate vendor  --interactive=0 --count=1
+./yii fixture/generate agent  --interactive=0 --count=1
 
 wait
 
-./yii fixture/load Vendor --interactive=0
+./yii fixture/load Agent --interactive=0
 
-wait 
+wait
 
 ./yii fixture/generate restaurant  --interactive=0 --count=1
 
@@ -16,7 +16,7 @@ wait
 
 ./yii fixture/load Restaurant --interactive=0
 
-wait 
+wait
 
 ./yii fixture/generate payment_method  --interactive=0 --count=2
 
@@ -24,7 +24,7 @@ wait
 
 ./yii fixture/load PaymentMethod --interactive=0
 
-wait 
+wait
 
 ./yii fixture/generate restaurant_payment_method  --interactive=0 --count=2
 
@@ -32,7 +32,7 @@ wait
 
 ./yii fixture/load RestaurantPaymentMethod --interactive=0
 
-wait 
+wait
 
 ./yii fixture/generate restaurant_delivery  --interactive=0 --count=10
 
@@ -40,7 +40,7 @@ wait
 
 ./yii fixture/load RestaurantDelivery --interactive=0
 
-wait 
+wait
 
 ./yii fixture/generate category --interactive=0 --count=5
 
@@ -48,7 +48,7 @@ wait
 
 ./yii fixture/load Category --interactive=0
 
-wait 
+wait
 
 ./yii fixture/generate item --interactive=0 --count=30
 
@@ -56,7 +56,7 @@ wait
 
 ./yii fixture/load Item --interactive=0
 
-wait 
+wait
 
 ./yii fixture/generate option --interactive=0 --count=50
 
@@ -64,7 +64,7 @@ wait
 
 ./yii fixture/load Option --interactive=0
 
-wait 
+wait
 
 ./yii fixture/generate extra_option --interactive=0 --count=80
 
@@ -72,7 +72,7 @@ wait
 
 ./yii fixture/load ExtraOption --interactive=0
 
-wait 
+wait
 
 ./yii fixture/generate category_item --interactive=0 --count=30
 
@@ -80,7 +80,7 @@ wait
 
 ./yii fixture/load CategoryItem --interactive=0
 
-wait 
+wait
 
 ./yii fixture/generate customer --interactive=0 --count=1
 
@@ -96,7 +96,7 @@ wait
 #
 #./yii fixture/load Order --interactive=0
 #
-#wait 
+#wait
 #
 #./yii fixture/generate order_item --interactive=0 --count=5
 #
@@ -104,7 +104,7 @@ wait
 #
 #./yii fixture/load OrderItem --interactive=0
 #
-#wait 
+#wait
 #
 #./yii fixture/generate order_item_extra_option --interactive=0 --count=5
 #

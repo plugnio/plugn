@@ -8,8 +8,10 @@ use common\models\Order;
 /* @var $this yii\web\View */
 /* @var $model common\models\Order */
 
+$this->params['restaurant_uuid'] = $model->restaurant_uuid;
+
 $this->title = 'Order #' . $model->order_uuid;
-$this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index', 'restaurantUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>

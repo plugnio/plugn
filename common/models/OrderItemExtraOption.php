@@ -15,6 +15,8 @@ use Yii;
  * @property float $extra_option_price
  *
  * @property ExtraOption $extraOption
+ * @property Restaurant $restaurant
+ * @property Order $order
  * @property OrderItem $orderItem
  */
 class OrderItemExtraOption extends \yii\db\ActiveRecord {
@@ -108,6 +110,15 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
      */
     public function getOrder() {
         return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid'])->via('orderItem');
+    }
+    
+    /**
+     * Gets query for [[Order]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurant() {
+        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('order');
     }
 
     /**

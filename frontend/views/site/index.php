@@ -5,29 +5,33 @@ use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 
+$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+
 $this->title = 'My Yii Application';
 ?>
 <div class="site-index">
 
+    <!-- Todo -->
     <div class="jumbotron">
         <?php if ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_CLOSE) { ?>
-            <h1>You're restaurant is closed!</h1>
+            <h3>You're restaurant is closed!</h3>
             <p>
                 <?=
-                    Html::a('Open', ['promote-to-open', 'id' => $restaurant_model->restaurant_uuid],
-                            ['class' => 'btn btn-success']);
+                Html::a('Open', ['promote-to-open', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']);
                 ?>
             </p>
-        <?php } else if ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) {
+            <?php
+        } else if ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) {
             ?>
-            <h1>You're restaurant is open!</h1>
+            <h3>You're restaurant is open!</h3>
             <p>
                 <?=
-                    Html::a('Close', ['promote-to-close', 'id' => $restaurant_model->restaurant_uuid], 
-                            ['class' => 'btn btn-danger']);
+                Html::a('Close', ['promote-to-close', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-danger']);
                 ?>
             </p>
-        <?php } ?>
+                <?php
+            }
+            ?>
 
     </div>
 

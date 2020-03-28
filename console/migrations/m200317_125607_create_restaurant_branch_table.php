@@ -71,6 +71,14 @@ class m200317_125607_create_restaurant_branch_table extends Migration
      */
     public function safeDown()
     {
+        $this->dropForeignKey('fk-order-restaurant_branch_id', 'order');
+        $this->dropIndex('idx-order-restaurant_branch_id', 'order');
+        
+        $this->dropColumn('order', 'restaurant_branch_id');
+        
+        $this->dropForeignKey('fk-restaurant_branch-restaurant_uuid', 'restaurant_branch');
+        $this->dropIndex('idx-restaurant_branch-restaurant_uuid', 'restaurant_branch');
+        
         $this->dropTable('{{%restaurant_branch}}');
     }
 }

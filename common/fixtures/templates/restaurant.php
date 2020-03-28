@@ -2,11 +2,11 @@
 
 $index1 = $index % 5;//faker->unique()->numberBetween(0, 50);
 
-$vendor = Yii::$app->db->createCommand('SELECT * from  vendor')->queryOne();
+$agent = Yii::$app->db->createCommand('SELECT * from  agent')->queryOne();
 
 return [
     'restaurant_uuid' => 'rest_fdb95572-1b66-36be-93d4-9853a5e50a60',
-    'vendor_id' => $vendor['vendor_id'],
+    'agent_id' => $agent['agent_id'],
     'name' => 'Lavina',
     'name_ar' => $faker->firstName,
     'tagline' => $faker->sentence(4, true),  // generate a sentence with 7 words,

@@ -45,7 +45,9 @@ class OrderItemController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($id) {
+    public function actionCreate($id, $restaurantUuid) {
+
+        $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
 
         if (Order::find()->where(['order_uuid' => $id])->exists()) {
 
@@ -53,12 +55,12 @@ class OrderItemController extends Controller {
             $model->order_uuid = $id;
 
             //Get restaurant's items to retrieve it on create-form page
-            $itemQuery = Item::find()->where(['restaurant_uuid' => Yii::$app->user->identity->restaurant_uuid])->asArray()->all();
+            $itemQuery = Item::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->asArray()->all();
             $restaurantsItems = ArrayHelper::map($itemQuery, 'item_uuid', 'item_name');
 
 
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                return $this->redirect(['order/update', 'id' => $model->order_uuid]);
+                return $this->redirect(['order/update', 'id' => $model->order_uuid, 'restaurantUuid' => $restaurantUuid]);
             }
 
             return $this->render('create', [
@@ -76,10 +78,10 @@ class OrderItemController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id) {
+    public function actionView($id, $restaurantUuid) {
 
-        $model = $this->findModel($id);
-        
+        $model = $this->findModel($id, $restaurantUuid);
+
         // Item extra optn
         $orderItemsExtraOpiton = new \yii\data\ActiveDataProvider([
             'query' => $model->getOrderItemExtraOptions()
@@ -99,13 +101,13 @@ class OrderItemController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id) {
-        $model = $this->findModel($id);
+    public function actionUpdate($id, $restaurantUuid) {
+        $model = $this->findModel($id, $restaurantUuid);
 
         $order_model = Order::findOne($model->order_uuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->order_item_id]);
+            return $this->redirect(['view', 'id' => $model->order_item_id, 'restaurantUuid' => $restaurantUuid]);
         }
 
         return $this->render('update', [
@@ -120,13 +122,13 @@ class OrderItemController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id) {
-        $order_item_model = $this->findModel($id);
+    public function actionDelete($id, $restaurantUuid) {
+        $order_item_model = $this->findModel($id, $restaurantUuid);
         $order_uuid = $order_item_model->order_uuid;
 
         $order_item_model->delete();
 
-        return $this->redirect(['order/update', 'id' => $order_uuid]);
+        return $this->redirect(['order/update', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid]);
     }
 
     /**
@@ -136,9 +138,10 @@ class OrderItemController extends Controller {
      * @return OrderItem the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id) {
+    protected function findModel($id, $restaurantUuid) {
         if (($model = OrderItem::findOne($id)) !== null) {
-            return $model;
+            if ($model->restaurant->restaurant_uuid == Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid)->restaurant_uuid)
+                return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');

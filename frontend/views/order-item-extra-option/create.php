@@ -5,6 +5,8 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\OrderItemExtraOptions */
 
+$this->params['restaurant_uuid'] = $model->restaurant->restaurant_uuid;
+
 $this->title = 'Create Order Item Extra Options';
 $this->params['breadcrumbs'][] = ['label' => $model->orderItem->item_name , 'url' => ['order-item/view' , 'id' => $model->order_item_id]];
 $this->params['breadcrumbs'][] = $this->title;

@@ -51,7 +51,7 @@ class PaymentMethodController extends Controller {
     }
 
     /**
-     * return a list of payments method that restaurant's owner added on vendor dashboard
+     * return a list of payments method that restaurant's owner added on agent dashboard
      */
     public function actionListAllRestaurantsPaymentMethod($id) {
 

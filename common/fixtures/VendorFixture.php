@@ -3,7 +3,7 @@ namespace common\fixtures;
 
 use yii\test\ActiveFixture;
 
-class VendorFixture extends ActiveFixture
+class AgentFixture extends ActiveFixture
 {
-    public $modelClass = 'common\models\Vendor';
+    public $modelClass = 'common\models\Agent';
 }

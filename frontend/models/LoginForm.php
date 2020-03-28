@@ -4,7 +4,7 @@ namespace frontend\models;
 
 use Yii;
 use yii\base\Model;
-use common\models\Vendor;
+use common\models\Agent;
 
 /**
  * Login form
@@ -13,18 +13,22 @@ class LoginForm extends Model {
 
     public $email;
     public $password;
+    public $restaurantUuid;
+    public $ownedRestaurant;
     public $rememberMe = true;
-    private $_vendor = false;
+    private $_agent = false;
 
     /**
      * @inheritdoc
      */
     public function rules() {
         return [
-            // email and password are both required
-            [['email', 'password'], 'required'],
+            // email , password and restaurantUuid are both required
+            [['email', 'password', 'restaurantUuid'], 'required'],
             // email must be an email
             ['email', 'email'],
+            // restaurantUuid must be a string
+            [['restaurantUuid'], 'string', 'max' => 60],
             // rememberMe must be a boolean value
             ['rememberMe', 'boolean'],
             // password is validated by validatePassword()
@@ -41,39 +45,41 @@ class LoginForm extends Model {
      */
     public function validatePassword($attribute, $params) {
         if (!$this->hasErrors()) {
-            $vendor = $this->getVendor();
-            if (!$vendor || !$vendor->validatePassword($this->password)) {
+            $agent = $this->getAgent();
+            if (!$agent || !$agent->validatePassword($this->password)) {
                 $this->addError($attribute, 'Incorrect email or password.');
             }
         }
     }
 
     /**
-     * Logs in a vendor using the provided email and password.
+     * Logs in a agent using the provided email and password.
      *
-     * @return boolean whether the vendor is logged in successfully
+     * @return boolean whether the agent is logged in successfully
      */
     public function login() {
         if ($this->validate()) {
-            $loggedInVendor = $this->getVendor();
-            if ($loggedInVendor->restaurant_uuid != NULL)
-                return Yii::$app->user->login($loggedInVendor, $this->rememberMe ? 3600 * 24 * 30 : 0);
+            $loggedInAgent = $this->getAgent();
+            if ($loggedInAgent != NULL) {
+                Yii::$app->user->login($loggedInAgent, $this->rememberMe ? 3600 * 24 * 30 : 0);
+                return Yii::$app->ownedAccountManager->getOwnedAccount($this->restaurantUuid);
+            }
         }
 
         return false;
     }
 
     /**
-     * Finds vendor by [[username]]
+     * Finds agent by [[username]]
      *
-     * @return Vendor|null
+     * @return Agent|null
      */
-    public function getVendor() {
-        if ($this->_vendor === false) {
-            $this->_vendor = Vendor::findByEmail($this->email);
+    public function getAgent() {
+        if ($this->_agent === false) {
+            $this->_agent = Agent::findByEmail($this->email);
         }
 
-        return $this->_vendor;
+        return $this->_agent;
     }
 
 }

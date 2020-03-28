@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\time\TimePicker;
-use common\models\Vendor;
+use common\models\Agent;
 use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
 use common\models\Area;
@@ -78,7 +78,7 @@ $(function () {
     $('#operatingToTimepicker').datetimepicker({
        format:'H:mm'
     })
-    
+
     //Bootstrap Duallistbox
     $('.duallistbox').bootstrapDualListbox()
 
@@ -96,7 +96,7 @@ $(function () {
     });
 
   })
-  
+
     $(document).ready(function () {
       bsCustomFileInput.init();
     });
@@ -117,7 +117,7 @@ $this->registerJs($js);
 <div class="restaurant-form">
 
     <?php
-    
+
     $paymentMethodQuery = PaymentMethod::find()->asArray()->all();
     $paymentMethodArray = ArrayHelper::map($paymentMethodQuery, 'payment_method_id', 'payment_method_name');
 

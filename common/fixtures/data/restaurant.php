@@ -3,7 +3,7 @@
 return [
     'restaurant0' => [
         'restaurant_uuid' => 'rest_fdb95572-1b66-36be-93d4-9853a5e50a60',
-        'vendor_id' => '469',
+        'agent_id' => '469',
         'name' => 'Lavina',
         'name_ar' => 'Dewayne',
         'tagline' => 'Nemo qui modi aperiam ducimus.',

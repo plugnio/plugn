@@ -62,18 +62,8 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $totalVendors = 1;
-        $totalVerified = 1;
-//        $totalVendors = \common\models\Investor::find()->count();
-//        $totalVerified = \common\models\Investor::find()->where([
-//            'investor_email_verified' => \common\models\Investor::EMAIL_VERIFIED
-//        ])->count();
 
-        return $this->render('index', [
-            'totalVendors' => $totalVendors,
-            'verifiedVendors' => $totalVerified,
-//            'unverifiedInvestors' => $totalVendors - $totalVerified,
-        ]);
+        return $this->render('index');
     }
 
     /**

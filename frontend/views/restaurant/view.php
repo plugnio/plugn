@@ -59,7 +59,7 @@ $this->params['breadcrumbs'][] = $this->title;
     DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'vendor.vendor_name',
+            'agent.agent_name',
             'name',
             'name_ar',
             'tagline',

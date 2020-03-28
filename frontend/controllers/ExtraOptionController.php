@@ -38,30 +38,16 @@ class ExtraOptionController extends Controller
     }
 
     /**
-     * Lists all ExtraOption models.
-     * @return mixed
-     */
-    public function actionIndex()
-    {
-        $searchModel = new ExtraOptionSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    /**
      * Displays a single ExtraOption model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
+    public function actionView($id ,$restaurantUuid)
     {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $this->findModel($id,$restaurantUuid),
+            'restaurantUuid' => $restaurantUuid
         ]);
     }
 
@@ -70,17 +56,18 @@ class ExtraOptionController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($option_id)
+    public function actionCreate($option_id, $restaurantUuid)
     {
         $model = new ExtraOption();
         $model->option_id = $option_id;
         
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->extra_option_id]);
+            return $this->redirect(['view', 'id' => $model->extra_option_id,'restaurantUuid' => $restaurantUuid]);
         }
 
         return $this->render('create', [
             'model' => $model,
+            'restaurantUuid' => $restaurantUuid
         ]);
     }
 
@@ -91,16 +78,17 @@ class ExtraOptionController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
+    public function actionUpdate($id, $restaurantUuid)
     {
-        $model = $this->findModel($id);
+        $model = $this->findModel($id, $restaurantUuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->extra_option_id]);
+            return $this->redirect(['view', 'id' => $model->extra_option_id, 'restaurantUuid' => $restaurantUuid]);
         }
 
         return $this->render('update', [
             'model' => $model,
+            'restaurantUuid' => $restaurantUuid
         ]);
     }
 
@@ -111,14 +99,14 @@ class ExtraOptionController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    public function actionDelete($id, $restaurantUuid)
     {
-        $model = $this->findModel($id);
+        $model = $this->findModel($id, $restaurantUuid);
         $option_id = $model->option_id;
 
-        $this->findModel($id)->delete();
+        $model->delete();
 
-        return $this->redirect(['option/view', 'id' => $option_id]);
+        return $this->redirect(['option/view', 'id' => $option_id, 'restaurantUuid' => $restaurantUuid]);
     }
 
     /**
@@ -128,9 +116,10 @@ class ExtraOptionController extends Controller
      * @return ExtraOption the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel($id, $restaurantUuid)
     {
         if (($model = ExtraOption::findOne($id)) !== null) {
+           if($model->item->restaurant_uuid == Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid)->restaurant_uuid)
             return $model;
         }
 

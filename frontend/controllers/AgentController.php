@@ -3,16 +3,16 @@
 namespace frontend\controllers;
 
 use Yii;
-use common\models\Vendor;
-use frontend\models\VendorSearch;
+use common\models\Agent;
+use frontend\models\AgentSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * VendorController implements the CRUD actions for Vendor model.
+ * AgentController implements the CRUD actions for Agent model.
  */
-class VendorController extends Controller
+class AgentController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -30,7 +30,7 @@ class VendorController extends Controller
     }
 
     /**
-     * Displays a single Vendor model.
+     * Displays a single Agent model.
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
@@ -42,7 +42,7 @@ class VendorController extends Controller
     }
 
     /**
-     * Updates an existing Vendor model.
+     * Updates an existing Agent model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -51,13 +51,13 @@ class VendorController extends Controller
     {
         $model = $this->findModel();
 
-        if ($model->load(Yii::$app->request->post())) { 
-            
-            $vendor_model = $this->findModel();
-            $vendor_model->vendor_name = $model->vendor_name;
-            $vendor_model->vendor_email = $model->vendor_email;
-            if($vendor_model->save()){
-                
+        if ($model->load(Yii::$app->request->post())) {
+
+            $agent_model = $this->findModel();
+            $agent_model->agent_name = $model->agent_name;
+            $agent_model->agent_email = $model->agent_email;
+            if($agent_model->save()){
+
                return $this->redirect(['index']);
             }
         }
@@ -68,14 +68,14 @@ class VendorController extends Controller
     }
 
     /**
-     * Finds the Vendor model based on its primary key value.
+     * Finds the Agent model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @return Vendor the loaded model
+     * @return Agent the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel()
     {
-        if (($model = Vendor::findOne(Yii::$app->user->identity->vendor_id)) !== null) {
+        if (($model = Agent::findOne(Yii::$app->user->identity->agent_id)) !== null) {
             return $model;
         }
 

@@ -4,20 +4,20 @@ namespace backend\controllers;
 
 use Yii;
 use yii\filters\AccessControl;
-use common\models\Vendor;
+use common\models\Agent;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use common\models\VendorSearch;
+use common\models\AgentSearch;
 
 /**
- * VendorController implements the CRUD actions for Vendor model.
+ * AgentController implements the CRUD actions for Agent model.
  */
-class VendorController extends Controller
+class AgentController extends Controller
 {
     public $enableCsrfValidation = false;
-    
+
     /**
      * {@inheritdoc}
      */
@@ -42,22 +42,22 @@ class VendorController extends Controller
     }
 
     /**
-     * Lists all Vendor models.
+     * Lists all Agent models.
      * @return mixed
      */
     public function actionIndex()
     {
-	$searchModel = new VendorSearch();
+	$searchModel = new AgentSearch();
        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-       
+
        return $this->render('index', [
-           'searchModel' => $searchModel, 
+           'searchModel' => $searchModel,
            'dataProvider' => $dataProvider,
        ]);
     }
 
     /**
-     * Displays a single Vendor model.
+     * Displays a single Agent model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -70,17 +70,17 @@ class VendorController extends Controller
     }
 
     /**
-     * Creates a new Vendor model.
+     * Creates a new Agent model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Vendor();
-       
+        $model = new Agent();
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            
-            return $this->redirect(['view', 'id' => $model->vendor_id]);
+
+            return $this->redirect(['view', 'id' => $model->agent_id]);
         }
 
         return $this->render('create', [
@@ -89,7 +89,7 @@ class VendorController extends Controller
     }
 
     /**
-     * Updates an existing Vendor model.
+     * Updates an existing Agent model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -102,7 +102,7 @@ class VendorController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
 
-            return $this->redirect(['view', 'id' => $model->vendor_id]);
+            return $this->redirect(['view', 'id' => $model->agent_id]);
         }
 
         return $this->render('update', [
@@ -111,7 +111,7 @@ class VendorController extends Controller
     }
 
     /**
-     * Deletes an existing Vendor model.
+     * Deletes an existing Agent model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -125,15 +125,15 @@ class VendorController extends Controller
     }
 
     /**
-     * Finds the Vendor model based on its primary key value.
+     * Finds the Agent model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Vendor the loaded model
+     * @return Agent the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Vendor::findOne($id)) !== null) {
+        if (($model = Agent::findOne($id)) !== null) {
             return $model;
         }
 

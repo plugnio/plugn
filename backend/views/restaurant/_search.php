@@ -17,7 +17,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'restaurant_uuid') ?>
 
-    <?= $form->field($model, 'vendor_id') ?>
+    <?= $form->field($model, 'agent_id') ?>
 
     <?= $form->field($model, 'name') ?>
 

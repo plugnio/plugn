@@ -43,13 +43,13 @@ AppAsset::register($this);
     } else {
         $menuItems = [
             ['label' => 'Admins', 'url' => ['/admin/index']],
-            ['label' => 'Vendors', 'url' => ['/vendor/index']],
+            ['label' => 'Agents', 'url' => ['/agent/index']],
             ['label' => 'Cities', 'url' => ['/city/index']],
             ['label' => 'Areas', 'url' => ['/area/index']],
             ['label' => 'Payments Method', 'url' => ['/payment-method/index']],
             ['label' => 'Restaurants', 'url' => ['/restaurant/index']]
         ];
-        
+
         $menuItems[] = '<li>'
             . Html::beginForm(['/site/logout'], 'post')
             . Html::submitButton(

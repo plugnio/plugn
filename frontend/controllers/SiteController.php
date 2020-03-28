@@ -57,6 +57,7 @@ class SiteController extends Controller {
         return [
             'error' => [
                 'class' => 'yii\web\ErrorAction',
+                'layout' => 'login',
             ],
             'captcha' => [
                 'class' => 'yii\captcha\CaptchaAction',
@@ -70,11 +71,10 @@ class SiteController extends Controller {
      *
      * @return mixed
      */
-    public function actionIndex() {
-        $restaurant_model = $this->findModel(Yii::$app->user->identity->restaurant_uuid);
-
+    public function actionIndex($id) {
+        
         return $this->render('index', [
-                    'restaurant_model' => $restaurant_model,
+            'restaurant_model' => Yii::$app->ownedAccountManager->getOwnedAccount($id)
         ]);
     }
 
@@ -89,7 +89,7 @@ class SiteController extends Controller {
         $model = $this->findModel($id);
         $model->promoteToOpenRestaurant();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['index' , 'id' => $id]);
     }
 
     /**
@@ -102,7 +102,7 @@ class SiteController extends Controller {
         $model = $this->findModel($id);
         $model->promoteToBusyRestaurant();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['index' , 'id' => $id]);
     }
 
     /**
@@ -115,7 +115,7 @@ class SiteController extends Controller {
         $model = $this->findModel($id);
         $model->promoteToCloseRestaurant();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['index' , 'id' => $id]);
     }
 
     /**
@@ -130,7 +130,8 @@ class SiteController extends Controller {
         }
 
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+        if ($model->load(Yii::$app->request->post()) && $ownedRestaurant = $model->login()) {
+            return $this->redirect(['site/index', 'id' => $ownedRestaurant->restaurant_uuid]);
             return $this->goBack();
         } else {
             $model->password = '';
@@ -238,7 +239,7 @@ class SiteController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id) {
-        if (($model = Restaurant::findOne($id)) !== null && $id == Yii::$app->user->identity->restaurant_uuid) {
+        if (($model = Yii::$app->ownedAccountManager->getOwnedAccount($id))) {
             return $model;
         }
 

@@ -7,8 +7,10 @@ use yii\grid\GridView;
 /* @var $this yii\web\View */
 /* @var $model common\models\Item */
 
+$this->params['restaurant_uuid'] = $restaurantUuid;
+
 $this->title = $model->item_name;
-$this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['index', 'restaurantUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -16,9 +18,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="item-view">
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->item_uuid], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Update', ['update', 'id' => $model->item_uuid, 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-primary']) ?>
         <?=
-        Html::a('Delete', ['delete', 'id' => $model->item_uuid], [
+        Html::a('Delete', ['delete', 'id' => $model->item_uuid, 'restaurantUuid' => $restaurantUuid], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
@@ -78,7 +80,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h2>Options</h2>
 
     <p>
-        <?= Html::a('Create Option', ['option/create', 'item_uuid' => $model->item_uuid], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Option', ['option/create', 'item_uuid' => $model->item_uuid, 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']) ?>
     </p>
 
 
@@ -92,28 +94,27 @@ $this->params['breadcrumbs'][] = $this->title;
                 'max_qty',
                 [
                     'class' => 'yii\grid\ActionColumn',
-                    'controller' => 'option',
                     'template' => ' {view} {update} {delete}',
                     'buttons' => [
-                        'view' => function ($url) {
+                        'view' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', $url, [
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['option/view','id' => $model->option_id, 'restaurantUuid'=> $model->item->restaurant_uuid ], [
                                         'title' => 'View',
                                         'data-pjax' => '0',
                                             ]
                             );
                         },
-                        'update' => function ($url) {
+                        'update' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', $url, [
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['option/update','id' => $model->option_id, 'restaurantUuid'=> $model->item->restaurant_uuid ], [
                                         'title' => 'Update',
                                         'data-pjax' => '0',
                                             ]
                             );
                         },
-                        'delete' => function ($url) {
+                        'delete' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', $url, [
+                                            '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['option/delete','id' => $model->option_id, 'restaurantUuid'=> $model->item->restaurant_uuid ], [
                                         'title' => 'Delete',
                                         'data' => [
                                             'confirm' => 'Are you absolutely sure ? You will lose all the information about this option with this action.',

@@ -8,22 +8,23 @@ use yii\db\Expression;
 use yii\web\IdentityInterface;
 
 /**
- * This is the model class for table "vendor".
+ * This is the model class for table "agent".
  *
- * @property int $vendor_id
- * @property string|null $restaurant_uuid
- * @property string $vendor_name
- * @property string $vendor_email
- * @property string $vendor_auth_key
- * @property string $vendor_password_hash
- * @property string|null $vendor_password_reset_token
- * @property int $vendor_status
- * @property string $vendor_created_at
- * @property string $vendor_updated_at
+ * @property int $agent_id
+ * @property string $agent_name
+ * @property string $agent_email
+ * @property string $agent_auth_key
+ * @property string $agent_password_hash
+ * @property string|null $agent_password_reset_token
+ * @property int $agent_status
+ * @property string $agent_created_at
+ * @property string $agent_updated_at
  *
- * @property Restaurant $restaurant
+ * @property Restaurant[] $restaurantsManaged
+ * @property Restaurant[] $restaurants
+ * @property AgentAssignment[] $agentAssignments
  */
-class Vendor extends \yii\db\ActiveRecord implements IdentityInterface {
+class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
 
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
@@ -38,7 +39,7 @@ class Vendor extends \yii\db\ActiveRecord implements IdentityInterface {
      * {@inheritdoc}
      */
     public static function tableName() {
-        return 'vendor';
+        return 'agent';
     }
 
     /**
@@ -46,17 +47,15 @@ class Vendor extends \yii\db\ActiveRecord implements IdentityInterface {
      */
     public function rules() {
         return [
-            [['vendor_name', 'vendor_email'], 'required'],
-            [['vendor_status'], 'integer'],
-            [['vendor_created_at', 'vendor_updated_at'], 'safe'],
-            [['restaurant_uuid'], 'string', 'max' => 60],
-            [['vendor_name', 'vendor_email', 'vendor_password_hash', 'vendor_password_reset_token'], 'string', 'max' => 255],
-            [['vendor_auth_key'], 'string', 'max' => 32],
-            [['vendor_email'], 'unique'],
+            [['agent_name', 'agent_email'], 'required'],
+            [['agent_status'], 'integer'],
+            [['agent_created_at', 'agent_updated_at'], 'safe'],
+            [['agent_name', 'agent_email', 'agent_password_hash', 'agent_password_reset_token'], 'string', 'max' => 255],
+            [['agent_auth_key'], 'string', 'max' => 32],
+            [['agent_email'], 'unique'],
             [['tempPassword'], 'required', 'on' => 'create'],
             [['tempPassword'], 'safe'],
-            [['vendor_password_reset_token'], 'unique'],
-            [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
+            [['agent_password_reset_token'], 'unique'],
         ];
     }
 
@@ -65,17 +64,16 @@ class Vendor extends \yii\db\ActiveRecord implements IdentityInterface {
      */
     public function attributeLabels() {
         return [
-            'vendor_id' => 'Vendor ID',
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'vendor_name' => 'Vendor Name',
+            'agent_id' => 'Agent ID',
+            'agent_name' => 'Agent Name',
             'tempPassword' => 'Password',
-            'vendor_email' => 'Vendor Email',
-            'vendor_auth_key' => 'Vendor Auth Key',
-            'vendor_password_hash' => 'Vendor Password Hash',
-            'vendor_password_reset_token' => 'Vendor Password Reset Token',
-            'vendor_status' => 'Vendor Status',
-            'vendor_created_at' => 'Vendor Created At',
-            'vendor_updated_at' => 'Vendor Updated At',
+            'agent_email' => 'Agent Email',
+            'agent_auth_key' => 'Agent Auth Key',
+            'agent_password_hash' => 'Agent Password Hash',
+            'agent_password_reset_token' => 'Agent Password Reset Token',
+            'agent_status' => 'Agent Status',
+            'agent_created_at' => 'Agent Created At',
+            'agent_updated_at' => 'Agent Updated At',
         ];
     }
 
@@ -83,8 +81,8 @@ class Vendor extends \yii\db\ActiveRecord implements IdentityInterface {
         return [
             [
                 'class' => TimestampBehavior::className(),
-                'createdAtAttribute' => 'vendor_created_at',
-                'updatedAtAttribute' => 'vendor_updated_at',
+                'createdAtAttribute' => 'agent_created_at',
+                'updatedAtAttribute' => 'agent_updated_at',
                 'value' => new Expression('NOW()'),
             ],
         ];
@@ -96,7 +94,7 @@ class Vendor extends \yii\db\ActiveRecord implements IdentityInterface {
     public function beforeSave($insert) {
         if (parent::beforeSave($insert)) {
 
-            // Generate Auth key if its a new vendor record
+            // Generate Auth key if its a new agent record
             if ($insert) {
                 $this->generateAuthKey();
             }
@@ -115,7 +113,7 @@ class Vendor extends \yii\db\ActiveRecord implements IdentityInterface {
      * @return string
      */
     public function getStatus() {
-        switch ($this->vendor_status) {
+        switch ($this->agent_status) {
             case self::STATUS_ACTIVE:
                 return "Active";
                 break;
@@ -131,7 +129,7 @@ class Vendor extends \yii\db\ActiveRecord implements IdentityInterface {
      * {@inheritdoc}
      */
     public static function findIdentity($id) {
-        return static::findOne(['vendor_id' => $id, 'vendor_status' => self::STATUS_ACTIVE]);
+        return static::findOne(['agent_id' => $id, 'agent_status' => self::STATUS_ACTIVE]);
     }
 
     /**
@@ -148,7 +146,7 @@ class Vendor extends \yii\db\ActiveRecord implements IdentityInterface {
      * @return static|null
      */
     public static function findByEmail($email) {
-        return static::findOne(['vendor_email' => $email, 'vendor_status' => self::STATUS_ACTIVE]);
+        return static::findOne(['agent_email' => $email, 'agent_status' => self::STATUS_ACTIVE]);
     }
 
     /**
@@ -163,8 +161,8 @@ class Vendor extends \yii\db\ActiveRecord implements IdentityInterface {
         }
 
         return static::findOne([
-                    'vendor_password_reset_token' => $token,
-                    'vendor_status' => self::STATUS_ACTIVE,
+                    'agent_password_reset_token' => $token,
+                    'agent_status' => self::STATUS_ACTIVE,
         ]);
     }
 
@@ -195,7 +193,7 @@ class Vendor extends \yii\db\ActiveRecord implements IdentityInterface {
      * {@inheritdoc}
      */
     public function getAuthKey() {
-        return $this->vendor_auth_key;
+        return $this->agent_auth_key;
     }
 
     /**
@@ -212,7 +210,7 @@ class Vendor extends \yii\db\ActiveRecord implements IdentityInterface {
      * @return bool if password provided is valid for current user
      */
     public function validatePassword($password) {
-        return Yii::$app->security->validatePassword($password, $this->vendor_password_hash);
+        return Yii::$app->security->validatePassword($password, $this->agent_password_hash);
     }
 
     /**
@@ -221,37 +219,64 @@ class Vendor extends \yii\db\ActiveRecord implements IdentityInterface {
      * @param string $password
      */
     public function setPassword($password) {
-        $this->vendor_password_hash = Yii::$app->security->generatePasswordHash($password);
+        $this->agent_password_hash = Yii::$app->security->generatePasswordHash($password);
     }
 
     /**
      * Generates "remember me" authentication key
      */
     public function generateAuthKey() {
-        $this->vendor_auth_key = Yii::$app->security->generateRandomString();
+        $this->agent_auth_key = Yii::$app->security->generateRandomString();
     }
 
     /**
      * Generates new password reset token
      */
     public function generatePasswordResetToken() {
-        $this->vendor_password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
+        $this->agent_password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
     }
 
     /**
      * Removes password reset token
      */
     public function removePasswordResetToken() {
-        $this->vendor_password_reset_token = null;
+        $this->agent_password_reset_token = null;
     }
 
     /**
-     * Gets query for [[RestaurantUu]].
-     *
+     * Accounts owned by this agent
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurants()
+    {
+        return $this->hasMany(Restaurant::className(), ['agent_id' => 'agent_id']);
     }
 
+    /**
+     * Get all Restaurant accounts this agent owns
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAccountsOwned()
+    {
+        return $this->hasMany(Restaurant::className(), ['agent_id' => 'agent_id']);
+    }
+
+    /**
+     * Get all RestauranZ accounts this agent is assigned to manage
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAccountsManaged()
+    {
+        return $this->hasMany(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+                ->via('agentAssignments');
+    }
+
+    /**
+     * All assignment records made for this agent
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAgentAssignments()
+    {
+        return $this->hasMany(AgentAssignment::className(), ['agent_id' => 'agent_id']);
+    }
 }

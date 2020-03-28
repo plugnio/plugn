@@ -38,17 +38,21 @@ class CategoryController extends Controller
     }
 
     /**
-     * Lists all Category models.
-     * @return mixed
+     * 
+     * @param type $restaurantUuid 
+     * @return type
      */
-    public function actionIndex()
+    public function actionIndex($restaurantUuid)
     {
-        $searchModel = new CategorySearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
 
+        $searchModel = new CategorySearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
+        
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'restaurant_model' => $restaurant_model
         ]);
     }
 
@@ -58,10 +62,11 @@ class CategoryController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
+    public function actionView($id, $restaurantUuid)
     {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $this->findModel($id,$restaurantUuid),
+            'restaurantUuid' => $restaurantUuid
         ]);
     }
 
@@ -70,17 +75,18 @@ class CategoryController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($restaurantUuid)
     {
         $model = new Category();
-        $model->restaurant_uuid = Yii::$app->user->identity->restaurant_uuid;
+        $model->restaurant_uuid = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid)->restaurant_uuid;
         
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->category_id]);
+            return $this->redirect(['view', 'id' => $model->category_id, 'restaurantUuid' => $restaurantUuid]);
         }
 
         return $this->render('create', [
             'model' => $model,
+            'restaurantUuid' => $restaurantUuid
         ]);
     }
 
@@ -91,16 +97,17 @@ class CategoryController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
+    public function actionUpdate($id, $restaurantUuid)
     {
-        $model = $this->findModel($id);
+        $model = $this->findModel($id, $restaurantUuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->category_id]);
+            return $this->redirect(['view', 'id' => $model->category_id, 'restaurantUuid' => $restaurantUuid]);
         }
 
         return $this->render('update', [
             'model' => $model,
+            'restaurantUuid' => $restaurantUuid
         ]);
     }
 
@@ -111,11 +118,11 @@ class CategoryController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    public function actionDelete($id,$restaurantUuid)
     {
-        $this->findModel($id)->delete();
+        $this->findModel($id,$restaurantUuid)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
     }
 
     /**
@@ -125,9 +132,9 @@ class CategoryController extends Controller
      * @return Category the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel($id, $restaurantUuid)
     {
-        if (($model = Category::findOne($id)) !== null) {
+        if (($model = Category::find()->where(['category_id' => $id, 'restaurant_uuid' => Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
             return $model;
         }
 

@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ])
             ?>
         <?php } ?>
-        
+
         <?php if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_BUSY) { ?>
             <?=
             Html::a('Busy', ['promote-to-busy', 'id' => $model->restaurant_uuid], [
@@ -59,7 +59,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ])
             ?>
         <?php } ?>
-        
+
         <?php if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_CLOSE) { ?>
             <?=
             Html::a('Close', ['promote-to-close', 'id' => $model->restaurant_uuid], [
@@ -79,7 +79,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'restaurant_uuid',
-            'vendor.vendor_name',
+            'agent.agent_name',
             'name',
             'name_ar',
             'tagline',

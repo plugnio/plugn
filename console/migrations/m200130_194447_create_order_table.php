@@ -170,7 +170,50 @@ class m200130_194447_create_order_table extends Migration {
      * {@inheritdoc}
      */
     public function safeDown() {
-        return true;
+        
+        //Drop Order Item extra option table 
+        $this->dropForeignKey('fk-order_item_extra_option-extra_option_id', 'order_item_extra_option');
+        $this->dropIndex('idx-order_item_extra_option-extra_option_id', 'order_item_extra_option');
+    
+        $this->dropForeignKey('fk-order_item_extra_option-order_item_id', 'order_item_extra_option');
+        $this->dropIndex('idx-order_item_extra_option-order_item_id', 'order_item_extra_option');
+    
+        $this->dropTable('order_item_extra_option');
+        
+        
+        //Drop Order Item table 
+        $this->dropForeignKey('fk-order_item-item_uuid', 'order_item');
+        $this->dropIndex('idx-order_item-item_uuid', 'order_item');
+        
+        $this->dropForeignKey('fk-order_item-order_uuid', 'order_item');
+        $this->dropIndex('idx-order_item-order_uuid', 'order_item');
+        
+        
+        $this->dropTable('order_item');
+
+        
+        //Drop Order table 
+        $this->dropForeignKey('fk-order-payment_method_id', 'order');
+        $this->dropIndex('idx-order-payment_method_id', 'order');
+        
+        
+        $this->dropForeignKey('fk-order-restaurant_uuid', 'order');
+        $this->dropIndex('idx-order-restaurant_uuid', 'order');
+        
+        
+        $this->dropForeignKey('fk-order-customer_id', 'order');
+        $this->dropIndex('idx-order-customer_id', 'order');
+        
+        $this->dropForeignKey('fk-order-area_id', 'order');
+        $this->dropIndex('idx-order-area_id', 'order');
+        
+        $this->dropPrimaryKey('PK', 'order');
+        
+        $this->dropTable('order');
+        
+        //Drop Customer table
+        $this->dropTable('customer');
+        
     }
 
 }

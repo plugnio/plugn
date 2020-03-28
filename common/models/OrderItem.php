@@ -16,6 +16,7 @@ use Yii;
  * @property string|null $customer_instruction
  *
  * @property Item $item
+ * @property Restaurant $restaurant
  * @property Order $order
  * @property OrderItemExtraOptions[] $orderItemExtraOptions
  */
@@ -163,6 +164,15 @@ class OrderItem extends \yii\db\ActiveRecord {
         return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid']);
     }
 
+        /**
+     * Gets query for [[Restaurant]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurant() {
+        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('order');
+    }
+    
     /**
      * Gets query for [[OrderItemExtraOptions]].
      *

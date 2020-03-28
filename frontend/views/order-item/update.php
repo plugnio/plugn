@@ -4,6 +4,7 @@ use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\OrderItem */
+$this->params['restaurant_uuid'] = $model->restaurant->restaurant_uuid;
 
 $this->title = 'Update Order Item: ' . $model->item_name;
 $this->params['breadcrumbs'][] = ['label' => 'Order #' . $model->order_uuid, 'url' => ['order/update','id' => $model->order_uuid]];

@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\time\TimePicker;
-use common\models\Vendor;
+use common\models\Agent;
 use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
 use common\models\Area;
@@ -51,8 +51,8 @@ $this->registerJs($js);
 <div class="restaurant-form">
 
     <?php
-    $vendorQuery = Vendor::find()->asArray()->all();
-    $vendorArray = ArrayHelper::map($vendorQuery, 'vendor_id', 'vendor_name');
+    $agentQuery = Agent::find()->asArray()->all();
+    $agentArray = ArrayHelper::map($agentQuery, 'agent_id', 'agent_name');
 
     $areaQuery = Area::find()->asArray()->all();
     $restaurantDeliveryArray = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
@@ -89,13 +89,13 @@ $this->registerJs($js);
     ?>
 
     <?=
-    $form->field($model, 'vendor_id')->widget(Select2::classname(), [
-        'data' => $vendorArray,
-        'options' => ['placeholder' => 'Select a vendor ...'],
+    $form->field($model, 'agent_id')->widget(Select2::classname(), [
+        'data' => $agentArray,
+        'options' => ['placeholder' => 'Select a agent ...'],
         'pluginOptions' => [
             'allowClear' => true
         ],
-    ])->label('Vendor');
+    ])->label('Agent');
     ?>
 
     <?=
@@ -185,8 +185,8 @@ $this->registerJs($js);
     ?>
 
     <?= $form->field($model, 'phone_number')->textInput(['maxlength' => true]) ?>
-    
-    
+
+
     <?= $form->field($model, 'restaurant_api_key')->textInput(['maxlength' => true]) ?>
 
 

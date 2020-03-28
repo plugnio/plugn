@@ -6,7 +6,7 @@ class m130524_201442_init extends Migration
 {
     public function up()
     {
-        
+
         $tableOptions = null;
         if ($this->db->driverName === 'mysql') {
             // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
@@ -41,29 +41,28 @@ class m130524_201442_init extends Migration
           admin_updated_at = "2018-08-21 19:40:58"';
 
         Yii::$app->db->createCommand($sql)->execute();
-           
+
           /**
-         * Create Vendor Table
+         * Create Agent Table
          */
-        $this->createTable('{{%vendor}}', [
-            'vendor_id' => $this->primaryKey(),
-            'restaurant_uuid' => $this->char(60),
-            'vendor_name' => $this->string()->notNull(),
-            'vendor_email' => $this->string()->notNull()->unique(),
-            'vendor_auth_key' => $this->string(32)->notNull(),
-            'vendor_password_hash' => $this->string()->notNull(),
-            'vendor_password_reset_token' => $this->string()->unique(),
-            'vendor_status' => $this->smallInteger()->notNull()->defaultValue(10),
-            'vendor_created_at' => $this->datetime()->notNull(),
-            'vendor_updated_at' => $this->datetime()->notNull(),
+        $this->createTable('{{%agent}}', [
+            'agent_id' => $this->bigPrimaryKey(),
+            'agent_name' => $this->string()->notNull(),
+            'agent_email' => $this->string()->notNull()->unique(),
+            'agent_auth_key' => $this->string(32)->notNull(),
+            'agent_password_hash' => $this->string()->notNull(),
+            'agent_password_reset_token' => $this->string()->unique(),
+            'agent_status' => $this->smallInteger()->notNull()->defaultValue(10),
+            'agent_created_at' => $this->datetime()->notNull(),
+            'agent_updated_at' => $this->datetime()->notNull(),
         ], $tableOptions);
- 
+
     }
 
     public function down()
     {
         $this->dropTable('{{%admin}}');
-        $this->dropTable('{{%vendor}}');
+        $this->dropTable('{{%agent}}');
 
     }
 }

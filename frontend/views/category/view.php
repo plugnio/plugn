@@ -6,6 +6,8 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\Category */
 
+$this->params['restaurant_uuid'] = $restaurantUuid;
+
 $this->title = $model->category_name;
 $this->params['breadcrumbs'][] = ['label' => 'Categories', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -13,9 +15,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="category-view">
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->category_id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Update', ['update', 'id' => $model->category_id, 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-primary']) ?>
         <?=
-        Html::a('Delete', ['delete', 'id' => $model->category_id], [
+        Html::a('Delete', ['delete', 'id' => $model->category_id, 'restaurantUuid' => $restaurantUuid], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
