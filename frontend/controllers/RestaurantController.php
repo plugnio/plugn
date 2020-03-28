@@ -41,11 +41,12 @@ class RestaurantController extends Controller {
      * Lists all Restaurant models.
      * @return mixed
      */
-    public function actionIndex() {
-        $restaurant_id = Yii::$app->user->identity->restaurant_uuid;
+    public function actionIndex($restaurantUuid) {
 
+        $model = $this->findModel($restaurantUuid);
+        
         return $this->render('view', [
-                    'model' => $this->findModel($restaurant_id),
+                    'model' => $model
         ]);
     }
 
@@ -71,18 +72,21 @@ class RestaurantController extends Controller {
 
                 if ($logo)
                     $model->uploadLogo($logo[0]->tempName);
+                
 
-                return $this->render('view', [
-                            'model' => $this->findModel($id),
-                ]);
+                return $this->redirect(['index', 'restaurantUuid' => $id]);
+            }else{
+                die('errr');
             }
+            
+                            die('errr');
+
         }
 
         return $this->render('update', [
                     'model' => $model,
         ]);
     }
-
 
     /**
      * Finds the Restaurant model based on its primary key value.
@@ -92,7 +96,7 @@ class RestaurantController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id) {
-        if (($model = Restaurant::findOne($id)) !== null && $id == Yii::$app->user->identity->restaurant_uuid) {
+        if (($model = Yii::$app->ownedAccountManager->getOwnedAccount($id)) !== null) {
             return $model;
         }
 

@@ -8,17 +8,19 @@ use common\models\Order;
 /* @var $this yii\web\View */
 /* @var $model common\models\Customer */
 
+$this->params['restaurant_uuid'] = $model->restaurant_uuid;
+
 $this->title = $model->customer_name;
-$this->params['breadcrumbs'][] = ['label' => 'Customers', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Customers', 'url' => ['index', 'restaurantUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="customer-view">
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->customer_id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Update', ['update', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
         <?=
-        Html::a('Delete', ['delete', 'id' => $model->customer_id], [
+        Html::a('Delete', ['delete', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
@@ -47,7 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 
-    
+
     <h2>Orders</h2>
     <div class="card">
 
@@ -55,9 +57,16 @@ $this->params['breadcrumbs'][] = $this->title;
         GridView::widget([
             'dataProvider' => $customersOrdersData,
             'columns' => [
-                'area_name',
-                'customer_name',
-                'customer_phone_number',
+                [
+                    'label' => 'Order Type',
+                    "format" => "raw",
+                    "value" => function($model) {
+                        if ($model->order_mode == Order::ORDER_MODE_DELIVERY)
+                            return 'Delivery';
+                        else
+                            return 'Pickup';
+                    }
+                ],
                 [
                     'attribute' => 'order_status',
                     'format' => "raw",
@@ -70,36 +79,20 @@ $this->params['breadcrumbs'][] = $this->title;
                             return '<span class="badge bg-success" >' . $model->orderStatus . '</span>';
                     }
                 ],
+                'delivery_fee:currency',
+                'total_price:currency',
                 [
                     'class' => 'yii\grid\ActionColumn',
                     'template' => ' {view} {update} {delete}',
                     'controller' => 'order',
                     'buttons' => [
-                        'view' => function ($url) {
+                        'view' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', $url, [
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['order/view','id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
                                         'title' => 'View',
                                         'data-pjax' => '0',
                                             ]
                             );
-                        },
-                        'update' => function ($url) {
-                            return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', $url, [
-                                        'title' => 'Update',
-                                        'data-pjax' => '0',
-                                            ]
-                            );
-                        },
-                        'delete' => function ($url) {
-                            return Html::a(
-                                            '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', $url, [
-                                        'title' => 'Delete',
-                                        'data' => [
-                                            'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',
-                                            'method' => 'post',
-                                        ],
-                            ]);
                         },
                     ],
                 ],

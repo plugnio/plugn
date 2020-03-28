@@ -308,6 +308,7 @@ class Order extends \yii\db\ActiveRecord {
 
             if (!$customer_model) {
                 $customer_model = new Customer();
+                $customer_model->restaurant_uuid = $this->restaurant_uuid;
                 $customer_model->customer_name = $this->customer_name;
                 $customer_model->customer_phone_number = $this->customer_phone_number;
                 if ($this->customer_email != null)

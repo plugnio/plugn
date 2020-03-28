@@ -12,6 +12,8 @@ use common\models\RestaurantDelivery;
 /* @var $searchModel frontend\models\RestaurantDeliverySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+$this->params['restaurant_uuid'] = $restaurantUuid;
+
 $this->title = 'Delivery Zones';
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -27,7 +29,7 @@ $(function () {
 
 if ($dataProvider) { ?> 
         <p>
-        <?= Html::a('Edit Delivery Zones', ['update'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Edit Delivery Zones', ['update', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']) ?>
     </p>
     
     <?php 
@@ -43,7 +45,7 @@ if ($dataProvider) { ?>
                         <div class="card-tools">
                             <?php
                             echo Html::a(
-                                    '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['restaurant-delivery/update-delivery-time-for-city', 'city_id' => $city->city_id]
+                                    '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['restaurant-delivery/update-delivery-time-for-city', 'city_id' => $city->city_id, 'restaurantUuid' => $restaurantUuid]
                             );
                             ?>
                             <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
@@ -74,7 +76,7 @@ if ($dataProvider) { ?>
                                     <tr>
                                         <td>  
                                         </td>
-                                        <td>
+                                        <td style="vertical-align: inherit;">
                                             <?= $restaurantDeliveryArea->area->area_name ?></td>
                                         <td>
                                             <?= $form->field($restaurantDeliveryArea, 'delivery_time')->input('number') ?></td>
@@ -91,7 +93,7 @@ if ($dataProvider) { ?>
                                                     </div>
                                                     <div class="col-6">
                                                         <?=
-                                                        Html::a('<i style="font-size: 21px;" class="fas fa-minus-circle"></i>', ['delete', 'area_id' => $restaurantDeliveryArea->area->area_id], ['class' => 'btn btn-danger',
+                                                        Html::a('<i style="font-size: 21px;" class="fas fa-minus-circle"></i>', ['delete', 'area_id' => $restaurantDeliveryArea->area->area_id, 'restaurantUuid' => $restaurantDeliveryArea->restaurant_uuid], ['class' => 'btn btn-danger',
                                                             'data' => [
                                                                 'method' => 'post',
                                                             ]
@@ -123,7 +125,7 @@ if ($dataProvider) { ?>
 } else {
     echo'<div class="card"><div style="padding: 70px 0; text-align: center;">'
     . '     <h4>You currently do not have any places you deliver to</h4>'
-    . Html::a('Setup Delivery Zones', ['create'], ['class' => 'btn btn-success'])
+    . Html::a('Setup Delivery Zones', ['create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success'])
     . '</div></div>';
 }
 ?>

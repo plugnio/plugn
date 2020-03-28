@@ -7,6 +7,8 @@ use common\models\Restaurant;
 /* @var $this yii\web\View */
 /* @var $model common\models\Restaurant */
 
+$this->params['restaurant_uuid'] = $model->restaurant_uuid;
+
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -14,44 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="restaurant-view">
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => Yii::$app->user->identity->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
-
-
-        <?php if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_OPEN) { ?>
-            <?php
-//            Html::a('Open', ['promote-to-open', 'id' => Yii::$app->user->identity->restaurant_uuid], [
-//                'class' => 'btn btn-success',
-//                'data' => [
-//                    'confirm' => 'Are you sure you want to change restaurant status to open?',
-//                    'method' => 'post',
-//                ],
-//            ])
-            ?>
-        <?php } ?>
-
-        <?php if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_BUSY) { ?>
-            <?php
-//            Html::a('Busy', ['promote-to-busy', 'id' => Yii::$app->user->identity->restaurant_uuid], [
-//                'class' => 'btn btn-warning',
-//                'data' => [
-//                    'confirm' => 'Are you sure you want to change restaurant status to busy?',
-//                    'method' => 'post',
-//                ],
-//            ]);
-            ?>
-        <?php } ?>
-
-        <?php if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_CLOSE) { ?>
-            <?php
-//            Html::a('Close', ['promote-to-close', 'id' => Yii::$app->user->identity->restaurant_uuid], [
-//                'class' => 'btn btn-danger',
-//                'data' => [
-//                    'confirm' => 'Are you sure you want to promote this project to close?',
-//                    'method' => 'post',
-//                ],
-//            ])
-            ?>
-        <?php } ?>
+        <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
 
     </p>
 
@@ -59,6 +24,10 @@ $this->params['breadcrumbs'][] = $this->title;
     DetailView::widget([
         'model' => $model,
         'attributes' => [
+            [
+                'label' => 'Owner',
+                'value' => 'agent.agent_name'
+            ],
             'agent.agent_name',
             'name',
             'name_ar',

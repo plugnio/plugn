@@ -20,12 +20,23 @@ class m200130_194447_create_order_table extends Migration {
 
         $this->createTable('{{%customer}}', [
             'customer_id' => $this->bigPrimaryKey(),
+            'restaurant_uuid' => $this->char(60),
             'customer_name' => $this->string()->notNull(),
             'customer_phone_number' => $this->string()->notNull(),
             'customer_email' => $this->string(),
             'customer_created_at' => $this->dateTime()->notNull(),
             'customer_updated_at' => $this->dateTime()->notNull(),
                 ], $tableOptions);
+        
+       // creates index for column `restaurant_uuid`
+        $this->createIndex(
+                'idx-customer-restaurant_uuid', 'customer', 'restaurant_uuid'
+        );
+
+        // add foreign key for table `customer`
+        $this->addForeignKey(
+                'fk-customer-restaurant_uuid', 'customer', 'restaurant_uuid', 'restaurant', 'restaurant_uuid', 'CASCADE'
+        );
 
         $this->createTable('{{%order}}', [
             'order_uuid' => $this->char(40)->notNull(),
@@ -212,6 +223,10 @@ class m200130_194447_create_order_table extends Migration {
         $this->dropTable('order');
         
         //Drop Customer table
+                
+        $this->dropForeignKey('fk-customer-restaurant_uuid', 'customer');
+        $this->dropIndex('idx-customer-restaurant_uuid', 'customer');
+        
         $this->dropTable('customer');
         
     }

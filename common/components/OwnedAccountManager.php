@@ -40,7 +40,7 @@ class OwnedAccountManager extends BaseObject
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT '.Yii::$app->user->identity->agent_id.', COUNT(*), SUM(restaurant_status) FROM restaurant WHERE agent_id='.Yii::$app->user->identity->agent_id,
+            'sql' => 'SELECT '.Yii::$app->user->identity->agent_id.', COUNT(*), SUM(restaurant_status), SUM(restaurant_updated_at) FROM restaurant WHERE agent_id='.Yii::$app->user->identity->agent_id,
             // we SELECT agent_id as well to make sure every cached sql statement is unique to this agent
             // don't want agents viewing the cached content of another agent
             // SUM of user_status is to bust the cache when status changes

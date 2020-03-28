@@ -41,13 +41,17 @@ class WorkingHoursController extends Controller {
      * Lists all WorkingHours models.
      * @return mixed
      */
-    public function actionIndex() {
+    public function actionIndex($restaurantUuid) {
+        
+        $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
+
         $searchModel = new WorkingHoursSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurantUuid);
 
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
+                    'restaurantUuid' => $restaurantUuid
         ]);
     }
 
@@ -56,12 +60,15 @@ class WorkingHoursController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate() {
+    public function actionCreate($restaurantUuid) {
+        
+        $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
+
         $model = new WorkingHours();
-        $model->restaurant_uuid = Yii::$app->user->identity->restaurant_uuid;
+        $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
         }
 
         return $this->render('create', [
@@ -77,11 +84,11 @@ class WorkingHoursController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($working_day_id) {
-        $model = $this->findModel($working_day_id);
+    public function actionUpdate($working_day_id, $restaurantUuid) {
+        $model = $this->findModel($working_day_id, $restaurantUuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
         }
 
         return $this->render('update', [
@@ -97,10 +104,12 @@ class WorkingHoursController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($working_day_id) {
-        $this->findModel($working_day_id)->delete();
+    public function actionDelete($working_day_id, $restaurantUuid) {
+        
+        
+        $this->findModel($working_day_id, $restaurantUuid)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
     }
 
     /**
@@ -111,8 +120,8 @@ class WorkingHoursController extends Controller {
      * @return WorkingHours the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($working_day_id) {
-        if (($model = WorkingHours::findOne(['working_day_id' => $working_day_id, 'restaurant_uuid' => Yii::$app->user->identity->restaurant_uuid])) !== null) {
+    protected function findModel($working_day_id, $restaurantUuid) {
+        if (($model = WorkingHours::findOne(['working_day_id' => $working_day_id, 'restaurant_uuid' => Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid)->restaurant_uuid])) !== null) {
             return $model;
         }
 

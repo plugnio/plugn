@@ -22,14 +22,14 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-              [
+            [
                 'label' => 'Order Type',
                 "format" => "raw",
                 "value" => function($model) {
-                    if( $model->order_mode == Order::ORDER_MODE_DELIVERY)
-                    return 'Delivery';
+                    if ($model->order_mode == Order::ORDER_MODE_DELIVERY)
+                        return 'Delivery';
                     else
-                    return 'Pickup';
+                        return 'Pickup';
                 }
             ],
             'customer_name',
@@ -38,21 +38,22 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'order_status',
                 "format" => "raw",
                 "value" => function($model) {
-                    if($model->order_status == Order::STATUS_SUBMITTED || $model->order_status == Order::STATUS_OUT_FOR_DELIVERY)
-                    return '<span class="badge bg-warning" >' . $model->orderStatus . '</span>';
-                    else if($model->order_status == Order::STATUS_BEING_PREPARED)
-                    return '<span class="badge bg-primary" >' . $model->orderStatus . '</span>';
-                    else if($model->order_status == Order::STATUS_COMPLETE)
-                    return '<span class="badge bg-success" >' . $model->orderStatus . '</span>';
+                    if ($model->order_status == Order::STATUS_SUBMITTED || $model->order_status == Order::STATUS_OUT_FOR_DELIVERY)
+                        return '<span class="badge bg-warning" >' . $model->orderStatus . '</span>';
+                    else if ($model->order_status == Order::STATUS_BEING_PREPARED)
+                        return '<span class="badge bg-primary" >' . $model->orderStatus . '</span>';
+                    else if ($model->order_status == Order::STATUS_COMPLETE)
+                        return '<span class="badge bg-success" >' . $model->orderStatus . '</span>';
                 }
             ],
+            'total_price:currency',
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template' => ' {view} {update} {delete}',
                 'buttons' => [
                     'view' => function ($url, $model) {
                         return Html::a(
-                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['view','id'=>$model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid ], [
+                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
                                     'title' => 'View',
                                     'data-pjax' => '0',
                                         ]
@@ -60,7 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                     'update' => function ($url, $model) {
                         return Html::a(
-                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['update','id'=>$model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid ], [
+                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['update', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
                                     'title' => 'Update',
                                     'data-pjax' => '0',
                                         ]
@@ -68,7 +69,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                     'delete' => function ($url, $model) {
                         return Html::a(
-                                        '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete','id'=>$model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid ], [
+                                        '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
                                     'title' => 'Delete',
                                     'data' => [
                                         'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',

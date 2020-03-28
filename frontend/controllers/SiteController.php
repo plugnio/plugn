@@ -132,7 +132,6 @@ class SiteController extends Controller {
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $ownedRestaurant = $model->login()) {
             return $this->redirect(['site/index', 'id' => $ownedRestaurant->restaurant_uuid]);
-            return $this->goBack();
         } else {
             $model->password = '';
 

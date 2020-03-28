@@ -2,9 +2,10 @@
 
 namespace frontend\models;
 
-use frontend\models\City;
-use common\models\RestaurantDelivery;
 use Yii;
+use frontend\models\City;
+use common\models\Restaurant;
+use common\models\RestaurantDelivery;
 
 /**
  *
@@ -22,6 +23,7 @@ class DeliveryZoneForm extends \yii\db\ActiveRecord {
     public $delivery_fee;
     public $delivery_time;
     public $city_id;
+    public $restaurant_uuid;
     public $min_charge;
     
     /**
@@ -31,6 +33,8 @@ class DeliveryZoneForm extends \yii\db\ActiveRecord {
         return [
             [['delivery_time'], 'integer','min' => 0],
             [['delivery_fee','min_charge'], 'number' ,'min' => 0],
+            [['restaurant_uuid'], 'string', 'max' => 60],
+            [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
             [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::className(), 'targetAttribute' => ['city_id' => 'city_id']],
         ];
     }
@@ -58,7 +62,7 @@ class DeliveryZoneForm extends \yii\db\ActiveRecord {
             return false;
         }
 
-        $restaurantDeliveryAreas = RestaurantDelivery::find()->with('area')->all();
+        $restaurantDeliveryAreas = RestaurantDelivery::find()->with('area')->where(['restaurant_uuid' => $this->restaurant_uuid])->all();
 
         foreach ($restaurantDeliveryAreas as $restaurantDeliveryArea) {
             if ($restaurantDeliveryArea->area->city_id == $this->city_id) {

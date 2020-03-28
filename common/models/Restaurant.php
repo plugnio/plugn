@@ -29,6 +29,7 @@ use yii\behaviors\AttributeBehavior;
  * @property AgentAssignment[] $agentAssignments
  * @property Agent[] $agents
  * @property Agent $agent
+ * @property Order[] $orders
  * @property Item[] $items
  * @property RestaurantDelivery[] $restaurantDeliveryAreas
  * @property RestaurantBranch[] $restaurantBranches
@@ -443,6 +444,26 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getWorkingDays() {
         return $this->hasMany(WorkingDay::className(), ['working_day_id' => 'working_day_id'])->viaTable('working_hours', ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+    
+    /**
+     * Gets query for [[Orders]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrders()
+    {
+        return $this->hasMany(Order::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+    
+    /**
+     * Gets query for [[Customers]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCustomers()
+    {
+        return $this->hasMany(Customer::className(), ['customer_id' => 'customer_id']);
     }
 
 }

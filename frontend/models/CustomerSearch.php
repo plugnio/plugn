@@ -38,9 +38,9 @@ class CustomerSearch extends Customer
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $restaurantUuid)
     {
-        $query = Customer::find();
+        $query = Customer::find()->where(['restaurant_uuid' => $restaurantUuid]);
 
         // add conditions that should always apply here
 

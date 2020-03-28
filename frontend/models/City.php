@@ -24,6 +24,6 @@ class City extends \common\models\City
      */
     public function getRestaurantDeliveryAreas()
     {
-        return $this->hasMany(RestaurantDelivery::className(), ['area_id' => 'area_id'])->via('areas')->with('area')->where(['restaurant_uuid' =>  Yii::$app->user->identity->restaurant_uuid]);
+        return $this->hasMany(RestaurantDelivery::className(), ['area_id' => 'area_id'])->via('areas');
     }
 }

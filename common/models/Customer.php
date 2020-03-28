@@ -9,6 +9,7 @@ use yii\db\Expression;
  * This is the model class for table "customer".
  *
  * @property int $customer_id
+ * @property int $restaurant_uuid
  * @property string $customer_name
  * @property string $customer_phone_number
  * @property string|null $customer_email
@@ -16,6 +17,7 @@ use yii\db\Expression;
  * @property string $customer_updated_at 
  *
  * @property Order[] $orders
+ * @property Restaurant $restaurant
  */
 class Customer extends \yii\db\ActiveRecord {
 
@@ -31,9 +33,13 @@ class Customer extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['customer_name', 'customer_phone_number'], 'required'],
-            [['customer_created_at','customer_updated_at '], 'safe'],
-            [['customer_name', 'customer_phone_number', 'customer_email'], 'string', 'max' => 255],
+            [['customer_name', 'customer_phone_number','restaurant_uuid'], 'required'],
+            [['restaurant_uuid'], 'string', 'max' => 60],
+            [['customer_phone_number'], 'unique'],
+            [['customer_email'], 'unique'],
+            [['customer_phone_number'], 'string', 'min' => 8, 'max' => 8],
+            [['customer_created_at','customer_updated_at'], 'safe'],
+            [['customer_name', 'customer_email'], 'string', 'max' => 255],
         ];
     }
 
@@ -57,6 +63,7 @@ class Customer extends \yii\db\ActiveRecord {
     public function attributeLabels() {
         return [
             'customer_id' => 'Customer ID',
+            'restaurant_uuid' => 'Restaurant UUID',
             'customer_name' => 'Customer Name',
             'customer_phone_number' => 'Customer Phone Number',
             'customer_email' => 'Customer Email',
@@ -72,6 +79,15 @@ class Customer extends \yii\db\ActiveRecord {
      */
     public function getOrders() {
         return $this->hasMany(Order::className(), ['customer_id' => 'customer_id']);
+    }
+    
+    /**
+     * Gets query for [[Orders]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurant() {
+        return $this->hasMany(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
 }

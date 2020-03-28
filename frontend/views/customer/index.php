@@ -7,6 +7,8 @@ use yii\grid\GridView;
 /* @var $searchModel frontend\models\CustomerSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+$this->params['restaurant_uuid'] = $restaurantUuid;
+
 $this->title = 'Customers';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -21,31 +23,30 @@ $this->params['breadcrumbs'][] = $this->title;
             'customer_name',
             'customer_phone_number',
             'customer_email:email',
-            'customer_created_at',
-            'customer_updated_at',
+            'customer_created_at:datetime',
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template' => ' {view} {update} {delete}',
                 'buttons' => [
-                    'view' => function ($url) {
+                    'view' => function ($url, $model) {
                         return Html::a(
-                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', $url, [
+                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['view','id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
                                     'title' => 'View',
                                     'data-pjax' => '0',
                                         ]
                         );
                     },
-                    'update' => function ($url) {
+                    'update' => function ($url, $model) {
                         return Html::a(
-                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', $url, [
+                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['update','id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
                                     'title' => 'Update',
                                     'data-pjax' => '0',
                                         ]
                         );
                     },
-                    'delete' => function ($url) {
+                    'delete' => function ($url, $model) {
                         return Html::a(
-                                        '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', $url, [
+                                        '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete','id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
                                     'title' => 'Delete',
                                     'data' => [
                                         'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',
