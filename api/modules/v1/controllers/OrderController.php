@@ -168,6 +168,7 @@ class OrderController extends Controller {
 
                     $order->updateOrderTotalPrice();
 
+                    //Send to customer: Email for order confirmation 
                     if ($order->customer_email) {
                         \Yii::$app->mailer->compose([
                                     'html' => 'order-confirmation-html',
@@ -181,6 +182,39 @@ class OrderController extends Controller {
                                 ->send();
                     }
 
+//                    foreach ($order->restaurant->getAgents() as $agent) {
+//
+//                        if ($agent->email_notification) {
+//                            //Send to All Agents who managed the restaurant: Send email when a new order is received for them to process
+//                            \Yii::$app->mailer->compose([
+//                                        'html' => 'received-order-html',
+//                                        'text' => 'received-order-text'
+//                                            ], [
+//                                        'order' => $order
+//                                    ])
+//                                    ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+//                                    ->setTo($agent->agent_email)
+//                                    ->setSubject('Order received frpm' . $order->customer_name)
+//                                    ->send();
+//                        }
+//                    }
+
+
+                    if ($order->restaurant->agent->email_notification) {
+                        //Send to owner: Send email when a new order is received for them to process
+                        \Yii::$app->mailer->compose([
+                                    'html' => 'received-order-html',
+                                    'text' => 'received-order-text'
+                                        ], [
+                                    'order' => $order
+                                ])
+                                ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+                                ->setTo($order->restaurant->agent->agent_email)
+                                ->setSubject('Order received from' . $order->customer_name)
+                                ->send();
+                    }
+                    
+                    
                     $response = [
                         'operation' => 'success',
                         'order_uuid' => $order->order_uuid,

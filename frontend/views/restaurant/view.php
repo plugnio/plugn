@@ -19,54 +19,60 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
 
     </p>
+    <div class="card">
+        <div class="card-body">
+            <?=
+            DetailView::widget([
+                'model' => $model,
+                'attributes' => [
+                    [
+                        'label' => 'Owner',
+                        'value' => function ($data) {
+                            return $data->agent->agent_name;
+                        }
+                    ],
+                    'name',
+                    'name_ar',
+                    'tagline',
+                    'tagline_ar',
+                    'status',
+                    [
+                        'attribute' => 'thumbnail_image',
+                        'format' => 'html',
+                        'value' => function ($data) {
+                            return Html::img("https://res.cloudinary.com/plugn/image/upload/restaurants/" . $data->name . "/thumbnail-image/" . $data->thumbnail_image);
+                        },
+                    ],
+                    [
+                        'attribute' => 'logo',
+                        'format' => 'html',
+                        'value' => function ($data) {
+                            return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/" . $data->name . "/logo/" . $data->logo);
+                        },
+                    ],
+                    [
+                        'label' => 'Support Delivery',
+                        'value' => function ($data) {
+                            return $data->support_delivery ? 'Yes' : 'No';
+                        },
+                        'format' => 'raw'
+                    ],
+                    [
+                        'label' => 'Support Pick up',
+                        'value' => function ($data) {
+                            return $data->support_pick_up ? 'Yes' : 'No';
+                        },
+                        'format' => 'raw'
+                    ],
+                    'phone_number',
+                    'restaurant_created_at',
+                    'restaurant_updated_at',
+                ],
+                'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
+            ])
+            ?>
 
-    <?=
-    DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            [
-                'label' => 'Owner',
-                'value' => 'agent.agent_name'
-            ],
-            'agent.agent_name',
-            'name',
-            'name_ar',
-            'tagline',
-            'tagline_ar',
-            'status',
-            [
-                'attribute' => 'thumbnail_image',
-                'format' => 'html',
-                'value' => function ($data) {
-                    return Html::img("https://res.cloudinary.com/plugn/image/upload/restaurants/" . $data->name . "/thumbnail-image/" . $data->thumbnail_image);
-                },
-            ],
-            [
-                'attribute' => 'logo',
-                'format' => 'html',
-                'value' => function ($data) {
-                    return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/" . $data->name . "/logo/" . $data->logo);
-                },
-            ],
-            [
-                'label' => 'Support Delivery',
-                'value' => function ($data) {
-                    return $data->support_delivery ? 'Yes' : 'No';
-                },
-                'format' => 'raw'
-            ],
-            [
-                'label' => 'Support Pick up',
-                'value' => function ($data) {
-                    return $data->support_pick_up ? 'Yes' : 'No';
-                },
-                'format' => 'raw'
-            ],
-            'phone_number',
-            'restaurant_created_at',
-            'restaurant_updated_at',
-        ],
-    ])
-    ?>
+        </div>
+    </div>
 
 </div>

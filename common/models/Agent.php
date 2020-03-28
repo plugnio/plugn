@@ -17,6 +17,7 @@ use yii\web\IdentityInterface;
  * @property string $agent_password_hash
  * @property string|null $agent_password_reset_token
  * @property int $agent_status
+ * @property int $email_notification
  * @property string $agent_created_at
  * @property string $agent_updated_at
  *
@@ -29,6 +30,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
 
+    
     /**
      * Field for temporary password. If set, it will overwrite the old password on save
      * @var string
@@ -48,7 +50,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     public function rules() {
         return [
             [['agent_name', 'agent_email'], 'required'],
-            [['agent_status'], 'integer'],
+            [['agent_status','email_notification'], 'integer'],
             [['agent_created_at', 'agent_updated_at'], 'safe'],
             [['agent_name', 'agent_email', 'agent_password_hash', 'agent_password_reset_token'], 'string', 'max' => 255],
             [['agent_auth_key'], 'string', 'max' => 32],
@@ -72,6 +74,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
             'agent_password_hash' => 'Agent Password Hash',
             'agent_password_reset_token' => 'Agent Password Reset Token',
             'agent_status' => 'Agent Status',
+            'email_notification' => 'Email Notification',
             'agent_created_at' => 'Agent Created At',
             'agent_updated_at' => 'Agent Updated At',
         ];

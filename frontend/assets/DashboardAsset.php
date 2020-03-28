@@ -38,7 +38,7 @@ class DashboardAsset extends AssetBundle {
         'plugins/select2/js/select2.full.min.js',
         'plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js',
         'plugins/moment/moment.min.js',
-        'plugins/datatables-bs4/js/dataTables.bootstrap4.js',
+//        'plugins/datatables-bs4/js/dataTables.bootstrap4.js',
         'plugins/inputmask/min/jquery.inputmask.bundle.min.js',
         'plugins/daterangepicker/daterangepicker.js',
         'plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js',

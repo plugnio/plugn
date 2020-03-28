@@ -76,7 +76,7 @@ DashboardAsset::register($this);
                             <img src="img/avatar.jpg" class="img-circle elevation-2" alt="User Image">
                         </div>
                         <div class="info">
-                            <?= Html::a(Yii::$app->user->identity->agent_name, ['agent/index']) ?>
+                            <?= Html::a(Yii::$app->user->identity->agent_name, ['agent/index', 'restaurantUuid' => $this->params['restaurant_uuid']]) ?>
 
                         </div>
                     </div>
