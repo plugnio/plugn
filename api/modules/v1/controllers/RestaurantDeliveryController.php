@@ -60,6 +60,8 @@ class RestaurantDeliveryController extends Controller {
         $restaurantDeliveryArea = RestaurantDelivery::find()
                 ->where(['area_id' => $id])
                 ->one();
+        
+//        Yii::$app->formatter->language = 'ru-RU';
 
         $restaurantDeliveryArea->delivery_time = Yii::$app->formatter->asDuration($restaurantDeliveryArea->delivery_time * 60);
 

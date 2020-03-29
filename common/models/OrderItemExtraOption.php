@@ -18,6 +18,7 @@ use Yii;
  * @property Restaurant $restaurant
  * @property Order $order
  * @property OrderItem $orderItem
+ * @property Item $Item
  */
 class OrderItemExtraOption extends \yii\db\ActiveRecord {
 
@@ -34,9 +35,9 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['order_item_id'], 'required'],
-            [['order_item_id', 'extra_option_id'], 'integer' , 'min'=> 0],
+            [['order_item_id', 'extra_option_id'], 'integer', 'min' => 0],
             [['extra_option_id'], 'checkIfExtraOptionBelongToItem'],
-            [['extra_option_price'], 'number', 'min'=> 0],
+            [['extra_option_price'], 'number', 'min' => 0],
             [['extra_option_name', 'extra_option_name_ar'], 'string', 'max' => 255],
             [['extra_option_id'], 'exist', 'skipOnError' => false, 'targetClass' => ExtraOption::className(), 'targetAttribute' => ['extra_option_id' => 'extra_option_id']],
             [['order_item_id'], 'exist', 'skipOnError' => true, 'targetClass' => OrderItem::className(), 'targetAttribute' => ['order_item_id' => 'order_item_id']],
@@ -84,12 +85,16 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
     public function checkIfExtraOptionBelongToItem($attribute) {
         $extra_option_model = ExtraOption::findOne($this->extra_option_id);
 
-        if ($this->orderItem->item_uuid != $extra_option_model->option->item_uuid)
+        if ($extra_option_model) {
+            if ($this->orderItem->item_uuid != $extra_option_model->option->item_uuid)
+                $this->addError($attribute, 'Extra Option Uuid is invalid');
+        }else {
             $this->addError($attribute, 'Extra Option Uuid is invalid');
+        }
     }
 
     public function beforeSave($insert) {
-        
+
 
         $extra_option_model = ExtraOption::findOne($this->extra_option_id);
 
@@ -111,7 +116,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
     public function getOrder() {
         return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid'])->via('orderItem');
     }
-    
+
     /**
      * Gets query for [[Order]].
      *
@@ -137,6 +142,15 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
      */
     public function getOrderItem() {
         return $this->hasOne(OrderItem::className(), ['order_item_id' => 'order_item_id']);
+    }
+    
+    /**
+     * Gets query for [[OrderItem]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItem() {
+        return $this->hasOne(OrderItem::className(), ['item_uuid' => 'item_uuid'])->via('orderItem');
     }
 
 }

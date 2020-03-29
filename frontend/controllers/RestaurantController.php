@@ -44,7 +44,7 @@ class RestaurantController extends Controller {
     public function actionIndex($restaurantUuid) {
 
         $model = $this->findModel($restaurantUuid);
-        
+
         return $this->render('view', [
                     'model' => $model
         ]);
@@ -67,20 +67,18 @@ class RestaurantController extends Controller {
                 $thumbnail_image = \yii\web\UploadedFile::getInstances($model, 'restaurant_thumbnail_image');
                 $logo = \yii\web\UploadedFile::getInstances($model, 'restaurant_logo');
 
+                if ($model->restaurant_payments_method)
+                    $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
+
                 if ($thumbnail_image)
                     $model->uploadThumbnailImage($thumbnail_image[0]->tempName);
 
                 if ($logo)
                     $model->uploadLogo($logo[0]->tempName);
-                
+
 
                 return $this->redirect(['index', 'restaurantUuid' => $id]);
-            }else{
-                die('errr');
             }
-            
-                            die('errr');
-
         }
 
         return $this->render('update', [

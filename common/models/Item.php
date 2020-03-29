@@ -27,6 +27,7 @@ use yii\behaviors\TimestampBehavior;
  * @property Category[] $categories
  * @property Restaurant $restaurant
  * @property Option[] $options
+ * @property ExtraOptions[] $extraOptions
  */
 class Item extends \yii\db\ActiveRecord {
 

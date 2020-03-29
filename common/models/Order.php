@@ -76,9 +76,9 @@ class Order extends \yii\db\ActiveRecord {
             ['restaurant_branch_id', 'required', 'when' => function($model) {
                     return $model->order_mode == static::ORDER_MODE_PICK_UP;
                 }],
-            [['area_id', 'unit_type', 'block', 'street', 'house_number'], 'required', 'when' => function($model) {
-                    return $model->order_mode == static::ORDER_MODE_DELIVERY;
-                }],
+//            [['area_id', 'unit_type', 'block', 'street', 'house_number'], 'required', 'when' => function($model) {
+//                    return $model->order_mode == static::ORDER_MODE_DELIVERY;
+//                }],
             [['area_id', 'unit_type', 'block', 'street', 'house_number'], 'validateArea', 'when' => function($model) {
                     return $model->order_mode == static::ORDER_MODE_DELIVERY;
                 }],
@@ -91,6 +91,7 @@ class Order extends \yii\db\ActiveRecord {
                     return $model->order_mode == static::ORDER_MODE_DELIVERY;
                 }],
             [['customer_email'], 'email'],
+            [['payment_method_id'], 'validatePaymentMethodId'],
             ['estimated_time_of_arrival', 'safe'],
             [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name','payment_method_name_ar'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
@@ -146,6 +147,15 @@ class Order extends \yii\db\ActiveRecord {
         return $uuid;
     }
 
+    /**
+     * Check if the selected payment method id is exist in restaurant_payment_method
+     * @param type $attribute
+     */
+    public function validatePaymentMethodId($attribute) {
+        if (!RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'payment_method_id' => $this->payment_method_id])->one())
+            $this->addError($attribute, "Payment method id id ivalid.");
+    }
+    
     /**
      * Check if the selected area delivery by the restaurant or no
      * @param type $attribute

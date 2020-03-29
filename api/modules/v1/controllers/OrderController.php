@@ -222,7 +222,7 @@ class OrderController extends Controller {
                     if ($order->payment_method_id != 3) {
 
                         // Create new payment record
-                        $payment = new \common\models\Payment;
+                        $payment = new Payment;
                         $payment->payment_mode = $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
                         $payment->customer_id = $order->customer->customer_id; //customer id
                         $payment->order_uuid = $order->order_uuid;
@@ -343,20 +343,20 @@ class OrderController extends Controller {
     /**
      * Get order status
      */
-//    public function actionOrderLookUp($id) {
-//        $model = Order::findOne($id);
-//
-//        if (!$model) {
-//            return [
-//                'operation' => 'error',
-//                'message' => 'Please insert a valid Order Code'
-//            ];
-//        }
-//
-//        return [
-//            'operation' => 'success',
-//            'body' => $model
-//        ];
-//    }
+    public function actionOrderLookUp($id) {
+        $model = Order::findOne($id);
+
+        if (!$model) {
+            return [
+                'operation' => 'error',
+                'message' => 'Please insert a valid Order Code'
+            ];
+        }
+
+        return [
+            'operation' => 'success',
+            'body' => $model
+        ];
+    }
 
 }

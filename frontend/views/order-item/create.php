@@ -8,7 +8,7 @@ use yii\helpers\Html;
 $this->params['restaurant_uuid'] = $model->restaurant->restaurant_uuid;
 
 $this->title = 'Create Order Item';
-$this->params['breadcrumbs'][] = ['label' => 'Order #' . $model->order_uuid, 'url' => ['order/update','id' => $model->order_uuid, 'restaurantuuid' => $model->restaurant->restaurant_uuid]];
+$this->params['breadcrumbs'][] = ['label' => 'Order #' . $model->order_uuid, 'url' => ['order/update','id' => $model->order_uuid, 'restaurantUuid' =>$model->restaurant->restaurant_uuid ]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="working-hours-create">

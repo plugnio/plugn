@@ -80,8 +80,8 @@ class RestaurantController extends Controller {
 //                if ($model->restaurant_delivery_area)
 //                    $model->restaurantDeliveryAreas->saveRestaurantDeliveryArea($model->restaurant_delivery_area);
 
-//                if ($model->restaurant_payments_method)
-//                    $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
+                if ($model->restaurant_payments_method)
+                    $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
 
                 $thumbnail_image = \yii\web\UploadedFile::getInstances($model, 'thumbnail_image');
                 $logo = \yii\web\UploadedFile::getInstances($model, 'logo');

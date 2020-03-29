@@ -152,6 +152,29 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
+     * save restaurant payment method
+     */
+    public function saveRestaurantPaymentMethod($payments_method) {
+
+        $sotred_restaurant_payment_method = RestaurantPaymentMethod::find()
+                ->where(['restaurant_uuid' => $this->restaurant_uuid])
+                ->all();
+
+        foreach ($sotred_restaurant_payment_method as $restaurant_payment_method) {
+            if (!in_array($restaurant_payment_method->payment_method_id, $payments_method)) {
+                RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $this->restaurant_uuid, 'payment_method_id' => $restaurant_payment_method->payment_method_id]);
+            }
+        }
+
+        foreach ($payments_method as $payment_method_id) {
+            $payments_method = new RestaurantPaymentMethod();
+            $payments_method->payment_method_id = $payment_method_id;
+            $payments_method->restaurant_uuid = $this->restaurant_uuid;
+            $payments_method->save();
+        }
+    }
+
+    /**
      * Upload restaurant's logo  to cloudinary
      * @param type $imageURL
      */
@@ -346,7 +369,6 @@ class Restaurant extends \yii\db\ActiveRecord {
         }
     }
 
-
     /**
      * Gets query for [[Items]].
      *
@@ -360,8 +382,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      * Get Agent Assignment Records
      * @return \yii\db\ActiveQuery
      */
-    public function getAgentAssignments()
-    {
+    public function getAgentAssignments() {
         return $this->hasMany(AgentAssignment::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
@@ -369,20 +390,19 @@ class Restaurant extends \yii\db\ActiveRecord {
      * Get Agents assigned to this Restaurant
      * @return \yii\db\ActiveQuery
      */
-    public function getAgents()
-    {
+    public function getAgents() {
         return $this->hasMany(Agent::className(), ['agent_id' => 'agent_id'])
-                    ->via('agentAssignments');
+                        ->via('agentAssignments');
     }
 
     /**
      * The Agent owning this account
      * @return \yii\db\ActiveQuery
      */
-    public function getAgent()
-    {
+    public function getAgent() {
         return $this->hasOne(Agent::className(), ['agent_id' => 'agent_id']);
     }
+
     /**
      * Gets query for [[RestaurantDeliveryAreas]].
      *
@@ -445,24 +465,22 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function getWorkingDays() {
         return $this->hasMany(WorkingDay::className(), ['working_day_id' => 'working_day_id'])->viaTable('working_hours', ['restaurant_uuid' => 'restaurant_uuid']);
     }
-    
+
     /**
      * Gets query for [[Orders]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrders()
-    {
+    public function getOrders() {
         return $this->hasMany(Order::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-    
+
     /**
      * Gets query for [[Customers]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCustomers()
-    {
+    public function getCustomers() {
         return $this->hasMany(Customer::className(), ['customer_id' => 'customer_id']);
     }
 

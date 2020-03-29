@@ -55,7 +55,14 @@ class OrderItemExtraOptionController extends Controller {
 
             //Get item's extra options to retrieve it on create-form page
             //todo retrieve item's extra optn only
-            $extraOptions = ExtraOption::find()->asArray()->all();
+            $extraOptions = ExtraOption::find()->all();
+            
+            foreach ($extraOptions as $key => $extraOption) {
+                if($extraOption->item->item_uuid != $model->orderItem->item_uuid){
+                    unset($extraOptions[$key]);
+                }
+            }
+            
             $extraOptionsQuery = ArrayHelper::map($extraOptions, 'extra_option_id', 'extra_option_name');
 
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
