@@ -9,6 +9,10 @@ use common\models\Order;
 use common\models\OrderItem;
 use common\models\OrderItemExtraOption;
 use common\models\Restaurant;
+use common\models\Payment;
+use common\components\TapPayments;
+use yii\helpers\Url;
+use yii\web\NotFoundHttpException;
 
 class OrderController extends Controller {
 
@@ -213,14 +217,65 @@ class OrderController extends Controller {
                                 ->setSubject('Order received from' . $order->customer_name)
                                 ->send();
                     }
-                    
-                    
-                    $response = [
-                        'operation' => 'success',
-                        'order_uuid' => $order->order_uuid,
-                        'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
-                        'message' => 'Order created successfully',
-                    ];
+
+                    //if payment method not cash redirect customer to payment gateway
+                    if ($order->payment_method_id != 3) {
+
+                        // Create new payment record
+                        $payment = new \common\models\Payment;
+                        $payment->payment_mode = $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
+                        $payment->customer_id = $order->customer->customer_id; //customer id
+                        $payment->order_uuid = $order->order_uuid;
+                        $payment->payment_amount_charged = $order->total_price;
+                        $payment->payment_current_status = "Redirected to payment gateway";
+                        $payment->save();
+
+//                  Yii::info("[Payment Attempt Started] " . Yii::$app->user->identity->investor_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($amountToInvest, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
+                        // Redirect to payment gateway
+                        $response = Yii::$app->tapPayments->createCharge(
+                                "Order placed from: " . $order->customer_name, // Description
+                                $order->restaurant->name, //Statement Desc.
+                                $payment->payment_uuid, // Reference
+                                $order->total_price,
+                                $order->customer_name,
+                                $order->customer_email,
+                                $order->customer_phone_number, 
+                                Url::to(['order/callback'], true), 
+                                $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD
+                        );
+
+                        $responseContent = json_decode($response->content);
+
+                        // Validate that theres no error from TAP gateway
+                        if (isset($responseContent->errors)) {
+                            $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
+                            \Yii::error($errorMessage, __METHOD__); // Log error faced by user
+//                \Yii::$app->getSession()->setFlash('error', $errorMessage);
+
+                            return [
+                                'operation' => 'error',
+                                'message' => $errorMessage
+                            ];
+                        }
+
+                        $chargeId = $responseContent->id;
+                        $redirectUrl = $responseContent->transaction->url;
+
+                        $payment->payment_gateway_transaction_id = $chargeId;
+                        $payment->save(false);
+
+                        return [
+                            'operation' => 'redirecting',
+                            'redirectUrl' => $redirectUrl,
+                        ];
+                    } else {
+                        $response = [
+                            'operation' => 'success',
+                            'order_uuid' => $order->order_uuid,
+                            'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
+                            'message' => 'Order created successfully',
+                        ];
+                    }
                 }
 
 
@@ -240,27 +295,68 @@ class OrderController extends Controller {
             ];
         }
 
-
         return $response;
+    }
+
+    /**
+     * Process callback from TAP payment gateway
+     * @param string $tap_id
+     * @return mixed
+     */
+    public function actionCallback($tap_id) {
+             
+        try {
+            $paymentRecord = Payment::updatePaymentStatusFromTap($tap_id);
+
+            $paymentRecord->received_callback = true;
+            $paymentRecord->save();
+
+            if ($paymentRecord->payment_current_status != 'CAPTURED') {  //Failed Payment
+                Yii::$app->session->setFlash('error', "There seems to be an issue with your payment, please try again.");
+                
+            // Redirect back to app
+                return    $this->redirect('http://localhost:8100/payment-failed/' . $paymentRecord->payment_uuid  );
+                // Redirect back to project page with message
+//                return [
+//                    'operation' => 'error',
+//                    'message' => 'There seems to be an issue with your payment, please try again.',
+//                ];
+            }
+
+            // Redirect back to app
+            return    $this->redirect('http://localhost:8100/payment-success/' . $paymentRecord->payment_uuid );
+//            return [
+//                'operation' => 'success',
+//                'order_uuid' => $order->order_uuid,
+//                'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
+//                'message' => 'Order created successfully',
+//            ];
+
+//            return $this->redirect(['investment/view', 'payid' => $paymentRecord->payment_uuid]);
+        } catch (\Exception $e) {
+                   return    $this->redirect('http://www.yiiframework.com');
+            Yii::info($e->getMessage(), __METHOD__);
+            throw new NotFoundHttpException($e->getMessage());
+        }
     }
 
     /**
      * Get order status
      */
-    public function actionOrderLookUp($id) {
-        $model = Order::findOne($id);
-
-        if (!$model) {
-            return [
-                'operation' => 'error',
-                'message' => 'Please insert a valid Order Code'
-            ];
-        }
-
-        return [
-            'operation' => 'success',
-            'body' => $model
-        ];
-    }
+//    public function actionOrderLookUp($id) {
+//        $model = Order::findOne($id);
+//
+//        if (!$model) {
+//            return [
+//                'operation' => 'error',
+//                'message' => 'Please insert a valid Order Code'
+//            ];
+//        }
+//
+//        return [
+//            'operation' => 'success',
+//            'body' => $model
+//        ];
+//    }
 
 }

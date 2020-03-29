@@ -29,9 +29,9 @@ $this->title = 'My Yii Application';
                 Html::a('Close', ['promote-to-close', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-danger']);
                 ?>
             </p>
-                <?php
-            }
-            ?>
+            <?php
+        }
+        ?>
 
     </div>
 

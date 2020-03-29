@@ -16,7 +16,6 @@ use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
 use common\models\Restaurant;
-
 /**
  * Site controller
  */
@@ -35,7 +34,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'promote-to-open', 'promote-to-close'],
+                        'actions' => ['logout', 'index', 'promote-to-open', 'promote-to-close','pay','callback'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],

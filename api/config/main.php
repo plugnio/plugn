@@ -55,7 +55,7 @@ return [
                         'OPTIONS detail' => 'options',
                     ]
                 ],
-                  [// RestaurantController
+                [// RestaurantController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/restaurant',
                     'pluralize' => false,
@@ -65,7 +65,7 @@ return [
                         'OPTIONS branches/<id>' => 'options',
                     ]
                 ],
-                [// CityController
+                [// RestaurantDeliveryController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/restaurant-delivery',
                     'pluralize' => false,
@@ -79,12 +79,14 @@ return [
                 ],
                 [// PaymentMethodController
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/payment-method',
+                    'controller' => 'v1/payment',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET payment-detail/<id>' => 'payment-detail',
                         'GET <id>' => 'list-all-restaurants-payment-method',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS payment-detail/<id>' => 'options',
                         'OPTIONS <id>' => 'options',
                     ]
                 ],
@@ -94,9 +96,11 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'POST <id>' => 'place-an-order',
+                        'GET callback' => 'callback',
                         'GET <id>' => 'order-look-up',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS callback' => 'options',
                         'OPTIONS <id>' => 'options',
                     ]
                 ],
