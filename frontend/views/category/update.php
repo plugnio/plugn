@@ -8,7 +8,7 @@ use yii\helpers\Html;
 $this->params['restaurant_uuid'] = $restaurantUuid;
 
 $this->title = 'Update Category: ' . $model->category_name;
-$this->params['breadcrumbs'][] = ['label' => 'Categories', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Categories', 'url' => ['index', 'restaurantUuid' => $restaurantUuid]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
 <div class="category-update">

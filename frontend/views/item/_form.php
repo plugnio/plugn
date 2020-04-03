@@ -86,7 +86,7 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'stock_qty')->textInput() ?>
 
-    <?= $form->field($model, 'item_price')->textInput() ?>
+    <?= $form->field($model, 'item_price')->textInput(['value' => $model->item_price != null ? $model->item_price : 0]) ?>
 
     
     <?=

@@ -31,6 +31,7 @@ class ExtraOption extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
+            [['extra_option_name', 'extra_option_name_ar', 'extra_option_price'], 'required'],
             [['option_id'], 'integer'],
             [['extra_option_price'], 'number' , 'min'=> 0],
             [['extra_option_name', 'extra_option_name_ar'], 'string', 'max' => 255],

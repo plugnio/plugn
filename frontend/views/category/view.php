@@ -9,7 +9,7 @@ use yii\widgets\DetailView;
 $this->params['restaurant_uuid'] = $restaurantUuid;
 
 $this->title = $model->category_name;
-$this->params['breadcrumbs'][] = ['label' => 'Categories', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Categories', 'url' => ['index', 'restaurantUuid' => $restaurantUuid]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="category-view">

@@ -18,7 +18,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'extra_option_name_ar')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'extra_option_price')->textInput() ?>
+    <?= $form->field($model, 'extra_option_price')->textInput(['value' => $model->extra_option_price != null ? $model->extra_option_price : 0]) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

@@ -8,7 +8,7 @@ use yii\helpers\Html;
 $this->params['restaurant_uuid'] = $restaurantUuid;
 
 $this->title = 'Create Item';
-$this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['index', 'restaurantUuid' => $restaurantUuid]];
 $this->params['breadcrumbs'][] = $this->title;
 
 

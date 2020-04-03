@@ -8,7 +8,7 @@ use yii\helpers\Html;
 $this->params['restaurant_uuid'] = $restaurantUuid;
 
 $this->title = 'Create Category';
-$this->params['breadcrumbs'][] = ['label' => 'Categories', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Categories', 'url' => ['index', 'restaurantUuid' => $restaurantUuid]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="category-create">

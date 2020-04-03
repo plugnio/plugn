@@ -9,6 +9,7 @@ use yii\grid\GridView;
 $this->params['restaurant_uuid'] = $restaurantUuid;
 
 $this->title = $model->option_name;
+$this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['item/index', 'restaurantUuid' => $restaurantUuid]];
 $this->params['breadcrumbs'][] = ['label' => $model->item->item_name, 'url' => ['item/view', 'id' => $model->item->item_uuid, 'restaurantUuid' => $restaurantUuid]];
 
 $this->params['breadcrumbs'][] = $this->title;

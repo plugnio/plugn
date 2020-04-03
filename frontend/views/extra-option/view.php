@@ -8,6 +8,7 @@ use yii\widgets\DetailView;
 $this->params['restaurant_uuid'] = $restaurantUuid;
 
 $this->title = $model->extra_option_name;
+$this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['item/index', 'restaurantUuid' => $restaurantUuid]];
 $this->params['breadcrumbs'][] = ['label' => $model->option->item->item_name, 'url' => ['item/view', 'id' => $model->option->item->item_uuid, 'restaurantUuid' => $restaurantUuid]];
 $this->params['breadcrumbs'][] = ['label' => $model->option->option_name, 'url' => ['option/view', 'id' => $model->option->option_id, 'restaurantUuid' => $restaurantUuid]];
 $this->params['breadcrumbs'][] = $this->title;
