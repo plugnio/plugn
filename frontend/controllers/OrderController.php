@@ -10,6 +10,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use common\models\Customer;
 use common\models\Restaurant;
+use kartik\mpdf\Pdf;
 
 /**
  * OrderController implements the CRUD actions for Order model.
@@ -67,6 +68,63 @@ class OrderController extends Controller {
     }
 
     /**
+     * Download a PDF  order's invoice
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionDownloadInvoice($restaurantUuid, $order_uuid) {
+        
+
+        $order_model = $this->findModel($order_uuid, $restaurantUuid);
+
+        // Item
+        $orderItems = new \yii\data\ActiveDataProvider([
+            'query' => $order_model->getOrderItems(),
+            'sort' => false
+        ]);
+
+        // Item extra optn
+        $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
+            'query' => $order_model->getOrderItemExtraOptions()
+        ]);
+
+        $this->layout = 'pdf';
+
+                
+        $content = $this->render('invoice', [
+                    'model' => $order_model,
+                    'orderItems' => $orderItems,
+                    'itemsExtraOpitons' => $itemsExtraOpitons
+        ]);
+
+//
+//        $content = $this->render('invoice', [
+//            'model' => $order_model,
+//            'orderItems ' => $orderItems,
+//        ]);
+
+        $pdf = new Pdf([
+            'mode' => Pdf::MODE_UTF8,
+            // A4 paper format
+            'format' => Pdf::FORMAT_A4,
+            // portrait orientation
+            'orientation' => Pdf::ORIENT_PORTRAIT,
+            // stream to browser inline
+            'destination' => Pdf::DEST_BROWSER,
+            // your html content input
+            'content' => $content,
+            // any css to be embedded if required
+            'cssInline' => '.kv-heading-1{font-size:38px}',
+            // set mPDF properties on the fly
+            'options' => [], //['title' => 'Booking #'.$id],
+        ]);
+
+        header('Access-Control-Allow-Origin: *');
+        return $pdf->render();
+    }
+
+    /**
      * Displays a single Order model.
      * @param integer $id
      * @return mixed
@@ -104,7 +162,7 @@ class OrderController extends Controller {
     public function actionUpdate($id, $restaurantUuid) {
         $model = $this->findModel($id, $restaurantUuid);
 
-         // order's Item
+        // order's Item
         $ordersItemDataProvider = new \yii\data\ActiveDataProvider([
             'query' => $model->getOrderItems()
         ]);
@@ -141,7 +199,7 @@ class OrderController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id, $restaurantUuid) {
-        if (($model = Order::find()->where(['order_uuid' => $id,  'restaurant_uuid' => Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
+        if (($model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
             return $model;
         }
 

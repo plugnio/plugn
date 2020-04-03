@@ -1,34 +1,13 @@
-<?php
+<?php 
+
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\grid\GridView;
 use common\models\Order;
 
-/* @var $this yii\web\View */
-/* @var $model common\models\Order */
 
-$this->params['restaurant_uuid'] = $model->restaurant_uuid;
-
-$this->title = 'Order #' . $model->order_uuid;
-$this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index', 'restaurantUuid' => $model->restaurant_uuid]];
-$this->params['breadcrumbs'][] = $this->title;
-\yii\web\YiiAsset::register($this);
-?>
-<div class="page-title"> <i class="icon-custom-left"></i>
-    <p>
-        <?php
-        if ($model->order_status != Order::STATUS_BEING_PREPARED)
-            echo Html::a('Being Prepared', ['change-order-status', 'id' => $model->order_uuid, 'status' => Order::STATUS_BEING_PREPARED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-warning']);
-
-        if ($model->order_status != Order::STATUS_OUT_FOR_DELIVERY)
-            echo Html::a('Out for Delivery', ['change-order-status', 'id' => $model->order_uuid, 'status' => Order::STATUS_OUT_FOR_DELIVERY], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-primary']);
-
-        if ($model->order_status != Order::STATUS_COMPLETE)
-            echo Html::a('Mark as Complete', ['change-order-status', 'id' => $model->order_uuid, 'status' => Order::STATUS_COMPLETE], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
-        ?>
-    </p>
-</div>
+?> 
 
 <!-- Main content -->
 <div class="invoice p-3 mb-3">
@@ -144,15 +123,7 @@ GridView::widget([
     <!-- /.row -->
 
     <div class="row">
-        <!-- /.col --> <div class="col-6">
-            <!-- this row will not appear when printing -->
-            <div class="row no-print">
-                <div class="col-12">
-                 <?=    Html::a('Print', ['download-invoice', 'restaurantUuid' => $model->restaurant_uuid , 'order_uuid' => $model->order_uuid ],['class'=>'btn btn-success'] ); ?>
-                    <!--<a href="invoice-print.html" target="_blank" class="btn btn-default"><i class="fas fa-print"></i> Print</a>-->
-                </div>
-            </div>
-        </div>
+
         <div class="col-6">
             <p class="lead">Amount Due <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy') ?></p>
 
