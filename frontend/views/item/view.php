@@ -46,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'attribute' => 'Image',
                         'format' => 'html',
                         'value' => function ($data) {
-                            return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/" . $data->restaurant->name . "/items/" . $data->item_image);
+                            return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/" . $data->restaurant->restaurant_uuid . "/items/" . $data->item_image);
                         },
                     ],
                     [
