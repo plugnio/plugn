@@ -51,6 +51,8 @@ class Order extends \yii\db\ActiveRecord {
     const STATUS_BEING_PREPARED = 2;
     const STATUS_OUT_FOR_DELIVERY = 3;
     const STATUS_COMPLETE = 4;
+    const STATUS_CANCELED = 5;
+    const STATUS_REFUNDED = 6;
     
     const ORDER_MODE_DELIVERY = 1;
     const ORDER_MODE_PICK_UP = 2;
@@ -68,10 +70,10 @@ class Order extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['customer_name', 'customer_phone_number', 'payment_method_id', 'order_mode'], 'required'],
-            [['order_uuid'], 'string', 'max' => 36],
+            [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer' , 'min'=> 0],
-            ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE]],
+            ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_CANCELED]],
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
             ['restaurant_branch_id', 'required', 'when' => function($model) {
                     return $model->order_mode == static::ORDER_MODE_PICK_UP;
@@ -256,6 +258,10 @@ class Order extends \yii\db\ActiveRecord {
             return 'Out for Delivery';
         else if ($this->order_status == self::STATUS_COMPLETE)
             return 'Complete';
+        else if ($this->order_status == self::STATUS_CANCELED)
+            return 'Canceled';
+        else if ($this->order_status == self::STATUS_REFUNDED)
+            return 'Refunded';
     }
 
     /**

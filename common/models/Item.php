@@ -165,13 +165,13 @@ class Item extends \yii\db\ActiveRecord {
     public function uploadItemImage($imageURL) {
 
         $filename = Yii::$app->security->generateRandomString();
-        $restaurantName = str_replace(' ', '', $this->restaurant->name);
+//        $restaurantName = str_replace(' ', '', $this->restaurant->name);
         $itemName = str_replace(' ', '', $this->item_name);
 
         try {
             $result = Yii::$app->cloudinaryManager->upload(
                     $imageURL, [
-                'public_id' => "restaurants/" . $restaurantName . "/items/" . $filename
+                'public_id' => "restaurants/" . $this->restaurant_uuid . "/items/" . $filename
                     ]
             );
 

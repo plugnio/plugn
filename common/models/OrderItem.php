@@ -36,7 +36,7 @@ class OrderItem extends \yii\db\ActiveRecord {
         return [
             [['order_uuid', 'item_uuid', 'qty'], 'required'],
             [['qty'], 'integer' , 'min'=> 0],
-            [['order_uuid'], 'string', 'max' => 36],
+            [['order_uuid'], 'string', 'max' => 40],
             [['item_price'], 'number', 'min'=> 0],
             [['item_uuid'], 'checkIfItemBelongToRestaurant'],
             [['item_uuid'], 'string', 'max' => 300],

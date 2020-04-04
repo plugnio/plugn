@@ -186,7 +186,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         try {
             $result = Yii::$app->cloudinaryManager->upload(
                     $imageURL, [
-                'public_id' => "restaurants/" . $restaurantName . "/logo/" . $filename
+                'public_id' => "restaurants/" . $this->restaurant_uuid . "/logo/" . $filename
                     ]
             );
 
@@ -211,7 +211,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         try {
             $result = Yii::$app->cloudinaryManager->upload(
                     $imageURL, [
-                'public_id' => "restaurants/" . $restaurantName . "/thumbnail-image/" . $filename
+                'public_id' => "restaurants/" . $this->restaurant_uuid . "/thumbnail-image/" . $filename
                     ]
             );
 

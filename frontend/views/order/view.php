@@ -19,13 +19,19 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?php
         if ($model->order_status != Order::STATUS_BEING_PREPARED)
-            echo Html::a('Being Prepared', ['change-order-status', 'id' => $model->order_uuid, 'status' => Order::STATUS_BEING_PREPARED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-warning']);
+            echo Html::a('Being Prepared', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_BEING_PREPARED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-warning']);
 
         if ($model->order_status != Order::STATUS_OUT_FOR_DELIVERY)
-            echo Html::a('Out for Delivery', ['change-order-status', 'id' => $model->order_uuid, 'status' => Order::STATUS_OUT_FOR_DELIVERY], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-primary']);
+            echo Html::a('Out for Delivery', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_OUT_FOR_DELIVERY], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-primary']);
 
         if ($model->order_status != Order::STATUS_COMPLETE)
-            echo Html::a('Mark as Complete', ['change-order-status', 'id' => $model->order_uuid, 'status' => Order::STATUS_COMPLETE], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
+            echo Html::a('Mark as Complete', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_COMPLETE], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
+
+        if ($model->order_status != Order::STATUS_REFUNDED)
+            echo Html::a('Refund', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_REFUNDED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-info']);
+     
+        if ($model->order_status != Order::STATUS_CANCELED)
+            echo Html::a('Cancel', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_CANCELED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-danger']);
         ?>
     </p>
 </div>

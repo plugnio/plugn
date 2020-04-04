@@ -58,8 +58,8 @@ class OrderController extends Controller {
         ]);
     }
 
-    public function actionChangeOrderStatus($id, $status) {
-        $order_model = $this->findModel($id);
+    public function actionChangeOrderStatus($order_uuid, $restaurantUuid, $status) {
+        $order_model = $this->findModel($order_uuid, $restaurantUuid);
 
         $order_model->order_status = $status;
         $order_model->save(false);

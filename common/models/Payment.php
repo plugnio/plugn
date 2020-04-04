@@ -51,7 +51,7 @@ class Payment extends \yii\db\ActiveRecord
         return [
             [['customer_id', 'order_uuid', 'payment_amount_charged'], 'required'],
             [['customer_id','received_callback'], 'integer'],
-            [['order_uuid'], 'string', 'max' => 36],
+            [['order_uuid'], 'string', 'max' => 40],
             [['payment_gateway_order_id', 'payment_current_status'], 'string'],
             [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee'], 'number'],
             [['payment_uuid'], 'string', 'max' => 36],
