@@ -16,19 +16,43 @@ return [
             'timeZone' => 'Asia/Kuwait',
             'timeFormat' => 'h:i:s'
         ],
+        'i18n' => [
+            'translations' => [
+                'api' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@common/messages',
+                    'sourceLanguage' => 'en',
+                ],
+                '*' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@common/messages',
+                    'sourceLanguage' => 'en',
+                ],
+                'app' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@common/messages',
+                    'sourceLanguage' => 'en',
+                ],
+                'yii' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@common/messages',
+                    'sourceLanguage' => 'en',
+                ],
+            ],
+        ],
         'cloudinaryManager' => [
             'class' => 'common\components\CloudinaryManager',
             'cloud_name' => 'plugn',
             'api_key' => '699963168546398',
             'api_secret' => 'SH2PbVsEsRT9Db257Pn9ZDgHGAU'
         ],
-       'ownedAccountManager' => [ //Component for agent to manage Owned Restaurant
+        'ownedAccountManager' => [//Component for agent to manage Owned Restaurant
             'class' => 'common\components\OwnedAccountManager',
         ],
-    'tapPayments' => [
+        'tapPayments' => [
             'class' => 'common\components\TapPayments',
             'gatewayToUse' => \common\components\TapPayments::USE_TEST_GATEWAY,
-              'liveApiKey' => "sk_live_9maCt8rNvqXxJfjoRehPITU1", // BeOrganic Honey Key
+            'liveApiKey' => "sk_live_9maCt8rNvqXxJfjoRehPITU1", // BeOrganic Honey Key
             // 'liveApiKey' => "sk_live_7nQ5fVq9IbX6JdrgBcoNx3yw", // Cavaraty key
             // 'liveApiKey' => "sk_live_as95jrPDz7W8QLtIuVNoCA6n", // Caro [Vodavoda] Payment Gateway
             // 'liveApiKey' => "sk_live_yC9SwZInzqpjU76QhAVMDXB3", // TheCapital Gateway

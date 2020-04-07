@@ -70,8 +70,10 @@ class DeliveryZoneForm extends \yii\db\ActiveRecord {
                 if($this->delivery_fee != null)
                     $restaurantDeliveryArea->delivery_fee = $this->delivery_fee;
                 
-                if($this->delivery_time != null)
+                if($this->delivery_time != null){
                     $restaurantDeliveryArea->delivery_time = $this->delivery_time;
+                    $restaurantDeliveryArea->delivery_time_ar = $this->delivery_time;
+                }
                 
                 if($this->min_charge != null)
                     $restaurantDeliveryArea->min_charge = $this->min_charge;

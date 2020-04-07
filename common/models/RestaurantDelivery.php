@@ -10,6 +10,7 @@ use Yii;
  * @property string $restaurant_uuid
  * @property int $area_id
  * @property int $delivery_time
+ * @property int $delivery_time_ar
  * @property int $delivery_fee
  * @property float $min_charge
  *
@@ -34,7 +35,7 @@ class RestaurantDelivery extends \yii\db\ActiveRecord {
         return [
             [['restaurant_uuid', 'area_id'], 'required'],
             [['restaurant_delivery_area_array'], 'safe'],
-            [['area_id', 'delivery_time'], 'integer', 'min' => 0],
+            [['area_id', 'delivery_time','delivery_time_ar'], 'integer', 'min' => 0],
             [['delivery_fee', 'min_charge'], 'number', 'min' => 0],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['restaurant_uuid', 'area_id'], 'unique', 'targetAttribute' => ['restaurant_uuid', 'area_id']],
@@ -51,6 +52,7 @@ class RestaurantDelivery extends \yii\db\ActiveRecord {
             'restaurant_uuid' => 'Restaurant Uuid',
             'area_id' => 'Area ID',
             'delivery_time' => 'Delivery time',
+            'delivery_time_ar' => 'Delivery time Ar',
             'delivery_fee' => 'Delivery fee',
             'restaurant_delivery_area_array' => 'Delivery Areas',
             'min_charge' => 'Min Charge',
