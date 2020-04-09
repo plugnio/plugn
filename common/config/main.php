@@ -52,11 +52,8 @@ return [
         'tapPayments' => [
             'class' => 'common\components\TapPayments',
             'gatewayToUse' => \common\components\TapPayments::USE_TEST_GATEWAY,
-            'liveApiKey' => "sk_live_9maCt8rNvqXxJfjoRehPITU1", // BeOrganic Honey Key
-            // 'liveApiKey' => "sk_live_7nQ5fVq9IbX6JdrgBcoNx3yw", // Cavaraty key
-            // 'liveApiKey' => "sk_live_as95jrPDz7W8QLtIuVNoCA6n", // Caro [Vodavoda] Payment Gateway
-            // 'liveApiKey' => "sk_live_yC9SwZInzqpjU76QhAVMDXB3", // TheCapital Gateway
-            'testApiKey' => "sk_test_cV4aXHefpuWlOG2xkmDIAq9b"
+            'liveApiKey' => "sk", 
+            'testApiKey' => "sk_test_p07NquMX4HgwLT8mycdJnZv5"
         ],
     ],
 ];

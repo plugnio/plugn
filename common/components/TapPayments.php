@@ -91,6 +91,35 @@ class TapPayments extends Component {
 
 
     /**
+     * upload a file to Tap
+     * @param type $file
+     */
+    public function uploadFileToTap($file_path , $purpose, $title, $file_link_create = false) {
+        $fileEndpoint = $this->apiEndpoint."/files";
+        
+       $fileParams = [
+           "purpose" => $purpose,
+           "title" => $title,
+           "file_link_create" => $file_link_create
+       ];
+       
+       
+        $client = new Client();
+        $response = $client->createRequest()
+            ->setMethod('POST')
+            ->setUrl($fileEndpoint)
+            ->setData($fileParams)
+            ->addFile('file', $file_path)
+            ->addHeaders([
+                'authorization' => 'Bearer '.$this->secretApiKey,
+                'content-type' => 'application/json',
+            ])
+            ->send();
+
+        return $response;
+    }
+    
+    /**
      * Create a charge for redirect
      */
     public function createCharge($desc = "Pay", $statementDesc = "", $ref, $amount, $firstName, $email, $phone, $redirectUrl, $gateway) {

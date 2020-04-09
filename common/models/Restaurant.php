@@ -181,7 +181,6 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function uploadLogo($imageURL) {
 
         $filename = Yii::$app->security->generateRandomString();
-        $restaurantName = str_replace(' ', '', $this->name);
 
         try {
             $result = Yii::$app->cloudinaryManager->upload(
@@ -206,7 +205,6 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function uploadThumbnailImage($imageURL) {
 
         $filename = Yii::$app->security->generateRandomString();
-        $restaurantName = str_replace(' ', '', $this->name);
 
         try {
             $result = Yii::$app->cloudinaryManager->upload(
