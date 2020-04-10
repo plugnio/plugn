@@ -11,7 +11,8 @@ use common\models\RestaurantDelivery;
 use common\models\RestaurantPaymentMethod;
 use common\models\PaymentMethod;
 use kartik\file\FileInput;
-
+use kartik\datetime\DateTimePicker;
+use kartik\date\DatePicker;
 
 $js = "
 let supportDeliveryInput = $('#supportDeliveryInput');
@@ -54,24 +55,13 @@ $this->registerJs($js);
     $agentQuery = Agent::find()->asArray()->all();
     $agentArray = ArrayHelper::map($agentQuery, 'agent_id', 'agent_name');
 
-    $areaQuery = Area::find()->asArray()->all();
-    $restaurantDeliveryArray = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
 
     $paymentMethodQuery = PaymentMethod::find()->asArray()->all();
     $paymentMethodArray = ArrayHelper::map($paymentMethodQuery, 'payment_method_id', 'payment_method_name');
 
-    $sotredRestaurantDeliveryAreas = [];
     $sotredRestaurantPaymentMethod = [];
 
     if ($model->restaurant_uuid != null) {
-
-        $sotredRestaurantDeliveryAreas = RestaurantDelivery::find()
-                ->select('area_id')
-                ->asArray()
-                ->where(['restaurant_uuid' => $model->restaurant_uuid])
-                ->all();
-
-        $sotredRestaurantDeliveryAreas = ArrayHelper::getColumn($sotredRestaurantDeliveryAreas, 'area_id');
 
 
         $sotredRestaurantPaymentMethod = RestaurantPaymentMethod::find()
@@ -81,11 +71,10 @@ $this->registerJs($js);
                 ->all();
 
         $sotredRestaurantPaymentMethod = ArrayHelper::getColumn($sotredRestaurantPaymentMethod, 'payment_method_id');
-
     }
 
 
-    $form = ActiveForm::begin();
+    $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]);
     ?>
 
     <?=
@@ -96,21 +85,6 @@ $this->registerJs($js);
             'allowClear' => true
         ],
     ])->label('Agent');
-    ?>
-
-    <?=
-    $form->field($model, 'restaurant_delivery_area')->widget(Select2::classname(), [
-        'data' => $restaurantDeliveryArray,
-        'options' => [
-            'placeholder' => 'Select delivery area ...',
-            'multiple' => true,
-            'value' => $sotredRestaurantDeliveryAreas
-        ],
-        'pluginOptions' => [
-            'tags' => true,
-            'tokenSeparators' => [',', ' '],
-        ],
-    ]);
     ?>
 
     <?=
@@ -142,9 +116,9 @@ $this->registerJs($js);
         ],
         'pluginOptions' => [
             'showUpload' => false,
-             'initialPreview' => $model->getThumbnailImage(),
-             'initialPreviewAsData' => true,
-             'overwriteInitial' => true,
+            'initialPreview' => $model->getThumbnailImage(),
+            'initialPreviewAsData' => true,
+            'overwriteInitial' => true,
             'maxFileSize' => 2800
         ]
     ]);
@@ -155,9 +129,9 @@ $this->registerJs($js);
         ],
         'pluginOptions' => [
             'showUpload' => false,
-             'initialPreview' => $model->getLogo(),
-             'initialPreviewAsData' => true,
-             'overwriteInitial' => true,
+            'initialPreview' => $model->getLogo(),
+            'initialPreviewAsData' => true,
+            'overwriteInitial' => true,
             'maxFileSize' => 2800
         ]
     ]);
@@ -187,7 +161,92 @@ $this->registerJs($js);
     <?= $form->field($model, 'phone_number')->textInput(['maxlength' => true]) ?>
 
 
-    <?= $form->field($model, 'restaurant_api_key')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'business_type')->textInput(['value' => 'corp']) ?>
+    <?= $form->field($model, 'vendor_sector')->textInput() ?>
+    <?= $form->field($model, 'license_number')->textInput() ?>
+    <?=
+    $form->field($model, 'not_for_profit', [
+        'template' => "<label style='display:block;' class='control-label' for='agent-agent_email'>Not for profit</label>\n{input}\n{hint}\n{error}"
+    ])->checkbox([
+        'label' => '',
+        'checked' => $model->not_for_profit == 0 ? false : true,
+        'data-bootstrap-switch' => '',
+        'data-off-color' => 'danger',
+        'data-on-color' => 'success',
+    ])
+    ?>            
+
+    
+    <?= $form->field($model, 'document_issuing_country')->textInput(['value' => "KW"]) ?>
+
+    <?=
+    $form->field($model, 'document_issuing_date')->widget(DatePicker::classname(), [
+        'pluginOptions' => [
+            'autoclose' => true,
+            'format' => 'yyyy-mm-dd'
+        ]
+    ])
+    ?>
+    <?=
+    $form->field($model, 'document_expiry_date')->widget(DatePicker::classname(), [
+        'pluginOptions' => [
+            'autoclose' => true,
+            'format' => 'yyyy-mm-dd'
+        ]
+    ])
+    ?>
+
+    <?=
+    $form->field($model, 'restaurant_document_file')->widget(FileInput::classname(), [
+        'options' => [
+            'accept' => 'image/*',
+            'multiple' => false
+        ]
+    ]);
+    ?>
+
+    <?= $form->field($model, 'document_title')->textInput(['value' => 'Authorized Signature']) ?>
+
+    <?= $form->field($model, 'document_file_purpose')->textInput(['value' => 'customer_signature']) ?>
+
+    <?= $form->field($model, 'iban')->textInput() ?>
+    <?= $form->field($model, 'owner_first_name')->textInput() ?>
+    <?= $form->field($model, 'owner_last_name')->textInput() ?>
+    <?= $form->field($model, 'owner_email')->textInput() ?>
+    <?= $form->field($model, 'owner_customer_number')->textInput() ?>
+
+    <?= $form->field($model, 'identification_issuing_country')->textInput(['value' => "KW"]) ?>
+
+    <?=
+    $form->field($model, 'identification_issuing_date')->widget(DatePicker::classname(), [
+        'pluginOptions' => [
+            'autoclose' => true,
+            'format' => 'yyyy-mm-dd'
+        ]
+    ])
+    ?>
+    <?=
+    $form->field($model, 'identification_expiry_date')->widget(DatePicker::classname(), [
+        'pluginOptions' => [
+            'autoclose' => true,
+            'format' => 'yyyy-mm-dd'
+        ]
+    ])
+    ?>
+
+    <?=
+    $form->field($model, 'owner_identification_file')->widget(FileInput::classname(), [
+        'options' => [
+            'accept' => 'image/*',
+            'multiple' => false
+        ]
+    ]);
+    ?>
+
+    <?= $form->field($model, 'identification_file_purpose')->textInput(['value' => 'identity_document']) ?>
+
+    <?= $form->field($model, 'identification_title')->textInput(['value' => "Owner's civil id"]) ?>
 
 
     <div class="form-group">

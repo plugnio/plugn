@@ -3,12 +3,13 @@
 namespace backend\controllers;
 
 use Yii;
-use common\models\Restaurant;
+use backend\models\Restaurant;
 use backend\models\RestaurantSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use yii\web\UploadedFile;
 
 /**
  * RestaurantController implements the CRUD actions for Restaurant model.
@@ -74,17 +75,24 @@ class RestaurantController extends Controller {
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
 
+            $model->restaurant_document_file = UploadedFile::getInstances($model, 'restaurant_document_file')[0]; //Authorized Signature
+            $model->owner_identification_file = UploadedFile::getInstances($model, 'owner_identification_file')[0]; //Owner's civil id
+
+            if ($model->restaurant_document_file && $model->owner_identification_file) {
+                    $model->createAMerchantAccountOnTap();
+            }
 
             if ($model->save()) {
 
-//                if ($model->restaurant_delivery_area)
-//                    $model->restaurantDeliveryAreas->saveRestaurantDeliveryArea($model->restaurant_delivery_area);
-
+                
+                //delete tmp files
+                $model->deleteTempFiles();
+                
                 if ($model->restaurant_payments_method)
                     $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
 
-                $thumbnail_image = \yii\web\UploadedFile::getInstances($model, 'thumbnail_image');
-                $logo = \yii\web\UploadedFile::getInstances($model, 'logo');
+                $thumbnail_image = UploadedFile::getInstances($model, 'thumbnail_image');
+                $logo = UploadedFile::getInstances($model, 'logo');
 
                 if ($thumbnail_image)
                     $model->uploadThumbnailImage($thumbnail_image[0]->tempName);
@@ -93,6 +101,8 @@ class RestaurantController extends Controller {
                     $model->uploadLogo($logo[0]->tempName);
 
                 return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+            }else{
+                die(json_encode($model->errors));
             }
         }
 
@@ -122,8 +132,8 @@ class RestaurantController extends Controller {
 
             if ($model->save()) {
 
-                $thumbnail_image = \yii\web\UploadedFile::getInstances($model, 'thumbnail_image');
-                $logo = \yii\web\UploadedFile::getInstances($model, 'logo');
+                $thumbnail_image = UploadedFile::getInstances($model, 'thumbnail_image');
+                $logo = UploadedFile::getInstances($model, 'logo');
 
                 if ($thumbnail_image)
                     $model->uploadThumbnailImage($thumbnail_image[0]->tempName);

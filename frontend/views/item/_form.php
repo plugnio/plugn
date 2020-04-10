@@ -42,7 +42,7 @@ $this->registerJs($js);
 <div class="item-form">
 
     <?php
-    $categoryQuery = Category::find()->asArray()->all();
+    $categoryQuery = Category::find()->where(['restaurant_uuid' => $model->restaurant_uuid])->asArray()->all();
     $categoryArray = ArrayHelper::map($categoryQuery, 'category_id', 'category_name');
 
     $itemCategoryValues = [];

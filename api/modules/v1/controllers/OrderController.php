@@ -232,6 +232,8 @@ class OrderController extends Controller {
 
 //                  Yii::info("[Payment Attempt Started] " . Yii::$app->user->identity->investor_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($amountToInvest, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
                         // Redirect to payment gateway
+                        Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
+                        
                         $response = Yii::$app->tapPayments->createCharge(
                                 "Order placed from: " . $order->customer_name, // Description
                                 $order->restaurant->name, //Statement Desc.
@@ -241,7 +243,8 @@ class OrderController extends Controller {
                                 $order->customer_email,
                                 $order->customer_phone_number, 
                                 Url::to(['order/callback'], true), 
-                                $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD
+                                $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD,
+                                $order->restaurant->test_api_key
                         );
 
                         $responseContent = json_decode($response->content);
