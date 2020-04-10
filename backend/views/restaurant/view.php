@@ -92,6 +92,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'phone_number',
             'restaurant_created_at',
             'restaurant_updated_at',
+            'live_api_key',
+            'test_api_key',
         ],
     ])
     ?>

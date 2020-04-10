@@ -78,19 +78,16 @@ class RestaurantController extends Controller {
             $model->restaurant_document_file = UploadedFile::getInstances($model, 'restaurant_document_file')[0]; //Authorized Signature
             $model->owner_identification_file = UploadedFile::getInstances($model, 'owner_identification_file')[0]; //Owner's civil id
 
+            if ($model->restaurant_document_file && $model->owner_identification_file) {
+                    $model->createAMerchantAccountOnTap();
+            }
 
             if ($model->save()) {
+
                 
-                if ($model->restaurant_document_file && $model->owner_identification_file) {
-                    $model->createAMerchantAccountOnTap();
-
-                    //Upload all files to cloudinary
-                    $model->uploadFileToCloudinary($model->restaurant_document_file, 'document_file');
-                    $model->uploadFileToCloudinary($model->owner_identification_file, 'identification_file');
-                }
-//                if ($model->restaurant_delivery_area)
-//                    $model->restaurantDeliveryAreas->saveRestaurantDeliveryArea($model->restaurant_delivery_area);
-
+                //delete tmp files
+                $model->deleteTempFiles();
+                
                 if ($model->restaurant_payments_method)
                     $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
 

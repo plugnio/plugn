@@ -28,6 +28,7 @@ class TapPayments extends Component {
      * @var string Generated link sends user directly to KNET portal
      */
     const GATEWAY_KNET = "src_kw.knet";
+
     /**
      * @var string Generated link sends user directly to VISA/MASTER portal
      */
@@ -46,18 +47,32 @@ class TapPayments extends Component {
     /**
      * @var string secret api key to use will be stored here
      */
-     public $secretApiKey;
+    public $plugnScretApiKey;
 
-     /**
-      * @var string Variable for live api key to be stored in
-      */
-      public $liveApiKey;
+    /**
+     * @var string Variable for live api key to be stored in
+     */
+    public $plugnLiveApiKey;
 
-      /**
-       * @var string Variable for test api key to be stored in
-       */
-     public $testApiKey;
+    /**
+     * @var string Variable for test api key to be stored in
+     */
+    public $plugnTestApiKey;
+    
+    /**
+     * @var string secret api key to use will be stored here
+     */
+    public $vendorSecretApiKey;
 
+    /**
+     * @var string Variable for live api key to be stored in
+     */
+    public $vendoerLiveApiKey;
+
+    /**
+     * @var string Variable for test api key to be stored in
+     */
+    public $vendorTestApiKey;
     private $apiEndpoint = "https://api.tap.company/v2";
 
     /**
@@ -65,7 +80,7 @@ class TapPayments extends Component {
      */
     public function init() {
         // Fields required by default
-        $requiredAttributes = ['gatewayToUse', 'liveApiKey', 'testApiKey'];
+        $requiredAttributes = ['gatewayToUse', 'plugnLiveApiKey', 'plugnTestApiKey'];
 
         // Process Validation
         foreach ($requiredAttributes as $attribute) {
@@ -78,122 +93,297 @@ class TapPayments extends Component {
         }
 
         // Set the API key we're going to use
-//        if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
-//            $this->secretApiKey = $this->liveApiKey;
-//        }else{
-//            $this->secretApiKey = $this->testApiKey;
-//        }
-
-          $this->secretApiKey = $this->testApiKey;
-          
+        //These keys we will use it to (upload document - create a business - create a merchant - create an operator)
+        if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
+            $this->plugnScretApiKey = $this->plugnLiveApiKey;
+        } else {
+            $this->plugnScretApiKey = $this->plugnTestApiKey;
+        }
+        
         parent::init();
     }
 
+        /**
+     * Set the api keys to use
+     * @param  [type] $liveKey [description]
+     * @param  [type] $testKey [description]
+     * @return [type]          [description]
+     */
+    public function setApiKeys($liveKey, $testKey){
+        $this->vendoerLiveApiKey = $liveKey;
+        $this->vendorTestApiKey = $testKey;
 
+        if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
+            $this->vendorSecretApiKey = $this->vendoerLiveApiKey;
+        }else{
+            $this->vendorSecretApiKey = $this->vendorTestApiKey;
+        }
+    }
+
+    
     /**
      * upload a file to Tap
-     * @param type $file
+     * @param type $file_path
+     * @param type $purpose
+     * @param type $title
+     * @return type
      */
-    public function uploadFileToTap($file_path , $purpose, $title, $file_link_create = false) {
-        $fileEndpoint = $this->apiEndpoint."/files";
-        
-       $fileParams = [
-           "purpose" => $purpose,
-           "title" => $title,
-           "file_link_create" => $file_link_create
-       ];
-       
-       
+    public function uploadFileToTap($file_path, $purpose, $title) {
+        $fileEndpoint = $this->apiEndpoint . "/files";
+
+        $fileParams = [
+            "purpose" => $purpose,
+            "title" => $title,
+            "file_link_create" => '0'
+        ];
+
+
         $client = new Client();
         $response = $client->createRequest()
-            ->setMethod('POST')
-            ->setUrl($fileEndpoint)
-            ->setData($fileParams)
-            ->addFile('file', $file_path)
-            ->addHeaders([
-                'authorization' => 'Bearer '.$this->secretApiKey,
-                'content-type' => 'application/json',
-            ])
-            ->send();
+                ->setMethod('POST')
+                ->setUrl($fileEndpoint)
+                ->setData($fileParams)
+                ->addFile('file', $file_path)
+                ->addHeaders([
+                    'authorization' => 'Bearer ' . $this->plugnScretApiKey,
+                    'content-type' => 'application/json',
+                ])
+                ->send();
 
         return $response;
     }
-    
-    /**
-     * Create a charge for redirect
-     */
-    public function createCharge($desc = "Pay", $statementDesc = "", $ref, $amount, $firstName, $email, $phone, $redirectUrl, $gateway) {
-        $chargeEndpoint = $this->apiEndpoint."/charges";
 
-        $chargeParams = [
-          "amount" => $amount,
-          "currency" => "KWD",
-          "threeDSecure" => true,
-          "save_card" => false,
-          "description" => $desc,
-          "statement_descriptor" => $statementDesc,
-          "metadata" => [
-            // "udf1" => "test 1",
-            // "udf2" => "test 2"
-          ],
-          "reference" => [
-            "transaction" => $ref,
-            "order" => $ref
-          ],
-          "receipt" => [
-            "email" => false,
-            "sms" => false
-          ],
-          "customer" => [
-            "first_name" => $firstName,
-            "email" => $email,
-            "phone" => [
-              "country_code" => "965",
-              "number" => $phone
+    /**
+     * Create a business
+     * @param type $restaurant
+     * @return type
+     */
+    public function createBussiness($restaurant) {
+        $bussinessEndpoint = $this->apiEndpoint . "/business";
+
+        $bussinessParams = [
+            "name" => [
+                "en" => $restaurant->name,
+                "ar" => $restaurant->name_ar
+            ],
+            "type" => $restaurant->business_type,
+            "entity" => [
+                "legal_name" => [
+                    "en" => $restaurant->name,
+                    "ar" => $restaurant->name_ar
+                ],
+                "is_licensed" => 'true',
+                "license_number" => $restaurant->license_number,
+                "not_for_profit" => $restaurant->not_for_profit == "0" ? 'false' : 'true',
+                "country" => "KW",
+                "documents" => [
+                    [
+                        "number" => 1,
+                        "issuing_country" => $restaurant->document_issuing_country,
+                        "issuing_date" => $restaurant->document_issuing_date,
+                        "expiry_date" => $restaurant->document_expiry_date,
+                        "images" => [
+                            $restaurant->document_file_id
+                        ]
+                    ]
+                ],
+                "bank_account" => [
+                    "iban" => $restaurant->iban
+                ]
+            ],
+            "contact_person" => [
+                "name" => [
+                    "first" => $restaurant->owner_first_name,
+                    "last" => $restaurant->owner_last_name
+                ],
+                "contact_info" => [
+                    "primary" => [
+                        "email" => $restaurant->owner_email,
+                        "phone" => [
+                            "country_code" => "965",
+                            "number" => $restaurant->owner_customer_number
+                        ]
+                    ]
+                ],
+                "identification" => [
+                    [
+                        "type" => "Identity Card",
+                        "issuing_country" => $restaurant->identification_issuing_country,
+                        "issuing_date" => $restaurant->identification_issuing_date,
+                        "expiry_date" => $restaurant->identification_expiry_date,
+                        "images" => [
+                            $restaurant->identification_file_id
+                        ]
+                    ]
+                ],
+            ],
+            "brands" => [
+                [
+                    "name" => [
+                        "en" => $restaurant->name,
+                        "ar" => $restaurant->name_ar
+                    ],
+                    "sector" => [
+                        $restaurant->vendor_sector
+                    ]
+                ]
             ]
-          ],
-          "source" => [
-            "id" => $gateway
-          ],
-          "redirect" => [
-            "url" => $redirectUrl
-          ]
+        ];
+
+
+
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setMethod('POST')
+                ->setUrl($bussinessEndpoint)
+                ->setData($bussinessParams)
+                ->addHeaders([
+                    'authorization' => 'Bearer ' . $this->plugnScretApiKey,
+                    'content-type' => 'application/json',
+                ])
+                ->send();
+
+        return $response;
+    }
+
+    /**
+     * Create a merchant account
+     * @param type $restaurant_name
+     * @param type $business_id
+     * @param type $business_entity_id
+     * @param type $iban
+     * @return type
+     */
+    public function createMergentAccount($restaurant_name, $business_id, $business_entity_id, $iban) {
+
+        $merchantEndpoint = $this->apiEndpoint . "/merchant";
+
+        $merchantParams = [
+            "display_name" => $restaurant_name,
+            "business_id" => $business_id,
+            "business_entity_id" => $business_entity_id,
+            "bank_account" => [
+                "iban" => $iban
+            ],
+            "charge_currenices" => [
+                "KWD"
+            ]
         ];
 
         $client = new Client();
         $response = $client->createRequest()
-            ->setMethod('POST')
-            ->setUrl($chargeEndpoint)
-            ->setData($chargeParams)
-            ->addHeaders([
-                'authorization' => 'Bearer '.$this->secretApiKey,
-                'content-type' => 'application/json',
-            ])
-            ->send();
+                ->setMethod('POST')
+                ->setUrl($merchantEndpoint)
+                ->setData($merchantParams)
+                ->addHeaders([
+                    'authorization' => 'Bearer ' . $this->plugnScretApiKey,
+                    'content-type' => 'application/json',
+                ])
+                ->send();
 
         return $response;
-
     }
 
+    /**
+     * Create an operator 
+     * @param type $restaurant_name
+     * @param type $wallet_id
+     */
+    public function createAnOperator($restaurant_name, $wallet_id) {
+
+        $operatorEndpoint = $this->apiEndpoint . "/operator";
+
+        $operatorParams = [
+            "wallet_id" => $wallet_id,
+            "name" => $restaurant_name,
+        ];
+
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setMethod('POST')
+                ->setUrl($operatorEndpoint)
+                ->setData($operatorParams)
+                ->addHeaders([
+                    'authorization' => 'Bearer ' . $this->plugnScretApiKey,
+                    'content-type' => 'application/json',
+                ])
+                ->send();
+        
+        
+        return $response;
+    }
+
+    /**
+     * Create a charge for redirect
+     */
+    public function createCharge($desc = "Pay", $statementDesc = "", $ref, $amount, $firstName, $email, $phone, $redirectUrl, $gateway) {
+        $chargeEndpoint = $this->apiEndpoint . "/charges";
+
+        $chargeParams = [
+            "amount" => $amount,
+            "currency" => "KWD",
+            "threeDSecure" => true,
+            "save_card" => false,
+            "description" => $desc,
+            "statement_descriptor" => $statementDesc,
+            "metadata" => [
+            // "udf1" => "test 1",
+            // "udf2" => "test 2"
+            ],
+            "reference" => [
+                "transaction" => $ref,
+                "order" => $ref
+            ],
+            "receipt" => [
+                "email" => false,
+                "sms" => false
+            ],
+            "customer" => [
+                "first_name" => $firstName,
+                "email" => $email,
+                "phone" => [
+                    "country_code" => "965",
+                    "number" => $phone
+                ]
+            ],
+            "source" => [
+                "id" => $gateway
+            ],
+            "redirect" => [
+                "url" => $redirectUrl
+            ]
+        ];
+
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setMethod('POST')
+                ->setUrl($chargeEndpoint)
+                ->setData($chargeParams)
+                ->addHeaders([
+                    'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
+                    'content-type' => 'application/json',
+                ])
+                ->send();
+
+        return $response;
+    }
 
     /**
      * Check charge object for status updates
      * @param  string $chargeId
      */
-    public function retrieveCharge($chargeId)
-    {
+    public function retrieveCharge($chargeId) {
         $client = new Client();
         $response = $client->createRequest()
-            ->setMethod('GET')
-            ->setUrl($this->apiEndpoint."/charges/".$chargeId)
-            ->addHeaders([
-                'authorization' => 'Bearer '.$this->secretApiKey,
-                'content-type' => 'application/json',
-            ])
-            ->send();
+                ->setMethod('GET')
+                ->setUrl($this->apiEndpoint . "/charges/" . $chargeId)
+                ->addHeaders([
+                    'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
+                    'content-type' => 'application/json',
+                ])
+                ->send();
 
         return $response;
     }
-
 
 }

@@ -52,8 +52,8 @@ return [
         'tapPayments' => [
             'class' => 'common\components\TapPayments',
             'gatewayToUse' => \common\components\TapPayments::USE_TEST_GATEWAY,
-            'liveApiKey' => "sk", 
-            'testApiKey' => "sk_test_p07NquMX4HgwLT8mycdJnZv5"
+            'plugnLiveApiKey' => "sk", 
+            'plugnTestApiKey' => "sk_test_p07NquMX4HgwLT8mycdJnZv5"
         ],
     ],
 ];

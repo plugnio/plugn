@@ -22,7 +22,6 @@ use yii\behaviors\AttributeBehavior;
  * @property int $support_delivery
  * @property int $support_pick_up
  * @property string|null $phone_number
- * @property string $restaurant_api_key
  * @property string|null $restaurant_created_at
  * @property string|null $restaurant_updated_at
  *
@@ -70,7 +69,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['agent_id', 'restaurant_status', 'support_delivery', 'support_pick_up'], 'integer', 'min' => 0],
             [['restaurant_created_at', 'restaurant_updated_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
-            [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_api_key'], 'string', 'max' => 255],
+            [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 8, 'max' => 8],
             [['phone_number'], 'integer', 'min' => 0],
             [['restaurant_uuid'], 'unique'],
@@ -98,7 +97,6 @@ class Restaurant extends \yii\db\ActiveRecord {
             'support_pick_up' => 'Support Pick Up',
             'restaurant_delivery_area' => 'Delivery Areas',
             'phone_number' => 'Phone Number',
-            'restaurant_api_key' => 'Api Key',
             'restaurant_created_at' => 'Restaurant Created At',
             'restaurant_updated_at' => 'Restaurant Updated At',
         ];
