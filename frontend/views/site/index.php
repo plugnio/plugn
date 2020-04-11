@@ -7,7 +7,7 @@ use yii\helpers\Html;
 
 $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
 
-$this->title = 'My Yii Application';
+$this->title = $restaurant_model->name;
 ?>
 <div class="site-index">
 

@@ -331,7 +331,6 @@ class Order extends \yii\db\ActiveRecord {
                 $customer_model->save();
             }
 
-
             $this->customer_id = $customer_model->customer_id;
 
 

@@ -86,7 +86,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'tagline_ar',
             'status',
             'thumbnail_image',
-            'logo',
+               [
+                        'attribute' => 'logo',
+                        'format' => 'html',
+                        'value' => function ($data) {
+                            return Html::img( $data->getRestaurantLogoUrl() );
+                        },
+            ],
             'support_delivery',
             'support_pick_up',
             'phone_number',

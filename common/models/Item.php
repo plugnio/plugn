@@ -193,7 +193,7 @@ class Item extends \yii\db\ActiveRecord {
 
         if ($this->item_image) {
             $restaurantName = str_replace(' ', '', $this->restaurant->name);
-            $url = 'https://res.cloudinary.com/plugn/image/upload/v1579555687/restaurants/'
+            $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
                     . $restaurantName . '/items/'
                     . $this->item_image;
             $photo_url = $url;

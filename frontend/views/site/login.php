@@ -23,16 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'enableClientScript' => false
             ]);
             ?>
-
-            <?=
-            $form->field($model, 'restaurantUuid', ['options' => [
-                    'tag' => 'div',
-                    'class' => 'form-group field-loginform has-feedback required'
-                ],
-                'template' => '{input}{error}{hint}'
-            ])->textInput(['type' => 'text', 'placeholder' => 'Restaurant Uuid'])
-            ?>
-            
+          
             <?=
             $form->field($model, 'email', ['options' => [
                     'tag' => 'div',

@@ -40,14 +40,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         'attribute' => 'thumbnail_image',
                         'format' => 'html',
                         'value' => function ($data) {
-                            return Html::img("https://res.cloudinary.com/plugn/image/upload/restaurants/" . $data->restaurant_uuid . "/thumbnail-image/" . $data->thumbnail_image);
+                            return Html::img( $data->getRestaurantThumbnailImageUrl() );
                         },
                     ],
                     [
                         'attribute' => 'logo',
                         'format' => 'html',
                         'value' => function ($data) {
-                            return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/" . $data->restaurant_uuid . "/logo/" . $data->logo);
+                            return Html::img( $data->getRestaurantLogoUrl() );
                         },
                     ],
                     [

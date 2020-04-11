@@ -64,7 +64,7 @@ class Restaurant extends \common\models\Restaurant {
                     'identification_issuing_date', 'identification_expiry_date',
                     'owner_identification_file', 'identification_file_purpose'
                 ],
-                'required'
+                'required' , 'on' => 'create'
             ],
             [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3],
             [['identification_file_id', 'document_file_id'], 'safe'],
@@ -85,7 +85,7 @@ class Restaurant extends \common\models\Restaurant {
                 ],
                 'string', 'max' => 255
             ],
-            [['restaurant_document_file', 'owner_identification_file'], 'file', 'skipOnEmpty' => false],
+            [['restaurant_document_file', 'owner_identification_file'], 'file', 'skipOnEmpty' => true],
         ]);
     }
 
@@ -235,6 +235,7 @@ class Restaurant extends \common\models\Restaurant {
             $this->merchant_id = $merchantApiResponse->data['id'];
             $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
         }
+
 
         //Create an Operator
         $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id);

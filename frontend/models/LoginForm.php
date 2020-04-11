@@ -13,7 +13,6 @@ class LoginForm extends Model {
 
     public $email;
     public $password;
-    public $restaurantUuid;
     public $ownedRestaurant;
     public $rememberMe = true;
     private $_agent = false;
@@ -23,12 +22,10 @@ class LoginForm extends Model {
      */
     public function rules() {
         return [
-            // email , password and restaurantUuid are both required
-            [['email', 'password', 'restaurantUuid'], 'required'],
+            // email , password are both required
+            [['email', 'password'], 'required'],
             // email must be an email
             ['email', 'email'],
-            // restaurantUuid must be a string
-            [['restaurantUuid'], 'string', 'max' => 60],
             // rememberMe must be a boolean value
             ['rememberMe', 'boolean'],
             // password is validated by validatePassword()
@@ -62,7 +59,9 @@ class LoginForm extends Model {
             $loggedInAgent = $this->getAgent();
             if ($loggedInAgent != NULL) {
                 Yii::$app->user->login($loggedInAgent, $this->rememberMe ? 3600 * 24 * 30 : 0);
-                return Yii::$app->ownedAccountManager->getOwnedAccount($this->restaurantUuid);
+                foreach (Yii::$app->ownedAccountManager->getOwnedRestaurants() as $restaurantOwned) {
+                    return Yii::$app->ownedAccountManager->getOwnedAccount($restaurantOwned->restaurant_uuid);
+                }
             }
         }
 

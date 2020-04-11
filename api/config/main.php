@@ -70,10 +70,11 @@ return [
                     'controller' => 'v1/restaurant-delivery',
                     'pluralize' => false,
                     'patterns' => [
-                        'GET' => 'list-all-cities',
-                        'GET <id>' => 'get-delivered-area-data',
+                        'GET delivery-area/<restaurant_uuid>' => 'list-all-cities',
+                        'GET <id>' => 'delivered-area-data',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS delivery-area/<restaurant_uuid>' => 'options',
                         'OPTIONS <id>' => 'options',
                     ]
                 ],

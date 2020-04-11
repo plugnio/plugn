@@ -54,7 +54,7 @@ class RestaurantDeliveryController extends Controller {
     /**
      * Return City list
      */
-    public function actionGetDeliveredAreaData($id) {
+    public function actionDeliveredAreaData($id) {
 
 
         $restaurantDeliveryArea = RestaurantDelivery::find()
@@ -73,7 +73,7 @@ class RestaurantDeliveryController extends Controller {
     /**
      * Return City list
      */
-    public function actionListAllCities() {
+    public function actionListAllCities($restaurant_uuid) {
 
 
         $allCitiesData = City::find()
@@ -81,6 +81,7 @@ class RestaurantDeliveryController extends Controller {
                 ->all();
 
         $restaurantDeliveryAreas = RestaurantDelivery::find()
+                ->where(['restaurant_uuid' => $restaurant_uuid])
                 ->asArray()
                 ->with('area')
                 ->all();

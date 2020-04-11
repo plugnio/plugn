@@ -174,6 +174,20 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Return Restaurant's logo url 
+     */
+    public function getRestaurantLogoUrl(){
+        return 'https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/' . $this->restaurant_uuid . "/logo/" . $this->logo;
+    }
+    
+    /**
+     * Return Restaurant's thumbnail image url 
+     */
+    public function getRestaurantThumbnailImageUrl(){
+        return 'https://res.cloudinary.com/plugn/image/upload/c_scale,w_600/restaurants/' . $this->restaurant_uuid . "/thumbnail-image/" . $this->thumbnail_image;
+    }
+    
+    /**
      * Upload restaurant's logo  to cloudinary
      * @param type $imageURL
      */

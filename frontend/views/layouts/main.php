@@ -8,8 +8,11 @@ use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use frontend\assets\DashboardAsset;
 use common\widgets\Alert;
+use common\models\Restaurant;
 
 DashboardAsset::register($this);
+
+$restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -20,6 +23,7 @@ DashboardAsset::register($this);
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <?php $this->registerCsrfMetaTags() ?>
         <title><?= Html::encode($this->title) ?></title>
+        <link rel="shortcut icon" href="<?php echo Yii::$app->request->baseUrl; ?>/favicon.ico" type="image/x-icon" />
         <?php $this->head() ?>
     </head>
     <body class="hold-transition sidebar-mini layout-fixed">
@@ -60,12 +64,12 @@ DashboardAsset::register($this);
                 <!-- Brand Logo -->
 
 
-                <?php
-                //todo
-//                Html::a('<img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">'
-//                        . '<span class="brand-text font-weight-light">'
-//                        . '</span>'
-//                        , ['site/index'], ['class' => 'brand-link']);
+                <?=
+                Html::a('<img src="' . $restaurant_model->getRestaurantLogoUrl() . '"alt="' . $restaurant_model->name . ' Logo" class="brand-image img-circle elevation-3" style="opacity: .8">'
+                        . '<span class="brand-text font-weight-light">'
+                        . $restaurant_model->name
+                        . '</span>'
+                        , ['site/index', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'brand-link']);
                 ?>
 
                 <!-- Sidebar -->
@@ -84,36 +88,26 @@ DashboardAsset::register($this);
                     <!-- Sidebar Menu -->
                     <nav class="mt-2">
                         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                            <li class="nav-item has-treeview">
+
+                            <li class="nav-item">
+
+                                <?=
+                                Html::a(
+                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-th']) .
+                                        Html::tag('p', 'Categories'), ['category/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
+                                )
+                                ?>
+
+                            </li>
+                            <li class="nav-item">
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'nav-icon fas fa-box']) .
-                                        Html::tag('p', '
-                                        Items
-                                      <i class="fas fa-angle-left right"></i>'), [''], ['class' => 'nav-link']
+                                        Html::tag('p', 'Items'), ['item/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
                                 )
                                 ?>
-                                <ul class="nav nav-treeview">
-                                    <li class="nav-item">
 
-                                        <?=
-                                        Html::a(
-                                                Html::tag('i', '', ['class' => 'nav-icon fas fa-th']) .
-                                                Html::tag('p', 'Categories'), ['category/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
-                                        )
-                                        ?>
-
-                                    </li>
-                                    <li class="nav-item">
-                                        <?=
-                                        Html::a(
-                                                Html::tag('i', '', ['class' => 'nav-icon fas fa-box']) .
-                                                Html::tag('p', 'All Items'), ['item/index' , 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
-                                        )
-                                        ?>
-
-                                    </li>
-                                </ul>
+                            </li>
                             </li>
                             <li class="nav-item has-treeview">
                                 <?=
@@ -131,64 +125,73 @@ DashboardAsset::register($this);
                                 )
                                 ?>
                             </li>
-                            <li class="nav-item has-treeview">
+
+                            <li class="nav-item">
                                 <?=
                                 Html::a(
-                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-cogs']) .
-                                        Html::tag('p', '
-                                      Settings
-                                      <i class="fas fa-angle-left right"></i>'), [''], ['class' => 'nav-link']
+                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-store']) .
+                                        Html::tag('p', 'Restaurant Info'), ['restaurant/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
                                 )
                                 ?>
-                                <ul class="nav nav-treeview">
-                                    <li class="nav-item">
-                                        <?=
-                                        Html::a(
-                                                Html::tag('i', '', ['class' => 'nav-icon fas fa-store']) .
-                                                Html::tag('p', 'Restaurant Info'), ['restaurant/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
-                                        )
-                                        ?>
 
-                                    </li>
-                                    <li class="nav-item">
-                                        <?=
-                                        Html::a(
-                                                Html::tag('i', '', ['class' => 'nav-icon fas fa-paint-brush']) .
-                                                Html::tag('p', 'Theme'), ['restaurant-theme/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
-                                        )
-                                        ?>
-
-                                    </li>
-                                    <li class="nav-item">
-                                        <?=
-                                        Html::a(
-                                                Html::tag('i', '', ['class' => 'nav-icon fas fa-truck']) .
-                                                Html::tag('p', 'Delivery Zone'), ['restaurant-delivery/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
-                                        )
-                                        ?>
-
-                                    </li>
-                                    <li class="nav-item">
-                                        <?=
-                                        Html::a(
-                                                Html::tag('i', '', ['class' => 'nav-icon fas fa-clock']) .
-                                                Html::tag('p', 'Working Hours'), ['working-hours/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
-                                        )
-                                        ?>
-
-                                    </li>
-                                    <li class="nav-item">
-                                        <?=
-                                        Html::a(
-                                                Html::tag('i', '', ['class' => 'nav-icon fas fa-store']) .
-                                                Html::tag('p', "Restaurant's Branches"), ['restaurant-branch/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
-                                        )
-                                        ?>
-
-                                    </li>
-                                </ul>
                             </li>
+                            <li class="nav-item">
+                                <?=
+                                Html::a(
+                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-paint-brush']) .
+                                        Html::tag('p', 'Theme'), ['restaurant-theme/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
+                                )
+                                ?>
+
+                            </li>
+                            <li class="nav-item">
+                                <?=
+                                Html::a(
+                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-truck']) .
+                                        Html::tag('p', 'Delivery Zone'), ['restaurant-delivery/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
+                                )
+                                ?>
+
+                            </li>
+                            <!--<li class="nav-item">-->
+                                <?php
+//                                Html::a(
+//                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-clock']) .
+//                                        Html::tag('p', 'Working Hours'), ['working-hours/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
+//                                )
+//                                ?>
+
+                            <!--</li>-->
+                            <li class="nav-item">
+                                <?=
+                                Html::a(
+                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-store']) .
+                                        Html::tag('p', "Restaurant's Branches"), ['restaurant-branch/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
+                                )
+                                ?>
+
+                            </li>
+                            </li>
+                            <?php if (count(Yii::$app->ownedAccountManager->getOwnedRestaurants()) > 1) { ?>
+                                <li class="nav-header">EXAMPLES</li>
+                                <?php
+                                foreach (Yii::$app->ownedAccountManager->getOwnedRestaurants() as $ownedRestaurant) {
+                                    if ($ownedRestaurant->restaurant_uuid != $this->params['restaurant_uuid']) {
+                                        ?>
+                                        <li class="nav-item">
+                                            <?=
+                                            Html::a(
+                                                Html::img( $ownedRestaurant->getRestaurantLogoUrl(),['class' => 'brand-image img-circle elevation-3', 'style'=>'opacity: .8; margin-right: .5rem; margin-top: -3px; max-height: 33px; width: auto;']) .
+                                                Html::tag('p', $ownedRestaurant->name), ['site/index', 'id' => $ownedRestaurant->restaurant_uuid], ['class' => 'nav-link']
+                                            )
+                                            ?>
+
+                                        </li>
+                                    <?php }
+                                }
+                            } ?>
                         </ul>
+
                     </nav>
                     <!-- /.sidebar-menu -->
                 </div>
@@ -207,6 +210,10 @@ DashboardAsset::register($this);
                             <div class="col-sm-6">
                                 <?=
                                 Breadcrumbs::widget([
+                                    'homeLink' => [
+                                        'label' => Yii::t('yii', 'Dashboard'),
+                                        'url' => ['site/index', 'id' => $this->params['restaurant_uuid']],
+                                    ],
                                     'itemTemplate' => "<li class='breadcrumb-item'><i>{link}</i></li>\n", // template for all links
                                     'activeItemTemplate' => "<li class='breadcrumb-item'><i>{link}</i></li>\n", // template for all links
                                     'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
@@ -222,8 +229,8 @@ DashboardAsset::register($this);
                 <!-- Main content -->
                 <section class="content">
                     <div class="container-fluid">
-                        <?= Alert::widget() ?>
-                        <?= $content ?>
+<?= Alert::widget() ?>
+<?= $content ?>
                     </div>
                 </section>
             </div>
@@ -232,7 +239,7 @@ DashboardAsset::register($this);
     </div>
 
 
-    <?php $this->endBody() ?>
+<?php $this->endBody() ?>
 </body>
 </html>
 <?php $this->endPage() ?>
