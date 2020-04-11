@@ -153,6 +153,15 @@ DashboardAsset::register($this);
                                     <li class="nav-item">
                                         <?=
                                         Html::a(
+                                                Html::tag('i', '', ['class' => 'nav-icon fas fa-paint-brush']) .
+                                                Html::tag('p', 'Theme'), ['restaurant-theme/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
+                                        )
+                                        ?>
+
+                                    </li>
+                                    <li class="nav-item">
+                                        <?=
+                                        Html::a(
                                                 Html::tag('i', '', ['class' => 'nav-icon fas fa-truck']) .
                                                 Html::tag('p', 'Delivery Zone'), ['restaurant-delivery/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
                                         )

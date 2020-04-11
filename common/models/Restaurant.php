@@ -34,6 +34,7 @@ use yii\behaviors\AttributeBehavior;
  * @property RestaurantBranch[] $restaurantBranches
  * @property Area[] $areas
  * @property RestaurantPaymentMethod[] $restaurantPaymentMethods
+ * @property RestaurantTheme $restaurantTheme
  * @property PaymentMethod[] $paymentMethods
  * @property Agent[] $agents 
  * @property WorkingHours[] $workingHours
@@ -238,6 +239,12 @@ class Restaurant extends \yii\db\ActiveRecord {
             if ($changedAttributes['logo']) {
                 $this->deleteRestaurantLogo($changedAttributes['logo']);
             }
+        }
+        
+        if($insert){
+            $restaurant_theme = new RestaurantTheme();
+            $restaurant_theme->restaurant_uuid = $this->restaurant_uuid;
+            $restaurant_theme->save();
         }
     }
 
@@ -479,5 +486,15 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function getCustomers() {
         return $this->hasMany(Customer::className(), ['customer_id' => 'customer_id']);
     }
-
+    
+    
+    /**
+     * Gets query for [[RestaurantTheme]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurantTheme()
+    {
+        return $this->hasOne(RestaurantTheme::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
 }

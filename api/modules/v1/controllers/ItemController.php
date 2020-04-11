@@ -59,8 +59,8 @@ class ItemController extends Controller {
 
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
 
-        $restaurant = Restaurant::findOne($restaurant_uuid);
-
+        $restaurant = Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->one();
+    
         if ($restaurant) {
             $restaurantMenu = Category::find()
                     ->where(['restaurant_uuid' => $restaurant_uuid])
@@ -80,6 +80,7 @@ class ItemController extends Controller {
 
             return [
                 'restaurant' => $restaurant,
+                'restaurantTheme' => $restaurant->getRestaurantTheme()->one(),
                 'restaurantMenu' => $restaurantMenu
             ];
         } else {
