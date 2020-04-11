@@ -2,19 +2,6 @@
 
 namespace console\controllers;
 
-use common\models\Email;
-use Yii;
-use yii\helpers\Console;
-use common\models\Payment;
-use common\models\Currency;
-use common\models\Employer;
-use common\models\CandidateJobApplication;
-use common\models\CandidateJobApplicationTrack;
-use common\models\Job;
-use common\models\Candidate;
-use common\models\Agent;
-
-
 /**
  * All Cron actions related to this project
  */
