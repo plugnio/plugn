@@ -30,11 +30,11 @@ class SiteController extends Controller {
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error'],
+                        'actions' => ['login', 'error', 'index'],
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'promote-to-open', 'promote-to-close','pay','callback'],
+                        'actions' => ['logout', 'promote-to-open', 'promote-to-close','pay','callback', 'vendor-dashboard'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -66,13 +66,23 @@ class SiteController extends Controller {
     }
 
     /**
-     * Displays homepage.
+     * Displays landing page
      *
      * @return mixed
      */
-    public function actionIndex($id) {
-        
-        return $this->render('index', [
+    public function actionIndex() {
+        $this->layout = 'landing';
+        return $this->render('landing');
+    }
+    
+
+    /**
+     * Displays vendor dashboard homepage.
+     *
+     * @return mixed
+     */
+    public function actionVendorDashboard($id) {
+       return $this->render('index', [
             'restaurant_model' => Yii::$app->ownedAccountManager->getOwnedAccount($id)
         ]);
     }
@@ -123,14 +133,15 @@ class SiteController extends Controller {
      * @return mixed
      */
     public function actionLogin() {
-        $this->layout = 'login';
+                $this->layout = 'landing';
+
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $ownedRestaurant = $model->login()) {
-            return $this->redirect(['site/index', 'id' => $ownedRestaurant->restaurant_uuid]);
+            return $this->redirect(['site/vendor-dashboard', 'id' => $ownedRestaurant->restaurant_uuid]);
         } else {
             $model->password = '';
 

@@ -5,62 +5,65 @@
 
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-
-$this->title = 'Login';
-$this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="login-box" style="margin-bottom: 100%;">
-    <div class="login-logo">
-        <a href="../../index2.html"><b>Admin</b>LTE</a>
-    </div>
-    <!-- /.login-logo -->
-    <div class="card">
-        <div class="card-body login-card-body">
-            <p class="login-box-msg">Sign in to start your session</p>
-            <?php
-            $form = ActiveForm::begin([
-                        'id' => 'login-form',
-                        'enableClientScript' => false
-            ]);
-            ?>
-          
-            <?=
-            $form->field($model, 'email', ['options' => [
-                    'tag' => 'div',
-                    'class' => 'form-group field-loginform has-feedback required'
-                ],
-                'template' => '{input}{error}{hint}'
-            ])->textInput(['type' => 'email', 'placeholder' => 'Email'])
-            ?>
 
-            <?=
-            $form->field($model, 'password', ['options' => [
-                    'tag' => 'div',
-                    'class' => 'form-group field-loginform has-feedback required'
-                ],
-                'template' => '{input}{error}{hint}'
-            ])->passwordInput(['placeholder' => 'Password'])
-            ?>
 
-            <div class="row">
-                <div class="col-8">
-                    <div class="icheck-primary">
+<!-- Header -->
+<header id="header" class="ex-2-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>Log In</h1>
+                <p>You don't have a password? Then please <a class="black" href="sign-up.html">Sign Up</a></p>
+                <!-- Sign Up Form -->
+                <div class="form-container">
+                    <?php $form = ActiveForm::begin(['id' => 'login-form', 'enableClientScript' => false]); ?>
+                    <div class="form-group">
+<!--                                <input type="email" class="form-control-input" id="lemail" required>
+                        <label class="label-control" for="lemail">Email</label>
+                        <div class="help-block with-errors"></div>-->
                         <?=
-                        $form->field($model, 'rememberMe', ['options' => [
+                        $form->field($model, 'email', ['options' => [
                                 'tag' => 'div',
-                                'class' => 'icheck-primary'
-                    ]])->checkbox()
+                                'class' => 'form-group field-loginform has-feedback required'
+                            ],
+                            'template' => '{input}{error}{hint}'
+                        ])->textInput(['type' => 'email', 'placeholder' => 'Email'])
                         ?>
-                    </div>
-                </div>
-                <!-- /.col -->
-                <div class="col-4">
-                    <?= Html::submitButton('Login', ['class' => 'btn btn-primary btn-block', 'name' => 'login-button']) ?>
-                </div>
-                <!-- /.col -->
-            </div>
 
-            <?php ActiveForm::end(); ?>
-        </div>
-    </div>
-</div>
+                    </div>
+                    <div class="form-group">
+<!--                        <input type="text" class="form-control-input" id="lpassword" required>
+                        <label class="label-control" for="lpassword">Password</label>
+                        <div class="help-block with-errors"></div>-->
+                        
+                    <?=
+                    $form->field($model, 'password', ['options' => [
+                            'tag' => 'div',
+                            'class' => 'form-group field-loginform has-feedback required'
+                        ],
+                        'template' => '{input}{error}{hint}'
+                    ])->passwordInput(['placeholder' => 'Password'])
+                    ?>
+                        
+                    </div>
+                    <div class="form-group">
+                         <?= Html::submitButton('LOG IN', ['class' => 'btn btn-primary btn-block', 'name' => 'login-button']) ?>
+                    </div>
+                    <div class="form-message">
+                        <div id="lmsgSubmit" class="h3 text-center hidden"></div>
+                    </div>
+                    <?php ActiveForm::end(); ?>
+
+
+                </div> <!-- end of form container -->
+                <!-- end of sign up form -->
+
+            </div> <!-- end of col -->
+        </div> <!-- end of row -->
+    </div> <!-- end of container -->
+</header> <!-- end of ex-header -->
+<!-- end of header -->
+
+
+ 
