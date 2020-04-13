@@ -76,11 +76,14 @@ LandingAsset::register($this);
                 <div class="container">
 
                     <!-- Text Logo - Use this if you don't have a graphic logo -->
-                    <!-- <a class="navbar-brand logo-text page-scroll" href="index.html">Tivo</a> -->
-
-                    <!-- Image Logo -->
-                    <a class="navbar-brand logo-image" href="index.html"><img src="images/logo-full.svg" alt="alternative"></a>
-
+                       <?=
+                         Html::a(
+                                 Html::img('images/logo-full.svg', ['alt' => '']),
+                                 ['site/index'],
+                                 ['class'=>'navbar-brand logo-image']
+                                 );
+                    ?>
+                    
                     <!-- Mobile Menu Toggle Button -->
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-awesome fas fa-bars"></span>
