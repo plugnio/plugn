@@ -12,6 +12,7 @@ use yii\behaviors\AttributeBehavior;
  * This is the model class for table "order".
  *
  * @property string $order_uuid
+ * @property string $payment_uuid
  * @property int $customer_id
  * @property string|null $restaurant_uuid
  * @property int $area_id
@@ -43,6 +44,7 @@ use yii\behaviors\AttributeBehavior;
  * @property PaymentMethod $paymentMethod
  * @property Restaurant $restaurant
  * @property RestaurantDelivery $restaurantDelivery
+ * @property Payment $payment
  * @property OrderItem[] $orderItems
  */
 class Order extends \yii\db\ActiveRecord {
@@ -53,6 +55,7 @@ class Order extends \yii\db\ActiveRecord {
     const STATUS_COMPLETE = 4;
     const STATUS_CANCELED = 5;
     const STATUS_REFUNDED = 6;
+    
     
     const ORDER_MODE_DELIVERY = 1;
     const ORDER_MODE_PICK_UP = 2;
@@ -72,7 +75,7 @@ class Order extends \yii\db\ActiveRecord {
             [['customer_name', 'customer_phone_number', 'payment_method_id', 'order_mode'], 'required'],
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
-            [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer' , 'min'=> 0],
+            [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer', 'min' => 0],
             ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_CANCELED]],
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
             ['restaurant_branch_id', 'required', 'when' => function($model) {
@@ -88,14 +91,16 @@ class Order extends \yii\db\ActiveRecord {
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['customer_phone_number'], 'string', 'min' => 8, 'max' => 8],
             [['customer_phone_number'], 'number'],
-            [['total_price', 'delivery_fee', 'total_items_price'], 'number' , 'min'=> 0],
+            [['total_price', 'delivery_fee', 'total_items_price'], 'number', 'min' => 0],
             ['total_items_price', 'validateMinCharge', 'when' => function($model) {
                     return $model->order_mode == static::ORDER_MODE_DELIVERY;
                 }],
             [['customer_email'], 'email'],
             [['payment_method_id'], 'validatePaymentMethodId'],
+            [['payment_uuid'], 'string', 'max' => 36],
             ['estimated_time_of_arrival', 'safe'],
-            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name','payment_method_name_ar'], 'string', 'max' => 255],
+            [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
+            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name', 'payment_method_name_ar'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
             [['customer_id'], 'exist', 'skipOnError' => false, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
             [['payment_method_id'], 'exist', 'skipOnError' => false, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
@@ -157,7 +162,7 @@ class Order extends \yii\db\ActiveRecord {
         if (!RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'payment_method_id' => $this->payment_method_id])->one())
             $this->addError($attribute, "Payment method id id ivalid.");
     }
-    
+
     /**
      * Check if the selected area delivery by the restaurant or no
      * @param type $attribute
@@ -190,24 +195,22 @@ class Order extends \yii\db\ActiveRecord {
             $this->addError($attribute, "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency($this->restaurantDelivery->min_charge));
     }
 
-    
-        /**
+    /**
      * @inheritdoc
      */
-    public function extraFields()
-    {
+    public function extraFields() {
         return [
             'orderStatus'
         ];
     }
 
-    
     /**
      * {@inheritdoc}
      */
     public function attributeLabels() {
         return [
             'order_uuid' => 'Order UUID',
+            'payment_uuid' => 'Payment Uuid',
             'restaurant_uuid' => 'Restaurant Uuid',
             'area_id' => 'Area ID',
             'area_name' => 'Area Name',
@@ -342,10 +345,9 @@ class Order extends \yii\db\ActiveRecord {
 
             $payment_method_model = PaymentMethod::findOne($this->payment_method_id);
 
-            if ($payment_method_model){
+            if ($payment_method_model) {
                 $this->payment_method_name = $payment_method_model->payment_method_name;
                 $this->payment_method_name_ar = $payment_method_model->payment_method_name_ar;
-
             }
 
             $this->save(false);
@@ -422,6 +424,15 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function getRestaurantBranch() {
         return $this->hasOne(RestaurantBranch::className(), ['restaurant_branch_id' => 'restaurant_branch_id']);
+    }
+
+    /**
+     * Gets query for [[PaymentUu]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPayment() {
+        return $this->hasOne(Payment::className(), ['payment_uuid' => 'payment_uuid']);
     }
 
 }

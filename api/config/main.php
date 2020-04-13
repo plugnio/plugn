@@ -98,7 +98,7 @@ return [
                     'patterns' => [
                         'POST <id>' => 'place-an-order',
                         'GET callback' => 'callback',
-                        'GET <id>' => 'order-look-up',
+                        'GET <id>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS callback' => 'options',

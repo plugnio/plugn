@@ -233,18 +233,12 @@ class OrderController extends Controller {
 //                  Yii::info("[Payment Attempt Started] " . Yii::$app->user->identity->investor_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($amountToInvest, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
                         // Redirect to payment gateway
                         Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
-                        
+
                         $response = Yii::$app->tapPayments->createCharge(
                                 "Order placed from: " . $order->customer_name, // Description
                                 $order->restaurant->name, //Statement Desc.
                                 $payment->payment_uuid, // Reference
-                                $order->total_price,
-                                $order->customer_name,
-                                $order->customer_email,
-                                $order->customer_phone_number, 
-                                Url::to(['order/callback'], true), 
-                                $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD,
-                                $order->restaurant->test_api_key
+                                $order->total_price, $order->customer_name, $order->customer_email, $order->customer_phone_number, Url::to(['order/callback'], true), $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD, $order->restaurant->test_api_key
                         );
 
                         $responseContent = json_decode($response->content);
@@ -307,38 +301,21 @@ class OrderController extends Controller {
      * @return mixed
      */
     public function actionCallback($tap_id) {
-             
+
         try {
             $paymentRecord = Payment::updatePaymentStatusFromTap($tap_id);
 
             $paymentRecord->received_callback = true;
             $paymentRecord->save();
 
-            if ($paymentRecord->payment_current_status != 'CAPTURED') {  //Failed Payment
-                Yii::$app->session->setFlash('error', "There seems to be an issue with your payment, please try again.");
-                
             // Redirect back to app
-                return    $this->redirect('http://localhost:8100/payment-failed/' . $paymentRecord->payment_uuid  );
-                // Redirect back to project page with message
-//                return [
-//                    'operation' => 'error',
-//                    'message' => 'There seems to be an issue with your payment, please try again.',
-//                ];
+            if ($paymentRecord->payment_current_status != 'CAPTURED') {  //Failed Payment
+                return $this->redirect($paymentRecord->restaurant->restaurant_domain . '/payment-failed/' . $paymentRecord->order_uuid);
             }
 
             // Redirect back to app
-            return    $this->redirect('http://localhost:8100/payment-success/' . $paymentRecord->payment_uuid );
-//            return [
-//                'operation' => 'success',
-//                'order_uuid' => $order->order_uuid,
-//                'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
-//                'message' => 'Order created successfully',
-//            ];
-
-//            return $this->redirect(['investment/view', 'payid' => $paymentRecord->payment_uuid]);
+            return $this->redirect($paymentRecord->restaurant->restaurant_domain . '/payment-success/' . $paymentRecord->order_uuid);
         } catch (\Exception $e) {
-                   return    $this->redirect('http://www.yiiframework.com');
-            Yii::info($e->getMessage(), __METHOD__);
             throw new NotFoundHttpException($e->getMessage());
         }
     }
@@ -346,13 +323,13 @@ class OrderController extends Controller {
     /**
      * Get order status
      */
-    public function actionOrderLookUp($id) {
-        $model = Order::findOne($id);
+    public function actionOrderDetails($id) {
+        $model = Order::find()->where(['order_uuid' => $id])->with('restaurant','orderItems','restaurantBranch','payment')->asArray()->one();
 
         if (!$model) {
             return [
                 'operation' => 'error',
-                'message' => 'Please insert a valid Order Code'
+                'message' => 'Invalid order uuid'
             ];
         }
 

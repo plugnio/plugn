@@ -32,6 +32,7 @@ use yii\web\NotFoundHttpException;
  *
  * @property Customer $customer
  * @property Order $order
+ * @property Restaurant $restaurant
  */
 class Payment extends \yii\db\ActiveRecord
 {
@@ -128,9 +129,17 @@ class Payment extends \yii\db\ActiveRecord
         $paymentRecord = \common\models\Payment::findOne(['payment_gateway_transaction_id' => $id]);
         if(!$paymentRecord){
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
-        }
+        } 
+        
+        //Update payment_uuid in order
+        $order = Order::findOne($paymentRecord->order_uuid);
+        $order->payment_uuid = $paymentRecord->payment_uuid;
+        $order->save(false);
 
+        
         // Request response about it from TAP
+        Yii::$app->tapPayments->setApiKeys($paymentRecord->restaurant->live_api_key, $paymentRecord->restaurant->test_api_key);
+       
         $response = Yii::$app->tapPayments->retrieveCharge($id);
         $responseContent = json_decode($response->content);
 
@@ -235,5 +244,13 @@ class Payment extends \yii\db\ActiveRecord
     public function getOrder()
     {
         return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid']);
+    }
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurant()
+    {
+        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('order');
     }
 }
