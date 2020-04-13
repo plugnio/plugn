@@ -35,7 +35,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     'primary',
                     'secondary',
                     'tertiary',
-                    'light',
                     'medium',
                     'dark',
                 ],
