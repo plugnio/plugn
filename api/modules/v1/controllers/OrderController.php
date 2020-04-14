@@ -310,7 +310,7 @@ class OrderController extends Controller {
 
             // Redirect back to app
             if ($paymentRecord->payment_current_status != 'CAPTURED') {  //Failed Payment
-                return $this->redirect($paymentRecord->restaurant->restaurant_domain . '/payment-failed/' . $paymentRecord->order_uuid);
+                return $this->redirect($paymentRecord->restaurant->restaurant_domain . '/payment-failed/' . $paymentRecord->payment_uuid);
             }
 
             // Redirect back to app
