@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 13, 2020 at 07:09 PM
+-- Generation Time: Apr 14, 2020 at 04:39 PM
 -- Server version: 5.7.24
 -- PHP Version: 7.3.11
 
@@ -787,8 +787,8 @@ CREATE TABLE `restaurant_theme` (
 --
 
 INSERT INTO `restaurant_theme` (`restaurant_uuid`, `primary`, `secondary`, `tertiary`, `light`, `medium`, `dark`) VALUES
-('rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', '#3880ff', '#3dc2ff', '#5260ff', '#f4f5f8', '#92949c', '#222428'),
-('rest_c2af4218-6b72-11ea-bfa2-270399f50534', '#3880ff', '#3dc2ff', '#5260ff', '#f4f5f8', '#92949c', '#222428');
+('rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', '#3880ff', '#3dc2ff', '#5260ff', '#ffffff', '#92949c', '#222428'),
+('rest_c2af4218-6b72-11ea-bfa2-270399f50534', '#3880ff', '#3dc2ff', '#5260ff', '#ffffff', '#92949c', '#222428');
 
 -- --------------------------------------------------------
 
