@@ -52,6 +52,29 @@ return [
             'api/config/main-local.php',
         ],
     ],
+    'Development [Khalid]' => [
+        'path' => 'dev-khalid',
+        'setWritable' => [
+            'backend/runtime',
+            'backend/web/assets',
+            'console/runtime',
+            'frontend/runtime',
+            'frontend/web/assets',
+            'api/runtime',
+            'api/web/assets',
+        ],
+        'setExecutable' => [
+            'yii',
+            'yii_test',
+            'fixture-generate-and-load'
+        ],
+        'setCookieValidationKey' => [
+            'backend/config/main-local.php',
+            'common/config/codeception-local.php',
+            'frontend/config/main-local.php',
+            'api/config/main-local.php',
+        ],
+    ],
     'Production' => [
         'path' => 'prod',
         'setWritable' => [
