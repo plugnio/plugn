@@ -96,8 +96,10 @@ class ItemController extends Controller {
      */
     public function actionItemData() {
         $item_uuid = Yii::$app->request->get("item_uuid");
+        $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
+        
         $item_model = Item::find()
-                ->where(['item_uuid' => $item_uuid])
+                ->where(['item_uuid' => $item_uuid,'restaurant_uuid' => $restaurant_uuid])
                 ->with('options', 'options.extraOptions')
                 ->asArray()
                 ->one();
