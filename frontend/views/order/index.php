@@ -44,6 +44,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         return '<span class="badge bg-primary" >' . $model->orderStatus . '</span>';
                     else if ($model->order_status == Order::STATUS_COMPLETE)
                         return '<span class="badge bg-success" >' . $model->orderStatus . '</span>';
+                    else if ($model->order_status == Order::STATUS_CANCELED)
+                        return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
                 }
             ],
             'total_price:currency',

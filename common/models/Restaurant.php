@@ -238,6 +238,53 @@ class Restaurant extends \yii\db\ActiveRecord {
         }
     }
 
+        /**
+     * @inheritdoc
+     */
+    public function fields() {
+        $fields = parent::fields();
+
+        // remove fields that contain sensitive information
+        unset( $fields['agent_id']);    
+        unset( $fields['restaurant_domain']);    
+        unset( $fields['vendor_sector']);    
+        unset( $fields['business_id']);    
+        unset( $fields['business_entity_id']);    
+        unset( $fields['wallet_id']);    
+        unset( $fields['merchant_id']);    
+        unset( $fields['operator_id']);    
+        unset( $fields['live_api_key']);    
+        unset( $fields['test_api_key']);    
+        unset( $fields['business_type']);    
+        unset( $fields['license_number']);    
+        unset( $fields['document_issuing_country']);    
+        unset( $fields['document_issuing_date']);    
+        unset( $fields['not_for_profit']);    
+        unset( $fields['document_issuing_date']);    
+        unset( $fields['document_expiry_date']);    
+        unset( $fields['document_title']);    
+        unset( $fields['document_file']);    
+        unset( $fields['document_file_id']);    
+        unset( $fields['document_file_purpose']);    
+        unset( $fields['iban']);    
+        unset( $fields['owner_first_name']);    
+        unset( $fields['owner_last_name']);    
+        unset( $fields['owner_email']);    
+        unset( $fields['owner_customer_number']);    
+        unset( $fields['identification_issuing_country']);    
+        unset( $fields['identification_issuing_date']);    
+        unset( $fields['identification_expiry_date']);    
+        unset( $fields['identification_file']);    
+        unset( $fields['identification_file_id']);    
+        unset( $fields['identification_title']);    
+        unset( $fields['identification_file_purpose']);    
+        unset( $fields['restaurant_created_at']);    
+        unset( $fields['restaurant_updated_at']);    
+        
+        return $fields;
+
+    }
+                
     /**
      *
      * @param type $insert

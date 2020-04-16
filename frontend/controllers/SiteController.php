@@ -13,9 +13,9 @@ use yii\filters\AccessControl;
 use frontend\models\LoginForm;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
-use frontend\models\SignupForm;
 use frontend\models\ContactForm;
 use common\models\Restaurant;
+
 /**
  * Site controller
  */
@@ -30,11 +30,11 @@ class SiteController extends Controller {
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error', 'index'],
+                        'actions' => ['login', 'error', 'index', 'signup'],
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'promote-to-open', 'promote-to-close','pay','callback', 'vendor-dashboard'],
+                        'actions' => ['logout', 'promote-to-open', 'promote-to-close', 'pay', 'callback', 'vendor-dashboard'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -72,9 +72,15 @@ class SiteController extends Controller {
      */
     public function actionIndex() {
         $this->layout = 'landing';
-        return $this->render('landing');
+
+        if (Yii::$app->user->isGuest)
+            return $this->render('landing');
+        else {
+            foreach (Yii::$app->ownedAccountManager->getOwnedRestaurants() as $restaurantOwned) {
+                return $this->redirect(['vendor-dashboard', 'id' => $restaurantOwned->restaurant_uuid]);
+            }
+        }
     }
-    
 
     /**
      * Displays vendor dashboard homepage.
@@ -82,8 +88,8 @@ class SiteController extends Controller {
      * @return mixed
      */
     public function actionVendorDashboard($id) {
-       return $this->render('index', [
-            'restaurant_model' => Yii::$app->ownedAccountManager->getOwnedAccount($id)
+        return $this->render('index', [
+                    'restaurant_model' => Yii::$app->ownedAccountManager->getOwnedAccount($id)
         ]);
     }
 
@@ -98,7 +104,7 @@ class SiteController extends Controller {
         $model = $this->findModel($id);
         $model->promoteToOpenRestaurant();
 
-        return $this->redirect(['index' , 'id' => $id]);
+        return $this->redirect(['index', 'id' => $id]);
     }
 
     /**
@@ -111,7 +117,7 @@ class SiteController extends Controller {
         $model = $this->findModel($id);
         $model->promoteToBusyRestaurant();
 
-        return $this->redirect(['index' , 'id' => $id]);
+        return $this->redirect(['index', 'id' => $id]);
     }
 
     /**
@@ -124,7 +130,7 @@ class SiteController extends Controller {
         $model = $this->findModel($id);
         $model->promoteToCloseRestaurant();
 
-        return $this->redirect(['index' , 'id' => $id]);
+        return $this->redirect(['index', 'id' => $id]);
     }
 
     /**
@@ -133,7 +139,7 @@ class SiteController extends Controller {
      * @return mixed
      */
     public function actionLogin() {
-                $this->layout = 'landing';
+        $this->layout = 'landing';
 
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
@@ -167,7 +173,10 @@ class SiteController extends Controller {
      *
      * @return mixed
      */
-    public function actionContact() {
+    public function actionSignup() {
+        
+        $this->layout = 'landing';
+
         $model = new ContactForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             if ($model->sendEmail(Yii::$app->params['adminEmail'])) {

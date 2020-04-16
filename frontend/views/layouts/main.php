@@ -182,7 +182,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                             <?=
                                             Html::a(
                                                 Html::img( $ownedRestaurant->getRestaurantLogoUrl(),['class' => 'brand-image img-circle elevation-3', 'style'=>'opacity: .8; margin-right: .5rem; margin-top: -3px; max-height: 33px; width: auto;']) .
-                                                Html::tag('p', $ownedRestaurant->name), ['site/index', 'id' => $ownedRestaurant->restaurant_uuid], ['class' => 'nav-link']
+                                                Html::tag('p', $ownedRestaurant->name), ['site/vendor-dashboard', 'id' => $ownedRestaurant->restaurant_uuid], ['class' => 'nav-link']
                                             )
                                             ?>
 

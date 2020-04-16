@@ -14,14 +14,14 @@ use yii\bootstrap\ActiveForm;
         <div class="row">
             <div class="col-lg-12">
                 <h1>Log In</h1>
-                <p>You don't have a password? Then please <a class="black" href="sign-up.html">Sign Up</a></p>
+                <p>You don't have a password? Then please             
+                    <?=
+                        Html::a('Sign up', ['site/signup'],['class' => 'black']);
+                    ?></p>
                 <!-- Sign Up Form -->
                 <div class="form-container">
                     <?php $form = ActiveForm::begin(['id' => 'login-form', 'enableClientScript' => false]); ?>
                     <div class="form-group">
-<!--                                <input type="email" class="form-control-input" id="lemail" required>
-                        <label class="label-control" for="lemail">Email</label>
-                        <div class="help-block with-errors"></div>-->
                         <?=
                         $form->field($model, 'email', ['options' => [
                                 'tag' => 'div',
@@ -33,9 +33,6 @@ use yii\bootstrap\ActiveForm;
 
                     </div>
                     <div class="form-group">
-<!--                        <input type="text" class="form-control-input" id="lpassword" required>
-                        <label class="label-control" for="lpassword">Password</label>
-                        <div class="help-block with-errors"></div>-->
                         
                     <?=
                     $form->field($model, 'password', ['options' => [

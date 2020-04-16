@@ -247,7 +247,6 @@ class OrderController extends Controller {
                         if (isset($responseContent->errors)) {
                             $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
                             \Yii::error($errorMessage, __METHOD__); // Log error faced by user
-//                \Yii::$app->getSession()->setFlash('error', $errorMessage);
 
                             return [
                                 'operation' => 'error',

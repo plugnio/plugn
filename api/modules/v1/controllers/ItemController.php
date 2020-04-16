@@ -60,7 +60,7 @@ class ItemController extends Controller {
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
 
         $restaurant = Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->one();
-    
+
         if ($restaurant) {
             $restaurantMenu = Category::find()
                     ->where(['restaurant_uuid' => $restaurant_uuid])
@@ -97,16 +97,19 @@ class ItemController extends Controller {
     public function actionItemData() {
         $item_uuid = Yii::$app->request->get("item_uuid");
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
-        
+
         $item_model = Item::find()
-                ->where(['item_uuid' => $item_uuid,'restaurant_uuid' => $restaurant_uuid])
+                ->where(['item_uuid' => $item_uuid, 'restaurant_uuid' => $restaurant_uuid])
                 ->with('options', 'options.extraOptions')
                 ->asArray()
                 ->one();
 
-        if ($item_model)
-            return $item_model;
-        else {
+        if ($item_model) {
+            return [
+                'operation' => 'success',
+                'itemData' => $item_model
+            ];
+        } else {
             return [
                 'operation' => 'error',
                 'message' => 'Item Uuid is invalid'

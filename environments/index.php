@@ -29,8 +29,8 @@
  * ```
  */
 return [
-    'Development' => [
-        'path' => 'dev',
+    'Development [Saoud]' => [
+        'path' => 'dev-saoud',
         'setWritable' => [
             'backend/runtime',
             'backend/web/assets',

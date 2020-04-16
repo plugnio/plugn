@@ -40,7 +40,9 @@ class OrderSearch extends Order
      */
     public function search($params, $restaurantUuid)
     {
-        $query = Order::find()->where(['restaurant_uuid' => $restaurantUuid]);
+        $query = Order::find()->where(['restaurant_uuid' => $restaurantUuid])->orderBy([
+                'order_created_at' => SORT_DESC 
+        ]);
 
         // add conditions that should always apply here
 
