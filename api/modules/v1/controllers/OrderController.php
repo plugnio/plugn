@@ -313,7 +313,7 @@ class OrderController extends Controller {
             }
 
             // Redirect back to app
-            return $this->redirect($paymentRecord->restaurant->restaurant_domain . '/payment-success/' . $paymentRecord->order_uuid);
+            return $this->redirect($paymentRecord->restaurant->restaurant_domain . '/payment-success/' . $paymentRecord->order_uuid . '/' . $paymentRecord->payment_uuid);
         } catch (\Exception $e) {
             throw new NotFoundHttpException($e->getMessage());
         }

@@ -139,6 +139,9 @@ class SiteController extends Controller {
      * @return mixed
      */
     public function actionLogin() {
+      exec("mpg321 --quiet --gain 10 /path/to/beep.mp3");
+
+    
         $this->layout = 'landing';
 
         if (!Yii::$app->user->isGuest) {
