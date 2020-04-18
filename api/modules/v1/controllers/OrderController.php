@@ -325,6 +325,7 @@ class OrderController extends Controller {
     public function actionOrderDetails($id) {
         $model = Order::find()->where(['order_uuid' => $id])->with('restaurant','orderItems','restaurantBranch','payment')->asArray()->one();
 
+    
         if (!$model) {
             return [
                 'operation' => 'error',

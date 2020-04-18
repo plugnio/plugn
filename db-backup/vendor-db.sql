@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 14, 2020 at 04:39 PM
+-- Generation Time: Apr 18, 2020 at 11:02 AM
 -- Server version: 5.7.24
 -- PHP Version: 7.3.11
 
@@ -287,11 +287,11 @@ INSERT INTO `category_item` (`category_item_id`, `category_id`, `item_uuid`) VAL
 (69, 448, 'item_d0dec88c-6d06-11ea-bfa2-270399f50534'),
 (70, 447, 'item_4c29b73a-6b73-11ea-bfa2-270399f50534'),
 (71, 448, 'item_4c29b73a-6b73-11ea-bfa2-270399f50534'),
-(73, 450, 'item_90e24876-7c3d-11ea-997e-4a682ca4b290'),
-(74, 451, 'item_194d7c4e-7c3e-11ea-997e-4a682ca4b290'),
 (75, 451, 'item_47c7bb8e-7c3e-11ea-997e-4a682ca4b290'),
 (76, 452, 'item_b6f27224-7c3e-11ea-997e-4a682ca4b290'),
-(77, 452, 'item_404f9768-7c3f-11ea-997e-4a682ca4b290');
+(78, 451, 'item_194d7c4e-7c3e-11ea-997e-4a682ca4b290'),
+(79, 452, 'item_404f9768-7c3f-11ea-997e-4a682ca4b290'),
+(80, 450, 'item_90e24876-7c3d-11ea-997e-4a682ca4b290');
 
 -- --------------------------------------------------------
 
@@ -406,12 +406,12 @@ CREATE TABLE `item` (
 --
 
 INSERT INTO `item` (`item_uuid`, `restaurant_uuid`, `item_name`, `item_name_ar`, `item_description`, `item_description_ar`, `sort_number`, `stock_qty`, `item_image`, `item_price`, `item_created_at`, `item_updated_at`) VALUES
-('item_194d7c4e-7c3e-11ea-997e-4a682ca4b290', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 'Pomegranate Seeds', 'حب رمان طازج', 'Fresh daily', 'يومي طازج', 1, 4, 'X8l0i2cKEJ9UK5HBNmPm-evhp1iu6LJk.jpg', 0.75, '2020-04-12 00:47:54', '2020-04-12 00:47:54'),
-('item_404f9768-7c3f-11ea-997e-4a682ca4b290', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 'Yellow Juice', 'عصير الأصفر', 'Pineapple + ginger', 'أناناس + زنجبيل', 2, 10, 'xU7WVwSQpyJcF9_b68sFMdMrhgDf7KVE.jpg', 0, '2020-04-12 00:56:09', '2020-04-12 00:56:09'),
-('item_47c7bb8e-7c3e-11ea-997e-4a682ca4b290', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 'Pineapple With Original Dip', 'أناناس مع صوص أصلي', 'Fresh Daily', 'يومي طازج', 2, 3, 'GdnNlRzTK1eUESng34LKSq5C40q_HEyj.jpg', 0.85, '2020-04-12 00:49:12', '2020-04-12 21:13:13'),
+('item_194d7c4e-7c3e-11ea-997e-4a682ca4b290', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 'Pomegranate Seeds', 'حب رمان طازج', 'Fresh daily', 'يومي طازج', 1, 5, 'X8l0i2cKEJ9UK5HBNmPm-evhp1iu6LJk.jpg', 0.75, '2020-04-12 00:47:54', '2020-04-17 20:00:43'),
+('item_404f9768-7c3f-11ea-997e-4a682ca4b290', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 'Yellow Juice', 'عصير الأصفر', 'Pineapple + ginger', 'أناناس + زنجبيل', 2, 20, 'xU7WVwSQpyJcF9_b68sFMdMrhgDf7KVE.jpg', 0, '2020-04-12 00:56:09', '2020-04-16 22:46:48'),
+('item_47c7bb8e-7c3e-11ea-997e-4a682ca4b290', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 'Pineapple With Original Dip', 'أناناس مع صوص أصلي', 'Fresh Daily', 'يومي طازج', 2, 0, 'GdnNlRzTK1eUESng34LKSq5C40q_HEyj.jpg', 0.85, '2020-04-12 00:49:12', '2020-04-16 20:17:54'),
 ('item_4c29b73a-6b73-11ea-bfa2-270399f50534', 'rest_c2af4218-6b72-11ea-bfa2-270399f50534', 'Make It Half & Half', 'نص ونص', 'With your choice of two different selections.', 'اختيارك لنوعين من الفطائر', 1, 945, 'd-au1nLzdWNxjD7yfCe8lKrGnoG8LFJp.jpg', 2, '2020-03-21 15:55:53', '2020-04-10 22:09:31'),
-('item_90e24876-7c3d-11ea-997e-4a682ca4b290', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 'Cool Box', 'كول بوكس', '15 bottles of 330ml fresh juice, 5 different flavors (max), a cool ice box. Price before promotion 16 kd', '١٥ عبوة عصير طازج حجم ٣٣٠ ملل، ٥ أنواع مختلفة كحد أقصى. السعر قبل العرض ١٦ دك', 1, 1, 'sXtzq2iTbydxovUNBKH8UesH9y2Q87-i.jpg', 13, '2020-04-12 00:44:05', '2020-04-12 21:13:13'),
-('item_b6f27224-7c3e-11ea-997e-4a682ca4b290', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 'Sweet Potato Pie', 'عصير فطيرة البطاطا الحلوه', 'Sweet potato + carrot + red apple + orange', 'بطاطا حلوة + جزر + تفاح أحمر + برتقال', 1, 4, 'lah6C2P9PFKC-7jTKV-FwdOTp0_cBZcD.jpg', 0, '2020-04-12 00:52:18', '2020-04-12 21:13:13'),
+('item_90e24876-7c3d-11ea-997e-4a682ca4b290', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 'Cool Box', 'كول بوكس', '15 bottles of 330ml fresh juice, 5 different flavors (max), a cool ice box. Price before promotion 16 kd', '١٥ عبوة عصير طازج حجم ٣٣٠ ملل، ٥ أنواع مختلفة كحد أقصى. السعر قبل العرض ١٦ دك', 1, 85, 'sXtzq2iTbydxovUNBKH8UesH9y2Q87-i.jpg', 13, '2020-04-12 00:44:05', '2020-04-17 20:07:50'),
+('item_b6f27224-7c3e-11ea-997e-4a682ca4b290', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 'Sweet Potato Pie', 'عصير فطيرة البطاطا الحلوه', 'Sweet potato + carrot + red apple + orange', 'بطاطا حلوة + جزر + تفاح أحمر + برتقال', 1, 0, 'lah6C2P9PFKC-7jTKV-FwdOTp0_cBZcD.jpg', 0, '2020-04-12 00:52:18', '2020-04-16 21:22:22'),
 ('item_c6eaf116-6b76-11ea-bfa2-270399f50534', 'rest_c2af4218-6b72-11ea-bfa2-270399f50534', 'Pink Pasta', ' باستا وردية', 'Pink sauce, parmesan, parsley.', 'الصلصة الورديه. بارميزان، بقدونس', 2, 7, 'xcDlSnz3PXQ0x8INsWbpQe4uCwns_ijH.jpg', 3.25, '2020-03-21 16:20:47', '2020-04-10 22:09:31'),
 ('item_d0dec88c-6d06-11ea-bfa2-270399f50534', 'rest_c2af4218-6b72-11ea-bfa2-270399f50534', 'Zaatar', 'زعتر', 'Mixture of high quality zataar prepared from organic ingredient.', 'خليط الزعتر الفاخر غني بالمكونات الطبيعيه', 2, 9, 'oiDrGDMIJLxirdLVAawVzGNQxbzOv-Ra.jpg', 1.5, '2020-03-23 16:04:22', '2020-04-10 15:13:06');
 
@@ -530,7 +530,16 @@ CREATE TABLE `order` (
 --
 
 INSERT INTO `order` (`order_uuid`, `payment_uuid`, `customer_id`, `customer_name`, `customer_phone_number`, `customer_email`, `restaurant_uuid`, `area_id`, `area_name`, `area_name_ar`, `unit_type`, `block`, `street`, `avenue`, `house_number`, `special_directions`, `payment_method_id`, `payment_method_name`, `payment_method_name_ar`, `total_price`, `total_items_price`, `delivery_fee`, `order_status`, `order_mode`, `estimated_time_of_arrival`, `delivery_time`, `order_created_at`, `order_updated_at`, `restaurant_branch_id`) VALUES
-('4ZdQHz', '46527676-7ce9-11ea-997e-4a682ca4b290', 4, 'sa', '12345678', '', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 'K-net', 'كي نت', 29.85, 29.85, 0, 4, 2, '09:25:00', 12, '2020-04-12 21:13:13', '2020-04-12 23:30:34', 8);
+('1hj1CR', NULL, 4, 's', '12345678', '', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, 'Cash', 'نقدي', 13, 13, 0, 3, 2, '07:45:00', 1, '2020-04-17 19:44:27', '2020-04-17 19:44:52', 15),
+('2eQvUR', 'f8263800-80cd-11ea-86c9-60ac403b664f', 4, 'Saoud', '12345678', '', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 'K-net', 'كي نت', 13, 13, 0, 1, 2, '08:08:00', 1, '2020-04-17 20:07:50', '2020-04-17 20:08:09', 15),
+('2jSS26', NULL, 4, 's', '12345678', '', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 35, 'Mishref', 'مشرف', 'House', '3', '3', '3', '3', '', 3, 'Cash', 'نقدي', 13, 13, 0, 1, 1, '09:05:00', 60, '2020-04-17 20:05:21', '2020-04-17 20:05:21', NULL),
+('2MhqvF', NULL, 4, 's', '12345678', '', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, 'Cash', 'نقدي', 0.75, 0.75, 0, 1, 2, '07:55:00', 1, '2020-04-17 19:54:13', '2020-04-17 19:54:13', 15),
+('3S42Oe', NULL, 4, 's', '12345678', '', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 78, 'Hateen', 'حطين', 'House', '3', '3', '3', '3', '', 3, 'Cash', 'نقدي', 0.75, 0.75, 0, 1, 1, '08:56:00', 60, '2020-04-17 19:56:53', '2020-04-17 19:56:53', NULL),
+('4fSDJ1', '0d1fad2a-80cb-11ea-86c9-60ac403b664f', 4, 's', '12345678', '', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 'K-net', 'كي نت', 0.75, 0.75, 0, 1, 2, '07:47:00', 1, '2020-04-17 19:46:57', '2020-04-17 19:47:20', 15),
+('4rkxCX', NULL, 4, 'Saoud', '12345678', '', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 78, 'Hateen', 'حطين', 'House', '3', '3', '3', '3', '', 3, 'Cash', 'نقدي', 13, 13, 0, 1, 1, '09:07:00', 60, '2020-04-17 20:07:24', '2020-04-17 20:07:24', NULL),
+('5vJYg6', NULL, 4, 's', '12345678', '', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 78, 'Hateen', 'حطين', 'House', '3', '3', '3', '3', '', 3, 'Cash', 'نقدي', 13, 13, 0, 1, 1, '09:06:00', 60, '2020-04-17 20:06:50', '2020-04-17 20:06:50', NULL),
+('67KQpG', NULL, 4, 's', '12345678', '', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 35, 'Mishref', 'مشرف', 'House', '3', '3', '3', '3', '', 3, 'Cash', 'نقدي', 13, 13, 0, 1, 1, '09:03:00', 60, '2020-04-17 20:03:14', '2020-04-17 20:03:14', NULL),
+('fFAXxP', NULL, 4, 's', '12345678', '', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, 'Cash', 'نقدي', 0.75, 0.75, 0, 1, 2, '08:01:00', 1, '2020-04-17 20:00:43', '2020-04-17 20:00:43', 15);
 
 -- --------------------------------------------------------
 
@@ -553,10 +562,16 @@ CREATE TABLE `order_item` (
 --
 
 INSERT INTO `order_item` (`order_item_id`, `order_uuid`, `item_uuid`, `item_name`, `item_price`, `qty`, `customer_instruction`) VALUES
-(25, '4ZdQHz', 'item_90e24876-7c3d-11ea-997e-4a682ca4b290', 'Cool Box', 13, 1, NULL),
-(26, '4ZdQHz', 'item_47c7bb8e-7c3e-11ea-997e-4a682ca4b290', 'Pineapple With Original Dip', 0.85, 1, NULL),
-(27, '4ZdQHz', 'item_b6f27224-7c3e-11ea-997e-4a682ca4b290', 'Sweet Potato Pie', 0, 1, NULL),
-(28, '4ZdQHz', 'item_90e24876-7c3d-11ea-997e-4a682ca4b290', 'Cool Box', 13, 1, NULL);
+(56, '1hj1CR', 'item_90e24876-7c3d-11ea-997e-4a682ca4b290', 'Cool Box', 13, 1, NULL),
+(57, '4fSDJ1', 'item_194d7c4e-7c3e-11ea-997e-4a682ca4b290', 'Pomegranate Seeds', 0.75, 1, NULL),
+(58, '2MhqvF', 'item_194d7c4e-7c3e-11ea-997e-4a682ca4b290', 'Pomegranate Seeds', 0.75, 1, NULL),
+(59, '3S42Oe', 'item_194d7c4e-7c3e-11ea-997e-4a682ca4b290', 'Pomegranate Seeds', 0.75, 1, NULL),
+(60, 'fFAXxP', 'item_194d7c4e-7c3e-11ea-997e-4a682ca4b290', 'Pomegranate Seeds', 0.75, 1, NULL),
+(61, '67KQpG', 'item_90e24876-7c3d-11ea-997e-4a682ca4b290', 'Cool Box', 13, 1, NULL),
+(62, '2jSS26', 'item_90e24876-7c3d-11ea-997e-4a682ca4b290', 'Cool Box', 13, 1, NULL),
+(63, '5vJYg6', 'item_90e24876-7c3d-11ea-997e-4a682ca4b290', 'Cool Box', 13, 1, NULL),
+(64, '4rkxCX', 'item_90e24876-7c3d-11ea-997e-4a682ca4b290', 'Cool Box', 13, 1, NULL),
+(65, '2eQvUR', 'item_90e24876-7c3d-11ea-997e-4a682ca4b290', 'Cool Box', 13, 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -578,9 +593,14 @@ CREATE TABLE `order_item_extra_option` (
 --
 
 INSERT INTO `order_item_extra_option` (`order_item_extra_option_id`, `order_item_id`, `extra_option_id`, `extra_option_name`, `extra_option_name_ar`, `extra_option_price`) VALUES
-(26, 25, 96517, 'Carrot Juice', 'عصير جزر', 0),
-(27, 27, 96520, 'Family Glass 500 ML', 'جلاس العائلي 500 مل', 3),
-(28, 28, 96519, 'Lemon With Mint Juice', 'عصير ليمون بالنعناع', 0);
+(50, 56, 96517, 'Carrot Juice', 'عصير جزر', 0),
+(51, 61, 96517, 'Carrot Juice', 'عصير جزر', 0),
+(52, 61, 96518, 'Kiwi Fruit Juice', 'عصير كيوي', 0),
+(53, 62, 96517, 'Carrot Juice', 'عصير جزر', 0),
+(54, 63, 96517, 'Carrot Juice', 'عصير جزر', 0),
+(55, 63, 96518, 'Kiwi Fruit Juice', 'عصير كيوي', 0),
+(56, 64, 96517, 'Carrot Juice', 'عصير جزر', 0),
+(57, 65, 96517, 'Carrot Juice', 'عصير جزر', 0);
 
 -- --------------------------------------------------------
 
@@ -614,7 +634,8 @@ CREATE TABLE `payment` (
 --
 
 INSERT INTO `payment` (`payment_uuid`, `customer_id`, `order_uuid`, `payment_gateway_order_id`, `payment_gateway_transaction_id`, `payment_mode`, `payment_current_status`, `payment_amount_charged`, `payment_net_amount`, `payment_gateway_fee`, `payment_udf1`, `payment_udf2`, `payment_udf3`, `payment_udf4`, `payment_udf5`, `payment_created_at`, `payment_updated_at`, `received_callback`) VALUES
-('46527676-7ce9-11ea-997e-4a682ca4b290', 4, '4ZdQHz', '3412202113047247009', 'chg_On3q3420202113s3KT1204036', 'KNET', 'CAPTURED', 29.85, 29.70075, 0.14925, NULL, NULL, NULL, NULL, NULL, '2020-04-12 21:13:13', '2020-04-12 21:14:25', 0);
+('0d1fad2a-80cb-11ea-86c9-60ac403b664f', 4, '4fSDJ1', '2317201947047951359', 'chg_n9RY2320201947s0BN1704396', 'KNET', 'CAPTURED', 0.75, 0.74625, 0.00375, NULL, NULL, NULL, NULL, NULL, '2020-04-17 19:46:57', '2020-04-17 19:47:22', 0),
+('f8263800-80cd-11ea-86c9-60ac403b664f', 4, '2eQvUR', '1617202008047398951', 'chg_Ou591620202008Rm3h1704505', 'KNET', 'CAPTURED', 13, 12.935, 0.065, NULL, NULL, NULL, NULL, NULL, '2020-04-17 20:07:50', '2020-04-17 20:08:10', 0);
 
 -- --------------------------------------------------------
 
@@ -696,7 +717,7 @@ CREATE TABLE `restaurant` (
 --
 
 INSERT INTO `restaurant` (`restaurant_uuid`, `agent_id`, `name`, `name_ar`, `tagline`, `tagline_ar`, `restaurant_domain`, `restaurant_status`, `thumbnail_image`, `logo`, `support_delivery`, `support_pick_up`, `phone_number`, `restaurant_created_at`, `restaurant_updated_at`, `business_id`, `business_entity_id`, `wallet_id`, `merchant_id`, `operator_id`, `live_api_key`, `test_api_key`, `business_type`, `vendor_sector`, `license_number`, `not_for_profit`, `document_issuing_country`, `document_issuing_date`, `document_expiry_date`, `document_title`, `document_file`, `document_file_id`, `document_file_purpose`, `iban`, `owner_first_name`, `owner_last_name`, `owner_email`, `owner_customer_number`, `identification_issuing_country`, `identification_issuing_date`, `identification_expiry_date`, `identification_file`, `identification_file_id`, `identification_title`, `identification_file_purpose`) VALUES
-('rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 1, 'JUICED (Fresh Juices)', 'عصير جوسد', 'Juices, Beverages, Breakfast', 'عصائر, مشروبات, فطور', 'http://localhost:8103', 1, 'zAHQUQ2KaGwT5oQiWT6p-KAwO2z341Vl.jpg', 'lb1EqWnwyJkI2P6QivAc-MJPmXV8RESr.jpg', 1, 1, '55541207', '2020-04-11 23:42:47', '2020-04-12 02:07:19', 'bus_RKTwK34202042iMaH11aP3f914', 'ent_hqTwK34202042JlVn11Un3g914', 'wal_HxTwK45202042NxHy11co3l143', '3801120345', 'opr_gYP846202042PQIb11ae3a943', NULL, 'sk_test_IolEuA6t7hwmd8CivVj9QxLG', 'corp', 'F&B', '2134342SE123456', 0, 'KW', '2019-04-12', '2020-04-17', 'Authorized Signature', '_K0PofCQXPc0am23DrOqPzmMo80wm9rz.png.png', 'file_698634099535245312', 'customer_signature', 'KW88BBYN0000000000000228879004', 'Hamad', 'AlQenai', 'saoudalturki@gmail.com', '51113111', 'KW', '2020-03-30', '2020-04-25', 'UmcDsnZIPKUxpPpxpYR1vJ_OHeOqzpjz.png.png', 'file_698634117033881600', 'Owner\'s civil id', 'identity_document'),
+('rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 1, 'JUICED (Fresh Juices)', 'عصير جوسد', 'Juices, Beverages, Breakfast', 'عصائر, مشروبات, فطور', 'http://localhost:8100', 1, 'zAHQUQ2KaGwT5oQiWT6p-KAwO2z341Vl.jpg', 'lb1EqWnwyJkI2P6QivAc-MJPmXV8RESr.jpg', 1, 1, '12345678', '2020-04-11 23:42:47', '2020-04-17 17:44:35', 'bus_RKTwK34202042iMaH11aP3f914', 'ent_hqTwK34202042JlVn11Un3g914', 'wal_HxTwK45202042NxHy11co3l143', '3801120345', 'opr_gYP846202042PQIb11ae3a943', NULL, 'sk_test_IolEuA6t7hwmd8CivVj9QxLG', 'corp', 'F&B', '2134342SE123456', 0, 'KW', '2019-04-12', '2020-04-17', 'Authorized Signature', '_K0PofCQXPc0am23DrOqPzmMo80wm9rz.png.png', 'file_698634099535245312', 'customer_signature', 'KW88BBYN0000000000000228879004', 'Hamad', 'AlQenai', 'saoudalturki@gmail.com', '51113111', 'KW', '2020-03-30', '2020-04-25', 'UmcDsnZIPKUxpPpxpYR1vJ_OHeOqzpjz.png.png', 'file_698634117033881600', 'Owner\'s civil id', 'identity_document'),
 ('rest_c2af4218-6b72-11ea-bfa2-270399f50534', 1, 'OVENLY', 'أوفينلي', 'Pizzas, Breakfast, Italian', 'بيتزا, فطور, ايطالي', NULL, 1, 'XVQ_Xbw6LvT0PuVfkstCZAZ3x1qkGWJl.jpg', '92GgpQIQXiC3TUtYrAUW5hHJCFElYkBa.jpg', 1, 1, '51113111', '2020-03-21 15:52:02', '2020-04-13 22:06:08', '', '', '', '', '', NULL, '', '', '', '', 0, 'KW', '', '', '', NULL, NULL, '', '', '', '', '', '', 'KW', '', '', NULL, NULL, '', '');
 
 -- --------------------------------------------------------
@@ -719,7 +740,7 @@ CREATE TABLE `restaurant_branch` (
 
 INSERT INTO `restaurant_branch` (`restaurant_branch_id`, `restaurant_uuid`, `branch_name_en`, `branch_name_ar`, `prep_time`) VALUES
 (6, 'rest_c2af4218-6b72-11ea-bfa2-270399f50534', 'Salmiya', 'السالمية', 23),
-(8, 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 'Salmiya', 'السالمية', 12);
+(15, 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 'a', 'a', 1);
 
 -- --------------------------------------------------------
 
@@ -741,7 +762,8 @@ CREATE TABLE `restaurant_delivery` (
 --
 
 INSERT INTO `restaurant_delivery` (`restaurant_uuid`, `area_id`, `delivery_time`, `delivery_time_ar`, `delivery_fee`, `min_charge`) VALUES
-('rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 1, 60, 60, 0, 0),
+('rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 35, 60, 60, 0, 0),
+('rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', 78, 60, 60, 0, 0),
 ('rest_c2af4218-6b72-11ea-bfa2-270399f50534', 67, 60, 60, 0, 0);
 
 -- --------------------------------------------------------
@@ -787,7 +809,7 @@ CREATE TABLE `restaurant_theme` (
 --
 
 INSERT INTO `restaurant_theme` (`restaurant_uuid`, `primary`, `secondary`, `tertiary`, `light`, `medium`, `dark`) VALUES
-('rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', '#3880ff', '#3dc2ff', '#5260ff', '#ffffff', '#92949c', '#222428'),
+('rest_00f54a5e-7c35-11ea-997e-4a682ca4b290', '#2c3d98', '#3dc2ff', '#5260ff', '#ffffff', '#92949c', '#222428'),
 ('rest_c2af4218-6b72-11ea-bfa2-270399f50534', '#3880ff', '#3dc2ff', '#5260ff', '#ffffff', '#92949c', '#222428');
 
 -- --------------------------------------------------------
@@ -1053,7 +1075,7 @@ ALTER TABLE `category`
 -- AUTO_INCREMENT for table `category_item`
 --
 ALTER TABLE `category_item`
-  MODIFY `category_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
+  MODIFY `category_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
 
 --
 -- AUTO_INCREMENT for table `city`
@@ -1083,13 +1105,13 @@ ALTER TABLE `option`
 -- AUTO_INCREMENT for table `order_item`
 --
 ALTER TABLE `order_item`
-  MODIFY `order_item_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `order_item_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
 
 --
 -- AUTO_INCREMENT for table `order_item_extra_option`
 --
 ALTER TABLE `order_item_extra_option`
-  MODIFY `order_item_extra_option_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `order_item_extra_option_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT for table `payment_method`
@@ -1101,7 +1123,7 @@ ALTER TABLE `payment_method`
 -- AUTO_INCREMENT for table `restaurant_branch`
 --
 ALTER TABLE `restaurant_branch`
-  MODIFY `restaurant_branch_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `restaurant_branch_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `working_day`
