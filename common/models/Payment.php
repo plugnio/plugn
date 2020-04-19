@@ -12,6 +12,7 @@ use yii\web\NotFoundHttpException;
  * This is the model class for table "payment".
  *
  * @property string $payment_uuid used as payment reference id
+ * @property string $restaurant_uuid 
  * @property string $customer_id Which customer made the payment?
  * @property string $order_uuid Which order this payment is for
  * @property string $payment_gateway_order_id myfatoorah order id
@@ -50,15 +51,16 @@ class Payment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['customer_id', 'order_uuid', 'payment_amount_charged'], 'required'],
+            [['customer_id', 'order_uuid', 'payment_amount_charged', 'restaurant_uuid'], 'required'],
             [['customer_id','received_callback'], 'integer'],
             [['order_uuid'], 'string', 'max' => 40],
             [['payment_gateway_order_id', 'payment_current_status'], 'string'],
             [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee'], 'number'],
             [['payment_uuid'], 'string', 'max' => 36],
-            [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5'], 'string', 'max' => 255],
+            [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5','response_message'], 'string', 'max' => 255],
             [['payment_uuid'], 'unique'],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
+            [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
 
@@ -95,6 +97,7 @@ class Payment extends \yii\db\ActiveRecord
     {
         return [
             'payment_uuid' => Yii::t('app', 'Payment Uuid'),
+            'restaurant_uuid' => Yii::t('app', 'Restaurant Uuid'),
             'customer_id' => Yii::t('app', 'Customer ID'),
             'order_id' => Yii::t('app', 'Order ID'),
             'payment_gateway_order_id' => Yii::t('app', 'Gateway Order ID'),
@@ -113,6 +116,7 @@ class Payment extends \yii\db\ActiveRecord
             'payment_updated_at' => Yii::t('app', 'Last activity'),
             'payment_updated_at' => Yii::t('app', 'Last activity'),
             'received_callback' => Yii::t('app', 'Received Callback'),
+            'response_message' => Yii::t('app', 'Response Message'),
         ];
     }
 
@@ -152,6 +156,7 @@ class Payment extends \yii\db\ActiveRecord
         }
 
         $paymentRecord->payment_current_status = $responseContent->status; // 'CAPTURED' ?
+        $paymentRecord->response_message = $responseContent->response->message;
 
         $isError = false;
         $errorMessage = "";
@@ -251,6 +256,6 @@ class Payment extends \yii\db\ActiveRecord
      */
     public function getRestaurant()
     {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('order');
+        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 }

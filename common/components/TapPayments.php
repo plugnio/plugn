@@ -385,5 +385,55 @@ class TapPayments extends Component {
 
         return $response;
     }
+    
+
+    /**
+     * Create a Refund
+     * @param  string $chargeId
+     */
+    public function createRefund($chargeId, $amount, $reason) {      
+        
+        $refundEndpoint = $this->apiEndpoint . "/refunds";
+
+        $refundParams = [
+            "charge_id" => $chargeId,
+            "amount" => $amount,
+            "currency" => "KWD",
+            "reason" => $reason
+        ];
+
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setMethod('POST')
+                ->setUrl($refundEndpoint)
+                ->setData($refundParams)
+                ->addHeaders([
+                    'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
+                    'content-type' => 'application/json',
+                ])
+                ->send();
+
+        return $response;
+    }
+    
+    /**
+     * Check refund object for status updates
+     * @param  string $chargeId
+     */
+    public function retrieveRefund($refundId) {      
+        
+        $client = new Client();
+        
+       $response = $client->createRequest()
+                ->setMethod('GET')
+                ->setUrl($this->apiEndpoint . "/refunds/" . $refundId)
+                ->addHeaders([
+                    'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
+                    'content-type' => 'application/json',
+                ])
+                ->send();
+
+        return $response;
+    }
 
 }

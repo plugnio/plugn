@@ -120,6 +120,22 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                             <li class="nav-item has-treeview">
                                 <?=
                                 Html::a(
+                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-shopping-cart']) .
+                                        Html::tag('p', 'Payments'), ['payment/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
+                                )
+                                ?>
+                            </li>
+                            <li class="nav-item has-treeview">
+                                <?=
+                                Html::a(
+                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-shopping-cart']) .
+                                        Html::tag('p', 'Refund'), ['refund/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
+                                )
+                                ?>
+                            </li>
+                            <li class="nav-item has-treeview">
+                                <?=
+                                Html::a(
                                         Html::tag('i', '', ['class' => 'nav-icon fas fa-user']) .
                                         Html::tag('p', 'Customers'), ['customer/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
                                 )

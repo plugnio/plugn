@@ -72,7 +72,7 @@ class OrderController extends Controller {
 
                 $order = new Order();
 
-                $order->restaurant_uuid = $id;
+                $order->restaurant_uuid = $restaurant_model->restaurant_uuid;
 
                 //Save Customer Info
                 $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
@@ -123,6 +123,7 @@ class OrderController extends Controller {
 
                             if ($orderItem->save()) {
 
+//                                There seems to be an issue with your payment, please try again.
                                 if (array_key_exists('extraOptions', $item)) {
 
 
@@ -172,35 +173,19 @@ class OrderController extends Controller {
 
                     $order->updateOrderTotalPrice();
 
-                    //Send to customer: Email for order confirmation 
-                    if ($order->customer_email) {
-                        \Yii::$app->mailer->compose([
-                                    'html' => 'order-confirmation-html',
-                                    'text' => 'order-confirmation-text'
-                                        ], [
-                                    'order' => $order
-                                ])
-                                ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
-                                ->setTo($order->customer_email)
-                                ->setSubject('Your order from ' . $order->restaurant->name)
-                                ->send();
-                    }
 
-//                    foreach ($order->restaurant->getAgents() as $agent) {
-//
-//                        if ($agent->email_notification) {
-//                            //Send to All Agents who managed the restaurant: Send email when a new order is received for them to process
-//                            \Yii::$app->mailer->compose([
-//                                        'html' => 'received-order-html',
-//                                        'text' => 'received-order-text'
-//                                            ], [
-//                                        'order' => $order
-//                                    ])
-//                                    ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
-//                                    ->setTo($agent->agent_email)
-//                                    ->setSubject('Order received frpm' . $order->customer_name)
-//                                    ->send();
-//                        }
+//                    if ($agent->email_notification) {
+//                        //Send to All Agents who managed the restaurant: Send email when a new order is received for them to process
+//                        \Yii::$app->mailer->compose([
+//                                    'html' => 'received-order-html',
+//                                    'text' => 'received-order-text'
+//                                        ], [
+//                                    'order' => $order
+//                                ])
+//                                ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+//                                ->setTo($agent->agent_email)
+//                                ->setSubject('Order received frpm' . $order->customer_name)
+//                                ->send();
 //                    }
 
 
@@ -223,6 +208,7 @@ class OrderController extends Controller {
 
                         // Create new payment record
                         $payment = new Payment;
+                        $payment->restaurant_uuid = $restaurant_model->restaurant_uuid;
                         $payment->payment_mode = $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
                         $payment->customer_id = $order->customer->customer_id; //customer id
                         $payment->order_uuid = $order->order_uuid;
@@ -309,7 +295,7 @@ class OrderController extends Controller {
 
             // Redirect back to app
             if ($paymentRecord->payment_current_status != 'CAPTURED') {  //Failed Payment
-                return $this->redirect($paymentRecord->restaurant->restaurant_domain . '/payment-failed/' . $paymentRecord->payment_uuid);
+                return $this->redirect($paymentRecord->restaurant->restaurant_domain . '/payment-failed/' . $paymentRecord->order_uuid);
             }
 
             // Redirect back to app
@@ -323,9 +309,9 @@ class OrderController extends Controller {
      * Get order status
      */
     public function actionOrderDetails($id) {
-        $model = Order::find()->where(['order_uuid' => $id])->with('restaurant','orderItems','restaurantBranch','payment')->asArray()->one();
+        $model = Order::find()->where(['order_uuid' => $id])->with('restaurant', 'orderItems', 'restaurantBranch', 'payment')->asArray()->one();
 
-    
+
         if (!$model) {
             return [
                 'operation' => 'error',

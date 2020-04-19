@@ -1,6 +1,6 @@
 <?php
 
-namespace common\models;
+namespace frontend\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -17,8 +17,8 @@ class PaymentSearch extends Payment
     public function rules()
     {
         return [
-            [['payment_uuid', 'restaurant_uuid','order_uuid', 'payment_gateway_order_id', 'payment_gateway_transaction_id', 'payment_mode', 'payment_current_status', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'payment_created_at', 'payment_updated_at'], 'safe'],
-            [['customer_id'], 'integer'],
+            [['payment_uuid', 'restaurant_uuid', 'order_uuid', 'payment_gateway_order_id', 'payment_gateway_transaction_id', 'payment_mode', 'payment_current_status', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'payment_created_at', 'payment_updated_at', 'response_message'], 'safe'],
+            [['customer_id', 'received_callback'], 'integer'],
             [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee'], 'number'],
         ];
     }
@@ -39,7 +39,7 @@ class PaymentSearch extends Payment
      *
      * @return ActiveDataProvider
      */
-    public function search($params, $restaurantUuid)
+    public function search($params,$restaurantUuid)
     {
         $query = Payment::find()->where(['restaurant_uuid' => $restaurantUuid]);
 
@@ -65,10 +65,12 @@ class PaymentSearch extends Payment
             'payment_gateway_fee' => $this->payment_gateway_fee,
             'payment_created_at' => $this->payment_created_at,
             'payment_updated_at' => $this->payment_updated_at,
+            'received_callback' => $this->received_callback,
         ]);
 
         $query->andFilterWhere(['like', 'payment_uuid', $this->payment_uuid])
             ->andFilterWhere(['like', 'order_uuid', $this->order_uuid])
+            ->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
             ->andFilterWhere(['like', 'payment_gateway_order_id', $this->payment_gateway_order_id])
             ->andFilterWhere(['like', 'payment_gateway_transaction_id', $this->payment_gateway_transaction_id])
             ->andFilterWhere(['like', 'payment_mode', $this->payment_mode])
@@ -77,7 +79,8 @@ class PaymentSearch extends Payment
             ->andFilterWhere(['like', 'payment_udf2', $this->payment_udf2])
             ->andFilterWhere(['like', 'payment_udf3', $this->payment_udf3])
             ->andFilterWhere(['like', 'payment_udf4', $this->payment_udf4])
-            ->andFilterWhere(['like', 'payment_udf5', $this->payment_udf5]);
+            ->andFilterWhere(['like', 'payment_udf5', $this->payment_udf5])
+            ->andFilterWhere(['like', 'response_message', $this->response_message]);
 
         return $dataProvider;
     }

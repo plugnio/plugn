@@ -30,6 +30,7 @@ use yii\behaviors\AttributeBehavior;
  * @property Agent[] $agents
  * @property Agent $agent
  * @property Order[] $orders
+ * @property Refund[] $refunds
  * @property Item[] $items
  * @property RestaurantDelivery[] $restaurantDeliveryAreas
  * @property RestaurantBranch[] $restaurantBranches
@@ -551,6 +552,15 @@ class Restaurant extends \yii\db\ActiveRecord {
         return $this->hasMany(Customer::className(), ['customer_id' => 'customer_id']);
     }
     
+    /**
+     * Gets query for [[Refunds]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRefunds()
+    {
+        return $this->hasMany(Refund::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }    
     
     /**
      * Gets query for [[RestaurantTheme]].

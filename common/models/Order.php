@@ -122,7 +122,7 @@ class Order extends \yii\db\ActiveRecord {
                 'value' => function() {
                     if (!$this->order_uuid) {
                         // Get a unique uuid from payment table
-                        $this->order_uuid = Order::getUniqueOrderUuid();
+                        $this->order_uuid = strtoupper(Order::getUniqueOrderUuid());
                     }
 
                     return $this->order_uuid;
