@@ -236,6 +236,36 @@ class Order extends \yii\db\ActiveRecord {
         ];
     }
 
+    
+    public function sendPaymentConfirmationEmail() {
+
+        if ($this->customer_email) {
+
+         $response =   \Yii::$app->mailer->compose([
+                        'html' => 'payment-confirm-html',
+                            ], [
+                        'order' => $this
+                    ])
+                    ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+                    ->setTo($this->customer_email)
+                    ->setSubject('Your order from: ' . $this->restaurant->name)
+                    ->send();
+        }
+
+        if ($this->agent->email_notification) {
+            \Yii::$app->mailer->compose([
+                        'html' => 'payment-confirm-html',
+                            ], [
+                        'order' => $this
+                    ])
+                    ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+                    ->setTo($this->agent->agent_email)
+                    ->setSubject('Your order from: ' . $this->restaurant->name)
+                    ->send();
+        }
+                
+    }
+    
     /**
      * Update order total price and items total price
      */
@@ -362,6 +392,15 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function getRestaurant() {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+    
+    /**
+     * Gets query for [[Agent]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAgent() {
+        return $this->hasOne(Agent::className(), ['agent_id' => 'agent_id'])->via('restaurant');
     }
 
     /**

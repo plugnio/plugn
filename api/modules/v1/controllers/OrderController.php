@@ -173,48 +173,6 @@ class OrderController extends Controller {
 
                     $order->updateOrderTotalPrice();
 
-                    if ($order->restaurant->agent->email_notification) {
-                        //Send to All Agents who managed the restaurant: Send email when a new order is received for them to process
-                        \Yii::$app->mailer->compose([
-                                    'html' => 'payment-confirm-html',
-//                                    'text' => 'received-order-text'
-                                        ], [
-                                    'order' => $order
-                                ])
-                                ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
-                                ->setTo($order->restaurant->agent->agent_email)
-                                ->setSubject('Order received frpm' . $order->customer_name)
-                                ->send();
-                    }
-                    
-                    if ($order->customer_email) {
-                        //Send an email to customer
-                        \Yii::$app->mailer->compose([
-                                    'html' => 'payment-confirm-html',
-//                                    'text' => 'received-order-text'
-                                        ], [
-                                    'order' => $order
-                                ])
-                                ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
-                                ->setTo($order->customer_email)
-                                ->setSubject('Your order from: ' . $order->restaurant->name)
-                                ->send();
-                    }
-
-
-//                    if ($order->restaurant->agent->email_notification) {
-//                        //Send to owner: Send email when a new order is received for them to process
-//                        \Yii::$app->mailer->compose([
-//                                    'html' => 'received-order-html',
-//                                    'text' => 'received-order-text'
-//                                        ], [
-//                                    'order' => $order
-//                                ])
-//                                ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
-//                                ->setTo($order->restaurant->agent->agent_email)
-//                                ->setSubject('Order received from' . $order->customer_name)
-//                                ->send();
-//                    }
                     //if payment method not cash redirect customer to payment gateway
                     if ($order->payment_method_id != 3) {
 
@@ -263,8 +221,12 @@ class OrderController extends Controller {
                             'redirectUrl' => $redirectUrl,
                         ];
                     } else {
+                        
+                        $order->sendPaymentConfirmationEmail();
+                        
                         $response = [
                             'operation' => 'success',
+                            '$r' => $r,
                             'order_uuid' => $order->order_uuid,
                             'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
                             'message' => 'Order created successfully',
