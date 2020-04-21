@@ -173,7 +173,7 @@ class OrderController extends Controller {
 
                     $order->updateOrderTotalPrice();
 
-                    if ($order->restaurant->email_notification) {
+                    if ($order->agent->email_notification) {
                         //Send to All Agents who managed the restaurant: Send email when a new order is received for them to process
                         \Yii::$app->mailer->compose([
                                     'html' => 'payment-confirm-html',

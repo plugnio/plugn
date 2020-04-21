@@ -6,6 +6,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use common\models\Customer;
+use common\models\Agent;
 use yii\behaviors\AttributeBehavior;
 
 /**
