@@ -101,6 +101,7 @@ return [
                         'GET <id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options',
                         'OPTIONS callback' => 'options',
                         'OPTIONS <id>/<restaurant_uuid>' => 'options',
                     ]
