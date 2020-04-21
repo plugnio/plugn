@@ -6,7 +6,7 @@ use yii\helpers\Html;
 
 ?>
 <div class="verify-form">
-    <p>Hello Big Boss>,</p>
+    <p>Hello Big Boss,</p>
 
     <p>Company Name: <?= $model->company_name ?></p>
     <p>Agent Name: <?= $model->name ?></p>
