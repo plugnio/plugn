@@ -8,9 +8,9 @@ use yii\helpers\Html;
 <div class="verify-form">
     <p>Hello Big Boss,</p>
 
-    <p>Company Name: <?= $model->company_name ?></p>
-    <p>Agent Name: <?= $model->name ?></p>
-    <p>Agent Phone: <?= $model->phone ?></p>
-    <p>Agent Email: <?= $model->email ?></p>
+    <h1>Company Name:</h1> <p> <?= $model->company_name ?></p>
+    <h1>Agent Name:</h1>  <p><?= $model->name ?></p>
+    <h1>Agent Phone:</h1> <p> <?= $model->phone ?></p>
+    <h1>Agent Email:</h1> <p> <?= $model->email ?></p>
     
 </div>
