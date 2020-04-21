@@ -98,11 +98,11 @@ return [
                     'patterns' => [
                         'POST <id>' => 'place-an-order',
                         'GET callback' => 'callback',
-                        'GET <id>' => 'order-details',
+                        'GET <id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS callback' => 'options',
-                        'OPTIONS <id>' => 'options',
+                        'OPTIONS <id>/<restaurant_uuid>' => 'options',
                     ]
                 ],
             ],

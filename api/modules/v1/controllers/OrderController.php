@@ -305,11 +305,15 @@ class OrderController extends Controller {
         }
     }
 
+    
     /**
-     * Get order status
+     * Get Order detail
+     * @param type $id
+     * @param type $restaurant_uuid
+     * @return type
      */
-    public function actionOrderDetails($id) {
-        $model = Order::find()->where(['order_uuid' => $id])->with('restaurant', 'orderItems', 'restaurantBranch', 'payment')->asArray()->one();
+    public function actionOrderDetails($id, $restaurant_uuid) {
+        $model = Order::find()->where(['order_uuid' => $id,'restaurant_uuid' => $restaurantUuid])->with('restaurant', 'orderItems', 'restaurantBranch', 'payment')->asArray()->one();
 
 
         if (!$model) {

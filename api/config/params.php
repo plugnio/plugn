@@ -1,4 +1,4 @@
 <?php
 return [
-    'adminEmail' => 'contact@yo3an.io'
+    'adminEmail' => 'contact@plugn.io'
 ];

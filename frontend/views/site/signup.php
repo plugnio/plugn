@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </p>
                 <!-- Sign Up Form -->
                 <div class="form-container">
-                    <?php $form = ActiveForm::begin(['id' => 'contact-form']); ?>
+                    <?php $form = ActiveForm::begin(['id' => 'form-signup','enableClientScript' => false]); ?>
 
 
                     <?=
@@ -68,8 +68,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                     <div class="form-group">
-                        <?= Html::submitButton('SEND REQUEST', ['class' => 'form-control-submit-button', 'name' => 'contact-button']) ?>
+                        <?= Html::submitButton('SEND REQUEST', ['class' => 'form-control-submit-button', 'name' => 'signup-button']) ?>
                     </div>
+                 
+                     <?php ActiveForm::end(); ?>
                 </div> <!-- end of form container -->
                 <!-- end of sign up form -->
 

@@ -13,7 +13,7 @@ use yii\filters\AccessControl;
 use frontend\models\LoginForm;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
-use frontend\models\ContactForm;
+use frontend\models\SignupForm;
 use common\models\Restaurant;
 
 /**
@@ -30,7 +30,7 @@ class SiteController extends Controller {
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error', 'index', 'signup'],
+                        'actions' => ['login', 'error', 'index', 'signup','thank-you'],
                         'allow' => true,
                     ],
                     [
@@ -139,8 +139,6 @@ class SiteController extends Controller {
      * @return mixed
      */
     public function actionLogin() {
-      exec("mpg321 --quiet --gain 10 /path/to/beep.mp3");
-
     
         $this->layout = 'landing';
 
@@ -172,28 +170,30 @@ class SiteController extends Controller {
     }
 
     /**
-     * Displays contact page.
+     * Displays signup page.
      *
      * @return mixed
      */
     public function actionSignup() {
         
         $this->layout = 'landing';
-
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
-                Yii::$app->session->setFlash('success', 'Thank you for contacting us. We will respond to you as soon as possible.');
-            } else {
-                Yii::$app->session->setFlash('error', 'There was an error sending your message.');
-            }
-
-            return $this->refresh();
-        } else {
-            return $this->render('contact', [
-                        'model' => $model,
-            ]);
+        
+        $model = new SignupForm();
+        if ($model->load(Yii::$app->request->post()) && $model->sendEmail()) {
+            return $this->redirect(['thank-you']);
+                    
         }
+
+        return $this->render('signup', [
+            'model' => $model,
+        ]);
+        
+    }
+    
+    public function actionThankYou(){
+     $this->layout = 'landing';
+     return $this->render('thankYou');
+
     }
 
     /**

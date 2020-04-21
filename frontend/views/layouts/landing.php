@@ -112,6 +112,7 @@ LandingAsset::register($this);
             <!-- end of navigation -->
 
             <?php $this->beginBody() ?>
+            <?= Alert::widget() ?>
             <?= $content ?> 
             <?php $this->endBody() ?>
         </body>

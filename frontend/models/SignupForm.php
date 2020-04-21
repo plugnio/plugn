@@ -6,9 +6,9 @@ use Yii;
 use yii\base\Model;
 
 /**
- * ContactForm is the model behind the contact form.
+ * SignupForm is the model behind the signup form.
  */
-class ContactForm extends Model {
+class SignupForm extends Model {
 
     public $company_name;
     public $name;
@@ -20,14 +20,14 @@ class ContactForm extends Model {
      */
     public function rules() {
         return [
-            [['name'], 'trim'],
-            [['name', 'company_name', 'phone', 'email'], 'required'],
-            [['name', 'company_name', 'email'], 'string', 'max' => 255],
-            [['phone'], 'string', 'min' => 8, 'max' => 8],
-            ['email', 'trim'],
-            ['email', 'required'],
-            ['email', 'email'],
-            ['email', 'string', 'max' => 255],
+//            [['name'], 'trim'],
+//            [['name', 'company_name', 'phone', 'email'], 'required'],
+//            [['name', 'company_name', 'email'], 'string', 'max' => 255],
+//            [['phone'], 'string', 'min' => 8, 'max' => 8],
+//            ['email', 'trim'],
+//            ['email', 'required'],
+//            ['email', 'email'],
+//            ['email', 'string', 'max' => 255],
         ];
     }
 
