@@ -20,14 +20,14 @@ class SignupForm extends Model {
      */
     public function rules() {
         return [
-//            [['name'], 'trim'],
-//            [['name', 'company_name', 'phone', 'email'], 'required'],
-//            [['name', 'company_name', 'email'], 'string', 'max' => 255],
-//            [['phone'], 'string', 'min' => 8, 'max' => 8],
-//            ['email', 'trim'],
-//            ['email', 'required'],
-//            ['email', 'email'],
-//            ['email', 'string', 'max' => 255],
+            [['name'], 'trim'],
+            [['name', 'company_name', 'phone', 'email'], 'required'],
+            [['name', 'company_name', 'email'], 'string', 'max' => 255],
+            [['phone'], 'string', 'min' => 8, 'max' => 8],
+            ['email', 'trim'],
+            ['email', 'required'],
+            ['email', 'email'],
+            ['email', 'string', 'max' => 255],
         ];
     }
 
@@ -48,9 +48,9 @@ class SignupForm extends Model {
                         ->compose(
                                 ['html' => 'signupForm-html', 'text' => 'signupForm-text'], ['model' => $this]
                         )
-                        ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' robot'])
+                        ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
                         ->setTo(Yii::$app->params['supportEmail'])
-                        ->setSubject('Account registration at ' . Yii::$app->name)
+                        ->setSubject('[Plugn] New Agent - ' . $this->name )
                         ->send();
     }
 

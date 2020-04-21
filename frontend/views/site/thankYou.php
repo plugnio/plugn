@@ -11,7 +11,11 @@ use yii\helpers\Html;
             <div class="col-lg-12">
                 <h1>Thank you for contacting us! </h1>
                 <p>We have received your message. One of our team members will get in touch with you shortly.</p>
-                <?= Html::button(Html::a('GO TO HOMEPAGE' , ['site/index'],['style'=>'text-decoration: none;']), ['site/index','class' => 'form-control-submit-button', 'style' => 'width:30%']) ?>  
+                <?=
+                Html::a(
+                        Html::button('GO TO HOMEPAGE', ['site/index', 'class' => 'form-control-submit-button', 'style' => 'width:30%']),
+                        ['site/index'], ['style' => 'text-decoration: none;'])
+                ?>  
             </div>
         </div>
     </div>
