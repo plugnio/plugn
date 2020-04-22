@@ -219,6 +219,8 @@ $this->registerJs($js);
 
 
     <?= $form->field($model, 'phone_number')->input('number') ?>
+    
+    <?= $form->field($model, 'restaurant_email')->input('email') ?>
 
 
     <div class="form-group">

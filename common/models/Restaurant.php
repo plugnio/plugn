@@ -23,6 +23,7 @@ use yii\behaviors\AttributeBehavior;
  * @property int $support_delivery
  * @property int $support_pick_up
  * @property string|null $phone_number
+ * @property string|null $restaurant_email
  * @property string|null $restaurant_created_at
  * @property string|null $restaurant_updated_at
  *
@@ -66,7 +67,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['name', 'support_delivery', 'support_pick_up', 'restaurant_payments_method','restaurant_domain'], 'required'],
+            [['name', 'support_delivery', 'support_pick_up', 'restaurant_payments_method','restaurant_domain','restaurant_email'], 'required'],
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['agent_id', 'restaurant_status', 'support_delivery', 'support_pick_up'], 'integer', 'min' => 0],
@@ -75,7 +76,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo','restaurant_domain'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 8, 'max' => 8],
             [['phone_number'], 'integer', 'min' => 0],
-            
+            ['restaurant_email', 'email'],
             [['restaurant_uuid'], 'unique'],
             [['agent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Agent::className(), 'targetAttribute' => ['agent_id' => 'agent_id']],
         ];
@@ -102,6 +103,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             'support_pick_up' => 'Support Pick Up',
             'restaurant_delivery_area' => 'Delivery Areas',
             'phone_number' => 'Phone Number',
+            'restaurant_email' => "Restaurant's Email",
             'restaurant_created_at' => 'Restaurant Created At',
             'restaurant_updated_at' => 'Restaurant Updated At',
         ];
@@ -257,6 +259,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset( $fields['live_api_key']);    
         unset( $fields['test_api_key']);    
         unset( $fields['business_type']);    
+        unset( $fields['restaurant_email']);    
         unset( $fields['license_number']);    
         unset( $fields['document_issuing_country']);    
         unset( $fields['document_issuing_date']);    

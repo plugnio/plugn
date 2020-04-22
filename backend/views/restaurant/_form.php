@@ -162,7 +162,7 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'phone_number')->textInput(['maxlength' => true]) ?>
 
-
+    <?= $form->field($model, 'restaurant_email')->input('email') ?>
 
     <?= $form->field($model, 'business_type')->textInput(['value' => 'corp']) ?>
     <?= $form->field($model, 'vendor_sector')->textInput() ?>
@@ -215,7 +215,7 @@ $this->registerJs($js);
     <?= $form->field($model, 'iban')->textInput() ?>
     <?= $form->field($model, 'owner_first_name')->textInput() ?>
     <?= $form->field($model, 'owner_last_name')->textInput() ?>
-    <?= $form->field($model, 'owner_email')->textInput() ?>
+    <?= $form->field($model, 'owner_email')->input('email') ?>
     <?= $form->field($model, 'owner_customer_number')->textInput() ?>
 
     <?= $form->field($model, 'identification_issuing_country')->textInput(['value' => "KW"]) ?>

@@ -85,7 +85,7 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'agent_name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'agent_email')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'agent_email')->input('email') ?>
 
 
     <?=

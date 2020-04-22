@@ -38,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'order_status',
                 "format" => "raw",
                 "value" => function($model) {
-                    if ($model->order_status == Order::STATUS_SUBMITTED || $model->order_status == Order::STATUS_OUT_FOR_DELIVERY)
+                    if ($model->order_status == Order::STATUS_PENDING || $model->order_status == Order::STATUS_OUT_FOR_DELIVERY)
                         return '<span class="badge bg-warning" >' . $model->orderStatus . '</span>';
                     else if ($model->order_status == Order::STATUS_BEING_PREPARED)
                         return '<span class="badge bg-primary" >' . $model->orderStatus . '</span>';

@@ -97,11 +97,13 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'POST <id>' => 'place-an-order',
+                        'GET check-for-pending-orders/<restaurant_uuid>' => 'check-pending-orders',
                         'GET callback' => 'callback',
                         'GET <id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS <id>' => 'options',
+                        'OPTIONS check-for-pending-orders/<restaurant_uuid>' => 'options',
                         'OPTIONS callback' => 'options',
                         'OPTIONS <id>/<restaurant_uuid>' => 'options',
                     ]

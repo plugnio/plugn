@@ -300,5 +300,21 @@ class OrderController extends Controller {
             'body' => $model
         ];
     }
-
+    
+    
+    /**
+     * CheckPendingOrders of type boolean and we want to return
+     * True if there are pending  orders , false if these isn't any
+     * @param type $restaurantUuid
+     * @return boolean
+     */
+    public function actionCheckPendingOrders($restaurant_uuid){
+        $pendingOrder = Order::find()->where(['restaurant_uuid' => $restaurant_uuid , 'order_status' => Order::STATUS_PENDING])->exists();
+        
+        if($pendingOrder)
+            return true;
+        
+        return false;
+    }
+    
 }

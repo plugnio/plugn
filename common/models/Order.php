@@ -50,7 +50,7 @@ use yii\behaviors\AttributeBehavior;
  */
 class Order extends \yii\db\ActiveRecord {
 
-    const STATUS_SUBMITTED = 1;
+    const STATUS_PENDING = 1;
     const STATUS_BEING_PREPARED = 2;
     const STATUS_OUT_FOR_DELIVERY = 3;
     const STATUS_COMPLETE = 4;
@@ -77,7 +77,7 @@ class Order extends \yii\db\ActiveRecord {
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer', 'min' => 0],
-            ['order_status', 'in', 'range' => [self::STATUS_SUBMITTED, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_CANCELED]],
+            ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_CANCELED]],
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
             ['restaurant_branch_id', 'required', 'when' => function($model) {
                     return $model->order_mode == static::ORDER_MODE_PICK_UP;
@@ -261,6 +261,7 @@ class Order extends \yii\db\ActiveRecord {
                     ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
                     ->setTo($this->agent->agent_email)
                     ->setSubject('Your order from: ' . $this->restaurant->name)
+                    ->setReplyTo($this->restaurant->restaurant_email)
                     ->send();
         }
                 
@@ -284,8 +285,8 @@ class Order extends \yii\db\ActiveRecord {
      * @return string text explaining Order Status
      */
     public function getOrderStatus() {
-        if ($this->order_status == self::STATUS_SUBMITTED)
-            return 'Order Submitted';
+        if ($this->order_status == self::STATUS_PENDING)
+            return 'Order Pending';
         else if ($this->order_status == self::STATUS_BEING_PREPARED)
             return 'Order Being Prepared';
         else if ($this->order_status == self::STATUS_OUT_FOR_DELIVERY)
