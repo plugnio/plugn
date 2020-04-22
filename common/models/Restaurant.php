@@ -23,7 +23,7 @@ use yii\behaviors\AttributeBehavior;
  * @property int $support_delivery
  * @property int $support_pick_up
  * @property string|null $phone_number
- * @property string|null $restaurant_email
+ * @property string $restaurant_email
  * @property string|null $restaurant_created_at
  * @property string|null $restaurant_updated_at
  *
