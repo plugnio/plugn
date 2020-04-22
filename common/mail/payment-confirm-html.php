@@ -96,6 +96,26 @@ use common\models\Order;
                                                                                 </tr>
                                                                             </table>
                                                                     </div><!--[if mso | IE]></td><td class="" style="vertical-align:top;width:294px;" ><![endif]-->
+                                                                    <?php } 
+                                                                    
+                                                                    else if ($order->order_status == Order::ORDER_MODE_PICK_UP) { ?>   
+                                                                        <div class="mj-column-per-50 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                                                                            <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                                                                                <tr>
+                                                                                    <td align="center" style="font-size:0px;padding:10px 25px;padding-top:15px;padding-bottom:6px;word-break:break-word;">
+                                                                                        <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:18px;line-height:24px;text-align:center;color:#000000;">
+                                                                                            Pickup from
+                                                                                        </div>
+                                                                                    </td></tr>
+                                                                                <tr>
+                                                                                    <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                                                                        <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">
+                                                                                            <?= $order->restaurantBranch->branch_name_en ?> 
+                                                                                        </div>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            </table>
+                                                                    </div><!--[if mso | IE]></td><td class="" style="vertical-align:top;width:294px;" ><![endif]-->
                                                                     <?php } ?>
                                                                     <div class="mj-column-per-50 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
                                                                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%"><tr><td align="center" style="font-size:0px;padding:10px 25px;padding-top:15px;padding-bottom:6px;word-break:break-word;">
@@ -118,28 +138,28 @@ use common\models\Order;
                                                                                     </div>
                                                                                 </td>
                                                                             </tr>
-                                                                            <?php if($order->payment_method_id != 3 ) { ?>
-                                                                            <tr>
-                                                                                <td align="left" style="font-size:0px;padding:10px 25px;padding-top:0;padding-bottom:0;word-break:break-word;">
-                                                                                    <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">
-                                                                                        Result: <?= $order->payment->payment_current_status ?>
-                                                                                    </div>
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td align="left" style="font-size:0px;padding:10px 25px;padding-top:0;padding-bottom:0;word-break:break-word;">
-                                                                                    <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">
-                                                                                        Ref: <?= $order->payment->payment_gateway_order_id ?>
-                                                                                    </div>
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td align="left" style="font-size:0px;padding:10px 25px;padding-top:0;padding-bottom:0;word-break:break-word;">
-                                                                                    <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">
-                                                                                        Charge: <?= $order->payment->payment_gateway_transaction_id ?>
-                                                                                    </div>
-                                                                                </td>
-                                                                            </tr>
+                                                                            <?php if ($order->payment_method_id != 3) { ?>
+                                                                                <tr>
+                                                                                    <td align="left" style="font-size:0px;padding:10px 25px;padding-top:0;padding-bottom:0;word-break:break-word;">
+                                                                                        <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">
+                                                                                            Result: <?= $order->payment->payment_current_status ?>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <td align="left" style="font-size:0px;padding:10px 25px;padding-top:0;padding-bottom:0;word-break:break-word;">
+                                                                                        <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">
+                                                                                            Ref: <?= $order->payment->payment_gateway_order_id ?>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <td align="left" style="font-size:0px;padding:10px 25px;padding-top:0;padding-bottom:0;word-break:break-word;">
+                                                                                        <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">
+                                                                                            Charge: <?= $order->payment->payment_gateway_transaction_id ?>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                </tr>
                                                                             <?php } ?>
                                                                         </table>
 
