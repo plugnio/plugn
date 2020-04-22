@@ -237,7 +237,7 @@ class Payment extends \yii\db\ActiveRecord
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
         
-        if($insert && $this->payment_current_status == 'CAPTURED')
+        if($this->payment_current_status == 'CAPTURED')
             $this->order->sendPaymentConfirmationEmail();
     }
     
