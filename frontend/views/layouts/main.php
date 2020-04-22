@@ -42,8 +42,9 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                              soundForNewOrders.play();
                          } else if (data == false){
                                console.log('pause');
-                              soundForNewOrders.pause();
-                         }
+                            if (soundForNewOrders.duration > 0 && !soundForNewOrders.paused) {
+                                soundForNewOrders.pause();
+                            }
                      }).catch(err => {
                          console.error('Error: ', err);
                      });

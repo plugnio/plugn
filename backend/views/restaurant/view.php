@@ -96,6 +96,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'support_delivery',
             'support_pick_up',
             'phone_number',
+            'restaurant_email:email',
             'restaurant_created_at',
             'restaurant_updated_at',
             'live_api_key',

@@ -104,7 +104,7 @@ use common\models\Order;
                                                                 <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
                                                                     <tbody>
                                                                         <tr>
-                                                                            <td style="width:100px;"><img height="auto" src="../img/logo-juiced.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="100"></td>
+                                                                            <td style="width:100px;"><img height="auto" src='<?= $order->restaurant->getRestaurantLogoUrl() ?>' style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="100"></td>
                                                                         </tr>
                                                                     </tbody>
                                                                 </table>
@@ -179,8 +179,7 @@ use common\models\Order;
                                                                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
                                                                             <tr>
                                                                                 <td align="center" style="font-size:0px;padding:10px 25px;padding-top:15px;padding-bottom:6px;word-break:break-word;">
-                                                                                    <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:18px;line-height:24px;text-align:center;color:#000000;">Order #
-                                                                                        <?= $order->order_uuid ?>
+                                                                                    <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:18px;line-height:24px;text-align:center;color:#000000;">Order #<?= $order->order_uuid ?>
                                                                                     </div>
                                                                                 </td>
                                                                             </tr>

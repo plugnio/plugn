@@ -65,6 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'format' => 'raw'
                     ],
                     'phone_number',
+                    'restaurant_email:email',
                     'restaurant_created_at',
                     'restaurant_updated_at',
                 ],
