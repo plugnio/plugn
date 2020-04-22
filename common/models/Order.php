@@ -362,7 +362,7 @@ class Order extends \yii\db\ActiveRecord {
                 if ($this->customer_email != null)
                     $customer_model->customer_email = $this->customer_email;
 
-                $customer_model->save();
+                $customer_model->save(false);
             }
 
             $this->customer_id = $customer_model->customer_id;
