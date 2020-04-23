@@ -6,6 +6,12 @@ $config = [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => '',
         ],
+        'urlManager' => [
+            'class' => 'yii\web\UrlManager',
+            'baseUrl' => '/~saoud/plugn-vendor/vendor-yii2/backend/web/',
+            'enablePrettyUrl' => true,
+            'showScriptName' => false,
+        ],
     ],
 ];
 
