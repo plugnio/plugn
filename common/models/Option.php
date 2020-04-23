@@ -32,15 +32,15 @@ class Option extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['item_uuid', 'min_qty', 'option_name', 'option_name_ar'], 'required'],
-            ['max_qty', 'required', 'when' => function($model) {
-                    return $model->min_qty != null;
-                }
-            ],
+//            ['max_qty', 'required', 'when' => function($model) {
+//                    return $model->min_qty != null;
+//                }
+//            ],
             [['min_qty'], 'integer', 'min' => 0],
             [['max_qty'], 'integer', 'min' => 1],
             // an inline validator defined as an anonymous function
             ['min_qty', function ($attribute, $params, $validator) {
-                    if ($this->min_qty > $this->max_qty) {
+                    if ($this->max_qty != null && $this->min_qty > $this->max_qty) {
                         $this->addError($attribute, 'Min quantity must be less than or equal to max quantity');
                     }
                 }],
@@ -57,10 +57,10 @@ class Option extends \yii\db\ActiveRecord {
         return [
             'option_id' => 'Option ID',
             'item_uuid' => 'Item Uuid',
-            'min_qty' => 'Min Qty',
-            'max_qty' => 'Max Qty',
+            'min_qty' => 'Minimum amount',
+            'max_qty' => 'Maximum amount',
             'option_name' => 'Option Name',
-            'option_name_ar' => 'Option Name Ar',
+            'option_name_ar' => 'Option Name in Arabic',
         ];
     }
 

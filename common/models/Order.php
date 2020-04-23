@@ -261,7 +261,8 @@ class Order extends \yii\db\ActiveRecord {
                     ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
                     ->setTo($this->agent->agent_email)
                     ->setSubject('Your order from: ' . $this->restaurant->name)
-                    ->setReplyTo($this->restaurant->restaurant_email ? $this->restaurant->restaurant_email : 'saoud@studenthub.co')
+//                    ->setReplyTo($this->restaurant->restaurant_email ? $this->restaurant->restaurant_email : 'saoud@studenthub.co')
+                    ->setReplyTo('noreply@example.com')
                     ->send();
         }
                 

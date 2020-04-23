@@ -71,7 +71,7 @@ class Item extends \yii\db\ActiveRecord {
             'item_name' => 'Item Name',
             'item_name_ar' => 'Item Name Ar',
             'item_description' => 'Item Description',
-            'item_description_ar' => 'Item Description Ar',
+            'item_description_ar' => 'Item Description in Arabic',
             'sort_number' => 'Sort Number',
             'stock_qty' => 'Stock Qty',
             'item_image' => 'Item Image',

@@ -47,7 +47,7 @@ class ExtraOption extends \yii\db\ActiveRecord {
             'extra_option_id' => 'Extra Option ID',
             'option_id' => 'Option ID',
             'extra_option_name' => 'Extra Option Name',
-            'extra_option_name_ar' => 'Extra Option Name Ar',
+            'extra_option_name_ar' => 'Extra Option Name in Arabic',
             'extra_option_price' => 'Extra Option Price',
         ];
     }

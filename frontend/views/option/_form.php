@@ -20,9 +20,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'option_name_ar')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'min_qty')->textInput() ?>
+    <?= $form->field($model, 'min_qty')->textInput(['placeholder' => 'Enter the minimum amount of items a customer should select']) ?>
     
-    <?= $form->field($model, 'max_qty')->textInput() ?>
+    <?= $form->field($model, 'max_qty')->textInput(['placeholder' => 'Enter the maximum amount of items a customer should select (optional)']) ?>
 
 
     <div class="form-group">

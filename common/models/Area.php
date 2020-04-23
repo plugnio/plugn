@@ -51,7 +51,7 @@ class Area extends \yii\db\ActiveRecord
             'area_id' => 'Area ID',
             'city_id' => 'City ID',
             'area_name' => 'Area Name',
-            'area_name_ar' => 'Area Name Ar',
+            'area_name_ar' => 'Area Name in Arabic',
             'latitude' => 'Latitude',
             'longitude' => 'Longitude',
         ];

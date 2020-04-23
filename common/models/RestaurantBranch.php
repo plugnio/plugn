@@ -47,7 +47,7 @@ class RestaurantBranch extends \yii\db\ActiveRecord
             'restaurant_branch_id' => 'Restaurant Branch ID',
             'restaurant_uuid' => 'Restaurant Uuid',
             'branch_name_en' => 'Branch Name En',
-            'branch_name_ar' => 'Branch Name Ar',
+            'branch_name_ar' => 'Branch Name in Arabic',
             'prep_time' => 'Preparation time',
         ];
     }

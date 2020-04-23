@@ -44,7 +44,7 @@ class Category extends \yii\db\ActiveRecord {
         return [
             'category_id' => 'Category ID',
             'category_name' => 'Category Name',
-            'category_name_ar' => 'Category Name Ar',
+            'category_name_ar' => 'Category Name in Arabic',
             'sort_number' => 'Sort Number',
             'restaurant_uuid' => 'Restaurant UUID',
         ];

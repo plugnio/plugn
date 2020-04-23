@@ -91,6 +91,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'columns' => [
                 'option_name',
                 'option_name_ar',
+                'min_qty',
                 'max_qty',
                 [
                     'class' => 'yii\grid\ActionColumn',

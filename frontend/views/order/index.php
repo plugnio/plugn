@@ -23,6 +23,13 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             [
+                'attribute' => 'order_created_at',
+                "format" => "raw",
+                "value" => function($model) {
+                        return Yii::$app->formatter->asRelativeTime($model->order_created_at);
+                }
+            ],
+            [
                 'label' => 'Order Type',
                 "format" => "raw",
                 "value" => function($model) {

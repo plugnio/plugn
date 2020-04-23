@@ -115,13 +115,14 @@ class OrderController extends Controller {
             // your html content input
             'content' => $content,
             // any css to be embedded if required
-            'cssInline' => '.kv-heading-1{font-size:38px}',
+            'cssFile' => '@frontend/web/css/invoice_1.css',
             // set mPDF properties on the fly
             'options' => [], //['title' => 'Booking #'.$id],
         ]);
 
         header('Access-Control-Allow-Origin: *');
         return $pdf->render();
+
     }
 
     /**

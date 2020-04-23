@@ -67,20 +67,20 @@ $this->registerJs($js);
 
     <?=
         $form->field($model, 'items_category[]')->dropDownList($categoryArray, [
-            'class' => 'select2',
+            'class' => 'select2', 
             'multiple' => 'multiple',
             'value' => $itemCategoryValues
         ]);
     ?>
 
 
-    <?= $form->field($model, 'item_name')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'item_name')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger']) ?>
 
-    <?= $form->field($model, 'item_name_ar')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'item_name_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger']) ?>
 
-    <?= $form->field($model, 'item_description')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'item_description')->textInput(['maxlength' => true, 'placeholder' => 'Item description']) ?>
 
-    <?= $form->field($model, 'item_description_ar')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'item_description_ar')->textInput(['maxlength' => true, 'placeholder' => 'Item description']) ?>
 
     <?= $form->field($model, 'sort_number')->textInput() ?>
 
