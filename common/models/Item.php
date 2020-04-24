@@ -271,6 +271,14 @@ class Item extends \yii\db\ActiveRecord {
     public function getOptions() {
         return $this->hasMany(Option::className(), ['item_uuid' => 'item_uuid']);
     }
+    /**
+     * Gets query for [[Options]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getExtraOptions() {
+        return $this->hasMany(ExtraOption::className(), ['option_id' => 'option_id'])->via('options');
+    }
 
     /**
      * Gets query for [[OrderItems]].

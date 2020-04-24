@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = 'Update';
     <div class="card">
         
     <p>
-        <?= Html::a('Create Order Item', ['order-item/create', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], ['class' => 'btn btn-success','style'=>'    margin: 10px;']) ?>
+        <?= Html::a('Add Item', ['order-item/create', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], ['class' => 'btn btn-success','style'=>'    margin: 10px;']) ?>
     </p>
     
         <?=

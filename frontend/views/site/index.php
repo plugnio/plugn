@@ -11,7 +11,6 @@ $this->title = $restaurant_model->name;
 ?>
 <div class="site-index">
 
-    <!-- Todo -->
     <div class="jumbotron">
         <?php if ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_CLOSE) { ?>
             <h3>You're restaurant is closed!</h3>

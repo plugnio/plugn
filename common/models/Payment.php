@@ -184,40 +184,6 @@ class Payment extends \yii\db\ActiveRecord
             // Net amount after deducting gateway fee
             $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee;
 
-            // Send Receipt to customer on successful payment
-            // TODO send email confirmation for customer
-//            if($responseContent->status == 'CAPTURED'){
-//                \Yii::$app->mailer->htmlLayout = "layouts/text";
-//
-//                \Yii::$app->mailer->compose('payment-confirmation', [
-//                            'model' => $paymentRecord
-//                        ])
-//                        ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
-//                        ->setTo($paymentRecord->customer->customer_email)
-//                        ->setSubject("Payment Received")
-//                        ->send();
-//            }
-
-            // Log to Slack
-//            Yii::info('[TAP Payment received from > '.$paymentRecord->customer->customer_name.']'
-//                      .$paymentRecord->customer->customer_name.
-//                      ' paid '. Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '',[\NumberFormatter::MAX_SIGNIFICANT_DIGITS=>10]).
-//                      ' for '.$paymentRecord->order->order_name_en.
-//                      ' we will receive '. Yii::$app->formatter->asCurrency($paymentRecord->payment_net_amount, '',[\NumberFormatter::MAX_SIGNIFICANT_DIGITS=>10]).
-//                      ' and '. Yii::$app->formatter->asCurrency($paymentRecord->payment_gateway_fee, '',[\NumberFormatter::MAX_SIGNIFICANT_DIGITS=>10]).
-//                      ' will go to payment gateway fee' , __METHOD__);
-
-
-        }else{
-//             Yii::error('[TAP Payment Issue > '.$paymentRecord->customer->customer_name.']'
-//                      .$paymentRecord->customer->customer_name.
-//                      ' tried to pay '.Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '',[\NumberFormatter::MAX_SIGNIFICANT_DIGITS=>10]).
-//                      ' for '.$paymentRecord->order->order_name_en.
-//                      ' and has failed at gateway. Maybe card issue.', __METHOD__);
-//
-//              Yii::error('[Response from TAP for Failed Payment] '.
-//                       print_r($responseContent, true), __METHOD__);
-
         }
 
         $paymentRecord->save();
