@@ -38,6 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'order_uuid',
             'item_uuid',
             'item_name',
+            'item_name_ar',
             'item_price:currency',
             'qty',
             'customer_instruction',

@@ -285,7 +285,7 @@ class OrderController extends Controller {
      * @return type
      */
     public function actionOrderDetails($id, $restaurant_uuid) {
-        $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->with('restaurant', 'orderItems', 'restaurantBranch', 'payment')->asArray()->one();
+        $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->with('restaurant', 'orderItems',  'restaurantBranch', 'payment')->asArray()->one();
 
 
         if (!$model) {

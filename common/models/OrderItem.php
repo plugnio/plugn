@@ -11,6 +11,7 @@ use Yii;
  * @property int $order_uuid
  * @property string $item_uuid
  * @property string $item_name
+ * @property string $item_name_ar
  * @property float $item_price
  * @property int|null $qty
  * @property string|null $customer_instruction
@@ -40,7 +41,7 @@ class OrderItem extends \yii\db\ActiveRecord {
             [['item_price'], 'number', 'min'=> 0],
             [['item_uuid'], 'checkIfItemBelongToRestaurant'],
             [['item_uuid'], 'string', 'max' => 300],
-            [['item_name', 'customer_instruction'], 'string', 'max' => 255],
+            [['item_name','item_name_ar', 'customer_instruction'], 'string', 'max' => 255],
             [['item_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_uuid' => 'item_uuid']],
             [['order_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_uuid' => 'order_uuid']],
         ];
@@ -55,6 +56,7 @@ class OrderItem extends \yii\db\ActiveRecord {
             'order_uuid' => 'Order ID',
             'item_uuid' => 'Item Uuid',
             'item_name' => 'Item Name',
+            'item_name_ar' => 'Item Name in Arabic',
             'item_price' => 'Item Price',
             'qty' => 'Qty',
             'customer_instruction' => 'Instructions',
@@ -121,6 +123,7 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         if ($item_model) {
             $this->item_name = $item_model->item_name;
+            $this->item_name_ar = $item_model->item_name_ar;
             $this->item_price = $item_model->item_price;
         } else
             return false;
