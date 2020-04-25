@@ -45,11 +45,11 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                             if (soundForNewOrders.duration > 0 && !soundForNewOrders.paused) {
                                 soundForNewOrders.pause();
                             }
-                     }).catch(err => {
+                     }
+                 }).catch(err => {
                          console.error('Error: ', err);
                      });
-
-             }
+                 }
 
              setInterval(function() {
 
