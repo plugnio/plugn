@@ -71,7 +71,7 @@ LandingAsset::register($this);
                 <!-- Text Logo - Use this if you don't have a graphic logo -->
                 <?=
                 Html::a(
-                        Html::img('images/logo-full.svg', ['alt' => '']), ['site/index'], ['class' => 'navbar-brand logo-image']
+                        Html::img(Yii::$app->request->baseUrl .'/images/logo-full.svg', ['alt' => '']), ['site/index'], ['class' => 'navbar-brand logo-image']
                 );
                 ?>
 
@@ -85,10 +85,10 @@ LandingAsset::register($this);
                 <div class="collapse navbar-collapse" id="navbarsExampleDefault">
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item">
-                            <a class="nav-link page-scroll" href="#header">HOME <span class="sr-only">(current)</span></a>
+                            <a class="nav-link page-scroll" href="<?= Yii::$app->request->baseUrl  ?>/">HOME <span class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link page-scroll" href="#contact">CONTACT</a>
+                            <a class="nav-link page-scroll" href="<?= Yii::$app->request->baseUrl  ?>/#contact">CONTACT</a>
                         </li>
 
                     </ul>

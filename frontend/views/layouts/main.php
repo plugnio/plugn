@@ -55,7 +55,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
 
                  CheckPendingOrders();
 
-             }, 10000);
+             }, 1000);
         
         </script>
 
