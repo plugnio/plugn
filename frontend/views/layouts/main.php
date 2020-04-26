@@ -116,7 +116,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                     <!-- Sidebar user panel (optional) -->
                     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                         <div class="image">
-                            <img src="../../web/img/avatar.jpg" class="img-circle elevation-2" alt="User Image">
+                            <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/avatar.jpg' ?>" class="img-circle elevation-2" alt="User Image">
                         </div>
                         <div class="info">
                             <?= Html::a(Yii::$app->user->identity->agent_name, ['agent/index', 'restaurantUuid' => $this->params['restaurant_uuid']]) ?>

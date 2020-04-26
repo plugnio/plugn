@@ -6,11 +6,11 @@ return [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => '',
         ],
-        'UrlManager' => [
+        'urlManager' => [
             'class' => 'yii\web\UrlManager',
+            'baseUrl' => 'https://plugn.io',
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'baseUrl' => 'https://plugn.io',
         ],
     ],
 ];
