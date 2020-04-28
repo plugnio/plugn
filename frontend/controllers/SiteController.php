@@ -15,7 +15,8 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use common\models\Restaurant;
-
+use common\models\Order;
+use common\models\Customer;
 /**
  * Site controller
  */
@@ -30,7 +31,7 @@ class SiteController extends Controller {
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error', 'index', 'signup','thank-you'],
+                        'actions' => ['login', 'error', 'index', 'signup', 'thank-you'],
                         'allow' => true,
                     ],
                     [
@@ -77,7 +78,10 @@ class SiteController extends Controller {
             return $this->render('landing');
         else {
             foreach (Yii::$app->ownedAccountManager->getOwnedRestaurants() as $restaurantOwned) {
-                return $this->redirect(['vendor-dashboard', 'id' => $restaurantOwned->restaurant_uuid]);
+
+                return $this->redirect(['vendor-dashboard',
+                            'id' => $restaurantOwned->restaurant_uuid
+                ]);
             }
         }
     }
@@ -88,9 +92,31 @@ class SiteController extends Controller {
      * @return mixed
      */
     public function actionVendorDashboard($id) {
-        return $this->render('index', [
-                    'restaurant_model' => Yii::$app->ownedAccountManager->getOwnedAccount($id)
-        ]);
+
+        if ($restaurantOwned = Yii::$app->ownedAccountManager->getOwnedAccount($id)) {
+
+            $orders = Order::find()->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid])
+                      ->orderBy(['order_created_at' => SORT_DESC])
+                      ->limit(5)
+                      ->all();
+
+            $new_orders = Order::find()->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid, 'order_status' => Order::STATUS_PENDING])->count();
+
+            $total_orders = Order::find()->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid])->count();
+
+            $total_customers = Customer::find()->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid])->count();
+
+            $total_earnings = Order::find()->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid])->sum('total_price');
+
+            return $this->render('index', [
+                        'restaurant_model' => $restaurantOwned,
+                        'orders' => $orders,
+                        'new_orders' => $new_orders,
+                        'total_orders' => $total_orders,
+                        'total_customers' => $total_customers,
+                        'total_earnings' => $total_earnings,
+            ]);
+        }
     }
 
     /**
@@ -139,7 +165,7 @@ class SiteController extends Controller {
      * @return mixed
      */
     public function actionLogin() {
-    
+
         $this->layout = 'landing';
 
         if (!Yii::$app->user->isGuest) {
@@ -175,25 +201,22 @@ class SiteController extends Controller {
      * @return mixed
      */
     public function actionSignup() {
-        
+
         $this->layout = 'landing';
-        
+
         $model = new SignupForm();
         if ($model->load(Yii::$app->request->post()) && $model->sendEmail()) {
             return $this->redirect(['thank-you']);
-                    
         }
 
         return $this->render('signup', [
-            'model' => $model,
+                    'model' => $model,
         ]);
-        
     }
-    
-    public function actionThankYou(){
-     $this->layout = 'landing';
-     return $this->render('thankYou');
 
+    public function actionThankYou() {
+        $this->layout = 'landing';
+        return $this->render('thankYou');
     }
 
     /**

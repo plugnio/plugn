@@ -14,11 +14,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="refund-index">
 
-    <p>
-        <?= Html::a('Create Refund', ['create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']) ?>
-    </p>
-
-
     <div class="card">
 
         <?=

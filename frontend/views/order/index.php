@@ -23,24 +23,20 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             [
-                'attribute' => 'order_created_at',
+                'attribute' => 'order_uuid',
                 "format" => "raw",
                 "value" => function($model) {
-                        return Yii::$app->formatter->asRelativeTime($model->order_created_at);
+                    return '#' . $model->order_uuid;
                 }
             ],
             [
-                'label' => 'Order Type',
+                'attribute' => 'order_created_at',
                 "format" => "raw",
                 "value" => function($model) {
-                    if ($model->order_mode == Order::ORDER_MODE_DELIVERY)
-                        return 'Delivery';
-                    else
-                        return 'Pickup';
+                    return Yii::$app->formatter->asRelativeTime($model->order_created_at);
                 }
             ],
             'customer_name',
-            'customer_phone_number',
             [
                 'attribute' => 'order_status',
                 "format" => "raw",
@@ -54,6 +50,16 @@ $this->params['breadcrumbs'][] = $this->title;
                     else if ($model->order_status == Order::STATUS_CANCELED)
                         return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
                 }
+            ],
+            [
+                'label' => 'Payment',
+                "format" => "raw",
+                "value" => function($data) {
+                if($data->payment_uuid)
+                    return $data->payment->payment_current_status;
+                else
+                    return $data->paymentMethod->payment_method_name;
+                },
             ],
             'total_price:currency',
             [

@@ -18,7 +18,7 @@ class OrderSearch extends Order
     {
         return [
             [['order_uuid', 'area_id', 'payment_method_id', 'order_status'], 'integer'],
-            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name' , 'payment_method_name_ar'], 'safe'],
+            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number','total_price', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name' , 'payment_method_name_ar'], 'safe'],
         ];
     }
 
@@ -41,7 +41,7 @@ class OrderSearch extends Order
     public function search($params, $restaurantUuid)
     {
         $query = Order::find()->where(['restaurant_uuid' => $restaurantUuid])->orderBy([
-                'order_created_at' => SORT_DESC 
+                'order_created_at' => SORT_DESC
         ]);
 
         // add conditions that should always apply here
@@ -72,6 +72,7 @@ class OrderSearch extends Order
             ->andFilterWhere(['like', 'block', $this->block])
             ->andFilterWhere(['like', 'street', $this->street])
             ->andFilterWhere(['like', 'avenue', $this->avenue])
+            ->andFilterWhere(['like', 'total_price', $this->total_price])
             ->andFilterWhere(['like', 'house_number', $this->house_number])
             ->andFilterWhere(['like', 'special_directions', $this->special_directions])
             ->andFilterWhere(['like', 'customer_name', $this->customer_name])

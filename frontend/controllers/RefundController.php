@@ -63,13 +63,15 @@ class RefundController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($restaurantUuid) {
+    public function actionCreate($restaurantUuid, $orderUuid) {
 
         $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
+        $order_model = Order::find()->where(['order_uuid' => $orderUuid])->exists();
 
-        if ($restaurant_model) {
+        if ($restaurant_model && $order_model) {
             $model = new Refund();
             $model->restaurant_uuid = $restaurantUuid;
+            $model->order_uuid = $orderUuid;
 
             if ($model->load(Yii::$app->request->post())) {
                 Yii::$app->tapPayments->setApiKeys($restaurant_model->live_api_key, $restaurant_model->test_api_key);
@@ -91,7 +93,7 @@ class RefundController extends Controller {
                         } else if ($response->data) {
                             $model->refund_id = $response->data['id'];
                             $model->refund_status = $response->data['status'];
-       
+
                             if ($model->save())
                                 return $this->redirect(['view', 'id' => $model->refund_id, 'restaurantUuid' => $model->restaurant_uuid]);
                         }

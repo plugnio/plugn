@@ -23,10 +23,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
+
+        <?= Html::a('Create Refund', ['refund/create', 'restaurantUuid' => $model->restaurant_uuid, 'orderUuid' => $model->order_uuid], ['class' => 'btn btn-success']) ?>
+
     </p>
     <div class="card">
         <div class="card-body">
-            
+
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
