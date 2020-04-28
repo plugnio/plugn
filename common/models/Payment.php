@@ -12,7 +12,7 @@ use yii\web\NotFoundHttpException;
  * This is the model class for table "payment".
  *
  * @property string $payment_uuid used as payment reference id
- * @property string $restaurant_uuid 
+ * @property string $restaurant_uuid
  * @property string $customer_id Which customer made the payment?
  * @property string $order_uuid Which order this payment is for
  * @property string $payment_gateway_order_id myfatoorah order id
@@ -133,17 +133,12 @@ class Payment extends \yii\db\ActiveRecord
         $paymentRecord = \common\models\Payment::findOne(['payment_gateway_transaction_id' => $id]);
         if(!$paymentRecord){
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
-        } 
-        
-        //Update payment_uuid in order
-        $order = Order::findOne($paymentRecord->order_uuid);
-        $order->payment_uuid = $paymentRecord->payment_uuid;
-        $order->save(false);
+        }
 
-        
+
         // Request response about it from TAP
         Yii::$app->tapPayments->setApiKeys($paymentRecord->restaurant->live_api_key, $paymentRecord->restaurant->test_api_key);
-       
+
         $response = Yii::$app->tapPayments->retrieveCharge($id);
         $responseContent = json_decode($response->content);
 
@@ -202,11 +197,11 @@ class Payment extends \yii\db\ActiveRecord
 
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
-        
+
         if($this->payment_current_status == 'CAPTURED')
             $this->order->sendPaymentConfirmationEmail();
     }
-    
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -222,7 +217,7 @@ class Payment extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid']);
     }
-    
+
     /**
      * @return \yii\db\ActiveQuery
      */

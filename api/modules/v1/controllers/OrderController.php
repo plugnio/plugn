@@ -186,6 +186,10 @@ class OrderController extends Controller {
                         $payment->payment_current_status = "Redirected to payment gateway";
                         $payment->save();
 
+                        //Update payment_uuid in order
+                        $order->payment_uuid = $payment->payment_uuid;
+                        $order->save(false);
+
 //                  Yii::info("[Payment Attempt Started] " . Yii::$app->user->identity->investor_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($amountToInvest, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
                         // Redirect to payment gateway
                         Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
