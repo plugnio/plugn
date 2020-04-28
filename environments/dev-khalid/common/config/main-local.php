@@ -17,5 +17,8 @@ return [
             // for the mailer to send real emails.
             'useFileTransport' => true,
         ],
+        'tapPayments' => [
+            'gatewayToUse' => \common\components\TapPayments::USE_TEST_GATEWAY,
+        ],
     ],
 ];
