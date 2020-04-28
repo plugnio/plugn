@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\RestaurantTheme */
 
-$this->title = 'Restaurant Theme';
+$this->title = 'Store Theme';
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 $this->params['breadcrumbs'][] = $this->title;

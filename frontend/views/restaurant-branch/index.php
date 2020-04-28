@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 $this->params['restaurant_uuid'] = $restaurantUuid;
 
-$this->title = 'Restaurant Branches';
+$this->title = 'Store Branches';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -15,11 +15,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="restaurant-branch-index">
 
-    <?php if ($dataProvider->totalCount > 0) { ?> 
+    <?php if ($dataProvider->totalCount > 0) { ?>
         <p>
-            <?= Html::a('Create Restaurant Branch', ['create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']) ?>
+            <?= Html::a('Create Store Branch', ['create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']) ?>
         </p>
-    <?php } ?>   
+    <?php } ?>
 
     <div class="card">
 
@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'showOnEmpty' => false,
             'emptyText' => '<div style="padding: 70px 0; text-align: center;">'
             . '  <h4>You currently do not have Branches set.</h4>'
-            . Html::a('Create Restaurant Branch', ['create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success'])
+            . Html::a('Create Store Branch', ['create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success'])
             . '</div>',
             'columns' => [
                 'branch_name_en',

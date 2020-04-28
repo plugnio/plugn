@@ -39,7 +39,7 @@ use yii\behaviors\AttributeBehavior;
  * @property RestaurantPaymentMethod[] $restaurantPaymentMethods
  * @property RestaurantTheme $restaurantTheme
  * @property PaymentMethod[] $paymentMethods
- * @property Agent[] $agents 
+ * @property Agent[] $agents
  * @property WorkingHours[] $workingHours
  * @property WorkingDay[] $workingDays
  */
@@ -94,7 +94,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             'tagline' => 'Tagline',
             'tagline_ar' => 'Tagline in Arabic',
             'restaurant_domain' => 'Domain',
-            'restaurant_status' => 'Restaurant Status',
+            'restaurant_status' => 'Store Status',
             'thumbnail_image' => 'Thumbnail Image',
             'logo' => 'Logo',
             'restaurant_thumbnail_image' => 'Thumbnail Image',
@@ -103,9 +103,9 @@ class Restaurant extends \yii\db\ActiveRecord {
             'support_pick_up' => 'Support Pick Up',
             'restaurant_delivery_area' => 'Delivery Areas',
             'phone_number' => 'Phone Number',
-            'restaurant_email' => "Restaurant's Email",
-            'restaurant_created_at' => 'Restaurant Created At',
-            'restaurant_updated_at' => 'Restaurant Updated At',
+            'restaurant_email' => "Store's Email",
+            'restaurant_created_at' => 'Store Created At',
+            'restaurant_updated_at' => 'Store Updated At',
         ];
     }
 
@@ -180,19 +180,19 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
-     * Return Restaurant's logo url 
+     * Return Restaurant's logo url
      */
     public function getRestaurantLogoUrl(){
         return 'https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/' . $this->restaurant_uuid . "/logo/" . $this->logo;
     }
-    
+
     /**
-     * Return Restaurant's thumbnail image url 
+     * Return Restaurant's thumbnail image url
      */
     public function getRestaurantThumbnailImageUrl(){
         return 'https://res.cloudinary.com/plugn/image/upload/c_scale,w_600/restaurants/' . $this->restaurant_uuid . "/thumbnail-image/" . $this->thumbnail_image;
     }
-    
+
     /**
      * Upload restaurant's logo  to cloudinary
      * @param type $imageURL
@@ -248,47 +248,47 @@ class Restaurant extends \yii\db\ActiveRecord {
         $fields = parent::fields();
 
         // remove fields that contain sensitive information
-        unset( $fields['agent_id']);    
-        unset( $fields['restaurant_domain']);    
-        unset( $fields['vendor_sector']);    
-        unset( $fields['business_id']);    
-        unset( $fields['business_entity_id']);    
-        unset( $fields['wallet_id']);    
-        unset( $fields['merchant_id']);    
-        unset( $fields['operator_id']);    
-        unset( $fields['live_api_key']);    
-        unset( $fields['test_api_key']);    
-        unset( $fields['business_type']);    
-        unset( $fields['restaurant_email']);    
-        unset( $fields['license_number']);    
-        unset( $fields['document_issuing_country']);    
-        unset( $fields['document_issuing_date']);    
-        unset( $fields['not_for_profit']);    
-        unset( $fields['document_issuing_date']);    
-        unset( $fields['document_expiry_date']);    
-        unset( $fields['document_title']);    
-        unset( $fields['document_file']);    
-        unset( $fields['document_file_id']);    
-        unset( $fields['document_file_purpose']);    
-        unset( $fields['iban']);    
-        unset( $fields['owner_first_name']);    
-        unset( $fields['owner_last_name']);    
-        unset( $fields['owner_email']);    
-        unset( $fields['owner_customer_number']);    
-        unset( $fields['identification_issuing_country']);    
-        unset( $fields['identification_issuing_date']);    
-        unset( $fields['identification_expiry_date']);    
-        unset( $fields['identification_file']);    
-        unset( $fields['identification_file_id']);    
-        unset( $fields['identification_title']);    
-        unset( $fields['identification_file_purpose']);    
-        unset( $fields['restaurant_created_at']);    
-        unset( $fields['restaurant_updated_at']);    
-        
+        unset( $fields['agent_id']);
+        unset( $fields['restaurant_domain']);
+        unset( $fields['vendor_sector']);
+        unset( $fields['business_id']);
+        unset( $fields['business_entity_id']);
+        unset( $fields['wallet_id']);
+        unset( $fields['merchant_id']);
+        unset( $fields['operator_id']);
+        unset( $fields['live_api_key']);
+        unset( $fields['test_api_key']);
+        unset( $fields['business_type']);
+        unset( $fields['restaurant_email']);
+        unset( $fields['license_number']);
+        unset( $fields['document_issuing_country']);
+        unset( $fields['document_issuing_date']);
+        unset( $fields['not_for_profit']);
+        unset( $fields['document_issuing_date']);
+        unset( $fields['document_expiry_date']);
+        unset( $fields['document_title']);
+        unset( $fields['document_file']);
+        unset( $fields['document_file_id']);
+        unset( $fields['document_file_purpose']);
+        unset( $fields['iban']);
+        unset( $fields['owner_first_name']);
+        unset( $fields['owner_last_name']);
+        unset( $fields['owner_email']);
+        unset( $fields['owner_customer_number']);
+        unset( $fields['identification_issuing_country']);
+        unset( $fields['identification_issuing_date']);
+        unset( $fields['identification_expiry_date']);
+        unset( $fields['identification_file']);
+        unset( $fields['identification_file_id']);
+        unset( $fields['identification_title']);
+        unset( $fields['identification_file_purpose']);
+        unset( $fields['restaurant_created_at']);
+        unset( $fields['restaurant_updated_at']);
+
         return $fields;
 
     }
-                
+
     /**
      *
      * @param type $insert
@@ -308,7 +308,7 @@ class Restaurant extends \yii\db\ActiveRecord {
                 $this->deleteRestaurantLogo($changedAttributes['logo']);
             }
         }
-        
+
         if($insert){
             $restaurant_theme = new RestaurantTheme();
             $restaurant_theme->restaurant_uuid = $this->restaurant_uuid;
@@ -554,7 +554,7 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function getCustomers() {
         return $this->hasMany(Customer::className(), ['customer_id' => 'customer_id']);
     }
-    
+
     /**
      * Gets query for [[Refunds]].
      *
@@ -563,8 +563,8 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function getRefunds()
     {
         return $this->hasMany(Refund::className(), ['restaurant_uuid' => 'restaurant_uuid']);
-    }    
-    
+    }
+
     /**
      * Gets query for [[RestaurantTheme]].
      *

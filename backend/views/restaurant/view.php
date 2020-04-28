@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
             Html::a('Open', ['promote-to-open', 'id' => $model->restaurant_uuid], [
                 'class' => 'btn btn-success',
                 'data' => [
-                    'confirm' => 'Are you sure you want to change restaurant status to open?',
+                    'confirm' => 'Are you sure you want to change store status to open?',
                     'method' => 'post',
                 ],
             ])
@@ -53,7 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
             Html::a('Busy', ['promote-to-busy', 'id' => $model->restaurant_uuid], [
                 'class' => 'btn btn-warning',
                 'data' => [
-                    'confirm' => 'Are you sure you want to change restaurant status to busy?',
+                    'confirm' => 'Are you sure you want to change store status to busy?',
                     'method' => 'post',
                 ],
             ])

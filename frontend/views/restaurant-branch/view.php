@@ -8,7 +8,7 @@ use yii\widgets\DetailView;
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 $this->title = $model->branch_name_en;
-$this->params['breadcrumbs'][] = ['label' => 'Restaurant Branches', 'url' => ['index', 'restaurantUuid' =>$model->restaurant_uuid ]];
+$this->params['breadcrumbs'][] = ['label' => 'Store Branches', 'url' => ['index', 'restaurantUuid' =>$model->restaurant_uuid ]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>

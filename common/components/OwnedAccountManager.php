@@ -79,7 +79,7 @@ class OwnedAccountManager extends BaseObject
         }
 
         Yii::$app->user->logout();
-        throw new \yii\web\BadRequestHttpException('You do not own this restaurant.');
+        throw new \yii\web\BadRequestHttpException('You do not own this store.');
     }
 
 }

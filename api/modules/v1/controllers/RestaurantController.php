@@ -64,7 +64,7 @@ class RestaurantController extends Controller {
         } else {
             return [
                 'operation' => 'error',
-                'message' => 'Restaurant Uuid is invalid'
+                'message' => 'Store Uuid is invalid'
             ];
         }
     }

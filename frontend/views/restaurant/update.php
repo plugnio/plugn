@@ -7,7 +7,7 @@ use yii\helpers\Html;
 
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
-$this->title = 'Update Restaurant: ' . $model->name;
+$this->title = 'Update Store: ' . $model->name;
 $this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['index','restaurantUuid' =>$model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>

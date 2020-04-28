@@ -221,9 +221,9 @@ class OrderController extends Controller {
                             'redirectUrl' => $redirectUrl,
                         ];
                     } else {
-                        
+
                         $order->sendPaymentConfirmationEmail();
-                        
+
                         $response = [
                             'operation' => 'success',
                             'order_uuid' => $order->order_uuid,
@@ -240,13 +240,13 @@ class OrderController extends Controller {
             } else if ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_CLOSE) {
                 $response = [
                     'operation' => 'error',
-                    'message' => 'Restaurant is close',
+                    'message' => 'Store is close',
                 ];
             }
         } else {
             $response = [
                 'operation' => 'error',
-                'message' => 'Restaurant Uuid is invalid'
+                'message' => 'Store Uuid is invalid'
             ];
         }
 
@@ -285,7 +285,7 @@ class OrderController extends Controller {
      * @return type
      */
     public function actionOrderDetails($id, $restaurant_uuid) {
-        $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->with('restaurant', 'orderItems',  'restaurantBranch', 'payment')->asArray()->one();
+        $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->with('restaurant', 'orderItems', 'restaurantBranch', 'payment')->asArray()->one();
 
 
         if (!$model) {
@@ -300,21 +300,18 @@ class OrderController extends Controller {
             'body' => $model
         ];
     }
-    
-    
+
+
     /**
      * CheckPendingOrders of type boolean and we want to return
      * True if there are pending  orders , false if these isn't any
      * @param type $restaurantUuid
      * @return boolean
      */
-    public function actionCheckPendingOrders($restaurant_uuid){
-        $pendingOrder = Order::find()->where(['restaurant_uuid' => $restaurant_uuid , 'order_status' => Order::STATUS_PENDING])->exists();
-        
-        if($pendingOrder)
-            return true;
-        
-        return false;
+    public function actionCheckPendingOrders($restaurant_uuid) {
+        return Order::find()->where(['restaurant_uuid' => $restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
+                        ->exists();
+
     }
-    
+
 }

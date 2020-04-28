@@ -17,6 +17,7 @@ use frontend\models\SignupForm;
 use common\models\Restaurant;
 use common\models\Order;
 use common\models\Customer;
+
 /**
  * Site controller
  */
@@ -31,7 +32,7 @@ class SiteController extends Controller {
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error', 'index', 'signup', 'thank-you'],
+                        'actions' => ['login', 'error', 'index', 'signup', 'check-for-new-orders', 'thank-you'],
                         'allow' => true,
                     ],
                     [
@@ -95,10 +96,10 @@ class SiteController extends Controller {
 
         if ($restaurantOwned = Yii::$app->ownedAccountManager->getOwnedAccount($id)) {
 
-            $orders = Order::find()->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid])
-                      ->orderBy(['order_created_at' => SORT_DESC])
-                      ->limit(5)
-                      ->all();
+            $orders = Order::find()->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
+                    ->orderBy(['order_created_at' => SORT_DESC])
+                    ->limit(5)
+                    ->all();
 
             $new_orders = Order::find()->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid, 'order_status' => Order::STATUS_PENDING])->count();
 
@@ -220,12 +221,23 @@ class SiteController extends Controller {
     }
 
     /**
-     * Displays about page.
-     *
-     * @return mixed
+     * Check for new orders
      */
-    public function actionAbout() {
-        return $this->render('about');
+    public function actionCheckForNewOrders($restaurant_uuid) {
+
+        $restaurantOwned = Yii::$app->ownedAccountManager->getOwnedAccount($restaurant_uuid);
+
+        $this->layout = false;
+
+        $newOrders = Order::find()->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
+                ->orderBy(['order_created_at' => SORT_DESC])
+                ->limit(5)
+                ->all();
+
+
+        return $this->render('incoming-orders-table', [
+                    'orders' => $newOrders,
+        ]);
     }
 
     /**

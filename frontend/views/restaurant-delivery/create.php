@@ -7,7 +7,7 @@ use yii\helpers\Html;
 
 $this->params['restaurant_uuid'] = $restaurantUuid;
 
-$this->title = 'Create Restaurant Delivery';
+$this->title = 'Create Store Delivery';
 $this->params['breadcrumbs'][] = ['label' => 'Delivery Zone', 'url' => ['index', 'restaurantUuid' => $restaurantUuid]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

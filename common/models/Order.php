@@ -56,8 +56,8 @@ class Order extends \yii\db\ActiveRecord {
     const STATUS_COMPLETE = 4;
     const STATUS_CANCELED = 5;
     const STATUS_REFUNDED = 6;
-    
-    
+
+
     const ORDER_MODE_DELIVERY = 1;
     const ORDER_MODE_PICK_UP = 2;
 
@@ -170,7 +170,7 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function validateArea($attribute) {
         if (!RestaurantDelivery::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'area_id' => $this->area_id])->one())
-            $this->addError($attribute, "Restaurant does not deliver to this Area.");
+            $this->addError($attribute, "Store does not deliver to this Area.");
     }
 
     /**
@@ -179,10 +179,10 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function validateOrderMode($attribute) {
         if ($this->$attribute == static::ORDER_MODE_DELIVERY && !$this->restaurant->support_delivery)
-            $this->addError($attribute, "Restaurant doesn't accept delviery");
+            $this->addError($attribute, "Store doesn't accept delviery");
 
         else if ($this->$attribute == static::ORDER_MODE_PICK_UP && !$this->restaurant->support_pick_up)
-            $this->addError($attribute, "Restaurant doesn't accept pick up");
+            $this->addError($attribute, "Store doesn't accept pick up");
     }
 
     /**
@@ -236,7 +236,7 @@ class Order extends \yii\db\ActiveRecord {
         ];
     }
 
-    
+
     public function sendPaymentConfirmationEmail() {
 
         if ($this->customer_email) {
@@ -265,9 +265,9 @@ class Order extends \yii\db\ActiveRecord {
                     ->setReplyTo('noreply@example.com')
                     ->send();
         }
-                
+
     }
-    
+
     /**
      * Update order total price and items total price
      */
@@ -395,7 +395,7 @@ class Order extends \yii\db\ActiveRecord {
     public function getRestaurant() {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-    
+
     /**
      * Gets query for [[Agent]].
      *

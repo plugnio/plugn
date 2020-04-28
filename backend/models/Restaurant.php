@@ -8,7 +8,7 @@ use Yii;
  * This is the model class for table "restaurant".
  *
  *  New fields added to create a merchant account on tap
- * 
+ *
  * @property string $business_id
  * @property string $business_entity_id
  * @property string $wallet_id
@@ -16,29 +16,29 @@ use Yii;
  * @property string $operator_id
  * @property string $live_api_key
  * @property string $test_api_key
- * @property string $business_type 
- * @property string $vendor_sector 
- * @property string $license_number 
- * @property int $not_for_profit 
- * @property string $document_issuing_country 
- * @property string|null $document_issuing_date 
- * @property string|null $document_expiry_date 
+ * @property string $business_type
+ * @property string $vendor_sector
+ * @property string $license_number
+ * @property int $not_for_profit
+ * @property string $document_issuing_country
+ * @property string|null $document_issuing_date
+ * @property string|null $document_expiry_date
  * @property string $document_file_id
- * @property string $document_file 
+ * @property string $document_file
  * @property string $document_title
- * @property string $document_file_purpose 
- * @property string $iban 
- * @property string $owner_first_name 
- * @property string $owner_last_name 
- * @property string $owner_email 
- * @property string $owner_customer_number 
- * @property string $identification_issuing_country 
- * @property string|null $identification_issuing_date 
- * @property string|null $identification_expiry_date 
- * @property string $identification_file 
- * @property string $identification_file_id 
- * @property string $identification_title 
- * @property string $identification_file_purpose 
+ * @property string $document_file_purpose
+ * @property string $iban
+ * @property string $owner_first_name
+ * @property string $owner_last_name
+ * @property string $owner_email
+ * @property string $owner_customer_number
+ * @property string $identification_issuing_country
+ * @property string|null $identification_issuing_date
+ * @property string|null $identification_expiry_date
+ * @property string $identification_file
+ * @property string $identification_file_id
+ * @property string $identification_title
+ * @property string $identification_file_purpose
  */
 class Restaurant extends \common\models\Restaurant {
 
@@ -102,7 +102,7 @@ class Restaurant extends \common\models\Restaurant {
             'document_issuing_date' => 'Document Issuing Date',
             'document_expiry_date' => 'Document Expiry Date',
             'document_file' => 'Document File',
-            'restaurant_document_file' => 'Restaurant Document File',
+            'restaurant_document_file' => 'Store Document File',
             'document_title' => 'Document Title',
             'document_file_purpose' => 'Document File Purpose',
             'iban' => 'IBAN',
@@ -141,9 +141,9 @@ class Restaurant extends \common\models\Restaurant {
                     'public_id' => "restaurants/" . $this->restaurant_uuid . "/private_documents/" . $filename
                         ]
                 );
-                
+
                 if ($result || count($result) > 0) {
-                    //delete the file from temp folder 
+                    //delete the file from temp folder
                     unlink($file_path);
                     $this[$attribute] = basename($result['url']);
                 }
