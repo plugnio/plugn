@@ -21,7 +21,7 @@ use yii\helpers\Html;
                 <div class="col-lg-6 col-xl-7">
                     <div class="image-container">
                         <div class="img-wrapper">
-                            <img class="img-fluid" src="images/header-software-app.png" alt="alternative">
+                            <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/images/header-software-app.png' ?>" class="img-fluid"  alt="alternative">
                         </div> <!-- end of img-wrapper -->
                     </div> <!-- end of image-container -->
                 </div> <!-- end of col -->
@@ -33,13 +33,13 @@ use yii\helpers\Html;
 
 
 <!-- Customers -->
-<div class="slider-1">
+<!-- <div class="slider-1">
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
 
                 <!-- Image Slider -->
-                <div class="slider-container">
+                <!-- <div class="slider-container">
                     <div class="swiper-container image-slider">
                         <div class="swiper-wrapper">
                             <div class="swiper-slide">
@@ -61,14 +61,14 @@ use yii\helpers\Html;
                                 <img class="img-fluid" src="images/customer-logo-6.png" alt="alternative">
                             </div>
                         </div> <!-- end of swiper-wrapper -->
-                    </div> <!-- end of swiper container -->
-                </div> <!-- end of slider-container -->
+                    <!-- </div> <!-- end of swiper container -->
+                <!-- </div> <!-- end of slider-container -->
                 <!-- end of image slider -->
 
-            </div> <!-- end of col -->
-        </div> <!-- end of row -->
-    </div> <!-- end of container -->
-</div> <!-- end of slider-1 -->
+            <!-- </div> <!-- end of col -->
+        <!-- </div> <!-- end of row -->
+    <!-- </div> <!-- end of container -->
+<!-- </div> <!-- end of slider-1 -->
 <!-- end of customers -->
 
 
@@ -87,7 +87,7 @@ use yii\helpers\Html;
                 <!-- Card -->
                 <div class="card">
                     <div class="card-image">
-                        <img class="img-fluid" src="images/description-1.png" alt="alternative">
+                        <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/images/description-1.png' ?>" class="img-fluid"  alt="alternative">
                     </div>
                     <div class="card-body">
                         <h4 class="card-title">KNET/creditcard payment gateway and delivery tracking</h4>
@@ -98,7 +98,7 @@ use yii\helpers\Html;
                 <!-- Card -->
                 <div class="card">
                     <div class="card-image">
-                        <img class="img-fluid" src="images/description-2.png" alt="alternative">
+                        <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/images/description-2.png' ?>" class="img-fluid"  alt="alternative">
                     </div>
                     <div class="card-body">
                         <h4 class="card-title">Your own website. Your branding.</h4>
@@ -109,7 +109,7 @@ use yii\helpers\Html;
                 <!-- Card -->
                 <div class="card">
                     <div class="card-image">
-                        <img class="img-fluid" src="images/description-3.png" alt="alternative">
+                        <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/images/description-3.png' ?>" class="img-fluid"  alt="alternative">
                     </div>
                     <div class="card-body">
                         <h4 class="card-title">Zero Commission. All your sales are yours</h4>
@@ -140,7 +140,7 @@ use yii\helpers\Html;
             </div> <!-- end of col -->
             <div class="col-lg-6">
                 <div class="image-container">
-                    <img class="img-fluid" src="images/details.png" alt="alternative">
+                    <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/images/details.png' ?>" class="img-fluid"  alt="alternative">
                 </div> <!-- end of image-container -->
             </div> <!-- end of col -->
         </div> <!-- end of row -->
