@@ -107,7 +107,11 @@ class SiteController extends Controller {
 
             $total_customers = Customer::find()->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid])->count();
 
-            $total_earnings = Order::find()->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid])->sum('total_price');
+            $total_earnings = Order::find()
+                    ->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid])
+                    ->andWhere(['!=' , 'order_status' , Order::STATUS_REFUNDED])
+                    ->andWhere(['!=' , 'order_status' , Order::STATUS_CANCELED])
+                    ->sum('total_price');
 
             return $this->render('index', [
                         'restaurant_model' => $restaurantOwned,

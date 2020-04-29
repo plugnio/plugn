@@ -16,15 +16,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Update', ['update', 'restaurantUuid' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
-        <?=
-        Html::a('Delete', ['delete', 'restaurantUuid' => $model->restaurant_uuid], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ])
-        ?>
     </p>
     <div class="card">
         <div class="card-body">

@@ -11,7 +11,7 @@ foreach ($orders as $order) {
     <tr>
         <td>
             <?=
-            Html::a('#' . $order->order_uuid, ['order/view', 'id' => $order->order_uuid, 'restaurantUuid' => $order->restaurant_uuid])
+            Html::a('#' . $order->order_uuid, ['order/view', 'id' => $order->order_uuid, 'restaurantUuid' => $order->restaurant_uuid],['target' => '_blank'])
             ?>
         </td>
         <td>

@@ -249,6 +249,10 @@ $this->registerJs($js);
     <?= $form->field($model, 'identification_file_purpose')->textInput(['value' => 'identity_document']) ?>
 
     <?= $form->field($model, 'identification_title')->textInput(['value' => "Owner's civil id"]) ?>
+    
+    <?= $form->field($model, 'live_api_key')->textInput() ?>
+    
+    <?= $form->field($model, 'test_api_key')->textInput() ?>
 
 
     <div class="form-group">

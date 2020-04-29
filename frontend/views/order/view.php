@@ -39,9 +39,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 if ($model->order_status != Order::STATUS_COMPLETE)
                     echo Html::a('Mark as Complete', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_COMPLETE], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
 
-                if ($model->order_status != Order::STATUS_REFUNDED)
-                    echo Html::a('Refund', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_REFUNDED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-info']);
-
                 if ($model->order_status != Order::STATUS_CANCELED)
                     echo Html::a('Mark order as cancelled', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_CANCELED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-danger']);
                 ?>
@@ -55,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'attribute' => 'order_status',
                         'format' => 'html',
                         'value' => function ($data) {
-                            return '<span class="badge bg-warning" style="font-size:20px;" >' . $data->orderStatus . '</span>';
+                            return '<span  style="font-size:25px; font-weight: 700" >' . $data->orderStatus . '</span>';
                         },
                     ],
                     'total_price:currency',
@@ -135,7 +132,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="card-body">
             <h3>Payment details</h3>
             <p>
-              <?php  if($model->payment_method_id != 3) echo Html::a('Create Refund', ['refund/create', 'restaurantUuid' => $model->restaurant_uuid, 'orderUuid' => $model->order_uuid], ['class' => 'btn btn-success']) ; ?>
+              <?php  if($model->payment_method_id != 3 && $model->order_status != Order::STATUS_REFUNDED) echo Html::a('Create Refund', ['refund/create', 'restaurantUuid' => $model->restaurant_uuid, 'orderUuid' => $model->order_uuid], ['class' => 'btn btn-success']) ; ?>
 
             </p>
             <?=
