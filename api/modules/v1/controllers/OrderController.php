@@ -266,9 +266,8 @@ class OrderController extends Controller {
 
         try {
             $paymentRecord = Payment::updatePaymentStatusFromTap($tap_id);
-
             $paymentRecord->received_callback = true;
-            $paymentRecord->save();
+            $paymentRecord->save(false);
 
             // Redirect back to app
             if ($paymentRecord->payment_current_status != 'CAPTURED') {  //Failed Payment
