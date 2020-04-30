@@ -165,6 +165,15 @@ $this->params['breadcrumbs'][] = $this->title;
                         'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
                     ],
                     [
+                        'label' => 'Received Callback',
+                        'format' => 'html',
+                        'value' => function ($data) {
+                            if ($data->payment)
+                                return $data->payment->received_callback == true ? 'True' : 'False';
+                        },
+                        'visible' => $model->payment
+                    ],
+                    [
                         'label' => 'Transaction ID',
                         'format' => 'html',
                         'value' => function ($data) {

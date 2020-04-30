@@ -187,10 +187,11 @@ use common\models\Order;
                                                                                 <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
                                                                                     <table cellpadding="0" cellspacing="0" width="100%" border="0" style="color:#000000;font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;table-layout:auto;width:100%;border:none;">
                                                                                         <!-- #item -->
-                                                                                        <tr>
-                                                                                            <?php
-                                                                                            foreach ($order->getOrderItems()->all() as $orderItem) {
-                                                                                                ?>
+
+                                                                                        <?php
+                                                                                        foreach ($order->getOrderItems()->all() as $orderItem) {
+                                                                                            ?>
+                                                                                            <tr>
                                                                                                 <td style="padding: 0 15px; padding-top:10px; width: 20px; vertical-align:top;">
                                                                                                     <?= $orderItem->qty ?>x
                                                                                                 </td>
@@ -207,9 +208,9 @@ use common\models\Order;
                                                                                                 <td style="color:#828585;padding: 0 15px 0 0; padding-top:10px; text-align: right; vertical-align:top;">
                                                                                                     <?= \Yii::$app->formatter->asCurrency($orderItem->calculateOrderItemPrice()); ?>
                                                                                                 </td>
+                                                                                            </tr>
+                                                                                        <?php } ?>
 
-                                                                                            <?php } ?>
-                                                                                        </tr>
                                                                                         <!-- #item -->
                                                                                         <!-- End items -->
                                                                                         <!-- Subtotal-->
@@ -283,7 +284,7 @@ use common\models\Order;
                                                                                 </tr>
                                                                                 <tr>
                                                                                     <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
-                                                                                        <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;"><?= $order->area_name ?>, Block <?= $order->block ?>, Street <?= $order->street ?>, <?= $order->avenue != null ?  'Avenue' . $order->avenue : '' ?>, House <?= $order->house_number ?></div>
+                                                                                        <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;"><?= $order->area_name ?>, Block <?= $order->block ?>, Street <?= $order->street ?>, <?= $order->avenue != null ? 'Avenue' . $order->avenue : '' ?>, House <?= $order->house_number ?></div>
                                                                                     </td>
                                                                                 </tr>
                                                                             </table>
