@@ -171,7 +171,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             if ($data->payment)
                                 return $data->payment->received_callback == true ? 'True' : 'False';
                         },
-                        'visible' => $model->payment
+                        'visible' => $model->payment_method_id != 3 &&  $model->payment
                     ],
                     [
                         'label' => 'Transaction ID',

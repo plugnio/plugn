@@ -11,7 +11,7 @@ $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
 $this->title = $restaurant_model->name;
 
 ?>
-<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
 
 <script type = "text/javascript">
 
