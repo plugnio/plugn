@@ -66,44 +66,62 @@ class RestaurantController extends Controller {
     }
 
     /**
+     * Creates a new Tap account
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreateTapAccount($restaurant_uuid) {
+        $model = $this->findModel($restaurant_uuid);
+        $model->setScenario(Restaurant::SCENARIO_CREATE_TAP_ACCOUNT);
+
+        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
+
+
+                
+                $model->restaurant_document_file = UploadedFile::getInstances($model, 'restaurant_document_file')[0]; //Authorized Signature
+                $model->owner_identification_file = UploadedFile::getInstances($model, 'owner_identification_file')[0]; //Owner's civil id
+
+                if ($model->owner_identification_file) {
+                    $model->createAMerchantAccountOnTap();
+                }
+                
+                
+            if ($model->validate() && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+            } else {
+                 Yii::$app->session->setFlash('error', print_r($model->errors, true));
+            }
+        }
+
+        return $this->render('create_tap_account', [
+                    'model' => $model,
+        ]);
+    }
+
+    /**
      * Creates a new Restaurant model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate() {
         $model = new Restaurant();
+        $model->setScenario(Restaurant::SCENARIO_CREATE);
 
-        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
+        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->save()) {
 
-            $model->restaurant_document_file = UploadedFile::getInstances($model, 'restaurant_document_file')[0]; //Authorized Signature
-            $model->owner_identification_file = UploadedFile::getInstances($model, 'owner_identification_file')[0]; //Owner's civil id
+            if ($model->restaurant_payments_method)
+                $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
 
-            if ($model->restaurant_document_file && $model->owner_identification_file) {
-                    $model->createAMerchantAccountOnTap();
-            }
+            $thumbnail_image = UploadedFile::getInstances($model, 'thumbnail_image');
+            $logo = UploadedFile::getInstances($model, 'logo');
 
-            if ($model->save()) {
+            if ($thumbnail_image)
+                $model->uploadThumbnailImage($thumbnail_image[0]->tempName);
 
-                
-                //delete tmp files
-                $model->deleteTempFiles();
-                
-                if ($model->restaurant_payments_method)
-                    $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
+            if ($logo)
+                $model->uploadLogo($logo[0]->tempName);
 
-                $thumbnail_image = UploadedFile::getInstances($model, 'thumbnail_image');
-                $logo = UploadedFile::getInstances($model, 'logo');
-
-                if ($thumbnail_image)
-                    $model->uploadThumbnailImage($thumbnail_image[0]->tempName);
-
-                if ($logo)
-                    $model->uploadLogo($logo[0]->tempName);
-
-                return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
-            }else{
-                die(json_encode($model->errors));
-            }
+            return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
         }
 
         return $this->render('create', [
@@ -130,7 +148,7 @@ class RestaurantController extends Controller {
             if ($model->save()) {
 
                 $thumbnail_image = UploadedFile::getInstances($model, 'restaurant_thumbnail_image');
-                
+
                 $logo = UploadedFile::getInstances($model, 'restaurant_logo');
 
                 if ($thumbnail_image)

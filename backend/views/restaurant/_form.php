@@ -146,7 +146,7 @@ $this->registerJs($js);
         1 => 'Yes',
         0 => 'No',
             ]
-            , ['prompt' => 'Choose...', 'id' => 'supportDeliveryInput']
+            , ['id' => 'supportDeliveryInput']
     );
     ?>
 
@@ -164,91 +164,14 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'restaurant_email')->input('email') ?>
 
-    <?= $form->field($model, 'business_type')->textInput(['value' => 'corp']) ?>
-    <?= $form->field($model, 'vendor_sector')->textInput() ?>
-    <?= $form->field($model, 'license_number')->textInput() ?>
-    <?=
-    $form->field($model, 'not_for_profit', [
-        'template' => "<label style='display:block;' class='control-label' for='agent-agent_email'>Not for profit</label>\n{input}\n{hint}\n{error}"
-    ])->checkbox([
-        'label' => '',
-        'checked' => $model->not_for_profit == 0 ? false : true,
-        'data-bootstrap-switch' => '',
-        'data-off-color' => 'danger',
-        'data-on-color' => 'success',
-    ])
-    ?>            
-
-    
-    <?= $form->field($model, 'document_issuing_country')->textInput(['value' => "KW"]) ?>
-
-    <?=
-    $form->field($model, 'document_issuing_date')->widget(DatePicker::classname(), [
-        'pluginOptions' => [
-            'autoclose' => true,
-            'format' => 'yyyy-mm-dd'
-        ]
-    ])
-    ?>
-    <?=
-    $form->field($model, 'document_expiry_date')->widget(DatePicker::classname(), [
-        'pluginOptions' => [
-            'autoclose' => true,
-            'format' => 'yyyy-mm-dd'
-        ]
-    ])
-    ?>
-
-    <?=
-    $form->field($model, 'restaurant_document_file')->widget(FileInput::classname(), [
-        'options' => [
-            'accept' => 'image/*',
-            'multiple' => false
-        ]
-    ]);
-    ?>
-
-    <?= $form->field($model, 'document_title')->textInput(['value' => 'Authorized Signature']) ?>
-
-    <?= $form->field($model, 'document_file_purpose')->textInput(['value' => 'customer_signature']) ?>
-
-    <?= $form->field($model, 'iban')->textInput() ?>
     <?= $form->field($model, 'owner_first_name')->textInput() ?>
+    
     <?= $form->field($model, 'owner_last_name')->textInput() ?>
+    
     <?= $form->field($model, 'owner_email')->input('email') ?>
+    
     <?= $form->field($model, 'owner_customer_number')->textInput() ?>
 
-    <?= $form->field($model, 'identification_issuing_country')->textInput(['value' => "KW"]) ?>
-
-    <?=
-    $form->field($model, 'identification_issuing_date')->widget(DatePicker::classname(), [
-        'pluginOptions' => [
-            'autoclose' => true,
-            'format' => 'yyyy-mm-dd'
-        ]
-    ])
-    ?>
-    <?=
-    $form->field($model, 'identification_expiry_date')->widget(DatePicker::classname(), [
-        'pluginOptions' => [
-            'autoclose' => true,
-            'format' => 'yyyy-mm-dd'
-        ]
-    ])
-    ?>
-
-    <?=
-    $form->field($model, 'owner_identification_file')->widget(FileInput::classname(), [
-        'options' => [
-            'accept' => 'image/*',
-            'multiple' => false
-        ]
-    ]);
-    ?>
-
-    <?= $form->field($model, 'identification_file_purpose')->textInput(['value' => 'identity_document']) ?>
-
-    <?= $form->field($model, 'identification_title')->textInput(['value' => "Owner's civil id"]) ?>
     
     <?= $form->field($model, 'live_api_key')->textInput() ?>
     

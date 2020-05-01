@@ -45,31 +45,32 @@ class Restaurant extends \common\models\Restaurant {
     public $owner_identification_file;
     public $restaurant_document_file;
 
+    const SCENARIO_CREATE_TAP_ACCOUNT = 'tap_account';
+    const SCENARIO_CREATE= 'create';
+
     /**
      * @inheritdoc
      */
     public function rules() {
         return array_merge(parent::rules(), [
+            [['owner_first_name', 'owner_last_name', 'owner_email', 'owner_customer_number'],'required', 'on' => 'create'],
             //All new fields added are required in order to create an account on Tap
             [
                 [
-                    'business_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id', 'test_api_key',
-                    'business_type', 'vendor_sector', 'license_number', 'not_for_profit',
-                    'document_issuing_country', 'document_issuing_date',
-                    'document_expiry_date', 'restaurant_document_file',
-                    'document_file_purpose', 'owner_last_name',
-                    'owner_email', 'owner_customer_number',
-                    'iban', 'owner_first_name',
-                    'document_title', 'identification_title', 'identification_issuing_country',
+//                    'business_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
+                    'business_id', 'business_entity_id', 'wallet_id', 'merchant_id',
+                    'vendor_sector', 'not_for_profit','iban',
+                    'identification_title', 'identification_issuing_country',
                     'identification_issuing_date', 'identification_expiry_date',
-                    'owner_identification_file', 'identification_file_purpose'
+                    'owner_identification_file', 'identification_file_purpose',
+//                    'live_api_key', 'test_api_key'
                 ],
-                'required' , 'on' => 'create'
+                'required', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT
             ],
             [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3],
-            [['identification_file_id', 'document_file_id'], 'safe'],
-            [['not_for_profit'], 'number'],
-            [['document_issuing_date', 'document_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe'],
+            [['identification_file_id', 'document_file_id'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            [['not_for_profit'], 'number', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            [['document_issuing_date', 'document_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             ['owner_email', 'email'],
             [
                 [
@@ -83,11 +84,17 @@ class Restaurant extends \common\models\Restaurant {
                     'business_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
                     'live_api_key', 'test_api_key'
                 ],
-                'string', 'max' => 255
+                'string', 'max' => 255, 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT
             ],
-            [['restaurant_document_file', 'owner_identification_file'], 'file', 'skipOnEmpty' => true],
+            [['restaurant_document_file', 'owner_identification_file'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
         ]);
     }
+
+//    public function scenarios() {
+//        $scenarios = parent::scenarios();
+//        $scenarios[self::SCENARIO_CREATE_TAP_ACCOUNT] = ['username', 'password'];
+//        return $scenarios;
+//    }
 
     /**
      * {@inheritdoc}
@@ -123,6 +130,7 @@ class Restaurant extends \common\models\Restaurant {
      * Processes file uploads if there are file inputs available
      */
     public function processFileUploads() {
+
         $this->_uploadTempFile($this->restaurant_document_file, 'document_file');
         $this->_uploadTempFile($this->owner_identification_file, 'identification_file');
     }
@@ -173,8 +181,16 @@ class Restaurant extends \common\models\Restaurant {
             }
 
             // Set this models attribute to the new filename
-            $this->$attribute = $filename;
-//            $this->save(false);
+            $this[$attribute] = $filename;
+        }
+    }
+
+    public function afterSave($insert, $changedAttributes) {
+        parent::afterSave($insert, $changedAttributes);
+
+        if ($this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT) {
+            //delete tmp files
+            $this->deleteTempFiles();
         }
     }
 
@@ -182,6 +198,7 @@ class Restaurant extends \common\models\Restaurant {
      * Deletes the files associated with this project
      */
     public function deleteTempFiles() {
+
         if ($this->document_file && file_exists(Yii::getAlias('@projectFiles') . "/" . $this->document_file)) {
             $this->uploadFileToCloudinary(Yii::getAlias('@projectFiles') . "/" . $this->document_file, $this->document_file, 'document_file');
         }
@@ -193,14 +210,16 @@ class Restaurant extends \common\models\Restaurant {
     public function uploadDocumentsToTap() {
         $this->processFileUploads();
 
-        //Upload Document file
-        $response = Yii::$app->tapPayments->uploadFileToTap(
-                Yii::getAlias('@projectFiles') . "/" . $this->document_file, $this->document_file_purpose, $this->document_title);
+        if ($this->document_expiry_date && $this->document_issuing_date && $this->document_issuing_country && $this->document_file_purpose && $this->document_title) {
+            
+            //Upload Document file
+            $response = Yii::$app->tapPayments->uploadFileToTap(
+                    Yii::getAlias('@projectFiles') . "/" . $this->document_file, $this->document_file_purpose, $this->document_title);
 
-        if ($response->isOk) {
-            $this->document_file_id = $response->data['id'];
+            if ($response->isOk) {
+                $this->document_file_id = $response->data['id'];
+            }
         }
-
 
 
         //Upload Owner civil id
@@ -219,7 +238,8 @@ class Restaurant extends \common\models\Restaurant {
     public function createAMerchantAccountOnTap() {
         //Upload temp file on our server after we create an account on tap we gonaa delete them
         $this->uploadDocumentsToTap();
-
+        
+  
         //Create a business for a vendor on Tap
         $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
 
@@ -227,7 +247,6 @@ class Restaurant extends \common\models\Restaurant {
             $this->business_id = $businessApiResponse->data['id'];
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
         }
-
         //Create a merchant on Tap
         $merchantApiResponse = Yii::$app->tapPayments->createMergentAccount($this->name, $this->business_id, $this->business_entity_id, $this->iban);
 
@@ -237,16 +256,16 @@ class Restaurant extends \common\models\Restaurant {
         }
 
 
-        //Create an Operator
-        $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id);
-
-        if ($operatorApiResponse->isOk) {
-            $this->operator_id = $operatorApiResponse->data['id'];
-            $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
-
-            if (array_key_exists('live', $operatorApiResponse->data['api_credentials']))
-                $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
-        }
+//        //Create an Operator
+//        $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id);
+//
+//        if ($operatorApiResponse->isOk) {
+//            $this->operator_id = $operatorApiResponse->data['id'];
+//            $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
+//
+//            if (array_key_exists('live', $operatorApiResponse->data['api_credentials']))
+//                $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
+//        }
     }
 
 }

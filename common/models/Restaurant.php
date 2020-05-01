@@ -67,7 +67,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['name', 'support_delivery', 'support_pick_up', 'restaurant_payments_method','restaurant_domain','restaurant_email'], 'required'],
+            [['name', 'support_delivery', 'support_pick_up', 'restaurant_payments_method','restaurant_domain','restaurant_email'], 'required', 'on' => 'create'],
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['agent_id', 'restaurant_status', 'support_delivery', 'support_pick_up'], 'integer', 'min' => 0],

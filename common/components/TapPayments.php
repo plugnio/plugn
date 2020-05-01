@@ -58,7 +58,7 @@ class TapPayments extends Component {
      * @var string Variable for test api key to be stored in
      */
     public $plugnTestApiKey;
-    
+
     /**
      * @var string secret api key to use will be stored here
      */
@@ -68,6 +68,11 @@ class TapPayments extends Component {
      * @var string Variable for live api key to be stored in
      */
     public $vendoerLiveApiKey;
+
+    /**
+     * @var string Variable for developer id
+     */
+    public $developerId;
 
     /**
      * @var string Variable for test api key to be stored in
@@ -80,7 +85,7 @@ class TapPayments extends Component {
      */
     public function init() {
         // Fields required by default
-        $requiredAttributes = ['gatewayToUse', 'plugnLiveApiKey', 'plugnTestApiKey'];
+        $requiredAttributes = ['gatewayToUse', 'plugnLiveApiKey', 'plugnTestApiKey','developerId'];
 
         // Process Validation
         foreach ($requiredAttributes as $attribute) {
@@ -99,7 +104,7 @@ class TapPayments extends Component {
         } else {
             $this->plugnScretApiKey = $this->plugnTestApiKey;
         }
-        
+
         parent::init();
     }
 
@@ -120,7 +125,7 @@ class TapPayments extends Component {
         }
     }
 
-    
+
     /**
      * upload a file to Tap
      * @param type $file_path
@@ -159,6 +164,7 @@ class TapPayments extends Component {
      * @return type
      */
     public function createBussiness($restaurant) {
+
         $bussinessEndpoint = $this->apiEndpoint . "/business";
 
         $bussinessParams = [
@@ -176,17 +182,7 @@ class TapPayments extends Component {
                 "license_number" => $restaurant->license_number,
                 "not_for_profit" => $restaurant->not_for_profit == "0" ? 'false' : 'true',
                 "country" => "KW",
-                "documents" => [
-                    [
-                        "number" => 1,
-                        "issuing_country" => $restaurant->document_issuing_country,
-                        "issuing_date" => $restaurant->document_issuing_date,
-                        "expiry_date" => $restaurant->document_expiry_date,
-                        "images" => [
-                            $restaurant->document_file_id
-                        ]
-                    ]
-                ],
+                "documents" => [],
                 "bank_account" => [
                     "iban" => $restaurant->iban
                 ]
@@ -227,9 +223,25 @@ class TapPayments extends Component {
                         $restaurant->vendor_sector
                     ]
                 ]
-            ]
+            ],
+
         ];
 
+
+          if($restaurant->document_issuing_country && $restaurant->document_issuing_date && $restaurant->document_expiry_date && $restaurant->document_file_id){
+            $documentArray  =  [
+                              "number" => 1,
+                              "issuing_country" => $restaurant->document_issuing_country,
+                              "issuing_date" => $restaurant->document_issuing_date,
+                              "expiry_date" => $restaurant->document_expiry_date,
+                              "images" => [
+                                  $restaurant->document_file_id
+                              ]
+                          ] ;
+
+            array_push($bussinessParams['entity']['documents'] , $documentArray);
+
+          }
 
 
         $client = new Client();
@@ -285,16 +297,18 @@ class TapPayments extends Component {
     }
 
     /**
-     * Create an operator 
+     * Create an operator
      * @param type $restaurant_name
      * @param type $wallet_id
      */
     public function createAnOperator($restaurant_name, $wallet_id) {
 
+
         $operatorEndpoint = $this->apiEndpoint . "/operator";
 
         $operatorParams = [
             "wallet_id" => $wallet_id,
+            "developer_id" => $this->developer_id,
             "name" => $restaurant_name,
         ];
 
@@ -308,8 +322,8 @@ class TapPayments extends Component {
                     'content-type' => 'application/json',
                 ])
                 ->send();
-        
-        
+
+
         return $response;
     }
 
@@ -385,14 +399,14 @@ class TapPayments extends Component {
 
         return $response;
     }
-    
+
 
     /**
      * Create a Refund
      * @param  string $chargeId
      */
-    public function createRefund($chargeId, $amount, $reason) {      
-        
+    public function createRefund($chargeId, $amount, $reason) {
+
         $refundEndpoint = $this->apiEndpoint . "/refunds";
 
         $refundParams = [
@@ -415,15 +429,15 @@ class TapPayments extends Component {
 
         return $response;
     }
-    
+
     /**
      * Check refund object for status updates
      * @param  string $chargeId
      */
-    public function retrieveRefund($refundId) {      
-        
+    public function retrieveRefund($refundId) {
+
         $client = new Client();
-        
+
        $response = $client->createRequest()
                 ->setMethod('GET')
                 ->setUrl($this->apiEndpoint . "/refunds/" . $refundId)
