@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <span class="badge">
             <?= $model->status ?>
         </span>
-        <?=  $model->business_id ? '' : Html::a('Create Tap account', ['create-tap-account', 'restaurant_uuid' => $model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+        <?= $model->business_id ? '' : Html::a('Create Tap account', ['create-tap-account', 'restaurant_uuid' => $model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
 
     </h1>
 
@@ -88,11 +88,11 @@ $this->params['breadcrumbs'][] = $this->title;
             'status',
             'thumbnail_image',
             [
-                        'attribute' => 'logo',
-                        'format' => 'html',
-                        'value' => function ($data) {
-                            return Html::img( $data->getRestaurantLogoUrl() );
-                        },
+                'attribute' => 'logo',
+                'format' => 'html',
+                'value' => function ($data) {
+                    return Html::img($data->getRestaurantLogoUrl());
+                },
             ],
             'support_delivery',
             'support_pick_up',
@@ -100,6 +100,11 @@ $this->params['breadcrumbs'][] = $this->title;
             'restaurant_email:email',
             'restaurant_created_at',
             'restaurant_updated_at',
+            'business_id',
+            'business_entity_id',
+            'merchant_id',
+            'wallet_id',
+            'operator_id',
             'live_api_key',
             'test_api_key',
         ],
