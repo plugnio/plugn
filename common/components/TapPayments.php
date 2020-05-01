@@ -180,7 +180,7 @@ class TapPayments extends Component {
                 ],
                 "is_licensed" => 'true',
                 "license_number" => $restaurant->license_number,
-                "not_for_profit" => $restaurant->not_for_profit == "0" ? 'false' : 'true',
+                "not_for_profit" => 'true',
                 "country" => "KW",
                 "documents" => [],
                 "bank_account" => [
@@ -308,7 +308,7 @@ class TapPayments extends Component {
 
         $operatorParams = [
             "wallet_id" => $wallet_id,
-            "developer_id" => $this->developerId,
+            "developer_id" => $this->developer_id,
             "name" => $restaurant_name,
         ];
 

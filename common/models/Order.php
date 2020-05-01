@@ -56,8 +56,6 @@ class Order extends \yii\db\ActiveRecord {
     const STATUS_COMPLETE = 4;
     const STATUS_CANCELED = 5;
     const STATUS_REFUNDED = 6;
-
-
     const ORDER_MODE_DELIVERY = 1;
     const ORDER_MODE_PICK_UP = 2;
 
@@ -236,12 +234,12 @@ class Order extends \yii\db\ActiveRecord {
         ];
     }
 
-
     public function sendPaymentConfirmationEmail() {
+
 
         if ($this->customer_email) {
 
-         $response =   \Yii::$app->mailer->compose([
+            \Yii::$app->mailer->compose([
                         'html' => 'payment-confirm-html',
                             ], [
                         'order' => $this
@@ -249,23 +247,54 @@ class Order extends \yii\db\ActiveRecord {
                     ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
                     ->setTo($this->customer_email)
                     ->setSubject('Your order from: ' . $this->restaurant->name)
+                    ->setReplyTo([$this->restaurant->restaurant_email => $this->restaurant->name])
                     ->send();
         }
 
-        if ($this->agent->email_notification) {
-            \Yii::$app->mailer->compose([
-                        'html' => 'payment-confirm-html',
-                            ], [
-                        'order' => $this
-                    ])
-                    ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
-                    ->setTo($this->agent->agent_email)
-                    ->setSubject('Your order from: ' . $this->restaurant->name)
-//                    ->setReplyTo($this->restaurant->restaurant_email ? $this->restaurant->restaurant_email : 'saoud@studenthub.co')
-                    ->setReplyTo('noreply@example.com')
-                    ->send();
-        }
+        if ($this->agent->agent_email == $this->restaurant->restaurant_email) {
 
+            if ($this->agent->email_notification) {
+                \Yii::$app->mailer->compose([
+                            'html' => 'payment-confirm-html',
+                                ], [
+                            'order' => $this
+                        ])
+                        ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+                        ->setTo($this->agent->agent_email)
+                        ->setSubject('Your order from: ' . $this->restaurant->name)
+                        ->setReplyTo([$this->restaurant->restaurant_email => $this->restaurant->name])
+                        ->send();
+            }
+        } else {
+
+            if ($this->agent->email_notification) {
+
+                \Yii::$app->mailer->compose([
+                            'html' => 'payment-confirm-html',
+                                ], [
+                            'order' => $this
+                        ])
+                        ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+                        ->setTo($this->agent->agent_email)
+                        ->setSubject('Your order from: ' . $this->restaurant->name)
+                        ->setReplyTo([$this->restaurant->restaurant_email => $this->restaurant->name])
+                        ->send();
+            }
+
+            if ($this->restaurant->restaurant_email_notification) {
+             
+                \Yii::$app->mailer->compose([
+                            'html' => 'payment-confirm-html',
+                                ], [
+                            'order' => $this
+                        ])
+                        ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+                        ->setTo($this->restaurant->restaurant_email)
+                        ->setSubject('Your order from: ' . $this->restaurant->name)
+                        ->setReplyTo([$this->restaurant->restaurant_email => $this->restaurant->name])
+                        ->send();
+            }
+        }
     }
 
     /**
@@ -447,7 +476,7 @@ class Order extends \yii\db\ActiveRecord {
      * @return \yii\db\ActiveQuery
      */
     public function getOrderItems() {
-        return $this->hasMany(OrderItem::className(), ['order_uuid' => 'order_uuid'])->with('item','orderItemExtraOptions');
+        return $this->hasMany(OrderItem::className(), ['order_uuid' => 'order_uuid'])->with('item', 'orderItemExtraOptions');
     }
 
     /**

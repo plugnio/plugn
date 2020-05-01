@@ -26,6 +26,7 @@ use yii\behaviors\AttributeBehavior;
  * @property string $restaurant_email
  * @property string|null $restaurant_created_at
  * @property string|null $restaurant_updated_at
+ * @property boolean $restaurant_email_notification
  *
  * @property AgentAssignment[] $agentAssignments
  * @property Agent[] $agents
@@ -76,6 +77,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo','restaurant_domain'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 8, 'max' => 8],
             [['phone_number'], 'integer', 'min' => 0],
+            [['restaurant_email_notification'], 'integer'],
             ['restaurant_email', 'email'],
             [['restaurant_uuid'], 'unique'],
             [['agent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Agent::className(), 'targetAttribute' => ['agent_id' => 'agent_id']],
@@ -106,6 +108,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             'restaurant_email' => "Store's Email",
             'restaurant_created_at' => 'Store Created At',
             'restaurant_updated_at' => 'Store Updated At',
+            'restaurant_email_notification' => 'Email Notification',
         ];
     }
 

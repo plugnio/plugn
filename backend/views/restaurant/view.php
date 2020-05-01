@@ -87,6 +87,14 @@ $this->params['breadcrumbs'][] = $this->title;
             'tagline_ar',
             'status',
             'thumbnail_image',
+            'logo',
+            [
+                'attribute' => 'thumbnail_image',
+                'format' => 'html',
+                'value' => function ($data) {
+                            return Html::img( $data->getRestaurantThumbnailImageUrl() );
+                },
+            ],
             [
                 'attribute' => 'logo',
                 'format' => 'html',

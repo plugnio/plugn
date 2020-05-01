@@ -117,7 +117,6 @@ $this->registerJs($js);
 <div class="restaurant-form">
 
     <?php
-
     $paymentMethodQuery = PaymentMethod::find()->asArray()->all();
     $paymentMethodArray = ArrayHelper::map($paymentMethodQuery, 'payment_method_id', 'payment_method_name');
 
@@ -161,6 +160,8 @@ $this->registerJs($js);
     <?= $form->field($model, 'tagline')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'tagline_ar')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'thumbnail_image')->textInput(['maxlength' => true]) ?>
 
 
     <?=
@@ -219,8 +220,20 @@ $this->registerJs($js);
 
 
     <?= $form->field($model, 'phone_number')->input('number') ?>
-    
+
     <?= $form->field($model, 'restaurant_email')->input('email') ?>
+
+    <?=
+        $form->field($model, 'restaurant_email_notification', [
+                    'template' => "<label style='display:block;' class='control-label' for='restaurant-restaurant_email'>Email Notification</label>\n{input}\n{hint}\n{error}"
+        ])->checkbox([
+            'label' => '',
+                    'checked' => $model->restaurant_email_notification == 0 ? false : true,
+            'data-bootstrap-switch' => '',
+            'data-off-color' => 'danger',
+            'data-on-color' => 'success'
+        ])
+    ?>         
 
 
     <div class="form-group">

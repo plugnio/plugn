@@ -107,7 +107,7 @@ class SiteController extends Controller {
 
             $total_customers = Customer::find()->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid])->count();
 
-            $total_earnings = Order::find()
+            $total_revenue = Order::find()
                     ->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid])
                     ->andWhere(['!=' , 'order_status' , Order::STATUS_REFUNDED])
                     ->andWhere(['!=' , 'order_status' , Order::STATUS_CANCELED])
@@ -119,7 +119,7 @@ class SiteController extends Controller {
                         'new_orders' => $new_orders,
                         'total_orders' => $total_orders,
                         'total_customers' => $total_customers,
-                        'total_earnings' => $total_earnings,
+                        'total_revenue' => $total_revenue,
             ]);
         }
     }

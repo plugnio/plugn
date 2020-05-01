@@ -132,7 +132,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="card-body">
             <h3>Payment details</h3>
             <p>
-              <?php  if($model->payment_method_id != 3 && $model->order_status != Order::STATUS_REFUNDED) echo Html::a('Create Refund', ['refund/create', 'restaurantUuid' => $model->restaurant_uuid, 'orderUuid' => $model->order_uuid], ['class' => 'btn btn-success']) ; ?>
+              <?php  
+//              if($model->payment_method_id != 3 && $model->order_status != Order::STATUS_REFUNDED) echo Html::a('Create Refund', ['refund/create', 'restaurantUuid' => $model->restaurant_uuid, 'orderUuid' => $model->order_uuid], ['class' => 'btn btn-success']) ; 
+              ?>
 
             </p>
             <?=

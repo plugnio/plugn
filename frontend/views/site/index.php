@@ -124,9 +124,9 @@ $this->title = $restaurant_model->name;
               <!-- small box -->
               <div class="small-box bg-danger">
                 <div class="inner">
-                  <h3>    <?=  \Yii::$app->formatter->asCurrency($total_earnings ? $total_earnings : 0)   ?></h3>
+                  <h3>    <?=  \Yii::$app->formatter->asCurrency($total_revenue ? $total_revenue : 0)   ?></h3>
 
-                  <p>Total Earnings</p>
+                  <p>Total Revenue</p>
                 </div>
                 <div class="icon">
                   <i class="fas fa-money-bill"></i>
