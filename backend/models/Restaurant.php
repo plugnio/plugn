@@ -211,7 +211,7 @@ class Restaurant extends \common\models\Restaurant {
         $this->processFileUploads();
 
         if ($this->document_expiry_date && $this->document_issuing_date && $this->document_issuing_country && $this->document_file_purpose && $this->document_title) {
-            
+
             //Upload Document file
             $response = Yii::$app->tapPayments->uploadFileToTap(
                     Yii::getAlias('@projectFiles') . "/" . $this->document_file, $this->document_file_purpose, $this->document_title);
@@ -238,8 +238,8 @@ class Restaurant extends \common\models\Restaurant {
     public function createAMerchantAccountOnTap() {
         //Upload temp file on our server after we create an account on tap we gonaa delete them
         $this->uploadDocumentsToTap();
-        
-  
+
+
         //Create a business for a vendor on Tap
         $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
 
@@ -255,17 +255,16 @@ class Restaurant extends \common\models\Restaurant {
             $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
         }
 
+       //Create an Operator
+       $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id);
 
-//        //Create an Operator
-//        $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id);
-//
-//        if ($operatorApiResponse->isOk) {
-//            $this->operator_id = $operatorApiResponse->data['id'];
-//            $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
-//
-//            if (array_key_exists('live', $operatorApiResponse->data['api_credentials']))
-//                $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
-//        }
+       if ($operatorApiResponse->isOk) {
+           $this->operator_id = $operatorApiResponse->data['id'];
+           $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
+
+           if (array_key_exists('live', $operatorApiResponse->data['api_credentials']))
+               $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
+       }
     }
 
 }
