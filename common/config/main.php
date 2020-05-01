@@ -57,7 +57,7 @@ return [
             'plugnTestApiKey' => "sk_test_p07NquMX4HgwLT8mycdJnZv5",
             'developerId' => "dev_Sqzb18201119SbNT1Jo4A121",
         ],
-             'log' => [
+        'log' => [
             'targets' => [
                 [
                     'class' => 'yii\log\DbTarget',
@@ -70,6 +70,9 @@ return [
             'class' => 'understeam\slack\Client',
             'url' => 'https://hooks.slack.com/services/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',
             'username' => 'plugn',
+        ],
+        'httpclient' => [
+            'class' =>'yii\httpclient\Client',
         ],
     ],
 ];

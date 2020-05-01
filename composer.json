@@ -30,6 +30,7 @@
         "almasaeed2010/adminlte": "~3.0",
         "yiisoft/yii2-shell": "^2.0",
         "leandrogehlen/yii2-treegrid": "*",
+        "yiisoft/yii2-httpclient": "dev-master",
         "ajaxray/short-code": "^1.1",
         "liyunfang/yii2-widget-linkpager": "^1.0",
         "kartik-v/yii2-mpdf": "dev-master",
