@@ -87,7 +87,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'tagline_ar',
             'status',
             'thumbnail_image',
-               [
+            [
                         'attribute' => 'logo',
                         'format' => 'html',
                         'value' => function ($data) {

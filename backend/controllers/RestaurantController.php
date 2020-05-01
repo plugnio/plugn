@@ -76,20 +76,25 @@ class RestaurantController extends Controller {
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
 
+            $restaurant_document_file = UploadedFile::getInstances($model, 'restaurant_document_file');
+            $owner_identification_file = UploadedFile::getInstances($model, 'owner_identification_file');
 
-                
-                $model->restaurant_document_file = UploadedFile::getInstances($model, 'restaurant_document_file')[0]; //Authorized Signature
-                $model->owner_identification_file = UploadedFile::getInstances($model, 'owner_identification_file')[0]; //Owner's civil id
+            if (sizeof($restaurant_document_file) > 0)
+                $model->restaurant_document_file = $restaurant_document_file[0]; //Authorized Signature
 
-                if ($model->owner_identification_file) {
-                    $model->createAMerchantAccountOnTap();
-                }
-                
-                
+            if (sizeof($owner_identification_file) > 0)
+                $model->owner_identification_file = $owner_identification_file[0]; //Owner's civil id
+
+
+            if ($model->owner_identification_file) {
+                $model->createAMerchantAccountOnTap();
+            }
+
+
             if ($model->validate() && $model->save()) {
                 return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
             } else {
-                 Yii::$app->session->setFlash('error', print_r($model->errors, true));
+                Yii::$app->session->setFlash('error', print_r($model->errors, true));
             }
         }
 

@@ -28,6 +28,34 @@ return [
             // Name of the cache component used to store schema information
             'schemaCache' => 'cache',
         ],
+        'log' => [
+            'targets' => [
+                [
+                    'class' => 'notamedia\sentry\SentryTarget',
+                    'dsn' => 'https://f6033f8f46ba451abbf4fa2730e8305a:7266a5e7beca44ff96fb32294ca35557@o70039.ingest.sentry.io/5220572',
+                    'levels' => ['error', 'warning'],
+                    'except' => [
+                        'yii\web\BadRequestHttpException',
+                        'yii\web\UnauthorizedHttpException',
+                        'yii\web\NotFoundHttpException',
+                        'yii\web\HttpException:400',
+                        'yii\web\HttpException:401',
+                        'yii\web\HttpException:404',
+                    ],
+                    'clientOptions' => [
+                        //which environment are we running this on?
+                        'environment' => 'production',
+                    ],
+                    'context' => true // Write the context information. The default is true.
+                ],
+                [
+                    'class' => 'common\components\SlackLogger',
+                    'logVars' => [],
+                    'levels' => ['info', 'warning'],
+                    'categories' => ['backend\*', 'frontend\*', 'common\*', 'console\*'],
+                ],
+            ],
+        ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             'viewPath' => '@common/mail',
