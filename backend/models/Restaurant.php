@@ -254,7 +254,7 @@ class Restaurant extends \common\models\Restaurant {
         
 
        //Create an Operator
-//       $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id, $this->developer_id);
+       $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id, $this->developer_id);
 
  
        if ($operatorApiResponse->isOk) {
