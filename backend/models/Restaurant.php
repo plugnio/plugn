@@ -82,7 +82,7 @@ class Restaurant extends \common\models\Restaurant {
                     'document_title', 'identification_title',
                     'identification_expiry_date', 'identification_file', 'identification_file_purpose',
                     'business_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
-                    'live_api_key', 'test_api_key'
+                    'live_api_key', 'test_api_key' 
 //                    ,'developer_id'
                 ],
                 'string', 'max' => 255
@@ -246,7 +246,7 @@ class Restaurant extends \common\models\Restaurant {
         if ($businessApiResponse->isOk) {
             $this->business_id = $businessApiResponse->data['id'];
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
-            $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
+//            $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
 
         }
 
@@ -260,7 +260,7 @@ class Restaurant extends \common\models\Restaurant {
         
 
        //Create an Operator
-       $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id, $this->developer_id);
+//       $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id, $this->developer_id);
 
  
        if ($operatorApiResponse->isOk) {
