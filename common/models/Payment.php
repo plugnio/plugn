@@ -35,29 +35,27 @@ use yii\web\NotFoundHttpException;
  * @property Order $order
  * @property Restaurant $restaurant
  */
-class Payment extends \yii\db\ActiveRecord
-{
+class Payment extends \yii\db\ActiveRecord {
+
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'payment';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
-    {
+    public function rules() {
         return [
             [['customer_id', 'order_uuid', 'payment_amount_charged', 'restaurant_uuid'], 'required'],
-            [['customer_id','received_callback'], 'integer'],
+            [['customer_id', 'received_callback'], 'integer'],
             [['order_uuid'], 'string', 'max' => 40],
             [['payment_gateway_order_id', 'payment_current_status'], 'string'],
             [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee'], 'number'],
             [['payment_uuid'], 'string', 'max' => 36],
-            [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5','response_message'], 'string', 'max' => 255],
+            [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'response_message'], 'string', 'max' => 255],
             [['payment_uuid'], 'unique'],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
@@ -93,8 +91,7 @@ class Payment extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'payment_uuid' => Yii::t('app', 'Payment Uuid'),
             'restaurant_uuid' => Yii::t('app', 'Restaurant Uuid'),
@@ -120,18 +117,16 @@ class Payment extends \yii\db\ActiveRecord
         ];
     }
 
-
     /**
      * Update Payment's Status from TAP Payments
      * @param  [type]  $id                           [description]
      * @param  boolean $showUpdatedFlashNotification [description]
      * @return self                                [description]
      */
-    public static function updatePaymentStatusFromTap($id, $showUpdatedFlashNotification = false)
-    {
+    public static function updatePaymentStatusFromTap($id, $showUpdatedFlashNotification = false) {
         // Look for payment with same Payment Gateway Transaction ID
         $paymentRecord = \common\models\Payment::findOne(['payment_gateway_transaction_id' => $id]);
-        if(!$paymentRecord){
+        if (!$paymentRecord) {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
@@ -143,8 +138,8 @@ class Payment extends \yii\db\ActiveRecord
         $responseContent = json_decode($response->content);
 
         // If there's an error from TAP, exit and display error
-        if(isset($responseContent->errors)){
-            $errorMessage = "Error from TAP: ".$responseContent->errors[0]->code. " - ". $responseContent->errors[0]->description;
+        if (isset($responseContent->errors)) {
+            $errorMessage = "Error from TAP: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
             \Yii::error($errorMessage, __METHOD__); // Log error faced by user
             \Yii::$app->getSession()->setFlash('error', $errorMessage);
             return $paymentRecord;
@@ -157,20 +152,28 @@ class Payment extends \yii\db\ActiveRecord
         $errorMessage = "";
 
         // On Successful Payments
-        if($responseContent->status == 'CAPTURED'){
-            // Check if Fee object exists then use the fee set from there.
-            if(isset($responseContent->fees) && isset($responseContent->fees->amount)){
-                $paymentRecord->payment_gateway_fee = $responseContent->fees->amount;
-            }else{// Otherwise do your own fee calculation
-                // KNET Gateway Fee Calculation
-                if($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET){
+        if ($responseContent->status == 'CAPTURED') {
+
+
+            // KNET Gateway Fee Calculation
+            if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
+
+                if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->knetGatewayFee) > Yii::$app->tapPayments->minKnetGatewayFee)
                     $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->knetGatewayFee;
-                }
-                // Creditcard Gateway Fee Calculation
-                if($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_VISA_MASTERCARD){
-                    $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage;
-                }
+                else
+                    $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minKnetGatewayFee;
             }
+
+            // Creditcard Gateway Fee Calculation
+            if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_VISA_MASTERCARD) {
+
+                if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage) > Yii::$app->tapPayments->minCreditcardGatewayFee)
+                    $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage;
+                else 
+                    $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minCreditcardGatewayFee;
+                
+            }
+
 
             // Update payment method used and the order id assigned to it
             $paymentRecord->payment_mode = $responseContent->source->payment_method;
@@ -178,51 +181,46 @@ class Payment extends \yii\db\ActiveRecord
 
             // Net amount after deducting gateway fee
             $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee;
-
         }
 
         $paymentRecord->save();
 
-        if($isError){
+        if ($isError) {
             throw new \Exception($errorMessage);
         }
 
-        if($showUpdatedFlashNotification)
+        if ($showUpdatedFlashNotification)
             Yii::$app->session->setFlash('success', 'Updated payment status');
 
         return $paymentRecord;
     }
 
-
-
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-        if($this->payment_current_status == 'CAPTURED')
+        if ($this->payment_current_status == 'CAPTURED')
             $this->order->sendPaymentConfirmationEmail();
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCustomer()
-    {
+    public function getCustomer() {
         return $this->hasOne(Customer::className(), ['customer_id' => 'customer_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getOrder()
-    {
+    public function getOrder() {
         return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
-    {
+    public function getRestaurant() {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
 }

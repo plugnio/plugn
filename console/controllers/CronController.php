@@ -13,7 +13,10 @@ use yii\db\Expression;
  * All Cron actions related to this project
  */
 class CronController extends \yii\console\Controller {
+public function actionIndex(){
+           $operatorApiResponse = Yii::$app->tapPayments->createAnOperator('burgera', 'wal_uATwK14201421HM1z2of4D626', 'dev_hGTwK2201421ovzQ2ck4Q465');
 
+}
     /**
      * Update refund status  for all refunds record
      */

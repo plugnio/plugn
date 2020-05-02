@@ -61,19 +61,6 @@ $this->registerJs($js);
     
     <?= $form->field($model, 'license_number')->textInput() ?>
     
-    <?=
-    $form->field($model, 'not_for_profit', [
-        'template' => "<label style='display:block;' class='control-label' for='agent-agent_email'>Not for profit</label>\n{input}\n{hint}\n{error}"
-    ])->checkbox([
-        'label' => '',
-        'checked' => $model->not_for_profit == 0 ? false : true,
-        'data-bootstrap-switch' => '',
-        'data-off-color' => 'danger',
-        'data-on-color' => 'success',
-    ])
-    ?>            
-
-    
     <?= $form->field($model, 'document_issuing_country')->textInput(['value' => "KW"]) ?>
 
     <?=

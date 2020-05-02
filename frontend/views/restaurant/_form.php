@@ -161,8 +161,6 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'tagline_ar')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'thumbnail_image')->textInput(['maxlength' => true]) ?>
-
 
     <?=
     $form->field($model, 'restaurant_thumbnail_image', [

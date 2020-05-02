@@ -10,6 +10,7 @@ use Yii;
  *  New fields added to create a merchant account on tap
  *
  * @property string $business_id
+ * @property string $developer_id
  * @property string $business_entity_id
  * @property string $wallet_id
  * @property string $merchant_id
@@ -46,20 +47,19 @@ class Restaurant extends \common\models\Restaurant {
     public $restaurant_document_file;
 
     const SCENARIO_CREATE_TAP_ACCOUNT = 'tap_account';
-    const SCENARIO_CREATE= 'create';
+    const SCENARIO_CREATE = 'create';
 
     /**
      * @inheritdoc
      */
     public function rules() {
         return array_merge(parent::rules(), [
-            [['owner_first_name', 'owner_last_name', 'owner_email', 'owner_customer_number'],'required', 'on' => 'create'],
+            [['owner_first_name', 'owner_last_name', 'owner_email', 'owner_customer_number'], 'required', 'on' => 'create'],
             //All new fields added are required in order to create an account on Tap
             [
                 [
-//                    'business_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
-                    'business_id', 'business_entity_id', 'wallet_id', 'merchant_id',
-                    'vendor_sector','iban',
+//                    'business_id', 'developer_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
+                    'vendor_sector', 'iban',
                     'identification_title', 'identification_issuing_country',
                     'identification_issuing_date', 'identification_expiry_date',
                     'owner_identification_file', 'identification_file_purpose',
@@ -69,7 +69,7 @@ class Restaurant extends \common\models\Restaurant {
             ],
             [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3],
             [['identification_file_id', 'document_file_id'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
-            [['not_for_profit'], 'number', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            [['not_for_profit'], 'number'],
             [['document_issuing_date', 'document_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             ['owner_email', 'email'],
             [
@@ -82,9 +82,9 @@ class Restaurant extends \common\models\Restaurant {
                     'document_title', 'identification_title',
                     'identification_expiry_date', 'identification_file', 'identification_file_purpose',
                     'business_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
-                    'live_api_key', 'test_api_key'
+                    'live_api_key', 'test_api_key','developer_id'
                 ],
-                'string', 'max' => 255, 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT
+                'string', 'max' => 255
             ],
             [['restaurant_document_file', 'owner_identification_file'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
         ]);
@@ -239,14 +239,16 @@ class Restaurant extends \common\models\Restaurant {
         //Upload temp file on our server after we create an account on tap we gonaa delete them
         $this->uploadDocumentsToTap();
 
-
         //Create a business for a vendor on Tap
         $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
 
         if ($businessApiResponse->isOk) {
             $this->business_id = $businessApiResponse->data['id'];
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
+            $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
+
         }
+
         //Create a merchant on Tap
         $merchantApiResponse = Yii::$app->tapPayments->createMergentAccount($this->name, $this->business_id, $this->business_entity_id, $this->iban);
 
@@ -254,10 +256,12 @@ class Restaurant extends \common\models\Restaurant {
             $this->merchant_id = $merchantApiResponse->data['id'];
             $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
         }
+        
 
        //Create an Operator
-       $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id);
+       $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id, $this->developer_id);
 
+ 
        if ($operatorApiResponse->isOk) {
            $this->operator_id = $operatorApiResponse->data['id'];
            $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
@@ -265,6 +269,7 @@ class Restaurant extends \common\models\Restaurant {
            if (array_key_exists('live', $operatorApiResponse->data['api_credentials']))
                $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
        }
+
     }
 
 }

@@ -163,6 +163,8 @@ class RestaurantController extends Controller {
                     $model->uploadLogo($logo[0]->tempName);
 
                 return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+            }else {
+                Yii::$app->session->setFlash('error', print_r($model->errors, true));
             }
         }
 

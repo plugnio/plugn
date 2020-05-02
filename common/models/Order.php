@@ -265,6 +265,7 @@ class Order extends \yii\db\ActiveRecord {
                         ->setReplyTo([$this->restaurant->restaurant_email => $this->restaurant->name])
                         ->send();
             }
+            
         } else {
 
             if ($this->agent->email_notification) {

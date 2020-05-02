@@ -37,12 +37,22 @@ class TapPayments extends Component {
     /**
      * @var float gateway fee charged by portal
      */
-    public $knetGatewayFee = 0.005; // How much is charged per KNET transaction
+    public $knetGatewayFee = 0.01; // How much is charged per KNET transaction
+    
+    /**
+     * @var float gateway fee charged by portal
+     */
+    public $minKnetGatewayFee = 0.100; // How much is charged per KNET transaction
 
     /**
      * @var float gateway fee charged by portal
      */
     public $creditcardGatewayFeePercentage = 0.025; // How much is charged per Creditcard transaction
+    
+    /**
+     * @var float gateway fee charged by portal
+     */
+    public $minCreditcardGatewayFee = 0; // How much is charged per Creditcard transaction
 
     /**
      * @var string secret api key to use will be stored here
@@ -70,11 +80,6 @@ class TapPayments extends Component {
     public $vendoerLiveApiKey;
 
     /**
-     * @var string Variable for developer id
-     */
-    public $developerId;
-
-    /**
      * @var string Variable for test api key to be stored in
      */
     public $vendorTestApiKey;
@@ -85,7 +90,7 @@ class TapPayments extends Component {
      */
     public function init() {
         // Fields required by default
-        $requiredAttributes = ['gatewayToUse', 'plugnLiveApiKey', 'plugnTestApiKey','developerId'];
+        $requiredAttributes = ['gatewayToUse', 'plugnLiveApiKey', 'plugnTestApiKey'];
 
         // Process Validation
         foreach ($requiredAttributes as $attribute) {
@@ -180,7 +185,6 @@ class TapPayments extends Component {
                 ],
                 "is_licensed" => 'true',
                 "license_number" => $restaurant->license_number,
-                "not_for_profit" => 'true',
                 "country" => "KW",
                 "documents" => [],
                 "bank_account" => [
@@ -295,21 +299,23 @@ class TapPayments extends Component {
 
         return $response;
     }
-
+    
+    
     /**
      * Create an operator
      * @param type $restaurant_name
      * @param type $wallet_id
      */
-    public function createAnOperator($restaurant_name, $wallet_id) {
+    public function createAnOperator($restaurant_name, $wallet_id, $developer_id) {
 
 
+   
         $operatorEndpoint = $this->apiEndpoint . "/operator";
 
         $operatorParams = [
             "wallet_id" => $wallet_id,
-            "developer_id" => $this->developer_id,
-            "name" => $restaurant_name,
+            "developer_id" => $developer_id,
+            "name" => 'sa',
         ];
 
         $client = new Client();
