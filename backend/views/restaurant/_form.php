@@ -173,7 +173,7 @@ $this->registerJs($js);
     <?= $form->field($model, 'owner_customer_number')->textInput() ?>
     
     <?php
-//    echo $form->field($model, 'developer_id')->textInput()
+        echo $form->field($model, 'developer_id')->textInput()
     ?>
     
     <?= $form->field($model, 'operator_id')->textInput() ?>
