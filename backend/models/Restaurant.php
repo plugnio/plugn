@@ -82,8 +82,7 @@ class Restaurant extends \common\models\Restaurant {
                     'document_title', 'identification_title',
                     'identification_expiry_date', 'identification_file', 'identification_file_purpose',
                     'business_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
-                    'live_api_key', 'test_api_key' 
-//                    ,'developer_id'
+                    'live_api_key', 'test_api_key'  ,'developer_id'
                 ],
                 'string', 'max' => 255
             ],
