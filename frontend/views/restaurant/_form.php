@@ -141,14 +141,15 @@ $this->registerJs($js);
     <?= $form->errorSummary($model); ?>
 
 
-    <?=
-    $form->field($model, 'restaurant_payments_method')->dropDownList(
-            $paymentMethodArray, [
-        'class' => 'select2',
-        'multiple' => 'multiple',
-        'value' => $sotredRestaurantPaymentMethod
-            ]
-    );
+    <?php
+    
+//    echo $form->field($model, 'restaurant_payments_method')->dropDownList(
+//            $paymentMethodArray, [
+//        'class' => 'select2',
+//        'multiple' => 'multiple',
+//        'value' => $sotredRestaurantPaymentMethod
+//            ]
+//    );
     ?>
 
 

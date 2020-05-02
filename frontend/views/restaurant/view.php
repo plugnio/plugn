@@ -31,6 +31,24 @@ $this->params['breadcrumbs'][] = $this->title;
                             return $data->agent->agent_name;
                         }
                     ],
+                 
+                    [
+                        'label' => 'Payment Methods',
+                        'value' => function ($data) {
+                            $paymentMethods = '';
+
+                            foreach ($data->getPaymentMethods()->all() as $key => $paymentMethod) {
+
+                                if ($key == 0)
+                                    $paymentMethods .= '<b>' . $paymentMethod['payment_method_name'] . '<b>';
+                                else
+                                    $paymentMethods .= ', ' . '<b>' . $paymentMethod['payment_method_name'] . '<b>';
+                            }
+
+                            return $paymentMethods;
+                        },
+                        'format' => 'raw'
+                    ],
                     'name',
                     'name_ar',
                     'tagline',
@@ -40,14 +58,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         'attribute' => 'thumbnail_image',
                         'format' => 'html',
                         'value' => function ($data) {
-                            return Html::img( $data->getRestaurantThumbnailImageUrl() );
+                            return Html::img($data->getRestaurantThumbnailImageUrl());
                         },
                     ],
                     [
                         'attribute' => 'logo',
                         'format' => 'html',
                         'value' => function ($data) {
-                            return Html::img( $data->getRestaurantLogoUrl() );
+                            return Html::img($data->getRestaurantLogoUrl());
                         },
                     ],
                     [
