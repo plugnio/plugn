@@ -315,7 +315,7 @@ class TapPayments extends Component {
         $operatorParams = [
             "wallet_id" => $wallet_id,
             "developer_id" => $developer_id,
-            "name" => 'sa',
+            "name" => $restaurant_name,
         ];
 
         $client = new Client();
