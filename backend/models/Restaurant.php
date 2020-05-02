@@ -240,7 +240,7 @@ class Restaurant extends \common\models\Restaurant {
         if ($businessApiResponse->isOk) {
             $this->business_id = $businessApiResponse->data['id'];
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
-//            $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
+            $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
 
         }
 
