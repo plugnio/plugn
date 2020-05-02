@@ -90,11 +90,6 @@ class Restaurant extends \common\models\Restaurant {
         ]);
     }
 
-//    public function scenarios() {
-//        $scenarios = parent::scenarios();
-//        $scenarios[self::SCENARIO_CREATE_TAP_ACCOUNT] = ['username', 'password'];
-//        return $scenarios;
-//    }
 
     /**
      * {@inheritdoc}
