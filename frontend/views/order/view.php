@@ -70,7 +70,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'attribute' => 'special_directions',
                         'format' => 'html',
                         'value' => function ($data) {
-                            return $data->aspecial_directions;
+                            return $data->special_directions;
                         },
                         'visible' => $model->special_directions,
                     ],
