@@ -58,12 +58,12 @@ class Restaurant extends \common\models\Restaurant {
             //All new fields added are required in order to create an account on Tap
             [
                 [
-                    'business_id', 'developer_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
+//                    'business_id', 'developer_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
                     'vendor_sector', 'iban',
                     'identification_title', 'identification_issuing_country',
                     'identification_issuing_date', 'identification_expiry_date',
                     'owner_identification_file', 'identification_file_purpose',
-                    'live_api_key', 'test_api_key'
+//                    'live_api_key', 'test_api_key'
                 ],
                 'required', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT
             ],
