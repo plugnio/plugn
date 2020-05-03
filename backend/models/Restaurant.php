@@ -264,8 +264,6 @@ class Restaurant extends \common\models\Restaurant {
            if (array_key_exists('live', $operatorApiResponse->data['api_credentials']))
                $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
        }
-       
-       die(json_encode($operatorApiResponse->data));
 
     }
 
