@@ -243,7 +243,7 @@ class Restaurant extends \common\models\Restaurant {
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
             $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
         } else {
-           return Yii::$app->session->setFlash('error', print_r('Business: '.  $businessApiResponse->data['message'], true));
+           return Yii::$app->session->setFlash('error', print_r('Business: '.  $businessApiResponse->data, true));
        }
 
         //Create a merchant on Tap
@@ -267,7 +267,7 @@ class Restaurant extends \common\models\Restaurant {
            if (array_key_exists('live', $operatorApiResponse->data['api_credentials']))
                $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
        } else {
-           return Yii::$app->session->setFlash('error', print_r( 'Operator: '. $operatorApiResponse->data['message'], true));
+           return Yii::$app->session->setFlash('error', print_r( 'Operator: '. $operatorApiResponse->data, true));
        }
 
     }
