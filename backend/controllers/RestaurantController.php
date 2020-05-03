@@ -86,10 +86,9 @@ class RestaurantController extends Controller {
                 $model->owner_identification_file = $owner_identification_file[0]; //Owner's civil id
 
 
-            if ($model->owner_identification_file) {
-                $model->createAMerchantAccountOnTap();
-            }
-
+       
+             $model->createAMerchantAccountOnTap();
+       
 
             if ($model->validate() && $model->save()) {
                 return $this->redirect(['view', 'id' => $model->restaurant_uuid]);

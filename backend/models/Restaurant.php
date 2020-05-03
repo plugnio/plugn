@@ -58,7 +58,7 @@ class Restaurant extends \common\models\Restaurant {
             //All new fields added are required in order to create an account on Tap
             [
                 [
-                    'business_id', 'developer_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
+//                    'business_id', 'developer_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
                     'vendor_sector', 'iban',
                     'identification_title', 'identification_issuing_country',
                     'identification_issuing_date', 'identification_expiry_date',
@@ -236,14 +236,15 @@ class Restaurant extends \common\models\Restaurant {
 
         //Create a business for a vendor on Tap
         $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
-
-        die($businessApiResponse);
+        
+        
         if ($businessApiResponse->isOk) {
             $this->business_id = $businessApiResponse->data['id'];
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
             $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
-
-        }
+        } else {
+           return Yii::$app->session->setFlash('error', print_r('Business: '.  $businessApiResponse->data['message'], true));
+       }
 
         //Create a merchant on Tap
         $merchantApiResponse = Yii::$app->tapPayments->createMergentAccount($this->name, $this->business_id, $this->business_entity_id, $this->iban);
@@ -251,21 +252,23 @@ class Restaurant extends \common\models\Restaurant {
         if ($merchantApiResponse->isOk) {
             $this->merchant_id = $merchantApiResponse->data['id'];
             $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
-        }
+        } else {
+           return Yii::$app->session->setFlash('error', print_r( 'Merchant: '.  $merchantApiResponse->data['message'], true));
+       }
         
-
-
        //Create an Operator
-//       $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id, $this->developer_id);
-//
-// 
-//       if ($operatorApiResponse->isOk) {
-//           $this->operator_id = $operatorApiResponse->data['id'];
-//           $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
-//
-//           if (array_key_exists('live', $operatorApiResponse->data['api_credentials']))
-//               $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
-//       }
+       $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id, $this->developer_id);
+
+ 
+       if ($operatorApiResponse->isOk) {
+           $this->operator_id = $operatorApiResponse->data['id'];
+           $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
+
+           if (array_key_exists('live', $operatorApiResponse->data['api_credentials']))
+               $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
+       } else {
+           return Yii::$app->session->setFlash('error', print_r( 'Operator: '. $operatorApiResponse->data['message'], true));
+       }
 
     }
 

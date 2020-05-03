@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\Restaurant */
 
-$this->title = 'Create Tap Account 1';
+$this->title = 'Create Tap Account';
 $this->params['breadcrumbs'][] = ['label' => 'Restaurants', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
