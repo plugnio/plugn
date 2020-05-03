@@ -253,17 +253,18 @@ class Restaurant extends \common\models\Restaurant {
         }
         
 
+
        //Create an Operator
-       $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id, $this->developer_id);
-
- 
-       if ($operatorApiResponse->isOk) {
-           $this->operator_id = $operatorApiResponse->data['id'];
-           $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
-
-           if (array_key_exists('live', $operatorApiResponse->data['api_credentials']))
-               $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
-       }
+//       $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id, $this->developer_id);
+//
+// 
+//       if ($operatorApiResponse->isOk) {
+//           $this->operator_id = $operatorApiResponse->data['id'];
+//           $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
+//
+//           if (array_key_exists('live', $operatorApiResponse->data['api_credentials']))
+//               $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
+//       }
 
     }
 
