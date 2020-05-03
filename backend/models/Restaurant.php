@@ -253,7 +253,7 @@ class Restaurant extends \common\models\Restaurant {
             $this->merchant_id = $merchantApiResponse->data['id'];
             $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
         } else {
-           return Yii::$app->session->setFlash('error', print_r( 'Merchant: '.  $merchantApiResponse->data['message'], true));
+           return Yii::$app->session->setFlash('error', print_r( 'Merchant: '.  $merchantApiResponse->data, true));
        }
         
        //Create an Operator
