@@ -237,6 +237,7 @@ class Restaurant extends \common\models\Restaurant {
         //Create a business for a vendor on Tap
         $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
 
+        die($businessApiResponse);
         if ($businessApiResponse->isOk) {
             $this->business_id = $businessApiResponse->data['id'];
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
