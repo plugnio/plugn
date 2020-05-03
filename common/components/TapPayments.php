@@ -78,11 +78,14 @@ class TapPayments extends Component {
      * @var string Variable for live api key to be stored in
      */
     public $vendoerLiveApiKey;
-
+    
     /**
      * @var string Variable for test api key to be stored in
      */
-    public $vendorTestApiKey;
+     public $vendorTestApiKey;
+
+        
+
     private $apiEndpoint = "https://api.tap.company/v2";
 
     /**

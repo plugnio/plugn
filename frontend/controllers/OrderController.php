@@ -58,6 +58,37 @@ class OrderController extends Controller {
         ]);
     }
 
+    /**
+     * Request a driver from Armada 
+     * @param type $order_uuid
+     * @param type $restaurantUuid
+     */
+    public function actionRequestDriverFromArmada($order_uuid, $restaurantUuid) {
+        
+          $order_model = $this->findModel($order_uuid, $restaurantUuid);
+            
+          $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery();
+
+          
+       if ($createDeliveryApiResponse->isOk) {
+           $order_model->tracking_link = $createDeliveryApiResponse->data['trackingLink'];
+           $order_model->save(false);
+       } else {
+           return Yii::$app->session->setFlash('error', print_r( 'Operator: '. $operatorApiResponse->data, true));
+       }
+       
+       return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid]);
+               
+    }
+
+    /**
+     * Change order status
+     * 
+     * @param type $order_uuid
+     * @param type $restaurantUuid
+     * @param type $status
+     * @return type
+     */
     public function actionChangeOrderStatus($order_uuid, $restaurantUuid, $status) {
         $order_model = $this->findModel($order_uuid, $restaurantUuid);
 
