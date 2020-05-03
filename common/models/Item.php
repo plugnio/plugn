@@ -19,7 +19,7 @@ use yii\behaviors\TimestampBehavior;
  * @property int|null $sort_number
  * @property int|null $stock_qty
  * @property string|null $item_image
- * @property float|null $price
+ * @property float|null $item_price
  * @property string|null $item_created_at
  * @property string|null $item_updated_at
  *
@@ -47,7 +47,7 @@ class Item extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['item_name', 'items_category'], 'required', 'on' => 'create'],
-            [['item_name', 'item_price'], 'required'],
+            [['item_name','item_name_ar', 'item_price'], 'required'],
             [['sort_number', 'stock_qty'], 'integer' , 'min'=> 0],
             [['item_price'], 'number', 'min'=> 0],
             [['image'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],

@@ -253,7 +253,7 @@ class Order extends \yii\db\ActiveRecord {
 
         if ($this->agent->agent_email == $this->restaurant->restaurant_email) {
 
-            if ($this->agent->email_notification) {
+            if ($this->agent->email_notification || $this->restaurant->restaurant_email_notification ) {
                 \Yii::$app->mailer->compose([
                             'html' => 'payment-confirm-html',
                                 ], [

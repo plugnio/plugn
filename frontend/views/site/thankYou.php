@@ -13,7 +13,7 @@ use yii\helpers\Html;
                 <p>We have received your message. One of our team members will get in touch with you shortly.</p>
                 <?=
                 Html::a(
-                        Html::button('GO TO HOMEPAGE', ['site/index', 'class' => 'form-control-submit-button', 'style' => 'width:30%']),
+                        Html::button('GO TO HOMEPAGE', ['site/index', 'class' => 'form-control-submit-button', 'style' => 'max-width: 50%;']),
                         ['site/index'], ['style' => 'text-decoration: none;'])
                 ?>  
             </div>
