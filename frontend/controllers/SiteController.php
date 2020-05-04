@@ -78,10 +78,10 @@ class SiteController extends Controller {
         if (Yii::$app->user->isGuest)
             return $this->render('landing');
         else {
-            foreach (Yii::$app->ownedAccountManager->getOwnedRestaurants() as $restaurantOwned) {
+            foreach (Yii::$app->accountManager->getManagedAccounts() as $managedRestaurant) {
 
                 return $this->redirect(['vendor-dashboard',
-                            'id' => $restaurantOwned->restaurant_uuid
+                            'id' => $managedRestaurant->restaurant_uuid
                 ]);
             }
         }
@@ -94,27 +94,27 @@ class SiteController extends Controller {
      */
     public function actionVendorDashboard($id) {
 
-        if ($restaurantOwned = Yii::$app->ownedAccountManager->getOwnedAccount($id)) {
+        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
 
-            $orders = Order::find()->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
+            $orders = Order::find()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
                     ->orderBy(['order_created_at' => SORT_DESC])
                     ->limit(5)
                     ->all();
 
-            $new_orders = Order::find()->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid, 'order_status' => Order::STATUS_PENDING])->count();
+            $new_orders = Order::find()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid, 'order_status' => Order::STATUS_PENDING])->count();
 
-            $total_orders = Order::find()->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid])->count();
+            $total_orders = Order::find()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])->count();
 
-            $total_customers = Customer::find()->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid])->count();
+            $total_customers = Customer::find()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])->count();
 
             $total_revenue = Order::find()
-                    ->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid])
+                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     ->andWhere(['!=' , 'order_status' , Order::STATUS_REFUNDED])
                     ->andWhere(['!=' , 'order_status' , Order::STATUS_CANCELED])
                     ->sum('total_price');
 
             return $this->render('index', [
-                        'restaurant_model' => $restaurantOwned,
+                        'restaurant_model' => $managedRestaurant,
                         'orders' => $orders,
                         'new_orders' => $new_orders,
                         'total_orders' => $total_orders,
@@ -178,8 +178,8 @@ class SiteController extends Controller {
         }
 
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $ownedRestaurant = $model->login()) {
-            return $this->redirect(['site/vendor-dashboard', 'id' => $ownedRestaurant->restaurant_uuid]);
+        if ($model->load(Yii::$app->request->post()) && $managedRestaurant = $model->login()) {
+            return $this->redirect(['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
         } else {
             $model->password = '';
 
@@ -229,11 +229,11 @@ class SiteController extends Controller {
      */
     public function actionCheckForNewOrders($restaurant_uuid) {
 
-        $restaurantOwned = Yii::$app->ownedAccountManager->getOwnedAccount($restaurant_uuid);
+        $managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurant_uuid);
 
         $this->layout = false;
 
-        $newOrders = Order::find()->where(['restaurant_uuid' => $restaurantOwned->restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
+        $newOrders = Order::find()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
                 ->orderBy(['order_created_at' => SORT_DESC])
                 ->limit(5)
                 ->all();
@@ -299,7 +299,7 @@ class SiteController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id) {
-        if (($model = Yii::$app->ownedAccountManager->getOwnedAccount($id))) {
+        if (($model = Yii::$app->accountManager->getManagedAccount($id))) {
             return $model;
         }
 

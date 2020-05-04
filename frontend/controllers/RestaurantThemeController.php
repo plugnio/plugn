@@ -71,7 +71,7 @@ class RestaurantThemeController extends Controller
      */
     protected function findModel($restaurantUuid)
     {
-        if (($model = RestaurantTheme::findOne(Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid)->restaurant_uuid)) !== null) {
+        if (($model = RestaurantTheme::findOne(Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid)) !== null) {
             return $model;
         }
 

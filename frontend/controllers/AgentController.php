@@ -66,7 +66,7 @@ class AgentController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($restaurantUuid) {
-        if (($model = Agent::findOne(Yii::$app->user->identity->agent_id)) !== null && Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid)) {
+        if (($model = Agent::findOne(Yii::$app->user->identity->agent_id)) !== null && Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
             return $model;
         }
 

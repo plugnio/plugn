@@ -47,7 +47,7 @@ class OrderItemController extends Controller {
      */
     public function actionCreate($id, $restaurantUuid) {
 
-        $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
         if (Order::find()->where(['order_uuid' => $id])->exists()) {
 
@@ -140,7 +140,7 @@ class OrderItemController extends Controller {
      */
     protected function findModel($id, $restaurantUuid) {
         if (($model = OrderItem::findOne($id)) !== null) {
-            if ($model->restaurant->restaurant_uuid == Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid)->restaurant_uuid)
+            if ($model->restaurant->restaurant_uuid == Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid)
                 return $model;
         }
 

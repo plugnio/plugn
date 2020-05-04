@@ -42,7 +42,7 @@ class ItemController extends Controller {
      */
     public function actionIndex($restaurantUuid) {
         
-        $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
         $searchModel = new ItemSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
@@ -83,7 +83,7 @@ class ItemController extends Controller {
      */
     public function actionCreate($restaurantUuid) {
         
-        $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
         $model = new Item();
         
         $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
@@ -164,7 +164,7 @@ class ItemController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id , $restaurantUuid) {
-        if (($model = Item::find()->where(['item_uuid' => $id, 'restaurant_uuid' => Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
+        if (($model = Item::find()->where(['item_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
             return $model;
         }
 

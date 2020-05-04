@@ -95,7 +95,7 @@ class RestaurantController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id) {
-        if (($model = Yii::$app->ownedAccountManager->getOwnedAccount($id)) !== null) {
+        if (($model = Yii::$app->accountManager->getManagedAccount($id)) !== null) {
             return $model;
         }
 

@@ -36,7 +36,7 @@ class PaymentController extends Controller
     public function actionIndex($restaurantUuid)
     {
         
-        $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->getManagedAccount->getManagedAccount($restaurantUuid);
 
         $searchModel = new PaymentSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
@@ -86,7 +86,7 @@ class PaymentController extends Controller
      */
     protected function findModel($id, $restaurantUuid)
     {
-        if (($model = Payment::find()->where(['payment_uuid' => $id, 'restaurant_uuid' => Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
+        if (($model = Payment::find()->where(['payment_uuid' => $id, 'restaurant_uuid' => Yii::$app->getManagedAccount->getManagedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
             return $model;
         }
 

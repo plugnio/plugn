@@ -47,7 +47,7 @@ class OrderItemExtraOptionController extends Controller {
      */
     public function actionCreate($id, $restaurantUuid) {
         
-        $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
                 
         if ($order_item_model = OrderItem::find()->where(['order_item_id' => $id])->one()) {
             $model = new OrderItemExtraOption();
@@ -124,7 +124,7 @@ class OrderItemExtraOptionController extends Controller {
      */
     protected function findModel($id, $restaurantUuid) {
         if (($model = OrderItemExtraOption::findOne($id)) !== null) {
-         if ($model->restaurant->restaurant_uuid == Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid)->restaurant_uuid)
+         if ($model->restaurant->restaurant_uuid == Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid)
             return $model;
         }
 

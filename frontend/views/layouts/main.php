@@ -9,6 +9,8 @@ use yii\widgets\Breadcrumbs;
 use frontend\assets\DashboardAsset;
 use common\widgets\Alert;
 use common\models\Restaurant;
+use common\models\AgentAssignment;
+
 
 DashboardAsset::register($this);
 
@@ -197,18 +199,29 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 ?>
 
                             </li>
+                                    <?php if ( AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
+                            <li class="nav-item">
+                                <?=
+                                Html::a(
+                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-user-plus']) .
+                                        Html::tag('p', "Staff Management"), ['agent-assignment/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
+                                )
+                                ?>
+
                             </li>
-                            <?php if (count(Yii::$app->ownedAccountManager->getOwnedRestaurants()) > 1) { ?>
+                            <?php  } ?>
+                            </li>
+                            <?php if (count(Yii::$app->accountManager->getManagedAccounts()) > 1) { ?>
                                 <li class="nav-header">Your stores</li>
                                 <?php
-                                foreach (Yii::$app->ownedAccountManager->getOwnedRestaurants() as $ownedRestaurant) {
-                                    if ($ownedRestaurant->restaurant_uuid != $this->params['restaurant_uuid']) {
+                                foreach (Yii::$app->accountManager->getManagedAccounts() as $managedRestaurant) {
+                                    if ($managedRestaurant->restaurant_uuid != $this->params['restaurant_uuid']) {
                                         ?>
                                         <li class="nav-item">
                                             <?=
                                             Html::a(
-                                                    Html::img($ownedRestaurant->getRestaurantLogoUrl(), ['class' => 'brand-image img-circle elevation-3', 'style' => 'opacity: .8; margin-right: .5rem; margin-top: -3px; max-height: 33px; width: auto;']) .
-                                                    Html::tag('p', $ownedRestaurant->name), ['site/vendor-dashboard', 'id' => $ownedRestaurant->restaurant_uuid], ['class' => 'nav-link']
+                                                    Html::img($managedRestaurant->getRestaurantLogoUrl(), ['class' => 'brand-image img-circle elevation-3', 'style' => 'opacity: .8; margin-right: .5rem; margin-top: -3px; max-height: 33px; width: auto;']) .
+                                                    Html::tag('p', $managedRestaurant->name), ['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid], ['class' => 'nav-link']
                                             )
                                             ?>
 
