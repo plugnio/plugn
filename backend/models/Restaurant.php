@@ -236,14 +236,14 @@ class Restaurant extends \common\models\Restaurant {
 
         //Create a business for a vendor on Tap
         $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
-        
-        
+
+
         if ($businessApiResponse->isOk) {
             $this->business_id = $businessApiResponse->data['id'];
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
             $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
         } else {
-           return Yii::$app->session->setFlash('error', print_r('Business: '.  $businessApiResponse->data, true));
+           return Yii::$app->session->setFlash('error', print_r('Business: '.  json_encode($businessApiResponse->data), true));
        }
 
         //Create a merchant on Tap
@@ -253,13 +253,13 @@ class Restaurant extends \common\models\Restaurant {
             $this->merchant_id = $merchantApiResponse->data['id'];
             $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
         } else {
-           return Yii::$app->session->setFlash('error', print_r( 'Merchant: '.  $merchantApiResponse->data, true));
+           return Yii::$app->session->setFlash('error', print_r( 'Merchant: '.  json_encode($merchantApiResponse->data), true));
        }
-        
+
        //Create an Operator
        $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id, $this->developer_id);
 
- 
+
        if ($operatorApiResponse->isOk) {
            $this->operator_id = $operatorApiResponse->data['id'];
            $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
@@ -267,7 +267,7 @@ class Restaurant extends \common\models\Restaurant {
            if (array_key_exists('live', $operatorApiResponse->data['api_credentials']))
                $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
        } else {
-           return Yii::$app->session->setFlash('error', print_r( 'Operator: '. $operatorApiResponse->data, true));
+           return Yii::$app->session->setFlash('error', print_r( 'Operator: '. json_encode($operatorApiResponse->data), true));
        }
 
     }
