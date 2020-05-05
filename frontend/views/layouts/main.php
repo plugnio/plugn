@@ -11,7 +11,6 @@ use common\widgets\Alert;
 use common\models\Restaurant;
 use common\models\AgentAssignment;
 
-
 DashboardAsset::register($this);
 
 $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
@@ -137,12 +136,12 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 ?>
                             </li>
                             <!--<li class="nav-item has-treeview">-->
-                                <?php
+                            <?php
 //                                Html::a(
 //                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-money-bill-wave']) .
 //                                        Html::tag('p', 'Refund'), ['refund/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
 //                                )
-                                ?>
+                            ?>
                             <!--</li>-->
                             <li class="nav-item has-treeview">
                                 <?=
@@ -152,25 +151,28 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 )
                                 ?>
                             </li>
+                            <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
+                                <li class="nav-item">
+                                    <?=
+                                    Html::a(
+                                            Html::tag('i', '', ['class' => 'nav-icon fas fa-store']) .
+                                            Html::tag('p', 'Store Info'), ['restaurant/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
+                                    )
+                                    ?>
+                                </li>
+                            <?php } ?>
+                            <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
+                                <li class="nav-item">
+                                    <?=
+                                    Html::a(
+                                            Html::tag('i', '', ['class' => 'nav-icon fas fa-paint-brush']) .
+                                            Html::tag('p', 'Theme'), ['restaurant-theme/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
+                                    )
+                                    ?>
 
-                            <li class="nav-item">
-                                <?=
-                                Html::a(
-                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-store']) .
-                                        Html::tag('p', 'Store Info'), ['restaurant/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
-                                )
-                                ?>
+                                </li>
+                            <?php } ?>
 
-                            </li>
-                            <li class="nav-item">
-                                <?=
-                                Html::a(
-                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-paint-brush']) .
-                                        Html::tag('p', 'Theme'), ['restaurant-theme/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
-                                )
-                                ?>
-
-                            </li>
                             <li class="nav-item">
                                 <?=
                                 Html::a(
@@ -180,16 +182,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 ?>
 
                             </li>
-                            <!--<li class="nav-item">-->
-                            <?php
-//                                Html::a(
-//                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-clock']) .
-//                                        Html::tag('p', 'Working Hours'), ['working-hours/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
-//                                )
-//
-                            ?>
 
-                            <!--</li>-->
                             <li class="nav-item">
                                 <?=
                                 Html::a(
@@ -199,17 +192,17 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 ?>
 
                             </li>
-                                    <?php if ( AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
-                            <li class="nav-item">
-                                <?=
-                                Html::a(
-                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-user-plus']) .
-                                        Html::tag('p', "Staff Management"), ['agent-assignment/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
-                                )
-                                ?>
+                            <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
+                                <li class="nav-item">
+                                    <?=
+                                    Html::a(
+                                            Html::tag('i', '', ['class' => 'nav-icon fas fa-user-plus']) .
+                                            Html::tag('p', "Staff Management"), ['agent-assignment/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
+                                    )
+                                    ?>
 
-                            </li>
-                            <?php  } ?>
+                                </li>
+                            <?php } ?>
                             </li>
                             <?php if (count(Yii::$app->accountManager->getManagedAccounts()) > 1) { ?>
                                 <li class="nav-header">Your stores</li>

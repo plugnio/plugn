@@ -11,7 +11,6 @@ use yii\behaviors\AttributeBehavior;
  * This is the model class for table "restaurant".
  *
  * @property string $restaurant_uuid
- * @property int $agent_id
  * @property string $name
  * @property string|null $name_ar
  * @property string|null $tagline
@@ -78,10 +77,9 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo','restaurant_domain'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 8, 'max' => 8],
             [['phone_number'], 'integer', 'min' => 0],
-            [['restaurant_email_notification','agent_id'], 'integer'],
+            [['restaurant_email_notification'], 'integer'],
             ['restaurant_email', 'email'],
             [['restaurant_uuid'], 'unique'],
-            [['agent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Agent::className(), 'targetAttribute' => ['agent_id' => 'agent_id']],
         ];
     }
 
@@ -91,7 +89,6 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function attributeLabels() {
         return [
             'restaurant_uuid' => 'Restaurant Uuid',
-            'agent_id' => 'Agent ID',
             'name' => 'Name',
             'name_ar' => 'Name in Arabic',
             'tagline' => 'Tagline',
@@ -252,7 +249,6 @@ class Restaurant extends \yii\db\ActiveRecord {
         $fields = parent::fields();
 
         // remove fields that contain sensitive information
-        unset( $fields['agent_id']);
         unset( $fields['restaurant_domain']);
         unset( $fields['vendor_sector']);
         unset( $fields['business_id']);
@@ -468,14 +464,6 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function getAgents() {
         return $this->hasMany(Agent::className(), ['agent_id' => 'agent_id'])
                         ->via('agentAssignments');
-    }
-
-    /**
-     * The Agent owning this account
-     * @return \yii\db\ActiveQuery
-     */
-    public function getAgent() {
-        return $this->hasOne(Agent::className(), ['agent_id' => 'agent_id']);
     }
 
     /**

@@ -87,6 +87,7 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'agent_email')->input('email') ?>
 
+    <?= $form->field($model, 'tempPassword')->passwordInput(['maxlength' => true])?>
 
     <?=
     $form->field($model, 'email_notification', [
@@ -99,6 +100,8 @@ $this->registerJs($js);
         'data-on-color' => 'success'
     ])
     ?>            
+
+
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use Yii;
 use common\models\Restaurant;
+use common\models\AgentAssignment;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -60,7 +61,7 @@ class RestaurantController extends Controller {
     public function actionUpdate($id) {
 
         $model = $this->findModel($id);
-        
+
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
 
             if ($model->save()) {
@@ -95,8 +96,14 @@ class RestaurantController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id) {
-        if (($model = Yii::$app->accountManager->getManagedAccount($id)) !== null) {
-            return $model;
+
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($id);
+
+        if ($restaurant_model !== null) {
+            if (AgentAssignment::isOwner($id))
+                return $restaurant_model;
+            else
+                throw new \yii\web\BadRequestHttpException('Sorry, you are not allowed to access this page.');
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');

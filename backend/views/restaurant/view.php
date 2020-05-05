@@ -80,7 +80,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'restaurant_uuid',
-            'agent.agent_name',
             'name',
             'name_ar',
             'tagline',

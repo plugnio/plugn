@@ -52,9 +52,6 @@ $this->registerJs($js);
 <div class="restaurant-form">
 
     <?php
-    $agentQuery = Agent::find()->asArray()->all();
-    $agentArray = ArrayHelper::map($agentQuery, 'agent_id', 'agent_name');
-
 
     $paymentMethodQuery = PaymentMethod::find()->asArray()->all();
     $paymentMethodArray = ArrayHelper::map($paymentMethodQuery, 'payment_method_id', 'payment_method_name');
@@ -75,16 +72,6 @@ $this->registerJs($js);
 
 
     $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]);
-    ?>
-
-    <?=
-    $form->field($model, 'agent_id')->widget(Select2::classname(), [
-        'data' => $agentArray,
-        'options' => ['placeholder' => 'Select a agent ...'],
-        'pluginOptions' => [
-            'allowClear' => true
-        ],
-    ])->label('Agent');
     ?>
 
     <?=

@@ -26,13 +26,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'model' => $model,
                 'attributes' => [
                     [
-                        'label' => 'Owner',
-                        'value' => function ($data) {
-                            return $data->agent->agent_name;
-                        }
-                    ],
-                 
-                    [
                         'label' => 'Payment Methods',
                         'value' => function ($data) {
                             $paymentMethods = '';

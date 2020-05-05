@@ -5,14 +5,14 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\AgentAssignment */
 
-$this->title = 'Update Agent Assignment: ' . $model->assignment_id;
-$this->params['breadcrumbs'][] = ['label' => 'Agent Assignments', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->assignment_id, 'url' => ['view', 'id' => $model->assignment_id]];
+$this->params['restaurant_uuid'] = $model->restaurant_uuid;
+
+$this->title = 'Update Agent Info: ' . $model->agent->agent_name;
+$this->params['breadcrumbs'][] = ['label' => 'Assigned Agents', 'url' => ['index', 'restaurantUuid' => $model->restaurant_uuid]];
+$this->params['breadcrumbs'][] = ['label' => $model->agent->agent_name, 'url' => ['view', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'restaurantUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
 <div class="agent-assignment-update">
-
-    <h1><?= Html::encode($this->title) ?></h1>
 
     <?= $this->render('_form', [
         'model' => $model,

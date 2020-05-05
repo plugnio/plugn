@@ -9,17 +9,17 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use common\models\Restaurant;
+use common\models\Agent;
 
 /**
  * AgentAssignmentController implements the CRUD actions for AgentAssignment model.
  */
-class AgentAssignmentController extends Controller
-{
+class AgentAssignmentController extends Controller {
+
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -34,20 +34,23 @@ class AgentAssignmentController extends Controller
      * Lists all AgentAssignment models.
      * @return mixed
      */
-    public function actionIndex($restaurantUuid)
-    {
+    public function actionIndex($restaurantUuid) {
 
-       $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
-                
-        $dataProvider = new ActiveDataProvider([
-            'query' => AgentAssignment::find(),
-        ]);
 
-        return $this->render('index', [
-            'dataProvider' => $dataProvider,
-            'restaurant_uuid' => $restaurant_model->restaurant_uuid
-        ]);
+        if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) {
+            $dataProvider = new ActiveDataProvider([
+                'query' => AgentAssignment::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid]),
+            ]);
+
+            return $this->render('index', [
+                        'dataProvider' => $dataProvider,
+                        'restaurant_uuid' => $restaurant_model->restaurant_uuid
+            ]);
+        } else {
+            throw new \yii\web\BadRequestHttpException('Sorry, you are not allowed to access this page.');
+        }
     }
 
     /**
@@ -56,29 +59,38 @@ class AgentAssignmentController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
-    {
+    public function actionView($assignment_id, $agent_id, $restaurantUuid) {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+                    'model' => $this->findModel($assignment_id, $agent_id, $restaurantUuid),
         ]);
     }
+
 
     /**
      * Creates a new AgentAssignment model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
-    {
+    public function actionCreate($restaurantUuid) {
+
         $model = new AgentAssignment();
+        $model->restaurant_uuid = Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->assignment_id]);
+        if (AgentAssignment::isOwner($model->restaurant_uuid)) {
+
+            if ($model->load(Yii::$app->request->post())) {
+
+                if ($model->validate() && $model->save()) {
+                    return $this->redirect(['view', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'restaurantUuid' => $restaurantUuid]);
+                }
+            }
+
+            return $this->render('create', [
+                        'model' => $model
+            ]);
+        } else {
+            throw new \yii\web\BadRequestHttpException('Sorry, you are not allowed to access this page.');
         }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
     }
 
     /**
@@ -88,16 +100,15 @@ class AgentAssignmentController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
+    public function actionUpdate($assignment_id, $agent_id, $restaurantUuid) {
+        $model = $this->findModel($assignment_id, $agent_id, $restaurantUuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->assignment_id]);
+            return $this->redirect(['view', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'restaurantUuid' => $restaurantUuid]);
         }
 
         return $this->render('update', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
@@ -108,11 +119,10 @@ class AgentAssignmentController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
+    public function actionDelete($assignment_id, $agent_id, $restaurantUuid) {
+        $this->findModel($assignment_id, $agent_id, $restaurantUuid)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
     }
 
     /**
@@ -122,12 +132,20 @@ class AgentAssignmentController extends Controller
      * @return AgentAssignment the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
-    {
-        if (($model = AgentAssignment::findOne($id)) !== null) {
-            return $model;
-        }
+    protected function findModel($assignment_id, $agent_id, $restaurantUuid) {
+        if (Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
 
-        throw new NotFoundHttpException('The requested page does not exist.');
+            if (AgentAssignment::isOwner($restaurantUuid)) {
+
+                if (($model = AgentAssignment::find()->where(['assignment_id' => $assignment_id, 'agent_id' => $agent_id, 'restaurant_uuid' => $restaurantUuid])->one()) !== null) {
+                    return $model;
+                }
+            } else {
+                throw new \yii\web\BadRequestHttpException('Sorry, you are not allowed to access this page.');
+            }
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
     }
+
 }

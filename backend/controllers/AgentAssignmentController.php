@@ -96,8 +96,12 @@ class AgentAssignmentController extends Controller {
     public function actionUpdate($id) {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->assignment_id]);
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->validate() && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->assignment_id]);
+            } else {
+                Yii::$app->session->setFlash('error', print_r($model->errors, true));
+            }
         }
 
         return $this->render('update', [
