@@ -3,6 +3,7 @@
 use common\models\Restaurant;
 use yii\helpers\Html;
 use common\models\Order;
+use common\models\AgentAssignment;
 
 /* @var $this yii\web\View */
 
@@ -69,6 +70,9 @@ $this->title = $restaurant_model->name;
         <div class="container-fluid">
           <!-- Small boxes (Stat box) -->
           <div class="row">
+              
+                   <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
+
             <div class="col-lg-3 col-6">
               <!-- small box -->
               <div class="small-box bg-info">
@@ -137,6 +141,60 @@ $this->title = $restaurant_model->name;
               </div>
             </div>
             <!-- ./col -->
+            
+                   <?php } else { ?>
+                       <div class="col-lg-4 col-7">
+              <!-- small box -->
+              <div class="small-box bg-info">
+                <div class="inner">
+                  <h3><?= $new_orders ?></h3>
+
+                  <p>New Orders</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-bag"></i>
+                </div>
+                <?=
+                      Html::a('More info' .  '<i style="margin-left: 10px;" class="fas fa-arrow-circle-right"></i>', ['order/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid],['class' => 'small-box-footer']);
+                ?>
+              </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-lg-4 col-7">
+              <!-- small box -->
+              <div class="small-box bg-success">
+                <div class="inner">
+                  <h3><?= $total_orders ?></h3>
+
+                  <p>Total Orders</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-stats-bars"></i>
+                </div>
+                <?=
+                    Html::a('More info' .  '<i style="margin-left: 10px;" class="fas fa-arrow-circle-right"></i>', ['order/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid],['class' => 'small-box-footer']);
+                ?>
+              </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-lg-4 col-7">
+              <!-- small box -->
+              <div class="small-box bg-warning">
+                <div class="inner">
+                  <h3><?= $total_customers ?> </h3>
+
+                  <p>Total Customers</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-person-add"></i>
+                </div>
+                <?=
+                    Html::a('More info' .  '<i style="margin-left: 10px;" class="fas fa-arrow-circle-right"></i>', ['customer/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid],['class' => 'small-box-footer']);
+                ?>
+              </div>
+            </div>
+      
+                   <?php } ?>
           </div>
           <!-- /.row -->
 

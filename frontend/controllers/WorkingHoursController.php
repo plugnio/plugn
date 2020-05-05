@@ -43,7 +43,7 @@ class WorkingHoursController extends Controller {
      */
     public function actionIndex($restaurantUuid) {
         
-        $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->getManagedAccount->getManagedAccount($restaurantUuid);
 
         $searchModel = new WorkingHoursSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurantUuid);
@@ -62,7 +62,7 @@ class WorkingHoursController extends Controller {
      */
     public function actionCreate($restaurantUuid) {
         
-        $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->getManagedAccount->getManagedAccount($restaurantUuid);
 
         $model = new WorkingHours();
         $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
@@ -121,7 +121,7 @@ class WorkingHoursController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($working_day_id, $restaurantUuid) {
-        if (($model = WorkingHours::findOne(['working_day_id' => $working_day_id, 'restaurant_uuid' => Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid)->restaurant_uuid])) !== null) {
+        if (($model = WorkingHours::findOne(['working_day_id' => $working_day_id, 'restaurant_uuid' => Yii::$app->getManagedAccount->getManagedAccount($restaurantUuid)->restaurant_uuid])) !== null) {
             return $model;
         }
 

@@ -13,7 +13,7 @@ class LoginForm extends Model {
 
     public $email;
     public $password;
-    public $ownedRestaurant;
+    public $managedRestaurant;
     public $rememberMe = true;
     private $_agent = false;
 
@@ -55,12 +55,19 @@ class LoginForm extends Model {
      * @return boolean whether the agent is logged in successfully
      */
     public function login() {
+
         if ($this->validate()) {
             $loggedInAgent = $this->getAgent();
+
             if ($loggedInAgent != NULL) {
                 Yii::$app->user->login($loggedInAgent, $this->rememberMe ? 3600 * 24 * 30 : 0);
-                foreach (Yii::$app->ownedAccountManager->getOwnedRestaurants() as $restaurantOwned) {
-                    return Yii::$app->ownedAccountManager->getOwnedAccount($restaurantOwned->restaurant_uuid);
+
+                if ($managedRestaurants = Yii::$app->accountManager->getManagedAccounts()) {
+                    foreach ($managedRestaurants as $managedRestaurant) {
+                        return Yii::$app->accountManager->getManagedAccount($managedRestaurant->restaurant_uuid);
+                    }
+                } else {
+                    Yii::$app->user->logout();
                 }
             }
         }

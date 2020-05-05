@@ -43,7 +43,7 @@ class CustomerController extends Controller {
      */
     public function actionIndex($restaurantUuid) {
         
-        $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
                 
         $searchModel = new CustomerSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurantUuid);

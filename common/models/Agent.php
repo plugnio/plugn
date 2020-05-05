@@ -6,6 +6,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use yii\web\IdentityInterface;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "agent".
@@ -246,14 +247,6 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
         $this->agent_password_reset_token = null;
     }
 
-    /**
-     * Accounts owned by this agent
-     * @return \yii\db\ActiveQuery
-     */
-    public function getRestaurants()
-    {
-        return $this->hasMany(Restaurant::className(), ['agent_id' => 'agent_id']);
-    }
 
     /**
      * Get all Restaurant accounts this agent owns
@@ -282,4 +275,5 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     {
         return $this->hasMany(AgentAssignment::className(), ['agent_id' => 'agent_id']);
     }
+    
 }

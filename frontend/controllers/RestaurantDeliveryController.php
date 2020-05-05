@@ -48,7 +48,7 @@ class RestaurantDeliveryController extends Controller {
      */
     public function actionIndex($restaurantUuid) {
 
-        $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
         $query = City::find()->with(['restaurantDeliveryAreas' => function($query) use($restaurantUuid) {
                 return $query->where(['restaurant_uuid' => $restaurantUuid]);
@@ -93,7 +93,7 @@ class RestaurantDeliveryController extends Controller {
      */
     public function actionCreate($restaurantUuid) {
 
-        $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
         $model = new RestaurantDelivery();
         $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
@@ -121,7 +121,7 @@ class RestaurantDeliveryController extends Controller {
      */
     public function actionUpdate($restaurantUuid) {
 
-        $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
         $model = new RestaurantDelivery();
         $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
@@ -152,7 +152,7 @@ class RestaurantDeliveryController extends Controller {
      */
     public function actionUpdateDeliveryTimeForCity($city_id, $restaurantUuid) {
 
-       $restaurant_model = Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid);
+       $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
                 
         $model = new DeliveryZoneForm;
@@ -193,7 +193,7 @@ class RestaurantDeliveryController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($restaurantUuid, $area_id) {
-        if (($model = RestaurantDelivery::find()->where(['restaurant_uuid' => Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid)->restaurant_uuid, 'area_id' => $area_id])->one()) !== null) {
+        if (($model = RestaurantDelivery::find()->where(['restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid, 'area_id' => $area_id])->one()) !== null) {
             return $model;
         }
 

@@ -58,7 +58,6 @@ class RestaurantSearch extends Restaurant
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'agent_id' => $this->agent_id,
             'status' => $this->status,
             'support_delivery' => $this->support_delivery,
             'support_pick_up' => $this->support_pick_up,

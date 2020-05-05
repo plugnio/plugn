@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use Yii;
 use common\models\RestaurantTheme;
+use common\models\AgentAssignment;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -12,13 +13,12 @@ use yii\filters\VerbFilter;
 /**
  * RestaurantThemeController implements the CRUD actions for RestaurantTheme model.
  */
-class RestaurantThemeController extends Controller
-{
+class RestaurantThemeController extends Controller {
+
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -35,11 +35,17 @@ class RestaurantThemeController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionIndex($restaurantUuid)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($restaurantUuid),
-        ]);
+    public function actionIndex($restaurantUuid) {
+        
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+
+        if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) {
+            return $this->render('view', [
+                        'model' => $this->findModel($restaurantUuid),
+            ]);
+        } else {
+            throw new \yii\web\BadRequestHttpException('Sorry, you are not allowed to access this page.');
+        }
     }
 
     /**
@@ -49,8 +55,7 @@ class RestaurantThemeController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($restaurantUuid)
-    {
+    public function actionUpdate($restaurantUuid) {
         $model = $this->findModel($restaurantUuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -58,7 +63,7 @@ class RestaurantThemeController extends Controller
         }
 
         return $this->render('update', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
@@ -69,12 +74,19 @@ class RestaurantThemeController extends Controller
      * @return RestaurantTheme the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($restaurantUuid)
-    {
-        if (($model = RestaurantTheme::findOne(Yii::$app->ownedAccountManager->getOwnedAccount($restaurantUuid)->restaurant_uuid)) !== null) {
-            return $model;
-        }
+    protected function findModel($restaurantUuid) {
+        if (Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
 
-        throw new NotFoundHttpException('The requested page does not exist.');
+            if (AgentAssignment::isOwner($restaurantUuid)) {
+                if (($model = RestaurantTheme::findOne(Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid)) !== null) {
+                    return $model;
+                }
+            } else {
+                throw new \yii\web\BadRequestHttpException('Sorry, you are not allowed to access this page.');
+            }
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
     }
+
 }

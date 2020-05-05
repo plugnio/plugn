@@ -31,7 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'agent_created_at',
             'agent_updated_at',
 
-            ['class' => 'yii\grid\ActionColumn', 'template' => '{view}'],
+            ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
 </div>
