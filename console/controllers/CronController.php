@@ -13,10 +13,7 @@ use yii\db\Expression;
  * All Cron actions related to this project
  */
 class CronController extends \yii\console\Controller {
-public function actionIndex(){
-           $operatorApiResponse = Yii::$app->tapPayments->createAnOperator('burgera', 'wal_uATwK14201421HM1z2of4D626', 'dev_hGTwK2201421ovzQ2ck4Q465');
 
-}
     /**
      * Update refund status  for all refunds record
      */
@@ -39,9 +36,7 @@ public function actionIndex(){
             }
         }
     }
-    
-    
-    
+
     /**
      * Method called to find old transactions that haven't received callback and force a callback
      */
@@ -71,6 +66,5 @@ public function actionIndex(){
         $this->stdout("Payments status updated successfully \n", Console::FG_RED, Console::BOLD);
         return self::EXIT_CODE_NORMAL;
     }
-    
 
 }

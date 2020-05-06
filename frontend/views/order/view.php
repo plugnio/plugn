@@ -18,6 +18,12 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="page-title">
     <p>
         <?= Html::a('Print', ['download-invoice', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-success']); ?>
+        
+        
+        <?php
+            if($model->order_mode == Order::ORDER_MODE_DELIVERY)
+                echo Html::a('Request a driver', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary']); 
+        ?>
     </p>
 </div>
 
@@ -73,6 +79,14 @@ $this->params['breadcrumbs'][] = $this->title;
                             return $data->special_directions;
                         },
                         'visible' => $model->special_directions,
+                    ],
+                    [
+                        'attribute' => 'tracking_link',
+                        'format' => 'html',
+                        'value' => function ($data) {
+                            return '<a target="_blank" href='. $data->tracking_link . '>' . $data->tracking_link  . '</a>';
+                        },
+                        'visible' => $model->tracking_link,
                     ],
                 ],
                 'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
