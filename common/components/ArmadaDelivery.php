@@ -7,6 +7,8 @@ use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\httpclient\Client;
 use yii\base\InvalidConfigException;
+use common\models\PaymentMethod;
+
 
 /**
  * ArmadaDelivery class for requesting a driver to deliver an order
@@ -25,27 +27,10 @@ class ArmadaDelivery extends Component {
      */
     public $keyToUse;
     
-    /**
-     * @var string Variable for live api key to be stored in
-     */
-    public $liveApiKey;
-    
-    /**
-     * @var string Variable for test api key to be stored in
-     */
-     public $testApiKey;
-
-    /**
-     * @var string secret api key to use will be stored here
-     */
-    public $secretApiKey;
-
-
     public $liveApiEndpoint = "https://api.tap.company/v2";
     
     public $testApiEndpoint = "https://api-simulation-env.herokuapp.com/v0";
 
- 
     private $apiEndpoint;
 
      
@@ -54,7 +39,7 @@ class ArmadaDelivery extends Component {
      */
     public function init() {
         // Fields required by default
-        $requiredAttributes = ['keyToUse','testApiKey', 'liveApiKey'];
+        $requiredAttributes = ['keyToUse'];
 
         // Process Validation
         foreach ($requiredAttributes as $attribute) {
@@ -68,10 +53,8 @@ class ArmadaDelivery extends Component {
 
         // Set the API key we're going to use
         if ($this->keyToUse == self::USE_LIVE_KEY) {
-            $this->secretApiKey = $this->liveApiKey;
             $this->apiEndpoint = $this->liveApiEndpoint;
         } else {
-            $this->secretApiKey = $this->testApiKey;
             $this->apiEndpoint = $this->testApiEndpoint;
         }
 
@@ -82,21 +65,21 @@ class ArmadaDelivery extends Component {
     /**
      * Create a delivery request
      */
-    public function createDelivery() {
+    public function createDelivery($model) {
         $deliveryEndpoint = $this->apiEndpoint . "/deliveries";
 
         $deliveryParams = [
             "platformName" => "pos",
             "platformData" => [
-                    "orderId" => "1",
-                    "name" => "saoud",
-                    "phone" => "51113111",
-                    "area" => "Sharq",
-                    "block" => "1",
-                    "street" => "1",
-                    "buildingNumber" => "1",
-                    "amount" => "1",
-                    "paymentType" => "paid",
+                    "orderId" => $model->order_uuid,
+                    "name" => $model->customer_name,
+                    "phone" =>  $model->customer_phone_number,
+                    "area" => $model->area_name,
+                    "block" => $model->block,
+                    "street" => $model->street,
+                    "buildingNumber" => $model->house_number,
+                    "amount" => $model->total_price,
+                    "paymentType" => $model->payment_method_id == 3 ? 'cash on delivery' : 'paid',
                     "threeDSecure" => true,
                     "save_card" => false,
             ],
@@ -108,7 +91,7 @@ class ArmadaDelivery extends Component {
                 ->setUrl($deliveryEndpoint)
                 ->setData($deliveryParams)
                 ->addHeaders([
-                    'authorization' => 'Key ' . $this->secretApiKey,
+                    'authorization' => 'Key ' . $model->restaurant->armada_api_key,
                     'content-type' => 'application/json',
                 ])
                 ->send();

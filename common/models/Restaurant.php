@@ -26,6 +26,7 @@ use yii\behaviors\AttributeBehavior;
  * @property string|null $restaurant_created_at
  * @property string|null $restaurant_updated_at
  * @property boolean $restaurant_email_notification
+ * @property boolean $armada_api_key_
  *
  * @property AgentAssignment[] $agentAssignments
  * @property Agent[] $agents
@@ -74,7 +75,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             ['restaurant_status', 'in', 'range' => [self::RESTAURANT_STATUS_OPEN, self::RESTAURANT_STATUS_BUSY, self::RESTAURANT_STATUS_CLOSE]],
             [['restaurant_created_at', 'restaurant_updated_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
-            [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo','restaurant_domain'], 'string', 'max' => 255],
+            [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo','restaurant_domain','armada_api_key'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 8, 'max' => 8],
             [['phone_number'], 'integer', 'min' => 0],
             [['restaurant_email_notification'], 'integer'],
@@ -106,6 +107,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             'restaurant_email' => "Store's Email",
             'restaurant_created_at' => 'Store Created At',
             'restaurant_updated_at' => 'Store Updated At',
+            'armada_api_key' => 'Armada Api Key',
             'restaurant_email_notification' => 'Email Notification',
         ];
     }

@@ -64,21 +64,31 @@ class OrderController extends Controller {
      * @param type $restaurantUuid
      */
     public function actionRequestDriverFromArmada($order_uuid, $restaurantUuid) {
-        
-          $order_model = $this->findModel($order_uuid, $restaurantUuid);
-            
-          $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery();
 
-          
-       if ($createDeliveryApiResponse->isOk) {
-           $order_model->tracking_link = $createDeliveryApiResponse->data['trackingLink'];
-           $order_model->save(false);
-       } else {
-           return Yii::$app->session->setFlash('error', print_r( 'Operator: '. $operatorApiResponse->data, true));
-       }
-       
-       return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid]);
-               
+        $order_model = $this->findModel($order_uuid, $restaurantUuid);
+
+        $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($order_model);
+
+        $errorMessage = null;
+        $successMessage = null;
+
+        if ($createDeliveryApiResponse->isOk) {
+            $order_model->tracking_link = $createDeliveryApiResponse->data['trackingLink'];
+            $order_model->save(false);
+            $successMessage = 'Your request has been successfully submitted';
+        } else {
+
+            if ($createDeliveryApiResponse->client)
+                $errorMessage = 'Invalid api key';
+            else if ($createDeliveryApiResponse->data['errors'])
+                $errorMessage = json_encode($createDeliveryApiResponse->data['errors'][0]['description'], true);
+
+
+
+            return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid, 'errorMessage' => $errorMessage]);
+        }
+
+        return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid, 'errorMessage' => $errorMessage, 'successMessage' => $successMessage,]);
     }
 
     /**
@@ -105,7 +115,7 @@ class OrderController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionDownloadInvoice($restaurantUuid, $order_uuid) {
-        
+
 
         $order_model = $this->findModel($order_uuid, $restaurantUuid);
 
@@ -122,11 +132,11 @@ class OrderController extends Controller {
 
         $this->layout = 'pdf';
 
-                
+
         $content = $this->render('invoice', [
-                    'model' => $order_model,
-                    'orderItems' => $orderItems,
-                    'itemsExtraOpitons' => $itemsExtraOpitons
+            'model' => $order_model,
+            'orderItems' => $orderItems,
+            'itemsExtraOpitons' => $itemsExtraOpitons
         ]);
 
 //
@@ -153,7 +163,6 @@ class OrderController extends Controller {
 
         header('Access-Control-Allow-Origin: *');
         return $pdf->render();
-
     }
 
     /**
@@ -162,7 +171,7 @@ class OrderController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id, $restaurantUuid) {
+    public function actionView($id, $restaurantUuid, $errorMessage = null, $successMessage = null) {
 
         $order_model = $this->findModel($id, $restaurantUuid);
 
@@ -180,6 +189,8 @@ class OrderController extends Controller {
         return $this->render('view', [
                     'model' => $order_model,
                     'orderItems' => $orderItems,
+                    'errorMessage' => $errorMessage,
+                    'successMessage' => $successMessage,
                     'itemsExtraOpitons' => $itemsExtraOpitons
         ]);
     }

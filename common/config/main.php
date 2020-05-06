@@ -53,23 +53,10 @@ return [
         'tapPayments' => [
             'class' => 'common\components\TapPayments',
             'gatewayToUse' => \common\components\TapPayments::USE_LIVE_GATEWAY,
-            'plugnLiveApiKey' => "sk_live_k31q5ActS9shuYgwa8LZ746X",
-            'plugnTestApiKey' => "sk_test_p07NquMX4HgwLT8mycdJnZv5",
         ],
         'armadaDelivery' => [
             'class' => 'common\components\ArmadaDelivery',
             'keyToUse' => \common\components\ArmadaDelivery::USE_LIVE_KEY,
-            'liveApiKey' => "1",
-            'testApiKey' => "420a6bbb-8b3e-4dd0-b9cf-140137150d9e",
-        ],
-        'log' => [
-            'targets' => [
-                [
-                    'class' => 'yii\log\DbTarget',
-                    'levels' => ['info', 'error', 'warning'],
-                    'categories' => ['backend\*', 'frontend\*', 'common\*'],
-                ],
-            ],
         ],
         'slack' => [
             'class' => 'understeam\slack\Client',

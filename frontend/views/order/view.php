@@ -15,14 +15,30 @@ $this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index', 'resta
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
+
+
+<?php if ($errorMessage && $successMessage == null) { ?>
+
+    <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h5><i class="icon fas fa-ban"></i> Warning!</h5>
+        <?= ($errorMessage) ?>
+    </div>
+<?php } else if ($successMessage && $errorMessage == null ){?>
+<div class="alert alert-success alert-dismissible">
+                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                  <h5><i class="icon fas fa-check"></i> Success!</h5>
+                          <?= ($successMessage) ?>
+                </div>
+<?php } ?>
 <div class="page-title">
     <p>
         <?= Html::a('Print', ['download-invoice', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-success']); ?>
-        
-        
+
+
         <?php
-            if($model->order_mode == Order::ORDER_MODE_DELIVERY)
-                echo Html::a('Request a driver', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary']); 
+        if ($model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->armada_api_key != null && $model->tracking_link == null)
+            echo Html::a('Request a driver', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary']);
         ?>
     </p>
 </div>
@@ -37,10 +53,10 @@ $this->params['breadcrumbs'][] = $this->title;
             <p>
                 <?php
                 if ($model->order_status != Order::STATUS_BEING_PREPARED)
-                    echo Html::a('Being Prepared', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_BEING_PREPARED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-warning']);
+                    echo Html::a('Being Prepared', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_BEING_PREPARED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-primary']);
 
                 if ($model->order_status != Order::STATUS_OUT_FOR_DELIVERY)
-                    echo Html::a('Out for Delivery', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_OUT_FOR_DELIVERY], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-primary']);
+                    echo Html::a('Out for Delivery', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_OUT_FOR_DELIVERY], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-info']);
 
                 if ($model->order_status != Order::STATUS_COMPLETE)
                     echo Html::a('Mark as Complete', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_COMPLETE], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
@@ -84,9 +100,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         'attribute' => 'tracking_link',
                         'format' => 'html',
                         'value' => function ($data) {
-                            return '<a target="_blank" href='. $data->tracking_link . '>' . $data->tracking_link  . '</a>';
+                            return '<a target="_blank" href=' . $data->tracking_link . '>' . $data->tracking_link . '</a>';
                         },
-                        'visible' => $model->tracking_link,
+                        'visible' => $model->tracking_link != null,
                     ],
                 ],
                 'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
@@ -146,9 +162,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="card-body">
             <h3>Payment details</h3>
             <p>
-              <?php  
+                <?php
 //              if($model->payment_method_id != 3 && $model->order_status != Order::STATUS_REFUNDED) echo Html::a('Create Refund', ['refund/create', 'restaurantUuid' => $model->restaurant_uuid, 'orderUuid' => $model->order_uuid], ['class' => 'btn btn-success']) ; 
-              ?>
+                ?>
 
             </p>
             <?=
@@ -167,7 +183,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'format' => 'html',
                         'value' => function ($data) {
                             if ($data->payment)
-                                return $data->payment->payment_current_status == 'CAPTURED' ? '<span class="badge bg-success" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>' :'<span class="badge bg-danger" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>' ;
+                                return $data->payment->payment_current_status == 'CAPTURED' ? '<span class="badge bg-success" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>' : '<span class="badge bg-danger" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>';
                         },
                         'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
                     ],
@@ -187,7 +203,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             if ($data->payment)
                                 return $data->payment->received_callback == true ? 'True' : 'False';
                         },
-                        'visible' => $model->payment_method_id != 3 &&  $model->payment
+                        'visible' => $model->payment_method_id != 3 && $model->payment
                     ],
                     [
                         'label' => 'Transaction ID',
@@ -210,40 +226,40 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="card-body">
             <h3>Customer Info</h3>
 
-<?=
-DetailView::widget([
-    'model' => $model,
-    'attributes' => [
-        'customer_name',
-        'customer_phone_number',
-        'customer_email:email',
-        [
-            'attribute' => 'order_mode',
-            'format' => 'html',
-            'value' => function ($data) {
-                return $data->order_mode == Order::ORDER_MODE_DELIVERY ? 'Delivery' : 'Pickup';
-            },
-        ],
-        [
-            'label' => 'Address',
-            'format' => 'html',
-            'value' => function ($data) {
-                return $data->area_name . ', Block ' . $data->block . ', St ' . $data->street . ', ' . ($data->avenue ? 'Avenue ' . $data->avenue . ', ' : '' ) . $data->house_number;
-            },
-            'visible' => $model->order_mode == Order::ORDER_MODE_DELIVERY,
-        ],
-        [
-            'label' => 'Pickup from',
-            'format' => 'html',
-            'value' => function ($data) {
-                return $data->restaurantBranch->branch_name_en;
-            },
-            'visible' => $model->order_mode == Order::ORDER_MODE_PICK_UP,
-        ],
-    ],
-    'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
-])
-?>
+            <?=
+            DetailView::widget([
+                'model' => $model,
+                'attributes' => [
+                    'customer_name',
+                    'customer_phone_number',
+                    'customer_email:email',
+                    [
+                        'attribute' => 'order_mode',
+                        'format' => 'html',
+                        'value' => function ($data) {
+                            return $data->order_mode == Order::ORDER_MODE_DELIVERY ? 'Delivery' : 'Pickup';
+                        },
+                    ],
+                    [
+                        'label' => 'Address',
+                        'format' => 'html',
+                        'value' => function ($data) {
+                            return $data->area_name . ', Block ' . $data->block . ', St ' . $data->street . ', ' . ($data->avenue ? 'Avenue ' . $data->avenue . ', ' : '' ) . $data->house_number;
+                        },
+                        'visible' => $model->order_mode == Order::ORDER_MODE_DELIVERY,
+                    ],
+                    [
+                        'label' => 'Pickup from',
+                        'format' => 'html',
+                        'value' => function ($data) {
+                            return $data->restaurantBranch->branch_name_en;
+                        },
+                        'visible' => $model->order_mode == Order::ORDER_MODE_PICK_UP,
+                    ],
+                ],
+                'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
+            ])
+            ?>
 
         </div>
     </div>

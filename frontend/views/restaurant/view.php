@@ -77,6 +77,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                     'phone_number',
                     'restaurant_email:email',
+                    [
+                        'attribute' => 'armada_api_key',
+                        'format' => 'html',
+                        'value' => function ($data) {
+                            return $data->armada_api_key;
+                        },
+                        'visible' => $model->armada_api_key != null,
+                    ],
                     'restaurant_created_at',
                     'restaurant_updated_at',
                 ],
