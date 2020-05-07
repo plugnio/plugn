@@ -238,7 +238,7 @@ class OrderController extends Controller {
                 }
 
 
-                if ($response['operation'] == 'error') {
+                if ( array_key_exists('operation', $response) &&  $response['operation'] == 'error') {
                     Order::deleteAll(['order_uuid' => $order->order_uuid]);
                 }
             } else if ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_CLOSE) {
