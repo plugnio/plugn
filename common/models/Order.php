@@ -99,7 +99,7 @@ class Order extends \yii\db\ActiveRecord {
             [['payment_uuid'], 'string', 'max' => 36],
             ['estimated_time_of_arrival', 'safe'],
             [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
-            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name', 'payment_method_name_ar','tracking_link'], 'string', 'max' => 255],
+            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name', 'payment_method_name_ar', 'tracking_link'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
             [['customer_id'], 'exist', 'skipOnError' => false, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
             [['payment_method_id'], 'exist', 'skipOnError' => false, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
@@ -349,6 +349,15 @@ class Order extends \yii\db\ActiveRecord {
             $totalPrice += $this->restaurantDelivery->delivery_fee;
 
         return $totalPrice;
+    }
+
+    public function beforeDelete() {
+
+        foreach ($this->getOrderItems()->all() as $orderItem) {
+            $orderItem->item->increaseStockQty($orderItem->qty);
+        }
+
+        return parent::beforeDelete();
     }
 
     public function afterSave($insert, $changedAttributes) {

@@ -37,6 +37,23 @@ class CronController extends \yii\console\Controller {
         }
     }
 
+    
+ 
+    public function actionUpdateStockQty() {
+        $now = new DateTime('now');
+        $payments = Payment::find()
+                ->where(['<>' , 'payment_current_status','CAPTURED'])
+                ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 HOUR)')])
+                ->all();
+        
+        foreach ($payments as $payment) {
+            foreach ($payment->order->getOrderItems()->all() as $orderItem) {
+                $orderItem->item->increaseStockQty($orderItem->qty);
+            }
+        }
+
+    }
+    
     /**
      * Method called to find old transactions that haven't received callback and force a callback
      */

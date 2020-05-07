@@ -36,12 +36,12 @@ class OrderItem extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['order_uuid', 'item_uuid', 'qty'], 'required'],
-            [['qty'], 'integer' , 'min'=> 0],
+            [['qty'], 'integer', 'min' => 0],
             [['order_uuid'], 'string', 'max' => 40],
-            [['item_price'], 'number', 'min'=> 0],
+            [['item_price'], 'number', 'min' => 0],
             [['item_uuid'], 'checkIfItemBelongToRestaurant'],
             [['item_uuid'], 'string', 'max' => 300],
-            [['item_name','item_name_ar', 'customer_instruction'], 'string', 'max' => 255],
+            [['item_name', 'item_name_ar', 'customer_instruction'], 'string', 'max' => 255],
             [['item_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_uuid' => 'item_uuid']],
             [['order_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_uuid' => 'order_uuid']],
         ];
@@ -92,10 +92,7 @@ class OrderItem extends \yii\db\ActiveRecord {
 
     public function beforeDelete() {
 
-        $item_model = Item::findOne($this->item_uuid);
-        $order_model = Order::findOne($this->order_uuid);
-
-        $item_model->increaseStockQty($this->qty);
+        $this->item->increaseStockQty($this->qty);
 
         return parent::beforeDelete();
     }
@@ -137,9 +134,9 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         if (!$insert && $changedAttributes['qty']) {
             $item_model->increaseStockQty($changedAttributes['qty']);
+            $item_model->decreaseStockQty($this->qty);
         }
 
-        $item_model->decreaseStockQty($this->qty);
 
         $order_model = Order::findOne($this->order_uuid);
 
@@ -167,7 +164,7 @@ class OrderItem extends \yii\db\ActiveRecord {
         return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid']);
     }
 
-        /**
+    /**
      * Gets query for [[Restaurant]].
      *
      * @return \yii\db\ActiveQuery
@@ -175,7 +172,7 @@ class OrderItem extends \yii\db\ActiveRecord {
     public function getRestaurant() {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('order');
     }
-    
+
     /**
      * Gets query for [[OrderItemExtraOptions]].
      *
