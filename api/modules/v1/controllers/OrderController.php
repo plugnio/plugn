@@ -246,7 +246,7 @@ class OrderController extends Controller {
                         $order->sendPaymentConfirmationEmail();
                         
 //                        Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
-                        Yii::info("[Placed an order]", __METHOD__);
+                        Yii::info("Placed an order", __METHOD__);
                         
                         $response = [
                             'operation' => 'success',
