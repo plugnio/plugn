@@ -141,7 +141,6 @@ class Payment extends \yii\db\ActiveRecord {
         if (isset($responseContent->errors)) {
             $errorMessage = "Error from TAP: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
             \Yii::error($errorMessage, __METHOD__); // Log error faced by user
-            \Yii::info($errorMessage, __METHOD__); // Log error faced by user
             \Yii::$app->getSession()->setFlash('error', $errorMessage);
             return $paymentRecord;
         }
@@ -183,13 +182,6 @@ class Payment extends \yii\db\ActiveRecord {
             // Net amount after deducting gateway fee
             $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee;
         }else {
-            Yii::info('[TAP Payment Issue > ' . $paymentRecord->customer->customer_name . ']'
-                    . $paymentRecord->customer->customer_name .
-                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) .
-                    ' and has failed at gateway. Maybe card issue.', __METHOD__);
-
-            Yii::info('[Response from TAP for Failed Payment] ' .
-                    print_r($responseContent, true), __METHOD__);
             Yii::error('[TAP Payment Issue > ' . $paymentRecord->customer->customer_name . ']'
                     . $paymentRecord->customer->customer_name .
                     ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) .
