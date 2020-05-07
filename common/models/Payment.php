@@ -154,6 +154,7 @@ class Payment extends \yii\db\ActiveRecord {
         // On Successful Payments
         if ($responseContent->status == 'CAPTURED') {
 
+            Yii::info("[" . $paymentRecord->restaurant->name . ": " . $paymentRecord->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $paymentRecord->payment_mode, __METHOD__);
 
             // KNET Gateway Fee Calculation
             if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
@@ -169,9 +170,8 @@ class Payment extends \yii\db\ActiveRecord {
 
                 if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage) > Yii::$app->tapPayments->minCreditcardGatewayFee)
                     $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage;
-                else 
+                else
                     $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minCreditcardGatewayFee;
-                
             }
 
 
@@ -181,6 +181,14 @@ class Payment extends \yii\db\ActiveRecord {
 
             // Net amount after deducting gateway fee
             $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee;
+        }else {
+            Yii::error('[TAP Payment Issue > ' . $paymentRecord->customer_name . ']'
+                    . $paymentRecord->customer_name .
+                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) .
+                    ' and has failed at gateway. Maybe card issue.', __METHOD__);
+
+            Yii::error('[Response from TAP for Failed Payment] ' .
+                    print_r($responseContent, true), __METHOD__);
         }
 
         $paymentRecord->save();

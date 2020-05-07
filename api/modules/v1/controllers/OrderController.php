@@ -184,66 +184,68 @@ class OrderController extends Controller {
                         $payment->order_uuid = $order->order_uuid;
                         $payment->payment_amount_charged = $order->total_price;
                         $payment->payment_current_status = "Redirected to payment gateway";
-                        if (!$payment->save()){
-                            
-                        //Update payment_uuid in order
-                        $order->payment_uuid = $payment->payment_uuid;
-                        $order->save(false);
 
-                  Yii::info("[Payment Attempt Started] " . $payment->payment_uuid , __METHOD__);
-                  
-                        // Redirect to payment gateway
-                        Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
+                        if ($payment->save()) {
 
-                        $response = Yii::$app->tapPayments->createCharge(
-                                "Order placed from: " . $order->customer_name, // Description
-                                $order->restaurant->name, //Statement Desc.
-                                $payment->payment_uuid, // Reference
-                                $order->total_price, $order->customer_name, $order->customer_email, $order->customer_phone_number, Url::to(['order/callback'], true), $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD, $order->restaurant->test_api_key
-                        );
+                            //Update payment_uuid in order
+                            $order->payment_uuid = $payment->payment_uuid;
+                            $order->save(false);
 
-                        $responseContent = json_decode($response->content);
+                            Yii::info("[Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
 
-                        // Validate that theres no error from TAP gateway
-                        if (isset($responseContent->errors)) {
-                            $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
-                            \Yii::error($errorMessage, __METHOD__); // Log error faced by user
+
+                            // Redirect to payment gateway
+                            Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
+
+                            $response = Yii::$app->tapPayments->createCharge(
+                                    "Order placed from: " . $order->customer_name, // Description
+                                    $order->restaurant->name, //Statement Desc.
+                                    $payment->payment_uuid, // Reference
+                                    $order->total_price, $order->customer_name, $order->customer_email, $order->customer_phone_number, Url::to(['order/callback'], true), $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD, $order->restaurant->test_api_key
+                            );
+
+                            $responseContent = json_decode($response->content);
+
+                            // Validate that theres no error from TAP gateway
+                            if (isset($responseContent->errors)) {
+                                $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
+                                \Yii::error($errorMessage, __METHOD__); // Log error faced by user
+
+                                return [
+                                    'operation' => 'error',
+                                    'message' => $errorMessage
+                                ];
+                            }
+
+                            $chargeId = $responseContent->id;
+                            $redirectUrl = $responseContent->transaction->url;
+
+                            $payment->payment_gateway_transaction_id = $chargeId;
+                            $payment->save(false);
 
                             return [
-                                'operation' => 'error',
-                                'message' => $errorMessage
+                                'operation' => 'redirecting',
+                                'redirectUrl' => $redirectUrl,
                             ];
-                        }
+                        } else {
 
-                        $chargeId = $responseContent->id;
-                        $redirectUrl = $responseContent->transaction->url;
+                            Yii::error('[TAP Payment Issue > ' . $paymentRecord->custoemr_name . ']'
+                                    . $paymentRecord->custoemr_name .
+                                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) .
+                                    ' and has failed at gateway. Maybe card issue.', __METHOD__);
 
-                        $payment->payment_gateway_transaction_id = $chargeId;
-                        $payment->save(false);
 
-                        return [
-                            'operation' => 'redirecting',
-                            'redirectUrl' => $redirectUrl,
-                        ];
-                        }else{
-                            
-         Yii::error('[TAP Payment Issue > '.$paymentRecord->custoemr_name.']'
-                      .$paymentRecord->custoemr_name.
-                      ' tried to pay '.Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '',[\NumberFormatter::MAX_SIGNIFICANT_DIGITS=>10]).
-                      ' and has failed at gateway. Maybe card issue.', __METHOD__);
-         
-         
-         
+
                             $response = [
                                 'operation' => 'error',
                                 'message' => $payment->getErrors()
                             ];
                         }
-
-
                     } else {
 
                         $order->sendPaymentConfirmationEmail();
+                        
+                        Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
 
                         $response = [
                             'operation' => 'success',

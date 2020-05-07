@@ -92,6 +92,8 @@ class ItemController extends Controller {
 
             if ($model->save()) {
 
+            Yii::info("[" . $model->restaurant->name . ": " . $model->item_name . " has been added  " . '] ' . $model->restaurant->restaurant_domain . '/product/' . $model->item_uuid, __METHOD__);
+
             $image = \yii\web\UploadedFile::getInstances($model, 'image');
 
                 if ($image)
@@ -124,6 +126,8 @@ class ItemController extends Controller {
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
 
             if ($model->save()) {
+
+                Yii::info("[" . $model->restaurant->name . ": " . $model->item_name . " has been updated  " . '] ' . $model->restaurant->restaurant_domain . '/product/' . $model->item_uuid, __METHOD__);
 
                 $image = \yii\web\UploadedFile::getInstances($model, 'image');
 
