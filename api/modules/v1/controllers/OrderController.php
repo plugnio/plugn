@@ -210,6 +210,7 @@ class OrderController extends Controller {
                             if (isset($responseContent->errors)) {
                                 $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
                                 \Yii::error($errorMessage, __METHOD__); // Log error faced by user
+                                \Yii::info($errorMessage, __METHOD__); // Log error faced by user
 
                                 return [
                                     'operation' => 'error',
@@ -228,6 +229,11 @@ class OrderController extends Controller {
                                 'redirectUrl' => $redirectUrl,
                             ];
                         } else {
+
+                            Yii::info('[TAP Payment Issue > ' . $paymentRecord->custoemr_name . ']'
+                                    . $paymentRecord->custoemr_name .
+                                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) .
+                                    ' and has failed at gateway. Maybe card issue.', __METHOD__);
 
                             Yii::error('[TAP Payment Issue > ' . $paymentRecord->custoemr_name . ']'
                                     . $paymentRecord->custoemr_name .
