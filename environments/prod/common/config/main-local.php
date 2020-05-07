@@ -52,7 +52,7 @@ return [
                     'class' => 'common\components\SlackLogger',
                     'logVars' => [],
                     'levels' => ['info', 'warning','error'],
-                    'categories' => ['backend\*', 'frontend\*', 'common\*', 'console\*'],
+                    'categories' => ['backend\*', 'frontend\*', 'common\*', 'console\*','api\*'],
                 ],
             ],
         ],
