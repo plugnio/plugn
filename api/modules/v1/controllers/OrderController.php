@@ -184,8 +184,6 @@ class OrderController extends Controller {
                         $payment->order_uuid = $order->order_uuid;
                         $payment->payment_amount_charged = $order->total_price;
                         $payment->payment_current_status = "Redirected to payment gateway";
-//                        $payment->save();
-
                         if (!$payment->save()){
                             
                         //Update payment_uuid in order
