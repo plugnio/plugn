@@ -18,7 +18,7 @@ class RestaurantSearch extends Restaurant
     {
         return [
             [['restaurant_uuid', 'name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'phone_number', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
-            [['agent_id', 'status', 'support_delivery', 'support_pick_up'], 'integer'],
+            [['status', 'support_delivery', 'support_pick_up'], 'integer'],
         ];
     }
 

@@ -184,13 +184,16 @@ class OrderController extends Controller {
                         $payment->order_uuid = $order->order_uuid;
                         $payment->payment_amount_charged = $order->total_price;
                         $payment->payment_current_status = "Redirected to payment gateway";
-                        $payment->save();
+//                        $payment->save();
 
+                        if (!$payment->save()){
+                            
                         //Update payment_uuid in order
                         $order->payment_uuid = $payment->payment_uuid;
                         $order->save(false);
 
-//                  Yii::info("[Payment Attempt Started] " . Yii::$app->user->identity->investor_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($amountToInvest, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
+                  Yii::info("[Payment Attempt Started] " . $payment->payment_uuid , __METHOD__);
+                  
                         // Redirect to payment gateway
                         Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
 
@@ -224,6 +227,22 @@ class OrderController extends Controller {
                             'operation' => 'redirecting',
                             'redirectUrl' => $redirectUrl,
                         ];
+                        }else{
+                            
+         Yii::error('[TAP Payment Issue > '.$paymentRecord->custoemr_name.']'
+                      .$paymentRecord->custoemr_name.
+                      ' tried to pay '.Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '',[\NumberFormatter::MAX_SIGNIFICANT_DIGITS=>10]).
+                      ' and has failed at gateway. Maybe card issue.', __METHOD__);
+         
+         
+         
+                            $response = [
+                                'operation' => 'error',
+                                'message' => $payment->getErrors()
+                            ];
+                        }
+
+
                     } else {
 
                         $order->sendPaymentConfirmationEmail();
@@ -238,7 +257,7 @@ class OrderController extends Controller {
                 }
 
 
-                if ( array_key_exists('operation', $response) &&  $response['operation'] == 'error') {
+                if (array_key_exists('operation', $response) && $response['operation'] == 'error') {
                     Order::deleteAll(['order_uuid' => $order->order_uuid]);
                 }
             } else if ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_CLOSE) {
@@ -304,7 +323,6 @@ class OrderController extends Controller {
         ];
     }
 
-
     /**
      * CheckPendingOrders of type boolean and we want to return
      * True if there are pending  orders , false if these isn't any
@@ -314,7 +332,6 @@ class OrderController extends Controller {
     public function actionCheckPendingOrders($restaurant_uuid) {
         return Order::find()->where(['restaurant_uuid' => $restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
                         ->exists();
-
     }
 
 }
