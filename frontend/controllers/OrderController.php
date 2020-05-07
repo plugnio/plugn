@@ -17,6 +17,8 @@ use kartik\mpdf\Pdf;
  */
 class OrderController extends Controller {
 
+    public $enableCsrfValidation = false;
+    
     /**
      * {@inheritdoc}
      */

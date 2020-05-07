@@ -19,6 +19,8 @@ use common\models\Restaurant;
  */
 class RestaurantDeliveryController extends Controller {
 
+    public $enableCsrfValidation = false;
+    
     /**
      * {@inheritdoc}
      */

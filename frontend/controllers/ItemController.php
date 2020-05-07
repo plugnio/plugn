@@ -13,6 +13,8 @@ use yii\filters\VerbFilter;
  * ItemController implements the CRUD actions for Item model.
  */
 class ItemController extends Controller {
+    
+    public $enableCsrfValidation = false;
 
     /**
      * {@inheritdoc}

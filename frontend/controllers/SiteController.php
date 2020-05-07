@@ -23,6 +23,8 @@ use common\models\Customer;
  */
 class SiteController extends Controller {
 
+    public $enableCsrfValidation = false;
+    
     /**
      * {@inheritdoc}
      */

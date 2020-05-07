@@ -14,6 +14,8 @@ use yii\filters\VerbFilter;
  */
 class PaymentController extends Controller
 {
+    public $enableCsrfValidation = false;
+    
     /**
      * {@inheritdoc}
      */

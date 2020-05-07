@@ -15,6 +15,8 @@ use yii\filters\VerbFilter;
  */
 class RestaurantController extends Controller {
 
+    public $enableCsrfValidation = false;
+    
     /**
      * {@inheritdoc}
      */

@@ -14,6 +14,8 @@ use yii\filters\VerbFilter;
  */
 class WorkingHoursController extends Controller {
 
+    public $enableCsrfValidation = false;
+    
     /**
      * {@inheritdoc}
      */

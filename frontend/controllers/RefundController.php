@@ -15,6 +15,8 @@ use common\models\Order;
  */
 class RefundController extends Controller {
 
+    public $enableCsrfValidation = false;
+    
     /**
      * {@inheritdoc}
      */

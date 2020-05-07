@@ -141,11 +141,7 @@ class Item extends \yii\db\ActiveRecord {
                 $this->deleteItemImage($changedAttributes['item_image']);
             }
         }
-        
-        if ($insert)
-            Yii::info("[Product has been added", __METHOD__);
-        else
-            Yii::info("[Product has been updated", __METHOD__);
+
     }
 
     /**

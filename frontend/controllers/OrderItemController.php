@@ -17,6 +17,8 @@ use yii\helpers\ArrayHelper;
  */
 class OrderItemController extends Controller {
 
+    public $enableCsrfValidation = false;
+    
     /**
      * {@inheritdoc}
      */
