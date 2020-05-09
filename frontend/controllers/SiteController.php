@@ -24,7 +24,7 @@ use common\models\Customer;
 class SiteController extends Controller {
 
     public $enableCsrfValidation = false;
-
+    
     /**
      * {@inheritdoc}
      */
@@ -96,10 +96,6 @@ class SiteController extends Controller {
      */
     public function actionVendorDashboard($id) {
 
-        if (Yii::$app->user->isGuest)
-            return $this->render('login');
-
-
         if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
 
             $orders = Order::find()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
@@ -115,8 +111,8 @@ class SiteController extends Controller {
 
             $total_revenue = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
-                    ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                    ->andWhere(['!=' , 'order_status' , Order::STATUS_REFUNDED])
+                    ->andWhere(['!=' , 'order_status' , Order::STATUS_CANCELED])
                     ->sum('total_price');
 
             return $this->render('index', [
