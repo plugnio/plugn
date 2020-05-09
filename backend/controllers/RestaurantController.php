@@ -16,6 +16,8 @@ use yii\web\UploadedFile;
  */
 class RestaurantController extends Controller {
 
+    public $enableCsrfValidation = false;
+    
     /**
      * {@inheritdoc}
      */
@@ -86,9 +88,9 @@ class RestaurantController extends Controller {
                 $model->owner_identification_file = $owner_identification_file[0]; //Owner's civil id
 
 
-       
+
              $model->createAMerchantAccountOnTap();
-       
+
 
             if ($model->validate() && $model->save()) {
                 return $this->redirect(['view', 'id' => $model->restaurant_uuid]);

@@ -13,7 +13,6 @@ use backend\models\LoginForm;
 class SiteController extends Controller
 {
     public $enableCsrfValidation = false;
-
     /**
      * {@inheritdoc}
      */
