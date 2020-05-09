@@ -17,7 +17,7 @@ use yii\web\UploadedFile;
 class RestaurantController extends Controller {
 
     public $enableCsrfValidation = false;
-    
+
     /**
      * {@inheritdoc}
      */
@@ -62,8 +62,18 @@ class RestaurantController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($id) {
+
+        $model = $this->findModel($id);
+        
+        // Store theme color
+        $storeThemeColors = new \yii\data\ActiveDataProvider([
+            'query' => $model->getRestaurantTheme()
+        ]);
+
+
         return $this->render('view', [
                     'model' => $this->findModel($id),
+                    'storeThemeColors' => $storeThemeColors
         ]);
     }
 
@@ -89,7 +99,7 @@ class RestaurantController extends Controller {
 
 
 
-             $model->createAMerchantAccountOnTap();
+            $model->createAMerchantAccountOnTap();
 
 
             if ($model->validate() && $model->save()) {

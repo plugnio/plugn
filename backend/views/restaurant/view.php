@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use common\models\Restaurant;
+use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Restaurant */
@@ -91,7 +92,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'thumbnail_image',
                 'format' => 'html',
                 'value' => function ($data) {
-                            return Html::img( $data->getRestaurantThumbnailImageUrl() );
+                    return Html::img($data->getRestaurantThumbnailImageUrl());
                 },
             ],
             [
@@ -119,5 +120,31 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ])
     ?>
+
+
+    <h2>Theme color</h2>
+
+    <div class="card">
+
+        <?=
+        GridView::widget([
+            'dataProvider' => $storeThemeColors,
+            'columns' => [
+                'primary',
+                'secondary',
+                'tertiary',
+                'light',
+                'medium',
+                'dark',
+            ],
+            'layout' => '{summary}<div class="card-body">{items}{pager}</div>',
+            'tableOptions' => ['class' => 'table table-bordered table-hover'],
+            'summaryOptions' => ['class' => "card-header"],
+        ]);
+        ?>
+
+    </div>
+
+
 
 </div>
