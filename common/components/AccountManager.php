@@ -33,7 +33,7 @@ class AccountManager  extends BaseObject
     {
         // This component must only be usable if agent is logged in
         if(Yii::$app->user->isGuest){
-    return Yii::$app->getResponse()->redirect(array(Url::to(['site/login'])));
+            throw new \yii\web\BadRequestHttpException('ILLEGAL USAGE OF ACCOUNT OWNERSHIP MANAGER');
         }
 
 //        // Getting a list of Restaurants this agent manages
