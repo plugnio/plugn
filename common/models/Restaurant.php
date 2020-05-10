@@ -68,14 +68,14 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['name', 'support_delivery', 'support_pick_up', 'restaurant_payments_method','restaurant_domain','restaurant_email'], 'required', 'on' => 'create'],
+            [['name', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_domain', 'restaurant_email'], 'required', 'on' => 'create'],
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['restaurant_status', 'support_delivery', 'support_pick_up'], 'integer', 'min' => 0],
             ['restaurant_status', 'in', 'range' => [self::RESTAURANT_STATUS_OPEN, self::RESTAURANT_STATUS_BUSY, self::RESTAURANT_STATUS_CLOSE]],
             [['restaurant_created_at', 'restaurant_updated_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
-            [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo','restaurant_domain','armada_api_key'], 'string', 'max' => 255],
+            [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'armada_api_key'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 8, 'max' => 8],
             [['phone_number'], 'integer', 'min' => 0],
             [['restaurant_email_notification'], 'integer'],
@@ -185,14 +185,14 @@ class Restaurant extends \yii\db\ActiveRecord {
     /**
      * Return Restaurant's logo url
      */
-    public function getRestaurantLogoUrl(){
+    public function getRestaurantLogoUrl() {
         return 'https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/' . $this->restaurant_uuid . "/logo/" . $this->logo;
     }
 
     /**
      * Return Restaurant's thumbnail image url
      */
-    public function getRestaurantThumbnailImageUrl(){
+    public function getRestaurantThumbnailImageUrl() {
         return 'https://res.cloudinary.com/plugn/image/upload/c_scale,w_600/restaurants/' . $this->restaurant_uuid . "/thumbnail-image/" . $this->thumbnail_image;
     }
 
@@ -211,12 +211,18 @@ class Restaurant extends \yii\db\ActiveRecord {
                     ]
             );
 
+            //Delete old store's logo
+            if ($this->logo) {
+                $this->deleteRestaurantLogo();
+            }
+
+
             if ($result || count($result) > 0) {
                 $this->logo = basename($result['url']);
                 $this->save();
             }
         } catch (\Cloudinary\Error $err) {
-            Yii::error('Error when uploading venue photos to Cloudinry: ' . json_encode($err));
+            Yii::error("Error when uploading logo photos to Cloudinry: " . json_encode($err));
         }
     }
 
@@ -235,60 +241,66 @@ class Restaurant extends \yii\db\ActiveRecord {
                     ]
             );
 
+
+
+            //Delete old store's ThumbnailImage
+            if ($this->thumbnail_image) {
+                $this->deleteRestaurantThumbnailImage();
+            }
+
             if ($result || count($result) > 0) {
                 $this->thumbnail_image = basename($result['url']);
                 $this->save();
             }
         } catch (\Cloudinary\Error $err) {
-            Yii::error('Error when uploading venue photos to Cloudinry: ' . json_encode($err));
+            Yii::error("Error when uploading thumbnail photos to Cloudinry: " . json_encode($err));
         }
     }
 
-        /**
+    /**
      * @inheritdoc
      */
     public function fields() {
         $fields = parent::fields();
 
         // remove fields that contain sensitive information
-        unset( $fields['restaurant_domain']);
-        unset( $fields['vendor_sector']);
-        unset( $fields['business_id']);
-        unset( $fields['business_entity_id']);
-        unset( $fields['wallet_id']);
-        unset( $fields['merchant_id']);
-        unset( $fields['operator_id']);
-        unset( $fields['live_api_key']);
-        unset( $fields['test_api_key']);
-        unset( $fields['business_type']);
-        unset( $fields['restaurant_email']);
-        unset( $fields['license_number']);
-        unset( $fields['document_issuing_country']);
-        unset( $fields['document_issuing_date']);
-        unset( $fields['not_for_profit']);
-        unset( $fields['document_issuing_date']);
-        unset( $fields['document_expiry_date']);
-        unset( $fields['document_title']);
-        unset( $fields['document_file']);
-        unset( $fields['document_file_id']);
-        unset( $fields['document_file_purpose']);
-        unset( $fields['iban']);
-        unset( $fields['owner_first_name']);
-        unset( $fields['owner_last_name']);
-        unset( $fields['owner_email']);
-        unset( $fields['owner_customer_number']);
-        unset( $fields['identification_issuing_country']);
-        unset( $fields['identification_issuing_date']);
-        unset( $fields['identification_expiry_date']);
-        unset( $fields['identification_file']);
-        unset( $fields['identification_file_id']);
-        unset( $fields['identification_title']);
-        unset( $fields['identification_file_purpose']);
-        unset( $fields['restaurant_created_at']);
-        unset( $fields['restaurant_updated_at']);
+        unset($fields['restaurant_domain']);
+        unset($fields['vendor_sector']);
+        unset($fields['business_id']);
+        unset($fields['business_entity_id']);
+        unset($fields['wallet_id']);
+        unset($fields['merchant_id']);
+        unset($fields['operator_id']);
+        unset($fields['live_api_key']);
+        unset($fields['test_api_key']);
+        unset($fields['business_type']);
+        unset($fields['restaurant_email']);
+        unset($fields['license_number']);
+        unset($fields['document_issuing_country']);
+        unset($fields['document_issuing_date']);
+        unset($fields['not_for_profit']);
+        unset($fields['document_issuing_date']);
+        unset($fields['document_expiry_date']);
+        unset($fields['document_title']);
+        unset($fields['document_file']);
+        unset($fields['document_file_id']);
+        unset($fields['document_file_purpose']);
+        unset($fields['iban']);
+        unset($fields['owner_first_name']);
+        unset($fields['owner_last_name']);
+        unset($fields['owner_email']);
+        unset($fields['owner_customer_number']);
+        unset($fields['identification_issuing_country']);
+        unset($fields['identification_issuing_date']);
+        unset($fields['identification_expiry_date']);
+        unset($fields['identification_file']);
+        unset($fields['identification_file_id']);
+        unset($fields['identification_title']);
+        unset($fields['identification_file_purpose']);
+        unset($fields['restaurant_created_at']);
+        unset($fields['restaurant_updated_at']);
 
         return $fields;
-
     }
 
     /**
@@ -311,7 +323,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             }
         }
 
-        if($insert){
+        if ($insert) {
             $restaurant_theme = new RestaurantTheme();
             $restaurant_theme->restaurant_uuid = $this->restaurant_uuid;
             $restaurant_theme->save();
@@ -362,13 +374,12 @@ class Restaurant extends \yii\db\ActiveRecord {
         if (!$logo)
             $logo = $this->logo;
 
-        $restaurantName = str_replace(' ', '', $this->name);
-        $imageURL = "restaurants/" . $restaurantName . "/logo/" . $logo;
+        $imageURL = "restaurants/" . $this->restaurant_uuid . "/logo/" . $logo;
 
         try {
             Yii::$app->cloudinaryManager->delete($imageURL);
         } catch (\Cloudinary\Error $err) {
-            Yii::error('Error when uploading logo photos to Cloudinry: ' . json_encode($err));
+            Yii::error('Error while deleting logo photos to Cloudinry: ' . json_encode($err));
         }
     }
 
@@ -380,27 +391,21 @@ class Restaurant extends \yii\db\ActiveRecord {
         if (!$thumbnail_image)
             $thumbnail_image = $this->thumbnail_image;
 
-        $restaurantName = str_replace(' ', '', $this->name);
-        $imageURL = "restaurants/" . $restaurantName . "/thumbnail-image/" . $thumbnail_image;
+        $imageURL = "restaurants/" . $this->restaurant_uuid . "/thumbnail-image/" . $thumbnail_image;
 
         try {
             Yii::$app->cloudinaryManager->delete($imageURL);
         } catch (\Cloudinary\Error $err) {
-            Yii::error('Error when uploading thumbnail image to Cloudinry: ' . json_encode($err));
+            Yii::error('Error while deleting thumbnail image to Cloudinry: ' . json_encode($err));
         }
     }
 
     public function beforeDelete() {
 
-
-        if (!parent::beforeDelete()) {
-            return false;
-        }
-
         $this->deleteRestaurantThumbnailImage();
         $this->deleteRestaurantLogo();
 
-        return true;
+        return parent::beforeDelete();
     }
 
     /**
@@ -554,8 +559,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRefunds()
-    {
+    public function getRefunds() {
         return $this->hasMany(Refund::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
@@ -564,8 +568,8 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantTheme()
-    {
+    public function getRestaurantTheme() {
         return $this->hasOne(RestaurantTheme::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
 }

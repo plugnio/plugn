@@ -151,11 +151,12 @@ class Restaurant extends \common\models\Restaurant {
                     $this[$attribute] = basename($result['url']);
                 }
             } catch (\Cloudinary\Error $err) {
-                Yii::error('Error when uploading venue photos to Cloudinry: ' . json_encode($err));
+                Yii::error('Error when uploading restaurant document to Cloudinary: ' . json_encode($err));
             }
         }
     }
 
+    
     /**
      * Processes a file upload
      * @param UploadedFile $file instance of yii\web\UploadedFile that will be uploaded into the attribute

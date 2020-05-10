@@ -47,9 +47,9 @@ class Item extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['item_name', 'items_category'], 'required', 'on' => 'create'],
-            [['item_name','item_name_ar', 'item_price'], 'required'],
-            [['sort_number', 'stock_qty'], 'integer' , 'min'=> 0],
-            [['item_price'], 'number', 'min'=> 0],
+            [['item_name', 'item_name_ar', 'item_price'], 'required'],
+            [['sort_number', 'stock_qty'], 'integer', 'min' => 0],
+            [['item_price'], 'number', 'min' => 0],
             [['image'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['item_created_at', 'item_updated_at', 'items_category'], 'safe'],
             [['item_uuid'], 'string', 'max' => 300],
@@ -125,9 +125,8 @@ class Item extends \yii\db\ActiveRecord {
      */
     public function decreaseStockQty($qty) {
         $this->stock_qty -= $qty;
-       $this->save(false);
+        $this->save(false);
     }
-
 
     /**
      * @param type $insert
@@ -141,7 +140,6 @@ class Item extends \yii\db\ActiveRecord {
                 $this->deleteItemImage($changedAttributes['item_image']);
             }
         }
-
     }
 
     /**
@@ -160,13 +158,13 @@ class Item extends \yii\db\ActiveRecord {
     }
 
     /**
-     * Upload item image  to cloudinary
+     * Upload item image  to Cloudinary
      * @param type $imageURL
      */
     public function uploadItemImage($imageURL) {
 
         $filename = Yii::$app->security->generateRandomString();
-//        $restaurantName = str_replace(' ', '', $this->restaurant->name);
+
         $itemName = str_replace(' ', '', $this->item_name);
 
         try {
@@ -176,14 +174,22 @@ class Item extends \yii\db\ActiveRecord {
                     ]
             );
 
+            //Delete old item's image
+            if ($this->item_image) {
+                $this->deleteItemImage();
+            }
+
+
+
             if ($result || count($result) > 0) {
                 $this->item_image = basename($result['url']);
                 $this->save();
             }
         } catch (\Cloudinary\Error $err) {
-            Yii::error('Error when uploading venue photos to Cloudinry: ' . json_encode($err));
+            Yii::error("Error when uploading item's image to Cloudinry: " . json_encode($err));
         }
     }
+
 
     /**
      * Return item image url to dispaly it on backend
@@ -211,30 +217,25 @@ class Item extends \yii\db\ActiveRecord {
         if (!$item_image)
             $item_image = $this->item_image;
 
-        $restaurantName = str_replace(' ', '', $this->restaurant->name);
-        $imageURL = "restaurants/" . $restaurantName . "/items/" . $item_image;
+        $imageURL = "restaurants/" . $this->restaurant->restaurant_uuid . "/items/" . $item_image;
 
         try {
-            Yii::$app->cloudinaryManager->delete($imageURL);
+         
+           Yii::$app->cloudinaryManager->delete($imageURL);
+ 
         } catch (\Cloudinary\Error $err) {
-            Yii::error('Error when uploading item image to Cloudinry: ' . json_encode($err));
+            Yii::error('Error while deleting item image to Cloudinry: ' . json_encode($err));
         }
     }
 
-    /**
-     *
-     * @return boolean
-     */
     public function beforeDelete() {
 
-
-        if (!parent::beforeDelete()) {
-            return false;
+        //Delete item's image
+        if ($this->item_image) {
+            $this->deleteItemImage();
         }
 
-        $this->deleteItemImage();
-
-        return true;
+        return parent::beforeDelete();
     }
 
     /**
@@ -272,6 +273,7 @@ class Item extends \yii\db\ActiveRecord {
     public function getOptions() {
         return $this->hasMany(Option::className(), ['item_uuid' => 'item_uuid']);
     }
+
     /**
      * Gets query for [[Options]].
      *
