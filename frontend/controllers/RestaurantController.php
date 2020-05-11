@@ -66,6 +66,9 @@ class RestaurantController extends Controller {
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
 
+            if(!$model->phone_number)
+                $model->phone_number_display = Restaurant::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER;
+            
             if ($model->save()) {
 
                 $thumbnail_image = \yii\web\UploadedFile::getInstances($model, 'restaurant_thumbnail_image');

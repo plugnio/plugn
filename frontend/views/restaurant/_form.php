@@ -13,16 +13,18 @@ use common\models\PaymentMethod;
 use kartik\file\FileInput;
 
 $js = "
-let supportPickupInput = $('#supportPickupInput');
+let phoneNumberInput = $('#phoneNumberInput');
 
-supportPickupInput.change(function(){
+phoneNumberInput.change(function(){
+     
     let selection = $(this).val();
-    if(selection == 0){ // Dont support pickup
-        $('#minPickupTime').hide();
-    }else{ // Reward based
-        $('#minPickupTime').show();
+    if(selection.length == 8){ 
+      $('#phoneNumberDisplay').show();
+    }else{ 
+        $('#phoneNumberDisplay').hide();
     }
 });
+
 
 
 $(function () {
@@ -216,10 +218,14 @@ $this->registerJs($js);
     );
     ?>
 
+    
 
+    <?= $form->field($model, 'phone_number')->input('number',['id' => 'phoneNumberInput']) ?>
 
-    <?= $form->field($model, 'phone_number')->input('number') ?>
-
+    <div id="phoneNumberDisplay" <?= $model->phone_number ? "style = display:block " : "style = display:none "?> >
+            <?= $form->field($model, 'phone_number_display')->radioList([2=>'📞',3=>'+965 12345678',1=>'Dont show phone number button'],['style'=>'display:grid']); ?>    
+    </div>
+    
     <?= $form->field($model, 'restaurant_email')->input('email') ?>
 
     <?=

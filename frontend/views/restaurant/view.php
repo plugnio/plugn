@@ -75,7 +75,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         },
                         'format' => 'raw'
                     ],
-                    'phone_number',
+                    [
+                        'attribute' => 'phone_number',
+                        'format' => 'html',
+                        'value' => function ($data) {
+                            return $data->phone_number;
+                        },
+                        'visible' => $model->phone_number != null,
+                    ],
                     'restaurant_email:email',
                     [
                         'attribute' => 'armada_api_key',
