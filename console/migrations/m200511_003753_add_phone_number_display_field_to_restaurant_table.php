@@ -12,7 +12,7 @@ class m200511_003753_add_phone_number_display_field_to_restaurant_table extends 
      */
     public function safeUp()
     {
-        $this->addColumn('restaurant', 'phone_number_display', $this->smallInteger()->defaultValue(1));
+        $this->addColumn('restaurant', 'phone_number_display', $this->smallInteger()->defaultValue(3));
     }
 
     /**
