@@ -12,7 +12,7 @@ use yii\helpers\Html;
     <h2>New Agent has signed up</h2>
 
     <p class="lead">
-        Company Name: <?= $student->student_firstname ?> <?= $model->company_name ?> <br/>
+        Company Name: <?= $model->company_name ?> <br/>
         Agent Name: <?= $model->name ?> <br/>
         Agent Phone: <?= $model->phone ?> <br/>
         Agent Email: <?= $model->email ?> <br/>
