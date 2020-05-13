@@ -94,7 +94,7 @@ class RestaurantController extends Controller {
                 'tagline' => $restaurant->tagline,
                 'restaurant_domain' => $restaurant->restaurant_domain,
                 'custom_css' => $restaurant->custom_css,
-                'theme_color '=> $themeColor->primary,
+                'theme_color'=> $themeColor->primary,
             ];
         } else {
             return [
