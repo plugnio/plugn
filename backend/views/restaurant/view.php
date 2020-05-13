@@ -117,6 +117,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'operator_id',
             'live_api_key',
             'test_api_key',
+            'store_branch_name',
+            'custom_css:text',
         ],
     ])
     ?>

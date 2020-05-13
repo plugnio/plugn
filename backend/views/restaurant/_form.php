@@ -166,6 +166,10 @@ $this->registerJs($js);
     <?= $form->field($model, 'live_api_key')->textInput() ?>
     
     <?= $form->field($model, 'test_api_key')->textInput() ?>
+    
+    <?= $form->field($model, 'store_branch_name')->textInput() ?>
+    
+    <?= $form->field($model, 'custom_css')->textarea(['rows' => '12']) ?>
 
 
     <div class="form-group">

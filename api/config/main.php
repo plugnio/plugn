@@ -61,8 +61,10 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET branches/<id>' => 'list-all-restaurants-branches',
+                        'GET get-restaurant-data/<branch_name>' => 'get-restaurant-data',
                         // OPTIONS VERBS
                         'OPTIONS branches/<id>' => 'options',
+                        'OPTIONS get-restaurant-data/<branch_name>' => 'options',
                     ]
                 ],
                 [// RestaurantDeliveryController

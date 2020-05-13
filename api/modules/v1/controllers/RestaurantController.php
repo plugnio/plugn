@@ -7,6 +7,8 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use common\models\City;
 use common\models\RestaurantBranch;
+use common\models\Restaurant;
+use common\models\RestaurantTheme;
 
 class RestaurantController extends Controller {
 
@@ -65,6 +67,39 @@ class RestaurantController extends Controller {
             return [
                 'operation' => 'error',
                 'message' => 'Store Uuid is invalid'
+            ];
+        }
+    }
+
+    /**
+     * Return Restaurant's data
+     */
+    public function actionGetRestaurantData($branch_name) {
+
+        $restaurant = Restaurant::find()
+                ->select(['restaurant_uuid', 'name', 'logo', 'tagline', 'restaurant_domain','custom_css'])
+                ->where(['store_branch_name' => $branch_name])
+                ->one();
+
+        $themeColor = RestaurantTheme::find()
+                ->select(['primary'])
+                ->where(['restaurant_uuid' => $restaurant->restaurant_uuid])
+                ->one();
+
+        if ($restaurant && $themeColor) {
+            return [
+                'restaurant_uuid' => $restaurant->restaurant_uuid,
+                'name' => $restaurant->name,
+                'logo' => $restaurant->logo,
+                'tagline' => $restaurant->tagline,
+                'restaurant_domain' => $restaurant->restaurant_domain,
+                'custom_css' => $restaurant->custom_css,
+                'theme_color '=> $themeColor->primary,
+            ];
+        } else {
+            return [
+                'operation' => 'error',
+                'message' => 'Branch name is invalid'
             ];
         }
     }
