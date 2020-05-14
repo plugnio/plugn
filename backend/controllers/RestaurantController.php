@@ -64,7 +64,7 @@ class RestaurantController extends Controller {
     public function actionView($id) {
 
         $model = $this->findModel($id);
-        
+
         // Store theme color
         $storeThemeColors = new \yii\data\ActiveDataProvider([
             'query' => $model->getRestaurantTheme()
@@ -128,14 +128,17 @@ class RestaurantController extends Controller {
             if ($model->restaurant_payments_method)
                 $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
 
-            $thumbnail_image = UploadedFile::getInstances($model, 'thumbnail_image');
-            $logo = UploadedFile::getInstances($model, 'logo');
+
+            $thumbnail_image = UploadedFile::getInstances($model, 'restaurant_thumbnail_image');
+
+            $logo = UploadedFile::getInstances($model, 'restaurant_logo');
 
             if ($thumbnail_image)
                 $model->uploadThumbnailImage($thumbnail_image[0]->tempName);
 
             if ($logo)
                 $model->uploadLogo($logo[0]->tempName);
+
 
             return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
         }
