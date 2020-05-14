@@ -15,6 +15,8 @@ use yii\filters\AccessControl;
  */
 class CityController extends Controller
 {
+     public $enableCsrfValidation = false;
+     
     /**
      * {@inheritdoc}
      */

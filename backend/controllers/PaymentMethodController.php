@@ -15,7 +15,7 @@ use yii\filters\AccessControl;
  */
 class PaymentMethodController extends Controller
 {
-      public $enableCsrfValidation = false;
+    public $enableCsrfValidation = false;
       
     /**
      * {@inheritdoc}

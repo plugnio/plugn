@@ -14,7 +14,7 @@ use yii\filters\VerbFilter;
  */
 class OrderItemExtraOptionController extends Controller
 {
-      public $enableCsrfValidation = false;
+    public $enableCsrfValidation = false;
       
     /**
      * {@inheritdoc}

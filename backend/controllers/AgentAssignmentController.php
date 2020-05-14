@@ -15,6 +15,8 @@ use common\models\Agent;
  */
 class AgentAssignmentController extends Controller {
 
+     public $enableCsrfValidation = false;
+     
     /**
      * {@inheritdoc}
      */
