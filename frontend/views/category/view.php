@@ -35,6 +35,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     'sort_number',
                     'category_name',
                     'category_name_ar',
+                    'sub_category_name',
+                    'sub_category_name_ar',
                 ],
             'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
             ])

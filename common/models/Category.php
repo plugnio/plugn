@@ -11,6 +11,8 @@ use Yii;
  * @property int $restaurant_uuid
  * @property string|null $category_name
  * @property string|null $category_name_ar
+ * @property string|null $sub_category_name
+ * @property string|null $sub_category_name_ar
  * @property int|null $sort_number
  *
  * @property CategoryItem[] $categoryItems
@@ -32,7 +34,7 @@ class Category extends \yii\db\ActiveRecord {
         return [
             [['sort_number'], 'integer', 'min'=> 0],
             [['restaurant_uuid'], 'string', 'max' => 60],
-            [['category_name', 'category_name_ar'], 'string', 'max' => 255],
+            [['category_name', 'category_name_ar', 'sub_category_name', 'sub_category_name_ar'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
@@ -45,6 +47,8 @@ class Category extends \yii\db\ActiveRecord {
             'category_id' => 'Category ID',
             'category_name' => 'Category Name',
             'category_name_ar' => 'Category Name in Arabic',
+            'sub_category_name' => 'Sub Category Name',
+            'sub_category_name_ar' => 'Sub Category Name in Arabic',
             'sort_number' => 'Sort Number',
             'restaurant_uuid' => 'Restaurant UUID',
         ];
