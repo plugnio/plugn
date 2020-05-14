@@ -222,12 +222,11 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'phone_number')->input('number',['id' => 'phoneNumberInput']) ?>
 
-    <!--<div id="phoneNumberDisplay" <?= $model->phone_number ? "style = display:block " : "style = display:none "?> >-->
-            <?php
-            
-//             $form->field($model, 'phone_number_display')->radioList([2=>'📞',3=>'+965 12345678',1=>'Dont show phone number button'],['style'=>'display:grid']);
+    <div id="phoneNumberDisplay" <?= $model->phone_number ? "style = display:block " : "style = display:none "?> >
+            <?=
+             $form->field($model, 'phone_number_display')->radioList([2=>'📞',3=>'+965 12345678',1=>'Dont show phone number button'],['style'=>'display:grid']);
             ?>    
-    <!--</div>-->
+    </div>
     
     <?= $form->field($model, 'restaurant_email')->input('email') ?>
 
