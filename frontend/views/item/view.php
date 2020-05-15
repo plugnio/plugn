@@ -57,9 +57,9 @@ $this->params['breadcrumbs'][] = $this->title;
                             foreach ($data->categoryItems as $key => $itemCategoryValue) {
 
                                 if ($key == 0)
-                                    $itemCategoryValues .= $itemCategoryValue->category->category_name;
+                                    $itemCategoryValues .= $itemCategoryValue->category->title;
                                 else
-                                    $itemCategoryValues .= ', ' . $itemCategoryValue->category->category_name;
+                                    $itemCategoryValues .= ', ' . $itemCategoryValue->category->title;
                             }
 
                             return $itemCategoryValues;

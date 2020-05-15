@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="page-title"> <i class="icon-custom-left"></i>
     <p>
-        <?= Html::a('Create Category', ['create' , 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Category', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
     </p>
 </div>
 <div class="card">
@@ -26,8 +26,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             'sort_number',
-            'category_name',
-            'category_name_ar',
+            'title',
+            'title_ar',
+            'subtitle',
+            'subtitle_ar',
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template' => ' {view} {update} {delete}',
@@ -42,7 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                     'delete' => function ($url, $model) {
                         return Html::a(
-                                        '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>',  ['delete', 'id' => $model->category_id, 'restaurantUuid' => $model->restaurant_uuid], [
+                                        '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete', 'id' => $model->category_id, 'restaurantUuid' => $model->restaurant_uuid], [
                                     'title' => 'Delete',
                                     'data' => [
                                         'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',

@@ -8,7 +8,7 @@ use yii\widgets\DetailView;
 
 $this->params['restaurant_uuid'] = $restaurantUuid;
 
-$this->title = $model->category_name;
+$this->title = $model->title;
 $this->params['breadcrumbs'][] = ['label' => 'Categories', 'url' => ['index', 'restaurantUuid' => $restaurantUuid]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -33,10 +33,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'model' => $model,
                 'attributes' => [
                     'sort_number',
-                    'category_name',
-                    'category_name_ar',
-                    'sub_category_name',
-                    'sub_category_name_ar',
+                    'title',
+                    'title_ar',
+                    'subtitle',
+                    'subtitle_ar',
                 ],
             'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
             ])

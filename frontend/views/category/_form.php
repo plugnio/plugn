@@ -19,13 +19,13 @@ use yii\widgets\ActiveForm;
     <?= $form->errorSummary($model); ?>
 
 
-    <?= $form->field($model, 'category_name')->textInput(['maxlength' => true,'placeholder' => 'e.g. Meal Deals or Sushi Sets or Soft Drinks']) ?>
+    <?= $form->field($model, 'title')->textInput(['maxlength' => true,'placeholder' => 'e.g. Meal Deals or Sushi Sets or Soft Drinks']) ?>
 
-    <?= $form->field($model, 'category_name_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. Meal Deals or Sushi Sets or Soft Drinks']) ?>
+    <?= $form->field($model, 'title_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. Meal Deals or Sushi Sets or Soft Drinks']) ?>
     
-    <?= $form->field($model, 'sub_category_name')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'subtitle')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'sub_category_name_ar')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'subtitle_ar')->textInput(['maxlength' => true]) ?>
 
         <?= $form->field($model, 'sort_number')->textInput() ?>
 

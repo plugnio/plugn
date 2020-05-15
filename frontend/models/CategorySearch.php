@@ -18,7 +18,7 @@ class CategorySearch extends Category
     {
         return [
             [['category_id', 'sort_number'], 'integer'],
-            [['category_name', 'category_name_ar'], 'safe'],
+            [['title', 'title_ar','subtitle', 'subtitle_ar'], 'safe'],
         ];
     }
 
@@ -63,8 +63,10 @@ class CategorySearch extends Category
             'sort_number' => $this->sort_number,
         ]);
 
-        $query->andFilterWhere(['like', 'category_name', $this->category_name])
-            ->andFilterWhere(['like', 'category_name_ar', $this->category_name_ar]);
+        $query->andFilterWhere(['like', 'title', $this->title])
+            ->andFilterWhere(['like', 'title_ar', $this->title_ar])
+            ->andFilterWhere(['like', 'subtitle', $this->subtitle])
+            ->andFilterWhere(['like', 'subtitle_ar', $this->subtitle_ar]);
 
         return $dataProvider;
     }

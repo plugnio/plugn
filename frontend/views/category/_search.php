@@ -17,9 +17,13 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'category_id') ?>
 
-    <?= $form->field($model, 'category_name') ?>
+    <?= $form->field($model, 'title') ?>
 
-    <?= $form->field($model, 'category_name_ar') ?>
+    <?= $form->field($model, 'title_ar') ?>
+
+    <?= $form->field($model, 'subtitle') ?>
+
+    <?= $form->field($model, 'subtitle_ar') ?>
 
     <?= $form->field($model, 'sort_number') ?>
 
