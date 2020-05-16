@@ -32,48 +32,50 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="card">
         <div class="card-body">
-            <?=
-            DetailView::widget([
-                'model' => $model,
-                'attributes' => [
-                    'item_name',
-                    'item_name_ar',
-                    'item_description',
-                    'item_description_ar',
-                    'sort_number',
-                    'stock_qty',
-                    [
-                        'attribute' => 'Image',
-                        'format' => 'html',
-                        'value' => function ($data) {
-                            return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/" . $data->restaurant->restaurant_uuid . "/items/" . $data->item_image);
-                        },
+            <div class="box-body table-responsive no-padding">
+                <?=
+                DetailView::widget([
+                    'model' => $model,
+                    'attributes' => [
+                        'item_name',
+                        'item_name_ar',
+                        'item_description:html',
+                        'item_description_ar:html',
+                        'sort_number',
+                        'stock_qty',
+                        [
+                            'attribute' => 'Image',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/" . $data->restaurant->restaurant_uuid . "/items/" . $data->item_image);
+                            },
+                        ],
+                        [
+                            'attribute' => 'category_item',
+                            'value' => function ($data) {
+                                $itemCategoryValues = '';
+
+                                foreach ($data->categoryItems as $key => $itemCategoryValue) {
+
+                                    if ($key == 0)
+                                        $itemCategoryValues .= $itemCategoryValue->category->title;
+                                    else
+                                        $itemCategoryValues .= ', ' . $itemCategoryValue->category->title;
+                                }
+
+                                return $itemCategoryValues;
+                            },
+                            'format' => 'raw'
+                        ],
+                        'item_price:currency',
+                        'item_created_at',
+                        'item_updated_at',
                     ],
-                    [
-                        'attribute' => 'category_item',
-                        'value' => function ($data) {
-                            $itemCategoryValues = '';
+                    'options' => ['class' => 'table table-hover text-nowrap  table-bordered'],
+                ])
+                ?>
 
-                            foreach ($data->categoryItems as $key => $itemCategoryValue) {
-
-                                if ($key == 0)
-                                    $itemCategoryValues .= $itemCategoryValue->category->title;
-                                else
-                                    $itemCategoryValues .= ', ' . $itemCategoryValue->category->title;
-                            }
-
-                            return $itemCategoryValues;
-                        },
-                        'format' => 'raw'
-                    ],
-                    'item_price:currency',
-                    'item_created_at',
-                    'item_updated_at',
-                ],
-                'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
-            ])
-            ?>
-
+            </div>
         </div>
     </div>
 
@@ -99,7 +101,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'buttons' => [
                         'view' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['option/view','id' => $model->option_id, 'restaurantUuid'=> $model->item->restaurant_uuid ], [
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['option/view', 'id' => $model->option_id, 'restaurantUuid' => $model->item->restaurant_uuid], [
                                         'title' => 'View',
                                         'data-pjax' => '0',
                                             ]
@@ -107,7 +109,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         },
                         'update' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['option/update','id' => $model->option_id, 'restaurantUuid'=> $model->item->restaurant_uuid ], [
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['option/update', 'id' => $model->option_id, 'restaurantUuid' => $model->item->restaurant_uuid], [
                                         'title' => 'Update',
                                         'data-pjax' => '0',
                                             ]
@@ -115,7 +117,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         },
                         'delete' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['option/delete','id' => $model->option_id, 'restaurantUuid'=> $model->item->restaurant_uuid ], [
+                                            '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['option/delete', 'id' => $model->option_id, 'restaurantUuid' => $model->item->restaurant_uuid], [
                                         'title' => 'Delete',
                                         'data' => [
                                             'confirm' => 'Are you absolutely sure ? You will lose all the information about this option with this action.',
@@ -126,12 +128,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
             ],
-            'layout' => '{summary}<div class="card-body">{items}{pager}</div>',
-            'tableOptions' => ['class' => 'table table-bordered table-hover'],
+            'layout' => '{summary}<div class="card-body"><div class="box-body table-responsive no-padding">{items}{pager}</div></div>',
+            'tableOptions' => ['class' => 'table  table-bordered  table-responsive table-hover'],
             'summaryOptions' => ['class' => "card-header"],
         ]);
         ?>
-
+            
     </div>
 
 </div>

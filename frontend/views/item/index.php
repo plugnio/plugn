@@ -25,7 +25,7 @@ $this->registerCss($css);
 
 <div class="page-title"> <i class="icon-custom-left"></i>
     <p>
-        <?= Html::a('Create Item', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Add Item', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
 
     </p>
 </div>
@@ -85,7 +85,7 @@ $this->registerCss($css);
             ],
         ],
         'layout' => '{summary}<div class="card-body">{items}<div class="card-footer clearfix">{pager}</div>',
-        'tableOptions' => ['class' => 'table table-bordered table-hover'],
+        'tableOptions' => ['class' => 'table table-responsive table-bordered table-responsive table-hover'],
         'summaryOptions' => ['class' => "card-header"],
     ]);
     ?>

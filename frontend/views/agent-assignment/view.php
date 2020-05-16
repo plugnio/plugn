@@ -36,24 +36,26 @@ $this->params['breadcrumbs'][] = $this->title;
     </p>
     <div class="card">
         <div class="card-body">
-            <?=
-            DetailView::widget([
-                'model' => $model,
-                'attributes' => [
-                    [
-                        'attribute' => 'role',
-                        'format' => 'html',
-                        'value' => function ($data) {
-                            return $data->role == AgentAssignment::AGENT_ROLE_OWNER ? 'Owner' : 'Staff';
-                        },
+            <div class="box-body table-responsive no-padding">
+                <?=
+                DetailView::widget([
+                    'model' => $model,
+                    'attributes' => [
+                        [
+                            'attribute' => 'role',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return $data->role == AgentAssignment::AGENT_ROLE_OWNER ? 'Owner' : 'Staff';
+                            },
+                        ],
+                        'assignment_agent_email:email',
+                        'assignment_created_at',
+                        'assignment_updated_at',
                     ],
-                    'assignment_agent_email:email',
-                    'assignment_created_at',
-                    'assignment_updated_at',
-                ],
-                'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
-            ])
-            ?>
+                    'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
+                ])
+                ?>
+            </div>
         </div>
     </div>
 

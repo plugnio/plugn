@@ -36,7 +36,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
     <body class="hold-transition sidebar-mini layout-fixed">
         <?php $this->beginBody() ?>
 
-        <div class="wrap">
+        <div class="wrap" style="background: #f4f6f9;    padding: 0 0 0px;">
 
             <!-- Navbar -->
             <nav class="main-header navbar navbar-expand navbar-white navbar-light">

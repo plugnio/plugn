@@ -74,8 +74,6 @@ if ($dataProvider) { ?>
                                     ]);
                                     ?>
                                     <tr>
-                                        <td>  
-                                        </td>
                                         <td style="vertical-align: inherit;">
                                             <?= $restaurantDeliveryArea->area->area_name ?></td>
                                         <td>

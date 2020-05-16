@@ -8,12 +8,16 @@ use backend\models\ItemSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use common\models\Option;
+use common\models\ExtraOption;
+use wbraganca\dynamicform\DynamicFormWidget;
+use frontend\base\Model;
 
 /**
  * ItemController implements the CRUD actions for Item model.
  */
 class ItemController extends Controller {
-    
+
     public $enableCsrfValidation = false;
 
     /**
@@ -38,19 +42,18 @@ class ItemController extends Controller {
             ],
         ];
     }
-    
-    
+
     /**
      * Lists all Item models.
      * @return mixed
      */
     public function actionIndex($restaurantUuid) {
-        
+
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
         $searchModel = new ItemSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
-        
+
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
@@ -86,34 +89,113 @@ class ItemController extends Controller {
      * @return mixed
      */
     public function actionCreate($restaurantUuid) {
-        
+
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
-        $model = new Item();
-        
-        $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
-        
-        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
 
-            if ($model->save()) {
+        $modelItem = new Item;
+        $modelItem->restaurant_uuid = $restaurant_model->restaurant_uuid;
 
-            Yii::info("[" . $model->restaurant->name . ": " . $model->item_name . " has been added  " . '] ' . $model->restaurant->restaurant_domain . '/product/' . $model->item_uuid, __METHOD__);
+        $modelsOption = [new Option];
+        $modelsExtraOption = [[new ExtraOption]];
 
-            $image = \yii\web\UploadedFile::getInstances($model, 'image');
+        if ($modelItem->load(Yii::$app->request->post())) {
+            
+       
+            $modelsOption = Model::createMultiple(Option::classname());
+            Model::loadMultiple($modelsOption, Yii::$app->request->post());
+            // validate item and Options models
+            $valid = $modelItem->validate();
+            $valid = Model::validateMultiple($modelsOption) && $valid;
 
-                if ($image)
-                    $model->uploadItemImage($image[0]->tempName);
 
-                if ($model->items_category)
-                    $model->saveItemsCategory($model->items_category);
 
-                return $this->redirect(['view', 'id' => $model->item_uuid, 'restaurantUuid' => $restaurantUuid]);
+            if (isset($_POST['ExtraOption'][0][0])) {
+
+                foreach ($_POST['ExtraOption'] as $indexOption => $extraOptions) {
+                    foreach ($extraOptions as $indexExtraOption => $extraOption) {
+                        $modelExtraOption = new ExtraOption;
+                        $modelExtraOption->extra_option_name = $extraOption['extra_option_name'];
+                        $modelExtraOption->extra_option_name_ar = $extraOption['extra_option_name'];
+                        $modelExtraOption->extra_option_price = 2;
+                        $modelsExtraOption[$indexOption][$indexExtraOption] = $modelExtraOption;
+                        $valid = $modelExtraOption->validate();
+                    }
+                }  
+
+            }
+            if ($valid) {
+                $transaction = Yii::$app->db->beginTransaction();
+                try {
+                    if ($flag = $modelItem->save(false)) {
+                        foreach ($modelsOption as $indexOption => $modelOption) {
+
+                            if ($flag === false) {
+                                break;
+                            }
+
+                            $modelOption->item_uuid = $modelItem->item_uuid;
+                            $modelOption->option_name = $modelOption->option_name;
+                            $modelOption->option_name_ar = $modelOption->option_name_ar;
+                            $modelOption->max_qty = $modelOption->max_qty;
+                            $modelOption->min_qty = $modelOption->min_qty;
+
+                            if (!($flag = $modelOption->save(false))) {
+                                break;
+                            }
+
+                            if (isset($modelsExtraOption[$indexOption]) && is_array($modelsExtraOption[$indexOption])) {
+                                foreach ($modelsExtraOption[$indexOption] as $indexExtraOption => $modelExtraOption) {
+                                    $modelExtraOption->option_id = $modelOption->option_id;
+                                    if (!($flag = $modelExtraOption->save(false))) {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if ($flag) {
+                        $transaction->commit();
+                        return $this->redirect(['view', 'id' => $modelItem->item_uuid, 'restaurantUuid' => $restaurantUuid]);
+                    } else {
+                        $transaction->rollBack();
+                    }
+                } catch (Exception $e) {
+                    $transaction->rollBack();
+                }
             }
         }
-        
+
         return $this->render('create', [
-                    'model' => $model,
+                    'model' => $modelItem,
+                    'modelsOption' => (empty($modelsOption)) ? [new Option] : $modelsOption,
+                    'modelsExtraOption' => (empty($modelsExtraOption)) ? [[new ExtraOption]] : $modelsExtraOption,
                     'restaurantUuid' => $restaurant_model->restaurant_uuid
         ]);
+
+//        
+//        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
+//
+//            if ($model->save()) {
+//
+//            Yii::info("[" . $model->restaurant->name . ": " . $model->item_name . " has been added  " . '] ' . $model->restaurant->restaurant_domain . '/product/' . $model->item_uuid, __METHOD__);
+//
+//            $image = \yii\web\UploadedFile::getInstances($model, 'image');
+//
+//                if ($image)
+//                    $model->uploadItemImage($image[0]->tempName);
+//
+//                if ($model->items_category)
+//                    $model->saveItemsCategory($model->items_category);
+//
+//                return $this->redirect(['view', 'id' => $model->item_uuid, 'restaurantUuid' => $restaurantUuid]);
+//            }
+//        }
+//        
+//        return $this->render('create', [
+//                    'model' => $model,
+//                    'restaurantUuid' => $restaurant_model->restaurant_uuid
+//        ]);
     }
 
     /**
@@ -124,7 +206,7 @@ class ItemController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($id, $restaurantUuid) {
-        
+
         $model = $this->findModel($id, $restaurantUuid);
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
@@ -161,7 +243,7 @@ class ItemController extends Controller {
     public function actionDelete($id, $restaurantUuid) {
         $this->findModel($id, $restaurantUuid)->delete();
 
-        return $this->redirect(['index','restaurantUuid' => $restaurantUuid]);
+        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
     }
 
     /**
@@ -171,7 +253,7 @@ class ItemController extends Controller {
      * @return Item the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id , $restaurantUuid) {
+    protected function findModel($id, $restaurantUuid) {
         if (($model = Item::find()->where(['item_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
             return $model;
         }

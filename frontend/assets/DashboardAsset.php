@@ -13,6 +13,7 @@ class DashboardAsset extends AssetBundle {
     public $baseUrl = '@web';
     public $css = [
         'css/site.css',
+        'css/fileinput.css',
         'plugins/datatables-bs4/css/dataTables.bootstrap4.css',
         'plugins/icheck-bootstrap/icheck-bootstrap.min.css',
         'plugins/overlayScrollbars/css/OverlayScrollbars.min.css',
@@ -24,6 +25,7 @@ class DashboardAsset extends AssetBundle {
         'plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css',
         'css/select2.min.css',
         'css/select2.css',
+        'plugins/summernote/summernote-bs4.css',
         'css/select2-bootstrap4.min.css',
         'plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css',
         'dist/css/adminlte.min.css',
@@ -39,6 +41,7 @@ class DashboardAsset extends AssetBundle {
         'plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js',
         'plugins/moment/moment.min.js',
 //        'plugins/datatables-bs4/js/dataTables.bootstrap4.js',
+        'plugins/summernote/summernote-bs4.min.js',
         'plugins/inputmask/min/jquery.inputmask.bundle.min.js',
         'plugins/daterangepicker/daterangepicker.js',
         'plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js',

@@ -7,7 +7,7 @@ use yii\helpers\Html;
 
 $this->params['restaurant_uuid'] = $restaurantUuid;
 
-$this->title = 'Create Item';
+$this->title = 'Add Item';
 $this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['index', 'restaurantUuid' => $restaurantUuid]];
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -17,7 +17,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?=
     $this->render('_form', [
-        'model' => $model,
+                  'model' => $model,
+                    'modelsOption' => (empty($modelsOption)) ? [new Option] : $modelsOption,
+                    'modelsExtraOption' => (empty($modelsExtraOption)) ? [[new ExtraOption]] : $modelsExtraOption,
+                    'restaurantUuid' => $restaurantUuid
     ])
     ?>
 

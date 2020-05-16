@@ -68,8 +68,8 @@ class Item extends \yii\db\ActiveRecord {
         return [
             'item_uuid' => 'Item Uuid',
             'restaurant_uuid' => 'Restaurant Uuid',
-            'item_name' => 'Item Name',
-            'item_name_ar' => 'Item Name Ar',
+            'item_name' => 'Title',
+            'item_name_ar' => 'Title in Arabic',
             'item_description' => 'Item Description',
             'item_description_ar' => 'Item Description in Arabic',
             'sort_number' => 'Sort Number',

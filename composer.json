@@ -26,6 +26,7 @@
         "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
         "openbuildings/swiftmailer-css-inliner": "*",
         "kartik-v/yii2-widget-fileinput": "dev-master",
+        "wbraganca/yii2-dynamicform": "dev-master",
         "2amigos/yii2-twilio-component": "^1.0",
         "almasaeed2010/adminlte": "~3.0",
         "yiisoft/yii2-shell": "^2.0",
