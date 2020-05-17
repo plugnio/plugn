@@ -206,8 +206,8 @@ use common\models\Option;
                                         echo Html::activeHiddenInput($modelOption, "[{$indexOption}]option_id");
                                     }
                                     ?>
-                                    <?= $form->field($modelOption, "[{$indexOption}]option_name")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'Option name in English']) ?>
-                                    <?= $form->field($modelOption, "[{$indexOption}]option_name_ar")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'Option name in Arabic']) ?>
+                                    <?= $form->field($modelOption, "[{$indexOption}]option_name")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'e.g. Color']) ?>
+                                    <?= $form->field($modelOption, "[{$indexOption}]option_name_ar")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'على سبيل المثال اللون']) ?>
                                     <?= $form->field($modelOption, "[{$indexOption}]min_qty")->label(false)->textInput(['type' => 'number', 'maxlength' => true, 'placeholder' => 'Minimum']) ?>
                                     <?= $form->field($modelOption, "[{$indexOption}]max_qty")->label(false)->textInput(['type' => 'number', 'maxlength' => true, 'placeholder' => 'Maximum']) ?>
                                 </td>
