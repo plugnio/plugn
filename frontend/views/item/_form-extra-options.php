@@ -10,7 +10,6 @@ use wbraganca\dynamicform\DynamicFormWidget;
     'widgetContainer' => 'dynamicform_inner',
     'widgetBody' => '.container-extra-options',
     'widgetItem' => '.extra-option',
-    'limit' => 4,
     'min' => 1,
     'insertButton' => '.add-extra-option',
     'deleteButton' => '.remove-extra-option',
