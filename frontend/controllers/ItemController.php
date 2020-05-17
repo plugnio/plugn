@@ -248,7 +248,7 @@ class ItemController extends Controller {
                 try {
                     if ($flag = $modelItem->save(false)) {
 
-                        Yii::info("[" . $modelItem->restaurant->name . ": " . $modelItem->item_name . " has been added  " . '] ' . $modelItem->restaurant->restaurant_domain . '/product/' . $modelItem->item_uuid, __METHOD__);
+                        Yii::info("[" . $modelItem->restaurant->name . ": " . $modelItem->item_name . " has been updated  " . '] ' . $modelItem->restaurant->restaurant_domain . '/product/' . $modelItem->item_uuid, __METHOD__);
 
                         if (!empty($deletedExtraOptionsIDs)) {
                             ExtraOption::deleteAll(['extra_option_id' => array_values($deletedExtraOptionsIDs)]);
