@@ -14,65 +14,38 @@ use common\models\Option;
 /* @var $this yii\web\View */
 /* @var $model common\models\Item */
 /* @var $form yii\widgets\ActiveForm */
-
-
-$js = "
-
-  $(function () {
-    // Summernote
-    $('.textarea').summernote()
-  })
-
-$(function () {
-
-    $('#item-image').change(function () {
-        filePreview(this);
-    });
-
-
-    //Initialize Select2 Elements
-    $('.select2').select2()
-
-
-    $('.select2').select2({
-        placeholder: 'e.g. Burger, Summer collection'
-    });
-
-
-    //Initialize Select2 Elements
-    $('.select2bs4').select2({
-      theme: 'bootstrap4'
-    })
-  })
-
-    $(document).ready(function () {
-      bsCustomFileInput.init();
-    });
-
-";
-
-
-
-
-
-$this->registerJs($js);
 ?>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
 <script>
+
+
+
+
     function filePreview(input) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();
             reader.onload = function (e) {
                 $('#uploadForm + img').remove();
-                $('#uploadForm').after('<img style="margin-left: auto; margin-right: auto; display: block;" src="' + e.target.result + '" width="500" height="300"/>');
+                $('#uploadForm').after('<img style="margin-left: auto; margin-right: auto; display: block;" src="' + e.target.result + '" width="100%" height="300"/>');
                 $('.file-drop-zone').css('display', 'none');
-
+                $('.file-preview').css('width', '40%');
             };
             reader.readAsDataURL(input.files[0]);
         }
     }
+
+    $(document).ready(function () {
+
+        if ("<?= $modelItem->getItemImage(); ?>") {
+            $('#uploadForm + img').remove();
+            $('#uploadForm').after('<img style="margin-left: auto; margin-right: auto; display: block;" src="<?= $modelItem->getItemImage(); ?>" width="100%" height="300"/>');
+            $('.file-drop-zone').css('display', 'none');
+            $('.file-preview').css('width', '40%');
+        }
+    });
+
 
 </script>
 
@@ -80,23 +53,20 @@ $this->registerJs($js);
 <div class="item-form">
 
     <?php
-
     $categoryQuery = Category::find()->where(['restaurant_uuid' => $modelItem->restaurant_uuid])->asArray()->all();
     $categoryArray = ArrayHelper::map($categoryQuery, 'category_id', 'title');
 
     $itemCategoryValues = [];
 
     if ($modelItem->item_uuid != null) {
-       $selectedCategoryValues =  $modelItem->getCategories()->asArray()->all();
-       $itemCategoryValues = ArrayHelper::getColumn($selectedCategoryValues, 'category_id');
+        $selectedCategoryValues = $modelItem->getCategories()->asArray()->all();
+        $itemCategoryValues = ArrayHelper::getColumn($selectedCategoryValues, 'category_id');
     }
 
     $form = ActiveForm::begin([
-                    'id' => 'dynamic-form',
+                'id' => 'dynamic-form',
 //                'enableClientScript' => false,
     ]);
-
-
     ?>
 
 
@@ -177,6 +147,7 @@ $this->registerJs($js);
                 . "{error}{hint}"
             ])->textInput([
                 'type' => 'number',
+                'step' => '.01',
                 'value' => $modelItem->item_price != null ? $modelItem->item_price : \Yii::$app->formatter->asDecimal(0, 2),
                 'class' => 'form-control'
             ])->label(false)
@@ -187,7 +158,7 @@ $this->registerJs($js);
     <div class="card">
         <div class="card-body">
             <h5 style="margin-bottom: 20px;">
-               Options
+                Options
             </h5>
 
             <div class="item-form">
@@ -197,7 +168,8 @@ $this->registerJs($js);
                     <div class="line line-dashed"></div>
                 </div>
 
-                <?php DynamicFormWidget::begin([
+                <?php
+                DynamicFormWidget::begin([
                     'widgetContainer' => 'dynamicform_wrapper',
                     'widgetBody' => '.container-items',
                     'widgetItem' => '.option-item',
@@ -212,7 +184,8 @@ $this->registerJs($js);
                         'min_qty',
                         'max_qty',
                     ],
-                ]); ?>
+                ]);
+                ?>
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
@@ -224,33 +197,34 @@ $this->registerJs($js);
                         </tr>
                     </thead>
                     <tbody class="container-items">
-                    <?php foreach ($modelsOption as $indexOption => $modelOption): ?>
-                        <tr class="option-item">
-                            <td class="vcenter">
-                                <?php
+                        <?php foreach ($modelsOption as $indexOption => $modelOption): ?>
+                            <tr class="option-item">
+                                <td class="vcenter">
+                                    <?php
                                     // necessary for update action.
-                                    if (! $modelOption->isNewRecord) {
+                                    if (!$modelOption->isNewRecord) {
                                         echo Html::activeHiddenInput($modelOption, "[{$indexOption}]option_id");
                                     }
-                                ?>
-                                <?= $form->field($modelOption, "[{$indexOption}]option_name")->label(false)->textInput(['maxlength' => true,'placeholder' => 'Option name in English']) ?>
-                                <?= $form->field($modelOption, "[{$indexOption}]option_name_ar")->label(false)->textInput(['maxlength' => true,'placeholder' => 'Option name in Arabic']) ?>
-                                <?= $form->field($modelOption, "[{$indexOption}]min_qty")->label(false)->textInput(['type' => 'number', 'maxlength' => true,'placeholder' => 'Minimum']) ?>
-                                <?= $form->field($modelOption, "[{$indexOption}]max_qty")->label(false)->textInput(['type' => 'number', 'maxlength' => true,'placeholder' => 'Maximum']) ?>
-                            </td>
-                            <td>
-                                <?=
-                                        $this->render('_form-extra-options', [
-                                    'form' => $form,
-                                    'indexOption' => $indexOption,
-                                    'modelsExtraOption' => (empty($modelsExtraOption[$indexOption])) ? [[new ExtraOption]] : $modelsExtraOption[$indexOption],
-                                ]) ?>
-                            </td>
-                            <td class="text-center vcenter" style="width: 90px; verti">
-                                <button type="button" class="remove-option btn btn-danger btn-xs"><span class="fa fa-minus"></span></button>
-                            </td>
-                        </tr>
-                     <?php endforeach; ?>
+                                    ?>
+                                    <?= $form->field($modelOption, "[{$indexOption}]option_name")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'Option name in English']) ?>
+                                    <?= $form->field($modelOption, "[{$indexOption}]option_name_ar")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'Option name in Arabic']) ?>
+                                    <?= $form->field($modelOption, "[{$indexOption}]min_qty")->label(false)->textInput(['type' => 'number', 'maxlength' => true, 'placeholder' => 'Minimum']) ?>
+                                    <?= $form->field($modelOption, "[{$indexOption}]max_qty")->label(false)->textInput(['type' => 'number', 'maxlength' => true, 'placeholder' => 'Maximum']) ?>
+                                </td>
+                                <td>
+                                    <?=
+                                    $this->render('_form-extra-options', [
+                                        'form' => $form,
+                                        'indexOption' => $indexOption,
+                                        'modelsExtraOption' => (empty($modelsExtraOption[$indexOption])) ? [[new ExtraOption]] : $modelsExtraOption[$indexOption],
+                                    ])
+                                    ?>
+                                </td>
+                                <td class="text-center vcenter" style="width: 90px; verti">
+                                    <button type="button" class="remove-option btn btn-danger btn-xs"><span class="fa fa-minus"></span></button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
                 <?php DynamicFormWidget::end(); ?>
@@ -267,6 +241,6 @@ $this->registerJs($js);
         <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
     </div>
 
-<?php ActiveForm::end(); ?>
+    <?php ActiveForm::end(); ?>
 
 </div>

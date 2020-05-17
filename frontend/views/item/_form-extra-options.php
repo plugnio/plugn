@@ -25,7 +25,7 @@ use wbraganca\dynamicform\DynamicFormWidget;
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>Description</th>
+            <th></th>
             <th class="text-center">
                 <button type="button" class="add-extra-option btn btn-success btn-xs"><span class="fa fa-plus"></span></button>
             </th>
@@ -41,9 +41,9 @@ use wbraganca\dynamicform\DynamicFormWidget;
                         echo Html::activeHiddenInput($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_id");
                     }
                 ?>
-                <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_name")->label(false)->textInput(['maxlength' => true]) ?>
-                <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_name_ar")->label(false)->textInput(['maxlength' => true]) ?>
-                <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_price")->label(false)->textInput(['type' => 'number','maxlength' => true]) ?>
+                <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_name")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'Extra option name in English']) ?>
+                <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_name_ar")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'Extra option name in Arabic']) ?>
+                <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_price")->label(false)->textInput(['type' => 'number', 'step' => '.01', 'maxlength' => true, 'placeholder' => 'Extra option price']) ?>
             </td>
             <td class="text-center vcenter" style="width: 90px;">
                 <button type="button" class="remove-extra-option btn btn-danger btn-xs"><span class="fa fa-minus"></span></button>

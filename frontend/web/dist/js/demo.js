@@ -5,9 +5,9 @@
  * This file is for demo purposes only.
  */
 (function ($) {
-    
-    
-    
+
+
+
 
 
   'use strict'
@@ -384,6 +384,31 @@
     $logo.addClass(color)
   }).append($clear_btn))
 
+  // Summernote
+  $('.textarea').summernote()
+
+
+  $('#item-image').change(function () {
+      filePreview(this);
+  });
+
+
+  //Initialize Select2 Elements
+  $('.select2').select2()
+
+
+  $('.select2').select2({
+      placeholder: 'e.g. Burger, Summer collection'
+  });
+
+
+  //Initialize Select2 Elements
+  $('.select2bs4').select2({
+    theme: 'bootstrap4'
+  })
+
+  bsCustomFileInput.init();
+  
   function createSkinBlock(colors, callback) {
     var $block = $('<div />', {
       'class': 'd-flex flex-wrap mb-3'
