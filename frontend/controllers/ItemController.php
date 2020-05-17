@@ -130,6 +130,9 @@ class ItemController extends Controller {
                 $transaction = Yii::$app->db->beginTransaction();
                 try {
                     if ($flag = $modelItem->save(false)) {
+                        
+                       Yii::info("[" . $modelItem->restaurant->name . ": " . $modelItem->item_name . " has been added  " . '] ' . $modelItem->restaurant->restaurant_domain . '/product/' . $modelItem->item_uuid, __METHOD__);
+
                         foreach ($modelsOption as $indexOption => $modelOption) {
 
                             if ($flag === false) {
@@ -244,6 +247,8 @@ class ItemController extends Controller {
                 $transaction = Yii::$app->db->beginTransaction();
                 try {
                     if ($flag = $modelItem->save(false)) {
+
+                        Yii::info("[" . $modelItem->restaurant->name . ": " . $modelItem->item_name . " has been added  " . '] ' . $modelItem->restaurant->restaurant_domain . '/product/' . $modelItem->item_uuid, __METHOD__);
 
                         if (!empty($deletedExtraOptionsIDs)) {
                             ExtraOption::deleteAll(['extra_option_id' => array_values($deletedExtraOptionsIDs)]);
