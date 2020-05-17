@@ -1,6 +1,8 @@
 <?php
 
 use yii\helpers\Html;
+use common\models\ExtraOption;
+use common\models\Option;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Item */
@@ -17,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?=
     $this->render('_form', [
-                  'model' => $model,
+                    'modelItem' => $modelItem,
                     'modelsOption' => (empty($modelsOption)) ? [new Option] : $modelsOption,
                     'modelsExtraOption' => (empty($modelsExtraOption)) ? [[new ExtraOption]] : $modelsExtraOption,
                     'restaurantUuid' => $restaurantUuid

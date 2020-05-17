@@ -55,14 +55,7 @@ $this->registerCss($css);
                 'class' => 'yii\grid\ActionColumn',
                 'template' => ' {view} {update} {delete}',
                 'buttons' => [
-                    'view' => function ($url, $model) {
-                        return Html::a(
-                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['view','id'=> $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
-                                    'title' => 'View',
-                                    'data-pjax' => '0',
-                                        ]
-                        );
-                    },
+
                     'update' => function ($url, $model) {
                         return Html::a(
                                         '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['update', 'id' => $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
@@ -84,8 +77,8 @@ $this->registerCss($css);
                 ],
             ],
         ],
-        'layout' => '{summary}<div class="card-body">{items}<div class="card-footer clearfix">{pager}</div>',
-        'tableOptions' => ['class' => 'table table-responsive table-bordered table-responsive table-hover'],
+        'layout' => '{summary}<div class="card-body"><div class="box-body table-responsive no-padding">{items}<div class="card-footer clearfix">{pager}</div></div>',
+        'tableOptions' => ['class' => 'table table-bordered table-hover'],
         'summaryOptions' => ['class' => "card-header"],
     ]);
     ?>

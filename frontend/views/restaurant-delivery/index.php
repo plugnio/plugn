@@ -27,12 +27,13 @@ $(function () {
 ";
 
 
-if ($dataProvider) { ?> 
-        <p>
-        <?= Html::a('Edit Delivery Zones', ['update', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']) ?>
+if ($dataProvider) {
+    ?> 
+    <p>
+    <?= Html::a('Edit Delivery Zones', ['update', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']) ?>
     </p>
-    
-    <?php 
+
+    <?php
     foreach ($dataProvider as $city) {
         if ($city->restaurantDeliveryAreas) {
             ?>
@@ -55,62 +56,65 @@ if ($dataProvider) { ?>
                     </div>
                     <div class="card-body">
 
-                        <table class="table table-hover text-nowrap">
-                            <thead>
-                                <tr>
-                                    <th>Area</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                foreach ($city->restaurantDeliveryAreas as $restaurantDeliveryArea) {
-                                    $form = ActiveForm::begin([
-                                                'enableClientScript' => false,
-                                    ]);
-                                    ?>
-                                    <tr>
-                                        <td style="vertical-align: inherit;">
-                                            <?= $restaurantDeliveryArea->area->area_name ?></td>
-                                        <td>
-                                            <?= $form->field($restaurantDeliveryArea, 'delivery_time')->input('number') ?></td>
-                                        <td>
-                                            <?= $form->field($restaurantDeliveryArea, 'delivery_fee')->input('float') ?></td>
-                                        <td>
-                                            <?= $form->field($restaurantDeliveryArea, 'min_charge')->input('float') ?></td>
-                                        <td style="padding-top: 43px">   
-                                            <div class="form-group">
-                                                <div class="row">
-                                                    <div class="col-6">
-                                                        <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'name' => $restaurantDeliveryArea->area->area_id]) ?>
+                        <div class="box-body table-responsive no-padding">
 
-                                                    </div>
-                                                    <div class="col-6">
-                                                        <?=
-                                                        Html::a('<i style="font-size: 21px;" class="fas fa-minus-circle"></i>', ['delete', 'area_id' => $restaurantDeliveryArea->area->area_id, 'restaurantUuid' => $restaurantDeliveryArea->restaurant_uuid], ['class' => 'btn btn-danger',
-                                                            'data' => [
-                                                                'method' => 'post',
-                                                            ]
-                                                        ])
-                                                        ?>
+                            <table class="table table-hover text-nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>Area</th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    foreach ($city->restaurantDeliveryAreas as $restaurantDeliveryArea) {
+                                        $form = ActiveForm::begin([
+                                                    'enableClientScript' => false,
+                                        ]);
+                                        ?>
+                                        <tr>
+                                            <td style="vertical-align: inherit;">
+                                                <?= $restaurantDeliveryArea->area->area_name ?></td>
+                                            <td>
+                                                <?= $form->field($restaurantDeliveryArea, 'delivery_time')->input('number') ?></td>
+                                            <td>
+                                                <?= $form->field($restaurantDeliveryArea, 'delivery_fee')->input('float') ?></td>
+                                            <td>
+                <?= $form->field($restaurantDeliveryArea, 'min_charge')->input('float') ?></td>
+                                            <td style="padding-top: 43px">   
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <div class="col-6">
+                <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'name' => $restaurantDeliveryArea->area->area_id]) ?>
+
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <?=
+                                                            Html::a('<i style="font-size: 21px;" class="fas fa-minus-circle"></i>', ['delete', 'area_id' => $restaurantDeliveryArea->area->area_id, 'restaurantUuid' => $restaurantDeliveryArea->restaurant_uuid], ['class' => 'btn btn-danger',
+                                                                'data' => [
+                                                                    'method' => 'post',
+                                                                ]
+                                                            ])
+                                                            ?>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                            </td>
+                                        </tr>
 
-                                    <?php
-                                    ActiveForm::end();
-                                }
-                                ?>
+                                        <?php
+                                        ActiveForm::end();
+                                    }
+                                    ?>
 
-                                <?php ?>
-                            </tbody>
-                        </table>
+            <?php ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

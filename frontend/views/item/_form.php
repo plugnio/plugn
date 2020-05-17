@@ -8,6 +8,8 @@ use yii\helpers\ArrayHelper;
 use common\models\CategoryItem;
 use kartik\file\FileInput;
 use wbraganca\dynamicform\DynamicFormWidget;
+use common\models\ExtraOption;
+use common\models\Option;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Item */
@@ -17,14 +19,10 @@ use wbraganca\dynamicform\DynamicFormWidget;
 $js = "
 
   $(function () {
-
-  })
-  
-  $(function () {
     // Summernote
     $('.textarea').summernote()
   })
-  
+
 $(function () {
 
     $('#item-image').change(function () {
@@ -46,7 +44,7 @@ $(function () {
       theme: 'bootstrap4'
     })
   })
-  
+
     $(document).ready(function () {
       bsCustomFileInput.init();
     });
@@ -78,30 +76,27 @@ $this->registerJs($js);
 
 </script>
 
+
 <div class="item-form">
 
     <?php
-    
-    $categoryQuery = Category::find()->where(['restaurant_uuid' => $model->restaurant_uuid])->asArray()->all();
+
+    $categoryQuery = Category::find()->where(['restaurant_uuid' => $modelItem->restaurant_uuid])->asArray()->all();
     $categoryArray = ArrayHelper::map($categoryQuery, 'category_id', 'title');
 
     $itemCategoryValues = [];
 
-    if ($model->item_uuid != null) {
-
-        $itemCategoryValues = CategoryItem::find()
-                ->select('category_id')
-                ->asArray()
-                ->where(['item_uuid' => $model->item_uuid])
-                ->all();
-
-        $itemCategoryValues = ArrayHelper::getColumn($itemCategoryValues, 'category_id');
+    if ($modelItem->item_uuid != null) {
+       $selectedCategoryValues =  $modelItem->getCategories()->asArray()->all();
+       $itemCategoryValues = ArrayHelper::getColumn($selectedCategoryValues, 'category_id');
     }
 
     $form = ActiveForm::begin([
                     'id' => 'dynamic-form',
 //                'enableClientScript' => false,
     ]);
+
+
     ?>
 
 
@@ -110,27 +105,26 @@ $this->registerJs($js);
 
     <div class="card">
         <div class="card-body">
-
             <?=
-            $form->field($model, 'items_category[]')->dropDownList($categoryArray, [
+            $form->field($modelItem, 'items_category[]')->dropDownList($categoryArray, [
                 'class' => 'select2',
                 'multiple' => 'multiple',
                 'value' => $itemCategoryValues
             ]);
             ?>
 
-            <?= $form->field($model, 'item_name')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger, Short sleeve t-shirt']) ?>
+            <?= $form->field($modelItem, 'item_name')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger, Short sleeve t-shirt']) ?>
 
-            <?= $form->field($model, 'item_name_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger']) ?>
+            <?= $form->field($modelItem, 'item_name_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger']) ?>
 
 
-            <?= $form->field($model, 'item_description')->textarea(['class' => 'textarea', 'style' => 'style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"']) ?>
+            <?= $form->field($modelItem, 'item_description')->textarea(['class' => 'textarea', 'style' => 'style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"']) ?>
 
-            <?= $form->field($model, 'item_description_ar')->textarea(['class' => 'textarea', 'style' => 'style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"']) ?>
+            <?= $form->field($modelItem, 'item_description_ar')->textarea(['class' => 'textarea', 'style' => 'style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"']) ?>
 
-            <?= $form->field($model, 'sort_number')->textInput(['type' => 'number']) ?>
+            <?= $form->field($modelItem, 'sort_number')->textInput(['type' => 'number']) ?>
 
-            <?= $form->field($model, 'stock_qty')->textInput(['type' => 'number']) ?>
+            <?= $form->field($modelItem, 'stock_qty')->textInput(['type' => 'number']) ?>
 
         </div>
     </div>
@@ -143,7 +137,7 @@ $this->registerJs($js);
             </h5>
 
             <?=
-            $form->field($model, 'image', [
+            $form->field($modelItem, 'image', [
                 'template' => "{label}"
                 . "            <div class='file-preview'>"
                 . "              <div class='clearfix' id='uploadForm'> </div>"
@@ -176,14 +170,14 @@ $this->registerJs($js);
 
 
             <?=
-            $form->field($model, 'item_price', [
+            $form->field($modelItem, 'item_price', [
                 'template' => "{label}"
                 . "<div class='input-group'> <div class='input-group-prepend'> <span class='input-group-text'>KWD</span> </div>{input}"
                 . "</div>"
                 . "{error}{hint}"
             ])->textInput([
                 'type' => 'number',
-                'value' => $model->item_price != null ? $model->item_price : \Yii::$app->formatter->asDecimal(0, 2),
+                'value' => $modelItem->item_price != null ? $modelItem->item_price : \Yii::$app->formatter->asDecimal(0, 2),
                 'class' => 'form-control'
             ])->label(false)
             ?>
@@ -195,7 +189,7 @@ $this->registerJs($js);
             <h5 style="margin-bottom: 20px;">
                Options
             </h5>
-            
+
             <div class="item-form">
 
 
@@ -241,14 +235,15 @@ $this->registerJs($js);
                                 ?>
                                 <?= $form->field($modelOption, "[{$indexOption}]option_name")->label(false)->textInput(['maxlength' => true,'placeholder' => 'Option name in English']) ?>
                                 <?= $form->field($modelOption, "[{$indexOption}]option_name_ar")->label(false)->textInput(['maxlength' => true,'placeholder' => 'Option name in Arabic']) ?>
-                                <?= $form->field($modelOption, "[{$indexOption}]min_qty")->label(false)->textInput(['maxlength' => true,'placeholder' => 'Minimum']) ?>
-                                <?= $form->field($modelOption, "[{$indexOption}]max_qty")->label(false)->textInput(['maxlength' => true,'placeholder' => 'Maximum']) ?>
+                                <?= $form->field($modelOption, "[{$indexOption}]min_qty")->label(false)->textInput(['type' => 'number', 'maxlength' => true,'placeholder' => 'Minimum']) ?>
+                                <?= $form->field($modelOption, "[{$indexOption}]max_qty")->label(false)->textInput(['type' => 'number', 'maxlength' => true,'placeholder' => 'Maximum']) ?>
                             </td>
                             <td>
-                                <?= $this->render('_form-extra-options', [
+                                <?=
+                                        $this->render('_form-extra-options', [
                                     'form' => $form,
                                     'indexOption' => $indexOption,
-                                    'modelsExtraOption' => $modelsExtraOption[$indexOption],
+                                    'modelsExtraOption' => (empty($modelsExtraOption[$indexOption])) ? [[new ExtraOption]] : $modelsExtraOption[$indexOption],
                                 ]) ?>
                             </td>
                             <td class="text-center vcenter" style="width: 90px; verti">
@@ -262,7 +257,7 @@ $this->registerJs($js);
 
 
             </div>
-            
+
         </div>
     </div>
 

@@ -1,116 +1,55 @@
 <?php
 
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
-use common\models\Category;
-use kartik\select2\Select2;
-use yii\helpers\ArrayHelper;
-use common\models\CategoryItem;
-use kartik\file\FileInput;
-
-/* @var $this yii\web\View */
-/* @var $model common\models\Item */
-/* @var $form yii\widgets\ActiveForm */
+use wbraganca\dynamicform\DynamicFormWidget;
 
 
-$js = "
-
-$(function () {
-    //Initialize Select2 Elements
-    $('.select2').select2()
-
-    //Initialize Select2 Elements
-    $('.select2bs4').select2({
-      theme: 'bootstrap4'
-    })
-
-  })
-  
-    $(document).ready(function () {
-      bsCustomFileInput.init();
-    });
-
-";
-
-
-
-
-
-$this->registerJs($js);
 ?>
 
-<div class="item-form">
-
-    <?php
-    $categoryQuery = Category::find()->where(['restaurant_uuid' => $model->restaurant_uuid])->asArray()->all();
-    $categoryArray = ArrayHelper::map($categoryQuery, 'category_id', 'title');
-
-    $itemCategoryValues = [];
-
-    if ($model->item_uuid != null) {
-
-        $itemCategoryValues = CategoryItem::find()
-                ->select('category_id')
-                ->asArray()
-                ->where(['item_uuid' => $model->item_uuid])
-                ->all();
-
-        $itemCategoryValues = ArrayHelper::getColumn($itemCategoryValues, 'category_id');
-    }
-
-    $form = ActiveForm::begin([
-                'enableClientScript' => false,
-    ]);
-    ?>
-
-    <?= $form->errorSummary($model); ?>
-
-    <?=
-        $form->field($model, 'items_category[]')->dropDownList($categoryArray, [
-            'class' => 'select2', 
-            'multiple' => 'multiple',
-            'value' => $itemCategoryValues
-        ]);
-    ?>
-
-
-    <?= $form->field($model, 'item_name')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger']) ?>
-
-    <?= $form->field($model, 'item_name_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger']) ?>
-
-    <?= $form->field($model, 'item_description')->textInput(['maxlength' => true, 'placeholder' => 'Item description']) ?>
-
-    <?= $form->field($model, 'item_description_ar')->textInput(['maxlength' => true, 'placeholder' => 'Item description']) ?>
-
-    <?= $form->field($model, 'sort_number')->textInput() ?>
-
-    <?= $form->field($model, 'stock_qty')->textInput() ?>
-
-    <?= $form->field($model, 'item_price')->textInput(['value' => $model->item_price != null ? $model->item_price : 0]) ?>
-
-    
-    <?=
-    $form->field($model, 'image', [
-        'template' => "{label}"
-        . "            <div class='input-group'>"
-        . "             <div class='custom-file'>"
-        . "                 {input}"
-        . "                 <label class='custom-file-label' for='exampleInputFile'>Choose file</label>"
-        . "             </div>"
-        . "            </div>"
-    ])->fileInput([
-        'multiple' => false,
-        'accept' => 'image/*',
-        'class' => 'custom-file-input',
-    ])
-    ?>
-
-
-
-    <div class="form-group">
-    <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
-    </div>
-
-<?php ActiveForm::end(); ?>
-
-</div>
+<?php DynamicFormWidget::begin([
+    'widgetContainer' => 'dynamicform_inner',
+    'widgetBody' => '.container-extra-options',
+    'widgetItem' => '.extra-option',
+    'limit' => 4,
+    'min' => 1,
+    'insertButton' => '.add-extra-option',
+    'deleteButton' => '.remove-extra-option',
+    'model' => $modelsExtraOption[0],
+    'formId' => 'dynamic-form',
+    'formFields' => [
+        'extra_option_name',
+        'extra_option_name_ar',
+        'extra_option_price',
+    ],
+]); ?>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th class="text-center">
+                <button type="button" class="add-extra-option btn btn-success btn-xs"><span class="fa fa-plus"></span></button>
+            </th>
+        </tr>
+    </thead>
+    <tbody class="container-extra-options">
+    <?php foreach ($modelsExtraOption as $indexExtraOption => $modelExtraOption): ?>
+        <tr class="extra-option">
+            <td class="vcenter">
+                <?php
+                    // necessary for update action.
+                    if (! $modelExtraOption->isNewRecord) {
+                        echo Html::activeHiddenInput($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_id");
+                    }
+                ?>
+                <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_name")->label(false)->textInput(['maxlength' => true]) ?>
+                <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_name_ar")->label(false)->textInput(['maxlength' => true]) ?>
+                <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_price")->label(false)->textInput(['type' => 'number','maxlength' => true]) ?>
+            </td>
+            <td class="text-center vcenter" style="width: 90px;">
+                <button type="button" class="remove-extra-option btn btn-danger btn-xs"><span class="fa fa-minus"></span></button>
+            </td>
+        </tr>
+     <?php endforeach; ?>
+    </tbody>
+</table>
+<?php DynamicFormWidget::end(); ?>

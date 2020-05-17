@@ -129,7 +129,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
             ],
             'layout' => '{summary}<div class="card-body"><div class="box-body table-responsive no-padding">{items}{pager}</div></div>',
-            'tableOptions' => ['class' => 'table  table-bordered  table-responsive table-hover'],
+            'tableOptions' => ['class' => 'table  table-bordered table-hover'],
             'summaryOptions' => ['class' => "card-header"],
         ]);
         ?>

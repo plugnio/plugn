@@ -248,6 +248,15 @@ class Item extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Gets query for [[CategoryItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCategory() {
+        return $this->hasMany(Category::className(), ['category_id' => 'category_id'])->via('categoryItems');
+    }
+
+    /**
      * Gets query for [[Categories]].
      *
      * @return \yii\db\ActiveQuery

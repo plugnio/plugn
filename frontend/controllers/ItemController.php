@@ -12,6 +12,7 @@ use common\models\Option;
 use common\models\ExtraOption;
 use wbraganca\dynamicform\DynamicFormWidget;
 use frontend\base\Model;
+use yii\helpers\ArrayHelper;
 
 /**
  * ItemController implements the CRUD actions for Item model.
@@ -67,62 +68,64 @@ class ItemController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id, $restaurantUuid) {
-
-        $item_model = $this->findModel($id, $restaurantUuid);
-
-        // Item options
-        $itemOptionsDataProvider = new \yii\data\ActiveDataProvider([
-            'query' => $item_model->getOptions(),
-        ]);
-
-        return $this->render('view', [
-                    'model' => $this->findModel($id, $restaurantUuid),
-                    'itemOptionsDataProvider' => $itemOptionsDataProvider,
-                    'restaurantUuid' => $restaurantUuid
-        ]);
-    }
+    // public function actionView($id, $restaurantUuid) {
+    //
+    //     $item_model = $this->findModel($id, $restaurantUuid);
+    //
+    //     // Item options
+    //     $itemOptionsDataProvider = new \yii\data\ActiveDataProvider([
+    //         'query' => $item_model->getOptions(),
+    //     ]);
+    //
+    //     return $this->render('view', [
+    //                 'model' => $this->findModel($id, $restaurantUuid),
+    //                 'itemOptionsDataProvider' => $itemOptionsDataProvider,
+    //                 'restaurantUuid' => $restaurantUuid
+    //     ]);
+    // }
 
     /**
      * Creates a new Item model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
+     * If creation is successful, the browser will be redirected to the 'index' page.
      * @return mixed
      */
     public function actionCreate($restaurantUuid) {
-
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
         $modelItem = new Item;
         $modelItem->restaurant_uuid = $restaurant_model->restaurant_uuid;
-
         $modelsOption = [new Option];
         $modelsExtraOption = [[new ExtraOption]];
 
         if ($modelItem->load(Yii::$app->request->post())) {
-            
-       
+
+            $image = \yii\web\UploadedFile::getInstances($modelItem, 'image');
+
+            if ($image)
+                $modelItem->uploadItemImage($image[0]->tempName);
+
+            if ($modelItem->items_category)
+                $modelItem->saveItemsCategory($modelItem->items_category);
+
             $modelsOption = Model::createMultiple(Option::classname());
             Model::loadMultiple($modelsOption, Yii::$app->request->post());
-            // validate item and Options models
+
+            // validate item and options models
             $valid = $modelItem->validate();
             $valid = Model::validateMultiple($modelsOption) && $valid;
 
-
-
             if (isset($_POST['ExtraOption'][0][0])) {
-
                 foreach ($_POST['ExtraOption'] as $indexOption => $extraOptions) {
                     foreach ($extraOptions as $indexExtraOption => $extraOption) {
+                        $data['ExtraOption'] = $extraOption;
                         $modelExtraOption = new ExtraOption;
-                        $modelExtraOption->extra_option_name = $extraOption['extra_option_name'];
-                        $modelExtraOption->extra_option_name_ar = $extraOption['extra_option_name'];
-                        $modelExtraOption->extra_option_price = 2;
+                        $modelExtraOption->load($data);
                         $modelsExtraOption[$indexOption][$indexExtraOption] = $modelExtraOption;
                         $valid = $modelExtraOption->validate();
                     }
-                }  
-
+                }
             }
+
             if ($valid) {
                 $transaction = Yii::$app->db->beginTransaction();
                 try {
@@ -134,10 +137,6 @@ class ItemController extends Controller {
                             }
 
                             $modelOption->item_uuid = $modelItem->item_uuid;
-                            $modelOption->option_name = $modelOption->option_name;
-                            $modelOption->option_name_ar = $modelOption->option_name_ar;
-                            $modelOption->max_qty = $modelOption->max_qty;
-                            $modelOption->min_qty = $modelOption->min_qty;
 
                             if (!($flag = $modelOption->save(false))) {
                                 break;
@@ -156,7 +155,7 @@ class ItemController extends Controller {
 
                     if ($flag) {
                         $transaction->commit();
-                        return $this->redirect(['view', 'id' => $modelItem->item_uuid, 'restaurantUuid' => $restaurantUuid]);
+                        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
                     } else {
                         $transaction->rollBack();
                     }
@@ -167,68 +166,133 @@ class ItemController extends Controller {
         }
 
         return $this->render('create', [
-                    'model' => $modelItem,
+                    'modelItem' => $modelItem,
                     'modelsOption' => (empty($modelsOption)) ? [new Option] : $modelsOption,
                     'modelsExtraOption' => (empty($modelsExtraOption)) ? [[new ExtraOption]] : $modelsExtraOption,
                     'restaurantUuid' => $restaurant_model->restaurant_uuid
         ]);
-
-//        
-//        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
-//
-//            if ($model->save()) {
-//
-//            Yii::info("[" . $model->restaurant->name . ": " . $model->item_name . " has been added  " . '] ' . $model->restaurant->restaurant_domain . '/product/' . $model->item_uuid, __METHOD__);
-//
-//            $image = \yii\web\UploadedFile::getInstances($model, 'image');
-//
-//                if ($image)
-//                    $model->uploadItemImage($image[0]->tempName);
-//
-//                if ($model->items_category)
-//                    $model->saveItemsCategory($model->items_category);
-//
-//                return $this->redirect(['view', 'id' => $model->item_uuid, 'restaurantUuid' => $restaurantUuid]);
-//            }
-//        }
-//        
-//        return $this->render('create', [
-//                    'model' => $model,
-//                    'restaurantUuid' => $restaurant_model->restaurant_uuid
-//        ]);
     }
 
     /**
      * Updates an existing Item model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param string $id
+     * If update is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
      * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($id, $restaurantUuid) {
+        $modelItem = $this->findModel($id, $restaurantUuid);
+        $modelsOption = $modelItem->getOptions()->all();
+        $modelsExtraOption = [];
+        $oldExtraOptions = [];
 
-        $model = $this->findModel($id, $restaurantUuid);
 
-        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
-
-            if ($model->save()) {
-
-                Yii::info("[" . $model->restaurant->name . ": " . $model->item_name . " has been updated  " . '] ' . $model->restaurant->restaurant_domain . '/product/' . $model->item_uuid, __METHOD__);
-
-                $image = \yii\web\UploadedFile::getInstances($model, 'image');
-
-                if ($image)
-                    $model->uploadItemImage($image[0]->tempName);
-
-                if ($model->items_category)
-                    $model->saveItemsCategory($model->items_category);
-
-                return $this->redirect(['view', 'id' => $model->item_uuid, 'restaurantUuid' => $restaurantUuid]);
+        if (!empty($modelsOption)) {
+            foreach ($modelsOption as $indexOption => $modelOption) {
+                $extraOptions = $modelOption->getExtraOptions()->all();
+                $modelsExtraOption[$indexOption] = $extraOptions;
+                $oldExtraOptions = ArrayHelper::merge(ArrayHelper::index($extraOptions, 'extra_option_id'), $oldExtraOptions);
             }
         }
 
+
+
+        if ($modelItem->load(Yii::$app->request->post())) {
+
+            $image = \yii\web\UploadedFile::getInstances($modelItem, 'image');
+
+            if ($image)
+                $modelItem->uploadItemImage($image[0]->tempName);
+
+            if ($modelItem->items_category)
+                $modelItem->saveItemsCategory($modelItem->items_category);
+
+
+           // reset
+            $modelsExtraOption = [];
+
+            $oldOptionIDs = ArrayHelper::map($modelsOption, 'option_id', 'option_id');
+            $modelsOption = Model::createMultiple(Option::classname(), $modelsOption);
+            Model::loadMultiple($modelsOption, Yii::$app->request->post());
+            $deletedOptionIDs = array_diff($oldOptionIDs, array_filter(ArrayHelper::map($modelsOption, 'option_id', 'option_id')));
+
+
+            // validate Item and options models
+            $valid = $modelItem->validate();
+            $valid = Model::validateMultiple($modelsOption) && $valid;
+
+
+            $extraOptionsIDs = [];
+            if (isset($_POST['ExtraOption'][0][0])) {
+                foreach ($_POST['ExtraOption'] as $indexOption => $extraOptions) {
+                    $extraOptionsIDs = ArrayHelper::merge($extraOptionsIDs, array_filter(ArrayHelper::getColumn($extraOptions, 'extra_option_id')));
+                    foreach ($extraOptions as $indexExtraOption => $extraOption) {
+                        $data['ExtraOption'] = $extraOption;
+                        $modelExtraOption = (isset($extraOption['extra_option_id']) && isset($oldExtraOptions[$extraOption['extra_option_id']])) ? $oldExtraOptions[$extraOption['extra_option_id']] : new ExtraOption;
+                        $modelExtraOption->load($data);
+                        $modelsExtraOption[$indexOption][$indexExtraOption] = $modelExtraOption;
+                        $valid = $modelExtraOption->validate();
+                    }
+                }
+            }
+
+
+
+            $oldExtraOptionsIDs = ArrayHelper::getColumn($oldExtraOptions, 'extra_option_id');
+            $deletedExtraOptionsIDs = array_diff($oldExtraOptionsIDs, $extraOptionsIDs);
+
+            if ($valid) {
+                $transaction = Yii::$app->db->beginTransaction();
+                try {
+                    if ($flag = $modelItem->save(false)) {
+
+                        if (!empty($deletedExtraOptionsIDs)) {
+                            ExtraOption::deleteAll(['extra_option_id' => array_values($deletedExtraOptionsIDs)]);
+                        }
+
+                        if (!empty($deletedOptionIDs)) {
+                            Option::deleteAll(['option_id' => $deletedOptionIDs]);
+                        }
+
+                        foreach ($modelsOption as $indexOption => $modelOption) {
+
+                            if ($flag === false) {
+                                break;
+                            }
+
+                            $modelOption->item_uuid = $modelItem->item_uuid;
+
+                            if (!($flag = $modelOption->save(false))) {
+                                break;
+                            }
+
+                            if (isset($modelsExtraOption[$indexOption]) && is_array($modelsExtraOption[$indexOption])) {
+                                foreach ($modelsExtraOption[$indexOption] as $indexExtraOption => $modelExtraOption) {
+                                    $modelExtraOption->option_id = $modelOption->option_id;
+                                    if (!($flag = $modelExtraOption->save(false))) {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if ($flag) {
+                        $transaction->commit();
+                        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+                    } else {
+                        $transaction->rollBack();
+                    }
+                } catch (Exception $e) {
+                    $transaction->rollBack();
+                }
+            }
+        }
+
+
         return $this->render('update', [
-                    'model' => $model,
+                    'modelItem' => $modelItem,
+                    'modelsOption' => (empty($modelsOption)) ? [new Option] : $modelsOption,
+                    'modelsExtraOption' => (empty($modelsExtraOption)) ? [[new ExtraOption]] : $modelsExtraOption,
                     'restaurantUuid' => $restaurantUuid
         ]);
     }

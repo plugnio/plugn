@@ -7,6 +7,7 @@ use Yii;
 /**
  * This is the model class for table "category_item".
  *
+ * @property int $category_item_id
  * @property int $category_id
  * @property string $item_uuid
  *
