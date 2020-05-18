@@ -30,7 +30,7 @@ $(function () {
 if ($dataProvider) {
     ?> 
     <p>
-    <?= Html::a('Edit Delivery Zones', ['update', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Edit Delivery Zones', ['update', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php
@@ -84,26 +84,25 @@ if ($dataProvider) {
                                             <td>
                                                 <?= $form->field($restaurantDeliveryArea, 'delivery_fee')->input('float') ?></td>
                                             <td>
-                <?= $form->field($restaurantDeliveryArea, 'min_charge')->input('float') ?></td>
-                                            <td style="padding-top: 43px">   
-                                                <div class="form-group">
-                                                    <div class="row">
-                                                        <div class="col-6">
-                <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'name' => $restaurantDeliveryArea->area->area_id]) ?>
+                                                <?= $form->field($restaurantDeliveryArea, 'min_charge')->input('float') ?></td>
 
-                                                        </div>
-                                                        <div class="col-6">
-                                                            <?=
-                                                            Html::a('<i style="font-size: 21px;" class="fas fa-minus-circle"></i>', ['delete', 'area_id' => $restaurantDeliveryArea->area->area_id, 'restaurantUuid' => $restaurantDeliveryArea->restaurant_uuid], ['class' => 'btn btn-danger',
-                                                                'data' => [
-                                                                    'method' => 'post',
-                                                                ]
-                                                            ])
-                                                            ?>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                            <td class="project-actions text-right" style="padding-top: 43px">
+                                                <?=
+                                                Html::submitButton('<i class="fas fa-folder"> </i> Save', ['class' => 'btn btn-success btn-sm', 'name' => $restaurantDeliveryArea->area->area_id])
+                                                ?>
+
+
+                                                <?=
+                                                Html::a('<i class="fas fa-trash"></i> Delete', ['delete', 'area_id' => $restaurantDeliveryArea->area->area_id, 'restaurantUuid' => $restaurantDeliveryArea->restaurant_uuid], ['class' => 'btn btn-danger btn-sm',
+                                                    'data' => [
+                                                        'method' => 'post',
+                                                    ]
+                                                ])
+                                                ?>
+
+
                                             </td>
+
                                         </tr>
 
                                         <?php
@@ -111,7 +110,7 @@ if ($dataProvider) {
                                     }
                                     ?>
 
-            <?php ?>
+                                    <?php ?>
                                 </tbody>
                             </table>
                         </div>
@@ -120,8 +119,6 @@ if ($dataProvider) {
             </div>
 
             <?php
-        } else {
-            echo 'lool.';
         }
     }
 } else {

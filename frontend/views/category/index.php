@@ -55,8 +55,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
             ],
         ],
-        'layout' => '{summary}<div class="card-body">{items}<div class="card-footer clearfix">{pager}</div></div>',
-        'tableOptions' => ['class' => 'table table-responsive table-bordered table-hover'],
+        'layout' => '{summary}<div class="card-body"><div class="box-body table-responsive no-padding">{items}<div class="card-footer clearfix">{pager}</div></div>',
+        'tableOptions' => ['class' => 'table table-bordered table-hover'],
         'summaryOptions' => ['class' => "card-header"],
     ]);
     ?>

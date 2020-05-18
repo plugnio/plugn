@@ -18,22 +18,25 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?= Html::a('Update', ['update', 'id' => $model->agent_id, 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-primary']) ?>
     </p>
-    
+
     <div class="card">
         <div class="card-body">
-            <?=
-            DetailView::widget([
-                'model' => $model,
-                'attributes' => [
-                    'agent_name',
-                    'agent_email:email',
-                    'agent_created_at',
-                    'agent_updated_at',
-                ],
-                'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
-            ])
-            ?>
+            <div class="box-body table-responsive no-padding">
 
+                <?=
+                DetailView::widget([
+                    'model' => $model,
+                    'attributes' => [
+                        'agent_name',
+                        'agent_email:email',
+                        'agent_created_at',
+                        'agent_updated_at',
+                    ],
+                    'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
+                ])
+                ?>
+
+            </div>
         </div>
     </div>
 </div>

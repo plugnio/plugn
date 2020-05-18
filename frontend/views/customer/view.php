@@ -31,21 +31,24 @@ $this->params['breadcrumbs'][] = $this->title;
     </p>
     <div class="card">
         <div class="card-body">
-            <?=
-            DetailView::widget([
-                'model' => $model,
-                'attributes' => [
-                    'customer_id',
-                    'customer_name',
-                    'customer_phone_number',
-                    'customer_email:email',
-                    'customer_created_at',
-                    'customer_updated_at',
-                ],
-                'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
-            ])
-            ?>
+            <div class="box-body table-responsive no-padding">
 
+                <?=
+                DetailView::widget([
+                    'model' => $model,
+                    'attributes' => [
+                        'customer_id',
+                        'customer_name',
+                        'customer_phone_number',
+                        'customer_email:email',
+                        'customer_created_at',
+                        'customer_updated_at',
+                    ],
+                    'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
+                ])
+                ?>
+
+            </div>
         </div>
     </div>
 
@@ -92,7 +95,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'buttons' => [
                         'view' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['order/view','id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
                                         'title' => 'View',
                                         'data-pjax' => '0',
                                             ]
@@ -101,8 +104,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
             ],
-            'layout' => '{summary}<div class="card-body">{items}{pager}</div>',
-            'tableOptions' => ['class' => 'table table-responsive table-bordered table-hover'],
+            'layout' => '{summary}<div class="card-body"><div class="box-body table-responsive no-padding">{items}<div class="card-footer clearfix">{pager}</div></div>',
+            'tableOptions' => ['class' => 'table  table-bordered table-hover'],
             'summaryOptions' => ['class' => "card-header"],
         ]);
         ?>
