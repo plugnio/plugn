@@ -20,7 +20,7 @@ class LandingAsset extends AssetBundle
         'css/styles.css',
     ];
     public $js = [
-    'js/jquery.min.js',
+//    'js/jquery.min.js',
     'js/popper.min.js',
     'js/bootstrap.min.js',
     'js/jquery.easing.min.js',

@@ -3,37 +3,6 @@
    Created: Sep 2019
    Description: Custom JS file
 */
-  $(function () {
-    // Summernote
-    $('.textarea').summernote()
-  })
-  
-$(function () {
-
-    $('#item-image').change(function () {
-        filePreview(this);
-    });
-
-
-    //Initialize Select2 Elements
-    $('.select2').select2()
-
-
-    $('.select2').select2({
-        placeholder: 'e.g. Burger, Summer collection'
-    });
-
-
-    //Initialize Select2 Elements
-    $('.select2bs4').select2({
-      theme: 'bootstrap4'
-    })
-  })
-  
-    $(document).ready(function () {
-      bsCustomFileInput.init();
-    });
-
 (function($) {
     "use strict"; 
 	
