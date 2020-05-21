@@ -24,7 +24,7 @@ return [
             // Enable Caching of Schema to Reduce SQL Queries
             'enableSchemaCache' => true,
             // Duration of schema cache.
-            'schemaCacheDuration' => 3600, // 1 hr
+            'schemaCacheDuration' => 300, // 5 mnts
             // Name of the cache component used to store schema information
             'schemaCache' => 'cache',
         ],
