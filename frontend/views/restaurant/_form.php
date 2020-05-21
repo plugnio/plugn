@@ -11,6 +11,7 @@ use common\models\RestaurantDelivery;
 use common\models\RestaurantPaymentMethod;
 use common\models\PaymentMethod;
 use kartik\file\FileInput;
+use common\models\Restaurant;
 
 $js = "
 let phoneNumberInput = $('#phoneNumberInput');
@@ -227,6 +228,10 @@ $this->registerJs($js);
              $form->field($model, 'phone_number_display')->radioList([2=>'📞',3=>'+965 12345678',1=>'Dont show phone number button'],['style'=>'display:grid']);
             ?>    
     </div>
+    
+           <?=
+             $form->field($model, 'store_layout')->radioList([Restaurant::STORE_LAYOUT_LIST=>'List', Restaurant::STORE_LAYOUT_GRID=>'Grid'],['style'=>'display:grid']);
+            ?>    
     
     <?= $form->field($model, 'restaurant_email')->input('email') ?>
 

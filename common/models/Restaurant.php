@@ -30,7 +30,9 @@ use yii\behaviors\AttributeBehavior;
  * @property int $phone_number_display
  * @property int $store_branch_name
  * @property int $custom_css
- *
+ * @property int $store_layout
+ * 
+ * 
  * @property AgentAssignment[] $agentAssignments
  * @property Agent[] $agents
  * @property Agent $agent
@@ -59,7 +61,11 @@ class Restaurant extends \yii\db\ActiveRecord {
     const PHONE_NUMBER_DISPLAY_ICON = 2;
     const PHONE_NUMBER_DISPLAY_SHOW_PHONE_NUMBER = 3;
 
-    
+    //Values for `store_layout`
+    const STORE_LAYOUT_LIST  = 1;
+    const STORE_LAYOUT_GRID  = 2;
+
+
     public $restaurant_delivery_area;
     public $restaurant_payments_method;
     public $restaurant_logo;
@@ -82,6 +88,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['restaurant_status', 'support_delivery', 'support_pick_up'], 'integer', 'min' => 0],
             ['restaurant_status', 'in', 'range' => [self::RESTAURANT_STATUS_OPEN, self::RESTAURANT_STATUS_BUSY, self::RESTAURANT_STATUS_CLOSE]],
+            ['store_layout', 'in', 'range' => [self::STORE_LAYOUT_LIST, self::STORE_LAYOUT_GRID]],
             ['phone_number_display', 'in', 'range' => [self::PHONE_NUMBER_DISPLAY_ICON, self::PHONE_NUMBER_DISPLAY_SHOW_PHONE_NUMBER, self::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER]],
             [['restaurant_created_at', 'restaurant_updated_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
@@ -89,7 +96,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'armada_api_key','store_branch_name'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 8, 'max' => 8],
             [['phone_number'], 'integer', 'min' => 0],
-            [['restaurant_email_notification','phone_number_display'], 'integer'],
+            [['restaurant_email_notification','phone_number_display','store_layout'], 'integer'],
             ['restaurant_email', 'email'],
             [['restaurant_uuid'], 'unique'],
         ];
@@ -123,6 +130,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             'phone_number_display' => 'Phone number display',
             'store_branch_name' => 'Branch name',
             'custom_css' => 'Custom css',
+            'store_layout' => 'Store layout',
 
         ];
     }
