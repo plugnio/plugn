@@ -229,8 +229,8 @@ $this->registerJs($js);
             ?>    
     </div>
     
-           <?=
-             $form->field($model, 'store_layout')->radioList([Restaurant::STORE_LAYOUT_LIST=>'List', Restaurant::STORE_LAYOUT_GRID=>'Grid'],['style'=>'display:grid']);
+           <?php
+//             echo $form->field($model, 'store_layout')->radioList([Restaurant::STORE_LAYOUT_LIST=>'List', Restaurant::STORE_LAYOUT_GRID=>'Grid'],['style'=>'display:grid']);
             ?>    
     
     <?= $form->field($model, 'restaurant_email')->input('email') ?>
