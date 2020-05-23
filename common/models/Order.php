@@ -353,8 +353,10 @@ class Order extends \yii\db\ActiveRecord {
 
     public function beforeDelete() {
 
-        foreach ($this->getOrderItems()->all() as $orderItem) {
-            $orderItem->item->increaseStockQty($orderItem->qty);
+        $orderItems = OrderItem::find()->where(['order_uuid'=> $this->order_uuid])->all();
+        
+        foreach ($orderItems as $model) {
+            $model->delete();
         }
 
         return parent::beforeDelete();

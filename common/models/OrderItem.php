@@ -92,7 +92,8 @@ class OrderItem extends \yii\db\ActiveRecord {
 
     public function beforeDelete() {
 
-        $this->item->increaseStockQty($this->qty);
+        if($this->item)
+            $this->item->increaseStockQty($this->qty);
 
         return parent::beforeDelete();
     }
