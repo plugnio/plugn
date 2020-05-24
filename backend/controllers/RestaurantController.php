@@ -88,18 +88,23 @@ class RestaurantController extends Controller {
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
 
-            $restaurant_document_file = UploadedFile::getInstances($model, 'restaurant_document_file');
+            $restaurant_authorized_signature_file = UploadedFile::getInstances($model, 'restaurant_authorized_signature_file');
+            $restaurant_commercial_license_file = UploadedFile::getInstances($model, 'restaurant_commercial_license_file');
+
             $owner_identification_file = UploadedFile::getInstances($model, 'owner_identification_file');
 
-            if (sizeof($restaurant_document_file) > 0)
-                $model->restaurant_document_file = $restaurant_document_file[0]; //Authorized Signature
+            if (sizeof($restaurant_commercial_license_file) > 0)
+                $model->restaurant_commercial_license_file = $restaurant_commercial_license_file[0]; //Commercial License
+
+            if (sizeof($restaurant_authorized_signature_file) > 0)
+                $model->restaurant_authorized_signature_file = $restaurant_authorized_signature_file[0]; //Authorized signature
 
             if (sizeof($owner_identification_file) > 0)
                 $model->owner_identification_file = $owner_identification_file[0]; //Owner's civil id
 
 
 
-            $model->createAMerchantAccountOnTap();
+            $model->createAnAccountOnTap();
 
 
             if ($model->validate() && $model->save()) {

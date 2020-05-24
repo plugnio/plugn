@@ -8,7 +8,7 @@ use Yii;
  * This is the model class for table "restaurant".
  *
  *  New fields added to create a merchant account on tap
- *
+ *commercial_license
  * @property string $business_id
  * @property string $developer_id
  * @property string $business_entity_id
@@ -21,13 +21,20 @@ use Yii;
  * @property string $vendor_sector
  * @property string $license_number
  * @property int $not_for_profit
- * @property string $document_issuing_country
- * @property string|null $document_issuing_date
- * @property string|null $document_expiry_date
- * @property string $document_file_id
- * @property string $document_file
- * @property string $document_title
- * @property string $document_file_purpose
+ * @property string $authorized_signature_issuing_country
+ * @property string|null $authorized_signature_issuing_date
+ * @property string|null $authorized_signature_expiry_date
+ * @property string $authorized_signature_file_id
+ * @property string $authorized_signature_file
+ * @property string $authorized_signature_title
+ * @property string $authorized_signature_file_purpose
+ * @property string $commercial_license_issuing_country
+ * @property string|null $commercial_license_issuing_date
+ * @property string|null $commercial_license_expiry_date
+ * @property string $commercial_license_file_id
+ * @property string $commercial_license_file
+ * @property string $commercial_license_title
+ * @property string $commercial_license_file_purpose
  * @property string $iban
  * @property string $owner_first_name
  * @property string $owner_last_name
@@ -44,7 +51,8 @@ use Yii;
 class Restaurant extends \common\models\Restaurant {
 
     public $owner_identification_file;
-    public $restaurant_document_file;
+    public $restaurant_authorized_signature_file;
+    public $restaurant_commercial_license_file;
 
     const SCENARIO_CREATE_TAP_ACCOUNT = 'tap_account';
     const SCENARIO_CREATE = 'create';
@@ -68,25 +76,29 @@ class Restaurant extends \common\models\Restaurant {
                 'required', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT
             ],
             [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3],
-            [['identification_file_id', 'document_file_id'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            [['identification_file_id', 'authorized_signature_file_id', 'commercial_license_file_id'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             [['not_for_profit'], 'number'],
-            [['document_issuing_date', 'document_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            [['authorized_signature_issuing_date', 'authorized_signature_expiry_date','commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             ['owner_email', 'email'],
             [
                 [
                     'business_type', 'vendor_sector', 'license_number',
-                    'document_issuing_country', 'document_issuing_date', 'document_expiry_date',
-                    'document_file', 'document_file_purpose', 'iban', 'owner_first_name', 'owner_last_name',
+                    'authorized_signature_issuing_country', 'authorized_signature_issuing_date', 'authorized_signature_expiry_date',
+                    'authorized_signature_file', 'authorized_signature_file_purpose', 'authorized_signature_title',
+                    'commercial_license_issuing_country', 'commercial_license_issuing_date', 'commercial_license_expiry_date',
+                    'commercial_license_file', 'commercial_license_file_purpose', 'commercial_license_title',
+                    'iban', 'owner_first_name', 'owner_last_name',
                     'owner_email', 'owner_customer_number',
-                    'identification_issuing_country', 'identification_issuing_date',
-                    'document_title', 'identification_title',
+                    'identification_issuing_country', 'identification_issuing_date', 'identification_title',
                     'identification_expiry_date', 'identification_file', 'identification_file_purpose',
                     'business_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
                     'live_api_key', 'test_api_key'  ,'developer_id'
                 ],
                 'string', 'max' => 255
             ],
-            [['restaurant_document_file', 'owner_identification_file'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+
+            [['restaurant_commercial_license_file', 'owner_identification_file'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            [['restaurant_authorized_signature_file', 'owner_identification_file'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
         ]);
     }
 
@@ -100,13 +112,20 @@ class Restaurant extends \common\models\Restaurant {
             'vendor_sector' => 'Vendor Sector',
             'license_number' => 'License Number',
             'not_for_profit' => 'Not For Profit',
-            'document_issuing_country' => 'Document Issuing Country',
-            'document_issuing_date' => 'Document Issuing Date',
-            'document_expiry_date' => 'Document Expiry Date',
-            'document_file' => 'Document File',
-            'restaurant_document_file' => 'Store Document File',
-            'document_title' => 'Document Title',
-            'document_file_purpose' => 'Document File Purpose',
+            'authorized_signature_issuing_country' => 'Authorized Signature Issuing Country',
+            'authorized_signature_issuing_date' => 'Authorized Signature Issuing Date',
+            'authorized_signature_expiry_date' => 'Authorized Signature Expiry Date',
+            'authorized_signature_file' => 'Authorized Signature File',
+            'restaurant_authorized_signature_file' => 'Store Authorized Signature File',
+            'authorized_signature_title' => 'Authorized Signature Title',
+            'authorized_signature_file_purpose' => 'Authorized Signature File Purpose',
+            'commercial_license_issuing_country' => 'Commercial License Issuing Country',
+            'commercial_license_issuing_date' => 'Commercial License Issuing Date',
+            'commercial_license_expiry_date' => 'Commercial License Expiry Date',
+            'commercial_license_file' => 'Commercial License File',
+            'restaurant_commercial_license_file' => 'Commercial License File',
+            'commercial_license_title' => 'Commercial License Title',
+            'commercial_license_file_purpose' => 'Commercial License File Purpose',
             'iban' => 'IBAN',
             'owner_first_name' => 'Owner First Name',
             'owner_last_name' => 'Owner Last Name',
@@ -126,7 +145,8 @@ class Restaurant extends \common\models\Restaurant {
      */
     public function processFileUploads() {
 
-        $this->_uploadTempFile($this->restaurant_document_file, 'document_file');
+        $this->_uploadTempFile($this->restaurant_authorized_signature_file, 'authorized_signature_file');
+        $this->_uploadTempFile($this->restaurant_commercial_license_file, 'commercial_license_file');
         $this->_uploadTempFile($this->owner_identification_file, 'identification_file');
     }
 
@@ -156,7 +176,7 @@ class Restaurant extends \common\models\Restaurant {
         }
     }
 
-    
+
     /**
      * Processes a file upload
      * @param UploadedFile $file instance of yii\web\UploadedFile that will be uploaded into the attribute
@@ -195,27 +215,48 @@ class Restaurant extends \common\models\Restaurant {
      */
     public function deleteTempFiles() {
 
-        if ($this->document_file && file_exists(Yii::getAlias('@projectFiles') . "/" . $this->document_file)) {
-            $this->uploadFileToCloudinary(Yii::getAlias('@projectFiles') . "/" . $this->document_file, $this->document_file, 'document_file');
+        if ($this->authorized_signature_file && file_exists(Yii::getAlias('@projectFiles') . "/" . $this->authorized_signature_file)) {
+            $this->uploadFileToCloudinary(Yii::getAlias('@projectFiles') . "/" . $this->authorized_signature_file, $this->authorized_signature_file, 'authorized_signature_file');
         }
+
+        if ($this->commercial_license_file && file_exists(Yii::getAlias('@projectFiles') . "/" . $this->commercial_license_file)) {
+            $this->uploadFileToCloudinary(Yii::getAlias('@projectFiles') . "/" . $this->commercial_license_file, $this->commercial_license_file, 'commercial_license_file');
+        }
+
         if ($this->identification_file && file_exists(Yii::getAlias('@projectFiles') . "/" . $this->identification_file)) {
             $this->uploadFileToCloudinary(Yii::getAlias('@projectFiles') . "/" . $this->identification_file, $this->identification_file, 'identification_file');
         }
     }
 
     public function uploadDocumentsToTap() {
+
         $this->processFileUploads();
-
-        if ($this->document_expiry_date && $this->document_issuing_date && $this->document_issuing_country && $this->document_file_purpose && $this->document_title) {
-
-            //Upload Document file
+  
+        if ($this->authorized_signature_expiry_date && $this->authorized_signature_issuing_date && $this->authorized_signature_issuing_country && $this->authorized_signature_file_purpose && $this->authorized_signature_title) {
+           
+            //Upload Authorized Signature file
             $response = Yii::$app->tapPayments->uploadFileToTap(
-                    Yii::getAlias('@projectFiles') . "/" . $this->document_file, $this->document_file_purpose, $this->document_title);
-
+                    Yii::getAlias('@projectFiles') . "/" . $this->authorized_signature_file, $this->authorized_signature_file_purpose, $this->authorized_signature_title);
             if ($response->isOk) {
-                $this->document_file_id = $response->data['id'];
+                
+                $this->authorized_signature_file_id = $response->data['id'];
+                
             }
         }
+               
+
+        if ($this->commercial_license_expiry_date && $this->commercial_license_issuing_date && $this->commercial_license_issuing_country && $this->commercial_license_file_purpose && $this->commercial_license_title) {
+
+            //Upload Authorized Signature file
+            $response = Yii::$app->tapPayments->uploadFileToTap(
+                    Yii::getAlias('@projectFiles') . "/" . $this->commercial_license_file, $this->commercial_license_file_purpose, $this->commercial_license_title);
+
+            if ($response->isOk) {
+                
+                $this->commercial_license_file_id = $response->data['id'];
+            }
+        }
+
 
 
         //Upload Owner civil id
@@ -227,12 +268,12 @@ class Restaurant extends \common\models\Restaurant {
         }
     }
 
+
     /**
      * Create an account for vendor on tap
-     * @param type $documentFile
      */
-    public function createAMerchantAccountOnTap() {
-        //Upload temp file on our server after we create an account on tap we gonaa delete them
+    public function createAnAccountOnTap() {
+        //Upload documents file on our server before we create an account on tap we gonaa delete them
         $this->uploadDocumentsToTap();
 
         //Create a business for a vendor on Tap

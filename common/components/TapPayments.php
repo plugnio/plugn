@@ -38,7 +38,7 @@ class TapPayments extends Component {
      * @var float gateway fee charged by portal
      */
     public $knetGatewayFee = 0.01; // How much is charged per KNET transaction
-    
+
     /**
      * @var float gateway fee charged by portal
      */
@@ -48,7 +48,7 @@ class TapPayments extends Component {
      * @var float gateway fee charged by portal
      */
     public $creditcardGatewayFeePercentage = 0.025; // How much is charged per Creditcard transaction
-    
+
     /**
      * @var float gateway fee charged by portal
      */
@@ -78,14 +78,11 @@ class TapPayments extends Component {
      * @var string Variable for live api key to be stored in
      */
     public $vendoerLiveApiKey;
-    
+
     /**
      * @var string Variable for test api key to be stored in
      */
-     public $vendorTestApiKey;
-
-        
-
+    public $vendorTestApiKey;
     private $apiEndpoint = "https://api.tap.company/v2";
 
     /**
@@ -116,23 +113,22 @@ class TapPayments extends Component {
         parent::init();
     }
 
-        /**
+    /**
      * Set the api keys to use
      * @param  [type] $liveKey [description]
      * @param  [type] $testKey [description]
      * @return [type]          [description]
      */
-    public function setApiKeys($liveKey, $testKey){
+    public function setApiKeys($liveKey, $testKey) {
         $this->vendoerLiveApiKey = $liveKey;
         $this->vendorTestApiKey = $testKey;
 
         if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
             $this->vendorSecretApiKey = $this->vendoerLiveApiKey;
-        }else{
+        } else {
             $this->vendorSecretApiKey = $this->vendorTestApiKey;
         }
     }
-
 
     /**
      * upload a file to Tap
@@ -149,6 +145,7 @@ class TapPayments extends Component {
             "title" => $title,
             "file_link_create" => '0'
         ];
+
 
 
         $client = new Client();
@@ -226,29 +223,45 @@ class TapPayments extends Component {
                         "en" => $restaurant->name,
                         "ar" => $restaurant->name_ar
                     ],
+                    "website" => $restaurant->restaurant_domain,
                     "sector" => [
                         $restaurant->vendor_sector
                     ]
                 ]
             ],
-
         ];
 
 
-          if($restaurant->document_issuing_country && $restaurant->document_issuing_date && $restaurant->document_expiry_date && $restaurant->document_file_id){
-            $documentArray  =  [
-                              "number" => 1,
-                              "issuing_country" => $restaurant->document_issuing_country,
-                              "issuing_date" => $restaurant->document_issuing_date,
-                              "expiry_date" => $restaurant->document_expiry_date,
-                              "images" => [
-                                  $restaurant->document_file_id
-                              ]
-                          ] ;
 
-            array_push($bussinessParams['entity']['documents'] , $documentArray);
+        if ($restaurant->authorized_signature_issuing_country && $restaurant->authorized_signature_issuing_date && $restaurant->authorized_signature_expiry_date && $restaurant->authorized_signature_file_id) {
+            $documentArray = [
+                "type" => "Authorized Signature",
+                "number" => 1,
+                "issuing_country" => $restaurant->authorized_signature_issuing_country,
+                "issuing_date" => $restaurant->authorized_signature_issuing_date,
+                "expiry_date" => $restaurant->authorized_signature_expiry_date,
+                "images" => [
+                    $restaurant->authorized_signature_file_id
+                ]
+                    ];
 
-          }
+            array_push($bussinessParams['entity']['documents'], $documentArray);
+        }
+
+        if ($restaurant->commercial_license_issuing_country && $restaurant->commercial_license_issuing_date && $restaurant->commercial_license_expiry_date && $restaurant->commercial_license_file_id) {
+            $documentArray = [
+                "type" => "Commercial License",
+                "number" => 1,
+                "issuing_country" => $restaurant->commercial_license_issuing_country,
+                "issuing_date" => $restaurant->commercial_license_issuing_date,
+                "expiry_date" => $restaurant->commercial_license_expiry_date,
+                "images" => [
+                    $restaurant->commercial_license_file_id
+                ]
+                    ];
+
+            array_push($bussinessParams['entity']['documents'], $documentArray);
+        }
 
 
         $client = new Client();
@@ -302,8 +315,7 @@ class TapPayments extends Component {
 
         return $response;
     }
-    
-    
+
     /**
      * Create an operator
      * @param type $restaurant_name
@@ -312,7 +324,7 @@ class TapPayments extends Component {
     public function createAnOperator($restaurant_name, $wallet_id, $developer_id) {
 
 
-   
+
         $operatorEndpoint = $this->apiEndpoint . "/operator";
 
         $operatorParams = [
@@ -409,7 +421,6 @@ class TapPayments extends Component {
         return $response;
     }
 
-
     /**
      * Create a Refund
      * @param  string $chargeId
@@ -447,7 +458,7 @@ class TapPayments extends Component {
 
         $client = new Client();
 
-       $response = $client->createRequest()
+        $response = $client->createRequest()
                 ->setMethod('GET')
                 ->setUrl($this->apiEndpoint . "/refunds/" . $refundId)
                 ->addHeaders([

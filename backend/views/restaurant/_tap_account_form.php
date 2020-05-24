@@ -56,15 +56,16 @@ $this->registerJs($js);
 
 
     <?= $form->field($model, 'business_type')->textInput(['value' => 'corp']) ?>
-    
+
     <?= $form->field($model, 'vendor_sector')->textInput() ?>
-    
+
     <?= $form->field($model, 'license_number')->textInput() ?>
-    
-    <?= $form->field($model, 'document_issuing_country')->textInput(['value' => "KW"]) ?>
+
+    <!-- Authorized Signature  -->
+    <?= $form->field($model, 'authorized_signature_issuing_country')->textInput(['value' => "KW"]) ?>
 
     <?=
-    $form->field($model, 'document_issuing_date')->widget(DatePicker::classname(), [
+    $form->field($model, 'authorized_signature_issuing_date')->widget(DatePicker::classname(), [
         'pluginOptions' => [
             'autoclose' => true,
             'format' => 'yyyy-mm-dd'
@@ -72,7 +73,7 @@ $this->registerJs($js);
     ])
     ?>
     <?=
-    $form->field($model, 'document_expiry_date')->widget(DatePicker::classname(), [
+    $form->field($model, 'authorized_signature_expiry_date')->widget(DatePicker::classname(), [
         'pluginOptions' => [
             'autoclose' => true,
             'format' => 'yyyy-mm-dd'
@@ -81,7 +82,7 @@ $this->registerJs($js);
     ?>
 
     <?=
-    $form->field($model, 'restaurant_document_file')->widget(FileInput::classname(), [
+    $form->field($model, 'restaurant_authorized_signature_file')->widget(FileInput::classname(), [
         'options' => [
             'accept' => 'image/*',
             'multiple' => false
@@ -89,12 +90,45 @@ $this->registerJs($js);
     ]);
     ?>
 
-    <?= $form->field($model, 'document_title')->textInput(['value' => 'Authorized Signature']) ?>
+    <?= $form->field($model, 'authorized_signature_title')->textInput(['value' => 'Authorized Signature']) ?>
 
-    <?= $form->field($model, 'document_file_purpose')->textInput(['value' => 'customer_signature']) ?>
+    <?= $form->field($model, 'authorized_signature_file_purpose')->textInput(['value' => 'customer_signature']) ?>
+
+    <!-- Commercial License  -->
+    <?= $form->field($model, 'commercial_license_issuing_country')->textInput(['value' => "KW"]) ?>
+
+    <?=
+    $form->field($model, 'commercial_license_issuing_date')->widget(DatePicker::classname(), [
+        'pluginOptions' => [
+            'autoclose' => true,
+            'format' => 'yyyy-mm-dd'
+        ]
+    ])
+    ?>
+    <?=
+    $form->field($model, 'commercial_license_expiry_date')->widget(DatePicker::classname(), [
+        'pluginOptions' => [
+            'autoclose' => true,
+            'format' => 'yyyy-mm-dd'
+        ]
+    ])
+    ?>
+
+    <?=
+    $form->field($model, 'restaurant_commercial_license_file')->widget(FileInput::classname(), [
+        'options' => [
+            'accept' => 'image/*',
+            'multiple' => false
+        ]
+    ]);
+    ?>
+
+    <?= $form->field($model, 'commercial_license_title')->textInput(['value' => 'Commercial License']) ?>
+
+    <?= $form->field($model, 'commercial_license_file_purpose')->textInput(['value' => 'license']) ?>
 
     <?= $form->field($model, 'iban')->textInput() ?>
-   
+
     <?= $form->field($model, 'identification_issuing_country')->textInput(['value' => "KW"]) ?>
 
     <?=
