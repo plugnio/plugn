@@ -201,7 +201,7 @@ class TapPayments extends Component {
                         "email" => $restaurant->owner_email,
                         "phone" => [
                             "country_code" => "965",
-                            "number" => $restaurant->owner_customer_number
+                            "number" => $restaurant->owner_number
                         ]
                     ]
                 ],
@@ -233,8 +233,17 @@ class TapPayments extends Component {
 
 
 
-        if ($restaurant->authorized_signature_issuing_country && $restaurant->authorized_signature_issuing_date && $restaurant->authorized_signature_expiry_date && $restaurant->authorized_signature_file_id) {
-            $documentArray = [
+        if (
+                $restaurant->authorized_signature_issuing_country &&
+                $restaurant->authorized_signature_issuing_date &&
+                $restaurant->authorized_signature_expiry_date &&
+                $restaurant->authorized_signature_file_id &&
+                $restaurant->commercial_license_issuing_country &&
+                $restaurant->commercial_license_issuing_date &&
+                $restaurant->commercial_license_expiry_date &&
+                $restaurant->commercial_license_file_id
+        ) {
+            $authorizedSignatureDocument = [
                 "type" => "Authorized Signature",
                 "number" => 1,
                 "issuing_country" => $restaurant->authorized_signature_issuing_country,
@@ -243,13 +252,12 @@ class TapPayments extends Component {
                 "images" => [
                     $restaurant->authorized_signature_file_id
                 ]
-                    ];
+            ];
 
-            array_push($bussinessParams['entity']['documents'], $documentArray);
-        }
+            array_push($bussinessParams['entity']['documents'], $authorizedSignatureDocument);
 
-        if ($restaurant->commercial_license_issuing_country && $restaurant->commercial_license_issuing_date && $restaurant->commercial_license_expiry_date && $restaurant->commercial_license_file_id) {
-            $documentArray = [
+
+            $commercialLicenseDocument = [
                 "type" => "Commercial License",
                 "number" => 1,
                 "issuing_country" => $restaurant->commercial_license_issuing_country,
@@ -258,10 +266,16 @@ class TapPayments extends Component {
                 "images" => [
                     $restaurant->commercial_license_file_id
                 ]
-                    ];
+            ];
 
-            array_push($bussinessParams['entity']['documents'], $documentArray);
-        }
+            array_push($bussinessParams['entity']['documents'], $commercialLicenseDocument);
+            
+            
+            $bussinessParams['entity']['is_licensed'] = 'true';
+            
+        } else 
+              $bussinessParams['entity']['is_licensed'] = 'false';
+
 
 
         $client = new Client();
@@ -274,7 +288,7 @@ class TapPayments extends Component {
                     'content-type' => 'application/json',
                 ])
                 ->send();
-
+        
         return $response;
     }
 
@@ -322,9 +336,7 @@ class TapPayments extends Component {
      * @param type $wallet_id
      */
     public function createAnOperator($restaurant_name, $wallet_id, $developer_id) {
-
-
-
+        
         $operatorEndpoint = $this->apiEndpoint . "/operator";
 
         $operatorParams = [
@@ -343,7 +355,6 @@ class TapPayments extends Component {
                     'content-type' => 'application/json',
                 ])
                 ->send();
-
 
         return $response;
     }

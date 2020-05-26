@@ -125,7 +125,7 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'commercial_license_title')->textInput(['value' => 'Commercial License']) ?>
 
-    <?= $form->field($model, 'commercial_license_file_purpose')->textInput(['value' => 'license']) ?>
+    <?= $form->field($model, 'commercial_license_file_purpose')->textInput(['value' => 'customer_signature']) ?>
 
     <?= $form->field($model, 'iban')->textInput() ?>
 

@@ -193,6 +193,16 @@ class RestaurantController extends Controller {
     }
 
     /**
+     * Send store's data to Tap via email
+     */
+    public function actionSendEmailToTap($id) {
+        $model = $this->findModel($id);
+        $model->sendStoreDataToTap();
+        
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
+
+    /**
      * Change restaurant status to become open
      * @param integer $id
      * @return mixed

@@ -8,7 +8,7 @@ use Yii;
  * This is the model class for table "restaurant".
  *
  *  New fields added to create a merchant account on tap
- *commercial_license
+ * commercial_license
  * @property string $business_id
  * @property string $developer_id
  * @property string $business_entity_id
@@ -39,7 +39,7 @@ use Yii;
  * @property string $owner_first_name
  * @property string $owner_last_name
  * @property string $owner_email
- * @property string $owner_customer_number
+ * @property string $owner_number
  * @property string $identification_issuing_country
  * @property string|null $identification_issuing_date
  * @property string|null $identification_expiry_date
@@ -62,7 +62,7 @@ class Restaurant extends \common\models\Restaurant {
      */
     public function rules() {
         return array_merge(parent::rules(), [
-            [['owner_first_name', 'owner_last_name', 'owner_email', 'owner_customer_number'], 'required', 'on' => 'create'],
+            [['owner_first_name', 'owner_last_name', 'owner_email', 'owner_number'], 'required', 'on' => 'create'],
             //All new fields added are required in order to create an account on Tap
             [
                 [
@@ -78,7 +78,7 @@ class Restaurant extends \common\models\Restaurant {
             [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3],
             [['identification_file_id', 'authorized_signature_file_id', 'commercial_license_file_id'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             [['not_for_profit'], 'number'],
-            [['authorized_signature_issuing_date', 'authorized_signature_expiry_date','commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            [['authorized_signature_issuing_date', 'authorized_signature_expiry_date', 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             ['owner_email', 'email'],
             [
                 [
@@ -88,20 +88,18 @@ class Restaurant extends \common\models\Restaurant {
                     'commercial_license_issuing_country', 'commercial_license_issuing_date', 'commercial_license_expiry_date',
                     'commercial_license_file', 'commercial_license_file_purpose', 'commercial_license_title',
                     'iban', 'owner_first_name', 'owner_last_name',
-                    'owner_email', 'owner_customer_number',
+                    'owner_email', 'owner_number',
                     'identification_issuing_country', 'identification_issuing_date', 'identification_title',
                     'identification_expiry_date', 'identification_file', 'identification_file_purpose',
                     'business_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
-                    'live_api_key', 'test_api_key'  ,'developer_id'
+                    'live_api_key', 'test_api_key', 'developer_id'
                 ],
                 'string', 'max' => 255
             ],
-
             [['restaurant_commercial_license_file', 'owner_identification_file'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             [['restaurant_authorized_signature_file', 'owner_identification_file'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
         ]);
     }
-
 
     /**
      * {@inheritdoc}
@@ -130,7 +128,7 @@ class Restaurant extends \common\models\Restaurant {
             'owner_first_name' => 'Owner First Name',
             'owner_last_name' => 'Owner Last Name',
             'owner_email' => 'Owner Email',
-            'owner_customer_number' => 'Owner Customer Number',
+            'owner_number' => 'Owner Number',
             'identification_issuing_country' => 'Identification Issuing Country',
             'identification_issuing_date' => 'Identification Issuing Date',
             'identification_expiry_date' => 'Identification Expiry Date',
@@ -176,7 +174,6 @@ class Restaurant extends \common\models\Restaurant {
         }
     }
 
-
     /**
      * Processes a file upload
      * @param UploadedFile $file instance of yii\web\UploadedFile that will be uploaded into the attribute
@@ -208,8 +205,26 @@ class Restaurant extends \common\models\Restaurant {
             //delete tmp files
             $this->deleteTempFiles();
         }
+        
     }
 
+    /**
+     * Send store's data to Tap via email
+     * @return type
+     */
+    public function sendStoreDataToTap(){
+    
+        return Yii::$app->mailer
+                        ->compose(
+                                ['html' => 'new-agent-signed-up-html'], ['model' => $this]
+                        )
+                        ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                        ->setTo('a.alhelow@tap.company')
+                        ->setCc('saoud@plugn.io')
+                        ->setSubject('[Plugn] New Agent - ' . $this->name )
+                        ->send();
+    }
+    
     /**
      * Deletes the files associated with this project
      */
@@ -231,19 +246,20 @@ class Restaurant extends \common\models\Restaurant {
     public function uploadDocumentsToTap() {
 
         $this->processFileUploads();
-  
+
         if ($this->authorized_signature_expiry_date && $this->authorized_signature_issuing_date && $this->authorized_signature_issuing_country && $this->authorized_signature_file_purpose && $this->authorized_signature_title) {
-           
+
             //Upload Authorized Signature file
             $response = Yii::$app->tapPayments->uploadFileToTap(
                     Yii::getAlias('@projectFiles') . "/" . $this->authorized_signature_file, $this->authorized_signature_file_purpose, $this->authorized_signature_title);
             if ($response->isOk) {
-                
+
                 $this->authorized_signature_file_id = $response->data['id'];
-                
+            } else {
+                return Yii::$app->session->setFlash('error', print_r('Error when uploading authorized signature document: ' . json_encode($response->data), true));
             }
         }
-               
+
 
         if ($this->commercial_license_expiry_date && $this->commercial_license_issuing_date && $this->commercial_license_issuing_country && $this->commercial_license_file_purpose && $this->commercial_license_title) {
 
@@ -252,8 +268,11 @@ class Restaurant extends \common\models\Restaurant {
                     Yii::getAlias('@projectFiles') . "/" . $this->commercial_license_file, $this->commercial_license_file_purpose, $this->commercial_license_title);
 
             if ($response->isOk) {
-                
+
                 $this->commercial_license_file_id = $response->data['id'];
+            }
+            else {
+                return Yii::$app->session->setFlash('error', print_r('Error when uploading commercial license document: ' . json_encode($response->data), true));
             }
         }
 
@@ -268,7 +287,6 @@ class Restaurant extends \common\models\Restaurant {
         }
     }
 
-
     /**
      * Create an account for vendor on tap
      */
@@ -281,12 +299,14 @@ class Restaurant extends \common\models\Restaurant {
 
 
         if ($businessApiResponse->isOk) {
+
             $this->business_id = $businessApiResponse->data['id'];
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
             $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
+                      
         } else {
-           return Yii::$app->session->setFlash('error', print_r('Business: '.  json_encode($businessApiResponse->data), true));
-       }
+            return Yii::$app->session->setFlash('error', print_r('Business: ' . json_encode($businessApiResponse->data), true));
+        }
 
         //Create a merchant on Tap
         $merchantApiResponse = Yii::$app->tapPayments->createMergentAccount($this->name, $this->business_id, $this->business_entity_id, $this->iban);
@@ -295,23 +315,22 @@ class Restaurant extends \common\models\Restaurant {
             $this->merchant_id = $merchantApiResponse->data['id'];
             $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
         } else {
-           return Yii::$app->session->setFlash('error', print_r( 'Merchant: '.  json_encode($merchantApiResponse->data), true));
-       }
+            return Yii::$app->session->setFlash('error', print_r('Merchant: ' . json_encode($merchantApiResponse->data), true));
+        }
 
-       //Create an Operator
-       $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id, $this->developer_id);
+        //Create an Operator
+        $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id, $this->developer_id);
 
 
-       if ($operatorApiResponse->isOk) {
-           $this->operator_id = $operatorApiResponse->data['id'];
-           $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
+        if ($operatorApiResponse->isOk) {
+            $this->operator_id = $operatorApiResponse->data['id'];
+            $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
 
-           if (array_key_exists('live', $operatorApiResponse->data['api_credentials']))
-               $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
-       } else {
-           return Yii::$app->session->setFlash('error', print_r( 'Operator: '. json_encode($operatorApiResponse->data), true));
-       }
-
+            if (array_key_exists('live', $operatorApiResponse->data['api_credentials']))
+                $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
+        } else {
+            return Yii::$app->session->setFlash('error', print_r('Operator: ' . json_encode($operatorApiResponse->data), true));
+        }
     }
 
 }

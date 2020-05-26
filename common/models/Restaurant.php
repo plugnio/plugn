@@ -320,7 +320,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset($fields['owner_first_name']);
         unset($fields['owner_last_name']);
         unset($fields['owner_email']);
-        unset($fields['owner_customer_number']);
+        unset($fields['owner_number']);
         unset($fields['identification_issuing_country']);
         unset($fields['identification_issuing_date']);
         unset($fields['identification_expiry_date']);

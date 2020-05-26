@@ -21,6 +21,15 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= $model->status ?>
         </span>
         <?= $model->business_id ? '' : Html::a('Create Tap account', ['create-tap-account', 'restaurant_uuid' => $model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+        <?=
+        Html::a('Send store data to Tap', ['send-email-to-tap', 'id' => $model->restaurant_uuid], [
+            'class' => 'btn btn-warning',
+            'data' => [
+                'confirm' => 'Are you sure you want to send an email to Tap?',
+                'method' => 'post',
+            ],
+        ])
+        ?>
 
     </h1>
 
@@ -105,7 +114,14 @@ $this->params['breadcrumbs'][] = $this->title;
             'support_delivery',
             'support_pick_up',
             'phone_number',
-            'owner_customer_number',
+            [
+                'attribute' => 'Owner name',
+                'format' => 'html',
+                'value' => function ($data) {
+                    return $data->owner_first_name . ' ' . $data->owner_last_name;
+                },
+            ],
+            'owner_number',
             'restaurant_email:email',
             'restaurant_created_at',
             'restaurant_updated_at',
