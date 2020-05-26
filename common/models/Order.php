@@ -247,7 +247,7 @@ class Order extends \yii\db\ActiveRecord {
                     ])
                     ->setFrom([\Yii::$app->params['supportEmail'] => $this->restaurant->name])
                     ->setTo($this->customer_email)
-                    ->setSubject('Your order from: ' . $this->restaurant->name)
+                    ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)
                     ->setReplyTo([$this->restaurant->restaurant_email => $this->restaurant->name])
                     ->send();
         }
@@ -264,7 +264,7 @@ class Order extends \yii\db\ActiveRecord {
                         ])
                         ->setFrom([\Yii::$app->params['supportEmail'] => $this->restaurant->name])
                         ->setTo($agent->agent_email)
-                        ->setSubject('Your order from: ' . $this->restaurant->name)
+                        ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)
                         ->setReplyTo([$this->restaurant->restaurant_email => $this->restaurant->name])
                         ->send();
             }
@@ -280,7 +280,7 @@ class Order extends \yii\db\ActiveRecord {
                     ])
                     ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
                     ->setTo($this->restaurant->restaurant_email)
-                    ->setSubject('Your order from: ' . $this->restaurant->name)
+                    ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)
                     ->setReplyTo([$this->restaurant->restaurant_email => $this->restaurant->name])
                     ->send();
         }

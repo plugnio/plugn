@@ -85,6 +85,25 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                             'visible' => $model->phone_number != null,
                         ],
+                        [
+                            'attribute' => 'phone_number_display',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                if ($data->phone_number_display == Restaurant::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER)
+                                    return "Dont show store's phone number";
+                                else if($data->phone_number_display == Restaurant::PHONE_NUMBER_DISPLAY_ICON)
+                                         return "📞";
+                                else if($data->phone_number_display == Restaurant::PHONE_NUMBER_DISPLAY_SHOW_PHONE_NUMBER)
+                                         return "+965" . $data->phone_number;
+                            },
+                        ],
+                        [
+                            'attribute' => 'restaurant_email_notification',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                               return $data->restaurant_email_notification ? 'Yes' : 'No';
+                            },
+                        ],
                         'restaurant_email:email',
                         [
                             'attribute' => 'armada_api_key',
