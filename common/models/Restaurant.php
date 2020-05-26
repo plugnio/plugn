@@ -31,8 +31,8 @@ use yii\behaviors\AttributeBehavior;
  * @property int $store_branch_name
  * @property int $custom_css
  * @property int $store_layout
- * 
- * 
+ *
+ *
  * @property AgentAssignment[] $agentAssignments
  * @property Agent[] $agents
  * @property Agent $agent
@@ -299,20 +299,28 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset($fields['business_type']);
         unset($fields['restaurant_email']);
         unset($fields['license_number']);
-        unset($fields['document_issuing_country']);
-        unset($fields['document_issuing_date']);
         unset($fields['not_for_profit']);
-        unset($fields['document_issuing_date']);
-        unset($fields['document_expiry_date']);
-        unset($fields['document_title']);
-        unset($fields['document_file']);
-        unset($fields['document_file_id']);
-        unset($fields['document_file_purpose']);
+        unset($fields['authorized_signature_issuing_country']);
+        unset($fields['authorized_signature_issuing_date']);
+        unset($fields['authorized_signature_issuing_date']);
+        unset($fields['authorized_signature_expiry_date']);
+        unset($fields['authorized_signature_title']);
+        unset($fields['authorized_signature_file']);
+        unset($fields['authorized_signature_file_id']);
+        unset($fields['authorized_signature_file_purpose']);
+        unset($fields['commercial_license_issuing_country']);
+        unset($fields['commercial_license_issuing_date']);
+        unset($fields['commercial_license_issuing_date']);
+        unset($fields['commercial_license_expiry_date']);
+        unset($fields['commercial_license_title']);
+        unset($fields['commercial_license_file']);
+        unset($fields['commercial_license_file_id']);
+        unset($fields['commercial_license_file_purpose']);
         unset($fields['iban']);
         unset($fields['owner_first_name']);
         unset($fields['owner_last_name']);
         unset($fields['owner_email']);
-        unset($fields['owner_customer_number']);
+        unset($fields['owner_number']);
         unset($fields['identification_issuing_country']);
         unset($fields['identification_issuing_date']);
         unset($fields['identification_expiry_date']);

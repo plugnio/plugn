@@ -157,7 +157,7 @@ $this->registerJs($js);
     
     <?= $form->field($model, 'owner_email')->input('email') ?>
     
-    <?= $form->field($model, 'owner_customer_number')->textInput() ?>
+    <?= $form->field($model, 'owner_number')->textInput() ?>
     
     <?=  $form->field($model, 'developer_id')->textInput() ?>
     
