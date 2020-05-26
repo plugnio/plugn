@@ -107,6 +107,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'phone_number',
             'owner_customer_number',
             'restaurant_email:email',
+            'iban',
             'restaurant_created_at',
             'restaurant_updated_at',
             'business_id',
