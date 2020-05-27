@@ -6,7 +6,8 @@ return [
     // 'senderEmail' => 'noreply@example.com',
     // 'senderName' => 'Example.com mailer',
     'user.passwordResetTokenExpire' => 3600,
-
+    'bsDependencyEnabled' => false,
+    
     'allowedOrigins' => [
         //'https://api.yo3an.io/',
         //Dev Envs
