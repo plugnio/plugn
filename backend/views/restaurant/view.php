@@ -95,6 +95,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'tagline',
             'tagline_ar',
             'status',
+            'restaurant_domain',
             'thumbnail_image',
             'logo',
             [
