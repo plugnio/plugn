@@ -42,13 +42,12 @@ class OrderController extends Controller {
         ];
     }
 
-
     /**
      * Lists all Order models.
      * @return mixed
      */
     public function actionIndex($restaurantUuid) {
-    
+
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
         $searchModel = new OrderSearch();
@@ -57,20 +56,15 @@ class OrderController extends Controller {
 
         if ($restaurant_model->load(Yii::$app->request->post())) {
 
-//            $date_range = explode(' -', $restaurant_model->date_range_picker_with_times);
-//            $start_date = $date_range[0];
-//            $end_date = $date_range[1];
+            list($start_date, $end_date) = explode(' - ', $restaurant_model->date_range_picker_with_time);
 
-            list($start_date, $end_date) = explode(' - ', $restaurant_model->date_range_picker_with_times);
-            
-            
+
             $searchResult = Order::find()
-//                    ->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
-                    ->where(['between', 'order_created_at', $start_date , $end_date])
+                    ->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
+                    ->andWhere(['between', 'order_created_at', $start_date, $end_date])
                     ->all();
 
 
-            
             header('Access-Control-Allow-Origin: *');
             header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             header("Content-Disposition: attachment;filename=\"orders.xlsx\"");
@@ -100,17 +94,17 @@ class OrderController extends Controller {
                         "format" => "raw",
                         "value" => function($model) {
                             if ($model->order_status == Order::STATUS_PENDING)
-                                return  $model->orderStatus;
+                                return $model->orderStatus;
                             else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY)
-                                return  $model->orderStatus;
+                                return $model->orderStatus;
                             else if ($model->order_status == Order::STATUS_BEING_PREPARED)
                                 return $model->orderStatus;
                             else if ($model->order_status == Order::STATUS_COMPLETE)
-                                return $model->orderStatus ;
+                                return $model->orderStatus;
                             else if ($model->order_status == Order::STATUS_CANCELED)
                                 return $model->orderStatus;
                             else if ($model->order_status == Order::STATUS_REFUNDED)
-                                return $model->orderStatus ;
+                                return $model->orderStatus;
                         }
                     ],
                     [

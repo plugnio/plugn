@@ -69,7 +69,7 @@ $this->registerJs($js);
         <?php $form = ActiveForm::begin(); ?>
 
         <?=
-        $form->field($restaurant_model, 'date_range_picker_with_times', [
+        $form->field($restaurant_model, 'date_range_picker_with_time', [
             'template' => "{label}"
             . "<div class='input-group'> <div class='input-group-prepend'> <span class='input-group-text'><i class='far fa-clock'></i></span> </div>{input}"
             . "</div>"
@@ -78,11 +78,11 @@ $this->registerJs($js);
             'type' => 'text',
             'class' => 'form-control float-right',
             'id' => 'reservationtime'
-        ])->label(false)
+        ])
         ?>
 
         <div class="form-group">
-            <?= Html::submitButton('Export', ['class' => 'btn btn-success']) ?>
+            <?= Html::submitButton('Export to Excel', ['class' => 'btn btn-success']) ?>
         </div>
 
 

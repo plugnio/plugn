@@ -71,7 +71,7 @@ class Restaurant extends \yii\db\ActiveRecord {
     public $restaurant_logo;
     public $restaurant_thumbnail_image;
     
-    public $date_range_picker_with_times;
+    public $date_range_picker_with_time;
 
     /**
      * {@inheritdoc}
@@ -95,7 +95,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_created_at', 'restaurant_updated_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['custom_css'], 'string'],
-            [['date_range_picker_with_times'], 'safe'],
+            [['date_range_picker_with_time'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'armada_api_key','store_branch_name'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 8, 'max' => 8],
             [['phone_number'], 'integer', 'min' => 0],
@@ -124,6 +124,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             'support_delivery' => 'Support Delivery',
             'support_pick_up' => 'Support Pick Up',
             'restaurant_delivery_area' => 'Delivery Areas',
+            'date_range_picker_with_time' => 'Export orders data in a specific date range',
             'phone_number' => 'Phone Number',
             'restaurant_email' => "Store's Email",
             'restaurant_created_at' => 'Store Created At',

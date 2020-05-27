@@ -11,7 +11,7 @@ use common\models\Order;
 
 $js = "
     $(function () {
- 
+
     //Initialize Select2 Elements
     $('.select2').select2()
 
@@ -31,8 +31,6 @@ $js = "
 
 
 $this->registerJs($js);
-
-
 ?>
 
 <div class="order-search">
@@ -40,23 +38,21 @@ $this->registerJs($js);
 
 
     <?php
-    
-    
-    $form = ActiveForm::begin([
-                'layout' => 'horizontal',
-                'fieldConfig' => [
-                    'template' => "{label}\n{beginWrapper}\n{input}\n{hint}\n{error}\n{endWrapper}",
-                    'horizontalCssClasses' => [
-                        'label' => 'col-sm-4',
-                        'offset' => 'col-sm-offset-4',
-                        'wrapper' => 'col-sm-8',
-                        'error' => '',
-                        'hint' => '',
+        $form = ActiveForm::begin([
+                    'layout' => 'horizontal',
+                    'fieldConfig' => [
+                        'template' => "{label}\n{beginWrapper}\n{input}\n{hint}\n{error}\n{endWrapper}",
+                        'horizontalCssClasses' => [
+                            'label' => 'col-sm-4',
+                            'offset' => 'col-sm-offset-4',
+                            'wrapper' => 'col-sm-8',
+                            'error' => '',
+                            'hint' => '',
+                        ],
                     ],
-                ],
-                'action' => ['order/index', 'restaurantUuid' => $restaurant_uuid],
-                'method' => 'get',
-    ]);
+                    'action' => ['order/index', 'restaurantUuid' => $restaurant_uuid],
+                    'method' => 'get',
+                ]);
     ?>
 
 
@@ -64,12 +60,12 @@ $this->registerJs($js);
         <div class="col-md-6">
             <?= $form->field($model, 'order_uuid') ?>
             <?=
-            $form->field($model, 'date_range', [
-            ])->widget(DateRangePicker::classname(), [
-                'presetDropdown' => true,
-                'convertFormat' => true,
-                'pluginOptions' => ['locale' => ['format' => 'Y-m-d H:m:s']],
-            ]);
+                $form->field($model, 'date_range', [
+                ])->widget(DateRangePicker::classname(), [
+                    'presetDropdown' => false,
+                    'convertFormat' => true,
+                    'pluginOptions' => ['locale' => ['format' => 'Y-m-d H:m:s']],
+                ]);
             ?>
             <?=
             $form->field($model, 'order_status')->dropDownList([
@@ -79,44 +75,19 @@ $this->registerJs($js);
                 Order::STATUS_COMPLETE => 'Complete',
                 Order::STATUS_CANCELED => 'Canceled',
                 Order::STATUS_REFUNDED => 'Refunded'
-            ],[  'class' => 'select2', 'prompt' => 'Select order status']);
+                    ], ['class' => 'select2', 'prompt' => 'Select order status']);
             ?>
         </div>
         <div class="col-md-6">
-<?= $form->field($model, 'customer_name') ?>
-<?= $form->field($model, 'customer_phone_number') ?>
-
+            <?= $form->field($model, 'customer_name') ?>
+            <?= $form->field($model, 'customer_phone_number') ?>
 
         </div>
     </div>
 
 
-
-
-    <?php // echo $form->field($model, 'block')   ?>
-
-    <?php // echo $form->field($model, 'street')  ?>
-
-    <?php // echo $form->field($model, 'avenue')  ?>
-
-    <?php // echo $form->field($model, 'house_number')  ?>
-
-    <?php // echo $form->field($model, 'special_directions')  ?>
-
-    <?php // echo $form->field($model, 'customer_name')  ?>
-
-    <?php // echo $form->field($model, 'customer_phone_number')  ?>
-
-    <?php // echo $form->field($model, 'customer_email')  ?>
-
-    <?php // echo $form->field($model, 'payment_method_id')  ?>
-
-    <?php // echo $form->field($model, 'payment_method_name')  ?>
-
-        <?php // echo $form->field($model, 'order_status')   ?>
-
     <div class="form-group">
-<?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
+    <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
     <?= Html::a('Reset', ['order/index', 'restaurantUuid' => $restaurant_uuid], ['class' => 'btn btn-outline-secondary']) ?>
     </div>
 
