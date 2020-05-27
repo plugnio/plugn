@@ -18,7 +18,7 @@ use kartik\mpdf\Pdf;
 class OrderController extends Controller {
 
     public $enableCsrfValidation = false;
-    
+
     /**
      * {@inheritdoc}
      */
@@ -52,6 +52,80 @@ class OrderController extends Controller {
 
         $searchModel = new OrderSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
+
+
+        if ($restaurant_model->load(Yii::$app->request->post())) {
+
+//            $date_range = explode(' -', $restaurant_model->date_range_picker_with_times);
+//            $start_date = $date_range[0];
+//            $end_date = $date_range[1];
+
+            list($start_date, $end_date) = explode(' - ', $restaurant_model->date_range_picker_with_times);
+            
+            
+            $searchResult = Order::find()
+//                    ->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
+                    ->where(['between', 'order_created_at', $start_date , $end_date])
+                    ->all();
+
+
+            
+            header('Access-Control-Allow-Origin: *');
+            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            header("Content-Disposition: attachment;filename=\"orders.xlsx\"");
+            header("Cache-Control: max-age=0");
+
+            \moonland\phpexcel\Excel::export([
+                'isMultipleSheet' => false,
+                'models' => $searchResult,
+                'columns' => [
+                    [
+                        'attribute' => 'order_uuid',
+                        "format" => "raw",
+                        "value" => function($model) {
+                            return '#' . $model->order_uuid;
+                        }
+                    ],
+                    [
+                        'attribute' => 'order_created_at',
+                        "format" => "raw",
+                        "value" => function($model) {
+                            return Yii::$app->formatter->asRelativeTime($model->order_created_at);
+                        }
+                    ],
+                    'customer_name',
+                    [
+                        'attribute' => 'order_status',
+                        "format" => "raw",
+                        "value" => function($model) {
+                            if ($model->order_status == Order::STATUS_PENDING)
+                                return  $model->orderStatus;
+                            else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY)
+                                return  $model->orderStatus;
+                            else if ($model->order_status == Order::STATUS_BEING_PREPARED)
+                                return $model->orderStatus;
+                            else if ($model->order_status == Order::STATUS_COMPLETE)
+                                return $model->orderStatus ;
+                            else if ($model->order_status == Order::STATUS_CANCELED)
+                                return $model->orderStatus;
+                            else if ($model->order_status == Order::STATUS_REFUNDED)
+                                return $model->orderStatus ;
+                        }
+                    ],
+                    [
+                        'label' => 'Payment',
+                        "format" => "raw",
+                        "value" => function($data) {
+                            if ($data->payment_uuid)
+                                return $data->payment->payment_current_status;
+                            else
+                                return $data->paymentMethod->payment_method_name;
+                        },
+                    ],
+                    'total_price:currency',
+                ]
+            ]);
+        }
 
         return $this->render('index', [
                     'searchModel' => $searchModel,

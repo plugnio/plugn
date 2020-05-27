@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use common\models\Order;
-
+use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\OrderSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -11,11 +11,80 @@ $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
 
 $this->title = 'Orders';
 $this->params['breadcrumbs'][] = $this->title;
+
+$js = "
+   $(function () {
+
+
+    //Date range picker
+    $('#reservation').daterangepicker()
+    //Date range picker with time picker
+    $('#reservationtime').daterangepicker({
+      timePicker: true,
+      timePickerIncrement: 30,
+      locale: {
+        format: 'YYYY-MM-DD H:mm:ss'
+      }
+    })
+    
+    //Date range as a button
+    $('#daterange-btn').daterangepicker(
+      {
+        ranges   : {
+          'Today'       : [moment(), moment()],
+          'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+          'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
+          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+          'This Month'  : [moment().startOf('month'), moment().endOf('month')],
+          'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        startDate: moment().subtract(29, 'days'),
+        endDate  : moment()
+      },
+      function (start, end) {
+        $('#reportrange span').html(start.format('YYYY-MM-DD H:mm:ss') + ' - ' + end.format('YYYY-MM-DD H:mm:ss'))
+      }
+    )
+
+
+
+   $(document).ready(function() { 
+            $('.input-field').change(function() { 
+                alert('Value: ' + $('#reservation').val());
+            }); 
+        }); 
+  })";
+
+
+$this->registerJs($js);
 ?>
+<!-- Date and time range -->
 
+
+
+<!-- /.input group -->
 <div class="card">
+<div class="card-body">
+    <?php $form = ActiveForm::begin(); ?>
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?=
+        $form->field($restaurant_model, 'date_range_picker_with_times', [
+            'template' => "{label}"
+            . "<div class='input-group'> <div class='input-group-prepend'> <span class='input-group-text'><i class='far fa-clock'></i></span> </div>{input}"
+            . "</div>"
+            . "{error}{hint}"
+        ])->textInput([
+            'type' => 'text',
+            'class' => 'form-control float-right',
+            'id' => 'reservationtime'
+        ])->label(false)
+    ?>
+    
+    <div class="form-group">
+        <?= Html::submitButton('Export', ['class' => 'btn btn-success']) ?>
+    </div>
+    
+    <?php ActiveForm::end(); ?>
 
     <?=
     GridView::widget([
@@ -34,7 +103,26 @@ $this->params['breadcrumbs'][] = $this->title;
                 "format" => "raw",
                 "value" => function($model) {
                     return Yii::$app->formatter->asRelativeTime($model->order_created_at);
-                }
+                },
+                             'filter' => kartik\daterange\DateRangePicker::widget([
+
+                            'model' => $searchModel,
+
+                            'attribute' => 'dealerAvailableDate',
+
+                            'convertFormat' => true,
+
+                            'pluginOptions' => [
+
+                                'locale' => [
+
+                                    'format' => 'Y-m-d'
+
+                                ],
+
+                            ],
+
+                        ]),
             ],
             'customer_name',
             [
@@ -99,11 +187,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
             ],
         ],
-        'layout' => '{summary}<div class="card-body"><div class="box-body table-responsive no-padding">{items}<div class="card-footer clearfix">{pager}</div></div>',
+        'layout' => '{summary}<div class="box-body table-responsive no-padding">{items}<div class="card-footer clearfix">{pager}</div>',
         'tableOptions' => ['class' => 'table table-bordered table-hover'],
         'summaryOptions' => ['class' => "card-header"],
     ]);
     ?>
 
 
+</div>
 </div>

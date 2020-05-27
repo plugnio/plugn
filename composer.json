@@ -39,7 +39,9 @@
         "kartik-v/yii2-widget-colorinput": "dev-master",
         "sentry/sdk": "2.1.0",
         "understeam/yii2-slack": "v0.3.0",
-        "yiier/yii2-slack": "*"
+        "yiier/yii2-slack": "*",
+        "moonlandsoft/yii2-phpexcel": "*",
+        "kartik-v/yii2-date-range": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

@@ -70,6 +70,8 @@ class Restaurant extends \yii\db\ActiveRecord {
     public $restaurant_payments_method;
     public $restaurant_logo;
     public $restaurant_thumbnail_image;
+    
+    public $date_range_picker_with_times;
 
     /**
      * {@inheritdoc}
@@ -93,6 +95,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_created_at', 'restaurant_updated_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['custom_css'], 'string'],
+            [['date_range_picker_with_times'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'armada_api_key','store_branch_name'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 8, 'max' => 8],
             [['phone_number'], 'integer', 'min' => 0],

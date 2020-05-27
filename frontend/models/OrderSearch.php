@@ -11,6 +11,9 @@ use common\models\Order;
  */
 class OrderSearch extends Order
 {
+    
+    public $dealerAvailableDate;
+    
     /**
      * {@inheritdoc}
      */
@@ -19,6 +22,7 @@ class OrderSearch extends Order
         return [
             [['area_id', 'payment_method_id', 'order_status'], 'integer'],
             [['total_price'], 'number'],
+            [['dealerAvailableDate'], 'safe'],
             [['order_uuid', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name' , 'payment_method_name_ar'], 'safe'],
         ];
     }
@@ -58,6 +62,20 @@ class OrderSearch extends Order
             // $query->where('0=1');
             return $dataProvider;
         }
+
+        
+        if (!is_null($this->dealerAvailableDate) && 
+
+            strpos($this->dealerAvailableDate, ' - ') !== false ) {
+
+            list($start_date, $end_date) = explode(' - ', $this->dealerAvailableDate);
+
+            $query->andFilterWhere(['between', 'date(customer_measurement.created_date)', $start_date, $end_date]);
+
+        }
+
+
+
 
         // grid filtering conditions
         $query->andFilterWhere([
