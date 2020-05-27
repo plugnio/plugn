@@ -12,20 +12,16 @@ use common\models\Order;
 $js = "
     $(function () {
 
-    //Initialize Select2 Elements
-    $('.select2').select2()
 
-    //Initialize Select2 Elements
-    $('.select2bs4').select2({
-      theme: 'bootstrap4'
-    })
+
     $('select').select2({
-    placeholder: 'Select a state',
-    allowClear: true
-});
-    $('select').select2({
-        minimumResultsForSearch: -1
+        minimumResultsForSearch: -1,
+              placeholder: 'Select order status'
     });
+    
+
+  
+  
   })
 ";
 

@@ -53,7 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 
 
-    <h2>Orders</h2>
+    <h2>Order history</h2>
     <div class="card">
 
         <?=

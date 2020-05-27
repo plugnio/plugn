@@ -88,7 +88,13 @@ class OrderController extends Controller {
                             return Yii::$app->formatter->asRelativeTime($model->order_created_at);
                         }
                     ],
-                    'customer_name',
+                    [
+                        'attribute' => 'customer_name',
+                        'format' => 'raw',
+                        'value' => function ($data) {
+                            return Html::a($data->customer->customer_name, ['customer/view', 'id' => $data->customer_id, 'restaurantUuid' => $data->restaurant_uuid]);
+                        },
+                    ],
                     [
                         'attribute' => 'order_status',
                         "format" => "raw",
