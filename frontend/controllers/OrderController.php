@@ -42,12 +42,13 @@ class OrderController extends Controller {
         ];
     }
 
+
     /**
      * Lists all Order models.
      * @return mixed
      */
     public function actionIndex($restaurantUuid) {
-
+    
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
         $searchModel = new OrderSearch();

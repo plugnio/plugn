@@ -9,29 +9,26 @@ use common\models\Order;
 /**
  * OrderSearch represents the model behind the search form of `common\models\Order`.
  */
-class OrderSearch extends Order
-{
-    
-    public $dealerAvailableDate;
-    
+class OrderSearch extends Order {
+
+    public $date_range;
+
     /**
      * {@inheritdoc}
      */
-    public function rules()
-    {
+    public function rules() {
         return [
             [['area_id', 'payment_method_id', 'order_status'], 'integer'],
             [['total_price'], 'number'],
-            [['dealerAvailableDate'], 'safe'],
-            [['order_uuid', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name' , 'payment_method_name_ar'], 'safe'],
+            [['date_range'], 'safe'],
+            [['order_uuid', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name', 'payment_method_name_ar'], 'safe'],
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function scenarios()
-    {
+    public function scenarios() {
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
@@ -43,11 +40,11 @@ class OrderSearch extends Order
      *
      * @return ActiveDataProvider
      */
-    public function search($params, $restaurantUuid)
-    {
+    public function search($params, $restaurantUuid) {
         $query = Order::find()->where(['restaurant_uuid' => $restaurantUuid])->orderBy([
-                'order_created_at' => SORT_DESC
+            'order_created_at' => SORT_DESC
         ]);
+        
 
         // add conditions that should always apply here
 
@@ -63,17 +60,14 @@ class OrderSearch extends Order
             return $dataProvider;
         }
 
-        
-        if (!is_null($this->dealerAvailableDate) && 
 
-            strpos($this->dealerAvailableDate, ' - ') !== false ) {
 
-            list($start_date, $end_date) = explode(' - ', $this->dealerAvailableDate);
-
-            $query->andFilterWhere(['between', 'date(customer_measurement.created_date)', $start_date, $end_date]);
-
-        }
-
+		// do we have values? if so, add a filter to our query
+		if(!empty($this->date_range) && strpos($this->date_range, '-') !== false) {
+           
+			list($start_date, $end_date) = explode(' - ', $this->date_range);
+			$query->andFilterWhere(['between', 'order_created_at', $start_date, $end_date]);
+		}		
 
 
 
@@ -86,20 +80,21 @@ class OrderSearch extends Order
         ]);
 
         $query->andFilterWhere(['like', 'area_name', $this->area_name])
-            ->andFilterWhere(['like', 'area_name_ar', $this->area_name_ar])
-            ->andFilterWhere(['like', 'unit_type', $this->unit_type])
-            ->andFilterWhere(['like', 'block', $this->block])
-            ->andFilterWhere(['like', 'street', $this->street])
-            ->andFilterWhere(['like', 'avenue', $this->avenue])
-            ->andFilterWhere(['like', 'total_price', $this->total_price])
-            ->andFilterWhere(['like', 'house_number', $this->house_number])
-            ->andFilterWhere(['like', 'special_directions', $this->special_directions])
-            ->andFilterWhere(['like', 'customer_name', $this->customer_name])
-            ->andFilterWhere(['like', 'customer_phone_number', $this->customer_phone_number])
-            ->andFilterWhere(['like', 'customer_email', $this->customer_email])
-            ->andFilterWhere(['like', 'payment_method_name', $this->payment_method_name])
-            ->andFilterWhere(['like', 'payment_method_name_ar', $this->payment_method_name_ar]);
+                ->andFilterWhere(['like', 'area_name_ar', $this->area_name_ar])
+                ->andFilterWhere(['like', 'unit_type', $this->unit_type])
+                ->andFilterWhere(['like', 'block', $this->block])
+                ->andFilterWhere(['like', 'street', $this->street])
+                ->andFilterWhere(['like', 'avenue', $this->avenue])
+                ->andFilterWhere(['like', 'total_price', $this->total_price])
+                ->andFilterWhere(['like', 'house_number', $this->house_number])
+                ->andFilterWhere(['like', 'special_directions', $this->special_directions])
+                ->andFilterWhere(['like', 'customer_name', $this->customer_name])
+                ->andFilterWhere(['like', 'customer_phone_number', $this->customer_phone_number])
+                ->andFilterWhere(['like', 'customer_email', $this->customer_email])
+                ->andFilterWhere(['like', 'payment_method_name', $this->payment_method_name])
+                ->andFilterWhere(['like', 'payment_method_name_ar', $this->payment_method_name_ar]);
 
         return $dataProvider;
     }
+
 }

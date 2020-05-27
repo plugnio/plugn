@@ -56,6 +56,9 @@ class Order extends \yii\db\ActiveRecord {
     const STATUS_COMPLETE = 4;
     const STATUS_CANCELED = 5;
     const STATUS_REFUNDED = 6;
+    
+    
+    
     const ORDER_MODE_DELIVERY = 1;
     const ORDER_MODE_PICK_UP = 2;
 
