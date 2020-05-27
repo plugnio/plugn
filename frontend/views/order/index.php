@@ -82,7 +82,9 @@ $this->registerJs($js);
         ?>
 
         <div class="form-group">
-            <?= Html::submitButton('Export to Excel', ['class' => 'btn btn-success']) ?>
+            <?php
+//            Html::submitButton('Export to Excel', ['class' => 'btn btn-success'])
+            ?>
         </div>
 
 
