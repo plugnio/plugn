@@ -59,13 +59,13 @@ $this->registerJs($js);
     <div class="row">
         <div class="col-md-6">
             <?= $form->field($model, 'order_uuid') ?>
-            <?=
-                $form->field($model, 'date_range', [
-                ])->widget(DateRangePicker::classname(), [
-                    'presetDropdown' => false,
-                    'convertFormat' => true,
-                    'pluginOptions' => ['locale' => ['format' => 'Y-m-d H:m:s']],
-                ]);
+            <?php
+//                $form->field($model, 'date_range', [
+//                ])->widget(DateRangePicker::classname(), [
+//                    'presetDropdown' => false,
+//                    'convertFormat' => true,
+//                    'pluginOptions' => ['locale' => ['format' => 'Y-m-d H:m:s']],
+//                ]);
             ?>
             <?=
             $form->field($model, 'order_status')->dropDownList([

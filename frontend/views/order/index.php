@@ -68,17 +68,17 @@ $this->registerJs($js);
     <div class="card-body">
         <?php $form = ActiveForm::begin(); ?>
 
-        <?=
-        $form->field($restaurant_model, 'date_range_picker_with_time', [
-            'template' => "{label}"
-            . "<div class='input-group'> <div class='input-group-prepend'> <span class='input-group-text'><i class='far fa-clock'></i></span> </div>{input}"
-            . "</div>"
-            . "{error}{hint}"
-        ])->textInput([
-            'type' => 'text',
-            'class' => 'form-control float-right',
-            'id' => 'reservationtime'
-        ])
+        <?php
+//        $form->field($restaurant_model, 'date_range_picker_with_time', [
+//            'template' => "{label}"
+//            . "<div class='input-group'> <div class='input-group-prepend'> <span class='input-group-text'><i class='far fa-clock'></i></span> </div>{input}"
+//            . "</div>"
+//            . "{error}{hint}"
+//        ])->textInput([
+//            'type' => 'text',
+//            'class' => 'form-control float-right',
+//            'id' => 'reservationtime'
+//        ])
         ?>
 
         <div class="form-group">
