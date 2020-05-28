@@ -388,10 +388,6 @@
   $('.textarea').summernote()
 
 
-  $('#item-image').change(function () {
-      filePreview(this);
-  });
-
 
   //Initialize Select2 Elements
   $('.select2').select2()

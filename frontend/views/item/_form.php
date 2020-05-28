@@ -16,39 +16,6 @@ use common\models\Option;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-
-<script>
-
-
-
-
-    function filePreview(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                $('#uploadForm + img').remove();
-                $('#uploadForm').after('<img style="margin-left: auto; margin-right: auto; display: block;" src="' + e.target.result + '" width="100%" height="300"/>');
-                $('.file-drop-zone').css('display', 'none');
-                $('.file-preview').css('width', '40%');
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    $(document).ready(function () {
-
-        if ("<?= $modelItem->getItemImage(); ?>") {
-            $('#uploadForm + img').remove();
-            $('#uploadForm').after('<img style="margin-left: auto; margin-right: auto; display: block;" src="<?= $modelItem->getItemImage(); ?>" width="100%" height="300"/>');
-            $('.file-drop-zone').css('display', 'none');
-            $('.file-preview').css('width', '40%');
-        }
-    });
-
-
-</script>
-
 
 <div class="item-form">
 
@@ -68,7 +35,6 @@ use common\models\Option;
 //                'enableClientScript' => false,
     ]);
     ?>
-
 
 
 
@@ -107,26 +73,21 @@ use common\models\Option;
             </h5>
 
             <?=
-            $form->field($modelItem, 'image', [
-                'template' => "{label}"
-                . "            <div class='file-preview'>"
-                . "              <div class='clearfix' id='uploadForm'> </div>"
-                . "              <div class=' file-drop-zone clearfix'><div class='file-drop-zone-title'>Item image will be displayed here after you upload it</div>"
-                . "              <div class='file-preview-thumbnails clearfix'> </div>"
-                . "            </div>"
-                . "            </div>"
-                . "             <div class='input-group'>"
-                . "                 <div class='custom-file'>"
-                . "                  {input}"
-                . "                  <label class='custom-file-label' for='exampleInputFile'>Choose image</label>"
-                . "              </div>"
-                . "             </div>"
-            ])->fileInput([
-                'multiple' => false,
-                'accept' => 'image/*',
-                'class' => 'custom-file-input',
-            ])->label(false)
+            $form->field($modelItem, 'image')->widget(FileInput::classname(), [
+                'options' => ['accept' => 'image/*', 'multiple' => false
+                ],
+                'pluginOptions' => [
+                    'showUpload' => false,
+                    'initialPreview' => $modelItem->getItemImage() ? $modelItem->getItemImage() : '',
+                    'initialPreviewAsData' => true,
+                    'showRemove' => false,
+                    'overwriteInitial' => true,
+                    'maxFileSize' => 2800
+                ]
+            ]);
             ?>
+
+
 
         </div>
     </div>
