@@ -14,6 +14,19 @@ use common\models\Option;
 /* @var $this yii\web\View */
 /* @var $model common\models\Item */
 /* @var $form yii\widgets\ActiveForm */
+$js = "  $(function () {
+            $( '.fileinput-remove' ).hide();
+
+
+    $(document).ready(function(){
+        if ($('.kv-file-zoom').length > 1){
+            $( '.file-preview-initial' ).hide();
+        }
+    });
+
+  })";
+
+$this->registerJs($js);
 ?>
 
 
@@ -81,7 +94,14 @@ use common\models\Option;
                     'initialPreview' => $modelItem->getItemImage() ? $modelItem->getItemImage() : '',
                     'initialPreviewAsData' => true,
                     'showRemove' => false,
+                    'allowedFileExtensions' => ['jpg', 'png', 'jpeg'],
                     'overwriteInitial' => true,
+                    'uploadAsync' => false,
+                    'showUploadedThumbs' => false,
+                    'initialPreviewCount' => 1,
+                    'validateInitialCount' => false,
+                    'maxFileCount' => 1,
+                    'initialPreviewShowDelete' => false,
                     'maxFileSize' => 2800
                 ]
             ]);

@@ -184,6 +184,7 @@ class ItemController extends Controller {
      * @return mixed
      */
     public function actionUpdate($id, $restaurantUuid) {
+       
         $modelItem = $this->findModel($id, $restaurantUuid);
         $modelsOption = $modelItem->getOptions()->all();
         $modelsExtraOption = [];
