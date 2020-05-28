@@ -11,6 +11,7 @@ use yii\filters\VerbFilter;
 use common\models\Customer;
 use common\models\Restaurant;
 use kartik\mpdf\Pdf;
+use yii\helpers\Html;
 
 /**
  * OrderController implements the CRUD actions for Order model.
