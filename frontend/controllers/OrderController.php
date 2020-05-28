@@ -93,7 +93,7 @@ class OrderController extends Controller {
                         'attribute' => 'customer_name',
                         'format' => 'raw',
                         'value' => function ($data) {
-                            return Html::a($data->customer->customer_name, ['customer/view', 'id' => $data->customer_id, 'restaurantUuid' => $data->restaurant_uuid]);
+                            return $data->customer->customer_name;
                         },
                     ],
                     [
