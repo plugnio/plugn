@@ -41,15 +41,15 @@ class OrderSearch extends Order {
      * @return ActiveDataProvider
      */
     public function search($params, $restaurantUuid) {
-        $query = Order::find()->where(['restaurant_uuid' => $restaurantUuid])->orderBy([
+        $query = Order::find()->where(['order.restaurant_uuid' => $restaurantUuid])->orderBy([
             'order_created_at' => SORT_DESC
         ]);
-        
+
 
         // add conditions that should always apply here
-
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => false,
         ]);
 
         $this->load($params);
@@ -61,13 +61,12 @@ class OrderSearch extends Order {
         }
 
 
+        // do we have values? if so, add a filter to our query
+        if (!empty($this->date_range) && strpos($this->date_range, '-') !== false) {
 
-		// do we have values? if so, add a filter to our query
-		if(!empty($this->date_range) && strpos($this->date_range, '-') !== false) {
-           
-			list($start_date, $end_date) = explode(' - ', $this->date_range);
-			$query->andFilterWhere(['between', 'order_created_at', $start_date, $end_date]);
-		}		
+            list($start_date, $end_date) = explode(' - ', $this->date_range);
+            $query->andFilterWhere(['between', 'order_created_at', $start_date, $end_date]);
+        }
 
 
 
