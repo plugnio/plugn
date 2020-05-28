@@ -73,11 +73,11 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET delivery-area/<restaurant_uuid>' => 'list-all-cities',
-                        'GET <id>' => 'delivered-area-data',
+                        'GET <id>/<restaurant_uuid>' => 'delivered-area-data',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS delivery-area/<restaurant_uuid>' => 'options',
-                        'OPTIONS <id>' => 'options',
+                        'OPTIONS <id>/<restaurant_uuid>' => 'options',
                     ]
                 ],
                 [// PaymentMethodController

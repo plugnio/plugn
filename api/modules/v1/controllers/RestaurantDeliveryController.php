@@ -54,11 +54,11 @@ class RestaurantDeliveryController extends Controller {
     /**
      * Return City list
      */
-    public function actionDeliveredAreaData($id) {
+    public function actionDeliveredAreaData($id,$restaurant_uuid) {
 
 
         $restaurantDeliveryArea = RestaurantDelivery::find()
-                ->where(['area_id' => $id])
+                ->where(['area_id' => $id, 'restaurant_uuid' => $restaurant_uuid])
                 ->one();
         
 
