@@ -55,7 +55,7 @@ class Item extends \yii\db\ActiveRecord {
             [['item_uuid'], 'string', 'max' => 300],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['item_name', 'item_name_ar', 'item_image'], 'string', 'max' => 255],
-            [['item_description', 'item_description_ar'], 'string', 'max' => 1000],
+            [['item_description', 'item_description_ar'], 'string', 'max' => 2000],
             [['item_uuid'], 'unique'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
@@ -198,7 +198,7 @@ class Item extends \yii\db\ActiveRecord {
     public function getItemImage() {
         $photo_url = null;
 
-        
+
         if ($this->item_image) {
             $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
                     . $this->restaurant->restaurant_uuid . '/items/'
@@ -220,9 +220,9 @@ class Item extends \yii\db\ActiveRecord {
         $imageURL = "restaurants/" . $this->restaurant->restaurant_uuid . "/items/" . $item_image;
 
         try {
-         
+
            Yii::$app->cloudinaryManager->delete($imageURL);
- 
+
         } catch (\Cloudinary\Error $err) {
             Yii::error('Error while deleting item image to Cloudinry: ' . json_encode($err));
         }
