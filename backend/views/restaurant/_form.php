@@ -96,7 +96,7 @@ $this->registerJs($js);
     <?= $form->field($model, 'tagline')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'tagline_ar')->textInput(['maxlength' => true]) ?>
-    
+
     <?= $form->field($model, 'restaurant_domain')->textInput(['maxlength' => true]) ?>
 
     <?=
@@ -152,23 +152,25 @@ $this->registerJs($js);
     <?= $form->field($model, 'restaurant_email')->input('email') ?>
 
     <?= $form->field($model, 'owner_first_name')->textInput() ?>
-    
+
     <?= $form->field($model, 'owner_last_name')->textInput() ?>
-    
+
     <?= $form->field($model, 'owner_email')->input('email') ?>
-    
+
     <?= $form->field($model, 'owner_number')->textInput() ?>
-    
+
     <?=  $form->field($model, 'developer_id')->textInput() ?>
-    
+
     <?= $form->field($model, 'operator_id')->textInput() ?>
     
+    <?= $form->field($model, 'wallet_id')->textInput() ?>
+
     <?= $form->field($model, 'live_api_key')->textInput() ?>
-    
+
     <?= $form->field($model, 'test_api_key')->textInput() ?>
-    
+
     <?= $form->field($model, 'store_branch_name')->textInput() ?>
-    
+
     <?= $form->field($model, 'custom_css')->textarea(['rows' => '12']) ?>
 
 
