@@ -58,7 +58,7 @@ class OrderItem extends \yii\db\ActiveRecord {
             'item_name' => 'Item Name',
             'item_name_ar' => 'Item Name in Arabic',
             'item_price' => 'Item Price',
-            'qty' => 'Qty',
+            'qty' => 'Quantity',
             'customer_instruction' => 'Instructions',
         ];
     }
@@ -92,7 +92,7 @@ class OrderItem extends \yii\db\ActiveRecord {
 
     public function beforeDelete() {
 
-        if($this->item)
+        if ($this->item)
             $this->item->increaseStockQty($this->qty);
 
         return parent::beforeDelete();
@@ -114,9 +114,23 @@ class OrderItem extends \yii\db\ActiveRecord {
         $item_model = Item::findOne($this->item_uuid);
         $order_model = Order::findOne($this->order_uuid);
 
-        if ($this->qty > $this->item->stock_qty) {
-            return $this->addError('qty', "The requested quantity for " . $this->item->item_name . " is not available.");
+        //Update order total price
+        $order_model->updateOrderTotalPrice();
+
+
+        if ($insert) {
+            
+            if ($this->qty > $this->item->stock_qty)
+                return $this->addError('qty', "The requested quantity for " . $this->qty . " is not available.");
         }
+        else {
+       
+            if ($this->qty > ( $this->item->stock_qty + $this->getOldAttribute('qty')))
+                return $this->addError('qty', "The requested quantity for " . $this->item->item_name . " is not available.");
+        }
+
+        if ($this->qty == 0)
+            return $this->addError('qty', "Invalid input");
 
 
         if ($item_model) {
@@ -126,6 +140,12 @@ class OrderItem extends \yii\db\ActiveRecord {
         } else
             return false;
 
+
+        //Update product inventory
+        if ($insert)
+            $this->item->decreaseStockQty($this->qty);
+
+
         return true;
     }
 
@@ -134,6 +154,7 @@ class OrderItem extends \yii\db\ActiveRecord {
         $item_model = Item::findOne($this->item_uuid);
 
         if (!$insert && $changedAttributes['qty']) {
+
             $item_model->increaseStockQty($changedAttributes['qty']);
             $item_model->decreaseStockQty($this->qty);
         }

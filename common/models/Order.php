@@ -56,11 +56,9 @@ class Order extends \yii\db\ActiveRecord {
     const STATUS_COMPLETE = 4;
     const STATUS_CANCELED = 5;
     const STATUS_REFUNDED = 6;
-    
-    
-    
     const ORDER_MODE_DELIVERY = 1;
     const ORDER_MODE_PICK_UP = 2;
+    const SCENARIO_CREATE_ORDER_BY_ADMIN = 'manual';
 
     /**
      * {@inheritdoc}
@@ -74,31 +72,48 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['customer_name', 'customer_phone_number', 'payment_method_id', 'order_mode'], 'required'],
+            [['customer_name', 'customer_phone_number', 'order_mode'], 'required'],
+            [['payment_method_id'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer', 'min' => 0],
             ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_CANCELED]],
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
-            ['restaurant_branch_id', 'required', 'when' => function($model) {
-                    return $model->order_mode == static::ORDER_MODE_PICK_UP;
-                }],
-//            [['area_id', 'unit_type', 'block', 'street', 'house_number'], 'required', 'when' => function($model) {
-//                    return $model->order_mode == static::ORDER_MODE_DELIVERY;
-//                }],
-            [['area_id', 'unit_type', 'block', 'street', 'house_number'], 'validateArea', 'when' => function($model) {
-                    return $model->order_mode == static::ORDER_MODE_DELIVERY;
-                }],
+            ['restaurant_branch_id', function ($attribute, $params, $validator) {
+                    if (!$this->restaurant_branch_id && $this->order_mode == Order::ORDER_MODE_PICK_UP)
+                        $this->addError($attribute, 'Branch name cannot be blank.');
+                }, 'skipOnError' => false, 'skipOnEmpty' => false],
+            ['area_id', function ($attribute, $params, $validator) {
+                    if (!$this->area_id && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                        $this->addError($attribute, 'Area name cannot be blank.');
+                }, 'skipOnError' => false, 'skipOnEmpty' => false],
+            [['area_id'], 'validateArea'],
+            ['unit_type', function ($attribute, $params, $validator) {
+                    if (!$this->unit_type && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                        $this->addError($attribute, 'Unit type cannot be blank.');
+                }, 'skipOnError' => false, 'skipOnEmpty' => false],
+            ['block', function ($attribute, $params, $validator) {
+                    if (!$this->block && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                        $this->addError($attribute, 'Block cannot be blank.');
+                }, 'skipOnError' => false, 'skipOnEmpty' => false],
+            ['street', function ($attribute, $params, $validator) {
+                    if (!$this->street && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                        $this->addError($attribute, 'Street cannot be blank.');
+                }, 'skipOnError' => false, 'skipOnEmpty' => false],
+            ['house_number', function ($attribute, $params, $validator) {
+                    if (!$this->house_number && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                        $this->addError($attribute, 'House number cannot be blank.');
+                }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['order_mode', 'validateOrderMode'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['customer_phone_number'], 'string', 'min' => 8, 'max' => 8],
             [['customer_phone_number'], 'number'],
             [['total_price', 'delivery_fee', 'total_items_price'], 'number', 'min' => 0],
-            ['total_items_price', 'validateMinCharge', 'when' => function($model) {
+            ['total_items_price', 'validateMinCharge', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN, 'when' => function($model) {
                     return $model->order_mode == static::ORDER_MODE_DELIVERY;
                 }],
             [['customer_email'], 'email'],
-            [['payment_method_id'], 'validatePaymentMethodId'],
+            [['payment_method_id'], 'validatePaymentMethodId', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['payment_uuid'], 'string', 'max' => 36],
             ['estimated_time_of_arrival', 'safe'],
             [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
@@ -162,7 +177,7 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function validatePaymentMethodId($attribute) {
         if (!RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'payment_method_id' => $this->payment_method_id])->one())
-            $this->addError($attribute, "Payment method id id ivalid.");
+            $this->addError($attribute, "Payment method id invalid.");
     }
 
     /**
@@ -297,10 +312,10 @@ class Order extends \yii\db\ActiveRecord {
             $this->delivery_fee = $this->restaurantDelivery->delivery_fee;
 
 
+
         $this->total_items_price = $this->calculateOrderItemsTotalPrice();
         $this->total_price = $this->calculateOrderTotalPrice();
-
-        return $this->save();
+        $this->save(false);
     }
 
     /**
@@ -356,8 +371,8 @@ class Order extends \yii\db\ActiveRecord {
 
     public function beforeDelete() {
 
-        $orderItems = OrderItem::find()->where(['order_uuid'=> $this->order_uuid])->all();
-        
+        $orderItems = OrderItem::find()->where(['order_uuid' => $this->order_uuid])->all();
+
         foreach ($orderItems as $model) {
             $model->delete();
         }
@@ -397,6 +412,12 @@ class Order extends \yii\db\ActiveRecord {
                     $customer_model->customer_email = $this->customer_email;
 
                 $customer_model->save(false);
+            } else {
+                //Make sure customer name & email are correct 
+                $this->customer_name = $customer_model->customer_name;
+                $this->customer_phone_number = $customer_model->customer_phone_number;
+                if($customer_model->customer_email != null)
+                 $this->customer_email = $customer_model->customer_email;
             }
 
             $this->customer_id = $customer_model->customer_id;

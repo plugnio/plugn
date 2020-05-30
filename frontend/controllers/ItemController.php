@@ -84,6 +84,7 @@ class ItemController extends Controller {
     //     ]);
     // }
 
+    
     /**
      * Creates a new Item model.
      * If creation is successful, the browser will be redirected to the 'index' page.
@@ -183,6 +184,7 @@ class ItemController extends Controller {
      * @return mixed
      */
     public function actionUpdate($id, $restaurantUuid) {
+       
         $modelItem = $this->findModel($id, $restaurantUuid);
         $modelsOption = $modelItem->getOptions()->all();
         $modelsExtraOption = [];

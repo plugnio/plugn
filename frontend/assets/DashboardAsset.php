@@ -48,7 +48,8 @@ class DashboardAsset extends AssetBundle {
         'plugins/bootstrap-switch/js/bootstrap-switch.min.js',
         'dist/js/adminlte.min.js',
         'dist/js/demo.js',
-        'js/scripts.js'
+        'js/scripts.js',
+        'js/fileinput.js'
     ];
     public $depends = [
       'yii\web\YiiAsset',

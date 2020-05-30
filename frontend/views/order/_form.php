@@ -3,9 +3,10 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use common\models\Area;
-use common\models\PaymentMethod;
 use yii\helpers\ArrayHelper;
 use common\models\Order;
+use common\models\City;
+use common\models\RestaurantDelivery;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Order */
@@ -13,6 +14,7 @@ use common\models\Order;
 
 
 $js = "
+
     let orderModeInput = $('#orderModeInput');
     // On Change of project type input
     orderModeInput.change(function(){
@@ -27,6 +29,9 @@ $js = "
     });
     
     $(function () {
+
+
+
     //Initialize Select2 Elements
     $('.select2').select2()
 
@@ -102,18 +107,15 @@ $this->registerJs($js);
 <div class="order-form">
 
     <?php
-    $areaQuery = Area::find()->asArray()->all();
+    $areaQuery = $restaurant_model->getAreas()->all();
     $areaList = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
 
-    $paymentQuery = PaymentMethod::find()->asArray()->all();
-    $paymentList = ArrayHelper::map($paymentQuery, 'payment_method_id', 'payment_method_name');
 
     $form = ActiveForm::begin();
     ?>
 
 
     <?= $form->errorSummary($model); ?>
-
 
     <?php
     $orderModeOptions = [];
@@ -130,8 +132,9 @@ $this->registerJs($js);
     $restaurantBrnachesArray = ArrayHelper::map($restaurantBrnachesQuery, 'restaurant_branch_id', 'branch_name_en');
     ?>
 
-    <div id='customer-address' style='<?= $model->order_mode == Order::ORDER_MODE_PICK_UP ? "display:none" : "" ?>'>
-        <?= $form->field($model, 'area_id')->dropDownList($areaList, ['class' => 'select2'])->label('Area'); ?>
+
+    <div id='customer-address' style='display:none; <?= $model->order_mode  != null && $model->order_mode == Order::ORDER_MODE_PICK_UP ? "display:none" : "display:block" ?>'>
+        <?= $form->field($model, 'area_id')->dropDownList($areaList, ['prompt' => 'Choose area name...', 'class' => 'select2'])->label('Area'); ?>
 
         <?= $form->field($model, 'unit_type')->textInput(['maxlength' => true]) ?>
 
@@ -143,17 +146,24 @@ $this->registerJs($js);
 
         <?= $form->field($model, 'house_number')->input('number') ?>
     </div>
+    
 
-    <div id='pickup-branch' style='<?= $model->order_mode == Order::ORDER_MODE_DELIVERY ? "display:none" : "" ?>'>
-        <?= $form->field($model, 'restaurant_branch_id')->dropDownList($restaurantBrnachesArray, ['prompt' => 'Choose...', 'class' => 'select2'])->label('Pickup from'); ?>
+    <div id='pickup-branch' style='<?= $model->order_mode != null && $model->order_mode == Order::ORDER_MODE_DELIVERY ? "display:none" : "" ?>'>
+        <?= $form->field($model, 'restaurant_branch_id')->dropDownList($restaurantBrnachesArray, ['prompt' => 'Choose branch...', 'class' => 'select2'])->label('Pickup from'); ?>
     </div>
+
+    <?= $form->field($model, 'customer_name')->textInput(['maxlength' => true]) ?>
+    
+    <?= $form->field($model, 'customer_phone_number')->textInput(['maxlength' => true]) ?>
+    
+    <?= $form->field($model, 'customer_email')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'special_directions')->textInput(['maxlength' => true]) ?>
 
-    <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
-    </div>
 
+    <div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px; padding-bottom: 15px; background:#f4f6f9 ">
+        <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
+    </div>
     <?php ActiveForm::end(); ?>
 
 </div>

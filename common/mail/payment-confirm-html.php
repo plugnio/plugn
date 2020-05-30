@@ -51,19 +51,7 @@ use common\models\Order;
                             margin: 13px 0;
                         }
                     </style>
-                    <!--[if mso]>
-                                        <xml>
-                                        <o:OfficeDocumentSettings>
-                                          <o:AllowPNG/>
-                                          <o:PixelsPerInch>96</o:PixelsPerInch>
-                                        </o:OfficeDocumentSettings>
-                                        </xml>
-                                        <![endif]-->
-                    <!--[if lte mso 11]>
-                                        <style type="text/css">
-                                          .mj-outlook-group-fix { width:100% !important; }
-                                        </style>
-                                        <![endif]-->
+              
                     <style type="text/css">
                         @media only screen and (min-width:480px) {
                             .mj-column-per-100 {
@@ -192,7 +180,7 @@ use common\models\Order;
                                                                                         foreach ($order->getOrderItems()->all() as $orderItem) {
                                                                                             ?>
                                                                                             <tr>
-                                                                                                <td style="padding: 0 15px; padding-top:10px; width: 20px; vertical-align:top;">
+                                                                                                <td style="padding: 0 15px; padding-top:10px; width: 34px; vertical-align:top;">
                                                                                                     <?= $orderItem->qty ?>x
                                                                                                 </td>
                                                                                                 <td style="padding: 0 15px; padding-top:10px; vertical-align:top;">
@@ -205,7 +193,7 @@ use common\models\Order;
                                                                                                         </p>
                                                                                                     <?php } ?>
                                                                                                 </td>
-                                                                                                <td style="color:#828585;padding: 0 15px 0 0; padding-top:10px; text-align: right; vertical-align:top;">
+                                                                                                <td style="color:#828585;padding: 0 15px 0 0; padding-top:10px; text-align: right; vertical-align:top;width: 80px;">
                                                                                                     <?= \Yii::$app->formatter->asCurrency($orderItem->calculateOrderItemPrice()); ?>
                                                                                                 </td>
                                                                                             </tr>

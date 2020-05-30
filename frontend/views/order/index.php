@@ -62,7 +62,9 @@ $this->registerJs($js);
 <!-- Date and time range -->
 
 
-
+<p>
+    <?= Html::a('Create Order', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+</p>
 <!-- /.input group -->
 <div class="card">
     <div class="card-body">
@@ -83,7 +85,7 @@ $this->registerJs($js);
 
         <div class="form-group">
             <?=
-             Html::submitButton('Export to Excel', ['class' => 'btn btn-success'])
+            Html::submitButton('Export to Excel', ['class' => 'btn btn-success'])
             ?>
         </div>
 
@@ -119,7 +121,11 @@ $this->registerJs($js);
                     'attribute' => 'customer_name',
                     'format' => 'raw',
                     'value' => function ($data) {
-                        return Html::a($data->customer->customer_name, ['customer/view', 'id' => $data->customer_id, 'restaurantUuid' => $data->restaurant_uuid]);
+                        if($data->customer_id)
+                            return Html::a($data->customer->customer_name, ['customer/view', 'id' => $data->customer_id, 'restaurantUuid' => $data->restaurant_uuid]);
+                    },
+                    'visible' => function ($data) {
+                        return $data->customer_id ? true : false;
                     },
                 ],
                 [

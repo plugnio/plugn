@@ -34,7 +34,8 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="page-title">
     <p>
         <?= Html::a('Print', ['download-invoice', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-success']); ?>
-
+        
+        <?= Html::a('Update', ['update', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid,], ['class' => 'btn btn-primary', 'style'=>'margin-left: 5px;']) ?>
 
         <?php
         if ($model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->armada_api_key != null && $model->tracking_link == null)
@@ -146,7 +147,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         [
                             'label' => 'Subtotal',
                             'value' => function ($orderitem) {
-                                return $orderitem->item_price;
+                                return $orderitem->calculateOrderItemPrice();
                             },
                             'format' => 'currency'
                         ],

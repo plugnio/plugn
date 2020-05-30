@@ -517,6 +517,17 @@ class Restaurant extends \yii\db\ActiveRecord {
         return $this->hasMany(RestaurantDelivery::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    
+    /**
+     * Gets query for [[Areas]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAreas()
+    {
+        return $this->hasMany(Area::className(), ['area_id' => 'area_id'])->viaTable('restaurant_delivery', ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+    
     /**
      * Gets query for [[RestaurantBranches]].
      *
@@ -526,14 +537,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         return $this->hasMany(RestaurantBranch::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
-    /**
-     * Gets query for [[Areas]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getAreas() {
-        return $this->hasMany(Area::className(), ['area_id' => 'area_id'])->viaTable('restaurant_delivery', ['restaurant_uuid' => 'restaurant_uuid']);
-    }
+ 
 
     /**
      * Gets query for [[RestaurantPaymentMethods]].

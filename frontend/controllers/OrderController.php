@@ -10,6 +10,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use common\models\Customer;
 use common\models\Restaurant;
+use common\models\PaymentMethod;
 use kartik\mpdf\Pdf;
 use yii\helpers\Html;
 
@@ -274,6 +275,47 @@ class OrderController extends Controller {
     }
 
     /**
+     * Creates a new Order model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreate($restaurantUuid) {
+        
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+
+        $model = new Order();
+        $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
+
+        $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
+
+        if ($model->load(Yii::$app->request->post())) {
+            $model->payment_method_id = 3;
+
+            
+            
+        // order's Item
+        $ordersItemDataProvider = new \yii\data\ActiveDataProvider([
+            'query' => $model->getOrderItems()
+        ]);
+
+        
+        
+            if ($model->validate() && $model->save()) {
+                return $this->render('update', [
+                            'model' => $model,
+                            'ordersItemDataProvider' => $ordersItemDataProvider,
+                            'restaurant_model' => $restaurant_model
+                ]);
+            }
+        }
+
+        return $this->render('create', [
+                    'model' => $model,
+                    'restaurant_model' => $restaurant_model
+        ]);
+    }
+
+    /**
      * Updates an existing Order model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
@@ -281,7 +323,11 @@ class OrderController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($id, $restaurantUuid) {
+
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+
         $model = $this->findModel($id, $restaurantUuid);
+        $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
 
         // order's Item
         $ordersItemDataProvider = new \yii\data\ActiveDataProvider([
@@ -296,6 +342,7 @@ class OrderController extends Controller {
         return $this->render('update', [
                     'model' => $model,
                     'ordersItemDataProvider' => $ordersItemDataProvider,
+                    'restaurant_model' => $restaurant_model
         ]);
     }
 
