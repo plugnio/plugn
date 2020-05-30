@@ -161,8 +161,10 @@ $this->registerJs($js);
 
     <?=  $form->field($model, 'developer_id')->textInput() ?>
 
-    <?= $form->field($model, 'operator_id')->textInput() ?>
+    <?= $form->field($model, 'merchant_id')->textInput() ?>
     
+    <?= $form->field($model, 'operator_id')->textInput() ?>
+
     <?= $form->field($model, 'wallet_id')->textInput() ?>
 
     <?= $form->field($model, 'live_api_key')->textInput() ?>
