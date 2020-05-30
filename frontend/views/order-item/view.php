@@ -8,7 +8,7 @@ use yii\grid\GridView;
 /* @var $model common\models\OrderItem */
 $this->params['restaurant_uuid'] = $model->restaurant->restaurant_uuid;
 
-$this->title = $model->item_name;
+$this->title = 'Order Item: ' . $model->item_name;
 $this->params['breadcrumbs'][] = ['label' => 'Order #' . $model->order_uuid, 'url' => ['order/update','id' => $model->order_uuid, 'restaurantUuid' =>$model->restaurant->restaurant_uuid ]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -51,13 +51,12 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     
      <h2>Extra Options</h2>
-
-
+    <p>
+        <?= Html::a('Add Extra option', ['order-item-extra-option/create', 'id' => $model->order_item_id, 'restaurantUuid' =>$model->restaurant->restaurant_uuid], ['class' => 'btn btn-success','style'=>'    margin: 10px 10px 10px 0px;']) ?>
+    </p>
     <div class="card">
         
-    <p>
-        <?= Html::a('Create Extra option', ['order-item-extra-option/create', 'id' => $model->order_item_id, 'restaurantUuid' =>$model->restaurant->restaurant_uuid], ['class' => 'btn btn-success','style'=>'    margin: 10px;']) ?>
-    </p>
+
     
         <?=
         GridView::widget([

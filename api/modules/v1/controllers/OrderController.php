@@ -172,9 +172,16 @@ class OrderController extends Controller {
                 if ($response == null) {
 
                     $order->updateOrderTotalPrice();
+                    if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->total_items_price < $order->restaurantDelivery->min_charge) {
+                        $response = [
+                            'operation' => 'error',
+                            'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
+                        ];
+                    }
+
 
                     //if payment method not cash redirect customer to payment gateway
-                    if ($order->payment_method_id != 3) {
+                    if ($response == null && $order->payment_method_id != 3) {
 
                         // Create new payment record
                         $payment = new Payment;
@@ -243,22 +250,24 @@ class OrderController extends Controller {
                         }
                     } else {
 
-                        $order->sendPaymentConfirmationEmail();
+                        if ($response == null) {
+                            $order->sendPaymentConfirmationEmail();
 
-                        Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
-                     
-                        
-            //Update product inventory
-            foreach ($order->getOrderItems()->all() as $orderItem) {
-                $orderItem->item->decreaseStockQty($orderItem->qty);
-            }
-         
-                        $response = [
-                            'operation' => 'success',
-                            'order_uuid' => $order->order_uuid,
-                            'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
-                            'message' => 'Order created successfully',
-                        ];
+                            Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
+
+
+//                            //Update product inventory
+//                            foreach ($order->getOrderItems()->all() as $orderItem) {
+//                                $orderItem->item->decreaseStockQty($orderItem->qty);
+//                            }
+
+                            $response = [
+                                'operation' => 'success',
+                                'order_uuid' => $order->order_uuid,
+                                'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
+                                'message' => 'Order created successfully',
+                            ];
+                        }
                     }
                 }
 

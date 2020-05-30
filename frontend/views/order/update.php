@@ -8,8 +8,8 @@ use yii\grid\GridView;
 
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
-$this->title = 'Update Order: ' . $model->order_uuid;
-$this->params['breadcrumbs'][] = ['label' => 'Order #' . $model->order_uuid, 'url' => ['order/index', 'restaurantUuid' => $model->restaurant_uuid]];
+$this->title = 'Update Order: #' . $model->order_uuid;
+$this->params['breadcrumbs'][] = ['label' => 'Order #' . $model->order_uuid, 'url' => ['order/view', 'id' => $model->order_uuid,'restaurantUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
 <div class="order-update">
@@ -17,19 +17,20 @@ $this->params['breadcrumbs'][] = 'Update';
     <?=
     $this->render('_form', [
         'model' => $model,
+        'restaurant_model' => $restaurant_model,
     ])
     ?>
 
 
     <h2>Items</h2>
 
+        <p>
+            <?= Html::a('Add Item', ['order-item/create', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], ['class' => 'btn btn-success', 'style' => 'margin: 10px 10px 10px 0px;']) ?>
+        </p>
 
     <div class="card">
-        
-    <p>
-        <?= Html::a('Add Item', ['order-item/create', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], ['class' => 'btn btn-success','style'=>'    margin: 10px;']) ?>
-    </p>
-    
+
+
         <?=
         GridView::widget([
             'dataProvider' => $ordersItemDataProvider,
@@ -61,7 +62,7 @@ $this->params['breadcrumbs'][] = 'Update';
                     'buttons' => [
                         'view' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['order-item/view','id' => $model->order_item_id, 'restaurantUuid' => $model->restaurant->restaurant_uuid], [
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['order-item/view', 'id' => $model->order_item_id, 'restaurantUuid' => $model->restaurant->restaurant_uuid], [
                                         'title' => $url,
                                         'data-pjax' => '0',
                                             ]
@@ -69,7 +70,7 @@ $this->params['breadcrumbs'][] = 'Update';
                         },
                         'update' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['order-item/update','id' => $model->order_item_id, 'restaurantUuid' => $model->restaurant->restaurant_uuid], [
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['order-item/update', 'id' => $model->order_item_id, 'restaurantUuid' => $model->restaurant->restaurant_uuid], [
                                         'title' => 'Update',
                                         'data-pjax' => '0',
                                             ]
@@ -77,7 +78,7 @@ $this->params['breadcrumbs'][] = 'Update';
                         },
                         'delete' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['order-item/delete','id' => $model->order_item_id, 'restaurantUuid' => $model->restaurant->restaurant_uuid], [
+                                            '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['order-item/delete', 'id' => $model->order_item_id, 'restaurantUuid' => $model->restaurant->restaurant_uuid], [
                                         'title' => 'Delete',
                                         'data' => [
                                             'confirm' => 'Are you absolutely sure ? You will lose all the information about this option with this action.',
