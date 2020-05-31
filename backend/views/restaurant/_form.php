@@ -52,7 +52,6 @@ $this->registerJs($js);
 <div class="restaurant-form">
 
     <?php
-
     $paymentMethodQuery = PaymentMethod::find()->asArray()->all();
     $paymentMethodArray = ArrayHelper::map($paymentMethodQuery, 'payment_method_id', 'payment_method_name');
 
@@ -159,10 +158,14 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'owner_number')->textInput() ?>
 
-    <?=  $form->field($model, 'developer_id')->textInput() ?>
+    <?= $form->field($model, 'store_branch_name')->textInput() ?>
+
+    <?= $form->field($model, 'custom_css')->textarea(['rows' => '12']) ?>
+
+    <?= $form->field($model, 'developer_id')->textInput() ?>
 
     <?= $form->field($model, 'merchant_id')->textInput() ?>
-    
+
     <?= $form->field($model, 'operator_id')->textInput() ?>
 
     <?= $form->field($model, 'wallet_id')->textInput() ?>
@@ -170,11 +173,6 @@ $this->registerJs($js);
     <?= $form->field($model, 'live_api_key')->textInput() ?>
 
     <?= $form->field($model, 'test_api_key')->textInput() ?>
-
-    <?= $form->field($model, 'store_branch_name')->textInput() ?>
-
-    <?= $form->field($model, 'custom_css')->textarea(['rows' => '12']) ?>
-
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

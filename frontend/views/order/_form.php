@@ -156,8 +156,6 @@ $this->registerJs($js);
     
     <?= $form->field($model, 'customer_phone_number')->textInput(['maxlength' => true]) ?>
     
-    <?= $form->field($model, 'customer_email')->textInput(['maxlength' => true]) ?>
-
     <?= $form->field($model, 'special_directions')->textInput(['maxlength' => true]) ?>
 
 
