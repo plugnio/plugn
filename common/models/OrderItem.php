@@ -117,14 +117,13 @@ class OrderItem extends \yii\db\ActiveRecord {
         //Update order total price
         $order_model->updateOrderTotalPrice();
 
-
         if ($insert) {
-            
+
             if ($this->qty > $this->item->stock_qty)
                 return $this->addError('qty', "The requested quantity for " . $this->qty . " is not available.");
         }
         else {
-       
+
             if ($this->qty > ( $this->item->stock_qty + $this->getOldAttribute('qty')))
                 return $this->addError('qty', "The requested quantity for " . $this->item->item_name . " is not available.");
         }
@@ -133,17 +132,22 @@ class OrderItem extends \yii\db\ActiveRecord {
             return $this->addError('qty', "Invalid input");
 
 
-        if ($item_model) {
-            $this->item_name = $item_model->item_name;
-            $this->item_name_ar = $item_model->item_name_ar;
-            $this->item_price = $item_model->item_price;
-        } else
-            return false;
+
 
 
         //Update product inventory
-        if ($insert)
-            $this->item->decreaseStockQty($this->qty);
+        if ($insert){
+          if ($item_model) {
+              $this->item_name = $item_model->item_name;
+              $this->item_name_ar = $item_model->item_name_ar;
+              $this->item_price = $this->calculateOrderItemPrice();
+          } else
+              return false;
+
+
+          $this->item->decreaseStockQty($this->qty);
+
+        }
 
 
         return true;
@@ -153,7 +157,7 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         $item_model = Item::findOne($this->item_uuid);
 
-        if (!$insert && $changedAttributes['qty']) {
+        if (!$insert && isset($changedAttributes['qty'])) {
 
             $item_model->increaseStockQty($changedAttributes['qty']);
             $item_model->decreaseStockQty($this->qty);

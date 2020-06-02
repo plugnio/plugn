@@ -65,6 +65,10 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
         if ($order_model)
             $order_model->updateOrderTotalPrice();
 
+        $order_item_model = OrderItem::findOne($this->order_item_id);
+        $order_item_model->item_price = $order_item_model->calculateOrderItemPrice();
+        $order_item_model->save(false);
+
 
         return parent::afterSave($insert, $changedAttributes);
     }
@@ -143,7 +147,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
     public function getOrderItem() {
         return $this->hasOne(OrderItem::className(), ['order_item_id' => 'order_item_id']);
     }
-    
+
     /**
      * Gets query for [[OrderItem]].
      *

@@ -18,7 +18,7 @@ use yii\helpers\ArrayHelper;
 class OrderItemController extends Controller {
 
     public $enableCsrfValidation = false;
-    
+
     /**
      * {@inheritdoc}
      */
@@ -62,7 +62,7 @@ class OrderItemController extends Controller {
 
 
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                return $this->redirect(['order/update', 'id' => $model->order_uuid, 'restaurantUuid' => $restaurantUuid]);
+                return $this->redirect(['view', 'id' => $model->order_item_id, 'restaurantUuid' => $restaurantUuid]);
             }
 
             return $this->render('create', [

@@ -138,7 +138,7 @@ class OrderController extends Controller {
     }
 
     /**
-     * Request a driver from Armada 
+     * Request a driver from Armada
      * @param type $order_uuid
      * @param type $restaurantUuid
      */
@@ -172,7 +172,7 @@ class OrderController extends Controller {
 
     /**
      * Change order status
-     * 
+     *
      * @param type $order_uuid
      * @param type $restaurantUuid
      * @param type $status
@@ -280,7 +280,7 @@ class OrderController extends Controller {
      * @return mixed
      */
     public function actionCreate($restaurantUuid) {
-        
+
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
         $model = new Order();
@@ -291,15 +291,15 @@ class OrderController extends Controller {
         if ($model->load(Yii::$app->request->post())) {
             $model->payment_method_id = 3;
 
-            
-            
+
+
         // order's Item
         $ordersItemDataProvider = new \yii\data\ActiveDataProvider([
             'query' => $model->getOrderItems()
         ]);
 
-        
-        
+
+
             if ($model->validate() && $model->save()) {
                 return $this->render('update', [
                             'model' => $model,
@@ -342,6 +342,33 @@ class OrderController extends Controller {
         return $this->render('update', [
                     'model' => $model,
                     'ordersItemDataProvider' => $ordersItemDataProvider,
+                    'restaurant_model' => $restaurant_model
+        ]);
+    }
+
+
+    /**
+     * Updates an existing Order model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionRefundOrder($order_uuid, $restaurantUuid) {
+
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+
+        $model = $this->findModel($order_uuid, $restaurantUuid);
+
+
+
+        if ($model->load(Yii::$app->request->post())) {
+          // $model->save()
+            // return $this->redirect(['view', 'id' => $model->order_uuid, 'restaurantUuid' => $restaurantUuid]);
+        }
+
+        return $this->render('refund-order', [
+                    'model' => $model,
                     'restaurant_model' => $restaurant_model
         ]);
     }

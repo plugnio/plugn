@@ -36,7 +36,7 @@ $this->params['breadcrumbs'][] = 'Update';
             'dataProvider' => $ordersItemDataProvider,
             'columns' => [
                 'item_name',
-                'item_price',
+                'item_price:currency',
                 'qty',
                 [
                     'label' => 'Extra Options',

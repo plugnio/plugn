@@ -383,6 +383,11 @@ class Order extends \yii\db\ActiveRecord {
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
+
+        $this->total_items_price = $this->calculateOrderItemsTotalPrice();
+        $this->total_price = $this->calculateOrderTotalPrice();
+
+
         if ($insert) {
 
 
@@ -413,7 +418,7 @@ class Order extends \yii\db\ActiveRecord {
 
                 $customer_model->save(false);
             } else {
-                //Make sure customer name & email are correct 
+                //Make sure customer name & email are correct
                 $this->customer_name = $customer_model->customer_name;
                 $this->customer_phone_number = $customer_model->customer_phone_number;
                 if($customer_model->customer_email != null)
@@ -482,7 +487,7 @@ class Order extends \yii\db\ActiveRecord {
      * @return \yii\db\ActiveQuery
      */
     public function getOrderItemExtraOptions() {
-        return $this->hasMany(OrderItemExtraOption::className(), ['order_item_id' => 'order_item_id']);
+        return $this->hasMany(OrderItemExtraOption::className(), ['order_item_id' => 'order_item_id'])->via('orderItems');
     }
 
     /**

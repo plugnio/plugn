@@ -18,7 +18,7 @@ use yii\helpers\ArrayHelper;
 class OrderItemExtraOptionController extends Controller {
 
     public $enableCsrfValidation = false;
-    
+
     /**
      * {@inheritdoc}
      */
@@ -48,24 +48,24 @@ class OrderItemExtraOptionController extends Controller {
      * @return mixed
      */
     public function actionCreate($id, $restaurantUuid) {
-        
+
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
-                
+
         if ($order_item_model = OrderItem::find()->where(['order_item_id' => $id])->one()) {
             $model = new OrderItemExtraOption();
             $model->order_item_id = $id;
 
             //Get item's extra options to retrieve it on create-form page
             //todo retrieve item's extra optn only
-            
+
             $extraOptions = $order_item_model->item->getExtraOptions()->all();
-            
+
             foreach ($extraOptions as $key => $extraOption) {
                 if($extraOption->item->item_uuid != $model->orderItem->item_uuid){
                     unset($extraOptions[$key]);
                 }
             }
-            
+
             $extraOptionsQuery = ArrayHelper::map($extraOptions, 'extra_option_id', 'extra_option_name');
 
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
