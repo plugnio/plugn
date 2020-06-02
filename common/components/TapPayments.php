@@ -14,8 +14,8 @@ use yii\base\InvalidConfigException;
  * @author Khalid Al-Mutawa <khalid@bawes.net>
  * @link http://www.bawes.net
  */
-class TapPayments extends Component {
-
+class TapPayments extends Component
+{
     const USE_TEST_GATEWAY = 1;
     const USE_LIVE_GATEWAY = 2;
 
@@ -88,7 +88,8 @@ class TapPayments extends Component {
     /**
      * @inheritdoc
      */
-    public function init() {
+    public function init()
+    {
         // Fields required by default
         $requiredAttributes = ['gatewayToUse', 'plugnLiveApiKey', 'plugnTestApiKey'];
 
@@ -119,7 +120,8 @@ class TapPayments extends Component {
      * @param  [type] $testKey [description]
      * @return [type]          [description]
      */
-    public function setApiKeys($liveKey, $testKey) {
+    public function setApiKeys($liveKey, $testKey)
+    {
         $this->vendoerLiveApiKey = $liveKey;
         $this->vendorTestApiKey = $testKey;
 
@@ -137,7 +139,8 @@ class TapPayments extends Component {
      * @param type $title
      * @return type
      */
-    public function uploadFileToTap($file_path, $purpose, $title) {
+    public function uploadFileToTap($file_path, $purpose, $title)
+    {
         $fileEndpoint = $this->apiEndpoint . "/files";
 
         $fileParams = [
@@ -168,8 +171,8 @@ class TapPayments extends Component {
      * @param type $restaurant
      * @return type
      */
-    public function createBussiness($restaurant) {
-
+    public function createBussiness($restaurant)
+    {
         $bussinessEndpoint = $this->apiEndpoint . "/business";
 
         $bussinessParams = [
@@ -269,12 +272,12 @@ class TapPayments extends Component {
             ];
 
             array_push($bussinessParams['entity']['documents'], $commercialLicenseDocument);
-            
-            
+
+
             $bussinessParams['entity']['is_licensed'] = 'true';
-            
-        } else 
-              $bussinessParams['entity']['is_licensed'] = 'false';
+        } else {
+            $bussinessParams['entity']['is_licensed'] = 'false';
+        }
 
 
 
@@ -288,7 +291,7 @@ class TapPayments extends Component {
                     'content-type' => 'application/json',
                 ])
                 ->send();
-        
+
         return $response;
     }
 
@@ -300,8 +303,8 @@ class TapPayments extends Component {
      * @param type $iban
      * @return type
      */
-    public function createMergentAccount($restaurant_name, $business_id, $business_entity_id, $iban) {
-
+    public function createMergentAccount($restaurant_name, $business_id, $business_entity_id, $iban)
+    {
         $merchantEndpoint = $this->apiEndpoint . "/merchant";
 
         $merchantParams = [
@@ -335,8 +338,8 @@ class TapPayments extends Component {
      * @param type $restaurant_name
      * @param type $wallet_id
      */
-    public function createAnOperator($restaurant_name, $wallet_id, $developer_id) {
-        
+    public function createAnOperator($restaurant_name, $wallet_id, $developer_id)
+    {
         $operatorEndpoint = $this->apiEndpoint . "/operator";
 
         $operatorParams = [
@@ -360,9 +363,38 @@ class TapPayments extends Component {
     }
 
     /**
+     * Create a refund for a customer
+     */
+    public function createRefund($chargeId, $amount, $currency = "KWD", $reason="requested_by_customer")  {
+        $refundEndpoint = $this->apiEndpoint . "/refunds";
+
+        $refundParams = [
+          "charge_id" => $chargeId,
+          "amount" => $amount,
+          "currency" => $currency,
+          "reason" => $reason,
+      ];
+
+
+        $client = new Client();
+        $response = $client->createRequest()
+                      ->setMethod('POST')
+                      ->setUrl($refundEndpoint)
+                      ->setData($refundParams)
+                      ->addHeaders([
+                          'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
+                          'content-type' => 'application/json',
+                      ])
+                      ->send();
+
+        return $response;
+    }
+
+    /**
      * Create a charge for redirect
      */
-    public function createCharge($desc = "Pay", $statementDesc = "", $ref, $amount, $firstName, $email, $phone, $redirectUrl, $gateway) {
+    public function createCharge($desc = "Pay", $statementDesc = "", $ref, $amount, $firstName, $email, $phone, $redirectUrl, $gateway)
+    {
         $chargeEndpoint = $this->apiEndpoint . "/charges";
 
         $chargeParams = [
@@ -418,7 +450,8 @@ class TapPayments extends Component {
      * Check charge object for status updates
      * @param  string $chargeId
      */
-    public function retrieveCharge($chargeId) {
+    public function retrieveCharge($chargeId)
+    {
         $client = new Client();
         $response = $client->createRequest()
                 ->setMethod('GET')
@@ -432,41 +465,13 @@ class TapPayments extends Component {
         return $response;
     }
 
-    /**
-     * Create a Refund
-     * @param  string $chargeId
-     */
-    public function createRefund($chargeId, $amount, $reason) {
-
-        $refundEndpoint = $this->apiEndpoint . "/refunds";
-
-        $refundParams = [
-            "charge_id" => $chargeId,
-            "amount" => $amount,
-            "currency" => "KWD",
-            "reason" => $reason
-        ];
-
-        $client = new Client();
-        $response = $client->createRequest()
-                ->setMethod('POST')
-                ->setUrl($refundEndpoint)
-                ->setData($refundParams)
-                ->addHeaders([
-                    'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
-                    'content-type' => 'application/json',
-                ])
-                ->send();
-
-        return $response;
-    }
 
     /**
      * Check refund object for status updates
      * @param  string $chargeId
      */
-    public function retrieveRefund($refundId) {
-
+    public function retrieveRefund($refundId)
+    {
         $client = new Client();
 
         $response = $client->createRequest()
@@ -480,5 +485,4 @@ class TapPayments extends Component {
 
         return $response;
     }
-
 }

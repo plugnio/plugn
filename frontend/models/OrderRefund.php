@@ -10,7 +10,7 @@ use yii\base\Model;
  */
 class SignupForm extends Model {
 
-    public $company_name;
+    public $item_uuid;
     public $name;
     public $phone;
     public $email;

@@ -27,7 +27,7 @@ $js = "
         format: 'YYYY-MM-DD H:mm:ss'
       }
     })
-    
+
     //Date range as a button
     $('#daterange-btn').daterangepicker(
       {
@@ -49,11 +49,11 @@ $js = "
 
 
 
-   $(document).ready(function() { 
-            $('.input-field').change(function() { 
+   $(document).ready(function() {
+            $('.input-field').change(function() {
                 alert('Value: ' + $('#reservation').val());
-            }); 
-        }); 
+            });
+        });
   })";
 
 
@@ -141,6 +141,8 @@ $this->registerJs($js);
                         else if ($model->order_status == Order::STATUS_COMPLETE)
                             return '<span class="badge bg-success" >' . $model->orderStatus . '</span>';
                         else if ($model->order_status == Order::STATUS_CANCELED)
+                            return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
+                        else if ($model->order_status == Order::STATUS_PARTIALLY_REFUNDED)
                             return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
                         else if ($model->order_status == Order::STATUS_REFUNDED)
                             return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';

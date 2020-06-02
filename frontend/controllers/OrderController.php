@@ -4,6 +4,8 @@ namespace frontend\controllers;
 
 use Yii;
 use common\models\Order;
+use common\models\Refund;
+use common\models\RefundedItem;
 use frontend\models\OrderSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -13,6 +15,7 @@ use common\models\Restaurant;
 use common\models\PaymentMethod;
 use kartik\mpdf\Pdf;
 use yii\helpers\Html;
+use yii\base\Model;
 
 /**
  * OrderController implements the CRUD actions for Order model.
@@ -356,21 +359,46 @@ class OrderController extends Controller {
      */
     public function actionRefundOrder($order_uuid, $restaurantUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+      $order_model = $this->findModel($order_uuid, $restaurantUuid);
 
-        $model = $this->findModel($order_uuid, $restaurantUuid);
+      // foreach ($order_model->getOrderItems()->all() as $orderItem) {
+      //    $refunded_items_model = new RefundedItem();
+      //    $refunded_items_model->order_item_id = $orderItem->order_item_id;
+      // }
+
+      $refunded_items_model = [new RefundedItem()];
+
+      foreach ($order_model->getOrderItems()->all() as $key => $orderItem) {
+           $refunded_items_model[$key] = new RefundedItem();
+           $refunded_items_model[$key]->order_item_id = $orderItem->order_item_id;
+           $refunded_items_model[$key]->order_uuid = $orderItem->order_uuid;
+       }
 
 
+      $model = new Refund();
+      $model->restaurant_uuid = $order_model->restaurant_uuid;
+      $model->order_uuid = $order_model->order_uuid;
 
-        if ($model->load(Yii::$app->request->post())) {
-          // $model->save()
-            // return $this->redirect(['view', 'id' => $model->order_uuid, 'restaurantUuid' => $restaurantUuid]);
+      if(Model::loadMultiple($refunded_items_model, Yii::$app->request->post())  && $model->load(Yii::$app->request->post()) && $model->save() ){
+
+        foreach ($refunded_items_model as  $refunded_item_model) {
+          $refunded_item_model->refund_id = $model->refund_id;
         }
 
-        return $this->render('refund-order', [
-                    'model' => $model,
-                    'restaurant_model' => $restaurant_model
-        ]);
+        if(Model::validateMultiple($refunded_items_model)){
+
+          foreach ($refunded_items_model as  $refunded_item_model) {
+            $refunded_item_model->save(false);
+          }
+
+         return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid]);
+       }
+      }
+
+      return $this->render('refund-order', [
+                  'model' => $model,
+                  'refunded_items_model' => $refunded_items_model
+      ]);
     }
 
     /**

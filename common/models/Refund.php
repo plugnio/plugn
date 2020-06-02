@@ -3,7 +3,12 @@
 namespace common\models;
 
 use Yii;
-
+use yii\behaviors\AttributeBehavior;
+use common\models\Order;
+use common\models\Payment;
+use common\models\OrderItem;
+use common\models\Restaurant;
+use yii\helpers\Html;
 /**
  * This is the model class for table "refund".
  *
@@ -11,12 +16,13 @@ use Yii;
  * @property string $restaurant_uuid
  * @property string $order_uuid
  * @property float $refund_amount
- * @property string $reason
+
  * @property string $refund_status
  *
  * @property Order $order
  * @property Payment $payment
  * @property Restaurant $restaurant
+ * @property RefundedItem[] $refundedItems
  */
 class Refund extends \yii\db\ActiveRecord {
 
@@ -32,15 +38,20 @@ class Refund extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['restaurant_uuid', 'order_uuid', 'refund_amount', 'reason'], 'required'],
-            [['refund_amount'], 'number'],
+            [['restaurant_uuid', 'order_uuid', 'refund_amount'], 'required'],
+            [['refund_amount'], 'number','min' => 0.1 , 'max' => $this->order->total_price,
+            'tooSmall' => '{attribute} must be greater than zero.',
+            'tooBig' => '{attribute} cannot exceed amount available for refund'],
+            [['refund_amount'], 'validateRefundAmount'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['order_uuid'], 'string', 'max' => 40],
-            [['reason', 'refund_status'], 'string', 'max' => 255],
+            [['refund_status'], 'string', 'max' => 255],
             [['order_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_uuid' => 'order_uuid']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
+
+
 
     /**
      * {@inheritdoc}
@@ -50,10 +61,56 @@ class Refund extends \yii\db\ActiveRecord {
             'refund_id' => 'Refund ID',
             'restaurant_uuid' => 'Restaurant Uuid',
             'order_uuid' => 'Order Uuid',
-            'refund_amount' => 'Refund Amount',
-            'reason' => 'Reason',
+            'refund_amount' => 'Refund amount',
             'refund_status' => 'Refund Status',
         ];
+    }
+
+
+    public function validateRefundAmount($attribute, $params, $validator)
+    {
+        if ($this->refund_amount > $this->order->total_price) {
+            $this->addError($attribute, 'Can’t refund more than available');
+        }
+    }
+
+
+
+
+    public function beforeSave($insert) {
+
+        if($insert){
+
+          if($this->payment && $this->payment->payment_current_status == 'CAPTURED'){
+            // Set api keys
+            Yii::$app->tapPayments->setApiKeys($this->order->restaurant->live_api_key, $this->order->restaurant->test_api_key);
+            $tapPaymentResponse = Yii::$app->tapPayments->createRefund($this->payment->payment_gateway_transaction_id, $this->refund_amount);
+
+            if ($tapPaymentResponse->isOk) {
+                $this->refund_id = $tapPaymentResponse->data['id'];
+                $this->refund_status = $tapPaymentResponse->data['status'];
+            } else {
+                return $this->addError('', print_r(json_encode($tapPaymentResponse->data), true));
+            }
+
+          }
+
+
+            $order_model = Order::findOne($this->order_uuid);
+
+            if($this->order->total_price == $this->refund_amount)
+              $order_model->order_status = Order::STATUS_REFUNDED ;
+            else if ($this->order->total_price > $this->refund_amount){
+              $order_model->order_status = Order::STATUS_PARTIALLY_REFUNDED ;
+
+            //
+            // $order_model->total_price -= $this->refund_amount;
+            // $order_model->total_items_price -= $this->refund_amount;
+            // $order_model->save(false);
+
+            }
+            return parent::beforeSave($insert);
+        }
     }
 
     /**
@@ -79,8 +136,32 @@ class Refund extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantUu() {
+    public function getRestaurant() {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
+
+    /**
+     * Gets query for [[RefundedItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRefundedItems()
+    {
+        return $this->hasMany(RefundedItem::className(), ['refund_id' => 'refund_id']);
+    }
+
+
+    /**
+     * Gets query for [[OrderItem]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrderItem()
+    {
+        return $this->hasOne(OrderItem::className(), ['order_item_id' => 'order_item_id'])->via('refundedItems');
+    }
+
+
 
 }

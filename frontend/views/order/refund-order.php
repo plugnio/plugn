@@ -3,6 +3,7 @@
 
 use yii\helpers\Html;
 use kartik\range\RangeInput;
+use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Order */
@@ -21,6 +22,23 @@ $this->params['breadcrumbs'][] = $this->title;
     var itemsSubtotal = 0.000;
     var refundedQty = 0;
 
+    // $(function(){
+    //    $('.refund_total').change(function(){
+    //      conole.log('ttst');
+    //         getSalutationValue(this.value);
+    //           $('.refund_amount_btn').val(this.value);
+    //     });
+    //
+    //
+    //   });
+
+
+    function inputHasBeenUpdated(event) {
+        console.log(document.getElementById("refund_amount").value);
+        document.getElementById("refund_amount_btn").innerHTML = document.getElementById("refund_amount").value + ' KWD';
+
+    }
+
     function incrementRefundedAmount(event, maxQty, refunded_qty, itemPrice) {
 
         inputValue = document.getElementById(refunded_qty).value;
@@ -34,6 +52,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
             document.getElementById("items_subtotal").innerHTML = parseFloat(itemsSubtotal).toFixed(3) + ' KWD';
             document.getElementById("refund_total").innerHTML = parseFloat(itemsSubtotal).toFixed(3) + ' KWD';
+            document.getElementById("refund_amount_btn").innerHTML = parseFloat(itemsSubtotal).toFixed(3) + ' KWD';
+            document.getElementById("refund_amount").value = parseFloat(itemsSubtotal).toFixed(3);
 
             if (itemCounter > 1)
                 $('#refunded_items_qty').text(itemCounter + ' items');
@@ -56,7 +76,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     function decrementRefundedAmount(maxQty, refunded_qty, itemPrice) {
 
-
+        console.log(refunded_qty);
 
         inputValue = document.getElementById(refunded_qty).value;
 
@@ -67,6 +87,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
             document.getElementById("items_subtotal").innerHTML = parseFloat(itemsSubtotal).toFixed(3) + ' KWD';
             document.getElementById("refund_total").innerHTML = parseFloat(itemsSubtotal).toFixed(3) + ' KWD';
+            document.getElementById("refund_amount_btn").innerHTML = parseFloat(itemsSubtotal).toFixed(3) + ' KWD';
+            document.getElementById("refund_amount").value = parseFloat(itemsSubtotal).toFixed(3);
 
             if (itemCounter > 1)
                 $('#refunded_items_qty').text(itemCounter + ' items');
@@ -93,7 +115,12 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="refund-order">
 
 
-
+    <?php
+    $form = ActiveForm::begin([
+                'enableClientValidation' => false,
+    ]);
+    ?>
+    <?= $form->errorSummary($model); ?>
     <div class="card-body">
         <div class="row">
             <div class=" col-12 col-lg-8 col-xl-8">
@@ -101,7 +128,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     <!-- Insert loop here -->
                     <?php
-                    foreach ($model->getOrderItems()->all() as $itemKey => $orderItem) {
+                    foreach ($refunded_items_model as $refundedItemKey => $refundedItem) {
                         ?>
                         <div class="card-body">
                             <div class="row">
@@ -109,23 +136,23 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <div  class="summary-container">
                                         <div>
                                             <section class="item-img-section">
-                                                <img  class="item-img" src="<?= $orderItem->item->getItemImage() ?>" alt="Smart Short Sleeve Kimono Romper + Bib - Blue 0-3 M / Blue Whale" class="_3R2Os">
+                                                <img  class="item-img" src="<?= $refundedItem->orderItem->item->getItemImage() ?>" alt="Smart Short Sleeve Kimono Romper + Bib - Blue 0-3 M / Blue Whale" class="_3R2Os">
                                             </section>
                                         </div>
                                         <div class="item-data">
                                             <!-- Product name -->
                                             <div>
                                                 <span>
-                                                    <?= $orderItem->item_name ?>
+                                                    <?= $refundedItem->orderItem->item_name ?>
                                                 </span>
                                             </div>
                                             <!-- Product description -->
                                             <div>
                                                 <?php
-                                                if (!empty($orderItem->getOrderItemExtraOptions()->all())) {
+                                                if (!empty($refundedItem->orderItem->getOrderItemExtraOptions()->all())) {
                                                     $extraOptions = '';
 
-                                                    foreach ($orderItem->getOrderItemExtraOptions()->all() as $key => $extraOption) {
+                                                    foreach ($refundedItem->orderItem->getOrderItemExtraOptions()->all() as $key => $extraOption) {
                                                         if ($key == 0) {
                                                             $extraOptions .= '<span>' . $extraOption->extra_option_name . '</span>';
                                                         } else {
@@ -142,7 +169,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                             </div>
                                             <!-- Product price -->
                                             <div>
-                                                <?= Yii::$app->formatter->asCurrency($orderItem->item_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5,]) ?>
+                                                <?= Yii::$app->formatter->asCurrency($refundedItem->orderItem->item_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
                                             </div>
                                         </div>
                                     </div>
@@ -153,40 +180,69 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                                         <div class="card-body">
-                                            <h5 style="margin-bottom: 20px;">
-                                                Price
-                                            </h5>
+
                                             <div class="form-group field-item-item_price required">
                                                 <div class="input-group">
                                                     <div class="input-group-prepend">
                                                         <?php
-                                                        echo Html::button(
-                                                                '-', [
-                                                            'class' => 'btn btn-danger bootstrap-touchspin-up',
-                                                            'type' => 'button',
-                                                            'onclick' => "decrementRefundedAmount('$orderItem->qty', 'refunded_qty'+$itemKey,'$orderItem->item_price')"
-                                                                ]
-                                                        );
+                                                        $order_item_price = $refundedItem->orderItem->item_price;
+                                                        //
+                                                        // echo Html::button(
+                                                        //         '-', [
+                                                        //     'class' => 'btn btn-danger bootstrap-touchspin-up',
+                                                        //     'type' => 'button',
+                                                        //     'onclick' => "decrementRefundedAmount('$refundedItem->qty', 'refunded_qty'+$refundedItemKey,'$order_item_price')"
+                                                        //         ]
+                                                        // );
                                                         ?>
                                                     </div>
-                                                    <input type="number" readonly id=<?= "refunded_qty" . $itemKey ?> class="form-control" style="background:white;" name="Item[item_price]" value="0" step=".01" aria-required="true">
+                                                        <?php
+                                                        $order_item_qty = $refundedItem->orderItem->qty;
 
+                                                        echo $form->field($refundedItem, "[$refundedItemKey]qty", [
+                                                            'template' =>
+                                                            '  <div class="form-group">
+                                                            <div class="input-group">
+                                                              <div class="input-group-prepend">' .
+                                                            Html::button(
+                                                                    '-', [
+                                                                'class' => 'btn btn-danger bootstrap-touchspin-up',
+                                                                'type' => 'button',
+                                                                'onclick' => "decrementRefundedAmount('$refundedItem->qty', 'refunded_qty'+$refundedItemKey,'$order_item_price')"
+                                                            ])
+                                                            . '</div>
+                                                                  {input}
+                                                                    <div class="input-group-prepend"> '
+                                                            . Html::button(
+                                                                    '+', [
+                                                                'class' => 'btn btn-success bootstrap-touchspin-up',
+                                                                'type' => 'button',
+                                                                'style' => 'border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem;',
+                                                                'onclick' => "incrementRefundedAmount(event, '$order_item_qty', 'refunded_qty'+$refundedItemKey,'$order_item_price')"
+                                                            ]) .
+                                                            '</div>
+                                                      ' .
+                                                            '</div> </div>'
+                                                        ])->textInput([
+                                                            'id' => "refunded_qty" . $refundedItemKey,
+                                                            'value' => "0",
+                                                            'type' => 'number',
+                                                            'step' => ".01"
+                                                        ])->label(false);
+                                                        ?>
 
                                                     <div class="input-group-prepend">
-                                                        <span class='input-group-text' style="background: white;">/ <?= $orderItem->qty ?></span>
-                                                        <?php
-                                                        $test = 'test';
-
-
-                                                        echo Html::button(
-                                                                '+', [
-                                                            'class' => 'btn btn-success bootstrap-touchspin-up',
-                                                            'type' => 'button',
-                                                            'style' => 'border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem;',
-                                                            'onclick' => "incrementRefundedAmount(event, '$orderItem->qty', 'refunded_qty'+$itemKey,'$orderItem->item_price')"
-                                                                ]
-                                                        );
-                                                        ?>
+                                                        <!-- <span class='input-group-text' style="background: white;">/ <?= $refundedItem->orderItem->qty ?></span> -->
+    <?php
+    // echo Html::button(
+    //         '+', [
+    //     'class' => 'btn btn-success bootstrap-touchspin-up',
+    //     'type' => 'button',
+    //     'style' => 'border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem;',
+    //     'onclick' => "incrementRefundedAmount(event, '$order_item_qty', 'refunded_qty'+$refundedItemKey,'$order_item_price')"
+    //         ]
+    // );
+    ?>
 
                                                     </div>
 
@@ -202,8 +258,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 </div>
                             </div>
                         </div>
-                    <?php }
-                    ?>
+<?php }
+?>
                 </div>
             </div>
 
@@ -244,36 +300,54 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     </div>
 
+
                     <div  class="refund-section">
+
+
                         <h2 class="refund-amount-txt">
                             REFUND AMOUNT
                         </h2>
 
                         <div style="margin-top: 1.6rem;">
                             <span>
-                                <?= $orderItem->order->payment_method_name ?>
+                              <?= $refundedItem->orderItem->order->payment_method_name ?>
                             </span>
 
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">$</span>
+
+                                <?=
+                                $form->field($model, 'refund_amount', [
+                                    'template' => "{label}"
+                                    . "<div class='input-group'> <div class='input-group-prepend'> <span class='input-group-text'>KWD</span> </div>{input}"
+                                    . "</div>"
+                                    . "{error}{hint}"
+                                ])->textInput([
+                                    'type' => 'number',
+                                    'onchange' => 'inputHasBeenUpdated(event)',
+                                    'step' => '0.001',
+                                    'id' => 'refund_amount',
+                                    'value' => \Yii::$app->formatter->asDecimal(0, 3),
+                                    'class' => 'form-control'
+                                ])->label(false)
+                                ?>
+
+                            <span class="avaliable-amount-to-refund">  <?= Yii::$app->formatter->asCurrency($refundedItem->orderItem->order->total_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5,]) ?> available for refund</span>
+
+                        </div>
+                        <div class="form-group refund-btn">
+                        <?= Html::submitButton('Refund <span id="refund_amount_btn">0.000 KWD</span>', ['class' => 'btn btn-block bg-gradient-success btn-m']) ?>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+
+
+
+                                    </div>
+
                                 </div>
-                                <input type="text" class="form-control">
                             </div>
+                        <?php ActiveForm::end(); ?>
 
-
-                            <span class="avaliable-amount-to-refund">    <?= Yii::$app->formatter->asCurrency($orderItem->order->total_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5,]) ?> available for refund</span>
-
-                        </div>
-                        <div class="refund-btn">
-                            <button type="button" class="btn btn-block bg-gradient-success btn-md">
-                                Refund $0.00 USD
-                            </button>
-                        </div>
-                    </div>
-
-
-                </div>
-
-
-            </div>
+</div>

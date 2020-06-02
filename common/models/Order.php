@@ -55,7 +55,11 @@ class Order extends \yii\db\ActiveRecord {
     const STATUS_OUT_FOR_DELIVERY = 3;
     const STATUS_COMPLETE = 4;
     const STATUS_CANCELED = 5;
-    const STATUS_REFUNDED = 6;
+    const STATUS_PARTIALLY_REFUNDED = 6;
+    const STATUS_REFUNDED = 7;
+
+
+
     const ORDER_MODE_DELIVERY = 1;
     const ORDER_MODE_PICK_UP = 2;
     const SCENARIO_CREATE_ORDER_BY_ADMIN = 'manual';
@@ -77,7 +81,7 @@ class Order extends \yii\db\ActiveRecord {
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer', 'min' => 0],
-            ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_CANCELED]],
+            ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_PARTIALLY_REFUNDED,self::STATUS_CANCELED]],
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
             ['restaurant_branch_id', function ($attribute, $params, $validator) {
                     if (!$this->restaurant_branch_id && $this->order_mode == Order::ORDER_MODE_PICK_UP)
@@ -334,6 +338,8 @@ class Order extends \yii\db\ActiveRecord {
             return 'Canceled';
         else if ($this->order_status == self::STATUS_REFUNDED)
             return 'Refunded';
+        else if ($this->order_status == self::STATUS_PARTIALLY_REFUNDED)
+            return 'Partially refunded';
     }
 
     /**
@@ -383,9 +389,10 @@ class Order extends \yii\db\ActiveRecord {
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-
-        $this->total_items_price = $this->calculateOrderItemsTotalPrice();
-        $this->total_price = $this->calculateOrderTotalPrice();
+        // if(!isset($changedAttributes['order_status']) ||  $this->order_status != self::STATUS_PARTIALLY_REFUNDED &&  $this->order_status != self::STATUS_REFUNDED){
+        //   $this->total_items_price = $this->calculateOrderItemsTotalPrice();
+        //   $this->total_price = $this->calculateOrderTotalPrice();
+        // }
 
 
         if ($insert) {
