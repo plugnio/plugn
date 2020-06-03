@@ -4,6 +4,7 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\AttributeBehavior;
+use common\models\ItemImage;
 use yii\db\Expression;
 use yii\behaviors\TimestampBehavior;
 
@@ -28,29 +29,32 @@ use yii\behaviors\TimestampBehavior;
  * @property Restaurant $restaurant
  * @property Option[] $options
  * @property ExtraOptions[] $extraOptions
+ * @property ItemImage[] $itemImages
  */
-class Item extends \yii\db\ActiveRecord {
-
+class Item extends \yii\db\ActiveRecord
+{
     public $items_category;
-    public $image;
+    public $item_images;
 
     /**
      * {@inheritdoc}
      */
-    public static function tableName() {
+    public static function tableName()
+    {
         return 'item';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules() {
+    public function rules()
+    {
         return [
             [['item_name', 'items_category'], 'required', 'on' => 'create'],
             [['item_name', 'item_name_ar', 'item_price'], 'required'],
             [['sort_number', 'stock_qty'], 'integer', 'min' => 0],
             [['item_price'], 'number', 'min' => 0],
-            [['image'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
+            [['item_images'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 10],
             [['item_created_at', 'item_updated_at', 'items_category'], 'safe'],
             [['item_uuid'], 'string', 'max' => 300],
             [['restaurant_uuid'], 'string', 'max' => 60],
@@ -64,7 +68,8 @@ class Item extends \yii\db\ActiveRecord {
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels() {
+    public function attributeLabels()
+    {
         return [
             'item_uuid' => 'Item Uuid',
             'restaurant_uuid' => 'Restaurant Uuid',
@@ -75,7 +80,6 @@ class Item extends \yii\db\ActiveRecord {
             'sort_number' => 'Sort Number',
             'stock_qty' => 'Stock Qty',
             'item_image' => 'Item Image',
-            'image' => 'Item Image',
             'item_price' => 'Price',
             'items_category' => 'Category',
             'item_created_at' => 'Item Created At',
@@ -87,16 +91,18 @@ class Item extends \yii\db\ActiveRecord {
      *
      * @return type
      */
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             [
                 'class' => AttributeBehavior::className(),
                 'attributes' => [
                     \yii\db\ActiveRecord::EVENT_BEFORE_INSERT => 'item_uuid',
                 ],
-                'value' => function() {
-                    if (!$this->item_uuid)
+                'value' => function () {
+                    if (!$this->item_uuid) {
                         $this->item_uuid = 'item_' . Yii::$app->db->createCommand('SELECT uuid()')->queryScalar();
+                    }
 
                     return $this->item_uuid;
                 }
@@ -114,7 +120,8 @@ class Item extends \yii\db\ActiveRecord {
      * increase stock_qty
      * @param type $qty
      */
-    public function increaseStockQty($qty) {
+    public function increaseStockQty($qty)
+    {
         $this->stock_qty += $qty;
         $this->save(false);
     }
@@ -123,30 +130,17 @@ class Item extends \yii\db\ActiveRecord {
      * decrease stock_qty
      * @param type $qty
      */
-    public function decreaseStockQty($qty) {
+    public function decreaseStockQty($qty)
+    {
         $this->stock_qty -= $qty;
         $this->save(false);
     }
 
     /**
-     * @param type $insert
-     * @param type $changedAttributes
-     */
-    public function afterSave($insert, $changedAttributes) {
-        parent::afterSave($insert, $changedAttributes);
-
-        if (!$insert && isset($changedAttributes['item_image']) && $this->image) {
-            if ($changedAttributes['item_image']) {
-                $this->deleteItemImage($changedAttributes['item_image']);
-            }
-        }
-    }
-
-    /**
      * save items category
      */
-    public function saveItemsCategory($items_categories) {
-
+    public function saveItemsCategory($items_categories)
+    {
         CategoryItem::deleteAll(['item_uuid' => $this->item_uuid]);
 
         foreach ($items_categories as $category_id) {
@@ -159,83 +153,75 @@ class Item extends \yii\db\ActiveRecord {
 
     /**
      * Upload item image  to Cloudinary
-     * @param type $imageURL
+     * @param type $imagesPath
      */
-    public function uploadItemImage($imageURL) {
+    public function uploadItemImage($imagesPath)
+    {
+        //deleteallofThem
+        foreach ($this->getItemImages()->all() as  $itemImage) {
+          $itemImage->delete();
+        }
 
-        $filename = Yii::$app->security->generateRandomString();
+        foreach ($imagesPath as $key => $path) {
+            $filename = Yii::$app->security->generateRandomString();
 
-        $itemName = str_replace(' ', '', $this->item_name);
+            $itemName = str_replace(' ', '', $this->item_name);
 
-        try {
-            $result = Yii::$app->cloudinaryManager->upload(
-                    $imageURL, [
+            try {
+                $result = Yii::$app->cloudinaryManager->upload(
+                    $path->tempName,
+                    [
                 'public_id' => "restaurants/" . $this->restaurant_uuid . "/items/" . $filename
                     ]
-            );
+                );
 
-            //Delete old item's image
-            if ($this->item_image) {
-                $this->deleteItemImage();
+                if ($result || count($result) > 0) {
+                    $item_image_model = new ItemImage();
+                    $item_image_model->item_uuid = $this->item_uuid;
+                    $item_image_model->product_file_name = basename($result['url']);
+                    $item_image_model->save(false);
+                }
+            } catch (\Cloudinary\Error $err) {
+                Yii::error("Error when uploading item's image to Cloudinry: " . json_encode($err));
             }
-
-
-
-            if ($result || count($result) > 0) {
-                $this->item_image = basename($result['url']);
-                $this->save();
-            }
-        } catch (\Cloudinary\Error $err) {
-            Yii::error("Error when uploading item's image to Cloudinry: " . json_encode($err));
         }
     }
 
 
-    /**
-     * Return item image url to dispaly it on backend
-     * @return string
-     */
-    public function getItemImage() {
-        $photo_url = null;
+    // /**
+    //  * Return item image url to dispaly it on backend
+    //  * @return string
+    //  */
+    // public function getItemImage()
+    // {
+    //     $photo_url = null;
+    //
+    //
+    //     if ($this->item_image) {
+    //         $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
+    //                 . $this->restaurant->restaurant_uuid . '/items/'
+    //                 . $this->item_image;
+    //         $photo_url = $url;
+    //     }
+    //
+    //     return $photo_url;
+    // }
 
 
-        if ($this->item_image) {
-            $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
-                    . $this->restaurant->restaurant_uuid . '/items/'
-                    . $this->item_image;
-            $photo_url = $url;
+    public function beforeDelete()
+    {
+        foreach ($this->getItemImages()->all() as  $itemImage) {
+            $itemImage->delete();
         }
 
-        return $photo_url;
-    }
-
-    /**
-     * Delete Item's image
-     */
-    public function deleteItemImage($item_image = null) {
-
-        if (!$item_image)
-            $item_image = $this->item_image;
-
-        $imageURL = "restaurants/" . $this->restaurant->restaurant_uuid . "/items/" . $item_image;
-
-        try {
-
-           Yii::$app->cloudinaryManager->delete($imageURL);
-
-        } catch (\Cloudinary\Error $err) {
-            Yii::error('Error while deleting item image to Cloudinry: ' . json_encode($err));
-        }
-    }
-
-    public function beforeDelete() {
-
-        //Delete item's image
-        if ($this->item_image) {
-            $this->deleteItemImage();
-        }
 
         return parent::beforeDelete();
+    }
+
+
+    public function findItemImageByFileName($file_name)
+    {
+        return ItemImage::find()->where(['item_uuid' => $this->item_uuid, 'product_file_name' => $file_name])->one();
     }
 
     /**
@@ -243,7 +229,8 @@ class Item extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCategoryItems() {
+    public function getCategoryItems()
+    {
         return $this->hasMany(CategoryItem::className(), ['item_uuid' => 'item_uuid']);
     }
 
@@ -252,7 +239,8 @@ class Item extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCategory() {
+    public function getCategory()
+    {
         return $this->hasMany(Category::className(), ['category_id' => 'category_id'])->via('categoryItems');
     }
 
@@ -261,7 +249,8 @@ class Item extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCategories() {
+    public function getCategories()
+    {
         return $this->hasMany(Category::className(), ['category_id' => 'category_id'])->viaTable('category_item', ['item_uuid' => 'item_uuid']);
     }
 
@@ -270,7 +259,8 @@ class Item extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
+    public function getRestaurant()
+    {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
@@ -279,8 +269,19 @@ class Item extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOptions() {
+    public function getOptions()
+    {
         return $this->hasMany(Option::className(), ['item_uuid' => 'item_uuid']);
+    }
+
+    /**
+     * Gets query for [[ItemImages]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItemImages()
+    {
+        return $this->hasMany(ItemImage::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -288,7 +289,8 @@ class Item extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getExtraOptions() {
+    public function getExtraOptions()
+    {
         return $this->hasMany(ExtraOption::className(), ['option_id' => 'option_id'])->via('options');
     }
 
@@ -297,8 +299,8 @@ class Item extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderItems() {
+    public function getOrderItems()
+    {
         return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid']);
     }
-
 }

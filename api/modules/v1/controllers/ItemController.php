@@ -64,7 +64,7 @@ class ItemController extends Controller {
         if ($restaurant) {
             $restaurantMenu = Category::find()
                     ->where(['restaurant_uuid' => $restaurant_uuid])
-                    ->with('items', 'items.options', 'items.options.extraOptions')
+                    ->with('items', 'items.options', 'items.options.extraOptions','items.itemImages')
                     ->orderBy(['sort_number' => SORT_ASC])
                     ->asArray()
                     ->all();
@@ -100,7 +100,7 @@ class ItemController extends Controller {
 
         $item_model = Item::find()
                 ->where(['item_uuid' => $item_uuid, 'restaurant_uuid' => $restaurant_uuid])
-                ->with('options', 'options.extraOptions')
+                ->with('options', 'options.extraOptions','itemImages')
                 ->asArray()
                 ->one();
 

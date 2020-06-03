@@ -32,8 +32,14 @@ $this->registerCss($css);
 
 
 <div class="card">
-    <?=
-    GridView::widget([
+    <?php
+
+    // $initialPreviewArray = $dataProvider->query->getItemImages()->asArray()->one();
+    // $initialPreviewArray = ArrayHelper::getColumn($initialPreviewArray, 'product_file_name');
+    // $initialPreviewArray[$key] = "https://res.cloudinary.com/plugn/image/upload/restaurants/rest_b57f0b55-8d4c-11ea-8b7f-06d4853caaaa/items/". $file_name;
+
+
+    echo GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
@@ -42,7 +48,9 @@ $this->registerCss($css);
                 'attribute' => 'Image',
                 'format' => 'html',
                 'value' => function ($data) {
-                    return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/". $data->restaurant->restaurant_uuid ."/items/" . $data->item_image);
+                    $itemItmage = $data->getItemImages()->one();
+                    if($itemItmage)
+                    return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/". $data->restaurant->restaurant_uuid ."/items/" . $itemItmage->product_file_name);
                 },
             ],
             'item_name',

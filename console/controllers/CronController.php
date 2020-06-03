@@ -5,6 +5,8 @@ namespace console\controllers;
 use Yii;
 use common\models\Restaurant;
 use common\models\Payment;
+use common\models\Item;
+use common\models\ItemImage;
 use \DateTime;
 use yii\helpers\Console;
 use yii\db\Expression;
@@ -13,6 +15,20 @@ use yii\db\Expression;
  * All Cron actions related to this project
  */
 class CronController extends \yii\console\Controller {
+
+  public function actionIndex(){
+    foreach (Item::find()->all() as $key => $item) {
+      if($item->item_image){
+        $item_image_model = new ItemImage();
+        $item_image_model->item_uuid = $item->item_uuid;
+        $item_image_model->product_file_name = $item->item_image;
+        $item_image_model->save(false);
+      }
+    }
+
+    $this->stdout('Thank you Big Boss', Console::FG_RED, Console::BOLD);
+    return self::EXIT_CODE_NORMAL;
+  }
 
     /**
      * Update refund status  for all refunds record
@@ -37,15 +53,15 @@ class CronController extends \yii\console\Controller {
         }
     }
 
-    
- 
+
+
     public function actionUpdateStockQty() {
         $now = new DateTime('now');
         $payments = Payment::find()
                 ->where(['<>' , 'payment_current_status','CAPTURED'])
                 ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 HOUR)')])
                 ->all();
-        
+
         foreach ($payments as $payment) {
             foreach ($payment->order->getOrderItems()->all() as $orderItem) {
                 $orderItem->item->increaseStockQty($orderItem->qty);
@@ -53,7 +69,7 @@ class CronController extends \yii\console\Controller {
         }
 
     }
-    
+
     /**
      * Method called to find old transactions that haven't received callback and force a callback
      */
