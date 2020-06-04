@@ -49,8 +49,9 @@ $this->registerCss($css);
                 'format' => 'html',
                 'value' => function ($data) {
                     $itemItmage = $data->getItemImages()->one();
-                    if($itemItmage)
-                    return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/". $data->restaurant->restaurant_uuid ."/items/" . $itemItmage->product_file_name);
+                    if ($itemItmage) {
+                        return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/". $data->restaurant->restaurant_uuid ."/items/" . $itemItmage->product_file_name);
+                    }
                 },
             ],
             'item_name',
@@ -66,7 +67,9 @@ $this->registerCss($css);
 
                     'update' => function ($url, $model) {
                         return Html::a(
-                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['update', 'id' => $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
+                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>',
+                            ['update', 'id' => $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid],
+                            [
                                     'title' => 'Update',
                                     'data-pjax' => '0',
                                         ]
@@ -74,13 +77,16 @@ $this->registerCss($css);
                     },
                     'delete' => function ($url, $model) {
                         return Html::a(
-                                        '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete','id' => $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
+                            '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>',
+                            ['delete','id' => $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid],
+                            [
                                     'title' => 'Delete',
                                     'data' => [
                                         'confirm' => 'Are you absolutely sure ? You will lose all the information about this item with this action.',
                                         'method' => 'post',
                                     ],
-                        ]);
+                        ]
+                        );
                     },
                 ],
             ],

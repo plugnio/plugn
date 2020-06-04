@@ -111,7 +111,7 @@ $this->registerJs($js);
                     'validateInitialCount' => false,
                     'maxFileCount' => 10,
                     'initialPreviewShowDelete' => false,
-                    'maxFileSize' => 2800
+                    'maxFileSize' => 20000
                 ]
             ])->label(false);
             ?>
