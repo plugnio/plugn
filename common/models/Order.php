@@ -35,6 +35,9 @@ use yii\behaviors\AttributeBehavior;
  * @property int $order_mode
  * @property int $total_items_price
  * @property int $total_price
+
+ * @property int $total_items_price_before_refund
+ * @property int $total_price
  * @property int $restaurant_branch_id
  * @property datetime $order_created_at
  * @property datetime $order_updated_at
@@ -46,10 +49,13 @@ use yii\behaviors\AttributeBehavior;
  * @property Restaurant $restaurant
  * @property RestaurantDelivery $restaurantDelivery
  * @property Payment $payment
+ * @property Refund[] $refunds
+ * @property RefundedItem[] $refundedItems
  * @property OrderItem[] $orderItems
  */
 class Order extends \yii\db\ActiveRecord {
 
+    const STATUS_DRAFT  = 0;
     const STATUS_PENDING = 1;
     const STATUS_BEING_PREPARED = 2;
     const STATUS_OUT_FOR_DELIVERY = 3;
@@ -57,7 +63,7 @@ class Order extends \yii\db\ActiveRecord {
     const STATUS_CANCELED = 5;
     const STATUS_PARTIALLY_REFUNDED = 6;
     const STATUS_REFUNDED = 7;
-
+    const STATUS_ABANDONED_CHECKOUT = 9;
 
 
     const ORDER_MODE_DELIVERY = 1;
@@ -81,7 +87,7 @@ class Order extends \yii\db\ActiveRecord {
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer', 'min' => 0],
-            ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_PARTIALLY_REFUNDED,self::STATUS_CANCELED]],
+            ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_PARTIALLY_REFUNDED,self::STATUS_CANCELED, self::STATUS_DRAFT, self::STATUS_ABANDONED_CHECKOUT]],
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
             ['restaurant_branch_id', function ($attribute, $params, $validator) {
                     if (!$this->restaurant_branch_id && $this->order_mode == Order::ORDER_MODE_PICK_UP)
@@ -309,6 +315,14 @@ class Order extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Update order status to pending
+     */
+    public function changeOrderStatusToPending() {
+        $this->order_status = self::STATUS_PENDING;
+        $this->save(false);
+    }
+
+    /**
      * Update order total price and items total price
      */
     public function updateOrderTotalPrice() {
@@ -340,6 +354,10 @@ class Order extends \yii\db\ActiveRecord {
             return 'Refunded';
         else if ($this->order_status == self::STATUS_PARTIALLY_REFUNDED)
             return 'Partially refunded';
+        else if ($this->order_status == self::STATUS_ABANDONED_CHECKOUT)
+            return 'Abandoned checkouts';
+        else if ($this->order_status == self::STATUS_DRAFT)
+            return 'Draft';
     }
 
     /**
@@ -385,6 +403,20 @@ class Order extends \yii\db\ActiveRecord {
 
         return parent::beforeDelete();
     }
+
+    public function beforeSave($insert)
+    {
+        if (!parent::beforeSave($insert)) {
+            return false;
+        }
+
+        if($insert && $this->scenario == self::SCENARIO_CREATE_ORDER_BY_ADMIN)
+          $this->order_status = self::STATUS_DRAFT;
+
+
+        return true;
+    }
+
 
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
@@ -531,6 +563,26 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function getPayment() {
         return $this->hasOne(Payment::className(), ['payment_uuid' => 'payment_uuid']);
+    }
+
+    /**
+     * Gets query for [[Refunds]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRefunds()
+    {
+        return $this->hasMany(Refund::className(), ['order_uuid' => 'order_uuid']);
+    }
+
+    /**
+     * Gets query for [[RefundedItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRefundedItems()
+    {
+        return $this->hasMany(RefundedItem::className(), ['order_uuid' => 'order_uuid']);
     }
 
 }

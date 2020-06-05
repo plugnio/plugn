@@ -257,6 +257,7 @@ class OrderController extends Controller {
 
         $order_model = $this->findModel($id, $restaurantUuid);
 
+
         // Item
         $orderItems = new \yii\data\ActiveDataProvider([
             'query' => $order_model->getOrderItems(),

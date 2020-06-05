@@ -250,7 +250,12 @@ class OrderController extends Controller {
                         }
                     } else {
 
+
+                       //pay by Cash
                         if ($response == null) {
+
+                            //Change order status to pending
+                            $order->changeOrderStatusToPending();
                             $order->sendPaymentConfirmationEmail();
 
                             Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
@@ -309,6 +314,7 @@ class OrderController extends Controller {
             }
 
             // Redirect back to app
+            $paymentRecord->order->changeOrderStatusToPending();
             return $this->redirect($paymentRecord->restaurant->restaurant_domain . '/payment-success/' . $paymentRecord->order_uuid . '/' . $paymentRecord->payment_uuid);
         } catch (\Exception $e) {
             throw new NotFoundHttpException($e->getMessage());

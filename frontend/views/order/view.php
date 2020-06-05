@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <h5><i class="icon fas fa-ban"></i> Warning!</h5>
         <?= ($errorMessage) ?>
     </div>
-<?php } else if ($successMessage && $errorMessage == null) { ?>
+<?php } elseif ($successMessage && $errorMessage == null) { ?>
     <div class="alert alert-success alert-dismissible">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         <h5><i class="icon fas fa-check"></i> Success!</h5>
@@ -40,8 +40,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Refund', ['refund-order', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid,], ['class' => 'btn btn-warning', 'style'=>'margin-left: 5px;']) ?>
 
         <?php
-        if ($model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->armada_api_key != null && $model->tracking_link == null)
+        if ($model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->armada_api_key != null && $model->tracking_link == null) {
             echo Html::a('Request a driver', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary']);
+        }
         ?>
     </p>
 </div>
@@ -55,17 +56,24 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <p>
                 <?php
-                if ($model->order_status != Order::STATUS_BEING_PREPARED)
-                    echo Html::a('Being Prepared', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_BEING_PREPARED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-primary']);
 
-                if ($model->order_status != Order::STATUS_OUT_FOR_DELIVERY)
-                    echo Html::a('Out for Delivery', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_OUT_FOR_DELIVERY], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-info']);
+                  if($model->order_status  != Order::STATUS_PARTIALLY_REFUNDED && $model->order_status  != Order::STATUS_REFUNDED ) {
+                        if ($model->order_status != Order::STATUS_BEING_PREPARED) {
+                            echo Html::a('Being Prepared', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_BEING_PREPARED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-primary']);
+                        }
 
-                if ($model->order_status != Order::STATUS_COMPLETE)
-                    echo Html::a('Mark as Complete', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_COMPLETE], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
+                        if ($model->order_status != Order::STATUS_OUT_FOR_DELIVERY) {
+                            echo Html::a('Out for Delivery', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_OUT_FOR_DELIVERY], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-info']);
+                        }
 
-                if ($model->order_status != Order::STATUS_CANCELED)
-                    echo Html::a('Mark order as cancelled', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_CANCELED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-danger']);
+                        if ($model->order_status != Order::STATUS_COMPLETE) {
+                            echo Html::a('Mark as Complete', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_COMPLETE], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
+                        }
+
+                        if ($model->order_status != Order::STATUS_CANCELED) {
+                            echo Html::a('Mark as cancelled', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_CANCELED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-danger']);
+                        }
+                }
                 ?>
             </p>
             <div class="box-body table-responsive no-padding">
@@ -81,9 +89,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return '<span  style="font-size:25px; font-weight: 700" >' . $data->orderStatus . '</span>';
                             },
                         ],
-                        'total_price:currency',
-                        'total_items_price:currency',
-                        'delivery_fee:currency',
+                        // 'total_price:currency',
+                        // 'total_items_price:currency',
+                        // 'delivery_fee:currency',
                         'estimated_time_of_arrival',
                         [
                             'attribute' => 'order_created_at',
@@ -116,10 +124,11 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
     </div>
-
+    <?php if ($orderItems->totalCount > 0) { ?>
     <div class="card">
         <div class="card-body">
             <div class="box-body table-responsive no-padding">
+
 
                 <?=
                 GridView::widget([
@@ -135,11 +144,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                 $extraOptions = '';
 
                                 foreach ($data->orderItemExtraOptions as $key => $extraOption) {
-
-                                    if ($key == 0)
+                                    if ($key == 0) {
                                         $extraOptions .= $extraOption['extra_option_name'];
-                                    else
+                                    } else {
                                         $extraOptions .= ', ' . $extraOption['extra_option_name'];
+                                    }
                                 }
 
                                 return $extraOptions;
@@ -157,13 +166,88 @@ $this->params['breadcrumbs'][] = $this->title;
                     'layout' => '{items}{pager} ',
                     'tableOptions' => ['class' => 'table table-bordered table-hover'],
                 ]);
+
                 ?>
 
             </div>
         </div>
     </div>
+  <?php } ?>
+
+    <?php
+          $totalNumberOfItems = $model->getOrderItems()->count();
+          $refunds = $model->getRefunds();
+
+          if ($totalNumberOfItems > 0 || $refunds->count() > 0) { ?>
+        <div class="card">
+            <div class="card-body">
+                <h3>
+                  <?php
+                    if ($model->order_status == Order::STATUS_PARTIALLY_REFUNDED) {
+                        echo 'Partially refunded';
+                    } elseif ($model->order_status == Order::STATUS_REFUNDED) {
+                        echo 'Refunded';
+                    } elseif ($model->order_status == Order::STATUS_COMPLETE) {
+                        echo 'Paid';
+                    } else {
+                        echo 'Payment pending';
+                    }
+                  ?>
+                </h3>
 
 
+                <table class="order-details-summary-table"  style="width: 100%; border-collapse: separate; border-spacing: 0; padding: 0.4rem 0.8rem; border: 0; vertical-align: top;">
+                    <tbody>
+                        <tr>
+                            <td colspan="2">Subtotal</td>
+                            <td><?= Yii::$app->formatter->asCurrency($model->total_items_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td colspan="2">Total</td>
+                            <td><?= Yii::$app->formatter->asCurrency($model->total_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td colspan="2">Delivery fee</td>
+                            <td><?= Yii::$app->formatter->asCurrency($model->delivery_fee, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td colspan="3" class="order-details-summary-table__separator"><hr /></td>
+                        </tr>
+                    </tbody>
+                    <?php if($model->order_status == Order::STATUS_REFUNDED ||$model->order_status == Order::STATUS_PARTIALLY_REFUNDED && ($refunds->count() > 0  )) {
+                                           foreach ($refunds->all() as $refund) { ?>
+                        <tbody class="order-details__summary__refund-lines">
+                          <tr class="order-details__summary__detail-line-row">
+                              <td>Refunded</td>
+                              <td class="type--subdued">
+                                  <?= $refund->reason ?   $refund->reason : 'Reason: –' ?>
+                              </td>
+                              <td>-$1.00</td>
+                          </tr>
+                      </tbody>
+
+                  <?php    }
+                                       }
+                  ?>
+                    <tbody class="order-details__summary__net-payment">
+                        <tr>
+                            <td class="type--bold" colspan="2">Net payment</td>
+                            <td>
+                              <?= Yii::$app->formatter->asCurrency($model->total_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    <?php } ?>
 
     <div class="card">
         <div class="card-body">
@@ -190,8 +274,9 @@ $this->params['breadcrumbs'][] = $this->title;
                             'label' => 'Payment status',
                             'format' => 'html',
                             'value' => function ($data) {
-                                if ($data->payment)
+                                if ($data->payment) {
                                     return $data->payment->payment_current_status == 'CAPTURED' ? '<span class="badge bg-success" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>' : '<span class="badge bg-danger" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>';
+                                }
                             },
                             'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
                         ],
@@ -199,8 +284,9 @@ $this->params['breadcrumbs'][] = $this->title;
                             'label' => 'Gateway ID',
                             'format' => 'html',
                             'value' => function ($data) {
-                                if ($data->payment)
+                                if ($data->payment) {
                                     return $data->payment->payment_gateway_order_id;
+                                }
                             },
                             'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
                         ],
@@ -208,8 +294,9 @@ $this->params['breadcrumbs'][] = $this->title;
                             'label' => 'Received Callback',
                             'format' => 'html',
                             'value' => function ($data) {
-                                if ($data->payment)
+                                if ($data->payment) {
                                     return $data->payment->received_callback == true ? 'True' : 'False';
+                                }
                             },
                             'visible' => $model->payment_method_id != 3 && $model->payment
                         ],
@@ -217,8 +304,9 @@ $this->params['breadcrumbs'][] = $this->title;
                             'label' => 'Transaction ID',
                             'format' => 'html',
                             'value' => function ($data) {
-                                if ($data->payment)
+                                if ($data->payment) {
                                     return $data->payment->payment_gateway_transaction_id;
+                                }
                             },
                             'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
                         ],
@@ -255,7 +343,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'label' => 'Address',
                             'format' => 'html',
                             'value' => function ($data) {
-                                return $data->area_name . ', Block ' . $data->block . ', St ' . $data->street . ', ' . ($data->avenue ? 'Avenue ' . $data->avenue . ', ' : '' ) . $data->house_number;
+                                return $data->area_name . ', Block ' . $data->block . ', St ' . $data->street . ', ' . ($data->avenue ? 'Avenue ' . $data->avenue . ', ' : '') . $data->house_number;
                             },
                             'visible' => $model->order_mode == Order::ORDER_MODE_DELIVERY,
                         ],

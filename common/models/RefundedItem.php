@@ -70,17 +70,26 @@ class RefundedItem extends \yii\db\ActiveRecord
         }
 
 
-                foreach ($this->getOrderItem()->all() as   $orderItem) {
-                  // $orderItem->delete();
-                  if(!$orderItem->delete()){
-                    die(var_dump($orderItem->errors));
-                  }
-                }
+
 
 
         return parent::beforeSave($insert);
 
     }
+
+    /**
+     * @param type $insert
+     * @param type $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes) {
+        parent::afterSave($insert, $changedAttributes);
+
+        foreach ($this->getOrderItem()->all() as   $orderItem)
+          $orderItem->delete();
+
+        return true;
+    }
+
 
     /**
      * {@inheritdoc}

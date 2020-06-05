@@ -183,68 +183,43 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                             <div class="form-group field-item-item_price required">
                                                 <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <?php
-                                                        $order_item_price = $refundedItem->orderItem->item_price;
-                                                        //
-                                                        // echo Html::button(
-                                                        //         '-', [
-                                                        //     'class' => 'btn btn-danger bootstrap-touchspin-up',
-                                                        //     'type' => 'button',
-                                                        //     'onclick' => "decrementRefundedAmount('$refundedItem->qty', 'refunded_qty'+$refundedItemKey,'$order_item_price')"
-                                                        //         ]
-                                                        // );
-                                                        ?>
-                                                    </div>
-                                                        <?php
-                                                        $order_item_qty = $refundedItem->orderItem->qty;
 
-                                                        echo $form->field($refundedItem, "[$refundedItemKey]qty", [
-                                                            'template' =>
-                                                            '  <div class="form-group">
-                                                            <div class="input-group">
+                                                      <?php
+                                                          $order_item_price = $refundedItem->orderItem->item_price;
+                                                          $order_item_qty = $refundedItem->orderItem->qty;
+
+                                                          echo $form->field($refundedItem, "[$refundedItemKey]qty", [
+                                                              'template' =>
+                                                              '  <div class="form-group">
+                                                              <div class="input-group">
                                                               <div class="input-group-prepend">' .
-                                                            Html::button(
-                                                                    '-', [
+                                                          Html::button(
+                                                                '-', [
                                                                 'class' => 'btn btn-danger bootstrap-touchspin-up',
                                                                 'type' => 'button',
                                                                 'onclick' => "decrementRefundedAmount('$refundedItem->qty', 'refunded_qty'+$refundedItemKey,'$order_item_price')"
-                                                            ])
-                                                            . '</div>
-                                                                  {input}
-                                                                    <div class="input-group-prepend"> '
-                                                            . Html::button(
-                                                                    '+', [
+                                                                ])
+                                                                . '</div>
+                                                                {input}
+                                                                <div class="input-group-prepend"> <span class="input-group-text">/ '. $order_item_qty  .'</span> </div>
+                                                                <div class="input-group-prepend"> '
+                                                              . Html::button(
+                                                                '+', [
                                                                 'class' => 'btn btn-success bootstrap-touchspin-up',
                                                                 'type' => 'button',
                                                                 'style' => 'border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem;',
                                                                 'onclick' => "incrementRefundedAmount(event, '$order_item_qty', 'refunded_qty'+$refundedItemKey,'$order_item_price')"
-                                                            ]) .
-                                                            '</div>
-                                                      ' .
-                                                            '</div> </div>'
-                                                        ])->textInput([
-                                                            'id' => "refunded_qty" . $refundedItemKey,
-                                                            'value' => "0",
-                                                            'type' => 'number',
-                                                            'step' => ".01"
-                                                        ])->label(false);
+                                                              ]) .
+                                                              '</div>
+                                                              ' .
+                                                              '</div> </div>'
+                                                          ])->textInput([
+                                                              'id' => "refunded_qty" . $refundedItemKey,
+                                                              'value' => "0",
+                                                              'type' => 'number',
+                                                              'step' => "1"
+                                                          ])->label(false);
                                                         ?>
-
-                                                    <div class="input-group-prepend">
-                                                        <!-- <span class='input-group-text' style="background: white;">/ <?= $refundedItem->orderItem->qty ?></span> -->
-    <?php
-    // echo Html::button(
-    //         '+', [
-    //     'class' => 'btn btn-success bootstrap-touchspin-up',
-    //     'type' => 'button',
-    //     'style' => 'border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem;',
-    //     'onclick' => "incrementRefundedAmount(event, '$order_item_qty', 'refunded_qty'+$refundedItemKey,'$order_item_price')"
-    //         ]
-    // );
-    ?>
-
-                                                    </div>
 
                                                 </div>
                                                 <div class="help-block"></div>
@@ -256,10 +231,43 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                                 </div>
+
+                            <span style="color: var(--p-text-subdued,#637381);">
+                              Refunded items will be removed from the order.
+                            </span>
+
                             </div>
                         </div>
-<?php }
-?>
+                      <?php } ?>
+                </div>
+
+                <div class="card">
+                  <div class="card-body">
+
+                    <div>
+                      <!-- <h2 style="font-family: -apple-system,BlinkMacSystemFont,San Francisco,Segoe UI,Roboto,Helvetica Neue,sans-serif; font-weight: 600; line-height: 2.4rem; margin: 0; font-size: 1.6rem;">
+                        Reason for refund
+                      </h2> -->
+
+                      <?= $form->field($model, 'reason',
+                      [
+                        'labelOptions' =>
+                              [
+                                'style' => 'padding-bottom: 20px;font-family: -apple-system,BlinkMacSystemFont,San Francisco,Segoe UI,Roboto,Helvetica Neue,sans-serif; font-weight: 600; line-height: 2.4rem; margin: 0; font-size: 1.4rem'
+                              ],
+                        'template' => '
+                          {label}
+                          {input}
+                          {hint}
+                          {error}
+                          <p style="    color: var(--p-text-subdued,#637381);">
+                            Only you and other staff can see this reason.
+                          </p>'
+                      ])->textInput(); ?>
+
+                    </div>
+
+                  </div>
                 </div>
             </div>
 

@@ -26,6 +26,28 @@ body {
     background-color: transparent;
 }
 
+.order-details-summary-table td {
+    padding: 0.4rem 0.8rem;
+    border: 0;
+    vertical-align: top;
+}
+
+.order-details-summary-table td:first-child {
+    width: 1%;
+    padding-left: 0;
+    white-space: nowrap;
+}
+
+.order-details-summary-table td:last-child {
+    padding-right: 0;
+    text-align: right;
+    white-space: nowrap;
+}
+.order-details-summary-table td {
+    padding: 0.4rem 0.8rem;
+    border: 0;
+    /* vertical-align: top; */
+}
 .jumbotron .btn {
     font-size: 21px;
     padding: 14px 24px;
