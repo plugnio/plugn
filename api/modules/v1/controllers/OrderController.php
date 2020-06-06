@@ -172,7 +172,7 @@ class OrderController extends Controller {
                 if ($response == null) {
 
                     $order->updateOrderTotalPrice();
-                    if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->total_items_price < $order->restaurantDelivery->min_charge) {
+                    if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->restaurantDelivery->min_charge) {
                         $response = [
                             'operation' => 'error',
                             'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])

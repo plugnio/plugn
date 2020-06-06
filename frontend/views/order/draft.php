@@ -10,99 +10,23 @@ use yii\widgets\ActiveForm;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
 
-$this->title = 'Orders';
+$this->title = 'Drafts';
 $this->params['breadcrumbs'][] = $this->title;
-
-$js = "
-   $(function () {
-
-
-    //Date range picker
-    $('#reservation').daterangepicker()
-    //Date range picker with time picker
-    $('#reservationtime').daterangepicker({
-      timePicker: true,
-      timePickerIncrement: 30,
-      locale: {
-        format: 'YYYY-MM-DD H:mm:ss'
-      }
-    })
-
-    //Date range as a button
-    $('#daterange-btn').daterangepicker(
-      {
-        ranges   : {
-          'Today'       : [moment(), moment()],
-          'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-          'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
-          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-          'This Month'  : [moment().startOf('month'), moment().endOf('month')],
-          'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-        },
-        startDate: moment().subtract(29, 'days'),
-        endDate  : moment()
-      },
-      function (start, end) {
-        $('#reportrange span').html(start.format('YYYY-MM-DD H:mm:ss') + ' - ' + end.format('YYYY-MM-DD H:mm:ss'))
-      }
-    )
-
-
-
-   $(document).ready(function() {
-            $('.input-field').change(function() {
-                alert('Value: ' + $('#reservation').val());
-            });
-        });
-  })";
-
-
-$this->registerJs($js);
 ?>
-
 
 <p>
     <?= Html::a('Create Order', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
 </p>
 
-
 <!-- /.input group -->
 <div class="card">
     <div class="card-body">
-        <?php $form = ActiveForm::begin(); ?>
-
-        <?=
-        $form->field($restaurant_model, 'date_range_picker_with_time', [
-            'template' => "{label}"
-            . "<div class='input-group'> <div class='input-group-prepend'> <span class='input-group-text'><i class='far fa-clock'></i></span> </div>{input}"
-            . "</div>"
-            . "{error}{hint}"
-        ])->textInput([
-            'type' => 'text',
-            'class' => 'form-control float-right',
-            'id' => 'reservationtime'
-        ])
-        ?>
-
-        <div class="form-group">
-            <?=
-            Html::submitButton('Export to Excel', ['class' => 'btn btn-success'])
-            ?>
-        </div>
-
-
-
-        <?php ActiveForm::end(); ?>
-
-
-        <?php echo $this->render('_search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
-
 
 
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
-//        'filterModel' => $searchModel,
+              'filterModel' => $searchModel,
             'columns' => [
                 [
                     'attribute' => 'order_uuid',
@@ -128,26 +52,6 @@ $this->registerJs($js);
                     'visible' => function ($data) {
                         return $data->customer_id ? true : false;
                     },
-                ],
-                [
-                    'attribute' => 'order_status',
-                    "format" => "raw",
-                    "value" => function($model) {
-                        if ($model->order_status == Order::STATUS_PENDING)
-                            return '<span class="badge bg-warning" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY)
-                            return '<span class="badge bg-info" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_BEING_PREPARED)
-                            return '<span class="badge bg-primary" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_COMPLETE)
-                            return '<span class="badge bg-success" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_CANCELED)
-                            return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_PARTIALLY_REFUNDED)
-                            return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_REFUNDED)
-                            return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
-                    }
                 ],
                 [
                     'label' => 'Payment',

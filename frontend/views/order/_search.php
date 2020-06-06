@@ -18,10 +18,10 @@ $js = "
         minimumResultsForSearch: -1,
               placeholder: 'Select order status'
     });
-    
 
-  
-  
+
+
+
   })
 ";
 
@@ -70,7 +70,6 @@ $this->registerJs($js);
                 Order::STATUS_OUT_FOR_DELIVERY => 'Out for delivery',
                 Order::STATUS_COMPLETE => 'Complete',
                 Order::STATUS_CANCELED => 'Canceled',
-                Order::STATUS_REFUNDED => 'Refunded'
                     ], ['class' => 'select2', 'prompt' => 'Select order status']);
             ?>
         </div>

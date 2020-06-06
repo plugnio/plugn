@@ -55,9 +55,9 @@ class RefundedItem extends \yii\db\ActiveRecord
 
     public function validateQty($attribute, $params, $validator)
     {
-        if ($this->orderItem->qty < $this->qty) {
+        if ($this->orderItem->qty < $this->qty)
             $this->addError($attribute, 'Invalid Qty');
-        }
+
     }
 
     public function beforeSave($insert) {
@@ -68,10 +68,6 @@ class RefundedItem extends \yii\db\ActiveRecord
           $this->item_name = $this->orderItem->item_name;
           $this->item_price = $this->orderItem->item_price;
         }
-
-
-
-
 
         return parent::beforeSave($insert);
 
@@ -84,8 +80,9 @@ class RefundedItem extends \yii\db\ActiveRecord
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-        foreach ($this->getOrderItem()->all() as   $orderItem)
-          $orderItem->delete();
+        $this->orderItem->delete();
+        // foreach ($this->getOrderItem()->all() as   $orderItem)
+        //   $orderItem->delete();
 
         return true;
     }

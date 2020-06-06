@@ -33,11 +33,11 @@ use yii\behaviors\AttributeBehavior;
  * @property string $payment_method_name_ar
  * @property int|null $order_status
  * @property int $order_mode
- * @property int $total_items_price
+ * @property int $subtotal
  * @property int $total_price
 
- * @property int $total_items_price_before_refund
- * @property int $total_price
+ * @property int $subtotal_before_refund
+ * @property int $total_price_before_refund
  * @property int $restaurant_branch_id
  * @property datetime $order_created_at
  * @property datetime $order_updated_at
@@ -118,8 +118,8 @@ class Order extends \yii\db\ActiveRecord {
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['customer_phone_number'], 'string', 'min' => 8, 'max' => 8],
             [['customer_phone_number'], 'number'],
-            [['total_price', 'delivery_fee', 'total_items_price'], 'number', 'min' => 0],
-            ['total_items_price', 'validateMinCharge', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN, 'when' => function($model) {
+            [['total_price', 'total_price_before_refund','delivery_fee', 'subtotal', 'subtotal_before_refund'], 'number', 'min' => 0],
+            ['subtotal', 'validateMinCharge', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN, 'when' => function($model) {
                     return $model->order_mode == static::ORDER_MODE_DELIVERY;
                 }],
             [['customer_email'], 'email'],
@@ -257,6 +257,8 @@ class Order extends \yii\db\ActiveRecord {
             'payment_method_name_ar' => 'Payment Method Name [Arabic]',
             'order_status' => 'Order Status',
             'total_price' => 'Total Price',
+            'total_price_before_refund' => 'Total Price',
+            'subtotal' => 'Subtotal',
             'order_created_at' => 'Order Created At',
             'order_updated_at' => 'Order Updated At',
             'tracking_link' => 'Tracking link',
@@ -330,8 +332,13 @@ class Order extends \yii\db\ActiveRecord {
             $this->delivery_fee = $this->restaurantDelivery->delivery_fee;
 
 
+        if($this->order_status != Order::STATUS_REFUNDED && $this->order_status != Order::STATUS_PARTIALLY_REFUNDED) {
+          $this->subtotal_before_refund = $this->calculateOrderItemsTotalPrice();
+          $this->total_price_before_refund = $this->calculateOrderTotalPrice();
+        }
 
-        $this->total_items_price = $this->calculateOrderItemsTotalPrice();
+
+        $this->subtotal = $this->calculateOrderItemsTotalPrice();
         $this->total_price = $this->calculateOrderTotalPrice();
         $this->save(false);
     }
@@ -420,11 +427,6 @@ class Order extends \yii\db\ActiveRecord {
 
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
-
-        // if(!isset($changedAttributes['order_status']) ||  $this->order_status != self::STATUS_PARTIALLY_REFUNDED &&  $this->order_status != self::STATUS_REFUNDED){
-        //   $this->total_items_price = $this->calculateOrderItemsTotalPrice();
-        //   $this->total_price = $this->calculateOrderTotalPrice();
-        // }
 
 
         if ($insert) {

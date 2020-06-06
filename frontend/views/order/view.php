@@ -37,7 +37,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= Html::a('Update', ['update', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid,], ['class' => 'btn btn-primary', 'style'=>'margin-left: 5px;']) ?>
 
-        <?= Html::a('Refund', ['refund-order', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid,], ['class' => 'btn btn-warning', 'style'=>'margin-left: 5px;']) ?>
+
+        <?php
+              // if ($model->payment)
+                  echo Html::a('Refund', ['refund-order', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid,], ['class' => 'btn btn-warning', 'style'=>'margin-left: 5px;']) ;
+        ?>
 
         <?php
         if ($model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->armada_api_key != null && $model->tracking_link == null) {
@@ -57,7 +61,12 @@ $this->params['breadcrumbs'][] = $this->title;
             <p>
                 <?php
 
-                  if($model->order_status  != Order::STATUS_PARTIALLY_REFUNDED && $model->order_status  != Order::STATUS_REFUNDED ) {
+                  if($model->order_status  == Order::STATUS_DRAFT  && $model->getOrderItems()->count()) {
+                        echo Html::a('Mark as pending', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_PENDING], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
+                  }
+
+
+                  if(($model->order_status  != Order::STATUS_PARTIALLY_REFUNDED && $model->order_status  != Order::STATUS_REFUNDED  && $model->order_status  != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status  != Order::STATUS_DRAFT )) {
                         if ($model->order_status != Order::STATUS_BEING_PREPARED) {
                             echo Html::a('Being Prepared', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_BEING_PREPARED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-primary']);
                         }
@@ -90,7 +99,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                         ],
                         // 'total_price:currency',
-                        // 'total_items_price:currency',
+                        // 'subtotal:currency',
                         // 'delivery_fee:currency',
                         'estimated_time_of_arrival',
                         [
@@ -200,13 +209,13 @@ $this->params['breadcrumbs'][] = $this->title;
                     <tbody>
                         <tr>
                             <td colspan="2">Subtotal</td>
-                            <td><?= Yii::$app->formatter->asCurrency($model->total_items_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                            <td><?= Yii::$app->formatter->asCurrency($model->subtotal_before_refund, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                         </tr>
                     </tbody>
                     <tbody>
                         <tr>
                             <td colspan="2">Total</td>
-                            <td><?= Yii::$app->formatter->asCurrency($model->total_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                            <td><?= Yii::$app->formatter->asCurrency($model->total_price_before_refund, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                         </tr>
                     </tbody>
                     <tbody>
@@ -228,7 +237,7 @@ $this->params['breadcrumbs'][] = $this->title;
                               <td class="type--subdued">
                                   <?= $refund->reason ?   $refund->reason : 'Reason: –' ?>
                               </td>
-                              <td>-$1.00</td>
+                              <td>-<?= Yii::$app->formatter->asCurrency($refund->refund_amount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                           </tr>
                       </tbody>
 

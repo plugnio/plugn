@@ -141,6 +141,44 @@ class OrderController extends Controller {
     }
 
     /**
+     * Lists all draft Orders.
+     * @return mixed
+     */
+    public function actionDraft($restaurantUuid) {
+
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+
+        $searchModel = new OrderSearch();
+        $dataProvider = $searchModel->searchDraftOrders(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
+
+        return $this->render('draft', [
+                    'searchModel' => $searchModel,
+                    'dataProvider' => $dataProvider,
+                    'restaurant_model' => $restaurant_model
+        ]);
+    }
+
+    /**
+     * Lists all Order models.
+     * @return mixed
+     */
+    public function actionAbandonedCheckout($restaurantUuid) {
+
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+
+        $searchModel = new OrderSearch();
+        $dataProvider = $searchModel->searchAbandonedCheckoutOrders(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
+
+
+
+        return $this->render('abandoned-checkout', [
+                    'searchModel' => $searchModel,
+                    'dataProvider' => $dataProvider,
+                    'restaurant_model' => $restaurant_model
+        ]);
+    }
+
+    /**
      * Request a driver from Armada
      * @param type $order_uuid
      * @param type $restaurantUuid
@@ -380,21 +418,21 @@ class OrderController extends Controller {
       $model->restaurant_uuid = $order_model->restaurant_uuid;
       $model->order_uuid = $order_model->order_uuid;
 
-      if(Model::loadMultiple($refunded_items_model, Yii::$app->request->post())  && $model->load(Yii::$app->request->post()) && $model->save() ){
+      if(Model::loadMultiple($refunded_items_model, Yii::$app->request->post())  && $model->load(Yii::$app->request->post())){
 
-        foreach ($refunded_items_model as  $refunded_item_model) {
-          $refunded_item_model->refund_id = $model->refund_id;
+
+          foreach ($refunded_items_model as  $key => $refunded_item_model) {
+            if($refunded_item_model->qty > 0){
+              $refunded_item_model->refund_id = $model->refund_id;
+              $refunded_item_model->save();
+            }
+
+
+          if($model->save())
+            return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid]);
         }
+     }
 
-        if(Model::validateMultiple($refunded_items_model)){
-
-          foreach ($refunded_items_model as  $refunded_item_model) {
-            $refunded_item_model->save(false);
-          }
-
-         return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid]);
-       }
-      }
 
       return $this->render('refund-order', [
                   'model' => $model,

@@ -34,8 +34,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
     function inputHasBeenUpdated(event) {
-        console.log(document.getElementById("refund_amount").value);
-        document.getElementById("refund_amount_btn").innerHTML = document.getElementById("refund_amount").value + ' KWD';
+        var userInput = document.getElementById("refund_amount").value;
+        userInput = parseFloat(document.getElementById("refund_amount").value);
+
+        if(!userInput)
+        userInput = 0;
+        document.getElementById("refund_amount").value = userInput.toFixed(3) ;
+        document.getElementById("refund_amount_btn").innerHTML = userInput.toFixed(3)  + ' KWD';
 
     }
 
@@ -120,7 +125,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 'enableClientValidation' => false,
     ]);
     ?>
+
     <?= $form->errorSummary($model); ?>
+
     <div class="card-body">
         <div class="row">
             <div class=" col-12 col-lg-8 col-xl-8">
@@ -188,6 +195,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                                           $order_item_price = $refundedItem->orderItem->item_price;
                                                           $order_item_qty = $refundedItem->orderItem->qty;
 
+                                                          // echo $form->field($refundedItem, "[$refundedItemKey]item_uuid")->textInput(['value' => $refundedItem->orderItem->item_uuid,'style'=>'display:none'])->label(false);
+
                                                           echo $form->field($refundedItem, "[$refundedItemKey]qty", [
                                                               'template' =>
                                                               '  <div class="form-group">
@@ -217,6 +226,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                                               'id' => "refunded_qty" . $refundedItemKey,
                                                               'value' => "0",
                                                               'type' => 'number',
+                                                              'min' => 0,
+                                                              'max'=> $order_item_qty,
                                                               'step' => "1"
                                                           ])->label(false);
                                                         ?>
@@ -330,7 +341,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     . "{error}{hint}"
                                 ])->textInput([
                                     'type' => 'number',
-                                    'onchange' => 'inputHasBeenUpdated(event)',
+                                    'oninput' => 'inputHasBeenUpdated(event)',
                                     'step' => '0.001',
                                     'id' => 'refund_amount',
                                     'value' => \Yii::$app->formatter->asDecimal(0, 3),

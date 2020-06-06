@@ -126,23 +126,46 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 ?>
 
                             </li>
+
+                        <li class="nav-item">
+                              <?=
+                              Html::a(
+                                      Html::tag('i', '', ['class' => 'nav-icon fas fa-shopping-cart']) .
+                                      Html::tag('p', 'Orders' .  Html::tag('i', '', ['class' => 'right fas fa-angle-left'])),
+                                      [''], ['class' => 'nav-link']
+
+                              )
+                              ?>
+
+                              <ul class="nav nav-treeview"  style="margin-left: 20px;">
+                                <li class="nav-item">
+
+                                    <?=
+                                      Html::a(
+                                              Html::tag('p', 'Orders'), ['order/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
+                                      )
+                                    ?>
+                                  </a>
+                                </li>
+                                <li class="nav-item">
+
+                                    <?=
+                                      Html::a(
+                                              Html::tag('p', 'Drafts'), ['order/draft', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
+                                      )
+                                    ?>
+                                  </a>
+                                </li>
+                                <li class="nav-item">
+                                    <?=
+                                      Html::a(
+                                              Html::tag('p', 'Abandoned checkouts'), ['order/abandoned-checkout', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
+                                      )
+                                    ?>
+                                  </a>
+                                </li>
+                              </ul>
                             </li>
-                            <li class="nav-item has-treeview">
-                                <?=
-                                Html::a(
-                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-shopping-cart']) .
-                                        Html::tag('p', 'Customer orders'), ['order/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
-                                )
-                                ?>
-                            </li>
-                            <!--<li class="nav-item has-treeview">-->
-                            <?php
-//                                Html::a(
-//                                        Html::tag('i', '', ['class' => 'nav-icon fas fa-money-bill-wave']) .
-//                                        Html::tag('p', 'Refund'), ['refund/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'nav-link']
-//                                )
-                            ?>
-                            <!--</li>-->
                             <li class="nav-item has-treeview">
                                 <?=
                                 Html::a(

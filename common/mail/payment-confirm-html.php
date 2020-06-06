@@ -51,7 +51,7 @@ use common\models\Order;
                             margin: 13px 0;
                         }
                     </style>
-              
+
                     <style type="text/css">
                         @media only screen and (min-width:480px) {
                             .mj-column-per-100 {
@@ -207,7 +207,7 @@ use common\models\Order;
                                                                                                 <p style="margin:0;padding:0;">Subtotal</p>
                                                                                             </td>
                                                                                             <td style="color:#828585;padding: 0 15px 0 0; padding-top:40px; text-align: right; vertical-align:top;">
-                                                                                                <?= \Yii::$app->formatter->asCurrency($order->total_items_price) ?>
+                                                                                                <?= \Yii::$app->formatter->asCurrency($order->subtotal) ?>
                                                                                             </td>
                                                                                         </tr>
                                                                                         <!-- Subtotal-->
@@ -262,7 +262,7 @@ use common\models\Order;
                                                                 <td style="direction:ltr;font-size:0px;padding:0px;padding-bottom:30px;text-align:center;">
                                                                     <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:294px;" ><![endif]-->
                                                                     <div class="mj-column-per-50 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
-                                                                        <?php if ($order->order_mode == Order::ORDER_MODE_DELIVERY) { ?>   
+                                                                        <?php if ($order->order_mode == Order::ORDER_MODE_DELIVERY) { ?>
 
                                                                             <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
                                                                                 <tr>
@@ -276,7 +276,7 @@ use common\models\Order;
                                                                                     </td>
                                                                                 </tr>
                                                                             </table>
-                                                                        <?php } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) { ?> 
+                                                                        <?php } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) { ?>
                                                                             <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
                                                                                 <tr>
                                                                                     <td align="center" style="font-size:0px;padding:10px 25px;padding-top:15px;padding-bottom:6px;word-break:break-word;">
@@ -289,7 +289,7 @@ use common\models\Order;
                                                                                     </td>
                                                                                 </tr>
                                                                             </table>
-                                                                        <?php } ?> 
+                                                                        <?php } ?>
                                                                     </div>
                                                                     <!--[if mso | IE]></td><td class="" style="vertical-align:top;width:294px;" ><![endif]-->
                                                                     <div class="mj-column-per-50 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">

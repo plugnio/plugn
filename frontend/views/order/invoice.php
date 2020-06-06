@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\grid\GridView;
 use common\models\Order;
-?> 
+?>
 
 <!-- Main content -->
 <div class="invoice p-3 mb-3">
@@ -64,7 +64,7 @@ use common\models\Order;
                         <p>
                             Area: <?= $model->area_name ?>,
                             Block: <?= $model->block ?>,
-                            Street: <?= $model->street ?>, 
+                            Street: <?= $model->street ?>,
     <?= $model->avenue != null ? 'Avenue: ' . $model->avenue . ', ' : '' ?>
                             House: <?= $model->house_number ?>
                         </p>
@@ -131,7 +131,7 @@ use common\models\Order;
                             <tr>
                                 <th style="width:50%">Subtotal:</th>
                                 <td>
-                                    <?= \Yii::$app->formatter->asCurrency($model->total_items_price) ?>
+                                    <?= \Yii::$app->formatter->asCurrency($model->subtotal) ?>
                                 </td>
                             </tr>
                             <tr>

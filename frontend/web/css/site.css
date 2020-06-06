@@ -25,6 +25,17 @@ body {
     text-align: center;
     background-color: transparent;
 }
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
 
 .order-details-summary-table td {
     padding: 0.4rem 0.8rem;

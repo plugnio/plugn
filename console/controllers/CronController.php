@@ -5,6 +5,7 @@ namespace console\controllers;
 use Yii;
 use common\models\Restaurant;
 use common\models\Payment;
+use common\models\Order;
 use \DateTime;
 use yii\helpers\Console;
 use yii\db\Expression;
@@ -13,6 +14,40 @@ use yii\db\Expression;
  * All Cron actions related to this project
  */
 class CronController extends \yii\console\Controller {
+
+public function actionIndex(){
+
+  $payments = Payment::find()->where(['!=','payment_current_status' , 'CAPTURED']);
+  $counter = 0;
+
+  foreach ($payments->all() as $payment) {
+    $order = Order::findOne($payment->order_uuid);
+
+    $order->order_status = Order::STATUS_ABANDONED_CHECKOUT;
+    $order->save(false);
+    $counter++;
+  }
+
+
+  $this->stdout($payments->count(), Console::FG_RED, Console::BOLD);
+  $this->stdout($counter, Console::FG_RED, Console::BOLD);
+
+
+
+  $orders = Order::find();
+
+  foreach ($orders->all() as $order) {
+      $order->subtotal_before_refund = $order->subtotal;
+      $order->total_price_before_refund = $order->total_price;
+      $order->save(false);
+  }
+
+
+  $this->stdout($orders->count(), Console::FG_RED, Console::BOLD);
+
+
+}
+
 
     /**
      * Update refund status  for all refunds record
@@ -37,15 +72,15 @@ class CronController extends \yii\console\Controller {
         }
     }
 
-    
- 
+
+
     public function actionUpdateStockQty() {
         $now = new DateTime('now');
         $payments = Payment::find()
                 ->where(['<>' , 'payment_current_status','CAPTURED'])
                 ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 HOUR)')])
                 ->all();
-        
+
         foreach ($payments as $payment) {
             foreach ($payment->order->getOrderItems()->all() as $orderItem) {
                 $orderItem->item->increaseStockQty($orderItem->qty);
@@ -53,7 +88,7 @@ class CronController extends \yii\console\Controller {
         }
 
     }
-    
+
     /**
      * Method called to find old transactions that haven't received callback and force a callback
      */

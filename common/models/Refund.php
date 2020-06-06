@@ -89,6 +89,7 @@ class Refund extends \yii\db\ActiveRecord
     {
         if ($insert) {
             if ($this->payment && $this->payment->payment_current_status == 'CAPTURED') {
+
                 // Set api keys
                 Yii::$app->tapPayments->setApiKeys($this->order->restaurant->live_api_key, $this->order->restaurant->test_api_key);
                 $tapPaymentResponse = Yii::$app->tapPayments->createRefund($this->payment->payment_gateway_transaction_id, $this->refund_amount);
@@ -109,16 +110,26 @@ class Refund extends \yii\db\ActiveRecord
             } elseif ($this->order->total_price > $this->refund_amount) {
                 $order_model->order_status = Order::STATUS_PARTIALLY_REFUNDED ;
 
-            $order_model->save(false);
 
-            //
-            // $order_model->total_price -= $this->refund_amount;
-            // $order_model->total_items_price -= $this->refund_amount;
-            // $order_model->save(false);
+
+
+             if($this->getRefundedItems()->count() ==0 ) {
+               $order_model->subtotal_before_refund = $order_model->subtotal;
+               $order_model->total_price_before_refund = $order_model->total_price;
+
+               if($this->refund_amount > $order_model->subtotal)
+                $order_model->subtotal = 0;
+               else
+                $order_model->subtotal -= $this->refund_amount;
+
+               $order_model->total_price -= $this->refund_amount;
+             }
+
+             $order_model->save(false);
 
             }
-            return parent::beforeSave($insert);
         }
+        return parent::beforeSave($insert);
     }
 
     /**
