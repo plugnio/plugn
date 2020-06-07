@@ -198,7 +198,7 @@ class OrderController extends Controller {
                             $order->payment_uuid = $payment->payment_uuid;
                             $order->save(false);
 
-                            Yii::info("[". $restaurant_model->name . "Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
+                            Yii::info("[". $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
 
 
                             // Redirect to payment gateway
