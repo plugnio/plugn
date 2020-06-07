@@ -58,7 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
         }
         ?>
     </p>
-    
+
 </div>
 
 <div class="order-view">
@@ -224,16 +224,17 @@ $this->params['breadcrumbs'][] = $this->title;
                     </tbody>
                     <tbody>
                         <tr>
-                            <td colspan="2">Total</td>
-                            <td><?= Yii::$app->formatter->asCurrency($model->total_price_before_refund, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
-                        </tr>
-                    </tbody>
-                    <tbody>
-                        <tr>
                             <td colspan="2">Delivery fee</td>
                             <td><?= Yii::$app->formatter->asCurrency($model->delivery_fee, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                         </tr>
                     </tbody>
+                    <tbody>
+                        <tr>
+                            <td colspan="2">Total</td>
+                            <td><?= Yii::$app->formatter->asCurrency($model->total_price_before_refund, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                        </tr>
+                    </tbody>
+
                     <tbody>
                         <tr>
                             <td colspan="3" class="order-details-summary-table__separator"><hr /></td>
@@ -276,7 +277,7 @@ $this->params['breadcrumbs'][] = $this->title;
     ]);
 
 
-     if ($refundDataProvider->totalCount > 0) { ?>
+     if ($refundDataProvider->totalCount > 0  && $model->payment) { ?>
         <div class="card">
             <div class="card-body">
 

@@ -211,7 +211,7 @@ use common\models\Order;
                                                                                             </td>
                                                                                         </tr>
                                                                                         <!-- Subtotal-->
-                                                                                        <?php if ($order->order_status == Order::ORDER_MODE_DELIVERY) { ?>
+                                                                                        <?php if ($order->order_mode == Order::ORDER_MODE_DELIVERY) { ?>
                                                                                             <tr>
                                                                                                 <td colspan="2" style="padding: 0 15px; padding-top:0px; vertical-align:top;">
                                                                                                     <p style="margin:0;padding:0;">Delivery fee</p>

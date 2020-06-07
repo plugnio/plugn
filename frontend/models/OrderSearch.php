@@ -19,7 +19,7 @@ class OrderSearch extends Order {
     public function rules() {
         return [
             [['area_id', 'payment_method_id', 'order_status'], 'integer'],
-            [['total_price'], 'number'],
+            [['total_price_before_refund'], 'number'],
             [['date_range'], 'safe'],
             [['order_uuid', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name', 'payment_method_name_ar'], 'safe'],
         ];
@@ -76,7 +76,7 @@ class OrderSearch extends Order {
                 ->andFilterWhere(['like', 'block', $this->block])
                 ->andFilterWhere(['like', 'street', $this->street])
                 ->andFilterWhere(['like', 'avenue', $this->avenue])
-                ->andFilterWhere(['like', 'total_price', $this->total_price])
+                ->andFilterWhere(['like', 'total_price_before_refund', $this->total_price_before_refund])
                 ->andFilterWhere(['like', 'house_number', $this->house_number])
                 ->andFilterWhere(['like', 'special_directions', $this->special_directions])
                 ->andFilterWhere(['like', 'customer_name', $this->customer_name])
@@ -132,7 +132,7 @@ class OrderSearch extends Order {
                 ->andFilterWhere(['like', 'block', $this->block])
                 ->andFilterWhere(['like', 'street', $this->street])
                 ->andFilterWhere(['like', 'avenue', $this->avenue])
-                ->andFilterWhere(['like', 'total_price', $this->total_price])
+                ->andFilterWhere(['like', 'total_price_before_refund', $this->total_price_before_refund])
                 ->andFilterWhere(['like', 'house_number', $this->house_number])
                 ->andFilterWhere(['like', 'special_directions', $this->special_directions])
                 ->andFilterWhere(['like', 'customer_name', $this->customer_name])
@@ -202,7 +202,7 @@ class OrderSearch extends Order {
                 ->andFilterWhere(['like', 'block', $this->block])
                 ->andFilterWhere(['like', 'street', $this->street])
                 ->andFilterWhere(['like', 'avenue', $this->avenue])
-                ->andFilterWhere(['like', 'total_price', $this->total_price])
+                ->andFilterWhere(['like', 'total_price_before_refund', $this->total_price_before_refund])
                 ->andFilterWhere(['like', 'house_number', $this->house_number])
                 ->andFilterWhere(['like', 'special_directions', $this->special_directions])
                 ->andFilterWhere(['like', 'customer_name', $this->customer_name])

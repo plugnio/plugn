@@ -6,6 +6,7 @@ use Yii;
 use common\models\Restaurant;
 use common\models\Payment;
 use common\models\Item;
+use common\models\Order;
 use common\models\ItemImage;
 use \DateTime;
 use yii\helpers\Console;
@@ -30,9 +31,10 @@ public function actionIndex(){
     }
 
 
-    $this->stdout($payments->count(), Console::FG_RED, Console::BOLD);
-    $this->stdout($counter, Console::FG_RED, Console::BOLD);
-
+    $this->stdout($payments->count(), Console::FG_RED, Console::BOLD); //payment 62
+    echo "\r\n";
+    $this->stdout($counter, Console::FG_RED, Console::BOLD); //counter 62
+    echo "\r\n";
 
 
     $orders = Order::find();
@@ -44,7 +46,7 @@ public function actionIndex(){
     }
 
 
-    $this->stdout($orders->count(), Console::FG_RED, Console::BOLD);
+    $this->stdout($orders->count(), Console::FG_RED, Console::BOLD); //order 157
 
 
 }

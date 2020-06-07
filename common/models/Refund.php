@@ -56,6 +56,28 @@ class Refund extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     *
+     * @return type
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => AttributeBehavior::className(),
+                'attributes' => [
+                    \yii\db\ActiveRecord::EVENT_BEFORE_INSERT => 'refund_id',
+                ],
+                'value' => function () {
+                    if (!$this->refund_id) {
+                        $this->refund_id = 'reff_' . Yii::$app->db->createCommand('SELECT uuid()')->queryScalar();
+                    }
+
+                    return $this->refund_id;
+                }
+            ],
+        ];
+    }
 
 
     /**
@@ -109,11 +131,11 @@ class Refund extends \yii\db\ActiveRecord
                 $order_model->order_status = Order::STATUS_REFUNDED ;
             } elseif ($this->order->total_price > $this->refund_amount) {
                 $order_model->order_status = Order::STATUS_PARTIALLY_REFUNDED ;
+            }
 
 
 
-
-             if($this->getRefundedItems()->count() ==0 ) {
+             if($this->getRefundedItems()->count() == 0 ) {
                $order_model->subtotal_before_refund = $order_model->subtotal;
                $order_model->total_price_before_refund = $order_model->total_price;
 
@@ -125,10 +147,12 @@ class Refund extends \yii\db\ActiveRecord
                $order_model->total_price -= $this->refund_amount;
              }
 
+
+
              $order_model->save(false);
 
             }
-        }
+
         return parent::beforeSave($insert);
     }
 

@@ -9,7 +9,8 @@ use yii\grid\GridView;
 $this->params['restaurant_uuid'] = $model->restaurant->restaurant_uuid;
 
 $this->title = 'Order Item: ' . $model->item_name;
-$this->params['breadcrumbs'][] = ['label' => 'Order #' . $model->order_uuid, 'url' => ['order/update','id' => $model->order_uuid, 'restaurantUuid' =>$model->restaurant->restaurant_uuid ]];
+$this->params['breadcrumbs'][] = ['label' => 'Order #' . $model->order_uuid, 'url' => ['order/index','id' => $model->order_uuid, 'restaurantUuid' =>$model->restaurant->restaurant_uuid ]];
+$this->params['breadcrumbs'][] = ['label' => 'Update', 'url' => ['order/update','id' => $model->order_uuid, 'restaurantUuid' =>$model->restaurant->restaurant_uuid ]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
