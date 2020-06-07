@@ -19,7 +19,9 @@ use Yii;
  * @property Item $item
  * @property OrderItem $orderItem
  * @property Order $order
+ * @property Restaurant $restaurant
  * @property Refund $refund
+ * @property ItemImage[] $itemImages
  */
 class RefundedItem extends \yii\db\ActiveRecord
 {
@@ -116,6 +118,16 @@ class RefundedItem extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[ItemUu]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurant()
+    {
+        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('order');
+    }
+
+    /**
      * Gets query for [[OrderItem]].
      *
      * @return \yii\db\ActiveQuery
@@ -123,6 +135,16 @@ class RefundedItem extends \yii\db\ActiveRecord
     public function getOrderItem()
     {
         return $this->hasOne(OrderItem::className(), ['order_item_id' => 'order_item_id']);
+    }
+
+    /**
+     * Gets query for [[ItemImages]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItemImages()
+    {
+        return $this->hasMany(ItemImage::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**

@@ -32,15 +32,24 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 <?php } ?>
 <div class="page-title">
+
     <p>
-        <?= Html::a('Print', ['download-invoice', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-success']); ?>
-
-        <?= Html::a('Update', ['update', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid,], ['class' => 'btn btn-primary', 'style'=>'margin-left: 5px;']) ?>
-
+        <?php
+              if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT) {
+                  echo Html::a('Print', ['download-invoice', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-success']);
+              }
+        ?>
 
         <?php
-              // if ($model->payment)
+              if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT) {
+                  echo Html::a('Update', ['update', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid,], ['class' => 'btn btn-primary', 'style'=>'margin-left: 5px;']);
+              }
+        ?>
+
+        <?php
+              if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT ) {
                   echo Html::a('Refund', ['refund-order', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid,], ['class' => 'btn btn-warning', 'style'=>'margin-left: 5px;']) ;
+              }
         ?>
 
         <?php
@@ -49,6 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
         }
         ?>
     </p>
+    
 </div>
 
 <div class="order-view">
@@ -61,28 +71,28 @@ $this->params['breadcrumbs'][] = $this->title;
             <p>
                 <?php
 
-                  if($model->order_status  == Order::STATUS_DRAFT  && $model->getOrderItems()->count()) {
-                        echo Html::a('Mark as pending', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_PENDING], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
+                  if ($model->order_status  == Order::STATUS_DRAFT  && $model->getOrderItems()->count()) {
+                      echo Html::a('Mark as pending', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_PENDING], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
                   }
 
 
-                  if(($model->order_status  != Order::STATUS_PARTIALLY_REFUNDED && $model->order_status  != Order::STATUS_REFUNDED  && $model->order_status  != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status  != Order::STATUS_DRAFT )) {
-                        if ($model->order_status != Order::STATUS_BEING_PREPARED) {
-                            echo Html::a('Being Prepared', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_BEING_PREPARED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-primary']);
-                        }
+                  if (($model->order_status  != Order::STATUS_PARTIALLY_REFUNDED && $model->order_status  != Order::STATUS_REFUNDED  && $model->order_status  != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status  != Order::STATUS_DRAFT)) {
+                      if ($model->order_status != Order::STATUS_BEING_PREPARED) {
+                          echo Html::a('Being Prepared', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_BEING_PREPARED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-primary']);
+                      }
 
-                        if ($model->order_status != Order::STATUS_OUT_FOR_DELIVERY) {
-                            echo Html::a('Out for Delivery', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_OUT_FOR_DELIVERY], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-info']);
-                        }
+                      if ($model->order_status != Order::STATUS_OUT_FOR_DELIVERY) {
+                          echo Html::a('Out for Delivery', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_OUT_FOR_DELIVERY], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-info']);
+                      }
 
-                        if ($model->order_status != Order::STATUS_COMPLETE) {
-                            echo Html::a('Mark as Complete', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_COMPLETE], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
-                        }
+                      if ($model->order_status != Order::STATUS_COMPLETE) {
+                          echo Html::a('Mark as Complete', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_COMPLETE], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
+                      }
 
-                        if ($model->order_status != Order::STATUS_CANCELED) {
-                            echo Html::a('Mark as cancelled', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_CANCELED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-danger']);
-                        }
-                }
+                      if ($model->order_status != Order::STATUS_CANCELED) {
+                          echo Html::a('Mark as cancelled', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_CANCELED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-danger']);
+                      }
+                  }
                 ?>
             </p>
             <div class="box-body table-responsive no-padding">
@@ -229,20 +239,20 @@ $this->params['breadcrumbs'][] = $this->title;
                             <td colspan="3" class="order-details-summary-table__separator"><hr /></td>
                         </tr>
                     </tbody>
-                    <?php if($model->order_status == Order::STATUS_REFUNDED ||$model->order_status == Order::STATUS_PARTIALLY_REFUNDED && ($refunds->count() > 0  )) {
-                                           foreach ($refunds->all() as $refund) { ?>
+                    <?php if ($model->order_status == Order::STATUS_REFUNDED ||$model->order_status == Order::STATUS_PARTIALLY_REFUNDED && ($refunds->count() > 0)) {
+                      foreach ($refunds->all() as $refund) { ?>
                         <tbody class="order-details__summary__refund-lines">
                           <tr class="order-details__summary__detail-line-row">
                               <td>Refunded</td>
                               <td class="type--subdued">
-                                  <?= $refund->reason ?   $refund->reason : 'Reason: –' ?>
+                                Reason:  <?= $refund->reason ?   $refund->reason : ' –' ?>
                               </td>
                               <td>-<?= Yii::$app->formatter->asCurrency($refund->refund_amount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                           </tr>
                       </tbody>
 
                   <?php    }
-                                       }
+                  }
                   ?>
                     <tbody class="order-details__summary__net-payment">
                         <tr>
@@ -256,6 +266,39 @@ $this->params['breadcrumbs'][] = $this->title;
 
             </div>
         </div>
+    <?php } ?>
+
+    <?php
+
+    // order's Item
+    $refundDataProvider = new \yii\data\ActiveDataProvider([
+        'query' => $model->getRefunds()
+    ]);
+
+
+     if ($refundDataProvider->totalCount > 0) { ?>
+        <div class="card">
+            <div class="card-body">
+
+              <h3 style="margin-bottom: 20px;"> Refunds  </h3>
+
+
+              <?=
+                  GridView::widget([
+                      'dataProvider' => $refundDataProvider,
+                      'sorter' => false,
+                      'columns' => [
+                        'refund_id',
+                        'refund_amount:currency',
+                        'refund_status',
+                      ],
+                      'layout' => '{items}{pager} ',
+                      'tableOptions' => ['class' => 'table table-bordered table-hover'],
+                  ]);
+              ?>
+            </div>
+        </div>
+
     <?php } ?>
 
     <div class="card">

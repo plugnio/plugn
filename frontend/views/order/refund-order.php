@@ -37,8 +37,8 @@ $this->params['breadcrumbs'][] = $this->title;
         var userInput = document.getElementById("refund_amount").value;
         userInput = parseFloat(document.getElementById("refund_amount").value);
 
-        if(!userInput)
-        userInput = 0;
+
+        
         document.getElementById("refund_amount").value = userInput.toFixed(3) ;
         document.getElementById("refund_amount_btn").innerHTML = userInput.toFixed(3)  + ' KWD';
 
@@ -143,7 +143,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <div  class="summary-container">
                                         <div>
                                             <section class="item-img-section">
-                                                <img  class="item-img" src="<?= $refundedItem->orderItem->item->getItemImage() ?>" alt="Smart Short Sleeve Kimono Romper + Bib - Blue 0-3 M / Blue Whale" class="_3R2Os">
+                                                <img  class="item-img" src="<?= "https://res.cloudinary.com/plugn/image/upload/restaurants/". $refundedItem->restaurant->restaurant_uuid ."/items/" .   $itemItmage = $refundedItem->orderItem->getItemImages()->one()->product_file_name ?>" alt="Smart Short Sleeve Kimono Romper + Bib - Blue 0-3 M / Blue Whale" class="_3R2Os">
                                             </section>
                                         </div>
                                         <div class="item-data">
@@ -192,8 +192,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 <div class="input-group">
 
                                                       <?php
-                                                          $order_item_price = $refundedItem->orderItem->item_price;
                                                           $order_item_qty = $refundedItem->orderItem->qty;
+                                                          $order_item_price = $refundedItem->orderItem->item_price / $order_item_qty;
 
                                                           // echo $form->field($refundedItem, "[$refundedItemKey]item_uuid")->textInput(['value' => $refundedItem->orderItem->item_uuid,'style'=>'display:none'])->label(false);
 

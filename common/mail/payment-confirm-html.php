@@ -233,7 +233,7 @@ use common\models\Order;
                                                                                                 <p style="margin:0;padding:0;">Total</p>
                                                                                             </td>
                                                                                             <td style="font-size:23px; padding: 0 15px 0 0; padding-top:30px; text-align: right; vertical-align:top;">
-                                                                                                <?= \Yii::$app->formatter->asCurrency($order->total_price) ?>
+                                                                                                <?= \Yii::$app->formatter->asCurrency($order->total_price_before_refund) ?>
                                                                                             </td>
                                                                                         </tr>
                                                                                     </table>

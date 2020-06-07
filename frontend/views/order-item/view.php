@@ -31,33 +31,39 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="card">
         <div class="card-body">
             <?=
-            DetailView::widget([
-                'model' => $model,
-                'attributes' => [
-               'order_item_id',
-            'order_uuid',
-            'item_uuid',
-            'item_name',
-            'item_name_ar',
-            'item_price:currency',
-            'qty',
-            'customer_instruction',
-                ],
-                'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
-            ])
+                DetailView::widget([
+                  'model' => $model,
+                  'attributes' => [
+                    'order_item_id',
+                  [
+                      'attribute' => 'order_uuid',
+                      "format" => "raw",
+                      "value" => function ($model) {
+                      return '#' . $model->order_uuid;
+                      }
+                  ],
+                    'item_uuid',
+                    'item_name',
+                    'item_name_ar',
+                    'item_price:currency',
+                    'qty',
+                    'customer_instruction',
+                  ],
+                  'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
+                ])
             ?>
 
         </div>
     </div>
-    
+
      <h2>Extra Options</h2>
     <p>
         <?= Html::a('Add Extra option', ['order-item-extra-option/create', 'id' => $model->order_item_id, 'restaurantUuid' =>$model->restaurant->restaurant_uuid], ['class' => 'btn btn-success','style'=>'    margin: 10px 10px 10px 0px;']) ?>
     </p>
     <div class="card">
-        
 
-    
+
+
         <?=
         GridView::widget([
             'dataProvider' => $orderItemsExtraOpiton,
@@ -72,13 +78,16 @@ $this->params['breadcrumbs'][] = $this->title;
                     'buttons' => [
                         'delete' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px; color: red;" class="nav-icon fas fa-trash"></span>', ['order-item-extra-option/delete', 'id' => $model->order_item_extra_option_id ,'restaurantUuid' =>$model->restaurant->restaurant_uuid], [
+                                '<span style="margin-right: 20px; color: red;" class="nav-icon fas fa-trash"></span>',
+                                ['order-item-extra-option/delete', 'id' => $model->order_item_extra_option_id ,'restaurantUuid' =>$model->restaurant->restaurant_uuid],
+                                [
                                         'title' => 'Delete',
                                         'data' => [
                                             'confirm' => 'Are you absolutely sure ? You will lose all the information about this option with this action.',
                                             'method' => 'post',
                                         ],
-                            ]);
+                            ]
+                            );
                         },
                     ],
                 ],
@@ -92,8 +101,3 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 
 </div>
-
-
-
-    
-   

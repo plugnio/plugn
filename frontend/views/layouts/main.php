@@ -102,7 +102,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'nav-icon fas fa-home']) .
-                                        Html::tag('p', 'Dashboard'), ['site/index', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'nav-link']
+                                        Html::tag('p', 'Dashboard'), ['site/vendor-dashboard', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'nav-link']
                                 )
                                 ?>
 

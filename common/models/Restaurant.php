@@ -70,7 +70,7 @@ class Restaurant extends \yii\db\ActiveRecord {
     public $restaurant_payments_method;
     public $restaurant_logo;
     public $restaurant_thumbnail_image;
-    
+
     public $date_range_picker_with_time;
 
     /**
@@ -291,7 +291,6 @@ class Restaurant extends \yii\db\ActiveRecord {
         $fields = parent::fields();
 
         // remove fields that contain sensitive information
-        unset($fields['restaurant_domain']);
         unset($fields['vendor_sector']);
         unset($fields['business_id']);
         unset($fields['business_entity_id']);
@@ -517,7 +516,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         return $this->hasMany(RestaurantDelivery::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
-    
+
     /**
      * Gets query for [[Areas]].
      *
@@ -527,7 +526,7 @@ class Restaurant extends \yii\db\ActiveRecord {
     {
         return $this->hasMany(Area::className(), ['area_id' => 'area_id'])->viaTable('restaurant_delivery', ['restaurant_uuid' => 'restaurant_uuid']);
     }
-    
+
     /**
      * Gets query for [[RestaurantBranches]].
      *
@@ -537,7 +536,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         return $this->hasMany(RestaurantBranch::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
- 
+
 
     /**
      * Gets query for [[RestaurantPaymentMethods]].

@@ -316,6 +316,15 @@ class Order extends \yii\db\ActiveRecord {
         }
     }
 
+    // /**
+    //  * Update order status to pending
+    //  */
+    // public function changeOrderStatusToAbandonedCheckout() {
+    //
+    //     $this->order_status = self::STATUS_ABANDONED_CHECKOUT;
+    //     $this->save(false);
+    // }
+
     /**
      * Update order status to pending
      */

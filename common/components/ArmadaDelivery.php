@@ -17,8 +17,8 @@ use common\models\PaymentMethod;
  * @link http://www.pogi.io
  */
 class ArmadaDelivery extends Component {
-    
-    
+
+
     const USE_TEST_KEY = 1;
     const USE_LIVE_KEY = 2;
 
@@ -26,14 +26,14 @@ class ArmadaDelivery extends Component {
      * @var string Which key to use, test or live?
      */
     public $keyToUse;
-    
+
     public $liveApiEndpoint = "https://api.tap.company/v2";
-    
+
     public $testApiEndpoint = "https://api-simulation-env.herokuapp.com/v0";
 
     private $apiEndpoint;
 
-     
+
     /**
      * @inheritdoc
      */
@@ -78,7 +78,7 @@ class ArmadaDelivery extends Component {
                     "block" => $model->block,
                     "street" => $model->street,
                     "buildingNumber" => $model->house_number,
-                    "amount" => $model->total_price,
+                    "amount" => $model->total_price_before_refund,
                     "paymentType" => $model->payment_method_id == 3 ? 'cash on delivery' : 'paid',
                     "threeDSecure" => true,
                     "save_card" => false,

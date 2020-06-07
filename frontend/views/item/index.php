@@ -32,8 +32,14 @@ $this->registerCss($css);
 
 
 <div class="card">
-    <?=
-    GridView::widget([
+    <?php
+
+    // $initialPreviewArray = $dataProvider->query->getItemImages()->asArray()->one();
+    // $initialPreviewArray = ArrayHelper::getColumn($initialPreviewArray, 'product_file_name');
+    // $initialPreviewArray[$key] = "https://res.cloudinary.com/plugn/image/upload/restaurants/rest_b57f0b55-8d4c-11ea-8b7f-06d4853caaaa/items/". $file_name;
+
+
+    echo GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
@@ -42,7 +48,10 @@ $this->registerCss($css);
                 'attribute' => 'Image',
                 'format' => 'html',
                 'value' => function ($data) {
-                    return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/". $data->restaurant->restaurant_uuid ."/items/" . $data->item_image);
+                    $itemItmage = $data->getItemImages()->one();
+                    if ($itemItmage) {
+                        return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/". $data->restaurant->restaurant_uuid ."/items/" . $itemItmage->product_file_name);
+                    }
                 },
             ],
             'item_name',
@@ -58,7 +67,9 @@ $this->registerCss($css);
 
                     'update' => function ($url, $model) {
                         return Html::a(
-                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['update', 'id' => $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
+                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>',
+                            ['update', 'id' => $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid],
+                            [
                                     'title' => 'Update',
                                     'data-pjax' => '0',
                                         ]
@@ -66,13 +77,16 @@ $this->registerCss($css);
                     },
                     'delete' => function ($url, $model) {
                         return Html::a(
-                                        '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete','id' => $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
+                            '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>',
+                            ['delete','id' => $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid],
+                            [
                                     'title' => 'Delete',
                                     'data' => [
                                         'confirm' => 'Are you absolutely sure ? You will lose all the information about this item with this action.',
                                         'method' => 'post',
                                     ],
-                        ]);
+                        ]
+                        );
                     },
                 ],
             ],

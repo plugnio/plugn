@@ -5,7 +5,8 @@ namespace console\controllers;
 use Yii;
 use common\models\Restaurant;
 use common\models\Payment;
-use common\models\Order;
+use common\models\Item;
+use common\models\ItemImage;
 use \DateTime;
 use yii\helpers\Console;
 use yii\db\Expression;
@@ -17,33 +18,33 @@ class CronController extends \yii\console\Controller {
 
 public function actionIndex(){
 
-  $payments = Payment::find()->where(['!=','payment_current_status' , 'CAPTURED']);
-  $counter = 0;
+    $payments = Payment::find()->where(['!=','payment_current_status' , 'CAPTURED']);
+    $counter = 0;
 
-  foreach ($payments->all() as $payment) {
-    $order = Order::findOne($payment->order_uuid);
+    foreach ($payments->all() as $payment) {
+      $order = Order::findOne($payment->order_uuid);
 
-    $order->order_status = Order::STATUS_ABANDONED_CHECKOUT;
-    $order->save(false);
-    $counter++;
-  }
-
-
-  $this->stdout($payments->count(), Console::FG_RED, Console::BOLD);
-  $this->stdout($counter, Console::FG_RED, Console::BOLD);
-
-
-
-  $orders = Order::find();
-
-  foreach ($orders->all() as $order) {
-      $order->subtotal_before_refund = $order->subtotal;
-      $order->total_price_before_refund = $order->total_price;
+      $order->order_status = Order::STATUS_ABANDONED_CHECKOUT;
       $order->save(false);
-  }
+      $counter++;
+    }
 
 
-  $this->stdout($orders->count(), Console::FG_RED, Console::BOLD);
+    $this->stdout($payments->count(), Console::FG_RED, Console::BOLD);
+    $this->stdout($counter, Console::FG_RED, Console::BOLD);
+
+
+
+    $orders = Order::find();
+
+    foreach ($orders->all() as $order) {
+        $order->subtotal_before_refund = $order->subtotal;
+        $order->total_price_before_refund = $order->total_price;
+        $order->save(false);
+    }
+
+
+    $this->stdout($orders->count(), Console::FG_RED, Console::BOLD);
 
 
 }

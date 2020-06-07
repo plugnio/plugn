@@ -15,14 +15,13 @@ use common\models\Option;
 /* @var $model common\models\Item */
 /* @var $form yii\widgets\ActiveForm */
 $js = "  $(function () {
-            $( '.fileinput-remove' ).hide();
 
-
-    $(document).ready(function(){
-        if ($('.kv-file-zoom').length > 1){
-            $( '.file-preview-initial' ).hide();
-        }
-    });
+    //
+    // $(document).ready(function(){
+    //     if ($('.kv-file-zoom').length > 1){
+    //         $( '.file-preview-initial' ).hide();
+    //     }
+    // });
 
   })";
 
@@ -66,7 +65,6 @@ $this->registerJs($js);
 
             <?= $form->field($modelItem, 'item_name_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger']) ?>
 
-
             <?= $form->field($modelItem, 'item_description')->textarea(['class' => 'textarea', 'style' => 'style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"']) ?>
 
             <?= $form->field($modelItem, 'item_description_ar')->textarea(['class' => 'textarea', 'style' => 'style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"']) ?>
@@ -80,31 +78,42 @@ $this->registerJs($js);
 
     <div class="card">
         <div class="card-body">
+          <?php
+          $initialPreviewArray = $modelItem->getItemImages()->asArray()->all();
+          $initialPreviewArray = ArrayHelper::getColumn($initialPreviewArray, 'product_file_name');
+
+          foreach ($initialPreviewArray as $key => $file_name)
+            $initialPreviewArray[$key] = "https://res.cloudinary.com/plugn/image/upload/restaurants/". $modelItem->restaurant->restaurant_uuid ."/items/". $file_name;
+
+
+          ?>
+
 
             <h5 style="margin-bottom: 20px;">
-                Media
+              Media
             </h5>
 
-            <?=
-            $form->field($modelItem, 'image')->widget(FileInput::classname(), [
-                'options' => ['accept' => 'image/*', 'multiple' => false
+            <?php
+
+            echo $form->field($modelItem, 'item_images[]')->widget(FileInput::classname(), [
+                'options' => ['accept' => 'image/*', 'multiple' => true
                 ],
                 'pluginOptions' => [
                     'showUpload' => false,
-                    'initialPreview' => $modelItem->getItemImage() ? $modelItem->getItemImage() : '',
+                    'initialPreview'=> $initialPreviewArray,
                     'initialPreviewAsData' => true,
-                    'showRemove' => false,
+                    'showRemove' => true,
                     'allowedFileExtensions' => ['jpg', 'png', 'jpeg'],
                     'overwriteInitial' => true,
-                    'uploadAsync' => false,
-                    'showUploadedThumbs' => false,
-                    'initialPreviewCount' => 1,
+                    'uploadAsync' => true,
+                    'showUploadedThumbs' => true,
+                    // 'initialPreviewCount' => 1,
                     'validateInitialCount' => false,
-                    'maxFileCount' => 1,
+                    'maxFileCount' => 10,
                     'initialPreviewShowDelete' => false,
-                    'maxFileSize' => 2800
+                    'maxFileSize' => 30000
                 ]
-            ]);
+            ])->label(false);
             ?>
 
 

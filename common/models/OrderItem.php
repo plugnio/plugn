@@ -182,6 +182,16 @@ class OrderItem extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Gets query for [[ItemImages]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItemImages()
+    {
+        return $this->hasMany(ItemImage::className(), ['item_uuid' => 'item_uuid']);
+    }
+
+    /**
      * Gets query for [[Order]].
      *
      * @return \yii\db\ActiveQuery

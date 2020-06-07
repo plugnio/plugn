@@ -36,13 +36,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                 ],
                 [
-                    'attribute' => 'order_created_at',
-                    "format" => "raw",
-                    "value" => function($model) {
-                        return Yii::$app->formatter->asRelativeTime($model->order_created_at);
-                    },
-                ],
-                [
                     'attribute' => 'customer_name',
                     'format' => 'raw',
                     'value' => function ($data) {
@@ -54,13 +47,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                 ],
                 [
-                    'label' => 'Payment',
+                    'attribute' => 'order_created_at',
                     "format" => "raw",
-                    "value" => function($data) {
-                        if ($data->payment_uuid)
-                            return $data->payment->payment_current_status;
-                        else
-                            return $data->paymentMethod->payment_method_name;
+                    "value" => function($model) {
+                        return Yii::$app->formatter->asRelativeTime($model->order_created_at);
                     },
                 ],
                 'total_price:currency',

@@ -72,14 +72,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                             ]
                             );
                         },
-                        'update' => function ($url, $model) {
-                            return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['update', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
-                                        'title' => 'Update',
-                                        'data-pjax' => '0',
-                                            ]
-                            );
-                        },
                         'delete' => function ($url, $model) {
                             return Html::a(
                                             '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
