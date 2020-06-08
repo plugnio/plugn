@@ -206,7 +206,7 @@ use common\models\Order;
                                                                                             <td colspan="2" style="padding: 0 15px; padding-top:40px; vertical-align:top;">
                                                                                                 <p style="margin:0;padding:0;">Subtotal</p>
                                                                                             </td>
-                                                                                            <td style="color:#828585;padding: 0 15px 0 0; padding-top:40px; text-align: right; vertical-align:top;">
+                                                                                            <td style="color:#828585;padding-top:40px; text-align: right; vertical-align:top;">
                                                                                                 <?= \Yii::$app->formatter->asCurrency($order->subtotal) ?>
                                                                                             </td>
                                                                                         </tr>
@@ -216,7 +216,7 @@ use common\models\Order;
                                                                                                 <td colspan="2" style="padding: 0 15px; padding-top:0px; vertical-align:top;">
                                                                                                     <p style="margin:0;padding:0;">Delivery fee</p>
                                                                                                 </td>
-                                                                                                <td style="color:#828585;padding: 0 15px 0 0; padding-top:0px; text-align: right; vertical-align:top;">
+                                                                                                <td style="color:#828585;padding-top:0px; text-align: right; vertical-align:top;">
                                                                                                     <?= \Yii::$app->formatter->asCurrency($order->delivery_fee) ?>
                                                                                                 </td>
                                                                                             </tr>
