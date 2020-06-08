@@ -183,7 +183,7 @@ use common\models\Order;
                                                                                                 <td style="padding: 0 15px; padding-top:10px; width: 34px; vertical-align:top;">
                                                                                                     <?= $orderItem->qty ?>x
                                                                                                 </td>
-                                                                                                <td style="padding: 0 15px; padding-top:10px; vertical-align:top;">
+                                                                                                <td style="width: 70%; padding: 0 15px; padding-top:10px; vertical-align:top;">
                                                                                                     <p style="margin:0;padding:0;">
                                                                                                         <?= $orderItem->item->item_name . ' ' . $orderItem->item->item_name_ar ?>
                                                                                                     </p>
