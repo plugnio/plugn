@@ -55,6 +55,11 @@ class TapPayments extends Component
     public $minCreditcardGatewayFee = 0; // How much is charged per Creditcard transaction
 
     /**
+     * @var string destination id
+     */
+    public $destinationId;
+
+    /**
      * @var string secret api key to use will be stored here
      */
     public $plugnScretApiKey;
@@ -91,7 +96,7 @@ class TapPayments extends Component
     public function init()
     {
         // Fields required by default
-        $requiredAttributes = ['gatewayToUse', 'plugnLiveApiKey', 'plugnTestApiKey'];
+        $requiredAttributes = ['gatewayToUse', 'plugnLiveApiKey', 'plugnTestApiKey','destinationId'];
 
         // Process Validation
         foreach ($requiredAttributes as $attribute) {
@@ -394,7 +399,7 @@ class TapPayments extends Component
     /**
      * Create a charge for redirect
      */
-    public function createCharge($desc = "Pay", $statementDesc = "", $ref, $amount, $firstName, $email, $phone, $redirectUrl, $gateway)
+    public function createCharge($desc = "Pay", $statementDesc = "", $ref, $amount, $firstName, $email, $phone,$platform_fee, $redirectUrl, $gateway)
     {
         $chargeEndpoint = $this->apiEndpoint . "/charges";
 
@@ -415,7 +420,7 @@ class TapPayments extends Component
             ],
             "receipt" => [
                 "email" => false,
-                "sms" => false
+                "sms" => true
             ],
             "customer" => [
                 "first_name" => $firstName,
@@ -425,6 +430,13 @@ class TapPayments extends Component
                     "number" => $phone
                 ]
             ],
+            "destinations" => [
+                "destination" => [
+                    "id" => $this->destinationId,
+                    "amount" => (float)$amount *  (float)$platform_fee,
+                    "currency" => "KWD",
+                ]
+            ],
             "source" => [
                 "id" => $gateway
             ],
@@ -432,6 +444,7 @@ class TapPayments extends Component
                 "url" => $redirectUrl
             ]
         ];
+
 
         $client = new Client();
         $response = $client->createRequest()

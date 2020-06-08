@@ -160,6 +160,8 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'store_branch_name')->textInput() ?>
 
+    <?= $form->field($model, 'platform_fee')->textInput(['type' => 'number', 'step' => '.01', 'maxlength' => true, 'placeholder' => 'Platform fee']) ?>
+
     <?= $form->field($model, 'custom_css')->textarea(['rows' => '12']) ?>
 
     <?= $form->field($model, 'developer_id')->textInput() ?>

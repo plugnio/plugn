@@ -55,6 +55,7 @@ return [
             'gatewayToUse' => \common\components\TapPayments::USE_LIVE_GATEWAY,
             'plugnLiveApiKey' => "sk_live_k31q5ActS9shuYgwa8LZ746X",
             'plugnTestApiKey' => "sk_test_p07NquMX4HgwLT8mycdJnZv5",
+            'destinationId' => "2663705",
         ],
         'armadaDelivery' => [
             'class' => 'common\components\ArmadaDelivery',

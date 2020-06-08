@@ -31,6 +31,7 @@ use yii\behaviors\AttributeBehavior;
  * @property int $store_branch_name
  * @property int $custom_css
  * @property int $store_layout
+ * @property int $platform_fee
  *
  *
  * @property AgentAssignment[] $agentAssignments
@@ -95,6 +96,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_created_at', 'restaurant_updated_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['custom_css'], 'string'],
+            [['platform_fee'], 'number'],
             [['date_range_picker_with_time'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'armada_api_key','store_branch_name'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 8, 'max' => 8],
@@ -134,6 +136,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             'phone_number_display' => 'Phone number display',
             'store_branch_name' => 'Branch name',
             'custom_css' => 'Custom css',
+            'platform_fee' => 'Platform fee',
             'store_layout' => 'Store layout',
 
         ];

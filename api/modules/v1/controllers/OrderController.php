@@ -208,8 +208,13 @@ class OrderController extends Controller {
                                     "Order placed from: " . $order->customer_name, // Description
                                     $order->restaurant->name, //Statement Desc.
                                     $payment->payment_uuid, // Reference
-                                    $order->total_price, $order->customer_name, $order->customer_email, $order->customer_phone_number, Url::to(['order/callback'], true), $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD, $order->restaurant->test_api_key
-                            );
+                                    $order->total_price,
+                                    $order->customer_name,
+                                    $order->customer_email,
+                                    $order->customer_phone_number,
+                                    $order->restaurant->platform_fee,
+                                    Url::to(['order/callback'], true),
+                                    $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD                            );
 
                             $responseContent = json_decode($response->content);
 
