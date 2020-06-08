@@ -18,7 +18,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="customer-view">
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
         <?=
         Html::a('Delete', ['delete', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
             'class' => 'btn btn-danger',
