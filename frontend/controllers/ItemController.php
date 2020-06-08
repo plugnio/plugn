@@ -103,10 +103,6 @@ class ItemController extends Controller
         if ($modelItem->load(Yii::$app->request->post())) {
             $itemImages = \yii\web\UploadedFile::getInstances($modelItem, 'item_images');
 
-            if ($modelItem->items_category) {
-                $modelItem->saveItemsCategory($modelItem->items_category);
-            }
-
             $modelsOption = Model::createMultiple(Option::classname());
             Model::loadMultiple($modelsOption, Yii::$app->request->post());
 
@@ -131,6 +127,9 @@ class ItemController extends Controller
                 try {
                     if ($flag = $modelItem->save(false)) {
 
+                        if ($modelItem->items_category) {
+                            $modelItem->saveItemsCategory($modelItem->items_category);
+                        }
 
                         if (!empty($itemImages))
                             $modelItem->uploadItemImage($itemImages);
@@ -207,12 +206,6 @@ class ItemController extends Controller
             $itemImages = \yii\web\UploadedFile::getInstances($modelItem, 'item_images');
 
 
-
-            if ($modelItem->items_category) {
-                $modelItem->saveItemsCategory($modelItem->items_category);
-            }
-
-
             // reset
             $modelsExtraOption = [];
 
@@ -251,8 +244,11 @@ class ItemController extends Controller
                 try {
                     if ($flag = $modelItem->save(false)) {
 
+                      if ($modelItem->items_category) {
+                          $modelItem->saveItemsCategory($modelItem->items_category);
+                      }
 
-                      if (!empty($itemImages)) 
+                      if (!empty($itemImages))
                               $modelItem->uploadItemImage($itemImages);
 
 
