@@ -193,7 +193,7 @@ use common\models\Order;
                                                                                                         </p>
                                                                                                     <?php } ?>
                                                                                                 </td>
-                                                                                                <td style="color:#828585;padding: 0 15px 0 0; padding-top:10px; text-align: right; vertical-align:top;width: 80px;">
+                                                                                                <td style="color:#828585; padding-top:10px; text-align: right; vertical-align:top;width: 80px;">
                                                                                                     <?= \Yii::$app->formatter->asCurrency($orderItem->calculateOrderItemPrice()); ?>
                                                                                                 </td>
                                                                                             </tr>
