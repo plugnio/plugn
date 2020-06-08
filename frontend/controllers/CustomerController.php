@@ -44,9 +44,9 @@ class CustomerController extends Controller {
      * @return mixed
      */
     public function actionIndex($restaurantUuid) {
-        
+
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
-                
+
         $searchModel = new CustomerSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurantUuid);
 
@@ -68,7 +68,7 @@ class CustomerController extends Controller {
 
         // Customer's Orders Data
         $customersOrdersData = new \yii\data\ActiveDataProvider([
-            'query' => $model->getOrders(),
+            'query' => $model->getOrders()->orderBy(['order_created_at' => SORT_DESC]),
         ]);
 
 

@@ -60,6 +60,13 @@ $this->params['breadcrumbs'][] = $this->title;
         GridView::widget([
             'dataProvider' => $customersOrdersData,
             'columns' => [
+              [
+                  'attribute' => 'order_uuid',
+                  "format" => "raw",
+                  "value" => function($model) {
+                      return '#' . $model->order_uuid;
+                  }
+              ],
                 [
                     'label' => 'Order Type',
                     "format" => "raw",
@@ -71,6 +78,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                 ],
                 [
+
                     'attribute' => 'order_status',
                     'format' => "raw",
                     'value' => function($model) {
@@ -84,10 +92,23 @@ $this->params['breadcrumbs'][] = $this->title;
                             return '<span class="badge bg-success" >' . $model->orderStatus . '</span>';
                         else if ($model->order_status == Order::STATUS_CANCELED)
                             return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
+                        else if ($model->order_status == Order::STATUS_PARTIALLY_REFUNDED)
+                            return '<span class="badge bg-warning" >' . $model->orderStatus . '</span>';
+                        else if ($model->order_status == Order::STATUS_REFUNDED)
+                            return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
+                        else if ($model->order_status == Order::STATUS_ABANDONED_CHECKOUT)
+                            return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
                     }
                 ],
                 'delivery_fee:currency',
                 'total_price:currency',
+                [
+                    'attribute' => 'order_created_at',
+                    "format" => "raw",
+                    "value" => function($model) {
+                        return Yii::$app->formatter->asRelativeTime($model->order_created_at);
+                    }
+                ],
                 [
                     'class' => 'yii\grid\ActionColumn',
                     'template' => ' {view} {update} {delete}',
