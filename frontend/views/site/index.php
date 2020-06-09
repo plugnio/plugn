@@ -21,7 +21,7 @@ $this->title = $restaurant_model->name;
     function enableSoundForNewOrders() {
         document.getElementById("play-btn").value = 'true';
         document.getElementById("stop-btn").value = 'false'
-                
+
         document.getElementById("play-sound-section").style.display = "none";
         document.getElementById("stop-sound-section").style.display = "block";
     }
@@ -30,7 +30,7 @@ $this->title = $restaurant_model->name;
     function disableSoundForNewOrders() {
         document.getElementById("stop-btn").value = 'true';
         document.getElementById("play-btn").value = 'false'
-        
+
         document.getElementById("play-sound-section").style.display = "block";
         document.getElementById("stop-sound-section").style.display = "none";
     }
@@ -42,16 +42,16 @@ $this->title = $restaurant_model->name;
             .then(data => {
 
                 $("#new-order-table").load(<?= "'" . yii\helpers\Url::to(['site/check-for-new-orders', 'restaurant_uuid' => $restaurant_model->restaurant_uuid]) . "'" ?>);
-       
-         
-                if (data && document.getElementById("play-btn").value == true && document.getElementById("stop-btn").value == false) {
+
+
+                if (data && document.getElementById("play-btn").value == 'true' && document.getElementById("stop-btn").value == 'false') {
                     console.log('play');
                      soundForNewOrders.play();
-                } else if (!data && document.getElementById("stop-btn").value == true && document.getElementById("play-btn").value == false) {
+                } else if (!data && document.getElementById("stop-btn").value == 'true' && document.getElementById("play-btn").value == 'false') {
                     console.log('pause');
                     soundForNewOrders.pause();
                 }
-          
+
 
             }).catch(err => {
                 console.error('Error: ', err);
@@ -73,7 +73,7 @@ $this->title = $restaurant_model->name;
         <div class="container-fluid">
           <!-- Small boxes (Stat box) -->
           <div class="row">
-              
+
                    <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
 
             <div class="col-lg-3 col-6">
@@ -144,7 +144,7 @@ $this->title = $restaurant_model->name;
               </div>
             </div>
             <!-- ./col -->
-            
+
                    <?php } else { ?>
                        <div class="col-lg-4 col-7">
               <!-- small box -->
@@ -196,7 +196,7 @@ $this->title = $restaurant_model->name;
                 ?>
               </div>
             </div>
-      
+
                    <?php } ?>
           </div>
           <!-- /.row -->
@@ -216,14 +216,14 @@ $this->title = $restaurant_model->name;
                                     <div id="play-sound-section">
                                        <?=
                                            Html::button('Play sound for new orders', [ 'class' => 'btn btn-success','id'=>'play-btn', 'value' => 'false' , 'onclick' => 'enableSoundForNewOrders()' ]);
-                                        ?> 
+                                        ?>
                                     </div>
                                     <div id="stop-sound-section" style="display: none">
                                        <?=
                                            Html::button('Stop sound for new orders', [ 'class' => 'btn btn-danger','id'=>'stop-btn', 'value' => 'false', 'onclick' => 'disableSoundForNewOrders()' ]);
-                                        ?> 
+                                        ?>
                                     </div>
-                                       
+
                                 </div>
                             </div>
                             <!-- /.card-header -->
