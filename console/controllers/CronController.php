@@ -76,16 +76,15 @@ public function actionIndex(){
     }
 
 
-
+    
     public function actionUpdateStockQty() {
         $now = new DateTime('now');
-        $payments = Payment::find()
-                ->where(['<>' , 'payment_current_status','CAPTURED'])
-                ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 HOUR)')])
-                ->all();
+        $orders = Order::find()
+                ->where([ 'order_status' => Order::STATUS_ABANDONED_CHECKOUT])
+                ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 HOUR)')]);
 
-        foreach ($payments as $payment) {
-            foreach ($payment->order->getOrderItems()->all() as $orderItem) {
+        foreach ($orders->all() as $order) {
+            foreach ($order->getOrderItems()->all() as $orderItem) {
                 $orderItem->item->increaseStockQty($orderItem->qty);
             }
         }
