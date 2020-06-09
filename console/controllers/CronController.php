@@ -76,12 +76,12 @@ public function actionIndex(){
     }
 
 
-    
+
     public function actionUpdateStockQty() {
         $now = new DateTime('now');
         $orders = Order::find()
                 ->where([ 'order_status' => Order::STATUS_ABANDONED_CHECKOUT])
-                ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 HOUR)')]);
+                ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')]);
 
         foreach ($orders->all() as $order) {
             foreach ($order->getOrderItems()->all() as $orderItem) {
