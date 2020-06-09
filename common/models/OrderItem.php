@@ -119,13 +119,14 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         if ($insert) {
 
-            if ($this->qty > $this->item->stock_qty)
-                return $this->addError('qty', "The requested quantity for " . $this->qty . " is not available.");
+            if ($this->qty == 1)
+                return $this->addError('qty', $this->item->item_name . " is currently out of stock and unavailable.");
         }
         else {
 
             if ($this->qty > ( $this->item->stock_qty + $this->getOldAttribute('qty')))
-                return $this->addError('qty', "The requested quantity for " . $this->item->item_name . " is not available.");
+                return $this->addError('qty', $this->item->item_name . " is currently out of stock and unavailable.");
+
         }
 
         if ($this->qty == 0)
