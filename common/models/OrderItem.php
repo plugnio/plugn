@@ -119,7 +119,7 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         if ($insert) {
 
-            if ($this->qty == 1)
+            if ($this->qty  > $this->item->stock_qty)
                 return $this->addError('qty', $this->item->item_name . " is currently out of stock and unavailable.");
         }
         else {
