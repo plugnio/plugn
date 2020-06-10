@@ -93,7 +93,6 @@ echo GridView::widget([
                                     ]
                     );
                 },
-=======
             'stock_qty',
             'unit_sold',
             'item_price:currency',
@@ -126,7 +125,7 @@ echo GridView::widget([
                         );
                     },
                 ],
->>>>>>> unit-sold
+
             ],
         ],
     ],
