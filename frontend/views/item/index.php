@@ -42,6 +42,16 @@ $this->registerCss($css);
     echo GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+           'pager' => [
+        'options' => [
+            'class' => 'pagination pagination-sm m-0 float-right'
+        ],
+        'linkOptions' => ['class' => 'page-link'],
+        'activePageCssClass' => 'page-item active',
+        'disabledPageCssClass' => 'page-item  disabled',
+        'prevPageCssClass' => 'page-item prev disabled',
+        'nextPageCssClass' => 'page-item next disabled',
+    ],
         'columns' => [
             'sort_number',
             [
