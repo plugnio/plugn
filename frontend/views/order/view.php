@@ -154,6 +154,17 @@ $this->params['breadcrumbs'][] = $this->title;
                     'dataProvider' => $orderItems,
                     'sorter' => false,
                     'columns' => [
+                      [
+                          'attribute' => 'Image',
+                          'format' => 'html',
+                          'value' => function ($data) {
+                              $itemItmage = $data->getItemImages()->one();
+                              if ($itemItmage) {
+                                return '<img src="https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/rest_00f54a5e-7c35-11ea-997e-4a682ca4b290/items/8kZST7rKneiWBwQx0gVZ3Kzdbb2Ge3dT.jpg" display style="display:block;" alt="">';
+                              }
+                          },
+                          'contentOptions' => ['style' => 'width: 100px;'],
+                      ],
                         'item_name',
                         'customer_instruction',
                         'qty',
