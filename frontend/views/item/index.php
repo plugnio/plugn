@@ -93,6 +93,7 @@ echo GridView::widget([
                                     ]
                     );
                 },
+
             'stock_qty',
             'unit_sold',
             'item_price:currency',
@@ -125,10 +126,10 @@ echo GridView::widget([
                         );
                     },
                 ],
-
             ],
         ],
     ],
+                            ],
     'layout' => '{summary}<div class="card-body"><div class="box-body table-responsive no-padding">{items}<div class="card-footer clearfix">{pager}</div></div>',
     'tableOptions' => ['class' => 'table table-bordered table-hover'],
     'summaryOptions' => ['class' => "card-header"],
