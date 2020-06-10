@@ -47,7 +47,6 @@ $this->registerCss($css);
             'activePageCssClass' => 'page-item active',
             'disabledPageCssClass' => 'page-item  disabled',
             'prevPageCssClass' => 'page-item prev',
-            'prevPageLabel' => '<span class=" page-link">«</span>',
             'nextPageCssClass' => 'page-item next',
         ],
         'columns' => [
