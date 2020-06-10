@@ -26,9 +26,14 @@ $this->params['breadcrumbs'][] = $this->title;
             'linkOptions' => ['class' => 'page-link'],
             'activePageCssClass' => 'page-item active',
             'disabledPageCssClass' => 'page-item  disabled',
-            'prevPageCssClass' => 'page-item prev disabled',
-            'prevPageLabel' => '<span class=" page-link">«</span>',
-            'nextPageCssClass' => 'page-item next disabled',
+            'prevPageCssClass' => 'page-item prev',
+            'nextPageCssClass' => 'page-item next',
+            
+            'disabledListItemSubTagOptions' => [
+                'tag' => 'span',
+                'class' => 'page-link',
+            ],
+
         ],
         'columns' => [
             'customer_name',

@@ -108,13 +108,14 @@ $this->registerJs($js);
                     'class' => 'pagination pagination-sm m-0 float-right',
                 ],
                 'linkOptions' => ['class' => 'page-link'],
-                
                 'activePageCssClass' => 'page-item active',
-                'disabledPageCssClass' => 'page-item disabled',
-                
+                'disabledPageCssClass' => 'page-item  disabled',
                 'prevPageCssClass' => 'page-item prev',
-                'prevPageLabel' => '<span class="page-link">«</span>',
                 'nextPageCssClass' => 'page-item next',
+                'disabledListItemSubTagOptions' => [
+                    'tag' => 'span',
+                    'class' => 'page-link',
+                ],
             ],
             'columns' => [
                 [

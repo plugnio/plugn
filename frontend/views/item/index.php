@@ -48,12 +48,10 @@ $this->registerCss($css);
             'disabledPageCssClass' => 'page-item  disabled',
             'prevPageCssClass' => 'page-item prev',
             'nextPageCssClass' => 'page-item next',
-            
             'disabledListItemSubTagOptions' => [
                 'tag' => 'span',
                 'class' => 'page-link',
             ],
-
         ],
         'columns' => [
             'sort_number',
