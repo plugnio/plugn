@@ -67,7 +67,7 @@ echo GridView::widget([
 //            'item_name_ar',
 //            'item_description',
 //            'item_description_ar',
-<<<<<<< HEAD
+
         'stock_qty',
         'item_price:currency',
         [
