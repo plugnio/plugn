@@ -67,6 +67,7 @@ echo GridView::widget([
 //            'item_name_ar',
 //            'item_description',
 //            'item_description_ar',
+<<<<<<< HEAD
         'stock_qty',
         'item_price:currency',
         [
@@ -92,6 +93,40 @@ echo GridView::widget([
                                     ]
                     );
                 },
+=======
+            'stock_qty',
+            'unit_sold',
+            'item_price:currency',
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => ' {view} {update} {delete}',
+                'buttons' => [
+
+                    'update' => function ($url, $model) {
+                        return Html::a(
+                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>',
+                            ['update', 'id' => $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid],
+                            [
+                                    'title' => 'Update',
+                                    'data-pjax' => '0',
+                                        ]
+                        );
+                    },
+                    'delete' => function ($url, $model) {
+                        return Html::a(
+                            '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>',
+                            ['delete','id' => $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid],
+                            [
+                                    'title' => 'Delete',
+                                    'data' => [
+                                        'confirm' => 'Are you absolutely sure ? You will lose all the information about this item with this action.',
+                                        'method' => 'post',
+                                    ],
+                        ]
+                        );
+                    },
+                ],
+>>>>>>> unit-sold
             ],
         ],
     ],

@@ -18,7 +18,7 @@ class ItemSearch extends Item
     {
         return [
             [['item_uuid', 'restaurant_uuid', 'item_name', 'item_name_ar', 'item_description', 'item_description_ar', 'item_image', 'item_created_at', 'item_updated_at'], 'safe'],
-            [['sort_number', 'stock_qty'], 'integer'],
+            [['sort_number', 'stock_qty','unit_sold'], 'integer'],
             [['item_price'], 'number'],
         ];
     }
@@ -62,6 +62,7 @@ class ItemSearch extends Item
         $query->andFilterWhere([
             'sort_number' => $this->sort_number,
             'stock_qty' => $this->stock_qty,
+            'unit_sold' => $this->unit_sold,
             'item_price' => $this->item_price,
             'item_created_at' => $this->item_created_at,
             'item_updated_at' => $this->item_updated_at,
