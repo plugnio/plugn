@@ -22,7 +22,18 @@ $this->params['breadcrumbs'][] = $this->title;
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
-              'filterModel' => $searchModel,
+            'filterModel' => $searchModel,
+            'pager' => [
+                'options' => [
+                    'class' => 'pagination pagination-sm m-0 float-right',
+                ],
+                'linkOptions' => ['class' => 'page-link'],
+                'activePageCssClass' => 'page-item active',
+                'disabledPageCssClass' => 'page-item  disabled',
+                'prevPageCssClass' => 'page-item prev disabled',
+                'prevPageLabel' => '<span class=" page-link">«</span>',
+                'nextPageCssClass' => 'page-item next disabled',
+            ],
             'columns' => [
                 [
                     'attribute' => 'order_uuid',
@@ -42,7 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'attribute' => 'customer_name',
                     'format' => 'raw',
                     'value' => function ($data) {
-                        if($data->customer_id)
+                        if ($data->customer_id)
                             return Html::a($data->customer->customer_name, ['customer/view', 'id' => $data->customer_id, 'restaurantUuid' => $data->restaurant_uuid]);
                     },
                     'visible' => function ($data) {

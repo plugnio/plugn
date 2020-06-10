@@ -58,14 +58,25 @@ $this->params['breadcrumbs'][] = $this->title;
         <?=
         GridView::widget([
             'dataProvider' => $customersOrdersData,
+            'pager' => [
+                'options' => [
+                    'class' => 'pagination pagination-sm m-0 float-right',
+                ],
+                'linkOptions' => ['class' => 'page-link'],
+                'activePageCssClass' => 'page-item active',
+                'disabledPageCssClass' => 'page-item  disabled',
+                'prevPageCssClass' => 'page-item prev disabled',
+                'prevPageLabel' => '<span class=" page-link">«</span>',
+                'nextPageCssClass' => 'page-item next disabled',
+            ],
             'columns' => [
-              [
-                  'attribute' => 'order_uuid',
-                  "format" => "raw",
-                  "value" => function($model) {
-                      return '#' . $model->order_uuid;
-                  }
-              ],
+                [
+                    'attribute' => 'order_uuid',
+                    "format" => "raw",
+                    "value" => function($model) {
+                        return '#' . $model->order_uuid;
+                    }
+                ],
                 [
                     'label' => 'Order Type',
                     "format" => "raw",
@@ -77,7 +88,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                 ],
                 [
-
                     'attribute' => 'order_status',
                     'format' => "raw",
                     'value' => function($model) {

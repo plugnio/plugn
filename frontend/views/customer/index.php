@@ -19,6 +19,17 @@ $this->params['breadcrumbs'][] = $this->title;
     GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+        'pager' => [
+            'options' => [
+                'class' => 'pagination pagination-sm m-0 float-right',
+            ],
+            'linkOptions' => ['class' => 'page-link'],
+            'activePageCssClass' => 'page-item active',
+            'disabledPageCssClass' => 'page-item  disabled',
+            'prevPageCssClass' => 'page-item prev disabled',
+            'prevPageLabel' => '<span class=" page-link">«</span>',
+            'nextPageCssClass' => 'page-item next disabled',
+        ],
         'columns' => [
             'customer_name',
             'customer_phone_number',
@@ -30,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'buttons' => [
                     'view' => function ($url, $model) {
                         return Html::a(
-                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['view','id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
+                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['view', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
                                     'title' => 'View',
                                     'data-pjax' => '0',
                                         ]
@@ -38,7 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                     'delete' => function ($url, $model) {
                         return Html::a(
-                                        '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete','id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
+                                        '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
                                     'title' => 'Delete',
                                     'data' => [
                                         'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',

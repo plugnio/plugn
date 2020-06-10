@@ -18,14 +18,25 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?php
         if (AgentAssignment::isOwner($restaurant_uuid))
-            echo Html::a('Invite Additional Agent', ['create','restaurantUuid' => $restaurant_uuid], ['class' => 'btn btn-success'])
-        ?>
+            echo Html::a('Invite Additional Agent', ['create', 'restaurantUuid' => $restaurant_uuid], ['class' => 'btn btn-success'])
+            ?>
     </p>
 
     <div class="card">
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'pager' => [
+                'options' => [
+                    'class' => 'pagination pagination-sm m-0 float-right',
+                ],
+                'linkOptions' => ['class' => 'page-link'],
+                'activePageCssClass' => 'page-item active',
+                'disabledPageCssClass' => 'page-item  disabled',
+                'prevPageCssClass' => 'page-item prev disabled',
+                'prevPageLabel' => '<span class=" page-link">«</span>',
+                'nextPageCssClass' => 'page-item next disabled',
+            ],
             'columns' => [
                 'agent.agent_name',
                 'assignment_agent_email:email',
