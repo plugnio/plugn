@@ -4,6 +4,7 @@ namespace console\controllers;
 
 use Yii;
 use common\models\Restaurant;
+use common\models\OrderItem;
 use common\models\Payment;
 use common\models\Item;
 use common\models\Order;
@@ -17,40 +18,19 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-public function actionIndex(){
+    public function actionIndex() {
+        foreach (OrderItem::find()->all() as $orderItem) {
 
-    $payments = Payment::find()->where(['!=','payment_current_status' , 'CAPTURED']);
-    $counter = 0;
+            if ($orderItem->order->order_status >= Order::STATUS_PENDING && $orderItem->order->order_status <= Order::STATUS_COMPLETE) {
+                $item = Item::findOne($orderItem->item_uuid);
 
-    foreach ($payments->all() as $payment) {
-      $order = Order::findOne($payment->order_uuid);
-
-      $order->order_status = Order::STATUS_ABANDONED_CHECKOUT;
-      $order->save(false);
-      $counter++;
+                if ($item) {
+                    $item->unit_sold = $item->unit_sold + $orderItem->qty;
+                    $item->save(false);
+                }
+            }
+        }
     }
-
-
-    $this->stdout($payments->count(), Console::FG_RED, Console::BOLD); //payment 62
-    echo "\r\n";
-    $this->stdout($counter, Console::FG_RED, Console::BOLD); //counter 62
-    echo "\r\n";
-
-
-    $orders = Order::find();
-
-    foreach ($orders->all() as $order) {
-        $order->subtotal_before_refund = $order->subtotal;
-        $order->total_price_before_refund = $order->total_price;
-        $order->save(false);
-    }
-
-
-    $this->stdout($orders->count(), Console::FG_RED, Console::BOLD); //order 157
-
-
-}
-
 
     /**
      * Update refund status  for all refunds record
@@ -75,23 +55,21 @@ public function actionIndex(){
         }
     }
 
-
-
     public function actionUpdateStockQty() {
-      
-      // $now = new DateTime('now');
-      // $orders = Order::find()
-      //         ->where([ 'order_status' => Order::STATUS_ABANDONED_CHECKOUT])
-      //         ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')]);
-      //
+
+        // $now = new DateTime('now');
+        // $orders = Order::find()
+        //         ->where([ 'order_status' => Order::STATUS_ABANDONED_CHECKOUT])
+        //         ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')]);
+        //
       // foreach ($orders->all() as $order) {
-      //     $orderItems = $order->getOrderItems();
-      //
+        //     $orderItems = $order->getOrderItems();
+        //
       //     if($orderItems->count() > 0 ){
-      //       foreach ($orderItems->all() as $orderItem)
-      //           $orderItem->item->increaseStockQty($orderItem->qty);
-      //     }
-      // }
+        //       foreach ($orderItems->all() as $orderItem)
+        //           $orderItem->item->increaseStockQty($orderItem->qty);
+        //     }
+        // }
     }
 
     /**

@@ -59,6 +59,7 @@ $this->registerCss($css);
 //            'item_description',
 //            'item_description_ar',
             'stock_qty',
+            'unit_sold',
             'item_price:currency',
             [
                 'class' => 'yii\grid\ActionColumn',

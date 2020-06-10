@@ -19,6 +19,7 @@ use yii\behaviors\TimestampBehavior;
  * @property string|null $item_description_ar
  * @property int|null $sort_number
  * @property int|null $stock_qty
+ * @property int|null $unit_sold
  * @property string|null $item_image
  * @property float|null $item_price
  * @property string|null $item_created_at
@@ -28,6 +29,7 @@ use yii\behaviors\TimestampBehavior;
  * @property Category[] $categories
  * @property Restaurant $restaurant
  * @property Option[] $options
+ * @property OrderItem[] $orderItems
  * @property ExtraOptions[] $extraOptions
  * @property ItemImage[] $itemImages
  */
@@ -53,6 +55,7 @@ class Item extends \yii\db\ActiveRecord
             [['item_name', 'items_category'], 'required', 'on' => 'create'],
             [['item_name', 'item_name_ar', 'item_price'], 'required'],
             [['sort_number', 'stock_qty'], 'integer', 'min' => 0],
+            [['unit_sold'], 'integer', 'min' => 0],
             [['item_price'], 'number', 'min' => 0],
             [['item_images'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 10],
             [['item_created_at', 'item_updated_at', 'items_category'], 'safe'],
@@ -79,6 +82,7 @@ class Item extends \yii\db\ActiveRecord
             'item_description_ar' => 'Item Description in Arabic',
             'sort_number' => 'Sort Number',
             'stock_qty' => 'Stock Qty',
+            'unit_sold' => 'Unit Sold',
             'item_image' => 'Item Image',
             'item_price' => 'Price',
             'items_category' => 'Category',
@@ -123,6 +127,7 @@ class Item extends \yii\db\ActiveRecord
     public function increaseStockQty($qty)
     {
         $this->stock_qty += $qty;
+        $this->unit_sold -= $qty;
         $this->save(false);
     }
 
@@ -133,6 +138,7 @@ class Item extends \yii\db\ActiveRecord
     public function decreaseStockQty($qty)
     {
         $this->stock_qty -= $qty;
+        $this->unit_sold += $qty;
         $this->save(false);
     }
 
