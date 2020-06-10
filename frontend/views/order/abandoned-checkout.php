@@ -61,6 +61,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                 'total_price:currency',
                 [
+                    'attribute' => 'order_created_at',
+                    "format" => "raw",
+                    "value" => function($data) {
+                        return Yii::$app->formatter->asRelativeTime($data->order_created_at);
+                    },
+                ],
+                [
                     'class' => 'yii\grid\ActionColumn',
                     'template' => ' {view} {update} {delete}',
                     'buttons' => [
