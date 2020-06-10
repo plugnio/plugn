@@ -49,7 +49,7 @@ $this->registerCss($css);
         'linkOptions' => ['class' => 'page-link'],
         'activePageCssClass' => 'page-item active',
         'disabledPageCssClass' => 'page-item  disabled',
-        'prevPageCssClass' => 'page-item prev disabled',
+//        'prevPageCssClass' => 'page-item prev disabled',
         'nextPageCssClass' => 'page-item next disabled',
     ],
         'columns' => [
