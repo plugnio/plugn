@@ -85,11 +85,14 @@ class CronController extends \yii\console\Controller {
 
         if ($payments) {
             foreach ($payments as $payment) {
-                try {
+              try {
+                  if($payment->payment_gateway_transaction_id){
                     $payment = Payment::updatePaymentStatusFromTap($payment->payment_gateway_transaction_id);
                     $payment->received_callback = true;
                     $payment->save(false);
-                } catch (\Exception $e) {
+                  }
+
+              } catch (\Exception $e) {
                     \Yii::error("[Issue checking status] " . $e->getMessage(), __METHOD__);
                 }
             }
