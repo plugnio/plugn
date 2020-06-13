@@ -23,10 +23,14 @@ $this->registerCss($css);
 
 <div class="page-title"> <i class="icon-custom-left"></i>
     <p>
+
         <?= Html::a('Add Item', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+
+        <?= Html::a('Export to Excel', ['export-to-excel' , 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-info' , 'style' => 'margin-left:10px;']) ?>
 
     </p>
 </div>
+
 
 
 <div class="card">
