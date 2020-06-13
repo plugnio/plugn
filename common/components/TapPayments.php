@@ -415,7 +415,7 @@ class TapPayments extends Component
             ],
             "receipt" => [
                 "email" => false,
-                "sms" => false
+                "sms" => true
             ],
             "customer" => [
                 "first_name" => $firstName,

@@ -208,32 +208,71 @@ class OrderController extends Controller {
                                     "Order placed from: " . $order->customer_name, // Description
                                     $order->restaurant->name, //Statement Desc.
                                     $payment->payment_uuid, // Reference
-                                    $order->total_price, $order->customer_name, $order->customer_email, $order->customer_phone_number, Url::to(['order/callback'], true), $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD, $order->restaurant->test_api_key
+                                    $order->total_price,
+                                    $order->customer_name,
+                                    $order->customer_email,
+                                    $order->customer_phone_number,
+                                    Url::to(['order/callback'], true),
+                                    $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD
                             );
 
                             $responseContent = json_decode($response->content);
 
-                            // Validate that theres no error from TAP gateway
-                            if (isset($responseContent->errors)) {
-                                $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
-                                \Yii::error($errorMessage, __METHOD__); // Log error faced by user
+                            try {
 
-                                return [
-                                    'operation' => 'error',
-                                    'message' => $errorMessage
-                                ];
-                            }
+                              // Validate that theres no error from TAP gateway
+                              if (isset($responseContent->errors)) {
+                                  $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
+                                  \Yii::error($errorMessage, __METHOD__); // Log error faced by user
 
-                            $chargeId = $responseContent->id;
-                            $redirectUrl = $responseContent->transaction->url;
+                                  return [
+                                      'operation' => 'error',
+                                      'message' => $errorMessage
+                                  ];
+                              }
 
-                            $payment->payment_gateway_transaction_id = $chargeId;
-                            $payment->save(false);
+                              if($responseContent->id) {
 
-                            return [
-                                'operation' => 'redirecting',
-                                'redirectUrl' => $redirectUrl,
-                            ];
+                              $chargeId = $responseContent->id;
+                              $redirectUrl = $responseContent->transaction->url;
+
+                               $payment->payment_gateway_transaction_id = $chargeId;
+
+                               if(!$payment->save(false)){
+
+                                 \Yii::error($payment->errors, __METHOD__); // Log error faced by user
+
+                                 return [
+                                     'operation' => 'error',
+                                     'message' => $payment->getErrors()
+                                 ];
+
+                               }
+
+                             } else {
+                               \Yii::error('[Payment Issue > Charge id is missing ]' . $responseContent , __METHOD__); // Log error faced by user
+                             }
+
+
+                              return [
+                                  'operation' => 'redirecting',
+                                  'redirectUrl' => $redirectUrl,
+                              ];
+
+                            } catch (\Exception $e) {
+
+                              if($payment)
+                                 Yii::error('[TAP Payment Issue > ]' . json_encode($payment->getErrors()) , __METHOD__);
+
+                                Yii::error('[TAP Payment Issue > Charge id is missing]' . json_encode($responseContent) , __METHOD__);
+
+                               $response = [
+                                   'operation' => 'error',
+                                   'message' => $responseContent
+                               ];
+
+                          }
+
                         } else {
 
                             Yii::error('[TAP Payment Issue > ' . $paymentRecord->custoemr_name . ']'
