@@ -57,21 +57,21 @@ class CronController extends \yii\console\Controller {
 
     public function actionUpdateStockQty() {
 
-        $now = new DateTime('now');
-        $payments = Payment::find()
-                ->where([ '!=' , 'payment_current_status' , 'CAPTURED'])
-                ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')]);
-
-      foreach ($payments->all() as $payment) {
-            $orderItems = $payment->getOrderItems();
-
-          if($orderItems->count() > 0 ){
-              foreach ($orderItems->all() as $orderItem)
-                if($orderItem->item_uuid){
-                  $orderItem->item->increaseStockQty($orderItem->qty);
-                }
-            }
-        }
+      //   $now = new DateTime('now');
+      //   $payments = Payment::find()
+      //           ->where([ '!=' , 'payment_current_status' , 'CAPTURED'])
+      //           ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')]);
+      //
+      // foreach ($payments->all() as $payment) {
+      //       $orderItems = $payment->getOrderItems();
+      //
+      //     if($orderItems->count() > 0 ){
+      //         foreach ($orderItems->all() as $orderItem)
+      //           if($orderItem->item_uuid){
+      //             $orderItem->item->increaseStockQty($orderItem->qty);
+      //           }
+      //       }
+      //   }
     }
 
     /**
