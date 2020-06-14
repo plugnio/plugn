@@ -156,11 +156,11 @@ class Payment extends \yii\db\ActiveRecord {
 
             Yii::info("[" . $paymentRecord->restaurant->name . ": " . $paymentRecord->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $paymentRecord->order->payment_method_name, __METHOD__);
 
-            
+
             foreach ($paymentRecord->order->getOrderItems()->all() as $orderItem) {
                 $orderItem->item->decreaseStockQty($orderItem->qty);
             }
-            
+
             // KNET Gateway Fee Calculation
             if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
 
@@ -227,6 +227,15 @@ class Payment extends \yii\db\ActiveRecord {
      */
     public function getOrder() {
         return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid']);
+    }
+
+    /**
+     * Gets query for [[OrderItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrderItems() {
+        return $this->hasMany(OrderItem::className(), ['order_uuid' => 'order_uuid'])->via('order');
     }
 
     /**

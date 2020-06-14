@@ -21,7 +21,7 @@ class CronController extends \yii\console\Controller {
     public function actionIndex() {
         foreach (OrderItem::find()->all() as $orderItem) {
 
-            if ($orderItem->order->order_status >= Order::STATUS_PENDING && $orderItem->order->order_status <= Order::STATUS_COMPLETE) {
+            if ($orderItem->order->order_status >= Order::STATUS_ABANDONED_CHECKOUT) {
                 $item = Item::findOne($orderItem->item_uuid);
 
                 if ($item) {
@@ -57,19 +57,21 @@ class CronController extends \yii\console\Controller {
 
     public function actionUpdateStockQty() {
 
-        // $now = new DateTime('now');
-        // $orders = Order::find()
-        //         ->where([ 'order_status' => Order::STATUS_ABANDONED_CHECKOUT])
-        //         ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')]);
-        //
-      // foreach ($orders->all() as $order) {
-        //     $orderItems = $order->getOrderItems();
-        //
-      //     if($orderItems->count() > 0 ){
-        //       foreach ($orderItems->all() as $orderItem)
-        //           $orderItem->item->increaseStockQty($orderItem->qty);
-        //     }
-        // }
+        $now = new DateTime('now');
+        $payments = Payment::find()
+                ->where([ '!=' , 'payment_current_status' , 'CAPTURED'])
+                ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 HOUR)')]);
+
+      foreach ($payments->all() as $payment) {
+            $orderItems = $payment->getOrderItems();
+
+          if($orderItems->count() > 0 ){
+              foreach ($orderItems->all() as $orderItem)
+                if($orderItem->item_uuid){
+                  $orderItem->item->increaseStockQty($orderItem->qty);
+                }
+            }
+        }
     }
 
     /**
