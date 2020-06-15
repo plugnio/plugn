@@ -432,9 +432,11 @@ class TapPayments extends Component
             ],
             "destinations" => [
                 "destination" => [
-                    "id" => $this->destinationId,
-                    "amount" => (float)$amount *  (float)$platform_fee,
-                    "currency" => "KWD",
+                    [
+                      "id" => $this->destinationId,
+                      "amount" => (float)$amount *  (float)$platform_fee,
+                      "currency" => "KWD",
+                    ]
                 ]
             ],
             "source" => [
