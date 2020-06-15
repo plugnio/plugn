@@ -12,7 +12,7 @@ use common\models\Order;
 
 
     <p class="lead">
-        An issue occurred, in which we received a payment from one of your customers while the item was out of stock. Can you mange this issue with the customer please.
+      An issue occurred, in which you received a payment from one of your customers while the item was out of stock. Please check this issue with the customer to see if they require a refund.
     </p>
 
 
