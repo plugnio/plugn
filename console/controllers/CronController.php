@@ -18,18 +18,17 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-    public function actionIndex() {
-        foreach (OrderItem::find()->all() as $orderItem) {
+  public function actionIndex() {
+      foreach (OrderItem::find()->all() as $orderItem) {
 
-            if ($orderItem->order->order_status >= Order::STATUS_ABANDONED_CHECKOUT) {
-                $item = Item::findOne($orderItem->item_uuid);
+    $orders = Order::find();
 
-                if ($item) {
-                    $item->unit_sold = $item->unit_sold + $orderItem->qty;
-                    $item->save(false);
-                }
-            }
-        }
+    foreach ($orders->all() as $order) {
+      if($order->order_mode == Order::ORDER_MODE_DELIVERY){
+        $eta =   date("Y-m-d H:i:s", strtotime('+' . $order->restaurantDelivery->delivery_time . ' minutes',strtotime($order->order_created_at)));
+        $order->estimated_time_of_arrival = $eta;
+        $order->save(false);
+      }
 
         $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::BOLD);
         return self::EXIT_CODE_NORMAL;
