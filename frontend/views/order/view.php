@@ -112,13 +112,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         // 'subtotal:currency',
                         // 'delivery_fee:currency',
                         'estimated_time_of_arrival',
-                        [
-                            'attribute' => 'order_created_at',
-                            'format' => 'html',
-                            'value' => function ($data) {
-                                return Yii::$app->formatter->asRelativeTime($data->order_created_at);
-                            },
-                        ],
+                            'order_created_at:datetime',
                         [
                             'attribute' => 'special_directions',
                             'format' => 'html',
@@ -188,7 +182,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         [
                             'label' => 'Subtotal',
                             'value' => function ($orderitem) {
-                                return $orderitem->item_price;
+                                return $orderitem->calculateOrderItemPrice();
                             },
                             'format' => 'currency'
                         ],
