@@ -35,6 +35,7 @@ use yii\behaviors\AttributeBehavior;
  * @property int $order_mode
  * @property int $subtotal
  * @property int $total_price
+ * @property int $items_has_been_restocked
 
  * @property int $subtotal_before_refund
  * @property int $total_price_before_refund
@@ -87,6 +88,7 @@ class Order extends \yii\db\ActiveRecord {
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer', 'min' => 0],
+            [['items_has_been_restocked'], 'integer'],
             ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_PARTIALLY_REFUNDED,self::STATUS_CANCELED, self::STATUS_DRAFT, self::STATUS_ABANDONED_CHECKOUT]],
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
             ['restaurant_branch_id', function ($attribute, $params, $validator) {
@@ -316,14 +318,29 @@ class Order extends \yii\db\ActiveRecord {
         }
     }
 
-    // /**
-    //  * Update order status to pending
-    //  */
-    // public function changeOrderStatusToAbandonedCheckout() {
-    //
-    //     $this->order_status = self::STATUS_ABANDONED_CHECKOUT;
-    //     $this->save(false);
-    // }
+    /**
+     * Update order status to pending
+     */
+    public function restockAllItems() {
+
+    $orderItems = $this->getOrderItems();
+    // die($orderItems->count());
+
+    if($orderItems->count() > 0 ){
+        foreach ($orderItems->all() as $orderItem)
+          if($orderItem->item_uuid){
+
+
+
+              $orderItem->item->increaseStockQty($orderItem->qty);
+              $this->items_has_been_restocked = true;
+              $this->save(false);
+
+          }
+      }
+
+
+    }
 
     /**
      * Update order status to pending
@@ -437,6 +454,38 @@ class Order extends \yii\db\ActiveRecord {
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
+        if (!$insert && $this->payment && $this->items_has_been_restocked && isset($changedAttributes['order_status']) &&  $changedAttributes['order_status'] == self::STATUS_ABANDONED_CHECKOUT) {
+
+          $orderItems = $this->getOrderItems();
+
+              foreach ($orderItems->all() as $orderItem){
+
+                if($orderItem->item_uuid){
+
+                  if($orderItem->item->stock_qty >= $orderItem->qty){
+                    $orderItem->item->decreaseStockQty($orderItem->qty);
+                  } else {
+
+                    \Yii::$app->mailer->compose([
+                                'html' => 'out-of-stock-order-html',
+                                    ], [
+                                'order' => $this
+                            ])
+                            ->setFrom([\Yii::$app->params['supportEmail']])
+                            ->setTo([$this->restaurant->restaurant_email, \Yii::$app->params['supportEmail']])
+                            ->setSubject('Order #' . $this->order_uuid)
+                            ->send();
+
+                  }
+
+                }
+              }
+
+
+          $this->items_has_been_restocked = false;
+          $this->save(false);
+
+        }
 
         if ($insert) {
 

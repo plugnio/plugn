@@ -188,7 +188,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         [
                             'label' => 'Subtotal',
                             'value' => function ($orderitem) {
-                                return $orderitem->calculateOrderItemPrice();
+                                return $orderitem->item_price;
                             },
                             'format' => 'currency'
                         ],

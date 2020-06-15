@@ -30,6 +30,10 @@ class CronController extends \yii\console\Controller {
                 }
             }
         }
+
+        $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::BOLD);
+        return self::EXIT_CODE_NORMAL;
+
     }
 
     /**
@@ -57,21 +61,16 @@ class CronController extends \yii\console\Controller {
 
     public function actionUpdateStockQty() {
 
-      //   $now = new DateTime('now');
-      //   $payments = Payment::find()
-      //           ->where([ '!=' , 'payment_current_status' , 'CAPTURED'])
-      //           ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')]);
-      //
-      // foreach ($payments->all() as $payment) {
-      //       $orderItems = $payment->getOrderItems();
-      //
-      //     if($orderItems->count() > 0 ){
-      //         foreach ($orderItems->all() as $orderItem)
-      //           if($orderItem->item_uuid){
-      //             $orderItem->item->increaseStockQty($orderItem->qty);
-      //           }
-      //       }
-      //   }
+        $now = new DateTime('now');
+        $payments = Payment::find()
+                ->joinWith('order')
+                ->where([ '!=' , 'payment.payment_current_status' , 'CAPTURED'])
+                ->andWhere(['order.items_has_been_restocked' => 0]) // if items hasnt been restocked
+                ->andWhere(['<', 'payment.payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')]);
+
+      foreach ($payments->all() as $payment) {
+        $payment->order->restockAllItems();
+      }
     }
 
     /**

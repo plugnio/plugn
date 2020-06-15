@@ -28,6 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'restaurant_uuid',
             'name',
+            'restaurant_email',
             'name_ar',
             'tagline',
             //'tagline_ar',
