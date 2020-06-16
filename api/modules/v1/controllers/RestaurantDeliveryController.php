@@ -60,10 +60,10 @@ class RestaurantDeliveryController extends Controller {
         $restaurantDeliveryArea = RestaurantDelivery::find()
                 ->where(['area_id' => $id, 'restaurant_uuid' => $restaurant_uuid])
                 ->one();
-        
+
 
         $restaurantDeliveryArea->delivery_time = Yii::$app->formatter->asDuration($restaurantDeliveryArea->delivery_time * 60);
-        
+
         Yii::$app->formatter->language = 'ar-KW';
         $restaurantDeliveryArea->delivery_time_ar = Yii::$app->formatter->asDuration($restaurantDeliveryArea->delivery_time_ar * 60);
 

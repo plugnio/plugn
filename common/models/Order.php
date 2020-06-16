@@ -489,17 +489,18 @@ class Order extends \yii\db\ActiveRecord {
 
         if ($insert) {
 
-
             if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
                 //set ETA value
                 \Yii::$app->timeZone = 'Asia/Kuwait';
-                $this->estimated_time_of_arrival = date('h:i', \Yii::$app->getFormatter()->asTimestamp(time() + ($this->restaurantDelivery->delivery_time * 60)));
+                $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $this->restaurantDelivery->delivery_time . ' minutes',  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
+
                 $this->delivery_time = $this->restaurantDelivery->delivery_time;
                 $this->save(false);
             } else {
                 //set ETA value
                 \Yii::$app->timeZone = 'Asia/Kuwait';
-                $this->estimated_time_of_arrival = date('h:i', \Yii::$app->getFormatter()->asTimestamp(time() + ($this->restaurantBranch->prep_time * 60)));
+                $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $this->restaurantBranch->prep_time . ' minutes',  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
+
                 $this->delivery_time = $this->restaurantBranch->prep_time;
             }
 
