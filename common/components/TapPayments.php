@@ -406,25 +406,35 @@ class TapPayments extends Component
      */
     public function createCharge($desc = "Pay", $statementDesc = "", $ref, $amount, $firstName, $email, $phone,$platform_fee, $redirectUrl, $gateway)
     {
-
         // charge amount = 53KD  ( 2.12 KD for us, 0.53 for them => 2.65KD)
         // charge amount = 40KD  ( 1.6 KD for us, 0.400 fils for them => 2KD)
         // charge amount = 30KD  ( 1.200 KD for us, 0.300 fils for them => 1.5KD)
         // charge amount = 20KD  ( 0.800 fils for us, 0.200 fils for them)
         // charge amount = 10KD  ( 0.400 fils for us, 0.100 fils for them)
+        // charge amount = 9.9KD  ( 0.395 fils for us, 0.100 fils for them)
+        // charge amount = 8.5KD  ( 0.325 fils for us, 0.100 fils for them)
+        // charge amount = 7KD  ( 0.250 fils for us, 0.100 fils for them)
+        // charge amount = 6KD  ( 0.200 fils for us, 0.100 fils for them)
         // charge amount = 5KD  ( 0.100 fils for us, 0.100 fils for them)
         // charge amount = 3KD  ( 0.100 fils for us, 0.100 fils for them)
         // charge amount = 2KD  ( 0.100 fils for us, 0.100 fils for them)
         // charge amount = 1KD  ( 0.100 fils for us, 0.100 fils for them)
         // charge amount = 0.500KD  ( 0.100 fils for us, 0.100 fils for them)
         // charge amount = 0.750KD  ( 0.100 fils for us, 0.100 fils for them)
+        
         if($platform_fee > 0){
           if($gateway == static::GATEWAY_KNET){
 
-            if ($amount > $this->minChargeAmount){
-              $platform_fee = $amount *  ($platform_fee  - $this->knetGatewayFee);
+
+            //if greater than 10KD
+          if (($amount * $this->knetGatewayFee) >= $this->minKnetGatewayFee) {
+
+              $platform_fee = $amount *  ( $platform_fee  - $this->knetGatewayFee );
             }
-            else{
+            else if  ($amount > $this->minChargeAmount && (($amount * $this->knetGatewayFee) < $this->minKnetGatewayFee)){ //10KD
+              $platform_fee = ($amount *  $platform_fee ) - $this->minKnetGatewayFee;
+            }
+            else if ($this->minChargeAmount >= $amount) {
               $platform_fee = 0.100;
             }
 
@@ -435,6 +445,11 @@ class TapPayments extends Component
             // charge amount = 30KD  ( 0.750 FILS each => 1.5KD)
             // charge amount = 20KD  ( 0.500 fils each => 1KD)
             // charge amount = 10KD  ( 0.250 fils each => 0.5KD)
+            // charge amount = 9.9KD  ( 0.2475 fils each => 0.5KD )
+            // charge amount = 9.9KD  ( 0.395 fils for us, 0.100 fils for them)
+            // charge amount = 8.5KD  ( 0.2125 fils each  => 0.400KD)
+            // charge amount = 7KD  ( 0.175 fils each  => 0.350KD)
+            // charge amount = 6KD  ( 0.150 fils each  => 0.300KD)
             // charge amount = 5KD  ( 0.125 fils each  => 0.250KD)
             // charge amount = 3KD  ( 0.075 fils each  => 0.15KD))
             // charge amount = 2KD  ( 0.05 fils each  => 0.1KD) )
