@@ -111,8 +111,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         // 'total_price:currency',
                         // 'subtotal:currency',
                         // 'delivery_fee:currency',
-                        'estimated_time_of_arrival:datetime',
                         'order_created_at:datetime',
+                        'estimated_time_of_arrival:datetime',
                         [
                             'attribute' => 'special_directions',
                             'format' => 'html',
