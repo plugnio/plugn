@@ -406,7 +406,6 @@ class TapPayments extends Component
      */
     public function createCharge($desc = "Pay", $statementDesc = "", $ref, $amount, $firstName, $email, $phone,$platform_fee, $redirectUrl, $gateway)
     {
-        $platform_fee; //5%
 
         // charge amount = 53KD  ( 2.12 KD for us, 0.53 for them => 2.65KD)
         // charge amount = 40KD  ( 1.6 KD for us, 0.400 fils for them => 2KD)
@@ -423,10 +422,10 @@ class TapPayments extends Component
           if($gateway == static::GATEWAY_KNET){
 
             if ($amount > $this->minChargeAmount){
-              $platformFee = $amount *  ($platform_fee  - $this->knetGatewayFee);
+              $platform_fee = $amount *  ($platform_fee  - $this->knetGatewayFee);
             }
             else{
-              $platformFee = 0.100;
+              $platform_fee = 0.100;
             }
 
           } else {
@@ -442,12 +441,12 @@ class TapPayments extends Component
             // charge amount = 1KD  ( 0.025 fils each =>0.05 )
             // charge amount = 0.750KD  ( 0.01875 fils each  => 0.0375)
 
-            $platformFee = $amount *  ($platform_fee  - $this->creditcardGatewayFeePercentage);
+            $platform_fee = $amount *  ($platform_fee  - $this->creditcardGatewayFeePercentage);
           }
         }
 
 
-          die($platformFee);
+        die($platform_fee);
 
         $chargeEndpoint = $this->apiEndpoint . "/charges";
 
