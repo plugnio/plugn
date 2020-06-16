@@ -127,7 +127,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'iban',
             'restaurant_created_at',
             'restaurant_updated_at',
-            'platform_fee:percent',
+            'platform_fee',
             'business_id',
             'developer_id',
             'business_entity_id',

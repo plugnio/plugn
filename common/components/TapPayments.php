@@ -47,6 +47,11 @@ class TapPayments extends Component
     /**
      * @var float gateway fee charged by portal
      */
+    public $minChargeAmount = 5; // How much is charged per KNET transaction
+
+    /**
+     * @var float gateway fee charged by portal
+     */
     public $creditcardGatewayFeePercentage = 0.025; // How much is charged per Creditcard transaction
 
     /**
@@ -401,6 +406,49 @@ class TapPayments extends Component
      */
     public function createCharge($desc = "Pay", $statementDesc = "", $ref, $amount, $firstName, $email, $phone,$platform_fee, $redirectUrl, $gateway)
     {
+        $platform_fee; //5%
+
+        // charge amount = 53KD  ( 2.12 KD for us, 0.53 for them => 2.65KD)
+        // charge amount = 40KD  ( 1.6 KD for us, 0.400 fils for them => 2KD)
+        // charge amount = 30KD  ( 1.200 KD for us, 0.300 fils for them => 1.5KD)
+        // charge amount = 20KD  ( 0.800 fils for us, 0.200 fils for them)
+        // charge amount = 10KD  ( 0.400 fils for us, 0.100 fils for them)
+        // charge amount = 5KD  ( 0.100 fils for us, 0.100 fils for them)
+        // charge amount = 3KD  ( 0.100 fils for us, 0.100 fils for them)
+        // charge amount = 2KD  ( 0.100 fils for us, 0.100 fils for them)
+        // charge amount = 1KD  ( 0.100 fils for us, 0.100 fils for them)
+        // charge amount = 0.500KD  ( 0.100 fils for us, 0.100 fils for them)
+        // charge amount = 0.750KD  ( 0.100 fils for us, 0.100 fils for them)
+        if($platform_fee > 0){
+          if($gateway == static::GATEWAY_KNET){
+
+            if ($amount > $this->minChargeAmount){
+              $platformFee = $amount *  ($platform_fee  - $this->knetGatewayFee);
+            }
+            else{
+              $platformFee = 0.100;
+            }
+
+          } else {
+
+            // charge amount = 53KD  ( 1.325 KD for us, 1KD for them => 2.65KD)
+            // charge amount = 40KD  ( 1 KD for us, 1KD for them => 2KD)
+            // charge amount = 30KD  ( 0.750 FILS each => 1.5KD)
+            // charge amount = 20KD  ( 0.500 fils each => 1KD)
+            // charge amount = 10KD  ( 0.250 fils each => 0.5KD)
+            // charge amount = 5KD  ( 0.125 fils each  => 0.250KD)
+            // charge amount = 3KD  ( 0.075 fils each  => 0.15KD))
+            // charge amount = 2KD  ( 0.05 fils each  => 0.1KD) )
+            // charge amount = 1KD  ( 0.025 fils each =>0.05 )
+            // charge amount = 0.750KD  ( 0.01875 fils each  => 0.0375)
+
+            $platformFee = $amount *  ($platform_fee  - $this->creditcardGatewayFeePercentage);
+          }
+        }
+
+
+          die($platformFee);
+
         $chargeEndpoint = $this->apiEndpoint . "/charges";
 
         $chargeParams = [
@@ -434,7 +482,7 @@ class TapPayments extends Component
                 "destination" => [
                     [
                       "id" => $this->destinationId,
-                      "amount" => (float)$amount *  (float)$platform_fee,
+                      "amount" => $platformFee,
                       "currency" => "KWD",
                     ]
                 ]
