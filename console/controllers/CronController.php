@@ -20,21 +20,17 @@ class CronController extends \yii\console\Controller {
 
   public function actionIndex() {
     $orders = Order::find();
-$counter = 0;
 
     foreach ($orders->all() as $order) {
-      echo strtotime($order->order_created_at);die();
-      $counter++;
+
       if($order->order_mode == Order::ORDER_MODE_DELIVERY){
         $eta =   date("Y-m-d H:i:s", strtotime('+' . $order->restaurantDelivery->delivery_time . ' minutes',strtotime($order->order_created_at)));
         $order->estimated_time_of_arrival = $eta;
         $order->save(false);
-        echo "\n";
       }
 
     }
 
-    echo $counter;
     $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::BOLD);
     return self::EXIT_CODE_NORMAL;
 
