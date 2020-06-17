@@ -61,21 +61,13 @@ class ItemController extends Controller {
       if($restaurant_uuid){
 
         $category = Category::find()
-                    ->where(['category.restaurant_uuid' => $restaurant_uuid, 'category.category_id' => $category_id]);  ;
-
-
-        // $category_model = new ActiveDataProvider([
-        //     'query' => $category->asArray(),
-        //     'pagination' => false
-        // ]);
-
-        $categoryItems = new ActiveDataProvider([
-            'query' => $category->joinWith('items'),
-            'pagination' => false
-        ]);
+                    ->where(['category.restaurant_uuid' => $restaurant_uuid, 'category.category_id' => $category_id])
+                    ->joinWith(['items','items.itemImages'])
+                    ->asArray()
+                    ->one();
 
         return [
-            'categoryItems' => $categoryItems,
+            'category' => $category,
         ];
 
 
