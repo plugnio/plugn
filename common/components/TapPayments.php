@@ -407,28 +407,6 @@ class TapPayments extends Component
     public function createCharge($desc = "Pay", $statementDesc = "", $ref, $amount, $firstName, $email, $phone,$platform_fee, $redirectUrl, $gateway)
     {
 
-        if($platform_fee > 0){
-          if($gateway == static::GATEWAY_KNET){
-
-
-            //if greater than 10KD
-          if (($amount * $this->knetGatewayFee) >= $this->minKnetGatewayFee) {
-              $platform_fee = $amount *  ( $platform_fee  - $this->knetGatewayFee );
-            }
-            // if amount between > 5 and < 10
-            else if  ($amount > $this->minChargeAmount && (($amount * $this->knetGatewayFee) < $this->minKnetGatewayFee)){ //10KD
-              $platform_fee = ($amount *  $platform_fee ) - $this->minKnetGatewayFee;
-            }
-            else if ($this->minChargeAmount >= $amount) {
-              $platform_fee = 0.100;
-            }
-
-          } else {
-            $platform_fee = $amount *  ($platform_fee  - $this->creditcardGatewayFeePercentage);
-          }
-        }
-
-
         $chargeEndpoint = $this->apiEndpoint . "/charges";
 
         $chargeParams = [
@@ -459,13 +437,7 @@ class TapPayments extends Component
                 ]
             ],
             "destinations" => [
-                "destination" => [
-                    [
-                      "id" => $this->destinationId,
-                      "amount" => $platform_fee,
-                      "currency" => "KWD",
-                    ]
-                ]
+                "destination" => []
             ],
             "source" => [
                 "id" => $gateway
@@ -474,6 +446,40 @@ class TapPayments extends Component
                 "url" => $redirectUrl
             ]
         ];
+
+
+        if($platform_fee > 0){
+          if($gateway == static::GATEWAY_KNET){
+
+
+            //if greater than 10KD
+          if (($amount * $this->knetGatewayFee) >= $this->minKnetGatewayFee) {
+              $platform_fee = $amount *  ( $platform_fee  - $this->knetGatewayFee );
+            }
+            // if amount between > 5 and < 10
+            else if  ($amount > $this->minChargeAmount && (($amount * $this->knetGatewayFee) < $this->minKnetGatewayFee)){ //10KD
+              $platform_fee = ($amount *  $platform_fee ) - $this->minKnetGatewayFee;
+            }
+            else if ($this->minChargeAmount >= $amount) {
+              $platform_fee = 0.100;
+            }
+
+          } else {
+            $platform_fee = $amount *  ($platform_fee  - $this->creditcardGatewayFeePercentage);
+          }
+
+
+          $destination = [
+              "id" => $this->destinationId,
+              "amount" => $platform_fee,
+              "currency" => "KWD",
+          ];
+
+
+          array_push($chargeParams['destinations']['destination'], $destination);
+
+        }
+
 
 
         $client = new Client();
