@@ -404,29 +404,29 @@ class TapPayments extends Component
     /**
      * Create a charge for redirect
      */
-    public function createCharge($desc = "Pay", $statementDesc = "", $ref, $amount, $firstName, $email, $phone,$platform_fee, $redirectUrl, $gateway)
+    public function createCharge($desc = "Pay", $statementDesc = "", $ref, $amount, $firstName, $email, $phone, $redirectUrl, $gateway)
     {
 
-        if($platform_fee > 0){
-          if($gateway == static::GATEWAY_KNET){
-
-
-            //if greater than 10KD
-          if (($amount * $this->knetGatewayFee) >= $this->minKnetGatewayFee) {
-              $platform_fee = $amount *  ( $platform_fee  - $this->knetGatewayFee );
-            }
-            // if amount between > 5 and < 10
-            else if  ($amount > $this->minChargeAmount && (($amount * $this->knetGatewayFee) < $this->minKnetGatewayFee)){ //10KD
-              $platform_fee = ($amount *  $platform_fee ) - $this->minKnetGatewayFee;
-            }
-            else if ($this->minChargeAmount >= $amount) {
-              $platform_fee = 0.100;
-            }
-
-          } else {
-            $platform_fee = $amount *  ($platform_fee  - $this->creditcardGatewayFeePercentage);
-          }
-        }
+        // if($platform_fee > 0){
+        //   if($gateway == static::GATEWAY_KNET){
+        //
+        //
+        //     //if greater than 10KD
+        //   if (($amount * $this->knetGatewayFee) >= $this->minKnetGatewayFee) {
+        //       $platform_fee = $amount *  ( $platform_fee  - $this->knetGatewayFee );
+        //     }
+        //     // if amount between > 5 and < 10
+        //     else if  ($amount > $this->minChargeAmount && (($amount * $this->knetGatewayFee) < $this->minKnetGatewayFee)){ //10KD
+        //       $platform_fee = ($amount *  $platform_fee ) - $this->minKnetGatewayFee;
+        //     }
+        //     else if ($this->minChargeAmount >= $amount) {
+        //       $platform_fee = 0.100;
+        //     }
+        //
+        //   } else {
+        //     $platform_fee = $amount *  ($platform_fee  - $this->creditcardGatewayFeePercentage);
+        //   }
+        // }
 
 
         $chargeEndpoint = $this->apiEndpoint . "/charges";
@@ -458,7 +458,7 @@ class TapPayments extends Component
                     "number" => $phone
                 ]
             ],
-    
+
             "source" => [
                 "id" => $gateway
             ],
