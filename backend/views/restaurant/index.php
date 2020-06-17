@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'restaurant_uuid',
             'name',
             'name_ar',
-            'platform_fee',
+            // 'platform_fee',
             'restaurant_email',
             //'tagline_ar',
             //'status',
