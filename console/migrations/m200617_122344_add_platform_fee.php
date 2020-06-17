@@ -3,9 +3,9 @@
 use yii\db\Migration;
 
 /**
- * Class m200608_175623_add_platform_fee_to_restaurant_table
+ * Class m200617_122344_add_platform_fee
  */
-class m200608_175623_add_platform_fee_to_restaurant_table extends Migration
+class m200617_122344_add_platform_fee extends Migration
 {
     /**
      * {@inheritdoc}
@@ -20,7 +20,8 @@ class m200608_175623_add_platform_fee_to_restaurant_table extends Migration
      */
     public function safeDown()
     {
-      $this->dropColumn('restaurant','platform_fee');
+      $this->dropColumn('restaurant', 'platform_fee');
+
     }
 
 }
