@@ -458,15 +458,7 @@ class TapPayments extends Component
                     "number" => $phone
                 ]
             ],
-            "destinations" => [
-                "destination" => [
-                    [
-                      "id" => $this->destinationId,
-                      "amount" => $platform_fee,
-                      "currency" => "KWD",
-                    ]
-                ]
-            ],
+    
             "source" => [
                 "id" => $gateway
             ],
