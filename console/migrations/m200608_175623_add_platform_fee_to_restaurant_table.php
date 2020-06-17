@@ -12,7 +12,7 @@ class m200608_175623_add_platform_fee_to_restaurant_table extends Migration
      */
     public function safeUp()
     {
-      $this->addColumn('restaurant', 'platform_fee', $this->float()->unsigned()->defaultValue(0.05));
+      $this->addColumn('restaurant', 'platform_fee', $this->float()->unsigned()->defaultValue(0));
     }
 
     /**
