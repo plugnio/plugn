@@ -118,20 +118,25 @@ $this->registerJs($js);
                 ],
             ],
             'columns' => [
+              [
+           'class' => 'yii\grid\SerialColumn',
+       ],
                 [
-                    'attribute' => 'order_uuid',
+                    'label' => 'Order ID',
                     "format" => "raw",
                     "value" => function($model) {
                         return '#' . $model->order_uuid;
                     }
                 ],
-                [
-                    'attribute' => 'order_created_at',
-                    "format" => "raw",
-                    "value" => function($model) {
-                        return Yii::$app->formatter->asRelativeTime($model->order_created_at);
-                    },
-                ],
+                // [
+                //     'attribute' => 'order_created_at',
+                //     "format" => "raw",
+                //     "value" => function($model) {
+                //       \Yii::$app->timeZone = 'Asia/Kuwait';
+                //
+                //         return Yii::$app->formatter->asRelativeTime($model->order_created_at);
+                //     },
+                // ],
                 [
                     'attribute' => 'customer_name',
                     'format' => 'raw',
@@ -174,6 +179,7 @@ $this->registerJs($js);
                     },
                 ],
                 'total_price:currency',
+                'order_created_at:datetime',
                 [
                     'class' => 'yii\grid\ActionColumn',
                     'template' => ' {view} {update} {delete}',

@@ -15,8 +15,11 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use common\models\Restaurant;
+use common\models\OrderItem;
 use common\models\Order;
+use common\models\Item;
 use common\models\Customer;
+use yii\db\Expression;
 
 /**
  * Site controller
@@ -38,7 +41,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'promote-to-open', 'promote-to-close', 'pay', 'callback', 'vendor-dashboard'],
+                        'actions' => ['logout', 'promote-to-open', 'promote-to-close', 'pay', 'callback', 'vendor-dashboard', 'export-today-sold-items', 'export-this-week-sold-items', 'export-this-months-sold-items'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -103,27 +106,249 @@ class SiteController extends Controller {
                     ->limit(5)
                     ->all();
 
-            $new_orders = Order::find()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid, 'order_status' => Order::STATUS_PENDING])->count();
 
-            $total_orders = Order::find()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])->count();
+            //New orders
+            $today_new_orders = Order::find()
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
+                    ->count();
 
-            $total_customers = Customer::find()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])->count();
+            $this_week_new_orders = Order::find()
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
+                    ->count();
 
-            $total_revenue = Order::find()
+            $this_month_new_orders = Order::find()
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
+                    ->count();
+
+
+
+            //Sold items
+            $today_sold_item = OrderItem::find()
+                    ->joinWith('order')
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
+                    ->sum('order_item.qty');
+
+
+            $this_week_sold_item = OrderItem::find()
+                    ->joinWith('order')
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
+                    ->sum('order_item.qty');
+
+            $this_month_sold_item = OrderItem::find()
+                    ->joinWith('order')
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
+                    ->sum('order_item.qty');
+
+
+            //Customers
+            $today_total_customers = Customer::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
-                    ->andWhere(['!=' , 'order_status' , Order::STATUS_DRAFT])
-                    ->andWhere(['!=' , 'order_status' , Order::STATUS_REFUNDED])
-                    ->andWhere(['!=' , 'order_status' , Order::STATUS_CANCELED])
+                    ->andWhere(['>', 'customer_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
+                    ->count();
+
+            $this_week_total_customers = Customer::find()
+                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['>', 'customer_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
+                    ->count();
+
+            $this_month_total_customers = Customer::find()
+                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['>', 'customer_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
+                    ->count();
+
+            //Revenue
+            $today_total_revenue = Order::find()
+                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
+                    ->sum('total_price');
+
+            $this_week_total_revenue = Order::find()
+                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
+                    ->sum('total_price');
+
+            $this_month_total_revenue = Order::find()
+                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
                     ->sum('total_price');
 
             return $this->render('index', [
                         'restaurant_model' => $managedRestaurant,
                         'orders' => $orders,
-                        'new_orders' => $new_orders,
-                        'total_orders' => $total_orders,
-                        'total_customers' => $total_customers,
-                        'total_revenue' => $total_revenue,
+                        'today_sold_item' => $today_sold_item,
+                        'this_week_sold_item' => $this_week_sold_item,
+                        'this_month_sold_item' => $this_month_sold_item,
+                        'today_new_orders' => $today_new_orders,
+                        'today_total_customers' => $today_total_customers,
+                        'today_total_revenue' => $today_total_revenue,
+                        'this_week_new_orders' => $this_week_new_orders,
+                        'this_week_total_customers' => $this_week_total_customers,
+                        'this_week_total_revenue' => $this_week_total_revenue,
+                        'this_month_new_orders' => $this_month_new_orders,
+                        'this_month_total_customers' => $this_month_total_customers,
+                        'this_month_total_revenue' => $this_month_total_revenue,
+            ]);
+        }
+    }
+
+    public function actionExportTodaySoldItems($restaurantUuid) {
+        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+
+
+            $today_sold_item = Item::find()
+                    ->joinWith(['orderItems', 'orderItems.order'])
+                    ->where(['order.order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
+                    ->all();
+
+            header('Access-Control-Allow-Origin: *');
+            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
+            header("Cache-Control: max-age=0");
+
+
+            \moonland\phpexcel\Excel::export([
+                'isMultipleSheet' => false,
+                'models' => $today_sold_item,
+                'columns' => [
+                    'item_name',
+                    [
+                        'label' => 'role',
+                        'format' => 'html',
+                        'value' => function ($data) {
+
+                            return $data->getTodaySoldUnits();
+                        },
+                    ],
+                ],
+            ]);
+        }
+    }
+
+    public function actionExportThisWeekSoldItems($restaurantUuid) {
+        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+
+
+            $this_week_sold_item = Item::find()
+                          ->joinWith(['orderItems', 'orderItems.order'])
+                          ->where(['order.order_status' => Order::STATUS_PENDING])
+                          ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
+                          ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                          ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+                          ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                          ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
+                          ->all();
+
+            header('Access-Control-Allow-Origin: *');
+            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
+            header("Cache-Control: max-age=0");
+
+
+            \moonland\phpexcel\Excel::export([
+                'isMultipleSheet' => false,
+                'models' => $this_week_sold_item,
+                'columns' => [
+                    'item_name',
+                    [
+                        'label' => 'role',
+                        'format' => 'html',
+                        'value' => function ($data) {
+                            return $data->getThisWeekSoldUnits();
+                        },
+                    ],
+                ],
+            ]);
+        }
+    }
+
+    public function actionExportThisMonthsSoldItems($restaurantUuid) {
+
+        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+
+
+            $this_month_sold_item = Item::find()
+                    ->joinWith(['orderItems', 'orderItems.order'])
+                    ->where(['order.order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
+                    ->all();
+
+            header('Access-Control-Allow-Origin: *');
+            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
+            header("Cache-Control: max-age=0");
+
+
+            \moonland\phpexcel\Excel::export([
+                'isMultipleSheet' => false,
+                'models' => $this_month_sold_item,
+                'columns' => [
+                    'item_name',
+                    [
+                        'label' => 'role',
+                        'format' => 'html',
+                        'value' => function ($data) {
+
+                            return $data->getThisMonthSoldUnits();
+                        },
+                    ],
+                ],
             ]);
         }
     }
