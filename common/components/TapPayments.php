@@ -47,12 +47,22 @@ class TapPayments extends Component
     /**
      * @var float gateway fee charged by portal
      */
+    public $minChargeAmount = 5; // How much is charged per KNET transaction
+
+    /**
+     * @var float gateway fee charged by portal
+     */
     public $creditcardGatewayFeePercentage = 0.025; // How much is charged per Creditcard transaction
 
     /**
      * @var float gateway fee charged by portal
      */
     public $minCreditcardGatewayFee = 0; // How much is charged per Creditcard transaction
+
+    /**
+     * @var string destination id
+     */
+    public $destinationId;
 
     /**
      * @var string secret api key to use will be stored here
@@ -91,7 +101,7 @@ class TapPayments extends Component
     public function init()
     {
         // Fields required by default
-        $requiredAttributes = ['gatewayToUse', 'plugnLiveApiKey', 'plugnTestApiKey'];
+        $requiredAttributes = ['gatewayToUse', 'plugnLiveApiKey', 'plugnTestApiKey','destinationId'];
 
         // Process Validation
         foreach ($requiredAttributes as $attribute) {
@@ -394,8 +404,31 @@ class TapPayments extends Component
     /**
      * Create a charge for redirect
      */
-    public function createCharge($desc = "Pay", $statementDesc = "", $ref, $amount, $firstName, $email, $phone, $redirectUrl, $gateway)
+    public function createCharge($desc = "Pay", $statementDesc = "", $ref, $amount, $firstName, $email, $phone,$platform_fee, $redirectUrl, $gateway)
     {
+
+        if($platform_fee > 0){
+          if($gateway == static::GATEWAY_KNET){
+
+
+            //if greater than 10KD
+          if (($amount * $this->knetGatewayFee) >= $this->minKnetGatewayFee) {
+              $platform_fee = $amount *  ( $platform_fee  - $this->knetGatewayFee );
+            }
+            // if amount between > 5 and < 10
+            else if  ($amount > $this->minChargeAmount && (($amount * $this->knetGatewayFee) < $this->minKnetGatewayFee)){ //10KD
+              $platform_fee = ($amount *  $platform_fee ) - $this->minKnetGatewayFee;
+            }
+            else if ($this->minChargeAmount >= $amount) {
+              $platform_fee = 0.100;
+            }
+
+          } else {
+            $platform_fee = $amount *  ($platform_fee  - $this->creditcardGatewayFeePercentage);
+          }
+        }
+
+
         $chargeEndpoint = $this->apiEndpoint . "/charges";
 
         $chargeParams = [
@@ -425,6 +458,15 @@ class TapPayments extends Component
                     "number" => $phone
                 ]
             ],
+            "destinations" => [
+                "destination" => [
+                    [
+                      "id" => $this->destinationId,
+                      "amount" => $platform_fee,
+                      "currency" => "KWD",
+                    ]
+                ]
+            ],
             "source" => [
                 "id" => $gateway
             ],
@@ -432,6 +474,7 @@ class TapPayments extends Component
                 "url" => $redirectUrl
             ]
         ];
+
 
         $client = new Client();
         $response = $client->createRequest()

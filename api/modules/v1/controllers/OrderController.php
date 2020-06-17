@@ -212,9 +212,10 @@ class OrderController extends Controller {
                                     $order->customer_name,
                                     $order->customer_email,
                                     $order->customer_phone_number,
+                                    $order->restaurant->platform_fee,
                                     Url::to(['order/callback'], true),
                                     $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD
-                            );
+                                  );
 
                             $responseContent = json_decode($response->content);
 
