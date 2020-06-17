@@ -31,6 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'name_ar',
             // 'platform_fee',
             'restaurant_email',
+            'platform_fee',
             //'tagline_ar',
             //'status',
             //'thumbnail_image',
