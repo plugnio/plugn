@@ -62,7 +62,7 @@ class ItemController extends Controller {
 
         $category = Category::find()
                     ->where(['category.restaurant_uuid' => $restaurant_uuid, 'category.category_id' => $category_id])
-                    ->joinWith(['items','items.itemImages'])
+                    ->joinWith(['items', 'items.options', 'items.options.extraOptions','items.itemImages'])
                     ->asArray()
                     ->one();
 
