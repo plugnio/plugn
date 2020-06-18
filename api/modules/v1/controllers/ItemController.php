@@ -53,6 +53,33 @@ class ItemController extends Controller {
     }
 
     /**
+     * Return category's products
+     */
+    public function actionCategoryProducts($category_id) {
+      $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
+
+      if($restaurant_uuid){
+
+        $category = Category::find()
+                    ->where(['category.restaurant_uuid' => $restaurant_uuid, 'category.category_id' => $category_id])
+                    ->joinWith(['items', 'items.options', 'items.options.extraOptions','items.itemImages'])
+                    ->asArray()
+                    ->one();
+
+        return [
+            'category' => $category,
+        ];
+
+
+      } else {
+          return [
+              'operation' => 'error',
+              'message' => 'Restaurant Uuid is invalid'
+          ];
+      }
+    }
+
+    /**
      * Return restaurant menu
      */
     public function actionRestaurantMenu() {

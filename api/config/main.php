@@ -49,9 +49,11 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'restaurant-menu',
+                        'GET <category_id>' => 'category-products',
                         'GET detail' => 'item-data',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS <category_id>' => 'options',
                         'OPTIONS detail' => 'options',
                     ]
                 ],

@@ -17,11 +17,11 @@ $js = "
 let phoneNumberInput = $('#phoneNumberInput');
 
 phoneNumberInput.change(function(){
-     
+
     let selection = $(this).val();
-    if(selection.length == 8){ 
+    if(selection.length == 8){
       $('#phoneNumberDisplay').show();
-    }else{ 
+    }else{
         $('#phoneNumberDisplay').hide();
     }
 });
@@ -145,7 +145,7 @@ $this->registerJs($js);
 
 
     <?php
-    
+
 //    echo $form->field($model, 'restaurant_payments_method')->dropDownList(
 //            $paymentMethodArray, [
 //        'class' => 'select2',
@@ -219,20 +219,20 @@ $this->registerJs($js);
     );
     ?>
 
-    
+
 
     <?= $form->field($model, 'phone_number')->input('number',['id' => 'phoneNumberInput']) ?>
 
     <div id="phoneNumberDisplay" <?= $model->phone_number ? "style = display:block " : "style = display:none "?> >
             <?=
              $form->field($model, 'phone_number_display')->radioList([2=>'📞',3=>'+965 12345678',1=>'Dont show phone number button'],['style'=>'display:grid']);
-            ?>    
+            ?>
     </div>
-    
-           <?php
-//             echo $form->field($model, 'store_layout')->radioList([Restaurant::STORE_LAYOUT_LIST=>'List', Restaurant::STORE_LAYOUT_GRID=>'Grid'],['style'=>'display:grid']);
-            ?>    
-    
+
+           <?=
+            $form->field($model, 'store_layout')->radioList([Restaurant::STORE_LAYOUT_LIST=>'List', Restaurant::STORE_LAYOUT_GRID=>'Grid'],['style'=>'display:grid']);
+            ?>
+
     <?= $form->field($model, 'restaurant_email')->input('email') ?>
 
     <?=
@@ -245,12 +245,12 @@ $this->registerJs($js);
             'data-off-color' => 'danger',
             'data-on-color' => 'success'
         ])
-    ?>         
+    ?>
 
 
     <?= $form->field($model, 'armada_api_key')->textInput(['maxlength' => true]) ?>
 
-    
+
     <div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px; padding-bottom: 15px; background:#f4f6f9 ">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
     </div>
