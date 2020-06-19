@@ -9,6 +9,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use common\models\Option;
+use common\models\CategoryItem;
 use common\models\ExtraOption;
 use wbraganca\dynamicform\DynamicFormWidget;
 use frontend\base\Model;
@@ -272,6 +273,8 @@ class ItemController extends Controller
 
                       if ($modelItem->items_category) {
                           $modelItem->saveItemsCategory($modelItem->items_category);
+                      } else {
+                        CategoryItem::deleteAll(['item_uuid' => $modelItem->item_uuid]);
                       }
 
                       if (!empty($itemImages))
