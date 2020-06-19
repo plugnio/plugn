@@ -98,6 +98,14 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                         ],
                         [
+                            'attribute' => 'store_layout',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return $data->store_layout == 1 ? 'List' : 'Grid';
+                            },
+                            'visible' => $model->phone_number != null,
+                        ],
+                        [
                             'attribute' => 'restaurant_email_notification',
                             'format' => 'html',
                             'value' => function ($data) {
