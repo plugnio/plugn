@@ -40,7 +40,12 @@ class DashboardAsset extends AssetBundle {
       'app-assets/css/pages/app-user.css',
       'app-assets/css/pages/aggrid.css',
       'app-assets/vendors/css/forms/select/select2.min.css',
+      'app-assets/vendors/css/ui/prism.min.css',
 
+
+
+
+      'css/fileinput.css',
 
     ];
 
@@ -63,18 +68,29 @@ class DashboardAsset extends AssetBundle {
       'app-assets/vendors/js/tables/datatable/dataTables.select.min.js',
       'app-assets/vendors/js/tables/ag-grid/ag-grid-community.min.noStyle.js',
       'app-assets/js/scripts/pages/app-user.js',
+      'app-assets/vendors/js/forms/select/select2.full.min.js',
+      'app-assets/js/scripts/forms/select/form-select2.js',
 
 
 
-  'app-assets/vendors/js/forms/select/select2.full.min.js',
-  'app-assets/js/scripts/forms/select/form-select2.js',
+      'plugins/daterangepicker/daterangepicker.js',
+      'plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js',
+
+
+
+          'app-assets/vendors/js/ui/prism.min.js',
+          'app-assets/js/scripts/extensions/dropzone.js',
+
+                  'js/scripts.js',
+
+          'js/fileinput.js'
 
 
     ];
 
     public $depends = [
-      // 'yii\web\YiiAsset',
-      // 'yii\web\JqueryAsset',
+      'yii\web\YiiAsset',
+      'yii\web\JqueryAsset',
     ];
 
 }

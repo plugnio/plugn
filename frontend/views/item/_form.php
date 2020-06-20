@@ -10,26 +10,18 @@ use kartik\file\FileInput;
 use wbraganca\dynamicform\DynamicFormWidget;
 use common\models\ExtraOption;
 use common\models\Option;
+use \bizley\quill\Quill;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Item */
 /* @var $form yii\widgets\ActiveForm */
-$js = "  $(function () {
 
-    //
-    // $(document).ready(function(){
-    //     if ($('.kv-file-zoom').length > 1){
-    //         $( '.file-preview-initial' ).hide();
-    //     }
-    // });
-
-  })";
-
-$this->registerJs($js);
 ?>
 
 
 <div class="item-form">
+
+
 
     <?php
     $categoryQuery = Category::find()->where(['restaurant_uuid' => $modelItem->restaurant_uuid])->asArray()->all();
@@ -44,11 +36,8 @@ $this->registerJs($js);
 
     $form = ActiveForm::begin([
                 'id' => 'dynamic-form',
-//                'enableClientScript' => false,
     ]);
     ?>
-
-
 
 
     <div class="card">
@@ -65,9 +54,9 @@ $this->registerJs($js);
 
             <?= $form->field($modelItem, 'item_name_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger']) ?>
 
-            <?= $form->field($modelItem, 'item_description')->textarea(['class' => 'textarea', 'style' => 'style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"']) ?>
+            <?= $form->field($modelItem, 'item_description')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' =>'FULL']) ?>
 
-            <?= $form->field($modelItem, 'item_description_ar')->textarea(['class' => 'textarea', 'style' => 'style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"']) ?>
+            <?= $form->field($modelItem, 'item_description_ar')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' =>'FULL']) ?>
 
             <?= $form->field($modelItem, 'sort_number')->textInput(['type' => 'number']) ?>
 

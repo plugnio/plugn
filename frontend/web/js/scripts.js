@@ -219,7 +219,7 @@
                 $(this).removeClass('field-' + id).addClass('field-' + newID);
             });
             // update "for" attribute
-            $elem.closest(widgetOptions.widgetItem).find("label[for='" + id + "']").attr('for',newID); 
+            $elem.closest(widgetOptions.widgetItem).find("label[for='" + id + "']").attr('for',newID);
         }
 
         return newID;
@@ -464,8 +464,8 @@
 })(window.jQuery);
 
 (function($) {
-    "use strict"; 
-	
+    "use strict";
+
 	/* Preloader */
 	$(window).on('load', function() {
 		var preloaderFadeOutTime = 500;
@@ -478,7 +478,7 @@
 		hidePreloader();
 	});
 
-	
+
 	/* Navbar Scripts */
 	// jQuery to collapse the navbar on scroll
     $(window).on('scroll load', function() {
@@ -567,8 +567,8 @@
         iframe: {
             patterns: {
                 youtube: {
-                    index: 'youtube.com/', 
-                    id: function(url) {        
+                    index: 'youtube.com/',
+                    id: function(url) {
                         var m = url.match(/[\\?\\&]v=([^\\?\\&]+)/);
                         if ( !m || !m[1] ) return null;
                         return m[1];
@@ -576,8 +576,8 @@
                     src: 'https://www.youtube.com/embed/%id%?autoplay=1'
                 },
                 vimeo: {
-                    index: 'vimeo.com/', 
-                    id: function(url) {        
+                    index: 'vimeo.com/',
+                    id: function(url) {
                         var m = url.match(/(https?:\/\/)?(www.)?(player.)?vimeo.com\/([a-z]*\/)*([0-9]{6,11})[?]?.*/);
                         if ( !m || !m[5] ) return null;
                         return m[5];
@@ -601,8 +601,8 @@
 		removalDelay: 300,
 		mainClass: 'my-mfp-slide-bottom'
 	});
-    
-    
+
+
     /* Move Form Fields Label When User Types */
     // for input and textarea fields
     $("input, textarea").keyup(function(){
@@ -633,11 +633,11 @@
 		var name = $("#sname").val();
 		var password = $("#spassword").val();
         var terms = $("#sterms").val();
-        
+
         $.ajax({
             type: "POST",
             url: "php/signupform-process.php",
-            data: "email=" + email + "&name=" + name + "&password=" + password + "&terms=" + terms, 
+            data: "email=" + email + "&name=" + name + "&password=" + password + "&terms=" + terms,
             success: function(text) {
                 if (text == "success") {
                     sformSuccess();
@@ -688,11 +688,11 @@
         // initiate variables with form content
 		var email = $("#lemail").val();
 		var password = $("#lpassword").val();
-        
+
         $.ajax({
             type: "POST",
             url: "php/loginform-process.php",
-            data: "email=" + email + "&password=" + password, 
+            data: "email=" + email + "&password=" + password,
             success: function(text) {
                 if (text == "success") {
                     lformSuccess();
@@ -746,7 +746,7 @@
         $.ajax({
             type: "POST",
             url: "php/newsletterform-process.php",
-            data: "email=" + email + "&terms=" + terms, 
+            data: "email=" + email + "&terms=" + terms,
             success: function(text) {
                 if (text == "success") {
                     nformSuccess();
@@ -778,7 +778,7 @@
         }
         $("#nmsgSubmit").removeClass().addClass(msgClasses).text(msg);
     }
-    
+
 
     /* Privacy Form */
     $("#privacyForm").validator().on("submit", function(event) {
@@ -799,11 +799,11 @@
 		var email = $("#pemail").val();
         var select = $("#pselect").val();
         var terms = $("#pterms").val();
-        
+
         $.ajax({
             type: "POST",
             url: "php/privacyform-process.php",
-            data: "name=" + name + "&email=" + email + "&select=" + select + "&terms=" + terms, 
+            data: "name=" + name + "&email=" + email + "&select=" + select + "&terms=" + terms,
             success: function(text) {
                 if (text == "success") {
                     pformSuccess();
@@ -835,7 +835,7 @@
         }
         $("#pmsgSubmit").removeClass().addClass(msgClasses).text(msg);
     }
-    
+
 
     /* Back To Top Button */
     // create the back to top button

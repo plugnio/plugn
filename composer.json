@@ -27,7 +27,6 @@
         "openbuildings/swiftmailer-css-inliner": "*",
         "kartik-v/yii2-widget-fileinput": "dev-master",
         "wbraganca/yii2-dynamicform": "dev-master",
-        "2amigos/yii2-twilio-component": "^1.0",
         "almasaeed2010/adminlte": "~3.0",
         "yiisoft/yii2-shell": "^2.0",
         "leandrogehlen/yii2-treegrid": "*",
@@ -44,7 +43,9 @@
         "kartik-v/yii2-date-range": "dev-master",
         "kartik-v/yii2-widget-touchspin": "dev-master",
         "kartik-v/yii2-widget-rangeinput": "dev-master",
-        "lubosdz/yii2-ui-range-plus-minus": "^1.1"
+        "lubosdz/yii2-ui-range-plus-minus": "^1.1",
+        "bizley/quill": "^3.1",
+        "twitf/yii2-dropzone": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
