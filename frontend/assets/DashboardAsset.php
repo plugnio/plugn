@@ -47,6 +47,14 @@ class DashboardAsset extends AssetBundle {
 
       'css/fileinput.css',
 
+
+
+
+
+
+   'app-assets/vendors/css/charts/apexcharts.css',
+
+
     ];
 
     public $js = [
@@ -84,6 +92,13 @@ class DashboardAsset extends AssetBundle {
                   'js/scripts.js',
 
           'js/fileinput.js',
+
+
+
+
+            'app-assets/vendors/js/charts/apexcharts.min.js',
+            'app-assets/js/scripts/charts/chart-apex.js',
+
 
 
            //

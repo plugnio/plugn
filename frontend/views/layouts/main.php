@@ -195,6 +195,15 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                     </li>
                     <li class=" nav-item">
 
+                        <?=
+                        Html::a(
+                                Html::tag('i', '', ['class' => 'fa fa-line-chart']) .
+                                Html::tag('span', 'Analytics'), ['restaurant/analytic', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                        )
+                        ?>
+                    </li>
+                    <li class=" nav-item">
+
 
                         <?=
                         Html::a(

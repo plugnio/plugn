@@ -54,6 +54,7 @@ $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
 
 
 $(window).on('load', function () {
+  
 
       var primary = '#7367F0';
       var success = '#28C76F';

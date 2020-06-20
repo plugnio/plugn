@@ -42,8 +42,8 @@ $(document).ready(function () {
       curve: 'straight'
     },
     series: [{
-      name: "Desktops",
-      data: [10, 41, 35, 51, 49, 62, 69, 91, 148],
+      name: "Deskddtops",
+      data: [10, 41, 35, 51, 49, 62, 69, 91, 100],
     }],
     title: {
       text: 'Product Trends by Month',

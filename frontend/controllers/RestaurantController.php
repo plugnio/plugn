@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use Yii;
 use common\models\Restaurant;
+use common\models\Order;
 use common\models\AgentAssignment;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
@@ -16,7 +17,7 @@ use yii\filters\VerbFilter;
 class RestaurantController extends Controller {
 
     public $enableCsrfValidation = false;
-    
+
     /**
      * {@inheritdoc}
      */
@@ -38,6 +39,206 @@ class RestaurantController extends Controller {
                 ],
             ],
         ];
+    }
+
+    /**
+     * @return mixed
+     */
+    public function actionAnalytic($restaurantUuid) {
+
+        $model = $this->findModel($restaurantUuid);
+
+
+        $revenue_generated_chart_data = [];
+        $months = [];
+
+        $revenue_generated_last_five_months_month = Order::find()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 5 MONTH)')
+                ->sum('total_price');
+
+        $lastFiveMonths = date('M', strtotime('-5 months'));
+
+        array_push($revenue_generated_chart_data, (int) ($revenue_generated_last_five_months_month));
+
+        array_push($months, $lastFiveMonths);
+
+
+        $revenue_generated_last_four_months_month = Order::find()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 4 MONTH)')
+                ->sum('total_price');
+
+        $lastFoureMonths = date('M', strtotime('-4 months'));
+
+        array_push($revenue_generated_chart_data, (int) ($revenue_generated_last_four_months_month));
+
+        array_push($months, $lastFoureMonths);
+
+        $revenue_generated_last_three_months_month = Order::find()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
+                ->sum('total_price');
+
+        $lastThreeMonths = date('M', strtotime('-3 months'));
+
+        array_push($revenue_generated_chart_data, (int) ($revenue_generated_last_three_months_month));
+
+        array_push($months, $lastThreeMonths);
+
+        $revenue_generated_last_two_months_month = Order::find()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
+                ->sum('total_price');
+
+        $lastTwoMonths = date('M', strtotime('-2 months'));
+
+        array_push($revenue_generated_chart_data, (int) ($revenue_generated_last_two_months_month));
+
+        array_push($months, $lastTwoMonths);
+
+        $revenue_generated_last_month = Order::find()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->sum('total_price');
+
+        $lastMonth = date('M', strtotime('-1 months'));
+
+        array_push($revenue_generated_chart_data, (int) ($revenue_generated_last_month));
+
+        array_push($months, $lastMonth);
+
+        $revenue_generated_current_month = Order::find()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
+                ->sum('total_price');
+
+        $currentMonth = date('M');
+
+        array_push($revenue_generated_chart_data, (int) ($revenue_generated_current_month));
+
+        array_push($months, $currentMonth);
+
+
+        $order_recevied_chart_data = [];
+
+        $order_recevied_last_five_months_month = Order::find()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 5 MONTH)')
+                ->count();
+
+        array_push($order_recevied_chart_data, (int) ($order_recevied_last_five_months_month));
+
+
+        $order_recevied_last_four_months_month = Order::find()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 4 MONTH)')
+                ->count();
+
+
+        array_push($order_recevied_chart_data, (int) ($order_recevied_last_four_months_month));
+
+
+        $order_recevied_last_three_months_month = Order::find()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
+                ->count();
+
+        array_push($order_recevied_chart_data, (int) ($order_recevied_last_three_months_month));
+
+        $order_recevied_last_two_months_month = Order::find()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
+                ->count();
+
+        array_push($order_recevied_chart_data, (int) ($order_recevied_last_two_months_month));
+
+        $order_recevied_last_month = Order::find()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->count();
+
+
+        array_push($order_recevied_chart_data, (int) ($order_recevied_last_month));
+
+
+        $order_recevied_current_month = Order::find()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
+                ->count();
+
+
+        array_push($order_recevied_chart_data, (int) ($order_recevied_current_month));
+
+
+
+        return $this->render('analytic', [
+                    'model' => $model,
+                    'months' => $months,
+                    'revenue_generated_chart_data' => $revenue_generated_chart_data,
+                    'order_recevied_chart_data' => $order_recevied_chart_data,
+                    // 'most_selling_items_chart_data' => $most_selling_items_chart_data,
+        ]);
     }
 
     /**
@@ -68,7 +269,7 @@ class RestaurantController extends Controller {
 
             if(!$model->phone_number)
                 $model->phone_number_display = Restaurant::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER;
-            
+
             if ($model->save()) {
 
                 $thumbnail_image = \yii\web\UploadedFile::getInstances($model, 'restaurant_thumbnail_image');
