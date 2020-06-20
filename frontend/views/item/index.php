@@ -12,101 +12,78 @@ $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
 $this->title = 'Items';
 $this->params['breadcrumbs'][] = $this->title;
 
-$css = "
-    td{
-        vertical-align: middle !important;
-        text-align: center;
-      }";
 
-$this->registerCss($css);
 ?>
 
-<div class="page-title"> <i class="icon-custom-left"></i>
-    <p>
 
-        <?= Html::a('Add Item', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
 
-        <?= Html::a('Export to Excel', ['export-to-excel' , 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-info' , 'style' => 'margin-left:10px;']) ?>
 
-    </p>
+<section id="data-list-view" class="data-list-view-header">
+
+<!-- Data list view starts -->
+<div class="action-btns d-none">
+    <div class="btn-dropdown mr-1 mb-1">
+        <div class="btn-group dropdown actions-dropodown">
+          <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary']) ?>
+        </div>
+    </div>
 </div>
 
+    <!-- DataTable starts -->
+    <div class="table-responsive">
 
-
-<div class="card">
-    <?php
-// $initialPreviewArray = $dataProvider->query->getItemImages()->asArray()->one();
-// $initialPreviewArray = ArrayHelper::getColumn($initialPreviewArray, 'product_file_name');
-// $initialPreviewArray[$key] = "https://res.cloudinary.com/plugn/image/upload/restaurants/rest_b57f0b55-8d4c-11ea-8b7f-06d4853caaaa/items/". $file_name;
-
-
-    echo GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'pager' => [
-            'options' => [
-                'class' => 'pagination pagination-sm m-0 float-right',
-            ],
-            'linkOptions' => ['class' => 'page-link'],
-            'activePageCssClass' => 'page-item active',
-            'disabledPageCssClass' => 'page-item  disabled',
-            'prevPageCssClass' => 'page-item prev',
-            'nextPageCssClass' => 'page-item next',
-            'disabledListItemSubTagOptions' => [
-                'tag' => 'span',
-                'class' => 'page-link',
-            ],
-        ],
-        'columns' => [
-            'sort_number',
-            [
-                'attribute' => 'Image',
-                'format' => 'html',
-                'value' => function ($data) {
-                    $itemItmage = $data->getItemImages()->one();
-                    if ($itemItmage) {
-                        return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/" . $data->restaurant->restaurant_uuid . "/items/" . $itemItmage->product_file_name);
-                    }
-                },
-            ],
-            'item_name',
-//            'item_name_ar',
-//            'item_description',
-//            'item_description_ar',
-            'stock_qty',
-            'unit_sold',
-            'item_price:currency',
-            [
-                'class' => 'yii\grid\ActionColumn',
-                'template' => ' {view} {update} {delete}',
-                'buttons' => [
-                    'update' => function ($url, $model) {
-                        return Html::a(
-                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['update', 'id' => $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
-                                    'title' => 'Update',
-                                    'data-pjax' => '0',
-                                        ]
-                        );
-                    },
-                    'delete' => function ($url, $model) {
-                        return Html::a(
-                                        '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete', 'id' => $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
-                                    'title' => 'Delete',
-                                    'data' => [
-                                        'confirm' => 'Are you absolutely sure ? You will lose all the information about this item with this action.',
-                                        'method' => 'post',
-                                    ],
-                                        ]
-                        );
-                    },
+        <?=
+        GridView::widget([
+            'dataProvider' => $dataProvider,
+            'columns' => [
+              ['class' => 'yii\grid\SerialColumn'],
+              [
+                  'attribute' => 'Image',
+                  'format' => 'html',
+                  'value' => function ($data) {
+                      $itemItmage = $data->getItemImages()->one();
+                      if ($itemItmage) {
+                          return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/" . $data->restaurant->restaurant_uuid . "/items/" . $itemItmage->product_file_name);
+                      }
+                  },
+              ],
+              'item_name',
+              'stock_qty',
+              'unit_sold',
+              'item_price:currency',
+                [
+                    'header' => 'Actions',
+                    'class' => 'yii\grid\ActionColumn',
+                    'template' => ' {view} {update} {delete}',
+                    'buttons' => [
+                        'update' => function ($url, $model) {
+                            return Html::a(
+                                            '<span style="margin-right: 20px;" class="feather icon-edit"></span>', ['update', 'id' => $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
+                                        'title' => $url,
+                                        'data-pjax' => '0',
+                                            ]
+                            );
+                        },
+                        'delete' => function ($url, $model) {
+                            return Html::a(
+                                            '<span style="margin-right: 20px;color: red;" class="feather icon-trash"></span>', ['delete', 'id' => $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
+                                        'title' => 'Delete',
+                                        'data' => [
+                                            'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',
+                                            'method' => 'post',
+                                        ],
+                            ]);
+                        },
+                    ],
                 ],
             ],
-        ],
-        'layout' => '{summary}<div class="card-body"><div class="box-body table-responsive no-padding">{items}<div class="card-footer clearfix">{pager}</div></div>',
-        'tableOptions' => ['class' => 'table table-bordered table-hover'],
-        'summaryOptions' => ['class' => "card-header"],
-    ]);
-    ?>
+            'layout' => '{summary}{items}{pager}',
+            'tableOptions' => ['class' => 'table data-list-view'],
+        ]);
+        ?>
 
+    </div>
+    <!-- DataTable ends -->
 
-</div>
+  </section>
+<!-- Data list view end -->

@@ -13,114 +13,33 @@ $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
 $this->title = 'Orders';
 $this->params['breadcrumbs'][] = $this->title;
 
-$js = "
-   $(function () {
 
-
-    //Date range picker
-    $('#reservation').daterangepicker()
-    //Date range picker with time picker
-    $('#reservationtime').daterangepicker({
-      timePicker: true,
-      timePickerIncrement: 30,
-      locale: {
-        format: 'YYYY-MM-DD H:mm:ss'
-      }
-    })
-
-    //Date range as a button
-    $('#daterange-btn').daterangepicker(
-      {
-        ranges   : {
-          'Today'       : [moment(), moment()],
-          'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-          'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
-          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-          'This Month'  : [moment().startOf('month'), moment().endOf('month')],
-          'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-        },
-        startDate: moment().subtract(29, 'days'),
-        endDate  : moment()
-      },
-      function (start, end) {
-        $('#reportrange span').html(start.format('YYYY-MM-DD H:mm:ss') + ' - ' + end.format('YYYY-MM-DD H:mm:ss'))
-      }
-    )
-
-
-
-   $(document).ready(function() {
-            $('.input-field').change(function() {
-                alert('Value: ' + $('#reservation').val());
-            });
-        });
-  })";
-
-
-$this->registerJs($js);
 ?>
 
+<section id="data-list-view" class="data-list-view-header">
 
-<p>
-    <?= Html::a('Create Order', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
-</p>
-
-
-<!-- /.input group -->
-<div class="card">
-    <div class="card-body">
-        <?php $form = ActiveForm::begin(); ?>
-
-        <?=
-        $form->field($restaurant_model, 'date_range_picker_with_time', [
-            'template' => "{label}"
-            . "<div class='input-group'> <div class='input-group-prepend'> <span class='input-group-text'><i class='far fa-clock'></i></span> </div>{input}"
-            . "</div>"
-            . "{error}{hint}"
-        ])->textInput([
-            'type' => 'text',
-            'class' => 'form-control float-right',
-            'id' => 'reservationtime'
-        ])
-        ?>
-
-        <div class="form-group">
-            <?=
-            Html::submitButton('Export to Excel', ['class' => 'btn btn-success'])
-            ?>
+<!-- Data list view starts -->
+<div class="action-btns d-none">
+    <div class="btn-dropdown mr-1 mb-1">
+        <div class="btn-group dropdown actions-dropodown">
+          <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary']) ?>
         </div>
+    </div>
+</div>
 
 
-
-        <?php ActiveForm::end(); ?>
-
-
-        <?php echo $this->render('_search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
+   <?php echo $this->render('_search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
 
 
+    <!-- DataTable starts -->
+    <div class="table-responsive">
 
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
-//        'filterModel' => $searchModel,
-            'pager' => [
-                'options' => [
-                    'class' => 'pagination pagination-sm m-0 float-right',
-                ],
-                'linkOptions' => ['class' => 'page-link'],
-                'activePageCssClass' => 'page-item active',
-                'disabledPageCssClass' => 'page-item  disabled',
-                'prevPageCssClass' => 'page-item prev',
-                'nextPageCssClass' => 'page-item next',
-                'disabledListItemSubTagOptions' => [
-                    'tag' => 'span',
-                    'class' => 'page-link',
-                ],
-            ],
             'columns' => [
-              [
-           'class' => 'yii\grid\SerialColumn',
-       ],
+              ['class' => 'yii\grid\SerialColumn'],
+
                 [
                     'label' => 'Order ID',
                     "format" => "raw",
@@ -128,15 +47,6 @@ $this->registerJs($js);
                         return '#' . $model->order_uuid;
                     }
                 ],
-                // [
-                //     'attribute' => 'order_created_at',
-                //     "format" => "raw",
-                //     "value" => function($model) {
-                //       \Yii::$app->timeZone = 'Asia/Kuwait';
-                //
-                //         return Yii::$app->formatter->asRelativeTime($model->order_created_at);
-                //     },
-                // ],
                 [
                     'attribute' => 'customer_name',
                     'format' => 'raw',
@@ -152,20 +62,61 @@ $this->registerJs($js);
                     'attribute' => 'order_status',
                     "format" => "raw",
                     "value" => function($model) {
-                        if ($model->order_status == Order::STATUS_PENDING)
-                            return '<span class="badge bg-warning" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY)
-                            return '<span class="badge bg-info" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_BEING_PREPARED)
-                            return '<span class="badge bg-primary" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_COMPLETE)
-                            return '<span class="badge bg-success" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_CANCELED)
-                            return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_PARTIALLY_REFUNDED)
-                            return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_REFUNDED)
-                            return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
+                        if ($model->order_status == Order::STATUS_PENDING){
+                          return   '<div class="chip chip-warning mr-1">
+                                      <div class="chip-body">
+                                          <span class="chip-text">' . $model->orderStatus . '</span>
+                                      </div>
+                                  </div>';
+                        }
+                        else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY){
+                          return   '<div class="chip chip-info mr-1">
+                                      <div class="chip-body">
+                                          <span class="chip-text">' . $model->orderStatus . '</span>
+                                      </div>
+                                  </div>';
+                        }
+
+                        else if ($model->order_status == Order::STATUS_BEING_PREPARED){
+                          return   '<div class="chip chip-primary mr-1">
+                                      <div class="chip-body">
+                                          <span class="chip-text">' . $model->orderStatus . '</span>
+                                      </div>
+                                  </div>';
+                        }
+
+                        else if ($model->order_status == Order::STATUS_COMPLETE){
+                          return   '<div class="chip chip-success mr-1">
+                                      <div class="chip-body">
+                                          <span class="chip-text">' . $model->orderStatus . '</span>
+                                      </div>
+                                  </div>';
+                        }
+
+                        else if ($model->order_status == Order::STATUS_CANCELED){
+                          return   '<div class="chip chip-danger mr-1">
+                                      <div class="chip-body">
+                                          <span class="chip-text">' . $model->orderStatus . '</span>
+                                      </div>
+                                    </div>';
+                        }
+
+                        else if ($model->order_status == Order::STATUS_PARTIALLY_REFUNDED){
+                          return   '<div class="chip chip-danger mr-1">
+                                      <div class="chip-body">
+                                          <span class="chip-text">' . $model->orderStatus . '</span>
+                                      </div>
+                                   </div>';
+                        }
+
+                        else if ($model->order_status == Order::STATUS_REFUNDED){
+                          return   '<div class="chip chip-danger mr-1">
+                                      <div class="chip-body">
+                                          <span class="chip-text">' . $model->orderStatus . '</span>
+                                      </div>
+                                   </div>';
+                        }
+
                     }
                 ],
                 [
@@ -181,28 +132,27 @@ $this->registerJs($js);
                 'total_price:currency',
                 'order_created_at:datetime',
                 [
+                    'header' => 'Action',
                     'class' => 'yii\grid\ActionColumn',
                     'template' => ' {view} {update} {delete}',
                     'buttons' => [
                         'view' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
-                                        'title' => 'View',
+                                            '<span style="margin-right: 20px;"><i class="feather icon-eye"></i></span>', ['view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
                                         'data-pjax' => '0',
                                             ]
                             );
                         },
                         'update' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['update', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
-                                        'title' => 'Update',
+                                            '<span style="margin-right: 20px;"><i class="feather icon-edit"></i></span>', ['update', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
                                         'data-pjax' => '0',
                                             ]
                             );
                         },
                         'delete' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
+                                            '<span style="margin-right: 20px;color: red;"><i class="feather icon-trash"></i></span>', ['delete', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
                                         'title' => 'Delete',
                                         'data' => [
                                             'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',
@@ -213,12 +163,13 @@ $this->registerJs($js);
                     ],
                 ],
             ],
-            'layout' => '{summary}<div class="box-body table-responsive no-padding">{items}<div class="card-footer clearfix">{pager}</div>',
-            'tableOptions' => ['class' => 'table table-bordered table-hover'],
-            'summaryOptions' => ['class' => "card-header"],
+            'layout' => '{summary}{items}{pager}',
+            'tableOptions' => ['class' => 'table data-list-view'],
         ]);
         ?>
 
-
     </div>
-</div>
+    <!-- DataTable ends -->
+
+  </section>
+<!-- Data list view end -->

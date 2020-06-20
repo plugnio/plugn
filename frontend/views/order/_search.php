@@ -9,83 +9,81 @@ use common\models\Order;
 /* @var $model frontend\models\OrderSearch */
 /* @var $form yii\widgets\ActiveForm */
 
-$js = "
-    $(function () {
-
-
-
-    $('select').select2({
-        minimumResultsForSearch: -1,
-              placeholder: 'Select order status'
-    });
-
-
-
-
-  })
-";
-
-
-$this->registerJs($js);
 ?>
 
-<div class="order-search">
+
+<!-- users filter start -->
+<div class="card">
 
 
 
-    <?php
-        $form = ActiveForm::begin([
-                    'layout' => 'horizontal',
-                    'fieldConfig' => [
-                        'template' => "{label}\n{beginWrapper}\n{input}\n{hint}\n{error}\n{endWrapper}",
-                        'horizontalCssClasses' => [
-                            'label' => 'col-sm-4',
-                            'offset' => 'col-sm-offset-4',
-                            'wrapper' => 'col-sm-8',
-                            'error' => '',
-                            'hint' => '',
-                        ],
-                    ],
-                    'action' => ['order/index', 'restaurantUuid' => $restaurant_uuid],
-                    'method' => 'get',
-                ]);
-    ?>
-
-
-    <div class="row">
-        <div class="col-md-6">
-            <?= $form->field($model, 'order_uuid') ?>
-            <?=
-                $form->field($model, 'date_range', [
-                ])->widget(DateRangePicker::classname(), [
-                    'presetDropdown' => false,
-                    'convertFormat' => true,
-                    'pluginOptions' => ['locale' => ['format' => 'Y-m-d H:m:s']],
-                ]);
-            ?>
-            <?=
-            $form->field($model, 'order_status')->dropDownList([
-                Order::STATUS_PENDING => 'Pending',
-                Order::STATUS_BEING_PREPARED => 'Being prepared',
-                Order::STATUS_OUT_FOR_DELIVERY => 'Out for delivery',
-                Order::STATUS_COMPLETE => 'Complete',
-                Order::STATUS_CANCELED => 'Canceled',
-                    ], ['class' => 'select2', 'prompt' => 'Select order status']);
-            ?>
-        </div>
-        <div class="col-md-6">
-            <?= $form->field($model, 'customer_name') ?>
-            <?= $form->field($model, 'customer_phone_number') ?>
-
+    <div class="card-header">
+        <h4 class="card-title">Filters</h4>
+        <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
+        <div class="heading-elements">
+            <ul class="list-inline mb-0">
+                <li><a data-action="collapse"><i class="feather icon-chevron-down"></i></a></li>
+                <li><a data-action="close"><i class="feather icon-x"></i></a></li>
+            </ul>
         </div>
     </div>
+    <div class="card-content collapse show">
 
 
-    <div class="form-group">
-    <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-    <?= Html::a('Reset', ['order/index', 'restaurantUuid' => $restaurant_uuid], ['class' => 'btn btn-outline-secondary']) ?>
+        <div class="card-body">
+            <div class="users-list-filter">
+                <form>
+                    <div class="row">
+
+                        <?php
+                        $form = ActiveForm::begin([
+                                    'action' => ['order/index', 'restaurantUuid' => $restaurant_uuid],
+                                    'method' => 'get',
+                        ]);
+                        ?>
+
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <?= $form->field($model, 'order_uuid') ?>
+                        </div>
+
+
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <?= $form->field($model, 'customer_phone_number') ?>
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-3">
+                          <?=
+                             $form->field($model, 'date_range', [
+                             ])->widget(DateRangePicker::classname(), [
+                                 'presetDropdown' => false,
+                                 'convertFormat' => true,
+                                 'pluginOptions' => ['locale' => ['format' => 'Y-m-d H:m:s']],
+                             ]);
+                         ?>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <?=
+                            $form->field($model, 'order_status')->dropDownList([
+                                Order::STATUS_PENDING => 'Pending',
+                                Order::STATUS_BEING_PREPARED => 'Being prepared',
+                                Order::STATUS_OUT_FOR_DELIVERY => 'Out for delivery',
+                                Order::STATUS_COMPLETE => 'Complete',
+                                Order::STATUS_CANCELED => 'Canceled',
+                                    ], ['class' => 'form-control', 'prompt' => 'Select order status']);
+                            ?>
+                        </div>
+
+
+                        <div class="form-group" style="margin: 0px 15px">
+                            <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
+                            <?= Html::a('Reset', ['order/index', 'restaurantUuid' => $restaurant_uuid], ['class' => 'btn btn-outline-secondary', 'style' => 'margin-left: 10px;']) ?>
+                        </div>
+                        <?php ActiveForm::end(); ?>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </div>
-
-<?php ActiveForm::end(); ?>
-
 </div>

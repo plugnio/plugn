@@ -374,9 +374,9 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function getOrderStatus() {
         if ($this->order_status == self::STATUS_PENDING)
-            return 'Order Pending';
+            return 'Pending';
         else if ($this->order_status == self::STATUS_BEING_PREPARED)
-            return 'Order Being Prepared';
+            return 'Being Prepared';
         else if ($this->order_status == self::STATUS_OUT_FOR_DELIVERY)
             return 'Out for Delivery';
         else if ($this->order_status == self::STATUS_COMPLETE)

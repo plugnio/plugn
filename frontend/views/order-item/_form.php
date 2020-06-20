@@ -59,7 +59,7 @@ $js = "$(function () {
     $('#timepicker').datetimepicker({
       format: 'LT'
     })
-    
+
     //Bootstrap Duallistbox
     $('.duallistbox').bootstrapDualListbox()
 
@@ -77,7 +77,7 @@ $js = "$(function () {
     });
 
   });
-  
+
 
   $(document).ready(function () {
      bsCustomFileInput.init();
@@ -101,7 +101,7 @@ $this->registerJs($js);
 
     <?php
     if (isset($restaurantsItems)) {
-        echo $form->field($model, 'item_uuid')->dropDownList($restaurantsItems, ['class' => 'select2'])->label('Item');
+        echo $form->field($model, 'item_uuid')->dropDownList($restaurantsItems, ['class' => 'form-control select2'])->label('Item');
     }
     ?>
 
@@ -111,7 +111,7 @@ $this->registerJs($js);
     <?= $form->field($model, 'customer_instruction')->textInput(['maxlength' => true]) ?>
 
     <div class="form-group">
-    <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+    <?= Html::submitButton('Save', ['class' => 'btn btn-success' ,'style' => 'width: 100%; height: 50px;']) ?>
     </div>
 
 <?php ActiveForm::end(); ?>

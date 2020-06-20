@@ -12,49 +12,69 @@ class DashboardAsset extends AssetBundle {
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
-        'css/site.css',
-        'css/fileinput.css',
-        'plugins/datatables-bs4/css/dataTables.bootstrap4.css',
-        'plugins/icheck-bootstrap/icheck-bootstrap.min.css',
-        'plugins/overlayScrollbars/css/OverlayScrollbars.min.css',
-        'plugins/summernote/summernote-bs4.css',
-        'plugins/fontawesome-free/css/all.min.css',
-        'https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css',
-        'plugins/daterangepicker/daterangepicker.css',
-        'plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css',
-        'plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css',
-        'css/select2.min.css',
-        'css/select2.css',
-        'plugins/summernote/summernote-bs4.css',
-        'css/select2-bootstrap4.min.css',
-        'plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css',
-        'dist/css/adminlte.min.css',
-        'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700',
+      'app-assets/vendors/css/vendors.min.css',
+      'app-assets/vendors/css/charts/apexcharts.css',
+      'app-assets/vendors/css/extensions/tether-theme-arrows.css',
+      'app-assets/vendors/css/extensions/tether.min.css',
+      'app-assets/vendors/css/extensions/shepherd-theme-default.css',
+      'app-assets/css/bootstrap.css',
+      'app-assets/css/bootstrap-extended.css',
+      'app-assets/css/colors.css',
+      'app-assets/css/components.css',
+      'app-assets/css/themes/dark-layout.css',
+      'app-assets/css/themes/semi-dark-layout.css',
+      'app-assets/css/core/menu/menu-types/vertical-menu.css',
+      'app-assets/css/core/colors/palette-gradient.css',
+      'app-assets/css/pages/dashboard-analytics.css',
+      'app-assets/css/pages/card-analytics.css',
+      'app-assets/css/pages/dashboard-ecommerce.css',
+      'app-assets/css/plugins/tour/tour.css',
+      'assets/css/style.css',
+      'https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600',
+      'app-assets/css/plugins/file-uploaders/dropzone.css',
+      'app-assets/css/pages/data-list-view.css',
+      'app-assets/vendors/css/tables/datatable/datatables.min.css',
+      'app-assets/vendors/css/file-uploaders/dropzone.min.css',
+      'app-assets/vendors/css/tables/ag-grid/ag-grid.css',
+      'app-assets/vendors/css/tables/ag-grid/ag-theme-material.css',
+      'app-assets/css/pages/app-user.css',
+      'app-assets/css/pages/aggrid.css',
+      'app-assets/vendors/css/forms/select/select2.min.css',
+
 
     ];
+
     public $js = [
-//        'plugins/jquery/jquery.min.js',
-        'plugins/bootstrap/js/bootstrap.bundle.min.js',
-        'plugins/bs-custom-file-input/bs-custom-file-input.min.js',
-        'plugins/select2/js/select2.full.min.js',
-        'plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js',
-        'plugins/moment/moment.min.js',
-//        'plugins/datatables-bs4/js/dataTables.bootstrap4.js',
-        'plugins/summernote/summernote-bs4.min.js',
-        'plugins/inputmask/min/jquery.inputmask.bundle.min.js',
-        'plugins/daterangepicker/daterangepicker.js',
-        'plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js',
-        'plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js',
-        'plugins/bootstrap-switch/js/bootstrap-switch.min.js',
-        'dist/js/adminlte.min.js',
-        'dist/js/demo.js',
-        'js/scripts.js',
-        'js/fileinput.js'
-    ];
-    public $depends = [
-      'yii\web\YiiAsset',
-      'yii\web\JqueryAsset',
+      'app-assets/vendors/js/vendors.min.js',
+      'app-assets/vendors/js/charts/apexcharts.min.js',
+      'app-assets/vendors/js/extensions/tether.min.js',
+      'app-assets/vendors/js/extensions/shepherd.min.js',
+      'app-assets/js/core/app-menu.js',
+      'app-assets/js/core/app.js',
+      'app-assets/js/scripts/components.js',
+      'app-assets/js/scripts/pages/dashboard-analytics.js',
+      'app-assets/js/scripts/pages/dashboard-ecommerce.js',
+      'app-assets/js/scripts/ui/data-list-view.js',
+      'app-assets/vendors/js/extensions/dropzone.min.js',
+      'app-assets/vendors/js/tables/datatable/datatables.min.js',
+      'app-assets/vendors/js/tables/datatable/datatables.buttons.min.js',
+      'app-assets/vendors/js/tables/datatable/datatables.bootstrap4.min.js',
+      'app-assets/vendors/js/tables/datatable/buttons.bootstrap.min.js',
+      'app-assets/vendors/js/tables/datatable/dataTables.select.min.js',
+      'app-assets/vendors/js/tables/ag-grid/ag-grid-community.min.noStyle.js',
+      'app-assets/js/scripts/pages/app-user.js',
 
+
+
+  'app-assets/vendors/js/forms/select/select2.full.min.js',
+  'app-assets/js/scripts/forms/select/form-select2.js',
+
+
+    ];
+
+    public $depends = [
+      // 'yii\web\YiiAsset',
+      // 'yii\web\JqueryAsset',
     ];
 
 }

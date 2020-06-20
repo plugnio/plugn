@@ -53,7 +53,7 @@ $js = "$(function () {
     $('#timepicker').datetimepicker({
       format: 'LT'
     })
-    
+
     //Bootstrap Duallistbox
     $('.duallistbox').bootstrapDualListbox()
 
@@ -71,7 +71,7 @@ $js = "$(function () {
     });
 
   });
-  
+
 
   $(document).ready(function () {
      bsCustomFileInput.init();
@@ -101,7 +101,7 @@ $this->registerJs($js);
 
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Save', ['class' => 'btn btn-success','style' => 'width: 100%; height: 50px;']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

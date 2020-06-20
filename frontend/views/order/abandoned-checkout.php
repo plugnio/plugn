@@ -14,44 +14,38 @@ $this->title = 'Abandoned checkouts';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<!-- /.input group -->
-<div class="card">
-    <div class="card-body">
 
+<section id="data-list-view" class="data-list-view-header">
+
+<!-- Data list view starts -->
+<div class="action-btns d-none">
+    <div class="btn-dropdown mr-1 mb-1">
+        <div class="btn-group dropdown actions-dropodown">
+          <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary']) ?>
+        </div>
+    </div>
+</div>
+
+
+   <?php echo $this->render('_search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
+
+
+    <!-- DataTable starts -->
+    <div class="table-responsive">
 
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
-            'filterModel' => $searchModel,
-            'pager' => [
-                'options' => [
-                    'class' => 'pagination pagination-sm m-0 float-right',
-                ],
-                'linkOptions' => ['class' => 'page-link'],
-                'activePageCssClass' => 'page-item active',
-                'disabledPageCssClass' => 'page-item  disabled',
-                'prevPageCssClass' => 'page-item prev',
-                'nextPageCssClass' => 'page-item next',
-                'disabledListItemSubTagOptions' => [
-                    'tag' => 'span',
-                    'class' => 'page-link',
-                ],
-            ],
             'columns' => [
+              ['class' => 'yii\grid\SerialColumn'],
+
                 [
-                    'attribute' => 'order_uuid',
+                    'label' => 'Order ID',
                     "format" => "raw",
                     "value" => function($model) {
                         return '#' . $model->order_uuid;
                     }
                 ],
-                // [
-                //     'attribute' => 'order_created_at',
-                //     "format" => "raw",
-                //     "value" => function($model) {
-                //         return Yii::$app->formatter->asRelativeTime($model->order_created_at);
-                //     },
-                // ],
                 [
                     'attribute' => 'customer_name',
                     'format' => 'raw',
@@ -74,28 +68,22 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                 ],
                 'total_price:currency',
+                'order_created_at:datetime',
                 [
-                    'attribute' => 'order_created_at',
-                    "format" => "raw",
-                    "value" => function($data) {
-                        return Yii::$app->formatter->asRelativeTime($data->order_created_at);
-                    },
-                ],
-                [
+                    'header' => 'Action',
                     'class' => 'yii\grid\ActionColumn',
                     'template' => ' {view} {update} {delete}',
                     'buttons' => [
                         'view' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
-                                        'title' => 'View',
+                                            '<span style="margin-right: 20px;"><i class="feather icon-eye"></i></span>', ['view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
                                         'data-pjax' => '0',
                                             ]
                             );
                         },
                         'delete' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
+                                            '<span style="margin-right: 20px;color: red;"><i class="feather icon-trash"></i></span>', ['delete', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
                                         'title' => 'Delete',
                                         'data' => [
                                             'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',
@@ -106,12 +94,13 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
             ],
-            'layout' => '{summary}<div class="box-body table-responsive no-padding">{items}<div class="card-footer clearfix">{pager}</div>',
-            'tableOptions' => ['class' => 'table table-bordered table-hover'],
-            'summaryOptions' => ['class' => "card-header"],
+            'layout' => '{summary}{items}{pager}',
+            'tableOptions' => ['class' => 'table data-list-view'],
         ]);
         ?>
 
-
     </div>
-</div>
+    <!-- DataTable ends -->
+
+  </section>
+<!-- Data list view end -->

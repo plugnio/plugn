@@ -115,29 +115,29 @@ class SiteController extends Controller {
                     ->orWhere(['order_status' => Order::STATUS_COMPLETE])
                     ->orWhere(['order_status' => Order::STATUS_CANCELED])
                     ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
+                    // ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
                     ->count();
 
-            $this_week_new_orders = Order::find()
-                    ->where(['order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
-                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
-                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
-                    ->count();
-
-            $this_month_new_orders = Order::find()
-                    ->where(['order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
-                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
-                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
-                    ->count();
-
+            // $this_week_new_orders = Order::find()
+            //         ->where(['order_status' => Order::STATUS_PENDING])
+            //         ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+            //         ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+            //         ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+            //         ->orWhere(['order_status' => Order::STATUS_CANCELED])
+            //         ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+            //         ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
+            //         ->count();
+            //
+            // $this_month_new_orders = Order::find()
+            //         ->where(['order_status' => Order::STATUS_PENDING])
+            //         ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+            //         ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+            //         ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+            //         ->orWhere(['order_status' => Order::STATUS_CANCELED])
+            //         ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+            //         ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
+            //         ->count();
+            //
 
 
             //Sold items
@@ -149,48 +149,48 @@ class SiteController extends Controller {
                     ->orWhere(['order_status' => Order::STATUS_COMPLETE])
                     ->orWhere(['order_status' => Order::STATUS_CANCELED])
                     ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
+                    // ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
                     ->sum('order_item.qty');
 
 
-            $this_week_sold_item = OrderItem::find()
-                    ->joinWith('order')
-                    ->where(['order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
-                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
-                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
-                    ->sum('order_item.qty');
-
-            $this_month_sold_item = OrderItem::find()
-                    ->joinWith('order')
-                    ->where(['order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
-                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
-                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
-                    ->sum('order_item.qty');
+            // $this_week_sold_item = OrderItem::find()
+            //         ->joinWith('order')
+            //         ->where(['order_status' => Order::STATUS_PENDING])
+            //         ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+            //         ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+            //         ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+            //         ->orWhere(['order_status' => Order::STATUS_CANCELED])
+            //         ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+            //         ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
+            //         ->sum('order_item.qty');
+            //
+            // $this_month_sold_item = OrderItem::find()
+            //         ->joinWith('order')
+            //         ->where(['order_status' => Order::STATUS_PENDING])
+            //         ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+            //         ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+            //         ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+            //         ->orWhere(['order_status' => Order::STATUS_CANCELED])
+            //         ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+            //         ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
+            //         ->sum('order_item.qty');
 
 
             //Customers
             $today_total_customers = Customer::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'customer_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
+                    // ->andWhere(['>', 'customer_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
                     ->count();
 
-            $this_week_total_customers = Customer::find()
-                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'customer_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
-                    ->count();
-
-            $this_month_total_customers = Customer::find()
-                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'customer_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
-                    ->count();
+            // $this_week_total_customers = Customer::find()
+            //         ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+            //         ->andWhere(['>', 'customer_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
+            //         ->count();
+            //
+            // $this_month_total_customers = Customer::find()
+            //         ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+            //         ->andWhere(['>', 'customer_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
+            //         ->count();
 
             //Revenue
             $today_total_revenue = Order::find()
@@ -199,42 +199,42 @@ class SiteController extends Controller {
                     ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
                     ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
                     ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
-                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
+                    // ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
                     ->sum('total_price');
 
-            $this_week_total_revenue = Order::find()
-                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
-                    ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
-                    ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
-                    ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
-                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
-                    ->sum('total_price');
-
-            $this_month_total_revenue = Order::find()
-                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
-                    ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
-                    ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
-                    ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
-                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
-                    ->sum('total_price');
+            // $this_week_total_revenue = Order::find()
+            //         ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+            //         ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+            //         ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+            //         ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+            //         ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+            //         ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
+            //         ->sum('total_price');
+            //
+            // $this_month_total_revenue = Order::find()
+            //         ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+            //         ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+            //         ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+            //         ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+            //         ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+            //         ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
+            //         ->sum('total_price');
 
             return $this->render('index', [
                         'restaurant_model' => $managedRestaurant,
                         'orders' => $orders,
                         'today_sold_item' => $today_sold_item,
-                        'this_week_sold_item' => $this_week_sold_item,
-                        'this_month_sold_item' => $this_month_sold_item,
+                        // 'this_week_sold_item' => $this_week_sold_item,
+                        // 'this_month_sold_item' => $this_month_sold_item,
                         'today_new_orders' => $today_new_orders,
                         'today_total_customers' => $today_total_customers,
                         'today_total_revenue' => $today_total_revenue,
-                        'this_week_new_orders' => $this_week_new_orders,
-                        'this_week_total_customers' => $this_week_total_customers,
-                        'this_week_total_revenue' => $this_week_total_revenue,
-                        'this_month_new_orders' => $this_month_new_orders,
-                        'this_month_total_customers' => $this_month_total_customers,
-                        'this_month_total_revenue' => $this_month_total_revenue,
+                        // 'this_week_new_orders' => $this_week_new_orders,
+                        // 'this_week_total_customers' => $this_week_total_customers,
+                        // 'this_week_total_revenue' => $this_week_total_revenue,
+                        // 'this_month_new_orders' => $this_month_new_orders,
+                        // 'this_month_total_customers' => $this_month_total_customers,
+                        // 'this_month_total_revenue' => $this_month_total_revenue,
             ]);
         }
     }
