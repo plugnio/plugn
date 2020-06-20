@@ -41,15 +41,216 @@ $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
 // ";
 //
 
+ $data = [1];
 
-$js = "
+?>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+
+<!-- <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script> -->
+<script type="text/javascript">
+// pass PHP variable declared above to JavaScript variable
 
 
 $(window).on('load', function () {
 
-  var primary = '#7367F0';
+      var primary = '#7367F0';
+      var success = '#28C76F';
+      var danger = '#EA5455';
+      var warning = '#FF9F43';
 
-      var gainedlineChartoptions = {
+      var soldItemsChartOptions = {
+        chart: {
+          height: 100,
+          type: 'area',
+          toolbar: {
+            show: false,
+          },
+          sparkline: {
+            enabled: true
+          },
+          grid: {
+            show: false,
+            padding: {
+              left: 0,
+              right: 0
+            }
+          },
+        },
+        colors: [danger],
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          curve: 'smooth',
+          width: 2.5
+        },
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shadeIntensity: 0.9,
+            opacityFrom: 0.7,
+            opacityTo: 0.5,
+            stops: [0, 80, 100]
+          }
+        },
+        series: [{
+          name: 'Items',
+          data: <?=  json_encode($sold_item_chart_data) ?>,
+        }],
+
+        xaxis: {
+          labels: {
+            show: false,
+          },
+          axisBorder: {
+            show: false,
+          }
+        },
+        yaxis: [{
+          y: 0,
+          offsetX: 0,
+          offsetY: 0,
+          padding: { left: 0, right: 0 },
+        }],
+        tooltip: {
+          x: { show: false }
+        },
+      }
+      var soldItemsChart = new ApexCharts(
+        document.querySelector('#sold-item-chart'),
+        soldItemsChartOptions
+      );
+
+      var orderReceivedChartOptions = {
+        chart: {
+          height: 100,
+          type: 'area',
+          toolbar: {
+            show: false,
+          },
+          sparkline: {
+            enabled: true
+          },
+          grid: {
+            show: false,
+            padding: {
+              left: 0,
+              right: 0
+            }
+          },
+        },
+        colors: [warning],
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          curve: 'smooth',
+          width: 2.5
+        },
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shadeIntensity: 0.9,
+            opacityFrom: 0.7,
+            opacityTo: 0.5,
+            stops: [0, 80, 100]
+          }
+        },
+        series: [{
+          name: 'Customers',
+          data: <?=  json_encode($orders_received_chart_data) ?>,
+        }],
+
+        xaxis: {
+          labels: {
+            show: false,
+          },
+          axisBorder: {
+            show: false,
+          }
+        },
+        yaxis: [{
+          y: 0,
+          offsetX: 0,
+          offsetY: 0,
+          padding: { left: 0, right: 0 },
+        }],
+        tooltip: {
+          x: { show: false }
+        },
+      }
+      var orderReceivedChart = new ApexCharts(
+        document.querySelector('#orders-recevied-chart'),
+        orderReceivedChartOptions
+      );
+
+      var revenueGeneratedChartOptions = {
+        chart: {
+          height: 100,
+          type: 'area',
+          toolbar: {
+            show: false,
+          },
+          sparkline: {
+            enabled: true
+          },
+          grid: {
+            show: false,
+            padding: {
+              left: 0,
+              right: 0
+            }
+          },
+        },
+        colors: [success],
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          curve: 'smooth',
+          width: 2.5
+        },
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shadeIntensity: 0.9,
+            opacityFrom: 0.7,
+            opacityTo: 0.5,
+            stops: [0, 80, 100]
+          }
+        },
+        series: [{
+          name: 'Orders',
+          data: <?=  json_encode($revenue_generated_chart_data) ?>,
+        }],
+
+        xaxis: {
+          labels: {
+            show: false,
+          },
+          axisBorder: {
+            show: false,
+          }
+        },
+        yaxis: [{
+          y: 0,
+          offsetX: 0,
+          offsetY: 0,
+          padding: { left: 0, right: 0 },
+        }],
+        tooltip: {
+          x: { show: false }
+        },
+      }
+      var revenueGeneratedChart = new ApexCharts(
+        document.querySelector('#revenue-generated-chart'),
+        revenueGeneratedChartOptions
+      );
+
+
+      var customerGainedChartOptions = {
         chart: {
           height: 100,
           type: 'area',
@@ -85,8 +286,8 @@ $(window).on('load', function () {
           }
         },
         series: [{
-          name: 'Subscribers',
-          data: [ 52, 38, 60, 55 ,28, 40, 36]
+          name: 'Customers',
+          data: <?=  json_encode($customer_chart_data) ?>,
         }],
 
         xaxis: {
@@ -107,21 +308,23 @@ $(window).on('load', function () {
           x: { show: false }
         },
       }
-
-      var gainedlineChart = new ApexCharts(
-        document.querySelector('#fuck-chart'),
-        gainedlineChartoptions
+      var customerGainedChart = new ApexCharts(
+        document.querySelector('#customer-gained-chart'),
+        customerGainedChartOptions
       );
 
-      gainedlineChart.render();
+
+      customerGainedChart.render();
+      revenueGeneratedChart.render();
+      soldItemsChart.render();
+      orderReceivedChart.render();
+
 
 });
-";
 
-$this->registerJs($js);
-?>
-<!-- <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script> -->
 
+
+</script>
 
 
 <!-- Dashboard Ecommerce Starts -->
@@ -136,12 +339,12 @@ $this->registerJs($js);
                         </div>
                     </div>
                     <h2 class="text-bold-700 mt-1">
-                        <?= $today_total_customers ?>
+                        <?= $customers_gained ?>
                     </h2>
                     <p class="mb-0">Customer Gained</p>
                 </div>
                 <div class="card-content">
-                    <div id="fuck-chart"></div>
+                    <div id="customer-gained-chart"></div>
                 </div>
             </div>
         </div>
@@ -154,13 +357,13 @@ $this->registerJs($js);
                         </div>
                     </div>
                     <h2 class="text-bold-700 mt-1">
-                        <?= $today_total_revenue ? Yii::$app->formatter->asCurrency($today_total_revenue, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) : 0 ?>
+                        <?= $revenue_generated ? Yii::$app->formatter->asCurrency($revenue_generated, 'KWD', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) : 0 ?>
 
                     </h2>
                     <p class="mb-0">Revenue Generated</p>
                 </div>
                 <div class="card-content">
-                    <div id="line-area-chart-2"></div>
+                    <div id="revenue-generated-chart"></div>
                 </div>
             </div>
         </div>
@@ -173,12 +376,12 @@ $this->registerJs($js);
                         </div>
                     </div>
                     <h2 class="text-bold-700 mt-1">
-                        <?= $today_sold_item ?>
+                        <?= $sold_item ?>
                     </h2>
                     <p class="mb-0">Sold Items</p>
                 </div>
                 <div class="card-content">
-                    <div id="line-area-chart-3"></div>
+                    <div id="sold-item-chart"></div>
                 </div>
             </div>
         </div>
@@ -191,12 +394,12 @@ $this->registerJs($js);
                         </div>
                     </div>
                     <h2 class="text-bold-700 mt-1">
-                        <?= $today_new_orders ?>
+                        <?= $orders_received ?>
                     </h2>
                     <p class="mb-0">Orders Received</p>
                 </div>
                 <div class="card-content">
-                    <div id="line-area-chart-4"></div>
+                    <div id="orders-recevied-chart"></div>
                 </div>
             </div>
         </div>
@@ -227,7 +430,7 @@ $this->registerJs($js);
                                     <tbody>
 
                                         <?php
-                                        foreach ($orders as $order) {
+                                        foreach ($incoming_orders as $order) {
                                             ?>
                                             <tr>
                                                 <td>

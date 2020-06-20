@@ -65,10 +65,13 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                     </span>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right">
-                                  <a class="dropdown-item" href="page-user-profile.html">
-                                    <i class="feather icon-user"></i>
-                                    Edit Profile
-                                  </a>
+
+
+                                  <?= Html::a(
+                                              '<i class="feather icon-user"></i> Edit Profile',
+                                               ['agent/index', 'restaurantUuid' => $this->params['restaurant_uuid']],['class' => 'dropdown-item']) ?>
+
+
 
                                     <div class="dropdown-divider">
                                     </div>
@@ -80,7 +83,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                                'method' => 'post',
                                            ]
                                        ])
-                                       ?>
+                                    ?>
 
 
                                 </div>
