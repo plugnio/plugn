@@ -17,7 +17,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 
-
 <section id="data-list-view" class="data-list-view-header">
 
 <!-- Data list view starts -->

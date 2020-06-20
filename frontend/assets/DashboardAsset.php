@@ -83,8 +83,18 @@ class DashboardAsset extends AssetBundle {
 
                   'js/scripts.js',
 
-          'js/fileinput.js'
+          'js/fileinput.js',
 
+
+           //
+           // 'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/vendors/js/vendors.min.js?id=0eef70ca571453be304a',
+           // 'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/vendors/js/ui/prism.min.js?id=fde910813cf7141eae50',
+           // 'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/vendors/js/charts/apexcharts.min.js?id=bbb1adadc937c1636f35',
+           // 'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/js/core/app-menu.js?id=d7158b834aaadf39f5a8',
+           // 'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/js/core/app.js?id=56696624259ddf3129cc',
+           // 'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/js/scripts/components.js?id=2ab188ae0fa7b622cdb1',
+           // 'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/js/scripts/customizer.js?id=bd6e1f733770a42402a7',
+           // 'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/js/scripts/footer.js?id=b382ec364916c35eff84',
 
     ];
 
