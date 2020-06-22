@@ -40,6 +40,12 @@ class OrderController extends Controller {
             ],
         ];
 
+
+        // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
+        $behaviors['authenticator'] = [
+            'class' => \yii\filters\auth\HttpBearerAuth::className(),
+        ];
+
         return $behaviors;
     }
 
