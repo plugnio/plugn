@@ -12,16 +12,26 @@ class LoginAsset extends AssetBundle {
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
-        'plugins/fontawesome-free/css/all.min.css',
-        'https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css',
-        'plugins/icheck-bootstrap/icheck-bootstrap.min.css',
-        'dist/css/adminlte.min.css',
-        'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700'
+
+  'https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600',
+  'app-assets/vendors/css/vendors.min.css',
+  'app-assets/css/bootstrap.css',
+  'app-assets/css/bootstrap-extended.css',
+  'app-assets/css/colors.css',
+  'app-assets/css/components.css',
+  'app-assets/css/themes/dark-layout.css',
+  'app-assets/css/themes/semi-dark-layout.css',
+  'app-assets/css/core/menu/menu-types/vertical-menu.css',
+  'app-assets/css/core/colors/palette-gradient.css',
+  'app-assets/css/pages/authentication.css',
+  'assets/css/style.css',
+
     ];
     public $js = [
-        'plugins/jquery/jquery.min.js',
-        'plugins/bootstrap/js/bootstrap.bundle.min.js',
-        'dist/js/adminlte.min.js',
+      'app-assets/vendors/js/vendors.min.js',
+      'app-assets/js/core/app-menu.js',
+      'app-assets/js/core/app.js',
+      'app-assets/js/scripts/components.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',

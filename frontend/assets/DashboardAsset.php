@@ -81,8 +81,8 @@ class DashboardAsset extends AssetBundle {
 
 
 
-      'plugins/daterangepicker/daterangepicker.js',
-      'plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js',
+      'js/daterangepicker/daterangepicker.js',
+      'js/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js',
 
 
 

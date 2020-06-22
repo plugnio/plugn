@@ -20,63 +20,65 @@ $this->registerJs($js);
 ?>
 
 
+<section id="data-list-view" class="data-list-view-header">
 
-<div class="restaurant-branch-index">
+<!-- Data list view starts -->
+<div class="action-btns d-none">
+    <div class="btn-dropdown mr-1 mb-1">
+        <div class="btn-group dropdown actions-dropodown">
+          <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-outline-primary']) ?>
+        </div>
+    </div>
+</div>
 
-    <?php if ($dataProvider->totalCount > 0) { ?>
-        <p>
-            <?= Html::a('Create Store Branch', ['create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']) ?>
-        </p>
-    <?php } ?>
 
-    <div class="card">
 
-            <div class="box-body table-responsive no-padding">
+
+    <!-- DataTable starts -->
+    <div class="table-responsive">
 
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
-            'showOnEmpty' => false,
-            'emptyText' => '<div style="padding: 70px 0; text-align: center;">'
-            . '  <h4>You currently do not have Branches set.</h4>'
-            . Html::a('Create Store Branch', ['create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success'])
-            . '</div>',
             'columns' => [
-                'branch_name_en',
-                'branch_name_ar',
-                [
-                    'class' => 'yii\grid\ActionColumn',
-                    'template' => ' {update} {delete}',
-                    'buttons' => [
-                        'update' => function ($url, $model) {
-                            return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['view', 'id' => $model->restaurant_branch_id, 'restaurantUuid' => $model->restaurant_uuid], [
-                                        'title' => 'Update',
-                                        'data-pjax' => '0',
-                                            ]
-                            );
-                        },
-                        'delete' => function ($url, $model) {
-                            return Html::a(
-                                            '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete', 'id' => $model->restaurant_branch_id, 'restaurantUuid' => $model->restaurant_uuid], [
-                                        'title' => 'Delete',
-                                        'data' => [
-                                            'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',
-                                            'method' => 'post',
-                                        ],
-                            ]);
-                        },
-                    ],
-                ],
+              ['class' => 'yii\grid\SerialColumn'],
+              'branch_name_en',
+              'branch_name_ar',
+              [
+                'header' => 'Action',
+
+                  'class' => 'yii\grid\ActionColumn',
+                  'template' => ' {update} {delete}',
+                  'buttons' => [
+                      'update' => function ($url, $model) {
+                          return Html::a(
+                                          '<span style="margin-right: 20px;" class="nav-icon fa fa-edit"></span>', ['view', 'id' => $model->restaurant_branch_id, 'restaurantUuid' => $model->restaurant_uuid], [
+                                      'title' => 'Update',
+                                      'data-pjax' => '0',
+                                          ]
+                          );
+                      },
+                      'delete' => function ($url, $model) {
+                          return Html::a(
+                                          '<span style="margin-right: 20px;color: red;" class="nav-icon fa fa-trash"></span>', ['delete', 'id' => $model->restaurant_branch_id, 'restaurantUuid' => $model->restaurant_uuid], [
+                                      'title' => 'Delete',
+                                      'data' => [
+                                          'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',
+                                          'method' => 'post',
+                                      ],
+                          ]);
+                      },
+                  ],
+              ],
+
             ],
-            'layout' => '{summary}<div class="card-body"><div class="box-body table-responsive no-padding">{items}<div class="card-footer clearfix">{pager}</div></div>',
-            'tableOptions' => ['class' => 'table table-bordered  table-hover'],
-            'summaryOptions' => ['class' => "card-header"],
+            'layout' => '{summary}{items}{pager}',
+            'tableOptions' => ['class' => 'table data-list-view'],
         ]);
         ?>
 
-
     </div>
-    </div>
+    <!-- DataTable ends -->
 
-</div>
+  </section>
+<!-- Data list view end -->

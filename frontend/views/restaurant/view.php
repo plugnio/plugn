@@ -121,8 +121,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                             'visible' => $model->armada_api_key != null,
                         ],
-                        'restaurant_created_at',
-                        'restaurant_updated_at',
                     ],
                     'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
                 ])

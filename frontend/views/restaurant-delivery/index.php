@@ -29,6 +29,7 @@ $(function () {
 
 if ($dataProvider) {
     ?>
+
     <p>
         <?= Html::a('Edit Delivery Zones', ['update', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']) ?>
     </p>
@@ -37,36 +38,33 @@ if ($dataProvider) {
     foreach ($dataProvider as $city) {
         if ($city->restaurantDeliveryAreas) {
             ?>
-            <div>
-                <div class="card card-default">
+            <div class="col-12">
+                <div class="card">
                     <div class="card-header">
-                        <h1 class="card-title" style="font-size: 25px; font-weight: 500"><?= $city->city_name ?></h1>
-
-
-                        <div class="card-tools">
-                            <?php
-                            echo Html::a(
-                                    '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['restaurant-delivery/update-delivery-time-for-city', 'city_id' => $city->city_id, 'restaurantUuid' => $restaurantUuid]
-                            );
-                            ?>
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                            <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-remove"></i></button>
-
+                        <h4 class="card-title"><?= $city->city_name ?></h4>
+                        <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
+                        <div class="heading-elements">
+                            <ul class="list-inline mb-0">
+                                <li><a data-action="collapse"><i class="feather icon-chevron-down"></i></a></li>
+                                <li><a data-action="expand"><i class="feather icon-maximize"></i></a></li>
+                            </ul>
+                          </div>
                         </div>
-                    </div>
-                    <div class="card-body">
 
-                        <div class="box-body table-responsive no-padding">
 
-                            <table class="table table-hover text-nowrap">
-                                <thead>
-                                    <tr>
+                        <div class="card-content collapse show">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
                                         <th>Area</th>
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
+                                        <th>Delivery Time</th>
+                                        <th>Delivery fee</th>
+                                        <th>Min Charge</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -86,14 +84,11 @@ if ($dataProvider) {
                                             <td>
                                                 <?= $form->field($restaurantDeliveryArea, 'min_charge')->input('float') ?></td>
 
-                                            <td class="project-actions text-right" style="padding-top: 43px">
-                                                <?=
-                                                Html::submitButton('<i class="fas fa-folder"> </i> Save', ['class' => 'btn btn-success btn-sm', 'name' => $restaurantDeliveryArea->area->area_id])
-                                                ?>
-
+                                            <td class="project-actions text-right">
+                                              <div style="margin-right: auto; margin-left: auto; display: flex;">
 
                                                 <?=
-                                                Html::a('<i class="fas fa-trash"></i> Delete', ['delete', 'area_id' => $restaurantDeliveryArea->area->area_id, 'restaurantUuid' => $restaurantDeliveryArea->restaurant_uuid], ['class' => 'btn btn-danger btn-sm',
+                                                Html::a('<i class="fa fa-trash"></i> ', ['delete', 'area_id' => $restaurantDeliveryArea->area->area_id, 'restaurantUuid' => $restaurantDeliveryArea->restaurant_uuid], ['class' => 'btn btn-danger ',
                                                     'data' => [
                                                         'method' => 'post',
                                                     ]
@@ -101,6 +96,12 @@ if ($dataProvider) {
                                                 ?>
 
 
+                                                <?=
+                                                Html::submitButton('<i class="feather icon-save"> </i> ', ['style' => 'margin-left: 20px;','class' => 'btn btn-success', 'name' => $restaurantDeliveryArea->area->area_id])
+                                                ?>
+
+
+                                              </div>
                                             </td>
 
                                         </tr>
@@ -111,12 +112,15 @@ if ($dataProvider) {
                                     ?>
 
                                     <?php ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                                  </tbody>
+                              </table>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
 
             <?php
         }

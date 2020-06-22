@@ -22,15 +22,34 @@ LoginAsset::register($this);
         <title><?= Html::encode($this->title) ?></title>
         <?php $this->head() ?>
     </head>
-    <body class="hold-transition login-page">
-        <?php $this->beginBody() ?>
-        <div class="wrap">
-            <div class="container">
-                <?= $content ?> 
+
+
+
+    <!-- END: Head-->
+
+    <!-- BEGIN: Body-->
+
+    <body class="vertical-layout vertical-menu-modern 1-column  navbar-floating footer-static bg-full-screen-image  blank-page blank-page" data-open="click" data-menu="vertical-menu-modern" data-col="1-column">
+
+      <?php $this->beginBody() ?>
+
+        <!-- BEGIN: Content-->
+        <div class="app-content content">
+            <div class="content-overlay"></div>
+            <div class="header-navbar-shadow"></div>
+            <div class="content-wrapper">
+                <div class="content-header row">
+                </div>
+                <div class="content-body">
+                  <?= $content ?>
+                </div>
             </div>
         </div>
-
+        <!-- END: Content-->
         <?php $this->endBody() ?>
+
     </body>
+    <!-- END: Body-->
+
 </html>
 <?php $this->endPage() ?>
