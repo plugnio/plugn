@@ -28,7 +28,7 @@ $(function () {
 
 
 if ($dataProvider) {
-    ?> 
+    ?>
     <p>
         <?= Html::a('Edit Delivery Zones', ['update', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']) ?>
     </p>

@@ -8,7 +8,7 @@ use common\models\AgentAssignment;
 /* @var $this yii\web\View */
 
 $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
-
+$this->title = $restaurant_model->name;
 
 // $js = "
 // let today = $('#today');
@@ -41,7 +41,6 @@ $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
 // ";
 //
 
- $data = [1];
 
 ?>
 

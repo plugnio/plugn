@@ -125,7 +125,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                 <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
 
 
-                    <li class=" nav-item ">
+                    <li class=" nav-item <?= $this->context->route == 'site/vendor-dashboard' ? 'active' : '' ?> ">
 
                         <?=
                         Html::a(
@@ -136,9 +136,13 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                     </li>
 
 
-                    <li class=" nav-item"><a><i class="feather icon-shopping-cart"></i><span class="menu-title">Orders</span></a>
+                    <li class=" nav-item">
+                        <a>
+                            <i class="feather icon-shopping-cart"></i>
+                            <span class="menu-title">Orders</span>
+                        </a>
                         <ul class="menu-content">
-                            <li>
+                            <li  <?= $this->context->route == 'order/index' ? 'class="active"' : '' ?>>
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
@@ -146,7 +150,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 )
                                 ?>
                             </li>
-                            <li>
+                            <li  <?= $this->context->route == 'order/draft' ? 'class="active"' : '' ?>>
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
@@ -154,7 +158,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 )
                                 ?>
                             </li>
-                            <li>
+                            <li  <?= $this->context->route == 'order/abandoned-checkout' ? 'class="active"' : '' ?>>
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
@@ -165,7 +169,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         </ul>
                     </li>
 
-                    <li class=" nav-item">
+                    <li class=" nav-item <?= $this->context->route == 'category/index' ? 'active' : '' ?> ">
 
                         <?=
                         Html::a(
@@ -175,7 +179,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         ?>
                     </li>
 
-                    <li class=" nav-item">
+                    <li class=" nav-item <?= $this->context->route == 'item/index' ? 'active' : '' ?> ">
 
                         <?=
                         Html::a(
@@ -184,7 +188,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         )
                         ?>
                     </li>
-                    <li class=" nav-item">
+                    <li class=" nav-item <?= $this->context->route == 'customer/index' ? 'active' : '' ?> ">
 
                         <?=
                         Html::a(
@@ -193,7 +197,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         )
                         ?>
                     </li>
-                    <li class=" nav-item">
+                    <li class=" nav-item <?= $this->context->route == 'restaurant/analytic' ? 'active' : '' ?> ">
 
                         <?=
                         Html::a(
@@ -202,8 +206,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         )
                         ?>
                     </li>
-                    <li class=" nav-item">
-
+                    <li class=" nav-item <?= $this->context->route == 'restaurant/index' ? 'active' : '' ?> ">
 
                         <?=
                         Html::a(
@@ -214,7 +217,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                     </li>
 
                     <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
-                        <li class=" nav-item">
+                    <li class=" nav-item <?= $this->context->route == 'restaurant-theme/index' ? 'active' : '' ?> ">
 
                             <?=
                             Html::a(
@@ -225,16 +228,16 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         </li>
                     <?php } ?>
 
-                    <li class=" nav-item">
+                    <li class=" nav-item <?= $this->context->route == 'restaurant-delivery/index' ? 'active' : '' ?> ">
 
                         <?=
                         Html::a(
                                 Html::tag('i', '', ['class' => 'fa fa-truck']) .
-                                Html::tag('span', 'Delivery Zone'), ['restaurant/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                Html::tag('span', 'Delivery Zone'), ['restaurant-delivery/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                         )
                         ?>
                     </li>
-                    <li class=" nav-item">
+                    <li class=" nav-item <?= $this->context->route == 'restaurant-branch/index' ? 'active' : '' ?> ">
 
                         <?=
                         Html::a(
@@ -244,7 +247,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         ?>
                     </li>
                     <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
-                        <li class=" nav-item">
+                    <li class=" nav-item <?= $this->context->route == 'agent-assignment/index' ? 'active' : '' ?> ">
 
                             <?=
                             Html::a(

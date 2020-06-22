@@ -18,6 +18,9 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= Html::a('Update', ['update', 'restaurantUuid' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
 </p>
 <div class="card">
+
+
+
     <div class="card-body">
         <?=
         DetailView::widget([
@@ -27,10 +30,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     'attribute' => 'primary',
                     'value' => function ($data) {
                         return '
-                                <span>' . $data->primary . '</span>
-                                    <span class="input-group-text" style="float: right; display: flex; border: 1px solid #ced4da; border-radius: .25rem;padding: 0;width:50px">
-                                            <span style="width:100px;height:20px;background:' . $data->primary . ';"></span>
-                                        </span>
+                                        <div style="float:right; background:' . $data->primary . ';" class="text-center colors-container rounded text-white width-100 height-100 d-flex align-items-center justify-content-center mr-1 ml-50 my-1 shadow">
+                                            <span class="align-middle">primary</span>
+                                        </div>
                                 ';
                     },
                     'format' => 'html'
@@ -39,10 +41,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     'attribute' => 'secondary',
                     'value' => function ($data) {
                         return '
-                                <span>' . $data->secondary . '</span>
-                                    <span class="input-group-text" style="float: right; display: flex; border: 1px solid #ced4da; border-radius: .25rem;padding: 0;width:50px">
-                                            <span style="width:100px;height:20px;background:' . $data->secondary . ';"></span>
-                                        </span>
+                                        <div style="float:right; background:' . $data->secondary . ';" class="text-center colors-container rounded text-white width-100 height-100 d-flex align-items-center justify-content-center mr-1 ml-50 my-1 shadow">
+                                            <span class="align-middle">secondary</span>
+                                        </div>
                                 ';
                     },
                     'format' => 'html'
@@ -51,10 +52,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     'attribute' => 'tertiary',
                     'value' => function ($data) {
                         return '
-                                <span>' . $data->tertiary . '</span>
-                                    <span class="input-group-text" style="float: right; display: flex; border: 1px solid #ced4da; border-radius: .25rem;padding: 0;width:50px">
-                                            <span style="width:100px;height:20px;background:' . $data->tertiary . ';"></span>
-                                        </span>
+                                <div style="float:right; background:' . $data->tertiary . ';" class="text-center colors-container rounded text-white width-100 height-100 d-flex align-items-center justify-content-center mr-1 ml-50 my-1 shadow">
+                                    <span class="align-middle">tertiary</span>
+                                </div>
                                 ';
                     },
                     'format' => 'html'
@@ -63,10 +63,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     'attribute' => 'medium',
                     'value' => function ($data) {
                         return '
-                                <span>' . $data->medium . '</span>
-                                    <span class="input-group-text" style="float: right; display: flex; border: 1px solid #ced4da; border-radius: .25rem;padding: 0;width:50px">
-                                            <span style="width:100px;height:20px;background:' . $data->medium . ';"></span>
-                                        </span>
+                        <div style="float:right; background:' . $data->medium . ';" class="text-center colors-container rounded text-white width-100 height-100 d-flex align-items-center justify-content-center mr-1 ml-50 my-1 shadow">
+                            <span class="align-middle">medium</span>
+                        </div>
                                 ';
                     },
                     'format' => 'html'
@@ -75,10 +74,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     'attribute' => 'dark',
                     'value' => function ($data) {
                         return '
-                                <span>' . $data->dark . '</span>
-                                    <span class="input-group-text" style="float: right; display: flex; border: 1px solid #ced4da; border-radius: .25rem;padding: 0;width:50px">
-                                            <span style="width:100px;height:20px;background:' . $data->dark . ';"></span>
-                                        </span>
+                            <div style="float:right; background:' . $data->dark . ';" class="text-center colors-container rounded text-white width-100 height-100 d-flex align-items-center justify-content-center mr-1 ml-50 my-1 shadow">
+                                <span class="align-middle">dark</span>
+                            </div>
                                 ';
                     },
                     'format' => 'html'

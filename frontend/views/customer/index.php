@@ -11,65 +11,69 @@ $this->params['restaurant_uuid'] = $restaurantUuid;
 
 $this->title = 'Customers';
 $this->params['breadcrumbs'][] = $this->title;
+
+$js = "
+$(function () {
+  $('.summary').insertAfter('.top');
+});
+";
+
+
+$this->registerJs($js);
+
+
 ?>
 
-<div class="card">
 
-    <?=
-    GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'pager' => [
-            'options' => [
-                'class' => 'pagination pagination-sm m-0 float-right',
-            ],
-            'linkOptions' => ['class' => 'page-link'],
-            'activePageCssClass' => 'page-item active',
-            'disabledPageCssClass' => 'page-item  disabled',
-            'prevPageCssClass' => 'page-item prev',
-            'nextPageCssClass' => 'page-item next',
-            
-            'disabledListItemSubTagOptions' => [
-                'tag' => 'span',
-                'class' => 'page-link',
-            ],
+<section id="data-list-view" class="data-list-view-header">
 
-        ],
-        'columns' => [
-            'customer_name',
-            'customer_phone_number',
-            'customer_email:email',
-            'customer_created_at:datetime',
-            [
-                'class' => 'yii\grid\ActionColumn',
-                'template' => ' {view} {update} {delete}',
-                'buttons' => [
-                    'view' => function ($url, $model) {
-                        return Html::a(
-                                        '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['view', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
-                                    'title' => 'View',
-                                    'data-pjax' => '0',
-                                        ]
-                        );
-                    },
-                    'delete' => function ($url, $model) {
-                        return Html::a(
-                                        '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
-                                    'title' => 'Delete',
-                                    'data' => [
-                                        'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',
-                                        'method' => 'post',
-                                    ],
-                        ]);
-                    },
-                ],
-            ],
-        ],
-        'layout' => '{summary}<div class="card-body"><div class="box-body table-responsive no-padding">{items}<div class="card-footer clearfix">{pager}</div></div></div>',
-        'tableOptions' => ['class' => 'table table-bordered table-hover'],
-        'summaryOptions' => ['class' => "card-header"],
-    ]);
-    ?>
+<!-- Data list view starts -->
 
+    <!-- DataTable starts -->
+    <div class="table-responsive">
 
-</div>
+        <?=
+        GridView::widget([
+            'dataProvider' => $dataProvider,
+              'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
+                  'customer_name',
+                  'customer_phone_number',
+                  'customer_email:email',
+                  'customer_created_at:datetime',
+                  [
+                      'header' => 'Actions',
+                      'class' => 'yii\grid\ActionColumn',
+                      'template' => ' {view} {update} {delete}',
+                      'buttons' => [
+                          'view' => function ($url, $model) {
+                              return Html::a(
+                                              '<span style="margin-right: 20px;" class="feather icon-eye"></span>', ['view', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
+                                          'title' => 'View',
+                                          'data-pjax' => '0',
+                                              ]
+                              );
+                          },
+                          'delete' => function ($url, $model) {
+                              return Html::a(
+                                              '<span style="margin-right: 20px;color: red;" class="feather icon-trash"></span>', ['delete', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
+                                          'title' => 'Delete',
+                                          'data' => [
+                                              'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',
+                                              'method' => 'post',
+                                          ],
+                              ]);
+                          },
+                      ],
+                  ],
+              ],
+            'layout' => '{summary}{items}{pager}',
+            'tableOptions' => ['class' => 'table data-list-view'],
+        ]);
+        ?>
+
+    </div>
+    <!-- DataTable ends -->
+
+  </section>
+<!-- Data list view end -->

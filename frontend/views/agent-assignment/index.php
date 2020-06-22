@@ -11,6 +11,15 @@ $this->params['restaurant_uuid'] = $restaurant_uuid;
 
 $this->title = 'Assigned Agents';
 $this->params['breadcrumbs'][] = $this->title;
+
+
+$js = "
+$(function () {
+  $('.summary').insertAfter('.top');
+});
+";
+$this->registerJs($js);
+
 ?>
 <div class="agent-assignment-index">
 

@@ -12,6 +12,13 @@ $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
 
 $this->title = 'Drafts';
 $this->params['breadcrumbs'][] = $this->title;
+$js = "
+$(function () {
+  $('.summary').insertAfter('.top');
+});
+";
+$this->registerJs($js);
+
 ?>
 
 <section id="data-list-view" class="data-list-view-header">

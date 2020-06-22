@@ -35,7 +35,7 @@ use yii\widgets\ActiveForm;
 
                         <?php
                         $form = ActiveForm::begin([
-                            'action' => ['index'],
+                            'action' => ['category/index', 'restaurantUuid' => $restaurant_uuid],
                             'method' => 'get',
                         ]);
                         ?>

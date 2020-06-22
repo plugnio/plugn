@@ -13,6 +13,12 @@ $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
 $this->title = 'Orders';
 $this->params['breadcrumbs'][] = $this->title;
 
+$js = "
+$(function () {
+  $('.summary').insertAfter('.top');
+});
+";
+$this->registerJs($js);
 
 ?>
 
@@ -58,6 +64,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         return $data->customer_id ? true : false;
                     },
                 ],
+                'customer_phone_number',
                 [
                     'attribute' => 'order_status',
                     "format" => "raw",
@@ -65,14 +72,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         if ($model->order_status == Order::STATUS_PENDING){
                           return   '<div class="chip chip-warning mr-1">
                                       <div class="chip-body">
-                                          <span class="chip-text">' . $model->orderStatus . '</span>
+                                          <span style="white-space: pre;" class="chip-text">' . $model->orderStatus . '</span>
                                       </div>
                                   </div>';
                         }
                         else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY){
                           return   '<div class="chip chip-info mr-1">
                                       <div class="chip-body">
-                                          <span class="chip-text">' . $model->orderStatus . '</span>
+                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatus . '</span>
                                       </div>
                                   </div>';
                         }
@@ -80,7 +87,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         else if ($model->order_status == Order::STATUS_BEING_PREPARED){
                           return   '<div class="chip chip-primary mr-1">
                                       <div class="chip-body">
-                                          <span class="chip-text">' . $model->orderStatus . '</span>
+                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatus . '</span>
                                       </div>
                                   </div>';
                         }
@@ -88,7 +95,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         else if ($model->order_status == Order::STATUS_COMPLETE){
                           return   '<div class="chip chip-success mr-1">
                                       <div class="chip-body">
-                                          <span class="chip-text">' . $model->orderStatus . '</span>
+                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatus . '</span>
                                       </div>
                                   </div>';
                         }
@@ -96,7 +103,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         else if ($model->order_status == Order::STATUS_CANCELED){
                           return   '<div class="chip chip-danger mr-1">
                                       <div class="chip-body">
-                                          <span class="chip-text">' . $model->orderStatus . '</span>
+                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatus . '</span>
                                       </div>
                                     </div>';
                         }
@@ -104,7 +111,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         else if ($model->order_status == Order::STATUS_PARTIALLY_REFUNDED){
                           return   '<div class="chip chip-danger mr-1">
                                       <div class="chip-body">
-                                          <span class="chip-text">' . $model->orderStatus . '</span>
+                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatus . '</span>
                                       </div>
                                    </div>';
                         }
@@ -112,7 +119,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         else if ($model->order_status == Order::STATUS_REFUNDED){
                           return   '<div class="chip chip-danger mr-1">
                                       <div class="chip-body">
-                                          <span class="chip-text">' . $model->orderStatus . '</span>
+                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatus . '</span>
                                       </div>
                                    </div>';
                         }

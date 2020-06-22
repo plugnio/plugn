@@ -9,6 +9,14 @@ $this->params['restaurant_uuid'] = $restaurantUuid;
 
 $this->title = 'Store Branches';
 $this->params['breadcrumbs'][] = $this->title;
+
+$js = "
+$(function () {
+  $('.summary').insertAfter('.top');
+});
+";
+$this->registerJs($js);
+
 ?>
 
 
