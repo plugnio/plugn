@@ -105,10 +105,6 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
         }
     }
  
-
-
-  
-
     
     /**
      * Returns String value of current status
@@ -124,7 +120,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
                 break;
         }
 
-        return "Couldnt find a status";
+        return "Couldnt find a status"; 
     }
     /*
      * Start Identity Code
@@ -158,16 +154,21 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
         $token->save();
 
  
+        if ($token->agent && $token->agent->agent_status != self::STATUS_DELETED) {
+            return $token->agent;
+        }
+        
+        
         // invalid token 
-
+        
         $token->delete();
     }
 
     
     
      /**
-     * Create an Access Token Record for this employer
-     * if the employer already has one, it will return it instead
+     * Create an Access Token Record for this agent
+     * if the agent already has one, it will return it instead
      * @return \common\models\AgentToken
      */
     public function getAccessToken() {
@@ -247,7 +248,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      * @inheritdoc
      */
     public function getAuthKey() {
-        return $this->auth_key;
+        return $this->agent_auth_key;
     }
 
     /**
@@ -280,7 +281,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      * Generates "remember me" authentication key
      */
     public function generateAuthKey() {
-        $this->auth_key = strtoupper($this->generateUniqueRandomString('auth_key', 4));
+        $this->agent_auth_key = Yii::$app->security->generateRandomString();
     }
 
     /**

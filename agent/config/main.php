@@ -49,6 +49,7 @@ return [
                 ],
             ],
         ],
+        
         'urlManager' => [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => false,

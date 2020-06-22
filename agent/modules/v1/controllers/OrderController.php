@@ -40,12 +40,13 @@ class OrderController extends Controller {
             ],
         ];
 
-
         // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
         $behaviors['authenticator'] = [
             'class' => \yii\filters\auth\HttpBearerAuth::className(),
         ];
 
+        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+        $behaviors['authenticator']['except'] = ['options'];
         return $behaviors;
     }
 
@@ -71,16 +72,19 @@ class OrderController extends Controller {
      * @return boolean
      */
     public function actionGetLatestOrder() {
-        return [
-          [
-            'id' => 1,
-            'customer_name' => 'Saoud'
-          ],
-          [
-            'id' => 2,
-            'customer_name' => 'Saoud'
-          ]
-        ];
+        
+        
+      
+      $orders = Order::find()->where(['restaurant_uuid' => 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])->asArray()->all();
+
+      foreach ($orders as $key => $order) {
+          $orders[$key]['id'] = $order['order_uuid'];
+         unset($orders[$key]['order_uuid']);
+      }
+      
+      return $orders;
+
+              
     }
 
 }
