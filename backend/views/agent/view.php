@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\Agent */
+/* @var $model backend\models\Agent */
 
 $this->title = $model->agent_name;
 $this->params['breadcrumbs'][] = ['label' => 'Agents', 'url' => ['index']];

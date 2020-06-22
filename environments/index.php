@@ -40,6 +40,8 @@ return [
             'frontend/web/assets',
             'api/runtime',
             'api/web/assets',
+            'agent/runtime',
+            'agent/web/assets',
         ],
         'setExecutable' => [
             'yii',
@@ -51,6 +53,7 @@ return [
             'common/config/codeception-local.php',
             'frontend/config/main-local.php',
             'api/config/main-local.php',
+            'agent/config/main-local.php',
         ],
     ],
     'Development [Khalid]' => [
@@ -64,6 +67,8 @@ return [
             'frontend/web/assets',
             'api/runtime',
             'api/web/assets',
+            'agent/runtime',
+            'agent/web/assets',
         ],
         'setExecutable' => [
             'yii',
@@ -75,6 +80,8 @@ return [
             'common/config/codeception-local.php',
             'frontend/config/main-local.php',
             'api/config/main-local.php',
+            'agent/config/main-local.php',
+
         ],
     ],
     'Production' => [
@@ -88,6 +95,8 @@ return [
             'frontend/web/assets',
             'api/runtime',
             'api/web/assets',
+            'agent/runtime',
+            'agent/web/assets',
         ],
         'setExecutable' => [
             'yii',
@@ -96,6 +105,7 @@ return [
             'backend/config/main-local.php',
             'frontend/config/main-local.php',
             'api/config/main-local.php',
+            'agent/config/main-local.php',
         ],
     ],
 ];

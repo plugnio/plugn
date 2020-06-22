@@ -8,7 +8,7 @@ use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use common\models\Agent;
+use backend\models\Agent;
 
 /**
  * AgentAssignmentController implements the CRUD actions for AgentAssignment model.

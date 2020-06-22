@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use common\models\Agent;
+use frontend\models\Agent;
 use yii\helpers\ArrayHelper;
 use common\models\AgentAssignment;
 
