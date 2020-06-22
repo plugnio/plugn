@@ -72,8 +72,6 @@ $this->registerJs($js);
             <?= $form->field($modelItem, 'sort_number')->textInput(['type' => 'number']) ?>
 
             <?= $form->field($modelItem, 'stock_qty')->textInput(['type' => 'number']) ?>
-            
-            <?= $form->field($modelItem, 'unit_sold')->textInput(['type' => 'number']) ?>
 
         </div>
     </div>
