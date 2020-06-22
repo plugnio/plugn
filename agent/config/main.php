@@ -64,6 +64,16 @@ return [
                         'OPTIONS login' => 'options',
                     ]
                 ],
+                [// OrderController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/order',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET get-latest-order' => 'get-latest-order',
+                        // OPTIONS VERBS
+                        'OPTIONS get-latest-order' => 'options',
+                    ]
+                ],
             ],
         ],
     ],
