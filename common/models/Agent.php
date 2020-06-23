@@ -283,7 +283,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      * Generates "remember me" authentication key
      */
     public function generateAuthKey() {
-        $this->agent_auth_key = strtoupper($this->generateUniqueRandomString('auth_key', 4));
+      $this->agent_auth_key = Yii::$app->security->generateRandomString();
     }
 
     /**
