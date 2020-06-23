@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use common\models\Agent;
+use backend\models\Agent;
 use backend\models\Restaurant;
 use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;

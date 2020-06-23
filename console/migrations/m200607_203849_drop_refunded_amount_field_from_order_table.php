@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Handles the dropping of table `{{%refunded_amount_field_from_order}}`.
  */
-class m200607_203849_drop_refunded_amount_field_from_order_table extends Migration
+class m200607_203849_add_platform_fee_to_restaurant_table extends Migration
 {
 
     /**
