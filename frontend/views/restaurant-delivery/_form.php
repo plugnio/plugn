@@ -52,7 +52,7 @@ $this->registerJs($js);
 
     echo $form->field($model, 'restaurant_delivery_area_array')->dropDownList(
             $restaurantDeliveryArray, [
-        'class' => 'select2',
+        'class' => 'form-control select2',
         'multiple' => 'multiple',
         'value' => $sotredRestaurantDeliveryAreas
             ]

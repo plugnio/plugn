@@ -44,7 +44,9 @@
         "kartik-v/yii2-widget-rangeinput": "dev-master",
         "lubosdz/yii2-ui-range-plus-minus": "^1.1",
         "bizley/quill": "^3.1",
-        "twitf/yii2-dropzone": "*"
+        "twitf/yii2-dropzone": "*",
+        "perminder-klair/yii2-dropzone": "dev-master",
+        "kartik-v/yii2-editors": "@dev"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

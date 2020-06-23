@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
         Html::a('Delete', ['delete', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
             'class' => 'btn btn-danger',
             'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
+                'confirm' => 'Are you sure you want to delete this customer?',
                 'method' => 'post',
             ],
         ])
@@ -52,96 +52,94 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 
 
-    <h2>Order history</h2>
-    <div class="card">
 
-        <?=
-        GridView::widget([
-            'dataProvider' => $customersOrdersData,
-            'pager' => [
-                'options' => [
-                    'class' => 'pagination pagination-sm m-0 float-right',
-                ],
-                'linkOptions' => ['class' => 'page-link'],
-                'activePageCssClass' => 'page-item active',
-                'disabledPageCssClass' => 'page-item  disabled',
-                'prevPageCssClass' => 'page-item prev',
-                'nextPageCssClass' => 'page-item next',
-                'disabledListItemSubTagOptions' => [
-                    'tag' => 'span',
-                    'class' => 'page-link',
-                ],
-            ],
-            'columns' => [
-                [
-                    'attribute' => 'order_uuid',
-                    "format" => "raw",
-                    "value" => function($model) {
-                        return '#' . $model->order_uuid;
-                    }
-                ],
-                [
-                    'label' => 'Order Type',
-                    "format" => "raw",
-                    "value" => function($model) {
-                        if ($model->order_mode == Order::ORDER_MODE_DELIVERY)
-                            return 'Delivery';
-                        else
-                            return 'Pickup';
-                    }
-                ],
-                [
-                    'attribute' => 'order_status',
-                    'format' => "raw",
-                    'value' => function($model) {
-                        if ($model->order_status == Order::STATUS_PENDING)
-                            return '<span class="badge bg-warning" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY)
-                            return '<span class="badge bg-info" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_BEING_PREPARED)
-                            return '<span class="badge bg-primary" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_COMPLETE)
-                            return '<span class="badge bg-success" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_CANCELED)
-                            return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_PARTIALLY_REFUNDED)
-                            return '<span class="badge bg-warning" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_REFUNDED)
-                            return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
-                        else if ($model->order_status == Order::STATUS_ABANDONED_CHECKOUT)
-                            return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
-                    }
-                ],
-                'delivery_fee:currency',
-                'total_price:currency',
-                [
-                    'attribute' => 'order_created_at',
-                    "format" => "raw",
-                    "value" => function($model) {
-                        return Yii::$app->formatter->asRelativeTime($model->order_created_at);
-                    }
-                ],
-                [
-                    'class' => 'yii\grid\ActionColumn',
-                    'template' => ' {view} {update} {delete}',
-                    'controller' => 'order',
-                    'buttons' => [
-                        'view' => function ($url, $model) {
-                            return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
-                                        'title' => 'View',
-                                        'data-pjax' => '0',
-                                            ]
-                            );
-                        },
+        <section id="data-list-view" class="data-list-view-header">
+          <h2>Order history</h2>
+
+
+
+            <!-- DataTable starts -->
+            <div class="table-responsive">
+
+                <?=
+                GridView::widget([
+                    'dataProvider' => $customersOrdersData,
+                    'columns' => [
+                      ['class' => 'yii\grid\SerialColumn'],
+                      [
+                          'attribute' => 'order_uuid',
+                          "format" => "raw",
+                          "value" => function($model) {
+                              return '#' . $model->order_uuid;
+                          }
+                      ],
+                      [
+                          'label' => 'Order Type',
+                          "format" => "raw",
+                          "value" => function($model) {
+                              if ($model->order_mode == Order::ORDER_MODE_DELIVERY)
+                                  return 'Delivery';
+                              else
+                                  return 'Pickup';
+                          }
+                      ],
+                      [
+                          'attribute' => 'order_status',
+                          'format' => "raw",
+                          'value' => function($model) {
+                              if ($model->order_status == Order::STATUS_PENDING)
+                                  return '<span class="badge bg-warning" >' . $model->orderStatus . '</span>';
+                              else if ($model->order_status == Order::STATUS_DRAFT)
+                                  return '<span class="badge bg-info" >' . $model->orderStatus . '</span>';
+                              else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY)
+                                  return '<span class="badge bg-info" >' . $model->orderStatus . '</span>';
+                              else if ($model->order_status == Order::STATUS_BEING_PREPARED)
+                                  return '<span class="badge bg-primary" >' . $model->orderStatus . '</span>';
+                              else if ($model->order_status == Order::STATUS_COMPLETE)
+                                  return '<span class="badge bg-success" >' . $model->orderStatus . '</span>';
+                              else if ($model->order_status == Order::STATUS_CANCELED)
+                                  return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
+                              else if ($model->order_status == Order::STATUS_PARTIALLY_REFUNDED)
+                                  return '<span class="badge bg-warning" >' . $model->orderStatus . '</span>';
+                              else if ($model->order_status == Order::STATUS_REFUNDED)
+                                  return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
+                              else if ($model->order_status == Order::STATUS_ABANDONED_CHECKOUT)
+                                  return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
+                          }
+                      ],
+                      'delivery_fee:currency',
+                      'total_price:currency',
+                      [
+                          'attribute' => 'order_created_at',
+                          "format" => "raw",
+                          "value" => function($model) {
+                              return Yii::$app->formatter->asRelativeTime($model->order_created_at);
+                          }
+                      ],
+                        [
+                            'header' => 'Action',
+                            'class' => 'yii\grid\ActionColumn',
+                            'template' => ' {view} {update} {delete}',
+                            'controller' => 'order',
+                            'buttons' => [
+                                'view' => function ($url, $model) {
+                                  return Html::a(
+                                                  '<span style="margin-right: 20px;" class="nav-icon fa fa-eye"></span>', ['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
+                                              'title' => 'View',
+                                              'data-pjax' => '0',
+                                                  ]
+                                    );
+                                },
+                            ],
+                        ],
                     ],
-                ],
-            ],
-            'layout' => '{summary}<div class="card-body"><div class="box-body table-responsive no-padding">{items}<div class="card-footer clearfix">{pager}</div></div>',
-            'tableOptions' => ['class' => 'table  table-bordered table-hover'],
-            'summaryOptions' => ['class' => "card-header"],
-        ]);
-        ?>
+                    'layout' => '{summary}{items}{pager}',
+                    'tableOptions' => ['class' => 'table data-list-view'],
+                ]);
+                ?>
 
+            </div>
+            <!-- DataTable ends -->
 
-    </div>
+          </section>
+        <!-- Data list view end -->

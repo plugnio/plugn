@@ -32,9 +32,9 @@ class DashboardAsset extends AssetBundle {
       'assets/css/style.css',
       'https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600',
       'app-assets/css/plugins/file-uploaders/dropzone.css',
+      'app-assets/vendors/css/file-uploaders/dropzone.min.css',
       'app-assets/css/pages/data-list-view.css',
       'app-assets/vendors/css/tables/datatable/datatables.min.css',
-      'app-assets/vendors/css/file-uploaders/dropzone.min.css',
       'app-assets/vendors/css/tables/ag-grid/ag-grid.css',
       'app-assets/vendors/css/tables/ag-grid/ag-theme-material.css',
       'app-assets/css/pages/app-user.css',
@@ -50,9 +50,17 @@ class DashboardAsset extends AssetBundle {
 
 
 
+      'app-assets/vendors/css/vendors.min.css',
+      'app-assets/vendors/css/editors/quill/katex.min.css',
+      'app-assets/vendors/css/editors/quill/monokai-sublime.min.css',
+      'app-assets/vendors/css/editors/quill/quill.snow.css',
+      'app-assets/vendors/css/editors/quill/quill.bubble.css',
+
 
 
    'app-assets/vendors/css/charts/apexcharts.css',
+
+
 
 
     ];
@@ -87,7 +95,6 @@ class DashboardAsset extends AssetBundle {
 
 
           'app-assets/vendors/js/ui/prism.min.js',
-          'app-assets/js/scripts/extensions/dropzone.js',
 
                   'js/scripts.js',
 
@@ -98,6 +105,14 @@ class DashboardAsset extends AssetBundle {
 
             'app-assets/vendors/js/charts/apexcharts.min.js',
             'app-assets/js/scripts/charts/chart-apex.js',
+
+            'app-assets/vendors/js/editors/quill/katex.min.js',
+            'app-assets/vendors/js/editors/quill/highlight.min.js',
+            'app-assets/vendors/js/editors/quill/quill.min.js',
+            'app-assets/vendors/js/extensions/jquery.steps.min.js',
+            'app-assets/vendors/js/forms/validation/jquery.validate.min.js',
+            'app-assets/js/scripts/editors/editor-quill.js',
+
 
 
 

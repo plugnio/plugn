@@ -17,7 +17,10 @@ $js = "
 
     let orderModeInput = $('#orderModeInput');
     // On Change of project type input
+
+
     orderModeInput.change(function(){
+
         let selection = $(this).val();
         if(selection == 2){ // Pickup mode
             $('#customer-address').hide();
@@ -29,6 +32,7 @@ $js = "
     });
 
 ";
+$this->registerJs($js);
 
 ?>
 
@@ -61,7 +65,7 @@ $js = "
     ?>
 
 
-    <div id='customer-address' style='display:none; <?= $model->order_mode  != null && $model->order_mode == Order::ORDER_MODE_PICK_UP ? "display:none" : "display:block" ?>'>
+    <div id='customer-address' style='display:none; <?= $model->order_mode  != null && $model->order_mode == Order::ORDER_MODE_DELIVERY ? "display:block" : "" ?>'>
         <?= $form->field($model, 'area_id')->dropDownList($areaList, ['prompt' => 'Choose area name...', 'class' => 'form-control select2'])->label('Area'); ?>
 
         <?= $form->field($model, 'unit_type')->textInput(['maxlength' => true]) ?>
@@ -76,7 +80,7 @@ $js = "
     </div>
 
 
-    <div id='pickup-branch' style='<?= $model->order_mode != null && $model->order_mode == Order::ORDER_MODE_DELIVERY ? "display:none" : "" ?>'>
+    <div id='pickup-branch' style='display:none; <?= $model->order_mode != null && $model->order_mode == Order::ORDER_MODE_DELIVERY ? "display:none" : "" ?>'>
         <?= $form->field($model, 'restaurant_branch_id')->dropDownList($restaurantBrnachesArray, ['prompt' => 'Choose branch...', 'class' => 'select2'])->label('Pickup from'); ?>
     </div>
 

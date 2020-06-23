@@ -13,6 +13,15 @@ $this->params['breadcrumbs'][] = ['label' => 'Order #' . $model->order_uuid, 'ur
 $this->params['breadcrumbs'][] = ['label' => 'Update', 'url' => ['order/update','id' => $model->order_uuid, 'restaurantUuid' =>$model->restaurant->restaurant_uuid ]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
+
+
+
+$js = "
+$(function () {
+  $('.summary').insertAfter('.top');
+});
+";
+$this->registerJs($js);
 ?>
 
 
@@ -57,48 +66,62 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 
-     <h2>Extra Options</h2>
-    <p>
-        <?= Html::a('Add Extra option', ['order-item-extra-option/create', 'id' => $model->order_item_id, 'restaurantUuid' =>$model->restaurant->restaurant_uuid], ['class' => 'btn btn-success','style'=>'    margin: 10px 10px 10px 0px;']) ?>
-    </p>
-    <div class="card">
 
 
+         <section id="data-list-view" class="data-list-view-header">
 
-        <?=
-        GridView::widget([
-            'dataProvider' => $orderItemsExtraOpiton,
-            'columns' => [
-                'extra_option_name',
-                'extra_option_name_ar',
-                'extra_option_price:currency',
-                [
-                    'class' => 'yii\grid\ActionColumn',
-                    'controller' => 'option',
-                    'template' => ' {view} {update} {delete}',
-                    'buttons' => [
-                        'delete' => function ($url, $model) {
-                            return Html::a(
-                                '<span style="margin-right: 20px; color: red;" class="nav-icon fas fa-trash"></span>',
-                                ['order-item-extra-option/delete', 'id' => $model->order_item_extra_option_id ,'restaurantUuid' =>$model->restaurant->restaurant_uuid],
-                                [
-                                        'title' => 'Delete',
-                                        'data' => [
-                                            'confirm' => 'Are you absolutely sure ? You will lose all the information about this option with this action.',
-                                            'method' => 'post',
-                                        ],
-                            ]
-                            );
-                        },
-                    ],
-                ],
-            ],
-            'layout' => '{summary}<div class="card-body">{items}{pager}</div>',
-            'tableOptions' => ['class' => 'table table-bordered table-hover'],
-            'summaryOptions' => ['class' => "card-header"],
-        ]);
-        ?>
+           <h2>Extra Options</h2>
 
-    </div>
 
-</div>
+         <!-- Data list view starts -->
+         <div class="action-btns">
+             <div class="btn-dropdown mr-1 mb-1">
+                 <div class="btn-group dropdown actions-dropodown">
+                   <?= Html::a('<i class="feather icon-plus"></i> Add New', ['order-item-extra-option/create', 'id' => $model->order_item_id, 'restaurantUuid' =>$model->restaurant->restaurant_uuid], ['class' => 'btn btn-outline-primary']) ?>
+                 </div>
+             </div>
+         </div>
+
+
+             <!-- DataTable starts -->
+             <div class="table-responsive">
+
+                 <?=
+                 GridView::widget([
+                     'dataProvider' => $orderItemsExtraOpiton,
+                     'columns' => [
+                       ['class' => 'yii\grid\SerialColumn'],
+                       'extra_option_name',
+                       'extra_option_name_ar',
+                       'extra_option_price:currency',
+                       [
+                           'class' => 'yii\grid\ActionColumn',
+                           'controller' => 'option',
+                           'template' => ' {view} {update} {delete}',
+                           'buttons' => [
+                               'delete' => function ($url, $model) {
+                                   return Html::a(
+                                       '<span style="margin-right: 20px; color: red;" class="nav-icon fa fa-trash"></span>',
+                                       ['order-item-extra-option/delete', 'id' => $model->order_item_extra_option_id ,'restaurantUuid' =>$model->restaurant->restaurant_uuid],
+                                       [
+                                               'title' => 'Delete',
+                                               'data' => [
+                                                   'confirm' => 'Are you absolutely sure ? You will lose all the information about this option with this action.',
+                                                   'method' => 'post',
+                                               ],
+                                   ]
+                                   );
+                               },
+                           ],
+                       ],
+                     ],
+                     'layout' => '{summary}{items}{pager}',
+                     'tableOptions' => ['class' => 'table data-list-view'],
+                 ]);
+                 ?>
+
+             </div>
+             <!-- DataTable ends -->
+
+           </section>
+         <!-- Data list view end -->

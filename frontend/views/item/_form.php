@@ -16,6 +16,16 @@ use \bizley\quill\Quill;
 /* @var $model common\models\Item */
 /* @var $form yii\widgets\ActiveForm */
 
+$js = "
+
+
+    $( '.ql-snow' ).css( 'border-radius', '0px' )
+
+
+";
+$this->registerJs($js);
+
+
 ?>
 
 

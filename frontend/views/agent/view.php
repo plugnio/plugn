@@ -13,30 +13,54 @@ $this->params['breadcrumbs'][] = ['label' => 'Agents', 'url' => ['index', 'resta
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
-<div class="agent-view">
 
-    <p>
-        <?= Html::a('Update', ['update', 'id' => $model->agent_id, 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-primary']) ?>
-    </p>
+        <!-- page users view start -->
+        <section class="page-users-view">
+            <div class="row">
+                <!-- account start -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Account</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="users-view-image">
+                                    <img src="img/avatar.jpg" class="users-avatar-shadow w-100 rounded mb-2 pr-2 ml-1" alt="avatar">
+                                </div>
+                                <div class="col-12 col-sm-9 col-md-6 col-lg-5">
+                                    <table>
+                                        <tr>
+                                            <td class="font-weight-bold">Name</td>
+                                            <td><?= $model->agent_name ?></td>
+                                        </tr>
 
-    <div class="card">
-        <div class="card-body">
-            <div class="box-body table-responsive no-padding">
-
-                <?=
-                DetailView::widget([
-                    'model' => $model,
-                    'attributes' => [
-                        'agent_name',
-                        'agent_email:email',
-                        'agent_created_at',
-                        'agent_updated_at',
-                    ],
-                    'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
-                ])
-                ?>
+                                        <tr>
+                                            <td class="font-weight-bold">Email</td>
+                                            <td><?= $model->agent_email ?></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-12 col-md-12 col-lg-5">
+                                    <table class="ml-0 ml-sm-0 ml-lg-0">
+                                        <tr>
+                                            <td class="font-weight-bold">Status</td>
+                                            <td>active</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-weight-bold">Email Notification</td>
+                                            <td><?= $model->email_notification ? 'True' : 'False'  ?></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-12">
+                                  <?= Html::a('<i class="feather icon-edit-1"></i> Edit', ['update', 'id' => $model->agent_id, 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-primary mr-1']) ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
-        </div>
-    </div>
-</div>
+        </section>
+        <!-- page users view end -->

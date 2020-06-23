@@ -24,7 +24,7 @@ $(function () {
     })
 
   })
-  
+
     $(document).ready(function () {
       bsCustomFileInput.init();
     });
@@ -40,8 +40,8 @@ $this->registerJs($js);
 <div class="agent-assignment-form">
 
     <?php
-    
-    
+
+
     $agentQuery = Agent::find()->asArray()->all();
     $agentArray = ArrayHelper::map($agentQuery, 'agent_id', 'agent_name');
 
@@ -64,17 +64,17 @@ $this->registerJs($js);
 
 
     <?php
-           if($model->isNewRecord) 
-             echo $form->field($model, 'assignment_agent_email')->textInput(['maxlength' => true , 'id' =>'agent-email']) 
+           if($model->isNewRecord)
+             echo $form->field($model, 'assignment_agent_email')->textInput(['maxlength' => true , 'id' =>'agent-email'])
     ?>
-    
+
     <?=
     $form->field($model, 'role')->dropDownList(
             [
         AgentAssignment::AGENT_ROLE_OWNER => "Owner",
         AgentAssignment::AGENT_ROLE_STAFF => "Staff"
             ], [
-        'class' => 'select2',
+        'class' => 'form-control select2 select2',
         'multiple' => false,
     ]);
     ?>
