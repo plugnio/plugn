@@ -387,7 +387,7 @@ class OrderController extends Controller {
     }
 
     /**
-     * CheckPendingOrders of type boolean and we want to return 
+     * CheckPendingOrders of type boolean and we want to return
      * True if there are pending  orders , false if these isn't any
      * @param type $restaurantUuid
      * @return boolean
@@ -395,23 +395,6 @@ class OrderController extends Controller {
     public function actionCheckPendingOrders($restaurant_uuid) {
         return Order::find()->where(['restaurant_uuid' => $restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
                         ->exists();
-    }
-
-    /**
-     * CheckPendingOrders of type boolean and we want to return
-     * True if there are pending  orders , false if these isn't any
-     * @param type $restaurantUuid
-     * @return boolean
-     */
-    public function actionGetOrder() {
-
-      $orders = Order::find()->where(['restaurant_uuid' => 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])->asArray()->all();
-
-      foreach ($orders as $key => $order) {
-          $orders[$key]['id'] = $order['order_uuid'];
-         unset($orders[$key]['order_uuid']);
-      }
-        return $orders;
     }
 
 }

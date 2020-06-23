@@ -130,20 +130,21 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      * @inheritdoc
      */
     public static function findIdentity($id) {
-        return static::findOne(['agent_id' => $id]);
+        return static::findOne(['agent_id' => $id, 'agent_status' => self::STATUS_ACTIVE]);
     }
 
     /**
      * @inheritdoc
      */
     public static function findIdentityByAccessToken($token_value, $unVerifiedToken = false) {
-        $token = AgentToken::find()
-                ->where([
-                    'token_value' => $token_value,
-                    'token_status' => AgentToken::STATUS_ACTIVE
-                ])
-                ->with('agent')
-                ->one();
+      $token = AgentToken::find()
+              ->where([
+                  'token_value' => $token_value,
+                  'token_status' => AgentToken::STATUS_ACTIVE
+              ])
+              ->with('agent')
+              ->one();
+
 
         if (!$token)
             return false;
@@ -200,7 +201,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      * @return static|null
      */
     public static function findByEmail($email) {
-        return static::findOne(['agent_email' => $email]);
+      return static::findOne(['agent_email' => $email, 'agent_status' => self::STATUS_ACTIVE]);
     }
 
     /**
@@ -215,7 +216,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
         }
 
         return static::findOne([
-                    'password_reset_token' => $token,
+            'agent_password_reset_token' => $token,
+            'agent_status' => self::STATUS_ACTIVE,
         ]);
     }
 
@@ -231,7 +233,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
         }
         $expire = Yii::$app->params['user.passwordResetTokenExpire'];
         $parts = explode('_', $token);
-        $timestamp = (int) end($parts);
+        $timestamp = (int) substr($token, strrpos($token, '_') + 1);
         return $timestamp + $expire >= time();
     }
 
