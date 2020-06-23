@@ -11,7 +11,7 @@ class m200621_161441_create_agent_token_table extends Migration {
      * {@inheritdoc}
      */
     public function safeUp() {
-        //agent token 
+        //agent token
         Yii::$app->db->createCommand('SET foreign_key_checks = 0')->execute();
 
         $tableOptions = null;
@@ -21,7 +21,7 @@ class m200621_161441_create_agent_token_table extends Migration {
 
 
         $this->createTable('{{%agent_token}}', [
-            'token_uuid' => $this->char(36),
+            'token_uuid' => $this->char(60),
             'agent_id' => $this->bigInteger()->notNull(),
             'token_value' => $this->string(255),
             'token_device' => $this->string(255),

@@ -93,8 +93,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      */
     public function beforeSave($insert) {
         if (parent::beforeSave($insert)) {
-            
-            
+
+
             // Generate Auth key if its a new agent record
             if ($insert) {
                 $this->generateAuthKey();
@@ -104,8 +104,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
             return true;
         }
     }
- 
-    
+
+
     /**
      * Returns String value of current status
      * @return string
@@ -120,7 +120,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
                 break;
         }
 
-        return "Couldnt find a status"; 
+        return "Couldnt find a status";
     }
     /*
      * Start Identity Code
@@ -148,24 +148,24 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
         if (!$token)
             return false;
 
-        //update last used datetime 
+        //update last used datetime
 
         $token->token_last_used_datetime = new Expression('NOW()');
         $token->save();
 
- 
+
         if ($token->agent && $token->agent->agent_status != self::STATUS_DELETED) {
             return $token->agent;
         }
-        
-        
-        // invalid token 
-        
+
+
+        // invalid token
+
         $token->delete();
     }
 
-    
-    
+
+
      /**
      * Create an Access Token Record for this agent
      * if the agent already has one, it will return it instead
@@ -192,7 +192,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
 
         return $token;
     }
-    
+
     /**
      * Finds agent by email
      *
@@ -242,7 +242,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
         return $this->getPrimaryKey();
     }
 
-  
+
 
     /**
      * @inheritdoc
@@ -281,7 +281,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      * Generates "remember me" authentication key
      */
     public function generateAuthKey() {
-        $this->agent_auth_key = Yii::$app->security->generateRandomString();
+        $this->agent_auth_key = strtoupper($this->generateUniqueRandomString('auth_key', 4));
     }
 
     /**
@@ -315,7 +315,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     }
 
 
-    
+
     /**
      * Get all Restaurant accounts this agent owns
      * @return \yii\db\ActiveQuery
@@ -343,5 +343,5 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     {
         return $this->hasMany(AgentAssignment::className(), ['agent_id' => 'agent_id']);
     }
-    
+
 }
