@@ -396,5 +396,4 @@ class OrderController extends Controller {
         return Order::find()->where(['restaurant_uuid' => $restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
                         ->exists();
     }
-
 }

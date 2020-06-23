@@ -17,7 +17,7 @@ return [
     ],
     'components' => [
         'user' => [
-            'identityClass' => 'common\models\User',
+            'identityClass' => 'common\models\Agent',
             'enableAutoLogin' => false,
             'enableSession' => false,
             'loginUrl' => null
@@ -43,6 +43,16 @@ return [
             'enableStrictParsing' => false,
             'showScriptName' => false,
             'rules' => [
+                [// AuthController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/auth',
+                    'pluralize' => false,
+                    'patterns' => [
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS login' => 'options',
+                    ]
+                ],
                 [// ItemController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/item',
@@ -103,15 +113,24 @@ return [
                         'POST <id>' => 'place-an-order',
                         'GET check-for-pending-orders/<restaurant_uuid>' => 'check-pending-orders',
                         'GET callback' => 'callback',
-                        'GET get-order' => 'get-order',
                         'GET <id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS <id>' => 'options',
                         'OPTIONS check-for-pending-orders/<restaurant_uuid>' => 'options',
                         'OPTIONS callback' => 'options',
-                        'OPTIONS get-order' => 'options',
                         'OPTIONS <id>/<restaurant_uuid>' => 'options',
+                    ]
+                ],
+                [//ZapierController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/zapier',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET get-latest-order' => 'get-latest-order',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS get-latest-order' => 'options',
                     ]
                 ],
             ],
