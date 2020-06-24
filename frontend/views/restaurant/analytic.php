@@ -20,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <!-- <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script> -->
 <script type="text/javascript">
 
-    $(window).on('load', function () {
+$(document).ready(function() {
 
 
         var primary = '#7367F0'
@@ -136,10 +136,12 @@ $this->params['breadcrumbs'][] = $this->title;
             enabled: false
           },
           series: [{
-            data: [400, 430, 448, 470, 540, 580, 690, 1100, 1200, 1380]
+                                      name: "Sold items",
+
+            data: <?=    json_encode($number_of_sold_items_chart_data) ?>
           }],
           xaxis: {
-            categories: ['South Korea', 'Canada', 'United Kingdom', 'Netherlands', 'Italy', 'France', 'Japan', 'United States', 'China', 'Germany'],
+            categories: <?= json_encode($sold_items_chart_data) ?>,
             tickAmount: 5
           },
           yaxis: {

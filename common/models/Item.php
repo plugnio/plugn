@@ -300,6 +300,7 @@ class Item extends \yii\db\ActiveRecord
         return $this->hasMany(ExtraOption::className(), ['option_id' => 'option_id'])->via('options');
     }
 
+    
     /**
      * Gets query for [[Options]].
      *

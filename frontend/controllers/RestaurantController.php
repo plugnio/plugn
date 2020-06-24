@@ -231,13 +231,39 @@ class RestaurantController extends Controller {
         array_push($order_recevied_chart_data, (int) ($order_recevied_current_month));
 
 
+        $sold_items_chart_data = [];
+        $number_of_sold_items_chart_data = [];
+              
+        
+
+        $sold_items = \common\models\Item::find()
+                ->joinWith(['orderItems', 'orderItems.order'])
+                 ->where(['order_status' => Order::STATUS_PENDING])
+                ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                ->andWhere(['item.restaurant_uuid' => $model->restaurant_uuid])
+                ->orderBy(['order_item.qty' => SORT_DESC])
+                ->limit(7)
+                ->all();
+
+
+        
+        foreach ($sold_items as $item) {
+            array_push($sold_items_chart_data, $item->item_name);
+            array_push($number_of_sold_items_chart_data, $item->getThisMonthSoldUnits() ? $item->getThisMonthSoldUnits() : 0);
+        }
+        
+        
 
         return $this->render('analytic', [
                     'model' => $model,
                     'months' => $months,
+            'sold_items_chart_data' => $sold_items_chart_data,
+            'number_of_sold_items_chart_data' => $number_of_sold_items_chart_data,
                     'revenue_generated_chart_data' => $revenue_generated_chart_data,
                     'order_recevied_chart_data' => $order_recevied_chart_data,
-                    // 'most_selling_items_chart_data' => $most_selling_items_chart_data,
+                        // 'most_selling_items_chart_data' => $most_selling_items_chart_data,
         ]);
     }
 
@@ -267,7 +293,7 @@ class RestaurantController extends Controller {
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
 
-            if(!$model->phone_number)
+            if (!$model->phone_number)
                 $model->phone_number_display = Restaurant::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER;
 
             if ($model->save()) {
