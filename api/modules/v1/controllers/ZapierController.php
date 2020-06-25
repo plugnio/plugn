@@ -84,6 +84,7 @@ class ZapierController extends Controller {
         if (Yii::$app->accountManager->getManagedAccount($restaurant_uuid)) {
 
             $orders = Order::find()
+                    ->joinWith('orderItems')
                     ->where(['restaurant_uuid' => $restaurant_uuid])
                     ->asArray()
                     ->all();
