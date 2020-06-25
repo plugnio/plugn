@@ -6,6 +6,7 @@ use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use common\models\Order;
+use common\models\Agent;
 use common\models\OrderItem;
 use common\models\OrderItemExtraOption;
 use common\models\Restaurant;
