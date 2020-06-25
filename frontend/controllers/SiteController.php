@@ -103,13 +103,11 @@ class SiteController extends Controller {
 
             $incoming_orders = Order::find()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
                     ->orderBy(['order_created_at' => SORT_DESC])
-                    ->limit(5);
+                    ->limit(5)
+                    ->all();
 
 
-            $incoming_orders = new \yii\data\ActiveDataProvider([
-                'query' => $incoming_orders,
-            ]);
-
+ 
 
             //Orders Recevied
             $orders_received_chart_data = [];

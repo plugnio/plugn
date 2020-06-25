@@ -458,93 +458,67 @@ $this->title = $restaurant_model->name;
 
                         <div class="card-content">
                             <div class="table-responsive mt-1">
+                                   <table class="table table-hover-animation mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>ORDER</th>
+                                            <th>STATUS</th>
+                                            <th>CUSTOMER NAME</th>
+                                            <th>Created At</th>
 
-                                <?php
-                                if ($incoming_orders->totalCount > 0) {
+                                        </tr>
+                                    </thead>
+                                    <tbody>
 
-                                    GridView::widget([
-                                        'dataProvider' => $incoming_orders,
-                                        'columns' => [
-                                            ['class' => 'yii\grid\SerialColumn'],
-                                            [
-                                                [
-                                                    'label' => 'Order ID',
-                                                    "format" => "raw",
-                                                    "value" => function($model) {
-                                                        return '#' . $model->order_uuid;
+                                        <?php
+                                        foreach ($incoming_orders as $order) {
+                                            ?>
+                                            <tr>
+                                                <td>
+                                                    <?=
+                                                    Html::a('#' . $order->order_uuid, ['order/view', 'id' => $order->order_uuid, 'restaurantUuid' => $order->restaurant_uuid])
+                                                    ?>
+                                                </td>
+
+                                                <td>
+
+                                                    <?php
+                                                    $options = ['class' => ''];
+
+                                                    if ($order->order_status == Order::STATUS_PENDING) {
+                                                        Html::addCssClass($options, ['fa fa-circle font-small-3 text-warning mr-50']);
+                                                    } elseif ($order->order_status == Order::STATUS_BEING_PREPARED) {
+                                                        Html::addCssClass($options, ['fa fa-circle font-small-3 text-primary mr-50']);
+                                                    } elseif ($order->order_status == Order::STATUS_OUT_FOR_DELIVERY) {
+                                                        Html::addCssClass($options, ['fa fa-circle font-small-3 text-info mr-50']);
+                                                    } elseif ($order->order_status == Order::STATUS_COMPLETE) {
+                                                        Html::addCssClass($options, ['fa fa-circle font-small-3 success-info mr-50']);
+                                                    } elseif ($order->order_status == Order::STATUS_REFUNDED) {
+                                                        Html::addCssClass($options, ['fa fa-circle font-small-3 text-danger mr-50']);
+                                                    } elseif ($order->order_status == Order::STATUS_CANCELED) {
+                                                        Html::addCssClass($options, ['fa fa-circle font-small-3 text-danger mr-50']);
                                                     }
-                                                ],
-                                                [
-                                                    
 
-                                                    
-                                                    'attribute' => 'order_status',
-                                                    "format" => "raw",
-                                                    "value" => function($model) {
-                                                        if ($model->order_status == Order::STATUS_PENDING) {
-                                                            return '<div class="chip chip-warning mr-1">
-                                      <div class="chip-body">
-                                          <span style="white-space: pre;" class="chip-text">' . $model->orderStatus . '</span>
-                                      </div>
-                                  </div>';
-                                                        } else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY) {
-                                                            return '<div class="chip chip-info mr-1">
-                                      <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatus . '</span>
-                                      </div>
-                                  </div>';
-                                                        } else if ($model->order_status == Order::STATUS_BEING_PREPARED) {
-                                                            return '<div class="chip chip-primary mr-1">
-                                      <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatus . '</span>
-                                      </div>
-                                  </div>';
-                                                        } else if ($model->order_status == Order::STATUS_COMPLETE) {
-                                                            return '<div class="chip chip-success mr-1">
-                                      <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatus . '</span>
-                                      </div>
-                                  </div>';
-                                                        } else if ($model->order_status == Order::STATUS_CANCELED) {
-                                                            return '<div class="chip chip-danger mr-1">
-                                      <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatus . '</span>
-                                      </div>
-                                    </div>';
-                                                        } else if ($model->order_status == Order::STATUS_PARTIALLY_REFUNDED) {
-                                                            return '<div class="chip chip-danger mr-1">
-                                      <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatus . '</span>
-                                      </div>
-                                   </div>';
-                                                        } else if ($model->order_status == Order::STATUS_REFUNDED) {
-                                                            return '<div class="chip chip-danger mr-1">
-                                      <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatus . '</span>
-                                      </div>
-                                   </div>';
-                                                        }
-                                                    }
-                                                ],
-                                                [
-                                                    'attribute' => 'customer_name',
-                                                    'format' => 'raw',
-                                                    'value' => function ($data) {
-                                                        if ($data->customer_id)
-                                                            return Html::a($data->customer->customer_name, ['customer/view', 'id' => $data->customer_id, 'restaurantUuid' => $data->restaurant_uuid]);
-                                                    },
-                                                    'visible' => function ($data) {
-                                                        return $data->customer_id ? true : false;
-                                                    },
-                                                ],
-                                                'order_created_at:datetime',
-                                            ],
-                                        ],
-                                        'layout' => '{summary}{items}{pager}',
-                                        'tableOptions' => ['class' => 'table table-hover-animation mb-0'],
-                                    ]);
-                                }
-                                ?>
+                                                    echo Html::tag('i', '', $options) . $order->orderStatus
+                                                    ?>
+
+                                                </td>
+                                                <td>
+                                              <?= $order->customer_name ?>
+                                                </td>
+
+                                                <td>
+                                                    <div class="sparkbar" data-color="#00a65a" data-height="20">
+                                                        <?= Yii::$app->formatter->asRelativeTime($order->order_created_at); ?>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <?php }
+                                        ?>
+
+                                    </tbody>
+                                </table>
+                                
 
                             </div>
                         </div>
