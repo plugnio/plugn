@@ -4,7 +4,7 @@ use yii\helpers\Html;
 
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\Agent */
+/* @var $model common\models\Agent */
 
 $this->title = 'Create Agent';
 $this->params['breadcrumbs'][] = ['label' => 'Agents', 'url' => ['index']];

@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\time\TimePicker;
-use backend\models\Agent;
+use common\models\Agent;
 use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
 use common\models\Area;

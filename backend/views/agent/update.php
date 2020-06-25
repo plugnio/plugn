@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\Agent */
+/* @var $model common\models\Agent */
 
 $this->title = 'Update Agent: ' . $model->agent_name;
 $this->params['breadcrumbs'][] = ['label' => 'Agents', 'url' => ['index']];

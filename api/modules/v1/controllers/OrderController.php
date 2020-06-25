@@ -12,7 +12,6 @@ use common\models\Restaurant;
 use common\models\Payment;
 use common\components\TapPayments;
 use yii\helpers\Url;
-use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
 class OrderController extends Controller {
@@ -396,4 +395,5 @@ class OrderController extends Controller {
         return Order::find()->where(['restaurant_uuid' => $restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
                         ->exists();
     }
+
 }
