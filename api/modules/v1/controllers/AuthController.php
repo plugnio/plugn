@@ -88,7 +88,6 @@ class AuthController extends Controller {
     public function actionLogin() {
         $agent = Yii::$app->user->identity;
 
-//         && Yii::$app->accountManager->getManagedAccount($restaurantUuid)
         return $this->_loginResponse($agent);
     }
 

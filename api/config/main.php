@@ -127,10 +127,10 @@ return [
                     'controller' => 'v1/zapier',
                     'pluralize' => false,
                     'patterns' => [
-                        'GET get-latest-order' => 'get-latest-order',
+                        'GET get-latest-order/<restaurant_uuid>' => 'get-latest-order',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS get-latest-order' => 'options',
+                        'OPTIONS get-latest-order/<restaurant_uuid>' => 'options',
                     ]
                 ],
             ],

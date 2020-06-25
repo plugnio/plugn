@@ -80,18 +80,21 @@ class ZapierController extends Controller {
    * @param type $restaurantUuid
    * @return boolean
    */
-  public function actionGetLatestOrder() {
+    public function actionGetLatestOrder($restaurant_uuid) {
+        if (Yii::$app->accountManager->getManagedAccount($restaurant_uuid)) {
 
-    $orders = Order::find()->where(['restaurant_uuid' => 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])->asArray()->all();
+            $orders = Order::find()
+                    ->where(['restaurant_uuid' => $restaurant_uuid])
+                    ->asArray()
+                    ->all();
 
-    foreach ($orders as $key => $order) {
-        $orders[$key]['id'] = $order['order_uuid'];
-       unset($orders[$key]['order_uuid']);
+            foreach ($orders as $key => $order) {
+                $orders[$key]['id'] = $order['order_uuid'];
+                unset($orders[$key]['order_uuid']);
+            }
+
+            return $orders;
+        }
     }
-
-    return $orders;
-
-  }
-
 
 }
