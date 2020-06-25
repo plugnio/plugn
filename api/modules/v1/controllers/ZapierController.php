@@ -44,7 +44,7 @@ class ZapierController extends Controller {
 
       // Basic Auth accepts Base64 encoded username/password and decodes it for you
         $behaviors['authenticator'] = [
-            'class' => HttpBasicAuth::className(),
+            'class' => \yii\filters\auth\HttpBasicAuth::className(),
             'except' => ['options'],
             'auth' => function ($email, $password) {
                 $agent = Agent::findByEmail($email);
