@@ -41,14 +41,24 @@ class ZapierController extends Controller {
           ],
       ];
 
-      // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-      $behaviors['authenticator'] = [
-          'class' => \yii\filters\auth\HttpBearerAuth::className(),
-      ];
 
-      // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-      $behaviors['authenticator']['except'] = ['options'];
-      return $behaviors;
+      // Basic Auth accepts Base64 encoded username/password and decodes it for you
+        $behaviors['authenticator'] = [
+            'class' => HttpBasicAuth::className(),
+            'except' => ['options'],
+            'auth' => function ($email, $password) {
+                $agent = Agent::findByEmail($email);
+                if ($agent && $agent->validatePassword($password)) {
+                    return $agent;
+                }
+                return null;
+            }
+        ];
+
+
+        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+        $behaviors['authenticator']['except'] = ['options'];
+        return $behaviors;
   }
 
   /**
