@@ -7,6 +7,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use yii\web\IdentityInterface;
 use yii\db\ActiveQuery;
+use common\models\AgentToken;
 
 /**
  * This is the model class for table "agent".
@@ -31,12 +32,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
 
-    
-    /**
-     * Field for temporary password. If set, it will overwrite the old password on save
-     * @var string
-     */
-    public $tempPassword;
+
 
     /**
      * {@inheritdoc}
@@ -98,19 +94,17 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     public function beforeSave($insert) {
         if (parent::beforeSave($insert)) {
 
+
             // Generate Auth key if its a new agent record
             if ($insert) {
                 $this->generateAuthKey();
             }
 
-            // If tempPassword is set, save it as the new password for this user
-            if ($this->tempPassword) {
-                $this->setPassword($this->tempPassword);
-            }
 
             return true;
         }
     }
+
 
     /**
      * Returns String value of current status
@@ -128,33 +122,90 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
 
         return "Couldnt find a status";
     }
+    /*
+     * Start Identity Code
+     */
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public static function findIdentity($id) {
         return static::findOne(['agent_id' => $id, 'agent_status' => self::STATUS_ACTIVE]);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public static function findIdentityByAccessToken($token, $type = null) {
-        throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
+    public static function findIdentityByAccessToken($token_value, $unVerifiedToken = false) {
+      $token = AgentToken::find()
+              ->where([
+                  'token_value' => $token_value,
+                  'token_status' => AgentToken::STATUS_ACTIVE
+              ])
+              ->with('agent')
+              ->one();
+
+
+        if (!$token)
+            return false;
+
+        //update last used datetime
+
+        $token->token_last_used_datetime = new Expression('NOW()');
+        $token->save();
+
+
+        if ($token->agent && $token->agent->agent_status != self::STATUS_DELETED) {
+            return $token->agent;
+        }
+
+
+        // invalid token
+
+        $token->delete();
+    }
+
+
+
+     /**
+     * Create an Access Token Record for this agent
+     * if the agent already has one, it will return it instead
+     * @return \common\models\AgentToken
+     */
+    public function getAccessToken() {
+        // Return existing inactive token if found
+        $token = AgentToken::findOne([
+                    'agent_id' => $this->agent_id,
+                    'token_status' => AgentToken::STATUS_ACTIVE
+        ]);
+
+        if ($token) {
+            return $token;
+        }
+
+        // Create new inactive token
+
+        $token = new AgentToken();
+        $token->agent_id = $this->agent_id;
+        $token->token_value = AgentToken::generateUniqueTokenString();
+        $token->token_status = AgentToken::STATUS_ACTIVE;
+        $token->save();
+
+        return $token;
     }
 
     /**
-     * Finds user by username
+     * Finds agent by email
      *
      * @param string $email
      * @return static|null
      */
     public static function findByEmail($email) {
-        return static::findOne(['agent_email' => $email, 'agent_status' => self::STATUS_ACTIVE]);
+      return static::findOne(['agent_email' => $email, 'agent_status' => self::STATUS_ACTIVE]);
     }
 
     /**
-     * Finds user by password reset token
+     * Finds agent by password reset token
      *
      * @param string $token password reset token
      * @return static|null
@@ -165,8 +216,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
         }
 
         return static::findOne([
-                    'agent_password_reset_token' => $token,
-                    'agent_status' => self::STATUS_ACTIVE,
+            'agent_password_reset_token' => $token,
+            'agent_status' => self::STATUS_ACTIVE,
         ]);
     }
 
@@ -174,34 +225,36 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      * Finds out if password reset token is valid
      *
      * @param string $token password reset token
-     * @return bool
+     * @return boolean
      */
     public static function isPasswordResetTokenValid($token) {
         if (empty($token)) {
             return false;
         }
-
-        $timestamp = (int) substr($token, strrpos($token, '_') + 1);
         $expire = Yii::$app->params['user.passwordResetTokenExpire'];
+        $parts = explode('_', $token);
+        $timestamp = (int) substr($token, strrpos($token, '_') + 1);
         return $timestamp + $expire >= time();
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getId() {
         return $this->getPrimaryKey();
     }
 
+
+
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getAuthKey() {
         return $this->agent_auth_key;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function validateAuthKey($authKey) {
         return $this->getAuthKey() === $authKey;
@@ -211,7 +264,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      * Validates password
      *
      * @param string $password password to validate
-     * @return bool if password provided is valid for current user
+     * @return boolean if password provided is valid for current user
      */
     public function validatePassword($password) {
         return Yii::$app->security->validatePassword($password, $this->agent_password_hash);
@@ -219,8 +272,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
 
     /**
      * Generates password hash from password and sets it to the model
-     *
-     * @param string $password
+     * @param $password
+     * @throws \yii\base\Exception
      */
     public function setPassword($password) {
         $this->agent_password_hash = Yii::$app->security->generatePasswordHash($password);
@@ -230,22 +283,39 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      * Generates "remember me" authentication key
      */
     public function generateAuthKey() {
-        $this->agent_auth_key = Yii::$app->security->generateRandomString();
+      $this->agent_auth_key = Yii::$app->security->generateRandomString();
+    }
+
+    /**
+     * Generate unique string for a given attribute of given length
+     * @param $attribute
+     * @param int $length
+     * @return string
+     * @throws \yii\base\Exception
+     */
+    public function generateUniqueRandomString($attribute, $length = 32) {
+        $randomString = Yii::$app->getSecurity()->generateRandomString($length);
+
+        if (!$this->findOne([$attribute => $randomString]))
+            return $randomString;
+        else
+            return $this->generateUniqueRandomString($attribute, $length);
     }
 
     /**
      * Generates new password reset token
      */
     public function generatePasswordResetToken() {
-        $this->agent_password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
+        $this->password_reset_token = Yii::$app->security->generateRandomString(6) . '_' . time();
     }
 
     /**
      * Removes password reset token
      */
     public function removePasswordResetToken() {
-        $this->agent_password_reset_token = null;
+        $this->password_reset_token = null;
     }
+
 
 
     /**
@@ -275,5 +345,5 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     {
         return $this->hasMany(AgentAssignment::className(), ['agent_id' => 'agent_id']);
     }
-    
+
 }

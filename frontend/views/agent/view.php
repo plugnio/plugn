@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\Agent */
+/* @var $model frontend\models\Agent */
 
 $this->params['restaurant_uuid'] = $restaurantUuid;
 

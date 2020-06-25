@@ -3,7 +3,7 @@
 namespace frontend\controllers;
 
 use Yii;
-use common\models\Agent;
+use frontend\models\Agent;
 use frontend\models\AgentSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;

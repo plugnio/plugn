@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\Agent */
+/* @var $model frontend\models\Agent */
 $this->params['restaurant_uuid'] = $restaurantUuid;
 
 $this->title = 'Update Agent: ' . $model->agent_name;
