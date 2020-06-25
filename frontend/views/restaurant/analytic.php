@@ -20,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <!-- <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script> -->
 <script type="text/javascript">
 
-$(document).ready(function() {
+    $(document).ready(function () {
 
 
         var primary = '#7367F0'
@@ -55,7 +55,7 @@ $(document).ready(function() {
             },
             series: [{
                     name: "Revenue",
-                    data:  <?=  json_encode($revenue_generated_chart_data) ?>,
+                    data: <?= json_encode($revenue_generated_chart_data) ?>,
                 }],
             grid: {
                 row: {
@@ -64,7 +64,7 @@ $(document).ready(function() {
                 },
             },
             xaxis: {
-                categories:  <?=  json_encode($months) ?>,
+                categories: <?= json_encode($months) ?>,
             },
             yaxis: {
                 tickAmount: 5,
@@ -96,7 +96,7 @@ $(document).ready(function() {
             },
             series: [{
                     name: "Orders",
-                    data:  <?=  json_encode($order_recevied_chart_data) ?>,
+                    data: <?= json_encode($order_recevied_chart_data) ?>,
                 }],
             grid: {
                 row: {
@@ -105,7 +105,41 @@ $(document).ready(function() {
                 },
             },
             xaxis: {
-                categories:  <?=  json_encode($months) ?>,
+                categories: <?= json_encode($months) ?>,
+            },
+            yaxis: {
+                tickAmount: 5,
+                opposite: yaxis_opposite
+            }
+        }
+
+        var customerGainedChartOptions = {
+            chart: {
+                height: 350,
+                type: 'line',
+                zoom: {
+                    enabled: false
+                }
+            },
+            colors: themeColors,
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'straight'
+            },
+            series: [{
+                    name: "Orders",
+                    data: <?= json_encode($customer_gained_chart_data) ?>,
+                }],
+            grid: {
+                row: {
+                    colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                    opacity: 0.5
+                },
+            },
+            xaxis: {
+                categories: <?= json_encode($months) ?>,
             },
             yaxis: {
                 tickAmount: 5,
@@ -121,32 +155,39 @@ $(document).ready(function() {
 
         ordersReceviedChart.render();
 
-        var soldItemsChartOptions = {
-          chart: {
-            height: 350,
-            type: 'bar',
-          },
-          colors: themeColors,
-          plotOptions: {
-            bar: {
-              horizontal: true,
-            }
-          },
-          dataLabels: {
-            enabled: false
-          },
-          series: [{
-                                      name: "Sold items",
 
-            data: <?=    json_encode($number_of_sold_items_chart_data) ?>
-          }],
-          xaxis: {
-            categories: <?= json_encode($sold_items_chart_data) ?>,
-            tickAmount: 5
-          },
-          yaxis: {
-            opposite: yaxis_opposite
-          }
+        var customerGainedChart = new ApexCharts(
+                document.querySelector("#customers-gained-chart"),
+                customerGainedChartOptions
+                );
+
+        customerGainedChart.render();
+
+        var soldItemsChartOptions = {
+            chart: {
+                height: 350,
+                type: 'bar',
+            },
+            colors: themeColors,
+            plotOptions: {
+                bar: {
+                    horizontal: true,
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            series: [{
+                    name: "Sold items",
+                    data: <?= json_encode($number_of_sold_items_chart_data) ?>
+                }],
+            xaxis: {
+                categories: <?= json_encode($most_selling_items_chart_data) ?>,
+                tickAmount: 5
+            },
+            yaxis: {
+                opposite: yaxis_opposite
+            }
         }
 
 
@@ -173,7 +214,7 @@ $(document).ready(function() {
                 <div class="card">
                     <div class="card-header">
                         <div>
-                          <h4 class="card-title">Revenue Generated</h4>
+                            <h4 class="card-title">Revenue Generated</h4>
 
                           <!-- <button type="button" style=" margin-top: 15px;" class="btn btn-success mr-1 mb-1 waves-effect waves-light"><i class="fa fa-file-excel-o"></i></button> -->
                         </div>
@@ -192,7 +233,7 @@ $(document).ready(function() {
                 <div class="card">
                     <div class="card-header">
                         <div>
-                          <h4 class="card-title">Orders Received</h4>
+                            <h4 class="card-title">Orders Received</h4>
 
                           <!-- <button type="button" style=" margin-top: 15px;" class="btn btn-success mr-1 mb-1 waves-effect waves-light"><i class="fa fa-file-excel-o"></i></button> -->
                         </div>
@@ -207,6 +248,10 @@ $(document).ready(function() {
             </div>
 
 
+
+            <?php 
+            
+            if(count($most_selling_items_chart_data)){ ?>
             <!-- Sold Items -->
             <div class="col-lg-6 col-md-12">
                 <div class="card">
@@ -220,24 +265,34 @@ $(document).ready(function() {
                     </div>
                 </div>
             </div>
-        </div>
+            <?php } ?>
 
-            <!-- Bar Chart -->
+            <!--Customer Gained-->
             <div class="col-lg-6 col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Bar Chart</h4>
+                        <div>
+                            <h4 class="card-title">Customers Gained</h4>
+
+                          <!-- <button type="button" style=" margin-top: 15px;" class="btn btn-success mr-1 mb-1 waves-effect waves-light"><i class="fa fa-file-excel-o"></i></button> -->
+                        </div>
                     </div>
+
                     <div class="card-content">
                         <div class="card-body">
-                            <div id="bar-chart"></div>
+                            <div id="customers-gained-chart"></div>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
 
-    </section>
-    <!-- // Apex charts section end -->
+
+
+</div>
+
+</section>
+<!-- // Apex charts section end -->
 
 </div>

@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use Yii;
 use common\models\Restaurant;
 use common\models\Order;
+use common\models\Customer;
 use common\models\AgentAssignment;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
@@ -231,36 +232,100 @@ class RestaurantController extends Controller {
         array_push($order_recevied_chart_data, (int) ($order_recevied_current_month));
 
 
-        $sold_items_chart_data = [];
+
+
+
+        $customer_gained_chart_data = [];
+
+        $customer_gained_last_five_months_month = Customer::find()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 5 MONTH)')
+                ->count();
+
+        array_push($customer_gained_chart_data, (int) ($customer_gained_last_five_months_month));
+
+
+        $customer_gained_last_four_months_month = Customer::find()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 4 MONTH)')
+                ->count();
+
+
+        array_push($customer_gained_chart_data, (int) ($customer_gained_last_four_months_month));
+
+
+        $customer_gained_last_three_months_month = Customer::find()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
+                ->count();
+
+        array_push($customer_gained_chart_data, (int) ($customer_gained_last_three_months_month));
+
+        $customer_gained_last_two_months_month = Customer::find()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
+                ->count();
+
+        array_push($customer_gained_chart_data, (int) ($customer_gained_last_two_months_month));
+
+        $customer_gained_last_month = Customer::find()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->count();
+
+
+        array_push($customer_gained_chart_data, (int) ($customer_gained_last_month));
+
+
+        $customer_gained_current_month = Customer::find()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
+                ->count();
+
+
+        array_push($customer_gained_chart_data, (int) ($customer_gained_current_month));
+
+
+        $most_selling_items_chart_data = [];
         $number_of_sold_items_chart_data = [];
-              
-        
+
+
 
         $sold_items = \common\models\Item::find()
-                ->joinWith(['orderItems', 'orderItems.order'])
-                 ->where(['order_status' => Order::STATUS_PENDING])
+                ->joinWith(['orderItems', 'order'])
+                ->where(['order_status' => Order::STATUS_PENDING])
                 ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
                 ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
                 ->orWhere(['order_status' => Order::STATUS_COMPLETE])
-                ->andWhere(['item.restaurant_uuid' => $model->restaurant_uuid])
-                ->orderBy(['order_item.qty' => SORT_DESC])
-                ->limit(7)
+                ->where(['item.restaurant_uuid' => $model->restaurant_uuid])
+                ->orderBy(['order_item.qty' => SORT_ASC])
                 ->all();
 
 
-        
-        foreach ($sold_items as $item) {
-            array_push($sold_items_chart_data, $item->item_name);
-            array_push($number_of_sold_items_chart_data, $item->getThisMonthSoldUnits() ? $item->getThisMonthSoldUnits() : 0);
+        $most_selling_items_counter = 0;
+
+        foreach ($sold_items as $key => $item) {
+            if ($most_selling_items_counter < 5 && $item->getThisMonthSoldUnits()) {
+                $most_selling_items_counter++;
+                array_push($most_selling_items_chart_data, $item->item_name);
+                array_push($number_of_sold_items_chart_data, $item->getThisMonthSoldUnits() ? $item->getThisMonthSoldUnits() : 0);
+            }
         }
-        
-        
+
+
 
         return $this->render('analytic', [
                     'model' => $model,
                     'months' => $months,
-            'sold_items_chart_data' => $sold_items_chart_data,
-            'number_of_sold_items_chart_data' => $number_of_sold_items_chart_data,
+                    'most_selling_items_chart_data' => $most_selling_items_chart_data,
+                    'customer_gained_chart_data' => $customer_gained_chart_data,
+                    'number_of_sold_items_chart_data' => $number_of_sold_items_chart_data,
                     'revenue_generated_chart_data' => $revenue_generated_chart_data,
                     'order_recevied_chart_data' => $order_recevied_chart_data,
                         // 'most_selling_items_chart_data' => $most_selling_items_chart_data,

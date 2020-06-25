@@ -354,4 +354,13 @@ class Item extends \yii\db\ActiveRecord
     {
         return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid']);
     }
+    /**
+     * Gets query for [[OrderItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrder()
+    {
+        return $this->hasMany(Order::className(), ['order_uuid' => 'order_uuid'])->via('orderItems');
+    }
 }
