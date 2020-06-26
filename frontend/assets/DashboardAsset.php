@@ -108,7 +108,7 @@ class DashboardAsset extends AssetBundle {
             'app-assets/js/scripts/editors/editor-quill.js',
 
 
-            'app-assets/js/scripts/pages/invoice.js'
+            'app-assets/js/scripts/pages/invoice.js',
 
            //
            // 'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/vendors/js/vendors.min.js?id=0eef70ca571453be304a',
@@ -117,7 +117,7 @@ class DashboardAsset extends AssetBundle {
            // 'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/js/core/app-menu.js?id=d7158b834aaadf39f5a8',
            // 'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/js/core/app.js?id=56696624259ddf3129cc',
            // 'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/js/scripts/components.js?id=2ab188ae0fa7b622cdb1',
-           // 'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/js/scripts/customizer.js?id=bd6e1f733770a42402a7',
+           'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/js/scripts/customizer.js?id=bd6e1f733770a42402a7',
            // 'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/js/scripts/footer.js?id=b382ec364916c35eff84',
 
     ];

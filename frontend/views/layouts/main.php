@@ -392,23 +392,6 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
 
             <hr>
 
-
-            <div id="collapse-sidebar">
-                <div class="collapse-sidebar d-flex justify-content-between">
-                    <div class="collapse-option-title">
-                    <h5 class="pt-25">Collapse Sidebar</h5>
-                    </div>
-                    <div class="collapse-option-switch">
-                    <div class="custom-control custom-switch">
-                        <input type="checkbox" class="custom-control-input" id="collapse-sidebar-switch">
-                        <label class="custom-control-label" for="collapse-sidebar-switch"></label>
-                    </div>
-                    </div>
-                </div>
-                <hr>
-            </div>
-
-
             <div id="navbar-type">
                 <h5 class="navbar_type">Navbar Type</h5>
                 <h5 class="menu_type d-none">Menu Type</h5>

@@ -10,6 +10,22 @@ use yii\grid\GridView;
 
 $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
 $this->title = $restaurant_model->name;
+
+
+$js= "
+
+ $(document).ready(function(){
+    $('#dropdownCustomerGained').html('Last 7 days');
+    $('#dropdownRevenueGenerated').html('Last 7 days');
+    $('#dropdownSoldItems').html('Last 7 days');
+    $('#dropdownOrdersReceived').html('Last 7 days');
+
+});
+
+
+";
+$this->registerJs($js);
+
 ?>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -167,7 +183,7 @@ $this->title = $restaurant_model->name;
                     }
             },
             series: [{
-            name: 'Customers',
+            name: 'Orders',
                     data: <?= json_encode($orders_received_chart_data) ?>,
             }],
             xaxis: {
@@ -188,11 +204,13 @@ $this->title = $restaurant_model->name;
             x: { show: false }
             },
     }
+
+
     var orderReceivedChart = new ApexCharts(
             document.querySelector('#orders-recevied-chart'),
             orderReceivedChartOptions
             );
-            
+
     var revenueGeneratedChartOptions = {
     chart: {
     height: 100,
@@ -250,6 +268,7 @@ $this->title = $restaurant_model->name;
             x: { show: false }
             },
     }
+
     var revenueGeneratedChart = new ApexCharts(
             document.querySelector('#revenue-generated-chart'),
             revenueGeneratedChartOptions
@@ -257,7 +276,7 @@ $this->title = $restaurant_model->name;
 
     var customerGainedChartOptions = {
     chart: {
-    height: 100,
+            height: 100,
             type: 'area',
             toolbar: {
             show: false,
@@ -272,7 +291,7 @@ $this->title = $restaurant_model->name;
                             right: 0
                     }
             },
-    },
+          },
             colors: [primary],
             dataLabels: {
             enabled: false
@@ -312,16 +331,63 @@ $this->title = $restaurant_model->name;
             x: { show: false }
             },
     }
+
     var customerGainedChart = new ApexCharts(
             document.querySelector('#customer-gained-chart'),
             customerGainedChartOptions
             );
-    customerGainedChart.render();
-    revenueGeneratedChart.render();
-    soldItemsChart.render();
-    orderReceivedChart.render();
+
+
+      customerGainedChart.render();
+
+      revenueGeneratedChart.render();
+
+      soldItemsChart.render();
+
+      orderReceivedChart.render();
+
+
+    function addData(chart, data) {
+        chart.opts.series[0].data = data;
+        chart.update();
+    }
+
+
+
+    //Get customer gained
+    document.getElementById("getCustomerGainedLast7DaysData").addEventListener("click", function(){
+      $('#dropdownCustomerGained').html('Last 7 days');
+      addData(customerGainedChart,[1234,432,4]);
     });
 
+    document.getElementById("getCustomerGainedLastMonth").addEventListener("click", function(){
+      $('#dropdownCustomerGained').html('Last Month');
+      addData(customerGainedChart,[0,432,4]);
+    });
+
+    document.getElementById("getCustomerGainedLast3Months").addEventListener("click", function(){
+      $('#dropdownCustomerGained').html('Last 3 Months');
+      addData(customerGainedChart,[432,1234,4]);
+    });
+
+
+    // Get Revenue Generated
+    document.getElementById("getRevenueGeneratedLast7DaysData").addEventListener("click", function(){
+      $('#dropdownRevenueGenerated').html('Last 7 days');
+      addData(revenueGeneratedChart,[1234,432,4]);
+    });
+
+    document.getElementById("getRevenueGeneratedLastMonth").addEventListener("click", function(){
+      $('#dropdownRevenueGenerated').html('Last Month');
+      addData(revenueGeneratedChart,[0,432,4]);
+    });
+
+    document.getElementById("getRevenueGeneratedLast3Months").addEventListener("click", function(){
+      $('#dropdownRevenueGenerated').html('Last 3 Months');
+      addData(revenueGeneratedChart,[432,1234,4]);
+    });
+
+  });
 
 
 </script>
@@ -338,13 +404,14 @@ $this->title = $restaurant_model->name;
                         </div>
                     </div>
                     <div class="dropdown chart-dropdown" style="float:right">
-                        <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px" type="button" id="dropdownItem4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Today
+                        <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px; padding-right: 0px;" type="button" id="dropdownCustomerGained" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         </button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownItem4">
-                          <a class="dropdown-item" href="#">Today</a>
-                          <a class="dropdown-item" href="#">This Week</a>
-                          <a class="dropdown-item" href="#">This Month</a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownCustomerGained">
+
+                          <button   id="getCustomerGainedLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
+                          <button   id="getCustomerGainedLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
+                          <button   id="getCustomerGainedLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
+
                         </div>
                     </div>
 
@@ -367,13 +434,13 @@ $this->title = $restaurant_model->name;
                         </div>
                     </div>
                     <div class="dropdown chart-dropdown" style="float:right">
-                        <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px" type="button" id="dropdownItem4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Today
+                        <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px;    padding-right: 0px;" type="button" id="dropdownRevenueGenerated" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         </button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownItem4">
-                          <a class="dropdown-item" href="#">Today</a>
-                          <a class="dropdown-item" href="#">This Week</a>
-                          <a class="dropdown-item" href="#">This Month</a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownRevenueGenerated">
+                          <button   id="getRevenueGeneratedLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
+                          <button   id="getRevenueGeneratedLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
+                          <button   id="getRevenueGeneratedLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
+
                         </div>
                     </div>
                     <h2 class="text-bold-700 mt-1">
@@ -396,13 +463,12 @@ $this->title = $restaurant_model->name;
                         </div>
                     </div>
                     <div class="dropdown chart-dropdown" style="float:right">
-                        <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px" type="button" id="dropdownItem4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Today
+                        <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px;    padding-right: 0px;" type="button" id="dropdownSoldItems" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         </button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownItem4">
-                          <a class="dropdown-item" href="#">Today</a>
-                          <a class="dropdown-item" href="#">This Week</a>
-                          <a class="dropdown-item" href="#">This Month</a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownSoldItems">
+                          <a class="dropdown-item" href="#">Last 7 days</a>
+                          <a class="dropdown-item" href="#">Las Month</a>
+                          <a class="dropdown-item" href="#">Last 3 Months</a>
                         </div>
                     </div>
                     <h2 class="text-bold-700 mt-1">
@@ -424,13 +490,12 @@ $this->title = $restaurant_model->name;
                         </div>
                     </div>
                     <div class="dropdown chart-dropdown" style="float:right">
-                        <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px" type="button" id="dropdownItem4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Today
+                        <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px;    padding-right: 0px;" type="button" id="dropdownOrdersReceived" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         </button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownItem4">
-                            <a class="dropdown-item" href="#">Today</a>
-                            <a class="dropdown-item" href="#">This Week</a>
-                            <a class="dropdown-item" href="#">This Month</a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownOrdersReceived">
+                            <a class="dropdown-item" href="#">Last 7 days</a>
+                            <a class="dropdown-item" href="#">Las Month</a>
+                            <a class="dropdown-item" href="#">Last 3 Months</a>
                         </div>
                     </div>
                     <h2 class="text-bold-700 mt-1">
@@ -447,6 +512,75 @@ $this->title = $restaurant_model->name;
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="card text-center">
+
+                <div class="card-content">
+
+
+                    <div class="card-body">
+                        <div class="avatar bg-rgba-primary p-50 m-0 mb-1">
+                            <div class="avatar-content">
+                                <i class="feather icon-users text-primary font-medium-5"></i>
+                            </div>
+                        </div>
+                        <h2 class="text-bold-700">36.9k</h2>
+                        <p class="mb-0 line-ellipsis">Today's Customer Gained</p>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="card text-center">
+                <div class="card-content">
+                    <div class="card-body">
+                        <div class="avatar bg-rgba-success p-50 m-0 mb-1">
+                            <div class="avatar-content">
+                                <i class="feather icon-credit-card text-success font-medium-5"></i>
+                            </div>
+                        </div>
+                        <h2 class="text-bold-700">12k</h2>
+                        <p class="mb-0 line-ellipsis">Today's Revenue Generated</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="card text-center">
+                <div class="card-content">
+                    <div class="card-body">
+                        <div class="avatar bg-rgba-danger p-50 m-0 mb-1">
+                            <div class="avatar-content">
+                                <i class="feather icon-shopping-cart text-danger font-medium-5"></i>
+                            </div>
+                        </div>
+                        <h2 class="text-bold-700">97.8k</h2>
+                        <p class="mb-0 line-ellipsis">Today's Sold Items</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="card text-center">
+                <div class="card-content">
+                    <div class="card-body">
+                        <div class="avatar bg-rgba-warning p-50 m-0 mb-1">
+                            <div class="avatar-content">
+                                <i class="feather icon-package text-warning font-medium-5"></i>
+                            </div>
+                        </div>
+                        <h2 class="text-bold-700">26.8</h2>
+                        <p class="mb-0 line-ellipsis">Today's Orders Received</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class=" col-12">
             <div class="row">
