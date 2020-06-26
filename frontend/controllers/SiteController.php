@@ -107,6 +107,7 @@ class SiteController extends Controller {
                     ->all();
 
 
+
             //New orders
             $today_new_orders = Order::find()
                     ->where(['order_status' => Order::STATUS_PENDING])
@@ -115,7 +116,7 @@ class SiteController extends Controller {
                     ->orWhere(['order_status' => Order::STATUS_COMPLETE])
                     ->orWhere(['order_status' => Order::STATUS_CANCELED])
                     ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
+                    ->andWhere(['DATE(order_created_at)' => new Expression('CURDATE()')])
                     ->count();
 
             $this_week_new_orders = Order::find()
@@ -149,7 +150,7 @@ class SiteController extends Controller {
                     ->orWhere(['order_status' => Order::STATUS_COMPLETE])
                     ->orWhere(['order_status' => Order::STATUS_CANCELED])
                     ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
+                    ->andWhere(['DATE(order.order_created_at)' => new Expression('CURDATE()')])
                     ->sum('order_item.qty');
 
 
@@ -179,7 +180,7 @@ class SiteController extends Controller {
             //Customers
             $today_total_customers = Customer::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'customer_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
+                    ->andWhere(['DATE(customer_created_at)' => new Expression('CURDATE()')])
                     ->count();
 
             $this_week_total_customers = Customer::find()
@@ -199,7 +200,7 @@ class SiteController extends Controller {
                     ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
                     ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
                     ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
-                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
+                    ->andWhere(['DATE(order_created_at)' => new Expression('CURDATE()')])
                     ->sum('total_price');
 
             $this_week_total_revenue = Order::find()
