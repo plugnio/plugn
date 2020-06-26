@@ -223,6 +223,36 @@ class OrderController extends Controller {
      * @param type $status
      * @return type
      */
+    public function actionViewInvoice($order_uuid, $restaurantUuid) {
+        $order_model = $this->findModel($order_uuid, $restaurantUuid);
+
+        // Item
+        $orderItems = new \yii\data\ActiveDataProvider([
+            'query' => $order_model->getOrderItems(),
+            'sort' => false
+        ]);
+
+        // Item extra optn
+        $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
+            'query' => $order_model->getOrderItemExtraOptions()
+        ]);
+
+
+        return $this->render('invoice', [
+                    'model' => $order_model,
+                    'orderItems' => $orderItems,
+                    'itemsExtraOpitons' => $itemsExtraOpitons,
+        ]);
+    }
+
+    /**
+     * Change order status
+     *
+     * @param type $order_uuid
+     * @param type $restaurantUuid
+     * @param type $status
+     * @return type
+     */
     public function actionChangeOrderStatus($order_uuid, $restaurantUuid, $status) {
         $order_model = $this->findModel($order_uuid, $restaurantUuid);
 

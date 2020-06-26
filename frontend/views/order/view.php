@@ -14,6 +14,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 $this->title = 'Order #' . $model->order_uuid;
 $this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index', 'restaurantUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
+
 \yii\web\YiiAsset::register($this);
 ?>
 
@@ -37,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?php
               if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT) {
-                  echo Html::a('Print', ['download-invoice', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-success']);
+                  echo Html::a('<i class="feather icon-file-text"></i> View Invoice', ['view-invoice',  'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], ['class' => 'btn btn-outline-primary']);
               }
         ?>
 
