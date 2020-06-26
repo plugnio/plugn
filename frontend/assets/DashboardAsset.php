@@ -41,26 +41,20 @@ class DashboardAsset extends AssetBundle {
       'app-assets/css/pages/aggrid.css',
       'app-assets/vendors/css/forms/select/select2.min.css',
       'app-assets/vendors/css/ui/prism.min.css',
-
-
-
-
       'css/fileinput.css',
-
-
-
-
       'app-assets/vendors/css/vendors.min.css',
       'app-assets/vendors/css/editors/quill/katex.min.css',
       'app-assets/vendors/css/editors/quill/monokai-sublime.min.css',
       'app-assets/vendors/css/editors/quill/quill.snow.css',
       'app-assets/vendors/css/editors/quill/quill.bubble.css',
-
-
-
    'app-assets/vendors/css/charts/apexcharts.css',
 
 
+
+
+  'app-assets/vendors/css/pickers/pickadate/pickadate.css',
+
+'app-assets/css/pages/invoice.css'
 
 
     ];
@@ -114,7 +108,7 @@ class DashboardAsset extends AssetBundle {
             'app-assets/js/scripts/editors/editor-quill.js',
 
 
-
+            'app-assets/js/scripts/pages/invoice.js'
 
            //
            // 'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/vendors/js/vendors.min.js?id=0eef70ca571453be304a',

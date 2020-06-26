@@ -10,37 +10,6 @@ use yii\grid\GridView;
 
 $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
 $this->title = $restaurant_model->name;
-
-// $js = "
-// let today = $('#today');
-// let thisWeek = $('#thisWeek');
-// let thisMonth = $('#thisMonth');
-//
-//
-// today.click(function(){
-//   console.log('today');
-//   $('#todayData').show();
-//   $('#thisWeekData').hide();
-//   $('#thisMonthData').hide();
-// });
-//
-// thisWeek.click(function(){
-//     console.log('week');
-//   $('#todayData').hide();
-//   $('#thisWeekData').show();
-//   $('#thisMonthData').hide();
-// });
-//
-// thisMonth.click(function(){
-//     console.log('month');
-//   $('#todayData').hide();
-//   $('#thisWeekData').hide();
-//   $('#thisMonthData').show();
-// });
-//
-//
-// ";
-//
 ?>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -223,6 +192,7 @@ $this->title = $restaurant_model->name;
             document.querySelector('#orders-recevied-chart'),
             orderReceivedChartOptions
             );
+            
     var revenueGeneratedChartOptions = {
     chart: {
     height: 100,
@@ -283,7 +253,8 @@ $this->title = $restaurant_model->name;
     var revenueGeneratedChart = new ApexCharts(
             document.querySelector('#revenue-generated-chart'),
             revenueGeneratedChartOptions
-            );
+        );
+
     var customerGainedChartOptions = {
     chart: {
     height: 100,
@@ -355,18 +326,28 @@ $this->title = $restaurant_model->name;
 
 </script>
 
-
 <!-- Dashboard Ecommerce Starts -->
 <section id="dashboard-ecommerce">
     <div class="row">
         <div class="col-lg-3 col-sm-6 col-12">
             <div class="card">
-                <div class="card-header d-flex flex-column align-items-start pb-0">
+                <div style="padding:21px">
                     <div class="avatar bg-rgba-primary p-50 m-0">
                         <div class="avatar-content">
                             <i class="feather icon-users text-primary font-medium-5"></i>
                         </div>
                     </div>
+                    <div class="dropdown chart-dropdown" style="float:right">
+                        <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px" type="button" id="dropdownItem4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Today
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownItem4">
+                          <a class="dropdown-item" href="#">Today</a>
+                          <a class="dropdown-item" href="#">This Week</a>
+                          <a class="dropdown-item" href="#">This Month</a>
+                        </div>
+                    </div>
+
                     <h2 class="text-bold-700 mt-1">
                         <?= $customers_gained ?>
                     </h2>
@@ -379,18 +360,28 @@ $this->title = $restaurant_model->name;
         </div>
         <div class="col-lg-3 col-sm-6 col-12">
             <div class="card">
-                <div class="card-header d-flex flex-column align-items-start pb-0">
+                <div style="padding:21px">
                     <div class="avatar bg-rgba-success p-50 m-0">
                         <div class="avatar-content">
                             <i class="feather icon-credit-card text-success font-medium-5"></i>
                         </div>
                     </div>
+                    <div class="dropdown chart-dropdown" style="float:right">
+                        <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px" type="button" id="dropdownItem4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Today
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownItem4">
+                          <a class="dropdown-item" href="#">Today</a>
+                          <a class="dropdown-item" href="#">This Week</a>
+                          <a class="dropdown-item" href="#">This Month</a>
+                        </div>
+                    </div>
                     <h2 class="text-bold-700 mt-1">
-                        <?= $revenue_generated ? Yii::$app->formatter->asCurrency($revenue_generated, 'KWD', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) : 0 ?>
-
+                      <?= $revenue_generated ? Yii::$app->formatter->asCurrency($revenue_generated, 'KWD', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) : 0 ?>
                     </h2>
                     <p class="mb-0">Revenue Generated</p>
                 </div>
+
                 <div class="card-content">
                     <div id="revenue-generated-chart"></div>
                 </div>
@@ -398,14 +389,24 @@ $this->title = $restaurant_model->name;
         </div>
         <div class="col-lg-3 col-sm-6 col-12">
             <div class="card">
-                <div class="card-header d-flex flex-column align-items-start pb-0">
+                <div style="padding:21px">
                     <div class="avatar bg-rgba-danger p-50 m-0">
                         <div class="avatar-content">
                             <i class="feather icon-shopping-cart text-danger font-medium-5"></i>
                         </div>
                     </div>
+                    <div class="dropdown chart-dropdown" style="float:right">
+                        <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px" type="button" id="dropdownItem4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Today
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownItem4">
+                          <a class="dropdown-item" href="#">Today</a>
+                          <a class="dropdown-item" href="#">This Week</a>
+                          <a class="dropdown-item" href="#">This Month</a>
+                        </div>
+                    </div>
                     <h2 class="text-bold-700 mt-1">
-                        <?= $sold_item ? $sold_item : 0 ?>
+                      <?= $sold_item ? $sold_item : 0 ?>
                     </h2>
                     <p class="mb-0">Sold Items</p>
                 </div>
@@ -416,17 +417,30 @@ $this->title = $restaurant_model->name;
         </div>
         <div class="col-lg-3 col-sm-6 col-12">
             <div class="card">
-                <div class="card-header d-flex flex-column align-items-start pb-0">
+                <div style="padding:21px">
                     <div class="avatar bg-rgba-warning p-50 m-0">
                         <div class="avatar-content">
                             <i class="feather icon-package text-warning font-medium-5"></i>
                         </div>
                     </div>
+                    <div class="dropdown chart-dropdown" style="float:right">
+                        <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px" type="button" id="dropdownItem4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Today
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownItem4">
+                            <a class="dropdown-item" href="#">Today</a>
+                            <a class="dropdown-item" href="#">This Week</a>
+                            <a class="dropdown-item" href="#">This Month</a>
+                        </div>
+                    </div>
                     <h2 class="text-bold-700 mt-1">
-                        <?= $orders_received ? $orders_received : 0 ?>
+                      <?= $orders_received ? $orders_received : 0 ?>
                     </h2>
                     <p class="mb-0">Orders Received</p>
                 </div>
+
+
+
                 <div class="card-content">
                     <div id="orders-recevied-chart"></div>
                 </div>
@@ -518,7 +532,7 @@ $this->title = $restaurant_model->name;
 
                                     </tbody>
                                 </table>
-                                
+
 
                             </div>
                         </div>
