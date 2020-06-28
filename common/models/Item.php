@@ -304,6 +304,20 @@ class Item extends \yii\db\ActiveRecord
      * Gets query for [[Options]].
      *
      */
+    public function getSoldUnits(){
+      return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid'])
+            ->joinWith('order')
+            ->where(['order.order_status' => Order::STATUS_PENDING])
+            ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
+            ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+            ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+            ->sum('qty');
+    }
+    
+    /**
+     * Gets query for [[Options]].
+     *
+     */
     public function getTodaySoldUnits(){
       return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid'])
             ->joinWith('order')
