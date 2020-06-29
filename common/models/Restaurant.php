@@ -33,6 +33,8 @@ use yii\behaviors\AttributeBehavior;
  * @property int $custom_css
  * @property int $store_layout
  * @property int $platform_fee
+ * @property int $facebook_pixil_id
+ * @property int $google_analytics_id
 
  *
  *
@@ -99,7 +101,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['custom_css'], 'string'],
             [['platform_fee'], 'number'],
-            [['date_range_picker_with_time'], 'safe'],
+            [['date_range_picker_with_time','google_analytics_id', 'facebook_pixil_id'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'app_id' ,'armada_api_key','store_branch_name'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 8, 'max' => 8],
             [['phone_number'], 'integer', 'min' => 0],
@@ -141,7 +143,8 @@ class Restaurant extends \yii\db\ActiveRecord {
             'custom_css' => 'Custom css',
             'platform_fee' => 'Platform fee',
             'store_layout' => 'Store layout',
-
+            'google_analytics_id' => 'Google Analytics ID',
+            'facebook_pixil_id' => 'Facebook Pixil ID'
         ];
     }
 
