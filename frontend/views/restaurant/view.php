@@ -121,6 +121,22 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                             'visible' => $model->armada_api_key != null,
                         ],
+                        [
+                            'attribute' => 'google_analytics_id',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return $data->google_analytics_id;
+                            },
+                            'visible' => $model->google_analytics_id != null,
+                        ],
+                        [
+                            'attribute' => 'facebook_pixil_id',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return $data->facebook_pixil_id;
+                            },
+                            'visible' => $model->facebook_pixil_id != null,
+                        ],
                         'restaurant_created_at',
                         'restaurant_updated_at',
                     ],
