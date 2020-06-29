@@ -25,24 +25,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
             'restaurant_uuid',
             'name',
             'name_ar',
-            // 'platform_fee',
-            'restaurant_email',
-            'platform_fee',
-            //'tagline_ar',
-            //'status',
-            //'thumbnail_image',
-            //'logo',
-            //'support_delivery',
-            //'support_pick_up',
-            //'min_charge',
-
-            //'phone_number',
-            //'restaurant_created_at',
-            //'restaurant_updated_at',
+            'restaurant_created_at:datetime',
+            'platform_fee:percent',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

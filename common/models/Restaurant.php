@@ -16,6 +16,7 @@ use yii\behaviors\AttributeBehavior;
  * @property string|null $tagline
  * @property string|null $tagline_ar
  * @property string|null $restaurant_domain
+*  @property int $app_id
  * @property int $restaurant_status
  * @property string $thumbnail_image
  * @property string $logo
@@ -32,6 +33,7 @@ use yii\behaviors\AttributeBehavior;
  * @property int $custom_css
  * @property int $store_layout
  * @property int $platform_fee
+
  *
  *
  * @property AgentAssignment[] $agentAssignments
@@ -86,7 +88,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['name', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_domain', 'restaurant_email','store_branch_name'], 'required', 'on' => 'create'],
+            [['name', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_domain', 'restaurant_email','store_branch_name','app_id'], 'required', 'on' => 'create'],
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['restaurant_status', 'support_delivery', 'support_pick_up'], 'integer', 'min' => 0],
@@ -98,7 +100,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['custom_css'], 'string'],
             [['platform_fee'], 'number'],
             [['date_range_picker_with_time'], 'safe'],
-            [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'armada_api_key','store_branch_name'], 'string', 'max' => 255],
+            [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'app_id' ,'armada_api_key','store_branch_name'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 8, 'max' => 8],
             [['phone_number'], 'integer', 'min' => 0],
             [['restaurant_email_notification','phone_number_display','store_layout'], 'integer'],
@@ -118,6 +120,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             'tagline' => 'Tagline',
             'tagline_ar' => 'Tagline in Arabic',
             'restaurant_domain' => 'Domain',
+            'app_id' => 'App id',
             'restaurant_status' => 'Store Status',
             'thumbnail_image' => 'Header Image',
             'logo' => 'Logo',

@@ -97,6 +97,8 @@ $this->registerJs($js);
     <?= $form->field($model, 'tagline_ar')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'restaurant_domain')->textInput(['maxlength' => true]) ?>
+    
+    <?= $form->field($model, 'app_id')->textInput(['maxlength' => true]) ?>
 
     <?=
     $form->field($model, 'restaurant_thumbnail_image')->widget(FileInput::classname(), [
