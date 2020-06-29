@@ -77,7 +77,7 @@ class RestaurantController extends Controller {
     public function actionGetRestaurantData($branch_name) {
 
         $restaurant = Restaurant::find()
-                ->select(['restaurant_uuid', 'name', 'logo', 'tagline', 'restaurant_domain','custom_css'])
+                ->select(['restaurant_uuid', 'name', 'logo', 'tagline', 'restaurant_domain','app_id','custom_css'])
                 ->where(['store_branch_name' => $branch_name])
                 ->one();
 
@@ -93,6 +93,7 @@ class RestaurantController extends Controller {
                 'logo' => $restaurant->logo,
                 'tagline' => $restaurant->tagline,
                 'restaurant_domain' => $restaurant->restaurant_domain,
+                'app_id' => $restaurant->app_id,
                 'custom_css' => $restaurant->custom_css,
                 'theme_color'=> $themeColor->primary,
             ];
