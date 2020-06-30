@@ -143,6 +143,7 @@ $this->registerJs($js);
             x: { show: false }
             },
     }
+
     var soldItemsChart = new ApexCharts(
             document.querySelector('#sold-item-chart'),
             soldItemsChartOptions
@@ -416,7 +417,6 @@ $this->registerJs($js);
                     </div>
 
                     <h2 class="text-bold-700 mt-1">
-                        <?= $customers_gained ?>
                     </h2>
                     <p class="mb-0">Customer Gained</p>
                 </div>
@@ -444,7 +444,6 @@ $this->registerJs($js);
                         </div>
                     </div>
                     <h2 class="text-bold-700 mt-1">
-                      <?= $revenue_generated ? Yii::$app->formatter->asCurrency($revenue_generated, 'KWD', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) : 0 ?>
                     </h2>
                     <p class="mb-0">Revenue Generated</p>
                 </div>
@@ -472,7 +471,6 @@ $this->registerJs($js);
                         </div>
                     </div>
                     <h2 class="text-bold-700 mt-1">
-                      <?= $sold_item ? $sold_item : 0 ?>
                     </h2>
                     <p class="mb-0">Sold Items</p>
                 </div>
@@ -499,7 +497,6 @@ $this->registerJs($js);
                         </div>
                     </div>
                     <h2 class="text-bold-700 mt-1">
-                      <?= $orders_received ? $orders_received : 0 ?>
                     </h2>
                     <p class="mb-0">Orders Received</p>
                 </div>
