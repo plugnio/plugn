@@ -5,6 +5,8 @@ namespace frontend\controllers;
 use Yii;
 use common\models\Restaurant;
 use common\models\Order;
+use common\models\Item;
+use yii\db\Expression;
 use common\models\Customer;
 use common\models\AgentAssignment;
 use yii\data\ActiveDataProvider;
@@ -41,6 +43,168 @@ class RestaurantController extends Controller {
             ],
         ];
     }
+
+
+
+
+    public function actionExportTodaySoldItems($restaurantUuid) {
+        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+
+
+            $today_sold_item = Item::find()
+                    ->joinWith(['orderItems', 'orderItems.order'])
+                    ->where(['order.order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['DATE(order.order_created_at)' => new Expression('CURDATE()')])
+                    ->all();
+
+            header('Access-Control-Allow-Origin: *');
+            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
+            header("Cache-Control: max-age=0");
+
+
+            \moonland\phpexcel\Excel::export([
+                'isMultipleSheet' => false,
+                'models' => $today_sold_item,
+                'columns' => [
+                    'item_name',
+                    [
+                        'label' => 'Sold items',
+                        'format' => 'html',
+                        'value' => function ($data) {
+
+                            return $data->getTodaySoldUnits();
+                        },
+                    ],
+                ],
+            ]);
+        }
+    }
+
+
+    public function actionExportLastSevenDaysSoldItems($restaurantUuid) {
+        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+
+
+            $this_week_sold_item = Item::find()
+                          ->joinWith(['orderItems', 'orderItems.order'])
+                          ->where(['order.order_status' => Order::STATUS_PENDING])
+                          ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
+                          ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                          ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+                          ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                          ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
+                          ->all();
+
+            header('Access-Control-Allow-Origin: *');
+            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
+            header("Cache-Control: max-age=0");
+
+
+            \moonland\phpexcel\Excel::export([
+                'isMultipleSheet' => false,
+                'models' => $this_week_sold_item,
+                'columns' => [
+                    'item_name',
+                    [
+                      'label' => 'Sold items',
+                        'format' => 'html',
+                        'value' => function ($data) {
+                            return $data->getThisWeekSoldUnits();
+                        },
+                    ],
+                ],
+            ]);
+        }
+    }
+
+
+
+
+        public function actionExportThisMonthsSoldItems($restaurantUuid) {
+
+            if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+
+
+                $this_month_sold_item = Item::find()
+                        ->joinWith(['orderItems', 'orderItems.order'])
+                        ->where(['order.order_status' => Order::STATUS_PENDING])
+                        ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
+                        ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                        ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+                        ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                        ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
+                        ->all();
+
+                header('Access-Control-Allow-Origin: *');
+                header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
+                header("Cache-Control: max-age=0");
+
+
+                \moonland\phpexcel\Excel::export([
+                    'isMultipleSheet' => false,
+                    'models' => $this_month_sold_item,
+                    'columns' => [
+                        'item_name',
+                        [
+                            'label' => 'role',
+                            'format' => 'html',
+                            'value' => function ($data) {
+
+                                return $data->getThisMonthSoldUnits();
+                            },
+                        ],
+                    ],
+                ]);
+            }
+        }
+
+        public function actionExportLastThreeMonthsSoldItems($restaurantUuid) {
+
+            if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+
+
+                $this_month_sold_item = Item::find()
+                        ->joinWith(['orderItems', 'orderItems.order'])
+                        ->where(['order.order_status' => Order::STATUS_PENDING])
+                        ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
+                        ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                        ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+                        ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                        ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
+                        ->all();
+
+                header('Access-Control-Allow-Origin: *');
+                header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
+                header("Cache-Control: max-age=0");
+
+
+                \moonland\phpexcel\Excel::export([
+                    'isMultipleSheet' => false,
+                    'models' => $this_month_sold_item,
+                    'columns' => [
+                        'item_name',
+                        [
+                            'label' => 'role',
+                            'format' => 'html',
+                            'value' => function ($data) {
+
+                                return $data->getThisMonthSoldUnits();
+                            },
+                        ],
+                    ],
+                ]);
+            }
+        }
+
+
 
     /**
      * @return mixed

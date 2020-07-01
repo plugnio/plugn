@@ -511,8 +511,6 @@ $this->registerJs($js);
                         </div>
 
                     </div>
-            <button type="button" name="button" class="vs-component vs-button vs-button-warning vs-button-filled includeIcon includeIconOnly vs-radius">
-              <span class="vs-button-backgroundx vs-button--background" style="opacity: 1; left: 20px; top: 20px; width: 0px; height: 0px; transition: width 0.3s ease 0s, height 0.3s ease 0s, opacity 0.3s ease 0s;"></span><i class="vs-icon notranslate icon-scale vs-button--icon  feather icon-archive null" style="order: 0; margin-right: 0px; margin-left: 0px;"></i><!----><span class="vs-button-linex" style="top: auto; bottom: -2px; left: 50%; transform: translate(-50%);"></span></button>
                     <h2 class="text-bold-700 mt-1 number-of-sold-items">
                       <?= $number_of_all_sold_item_this_week ?>
                     </h2>
@@ -658,7 +656,7 @@ $this->registerJs($js);
 
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="new-order-table">
 
                                         <?php
                                         foreach ($incoming_orders as $order) {
@@ -666,7 +664,7 @@ $this->registerJs($js);
                                             <tr>
                                                 <td>
                                                     <?=
-                                                    Html::a('#' . $order->order_uuid, ['order/view', 'id' => $order->order_uuid, 'restaurantUuid' => $order->restaurant_uuid])
+                                                    Html::a('#' . $order->order_uuid, ['order/view', 'id' => $order->order_uuid, 'restaurantUuid' => $order->restaurant_uuid],['target' => '_blank'])
                                                     ?>
                                                 </td>
 

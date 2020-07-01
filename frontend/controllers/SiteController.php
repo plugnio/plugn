@@ -781,7 +781,7 @@ class SiteController extends Controller {
                         'restaurant_model' => $managedRestaurant,
                         'incoming_orders' => $incoming_orders,
                         //customer gained
-                        'today_customer_gained' => $today_customer_gained,
+                        'today_customer_gained' => $today_customer_gained ? $today_customer_gained : 0,
                         'number_of_all_customer_gained_last_three_months' => $number_of_all_customer_gained_last_three_months,
                         'number_of_all_customer_gained_last_month' => $number_of_all_customer_gained_last_month,
                         'number_of_all_customer_gained_this_week' => $number_of_all_customer_gained_this_week,
@@ -792,7 +792,7 @@ class SiteController extends Controller {
 
 
                         //revenue Generated
-                        'today_revenue_generated' => $today_revenue_generated,
+                        'today_revenue_generated' => $today_revenue_generated ? $today_revenue_generated : 0,
                         'number_of_all_revenue_generated_last_three_months' => $number_of_all_revenue_generated_last_three_months,
                         'number_of_all_revenue_generated_last_month' => $number_of_all_revenue_generated_last_month,
                         'number_of_all_revenue_generated_this_week' => $number_of_all_revenue_generated_this_week,
@@ -803,19 +803,19 @@ class SiteController extends Controller {
 
 
                         //sold_item
-                        'today_sold_items' => $today_sold_items,
+                        'today_sold_items' => $today_sold_items ? $today_sold_items : 0,
                         'number_of_all_sold_item_last_three_months' => $number_of_all_sold_item_last_three_months,
                         'number_of_all_sold_item_last_month' => $number_of_all_sold_item_last_month,
                         'number_of_all_sold_item_this_week' => $number_of_all_sold_item_this_week,
 
                         //sold_item chart
-                        'sold_item_chart_data_this_week' => $sold_item_chart_data_this_week,
+                        'sold_item_chart_data_this_week' => $sold_item_chart_data_this_week ? $sold_item_chart_data_this_week : 0,
                         'sold_item_chart_data_last_month' => $sold_item_chart_data_last_month,
                         'sold_item_chart_data_last_three_months' => $sold_item_chart_data_last_three_months,
 
 
                         //orders_received
-                        'today_orders_received' => $today_orders_received,
+                        'today_orders_received' => $today_orders_received ? $today_orders_received : 0,
                         'number_of_all_orders_received_last_three_months' => $number_of_all_orders_received_last_three_months,
                         'number_of_all_orders_received_last_month' => $number_of_all_orders_received_last_month,
                         'number_of_all_orders_received_this_week' => $number_of_all_orders_received_this_week,
@@ -1058,7 +1058,7 @@ class SiteController extends Controller {
 
 
         return $this->render('incoming-orders-table', [
-                    'orders' => $newOrders,
+'orders' => $newOrders
         ]);
     }
 
