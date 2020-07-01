@@ -19,7 +19,21 @@ use common\models\Order;
     </div>
     <!-- info row -->
     <div class="row invoice-info">
-        <div class="col-sm-4 invoice-col">
+      <div style="margin-bottom:20px">
+          <b>Order ID:</b>
+          <?= $model->order_uuid ?>
+              <br>
+              <b>Order Placed:</b>
+              <?= \Yii::$app->formatter->asDatetime($model->order_created_at) ?>
+                  <br>
+                  <b>Invoice Date:</b>
+                  <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy') ?>
+                      <br>
+                      <b>Order Status:</b>
+                      <?= $model->getOrderStatus() ?>
+                          <br>
+      </div>
+        <div>
             <address>
                 <b>Customer Name:</b> <?= $model->customer_name ?> <br>
                 <b>Phone:</b> <?= $model->customer_phone_number ?> <br>
@@ -37,20 +51,7 @@ use common\models\Order;
             </address>
         </div>
         <!-- /.col -->
-        <div class="col-sm-4 invoice-col">
-            <b>Order ID:</b>
-            <?= $model->order_uuid ?>
-                <br>
-                <b>Order Placed:</b>
-                <?= \Yii::$app->formatter->asDatetime($model->order_created_at) ?>
-                    <br>
-                    <b>Invoice Date:</b>
-                    <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy') ?>
-                        <br>
-                        <b>Order Status:</b>
-                        <?= $model->getOrderStatus() ?>
-                            <br>
-        </div>
+
         <!-- /.col -->
     </div>
 
