@@ -110,53 +110,22 @@ class SiteController extends Controller {
 
 
             //Orders Recevied
-            $orders_received_chart_data = [];
+            $orders_received_chart_data_this_week = [];
+            $orders_received_chart_data_last_month = [];
+            $orders_received_chart_data_last_three_months = [];
 
-              $number_of_all_orders_received_last_three_months = Order::find()
+
+            $number_of_all_orders_received_last_three_months = Order::find()
                     ->where(['order_status' => Order::STATUS_PENDING])
                     ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
                     ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
                     ->orWhere(['order_status' => Order::STATUS_COMPLETE])
                     ->orWhere(['order_status' => Order::STATUS_CANCELED])
                     ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 3 MONTH)')])
+                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 3 MONTH)')])
                     ->count();
 
-              $number_of_all_orders_received_last_month = Order::find()
-                    ->where(['order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
-                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
-                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 MONTH)')])
-                    ->count();
-
-              $number_of_all_orders_received_last_week = Order::find()
-                    ->where(['order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
-                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
-                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 WEEK)')])
-                    ->count();
-
-
-              $orders_received_last_two_months = Order::find()
-                    ->where(['order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
-                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
-                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
-                    ->count();
-
-              array_push($orders_received_chart_data, (int) ($orders_received_last_two_months));
-
-              $orders_received_last_month = Order::find()
+            $number_of_all_orders_received_last_month = Order::find()
                     ->where(['order_status' => Order::STATUS_PENDING])
                     ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
                     ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
@@ -167,9 +136,108 @@ class SiteController extends Controller {
                     ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
                     ->count();
 
-              array_push($orders_received_chart_data, (int) ($orders_received_last_month));
+            $number_of_all_orders_received_this_week = Order::find()
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
+                    ->count();
 
-              $orders_received_current_month = Order::find()
+            //order recevied chart
+            $number_of_all_orders_received_last_7_days_only = Order::find()
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 6 DAY) ')
+                    ->count();
+
+            array_push($orders_received_chart_data_this_week, (int) ($number_of_all_orders_received_last_7_days_only));
+
+            $number_of_all_orders_received_last_6_days_only = Order::find()
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')
+                    ->count();
+
+            array_push($orders_received_chart_data_this_week, (int) ($number_of_all_orders_received_last_6_days_only));
+
+            $number_of_all_orders_received_last_5_days_only = Order::find()
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 4 DAY) ')
+                    ->count();
+
+
+            array_push($orders_received_chart_data_this_week, (int) ($number_of_all_orders_received_last_5_days_only));
+
+            $number_of_all_orders_received_last_4_days_only = Order::find()
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 3 DAY) ')
+                    ->count();
+
+
+            array_push($orders_received_chart_data_this_week, (int) ($number_of_all_orders_received_last_4_days_only));
+
+            $number_of_all_orders_received_last_3_days_only = Order::find()
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')
+                    ->count();
+
+
+            array_push($orders_received_chart_data_this_week, (int) ($number_of_all_orders_received_last_3_days_only));
+
+            $number_of_all_orders_received_last_2_days_only = Order::find()
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 1 DAY) ')
+                    ->count();
+
+
+            array_push($orders_received_chart_data_this_week, (int) ($number_of_all_orders_received_last_2_days_only));
+
+
+            $number_of_all_orders_received_today_only = Order::find()
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['DATE(order.order_created_at)' => new Expression('CURDATE()')])
+                    ->count();
+
+            array_push($orders_received_chart_data_this_week, (int) ($number_of_all_orders_received_today_only));
+
+            //last month
+            $number_of_all_orders_received_last_two_months_only = Order::find()
                     ->where(['order_status' => Order::STATUS_PENDING])
                     ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
                     ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
@@ -177,15 +245,51 @@ class SiteController extends Controller {
                     ->orWhere(['order_status' => Order::STATUS_CANCELED])
                     ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
+                    ->count();
+
+            array_push($orders_received_chart_data_last_month, (int) ($number_of_all_orders_received_last_two_months_only));
+
+            $number_of_all_orders_received_last_month_only = Order::find()
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->count();
+
+            array_push($orders_received_chart_data_last_month, (int) ($number_of_all_orders_received_last_month_only));
+
+
+
+            array_push($orders_received_chart_data_last_three_months, (int) ($number_of_all_orders_received_last_two_months_only));
+
+            array_push($orders_received_chart_data_last_three_months, (int) ($number_of_all_orders_received_last_month_only));
+
+            $number_of_all_orders_received_current_month_only = Order::find()
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere('YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
                     ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
                     ->count();
 
-              array_push($orders_received_chart_data, (int) ($orders_received_current_month));
+            array_push($orders_received_chart_data_last_three_months, (int) ($number_of_all_orders_received_current_month_only));
+
 
 
 
             //Sold items
-            $sold_item_chart_data = [];
+            $sold_item_chart_data_this_week = [];
+            $sold_item_chart_data_last_month = [];
+            $sold_item_chart_data_last_three_months = [];
+
 
             $number_of_all_sold_item_last_three_months = OrderItem::find()
                     ->joinWith('order')
@@ -206,10 +310,11 @@ class SiteController extends Controller {
                     ->orWhere(['order_status' => Order::STATUS_COMPLETE])
                     ->orWhere(['order_status' => Order::STATUS_CANCELED])
                     ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 MONTH)')])
+                    ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
                     ->sum('order_item.qty');
 
-            $number_of_all_sold_item_last_week = OrderItem::find()
+            $number_of_all_sold_item_this_week = OrderItem::find()
                     ->joinWith('order')
                     ->where(['order_status' => Order::STATUS_PENDING])
                     ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
@@ -217,10 +322,105 @@ class SiteController extends Controller {
                     ->orWhere(['order_status' => Order::STATUS_COMPLETE])
                     ->orWhere(['order_status' => Order::STATUS_CANCELED])
                     ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 WEEK)')])
+                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
                     ->sum('order_item.qty');
 
-            $sold_item_last_two_months = OrderItem::find()
+
+            //Sold items chart
+            $number_of_all_sold_item_last_7_days_only = OrderItem::find()
+                    ->joinWith('order')
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 6 DAY) ')
+                    ->sum('order_item.qty');
+
+            array_push($sold_item_chart_data_this_week, (int) ($number_of_all_sold_item_last_7_days_only));
+
+            $number_of_all_sold_item_last_6_days_only = OrderItem::find()
+                    ->joinWith('order')
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')
+                    ->sum('order_item.qty');
+
+            array_push($sold_item_chart_data_this_week, (int) ($number_of_all_sold_item_last_6_days_only));
+
+            $number_of_all_sold_item_last_5_days_only = OrderItem::find()
+                    ->joinWith('order')
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 4 DAY) ')
+                    ->sum('order_item.qty');
+
+            array_push($sold_item_chart_data_this_week, (int) ($number_of_all_sold_item_last_5_days_only));
+
+            $number_of_all_sold_item_last_4_days_only = OrderItem::find()
+                    ->joinWith('order')
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 3 DAY) ')
+                    ->sum('order_item.qty');
+
+            array_push($sold_item_chart_data_this_week, (int) ($number_of_all_sold_item_last_4_days_only));
+
+            $number_of_all_sold_item_last_3_days_only = OrderItem::find()
+                    ->joinWith('order')
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')
+                    ->sum('order_item.qty');
+
+            array_push($sold_item_chart_data_this_week, (int) ($number_of_all_sold_item_last_3_days_only));
+
+            $number_of_all_sold_item_last_2_days_only = OrderItem::find()
+                    ->joinWith('order')
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 1 DAY) ')
+                    ->sum('order_item.qty');
+
+            array_push($sold_item_chart_data_this_week, (int) ($number_of_all_sold_item_last_2_days_only));
+
+
+            $number_of_all_sold_item_today_only = OrderItem::find()
+                    ->joinWith('order')
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['DATE(order.order_created_at)' => new Expression('CURDATE()')])
+                    ->sum('order_item.qty');
+
+            array_push($sold_item_chart_data_this_week, (int) ($number_of_all_sold_item_today_only));
+
+            //last month
+            $number_of_all_sold_item_last_two_months_only = OrderItem::find()
                     ->joinWith('order')
                     ->where(['order_status' => Order::STATUS_PENDING])
                     ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
@@ -232,9 +432,9 @@ class SiteController extends Controller {
                     ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
                     ->sum('order_item.qty');
 
-            array_push($sold_item_chart_data, (int) ($sold_item_last_two_months));
+            array_push($sold_item_chart_data_last_month, (int) ($number_of_all_sold_item_last_two_months_only));
 
-            $sold_item_last_month = OrderItem::find()
+            $number_of_all_sold_item_last_month_only = OrderItem::find()
                     ->joinWith('order')
                     ->where(['order_status' => Order::STATUS_PENDING])
                     ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
@@ -246,9 +446,15 @@ class SiteController extends Controller {
                     ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
                     ->sum('order_item.qty');
 
-            array_push($sold_item_chart_data, (int) ($sold_item_last_month));
+            array_push($sold_item_chart_data_last_month, (int) ($number_of_all_sold_item_last_month_only));
 
-            $sold_item_current_month = OrderItem::find()
+
+
+            array_push($sold_item_chart_data_last_three_months, (int) ($number_of_all_sold_item_last_two_months_only));
+
+            array_push($sold_item_chart_data_last_three_months, (int) ($number_of_all_sold_item_last_month_only));
+
+            $number_of_all_sold_item_current_month_only = OrderItem::find()
                     ->joinWith('order')
                     ->where(['order_status' => Order::STATUS_PENDING])
                     ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
@@ -256,63 +462,124 @@ class SiteController extends Controller {
                     ->orWhere(['order_status' => Order::STATUS_COMPLETE])
                     ->orWhere(['order_status' => Order::STATUS_CANCELED])
                     ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
                     ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
                     ->sum('order_item.qty');
 
-              array_push($sold_item_chart_data, (int) ($sold_item_current_month));
+            array_push($sold_item_chart_data_last_three_months, (int) ($number_of_all_sold_item_current_month_only));
+
+
 
 
             //Customers
-            $customer_chart_data = [];
+            $customer_chart_data_this_week = [];
+            $customer_chart_data_last_month = [];
+            $customer_chart_data_last_three_months = [];
 
             $number_of_all_customer_gained_last_three_months = Customer::find()
                     ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     ->andWhere(['>', 'customer.customer_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 3 MONTH)')])
-                    ->count();
+                    ->count(); //19
 
             $number_of_all_customer_gained_last_month = Customer::find()
                     ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'customer.customer_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 MONTH)')])
-                    ->count();
+                    ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->count(); //6
 
-            $number_of_all_customer_gained_last_week = Customer::find()
+
+            $number_of_all_customer_gained_this_week = Customer::find()
                     ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'customer.customer_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 WEEK)')])
+                    ->andWhere(['>', 'customer.customer_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
+                    ->count(); //3
+
+            $number_of_all_customers_gained_last_7_days_only = Customer::find()
+                    ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(`customer_created_at`) = DATE(NOW() - INTERVAL 6 DAY) ')
+                    ->count(); //
+
+            array_push($customer_chart_data_this_week, (int) ($number_of_all_customers_gained_last_7_days_only));
+
+            $number_of_all_customers_gained_last_6_days_only = Customer::find()
+                    ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(`customer_created_at`) = DATE(NOW() - INTERVAL 5 DAY) ')
+                    ->count(); //
+
+            array_push($customer_chart_data_this_week, (int) ($number_of_all_customers_gained_last_6_days_only));
+
+            $number_of_all_customers_gained_last_5_days_only = Customer::find()
+                    ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(`customer_created_at`) = DATE(NOW() - INTERVAL 4 DAY) ')
+                    ->count(); //
+
+            array_push($customer_chart_data_this_week, (int) ($number_of_all_customers_gained_last_5_days_only));
+
+            $number_of_all_customers_gained_last_4_days_only = Customer::find()
+                    ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(`customer_created_at`) = DATE(NOW() - INTERVAL 3 DAY) ')
+                    ->count(); //
+
+            array_push($customer_chart_data_this_week, (int) ($number_of_all_customers_gained_last_4_days_only));
+
+            $number_of_all_customers_gained_last_3_days_only = Customer::find()
+                    ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(`customer_created_at`) = DATE(NOW() - INTERVAL 2 DAY) ')
+                    ->count(); //
+
+            array_push($customer_chart_data_this_week, (int) ($number_of_all_customers_gained_last_3_days_only));
+
+            $number_of_all_customers_gained_last_2_days_only = Customer::find()
+                    ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(`customer_created_at`) = DATE(NOW() - INTERVAL 1 DAY) ')
+                    ->count(); //
+
+            array_push($customer_chart_data_this_week, (int) ($number_of_all_customers_gained_last_2_days_only));
+
+
+            $number_of_all_customers_gained_today_only = Customer::find()
+                    ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['DATE(customer_created_at)' => new Expression('CURDATE()')])
+                    ->count(); //
+
+            array_push($customer_chart_data_this_week, (int) ($number_of_all_customers_gained_today_only));
+
+            //last month
+            $number_of_all_customers_gained_last_two_months_only = Customer::find()
+                    ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
                     ->count();
 
+            array_push($customer_chart_data_last_month, (int) ($number_of_all_customers_gained_last_two_months_only));
 
-            $customers_gained_last_two_month = Customer::find()
-                              ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                              ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                              ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
-                              ->count();
-
-            array_push($customer_chart_data, (int) ($customers_gained_last_two_month));
-
-
-            $customers_gained_last_month = Customer::find()
+            $number_of_all_customers_gained_last_month_only = Customer::find()
                     ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
                     ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
                     ->count();
 
-            array_push($customer_chart_data, (int) ($customers_gained_last_month));
+            array_push($customer_chart_data_last_month, (int) ($number_of_all_customers_gained_last_month_only));
 
+            //last three month
+            array_push($customer_chart_data_last_three_months, (int) ($number_of_all_customers_gained_last_two_months_only));
 
-            $customers_gained_current_month = Customer::find()
+            array_push($customer_chart_data_last_three_months, (int) ($number_of_all_customers_gained_last_month_only));
+
+            $number_of_all_customers_gained_current_month_only = Customer::find()
                     ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
                     ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
                     ->count();
 
-            array_push($customer_chart_data, (int) ($customers_gained_current_month));
-
+            array_push($customer_chart_data_last_three_months, (int) ($number_of_all_customers_gained_current_month_only));
 
 
             //Revenue
-            $revenue_generated_chart_data = [];
 
+            $revenue_generated_chart_data_this_week = [];
+            $revenue_generated_chart_data_last_month = [];
+            $revenue_generated_chart_data_last_three_months = [];
+            $revenue_generated_chart_data = [];
 
             $number_of_all_revenue_generated_last_three_months = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -320,8 +587,8 @@ class SiteController extends Controller {
                     ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
                     ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
                     ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
-                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 3 MONTH)')])
-                    ->sum('total_price');
+                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 3 MONTH)')])
+                    ->sum('total_price'); //434.5
 
             $number_of_all_revenue_generated_last_month = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -329,85 +596,180 @@ class SiteController extends Controller {
                     ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
                     ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
                     ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
-                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 MONTH)')])
-                    ->sum('total_price');
+                    ->andWhere('YEAR(`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->sum('total_price'); //434.5
 
-            $number_of_all_revenue_generated_last_week = Order::find()
+
+            $number_of_all_revenue_generated_this_week = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
                     ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
                     ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
                     ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
-                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 WEEK)')])
+                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
                     ->sum('total_price');
 
 
-            $revenue_generated_last_two_month = Order::find()
+            //Chart
+            $number_of_all_revenue_generated_last_7_days_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
                     ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
                     ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
                     ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
-                    ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
+                    ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 6 DAY) ')
                     ->sum('total_price');
 
+            array_push($revenue_generated_chart_data_this_week, (float) ($number_of_all_revenue_generated_last_7_days_only));
 
-
-            array_push($revenue_generated_chart_data,  number_format((float)$revenue_generated_last_two_month, 3));
-
-
-            $revenue_generated_last_month = Order::find()
+            $number_of_all_revenue_generated_last_6_days_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
                     ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
                     ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
                     ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
-                    ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 5 DAY) ')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data,  number_format((float)$revenue_generated_last_month, 3));
+            array_push($revenue_generated_chart_data_this_week, (float) ($number_of_all_revenue_generated_last_6_days_only));
 
-
-            $revenue_generated_current_month = Order::find()
+            $number_of_all_revenue_generated_last_5_days_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
                     ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
                     ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
                     ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
-                    ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
+                    ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 4 DAY) ')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data,  number_format((float)$revenue_generated_current_month, 3));
+            array_push($revenue_generated_chart_data_this_week, (float) ($number_of_all_revenue_generated_last_5_days_only));
+
+            $number_of_all_revenue_generated_last_4_days_only = Order::find()
+                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                    ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 3 DAY) ')
+                    ->sum('total_price');
+
+            array_push($revenue_generated_chart_data_this_week, (float) ($number_of_all_revenue_generated_last_4_days_only));
+
+            $number_of_all_revenue_generated_last_3_days_only = Order::find()
+                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                    ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 2 DAY) ')
+                    ->sum('total_price');
+
+            array_push($revenue_generated_chart_data_this_week, (float) ($number_of_all_revenue_generated_last_3_days_only));
+
+            $number_of_all_revenue_generated_last_2_days_only = Order::find()
+                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                    ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 1 DAY) ')
+                    ->sum('total_price');
+
+            array_push($revenue_generated_chart_data_this_week, (float) ($number_of_all_revenue_generated_last_2_days_only));
+
+
+            $number_of_all_revenue_generated_today_only = Order::find()
+                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                    ->andWhere(['DATE(order_created_at)' => new Expression('CURDATE()')])
+                    ->sum('total_price');
+
+            array_push($revenue_generated_chart_data_this_week, (float) ($number_of_all_revenue_generated_today_only));
+
+            //last month
+            $number_of_all_revenue_generated_last_two_months_only = Order::find()
+                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                    ->andWhere('YEAR(`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
+                    ->sum('total_price');
+
+            array_push($revenue_generated_chart_data_last_month, (float) ($number_of_all_revenue_generated_last_two_months_only));
+
+            $number_of_all_revenue_generated_last_month_only = Order::find()
+                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                    ->andWhere('YEAR(`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->sum('total_price');
+
+            array_push($revenue_generated_chart_data_last_month, (float) ($number_of_all_revenue_generated_last_month_only));
+
+            //last month
+            array_push($revenue_generated_chart_data_last_three_months, (float) ($number_of_all_revenue_generated_last_two_months_only));
+            array_push($revenue_generated_chart_data_last_three_months, (float) ($number_of_all_revenue_generated_last_month_only));
+
+            $number_of_all_revenue_generated_current_month_only = Order::find()
+                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                    ->andWhere('YEAR(`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
+                    ->sum('total_price');
+
+            array_push($revenue_generated_chart_data_last_three_months, (float) ($number_of_all_revenue_generated_current_month_only));
+
+
 
             return $this->render('index', [
                         'restaurant_model' => $managedRestaurant,
                         'incoming_orders' => $incoming_orders,
-                        'customer_chart_data' => $customer_chart_data,
-                        'revenue_generated_chart_data' => $revenue_generated_chart_data,
-                        'sold_item_chart_data' => $sold_item_chart_data,
-                        'orders_received_chart_data' => $orders_received_chart_data,
-
-                        'number_of_all_orders_received_last_three_months' => $number_of_all_orders_received_last_three_months,
-                        'number_of_all_orders_received_last_month' => $number_of_all_orders_received_last_month,
-                        'number_of_all_orders_received_last_week' => $number_of_all_orders_received_last_week,
-
-                        'number_of_all_sold_item_last_three_months' => $number_of_all_sold_item_last_three_months,
-                        'number_of_all_sold_item_last_month' => $number_of_all_sold_item_last_month,
-                        'number_of_all_sold_item_last_week' => $number_of_all_sold_item_last_week,
-
+                        //customer gained
                         'number_of_all_customer_gained_last_three_months' => $number_of_all_customer_gained_last_three_months,
                         'number_of_all_customer_gained_last_month' => $number_of_all_customer_gained_last_month,
-                        'number_of_all_customer_gained_last_week' => $number_of_all_customer_gained_last_week,
-
+                        'number_of_all_customer_gained_this_week' => $number_of_all_customer_gained_this_week,
+                        //customer gained charts
+                        'customer_chart_data_this_week' => $customer_chart_data_this_week,
+                        'customer_chart_data_last_month' => $customer_chart_data_last_month,
+                        'customer_chart_data_last_three_months' => $customer_chart_data_last_three_months,
+                        //revenue Generated
                         'number_of_all_revenue_generated_last_three_months' => $number_of_all_revenue_generated_last_three_months,
                         'number_of_all_revenue_generated_last_month' => $number_of_all_revenue_generated_last_month,
-                        'number_of_all_revenue_generated_last_week' => $number_of_all_revenue_generated_last_week,
+                        'number_of_all_revenue_generated_this_week' => $number_of_all_revenue_generated_this_week,
+                        //revenue Generated charts
+                        'revenue_generated_chart_data_this_week' => $revenue_generated_chart_data_this_week,
+                        'revenue_generated_chart_data_last_month' => $revenue_generated_chart_data_last_month,
+                        'revenue_generated_chart_data_last_three_months' => $revenue_generated_chart_data_last_three_months,
+                        //sold_item
+                        'number_of_all_sold_item_last_three_months' => $number_of_all_sold_item_last_three_months,
+                        'number_of_all_sold_item_last_month' => $number_of_all_sold_item_last_month,
+                        'number_of_all_sold_item_this_week' => $number_of_all_sold_item_this_week,
 
+                        //sold_item chart
+                        'sold_item_chart_data_this_week' => $sold_item_chart_data_this_week,
+                        'sold_item_chart_data_last_month' => $sold_item_chart_data_last_month,
+                        'sold_item_chart_data_last_three_months' => $sold_item_chart_data_last_three_months,
+                        //orders_received
+                        'number_of_all_orders_received_last_three_months' => $number_of_all_orders_received_last_three_months,
+                        'number_of_all_orders_received_last_month' => $number_of_all_orders_received_last_month,
+                        'number_of_all_orders_received_this_week' => $number_of_all_orders_received_this_week,
 
-
+                        //orders_received chart
+                        'orders_received_chart_data_this_week' => $orders_received_chart_data_this_week,
+                        'orders_received_chart_data_last_month' => $orders_received_chart_data_last_month,
+                        'orders_received_chart_data_last_three_months' => $orders_received_chart_data_last_three_months,
             ]);
         }
     }
