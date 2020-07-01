@@ -302,16 +302,16 @@ class SiteController extends Controller {
             $sold_item_chart_data_last_three_months = [];
 
 
-          $today_sold_items = OrderItem::find()
-                  ->joinWith('order')
-                  ->where(['order_status' => Order::STATUS_PENDING])
-                  ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
-                  ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                  ->orWhere(['order_status' => Order::STATUS_COMPLETE])
-                  ->orWhere(['order_status' => Order::STATUS_CANCELED])
-                  ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                  ->andWhere(['DATE(order_created_at)' => new Expression('CURDATE()')])
-                  ->sum('order_item.qty');
+            $today_sold_items = OrderItem::find()
+                    ->joinWith('order')
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['DATE(order_created_at)' => new Expression('CURDATE()')])
+                    ->sum('order_item.qty');
 
 
 
@@ -789,8 +789,6 @@ class SiteController extends Controller {
                         'customer_chart_data_this_week' => $customer_chart_data_this_week,
                         'customer_chart_data_last_month' => $customer_chart_data_last_month,
                         'customer_chart_data_last_three_months' => $customer_chart_data_last_three_months,
-
-
                         //revenue Generated
                         'today_revenue_generated' => $today_revenue_generated ? $today_revenue_generated : 0,
                         'number_of_all_revenue_generated_last_three_months' => $number_of_all_revenue_generated_last_three_months,
@@ -800,26 +798,20 @@ class SiteController extends Controller {
                         'revenue_generated_chart_data_this_week' => $revenue_generated_chart_data_this_week,
                         'revenue_generated_chart_data_last_month' => $revenue_generated_chart_data_last_month,
                         'revenue_generated_chart_data_last_three_months' => $revenue_generated_chart_data_last_three_months,
-
-
                         //sold_item
                         'today_sold_items' => $today_sold_items ? $today_sold_items : 0,
                         'number_of_all_sold_item_last_three_months' => $number_of_all_sold_item_last_three_months,
                         'number_of_all_sold_item_last_month' => $number_of_all_sold_item_last_month,
                         'number_of_all_sold_item_this_week' => $number_of_all_sold_item_this_week,
-
                         //sold_item chart
                         'sold_item_chart_data_this_week' => $sold_item_chart_data_this_week ? $sold_item_chart_data_this_week : 0,
                         'sold_item_chart_data_last_month' => $sold_item_chart_data_last_month,
                         'sold_item_chart_data_last_three_months' => $sold_item_chart_data_last_three_months,
-
-
                         //orders_received
                         'today_orders_received' => $today_orders_received ? $today_orders_received : 0,
                         'number_of_all_orders_received_last_three_months' => $number_of_all_orders_received_last_three_months,
                         'number_of_all_orders_received_last_month' => $number_of_all_orders_received_last_month,
                         'number_of_all_orders_received_this_week' => $number_of_all_orders_received_this_week,
-
                         //orders_received chart
                         'orders_received_chart_data_this_week' => $orders_received_chart_data_this_week,
                         'orders_received_chart_data_last_month' => $orders_received_chart_data_last_month,
@@ -1058,7 +1050,7 @@ class SiteController extends Controller {
 
 
         return $this->render('incoming-orders-table', [
-'orders' => $newOrders
+                    'orders' => $newOrders
         ]);
     }
 

@@ -12,7 +12,7 @@ $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
 $this->title = $restaurant_model->name;
 
 
-$js= "
+$js = "
  $(document).ready(function(){
     $('#dropdownCustomerGained').html('Last 7 days');
     $('#dropdownRevenueGenerated').html('Last 7 days');
@@ -21,7 +21,6 @@ $js= "
 });
 ";
 $this->registerJs($js);
-
 ?>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -207,7 +206,6 @@ $this->registerJs($js);
             document.querySelector('#orders-recevied-chart'),
             orderReceivedChartOptions
             );
-
     var revenueGeneratedChartOptions = {
     chart: {
     height: 100,
@@ -269,11 +267,10 @@ $this->registerJs($js);
     var revenueGeneratedChart = new ApexCharts(
             document.querySelector('#revenue-generated-chart'),
             revenueGeneratedChartOptions
-        );
-
+            );
     var customerGainedChartOptions = {
     chart: {
-            height: 100,
+    height: 100,
             type: 'area',
             toolbar: {
             show: false,
@@ -288,7 +285,7 @@ $this->registerJs($js);
                             right: 0
                     }
             },
-          },
+    },
             colors: [primary],
             dataLabels: {
             enabled: false
@@ -333,100 +330,80 @@ $this->registerJs($js);
             document.querySelector('#customer-gained-chart'),
             customerGainedChartOptions
             );
-
-
-      customerGainedChart.render();
-
-      revenueGeneratedChart.render();
-
-      soldItemsChart.render();
-
-      orderReceivedChart.render();
-
-
+    customerGainedChart.render();
+    revenueGeneratedChart.render();
+    soldItemsChart.render();
+    orderReceivedChart.render();
     function addData(chart, data) {
-        chart.opts.series[0].data = data;
-        chart.update();
+    chart.opts.series[0].data = data;
+    chart.update();
     }
 
     //Get customer gained
     document.getElementById("getCustomerGainedLast7DaysData").addEventListener("click", function(){
-      $('#dropdownCustomerGained').html('Last 7 days');
-      $('.number-of-customer-gained').html(<?= $number_of_all_customer_gained_this_week ?>);
-      addData(customerGainedChart,<?= json_encode($customer_chart_data_this_week) ?>);
+    $('#dropdownCustomerGained').html('Last 7 days');
+    $('.number-of-customer-gained').html(<?= $number_of_all_customer_gained_this_week ?>);
+    addData(customerGainedChart,<?= json_encode($customer_chart_data_this_week) ?>);
     });
-
     document.getElementById("getCustomerGainedLastMonth").addEventListener("click", function(){
-      $('#dropdownCustomerGained').html('Last Month');
-      $('.number-of-customer-gained').html(<?= $number_of_all_customer_gained_last_month ?>);
-      addData(customerGainedChart,<?= json_encode($customer_chart_data_last_month)   ?>);
+    $('#dropdownCustomerGained').html('Last Month');
+    $('.number-of-customer-gained').html(<?= $number_of_all_customer_gained_last_month ?>);
+    addData(customerGainedChart,<?= json_encode($customer_chart_data_last_month) ?>);
     });
-
     document.getElementById("getCustomerGainedLast3Months").addEventListener("click", function(){
-      $('#dropdownCustomerGained').html('Last 3 Months');
-      $('.number-of-customer-gained').html(<?= $number_of_all_customer_gained_last_three_months ?>);
-      addData(customerGainedChart,<?= json_encode($customer_chart_data_last_three_months)   ?>);
+    $('#dropdownCustomerGained').html('Last 3 Months');
+    $('.number-of-customer-gained').html(<?= $number_of_all_customer_gained_last_three_months ?>);
+    addData(customerGainedChart,<?= json_encode($customer_chart_data_last_three_months) ?>);
     });
-
-
     // Get Revenue Generated
     document.getElementById("getRevenueGeneratedLast7DaysData").addEventListener("click", function(){
-      $('#dropdownRevenueGenerated').html('Last 7 days');
-      $('.number-of-revenue-generated').html ( <?= $number_of_all_revenue_generated_this_week ?> );
-      addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_this_week)   ?>);
+    $('#dropdownRevenueGenerated').html('Last 7 days');
+    $('.number-of-revenue-generated').html (<?= $number_of_all_revenue_generated_this_week ?>);
+    addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_this_week) ?>);
     });
-
     document.getElementById("getRevenueGeneratedLastMonth").addEventListener("click", function(){
-      $('#dropdownRevenueGenerated').html('Last Month');
-      $('.number-of-revenue-generated').html ( <?= $number_of_all_revenue_generated_last_month ?> );
-      addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_month)   ?>);
+    $('#dropdownRevenueGenerated').html('Last Month');
+    $('.number-of-revenue-generated').html (<?= $number_of_all_revenue_generated_last_month ?>);
+    addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_month) ?>);
     });
-
     document.getElementById("getRevenueGeneratedLast3Months").addEventListener("click", function(){
-      $('#dropdownRevenueGenerated').html('Last 3 Months');
-      $('.number-of-revenue-generated').html ( <?= $number_of_all_revenue_generated_last_three_months ?> );
-      addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_three_months)   ?>);
+    $('#dropdownRevenueGenerated').html('Last 3 Months');
+    $('.number-of-revenue-generated').html (<?= $number_of_all_revenue_generated_last_three_months ?>);
+    addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_three_months) ?>);
     });
-
     // Get Sold Items
     document.getElementById("getSoldItemsLast7DaysData").addEventListener("click", function(){
-      $('#dropdownSoldItems').html('Last 7 days');
-      $('.number-of-sold-items').html(<?= $number_of_all_sold_item_this_week ?>);
-      addData(soldItemsChart,<?= json_encode($sold_item_chart_data_this_week)   ?>);
+    $('#dropdownSoldItems').html('Last 7 days');
+    $('.number-of-sold-items').html(<?= $number_of_all_sold_item_this_week ?>);
+    addData(soldItemsChart,<?= json_encode($sold_item_chart_data_this_week) ?>);
     });
-
     document.getElementById("getSoldItemsLastMonth").addEventListener("click", function(){
-      $('#dropdownSoldItems').html('Last Month');
-      $('.number-of-sold-items').html(<?= $number_of_all_sold_item_last_month ?>);
-      addData(soldItemsChart,<?= json_encode($sold_item_chart_data_last_month)   ?>);
+    $('#dropdownSoldItems').html('Last Month');
+    $('.number-of-sold-items').html(<?= $number_of_all_sold_item_last_month ?>);
+    addData(soldItemsChart,<?= json_encode($sold_item_chart_data_last_month) ?>);
     });
-
     document.getElementById("getSoldItemsLast3Months").addEventListener("click", function(){
-      $('#dropdownSoldItems').html('Last 3 Months');
-      $('.number-of-sold-items').html(<?= $number_of_all_sold_item_last_three_months ?>);
-      addData(soldItemsChart,<?= json_encode([$sold_item_chart_data_last_three_months])   ?>);
+    $('#dropdownSoldItems').html('Last 3 Months');
+    $('.number-of-sold-items').html(<?= $number_of_all_sold_item_last_three_months ?>);
+    addData(soldItemsChart,<?= json_encode([$sold_item_chart_data_last_three_months]) ?>);
     });
-
     // Get Order Recevied
     document.getElementById("getOrderReceivedLast7DaysData").addEventListener("click", function(){
-      $('#dropdownOrdersReceived').html('Last 7 days');
-      $('.number-of-orders-received').html(<?= $number_of_all_orders_received_this_week ?>);
-      addData(orderReceivedChart,<?= json_encode($orders_received_chart_data_this_week)   ?>);
+    $('#dropdownOrdersReceived').html('Last 7 days');
+    $('.number-of-orders-received').html(<?= $number_of_all_orders_received_this_week ?>);
+    addData(orderReceivedChart,<?= json_encode($orders_received_chart_data_this_week) ?>);
     });
-
     document.getElementById("getOrderReceivedLastMonth").addEventListener("click", function(){
-      $('#dropdownOrdersReceived').html('Last Month');
-      $('.number-of-orders-received').html(<?= $number_of_all_orders_received_last_month ?>);
-      addData(orderReceivedChart,<?= json_encode($orders_received_chart_data_last_month)   ?>);
+    $('#dropdownOrdersReceived').html('Last Month');
+    $('.number-of-orders-received').html(<?= $number_of_all_orders_received_last_month ?>);
+    addData(orderReceivedChart,<?= json_encode($orders_received_chart_data_last_month) ?>);
     });
-
     document.getElementById("getOrderReceivedLast3Months").addEventListener("click", function(){
-      $('#dropdownOrdersReceived').html('Last 3 Months');
-      $('.number-of-orders-received').html(<?= $number_of_all_orders_received_last_three_months ?>);
-      addData(orderReceivedChart,<?= json_encode($orders_received_chart_data_last_three_months)   ?>);
+    $('#dropdownOrdersReceived').html('Last 3 Months');
+    $('.number-of-orders-received').html(<?= $number_of_all_orders_received_last_three_months ?>);
+    addData(orderReceivedChart,<?= json_encode($orders_received_chart_data_last_three_months) ?>);
     });
-
-  });
+    });
 
 
 </script>
@@ -447,15 +424,15 @@ $this->registerJs($js);
                         </button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownCustomerGained">
 
-                          <button   id="getCustomerGainedLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
-                          <button   id="getCustomerGainedLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
-                          <button   id="getCustomerGainedLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
+                            <button   id="getCustomerGainedLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
+                            <button   id="getCustomerGainedLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
+                            <button   id="getCustomerGainedLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
 
                         </div>
                     </div>
 
                     <h2 class="text-bold-700 mt-1 number-of-customer-gained">
-                      <?= $number_of_all_customer_gained_this_week ?>
+                        <?= $number_of_all_customer_gained_this_week ?>
                     </h2>
                     <p class="mb-0">Customer Gained</p>
                 </div>
@@ -476,14 +453,14 @@ $this->registerJs($js);
                         <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px;    padding-right: 0px;" type="button" id="dropdownRevenueGenerated" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         </button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownRevenueGenerated">
-                          <button   id="getRevenueGeneratedLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
-                          <button   id="getRevenueGeneratedLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
-                          <button   id="getRevenueGeneratedLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
+                            <button   id="getRevenueGeneratedLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
+                            <button   id="getRevenueGeneratedLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
+                            <button   id="getRevenueGeneratedLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
 
                         </div>
                     </div>
                     <h2 class="text-bold-700 mt-1 number-of-revenue-generated">
-                      <?= Yii::$app->formatter->asCurrency($number_of_all_revenue_generated_this_week, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                        <?= Yii::$app->formatter->asCurrency($number_of_all_revenue_generated_this_week, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
                     </h2>
                     <p class="mb-0">Revenue Generated</p>
                 </div>
@@ -505,14 +482,14 @@ $this->registerJs($js);
                         <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px;    padding-right: 0px;" type="button" id="dropdownSoldItems" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         </button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownSoldItems">
-                          <button   id="getSoldItemsLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
-                          <button   id="getSoldItemsLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
-                          <button   id="getSoldItemsLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
+                            <button   id="getSoldItemsLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
+                            <button   id="getSoldItemsLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
+                            <button   id="getSoldItemsLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
                         </div>
 
                     </div>
                     <h2 class="text-bold-700 mt-1 number-of-sold-items">
-                      <?= $number_of_all_sold_item_this_week ?>
+                        <?= $number_of_all_sold_item_this_week ?>
                     </h2>
                     <p class="mb-0">Sold Items</p>
                 </div>
@@ -533,13 +510,13 @@ $this->registerJs($js);
                         <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px;    padding-right: 0px;" type="button" id="dropdownOrdersReceived" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         </button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownOrdersReceived">
-                          <button   id="getOrderReceivedLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
-                          <button   id="getOrderReceivedLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
-                          <button   id="getOrderReceivedLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
+                            <button   id="getOrderReceivedLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
+                            <button   id="getOrderReceivedLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
+                            <button   id="getOrderReceivedLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
                         </div>
                     </div>
                     <h2 class="text-bold-700 mt-1 number-of-orders-received">
-                      <?= $number_of_all_orders_received_this_week ?>
+                        <?= $number_of_all_orders_received_this_week ?>
                     </h2>
                     <p class="mb-0">Orders Received</p>
                 </div>
@@ -646,7 +623,7 @@ $this->registerJs($js);
 
                         <div class="card-content">
                             <div class="table-responsive mt-1">
-                                   <table class="table table-hover-animation mb-0">
+                                <table class="table table-hover-animation mb-0">
                                     <thead>
                                         <tr>
                                             <th>ORDER</th>
@@ -664,7 +641,7 @@ $this->registerJs($js);
                                             <tr>
                                                 <td>
                                                     <?=
-                                                    Html::a('#' . $order->order_uuid, ['order/view', 'id' => $order->order_uuid, 'restaurantUuid' => $order->restaurant_uuid],['target' => '_blank'])
+                                                    Html::a('#' . $order->order_uuid, ['order/view', 'id' => $order->order_uuid, 'restaurantUuid' => $order->restaurant_uuid], ['target' => '_blank'])
                                                     ?>
                                                 </td>
 
@@ -692,7 +669,7 @@ $this->registerJs($js);
 
                                                 </td>
                                                 <td>
-                                              <?= $order->customer_name ?>
+                                                    <?= $order->customer_name ?>
                                                 </td>
 
                                                 <td>
@@ -701,7 +678,7 @@ $this->registerJs($js);
                                                     </div>
                                                 </td>
                                             </tr>
-                                            <?php }
+                                        <?php }
                                         ?>
 
                                     </tbody>
@@ -729,25 +706,25 @@ $this->registerJs($js);
 
                         <div class="col-12">
                             <div class="form-group">
-<?php if ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_CLOSE) { ?>
+                                <?php if ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_CLOSE) { ?>
 
                                     <p style="font-size: 20px; margin-top: 65px; padding-left: 20px; margin-bottom: 65px; text-align: center; padding-right: 20px;">
                                         Your store is open you can accept orders!
                                     </p>
 
-    <?=
-    Html::a('Open your store', ['promote-to-open', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn mb-1 btn-success btn-lg btn-block']);
-    ?>
+                                    <?=
+                                    Html::a('Open your store', ['promote-to-open', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn mb-1 btn-success btn-lg btn-block']);
+                                    ?>
 
-<?php } elseif ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) {
-    ?>
+                                <?php } elseif ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) {
+                                    ?>
                                     <p style="font-size: 20px; margin-top: 65px; padding-left: 20px; margin-bottom: 65px; text-align: center; padding-right: 20px;">
                                         Your store is open you can accept orders!
                                     </p>
 
-    <?=
-    Html::a('Close your store', ['promote-to-close', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn mb-1 btn-danger btn-lg btn-block']);
-    ?>
+                                    <?=
+                                    Html::a('Close your store', ['promote-to-close', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn mb-1 btn-danger btn-lg btn-block']);
+                                    ?>
 
                                 <?php } ?>
                             </div>
