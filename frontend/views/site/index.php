@@ -509,7 +509,10 @@ $this->registerJs($js);
                           <button   id="getSoldItemsLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
                           <button   id="getSoldItemsLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
                         </div>
+
                     </div>
+            <button type="button" name="button" class="vs-component vs-button vs-button-warning vs-button-filled includeIcon includeIconOnly vs-radius">
+              <span class="vs-button-backgroundx vs-button--background" style="opacity: 1; left: 20px; top: 20px; width: 0px; height: 0px; transition: width 0.3s ease 0s, height 0.3s ease 0s, opacity 0.3s ease 0s;"></span><i class="vs-icon notranslate icon-scale vs-button--icon  feather icon-archive null" style="order: 0; margin-right: 0px; margin-left: 0px;"></i><!----><span class="vs-button-linex" style="top: auto; bottom: -2px; left: 50%; transform: translate(-50%);"></span></button>
                     <h2 class="text-bold-700 mt-1 number-of-sold-items">
                       <?= $number_of_all_sold_item_this_week ?>
                     </h2>
@@ -565,7 +568,7 @@ $this->registerJs($js);
                                 <i class="feather icon-users text-primary font-medium-5"></i>
                             </div>
                         </div>
-                        <h2 class="text-bold-700">36.9k</h2>
+                        <h2 class="text-bold-700"><?= $today_customer_gained ?></h2>
                         <p class="mb-0 line-ellipsis">Today's Customer Gained</p>
 
 
@@ -582,7 +585,7 @@ $this->registerJs($js);
                                 <i class="feather icon-credit-card text-success font-medium-5"></i>
                             </div>
                         </div>
-                        <h2 class="text-bold-700">12k</h2>
+                        <h2 class="text-bold-700">  <?= Yii::$app->formatter->asCurrency($today_revenue_generated, 'KWD', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></h2>
                         <p class="mb-0 line-ellipsis">Today's Revenue Generated</p>
                     </div>
                 </div>
@@ -597,7 +600,7 @@ $this->registerJs($js);
                                 <i class="feather icon-shopping-cart text-danger font-medium-5"></i>
                             </div>
                         </div>
-                        <h2 class="text-bold-700">97.8k</h2>
+                        <h2 class="text-bold-700"><?= $today_sold_items ?></h2>
                         <p class="mb-0 line-ellipsis">Today's Sold Items</p>
                     </div>
                 </div>
@@ -612,7 +615,7 @@ $this->registerJs($js);
                                 <i class="feather icon-package text-warning font-medium-5"></i>
                             </div>
                         </div>
-                        <h2 class="text-bold-700">26.8</h2>
+                        <h2 class="text-bold-700"><?= $today_orders_received ?></h2>
                         <p class="mb-0 line-ellipsis">Today's Orders Received</p>
                     </div>
                 </div>
