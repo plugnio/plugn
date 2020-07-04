@@ -40,17 +40,26 @@ class CategoryController extends Controller
     }
 
     /**
-     * 
-     * @param type $restaurantUuid 
+     *
+     * @param type $restaurantUuid
      * @return type
      */
     public function actionIndex($restaurantUuid)
     {
+
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+
+
+        // $model = new Category();
+        // $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
+        //
+        // if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        //     return $this->redirect(['view', 'id' => $model->category_id, 'restaurantUuid' => $restaurantUuid]);
+        // }
 
         $searchModel = new CategorySearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
-        
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -81,7 +90,7 @@ class CategoryController extends Controller
     {
         $model = new Category();
         $model->restaurant_uuid = Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid;
-        
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->category_id, 'restaurantUuid' => $restaurantUuid]);
         }

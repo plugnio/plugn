@@ -40,14 +40,17 @@ $this->registerJs($js);
 
 ?>
 
-<div class="order-form">
+<div class="card order-form">
 
+<div class="card-body">
     <?php
     $areaQuery = $restaurant_model->getAreas()->all();
     $areaList = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
 
 
-    $form = ActiveForm::begin();
+    $form = ActiveForm::begin([
+      'errorSummaryCssClass' => 'alert alert-danger'
+    ]);
     ?>
 
     <?= $form->errorSummary($model,['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
@@ -101,4 +104,5 @@ $this->registerJs($js);
     </div>
     <?php ActiveForm::end(); ?>
 
+</div>
 </div>

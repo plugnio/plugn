@@ -11,7 +11,8 @@ use yii\helpers\ArrayHelper;
 
 ?>
 
-<div class="order-item-form">
+<div class="card order-item-form">
+  <div class="card-body">
 
     <?php
     $form = ActiveForm::begin([
@@ -38,4 +39,5 @@ use yii\helpers\ArrayHelper;
 
 <?php ActiveForm::end(); ?>
 
+</div>
 </div>

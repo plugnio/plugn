@@ -4,7 +4,8 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 ?>
 
-<div class="order-item-extra-options-form">
+<div class="card order-item-extra-options-form">
+  <div class="card-body">
 
     <?php
     $form = ActiveForm::begin();
@@ -25,4 +26,5 @@ use yii\widgets\ActiveForm;
 
     <?php ActiveForm::end(); ?>
 
+</div>
 </div>

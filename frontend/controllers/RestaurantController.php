@@ -124,9 +124,7 @@ class RestaurantController extends Controller {
     }
 
 
-
-
-        public function actionExportThisMonthsSoldItems($restaurantUuid) {
+    public function actionExportThisMonthsSoldItems($restaurantUuid) {
 
             if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
 
@@ -165,7 +163,7 @@ class RestaurantController extends Controller {
             }
         }
 
-        public function actionExportLastThreeMonthsSoldItems($restaurantUuid) {
+    public function actionExportLastThreeMonthsSoldItems($restaurantUuid) {
 
             if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
 

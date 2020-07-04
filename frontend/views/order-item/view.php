@@ -67,7 +67,7 @@ $this->registerJs($js);
     </div>
 
 
-
+    <?php if($model->item->getExtraOptions()->count() > 0){ ?>
          <section id="data-list-view" class="data-list-view-header">
 
            <h2>Extra Options</h2>
@@ -125,3 +125,5 @@ $this->registerJs($js);
 
            </section>
          <!-- Data list view end -->
+
+       <?php  } ?>

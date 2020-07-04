@@ -358,17 +358,17 @@ $this->registerJs($js);
     // Get Revenue Generated
     document.getElementById("getRevenueGeneratedLast7DaysData").addEventListener("click", function(){
     $('#dropdownRevenueGenerated').html('Last 7 days');
-    $('.number-of-revenue-generated').html (<?= $number_of_all_revenue_generated_this_week ?>);
+    $('.number-of-revenue-generated').html (<?= number_format($number_of_all_revenue_generated_this_week, 4, '.', '');  ?>);
     addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_this_week) ?>);
     });
     document.getElementById("getRevenueGeneratedLastMonth").addEventListener("click", function(){
     $('#dropdownRevenueGenerated').html('Last Month');
-    $('.number-of-revenue-generated').html (<?= $number_of_all_revenue_generated_last_month ?>);
+    $('.number-of-revenue-generated').html (<?= number_format($number_of_all_revenue_generated_last_month, 4, '.', '');  ?>);
     addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_month) ?>);
     });
     document.getElementById("getRevenueGeneratedLast3Months").addEventListener("click", function(){
     $('#dropdownRevenueGenerated').html('Last 3 Months');
-    $('.number-of-revenue-generated').html (<?= $number_of_all_revenue_generated_last_three_months ?>);
+    $('.number-of-revenue-generated').html (<?= number_format($number_of_all_revenue_generated_last_three_months, 4, '.', '');  ?>);
     addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_three_months) ?>);
     });
     // Get Sold Items
@@ -432,7 +432,7 @@ $this->registerJs($js);
                     </div>
 
                     <h2 class="text-bold-700 mt-1 number-of-customer-gained">
-                        <?= $number_of_all_customer_gained_this_week ?>
+                        <?= $number_of_all_customer_gained_this_week ? $number_of_all_customer_gained_this_week : 0 ?>
                     </h2>
                     <p class="mb-0">Customer Gained</p>
                 </div>
@@ -453,15 +453,20 @@ $this->registerJs($js);
                         <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px;    padding-right: 0px;" type="button" id="dropdownRevenueGenerated" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         </button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownRevenueGenerated">
-                            <button   id="getRevenueGeneratedLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
-                            <button   id="getRevenueGeneratedLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
-                            <button   id="getRevenueGeneratedLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
+                            <button id="getRevenueGeneratedLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
+                            <button id="getRevenueGeneratedLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
+                            <button id="getRevenueGeneratedLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
 
                         </div>
                     </div>
-                    <h2 class="text-bold-700 mt-1 number-of-revenue-generated">
-                        <?= Yii::$app->formatter->asCurrency($number_of_all_revenue_generated_this_week, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
-                    </h2>
+                    <div style="  margin-bottom: 0.5rem;  margin-top: 1rem !important;">
+                      <h2 style="  display: contents;" class="text-bold-700 mt-1 number-of-revenue-generated">
+                          <?= number_format($number_of_all_revenue_generated_this_week, 3, '.', '');  ?>
+                      </h2>
+                      <h2 style="  display: contents;">
+                          KWD
+                      </h2>
+                    </div>
                     <p class="mb-0">Revenue Generated</p>
                 </div>
 
@@ -489,7 +494,7 @@ $this->registerJs($js);
 
                     </div>
                     <h2 class="text-bold-700 mt-1 number-of-sold-items">
-                        <?= $number_of_all_sold_item_this_week ?>
+                        <?= $number_of_all_sold_item_this_week ? $number_of_all_sold_item_this_week : 0 ?>
                     </h2>
                     <p class="mb-0">Sold Items</p>
                 </div>
@@ -516,7 +521,7 @@ $this->registerJs($js);
                         </div>
                     </div>
                     <h2 class="text-bold-700 mt-1 number-of-orders-received">
-                        <?= $number_of_all_orders_received_this_week ?>
+                        <?= $number_of_all_orders_received_this_week ? $number_of_all_orders_received_this_week : 0 ?>
                     </h2>
                     <p class="mb-0">Orders Received</p>
                 </div>

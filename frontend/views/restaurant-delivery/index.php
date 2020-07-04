@@ -35,23 +35,34 @@ $(function () {
 
 if ($dataProvider) {
     ?>
-
+    <div class="col-12">
     <p>
         <?= Html::a('Edit Delivery Zones', ['update', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']) ?>
     </p>
-
+  </div>
     <?php
     foreach ($dataProvider as $city) {
         if ($city->restaurantDeliveryAreas) {
             ?>
             <div class="col-12">
+
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title"><?= $city->city_name ?></h4>
                         <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
                         <div class="heading-elements">
                             <ul class="list-inline mb-0">
-                                <li><a data-action="collapse"><i class="feather icon-chevron-down"></i></a></li>
+                              <li>
+                                <?=
+                                Html::a(
+                                 '<i class="feather icon-edit"></i>', ['restaurant-delivery/update-delivery-time-for-city', 'city_id' => $city->city_id, 'restaurantUuid' => $restaurantUuid],['class' => 'action-edit', 'style' =>'color: rgb(98, 98, 98);']
+                                 );
+                                 ?>
+                              </li>
+                              <li>
+                                  <a style="font-size: 15px;" data-action="collapse"><i class="feather icon-chevron-down"></i></a>
+
+                              </li>
                             </ul>
                           </div>
                         </div>

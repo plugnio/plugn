@@ -28,8 +28,8 @@ $this->registerJs($js);
 ?>
 
 
-<div class="restaurant-delivery-form">
-
+<div class="card restaurant-delivery-form">
+<div class="card-body">
 
     <?php
     $areaQuery = Area::find()->asArray()->all();
@@ -65,4 +65,5 @@ $this->registerJs($js);
 
     <?php ActiveForm::end(); ?>
 
+</div>
 </div>

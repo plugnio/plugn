@@ -9,6 +9,14 @@ use common\models\Order;
 /* @var $model frontend\models\OrderSearch */
 /* @var $form yii\widgets\ActiveForm */
 
+$js = "
+$(function () {
+
+  $('#ordersearch-date_range').attr('autocomplete','off');
+
+  });
+";
+$this->registerJs($js);
 ?>
 
 

@@ -17,6 +17,19 @@ $this->params['breadcrumbs'][] = $this->title;
 $js = "
 $(function () {
   $('.summary').insertAfter('.top');
+
+
+  $('#restaurant-date_range_picker_with_time').attr('autocomplete','off');
+
+  $('#restaurant-date_range_picker_with_time').change(function(e){
+    if(e.target.value){
+      $('#export-to-excel-btn').attr('disabled',false);
+    }else {
+      $('#export-to-excel-btn').attr('disabled',true);
+    }
+});
+
+
 });
 ";
 $this->registerJs($js);
@@ -62,10 +75,9 @@ $this->registerJs($js);
           </div>'
 
          ])->widget(DateRangePicker::classname(), [
-
              'presetDropdown' => false,
              'convertFormat' => true,
-             'pluginOptions' => ['locale' => ['format' => 'Y-m-d H:m:s']],
+             'pluginOptions' => ['locale' => ['format' => 'Y-m-d H:m:s'],],
          ]);
 
 
@@ -73,7 +85,7 @@ $this->registerJs($js);
 
      <div class="form-group">
          <?=
-         Html::submitButton('Export to Excel', ['class' => 'btn btn-success'])
+         Html::submitButton('Export to Excel', ['class' => 'btn btn-success','id' => 'export-to-excel-btn' ,'disabled' => true])
          ?>
      </div>
 

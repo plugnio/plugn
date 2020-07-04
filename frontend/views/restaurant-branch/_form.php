@@ -8,9 +8,10 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="restaurant-branch-form">
+<div class="card restaurant-branch-form">
+  <div class="card-body">
 
-    <?php $form = ActiveForm::begin([         
+    <?php $form = ActiveForm::begin([
         'errorSummaryCssClass' => 'alert alert-danger'
       ]);
       ?>
@@ -29,4 +30,5 @@ use yii\widgets\ActiveForm;
 
     <?php ActiveForm::end(); ?>
 
+</div>
 </div>

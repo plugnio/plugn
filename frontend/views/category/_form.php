@@ -8,7 +8,8 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="category-form">
+<div class="card category-form">
+  <div class="card-body">
 
     <?php
     $form = ActiveForm::begin([
@@ -36,4 +37,5 @@ use yii\widgets\ActiveForm;
 
 <?php ActiveForm::end(); ?>
 
+</div>
 </div>
