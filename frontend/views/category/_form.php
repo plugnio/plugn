@@ -13,16 +13,17 @@ use yii\widgets\ActiveForm;
     <?php
     $form = ActiveForm::begin([
                 'enableClientScript' => false,
+                'errorSummaryCssClass' => 'alert alert-danger'
     ]);
     ?>
 
-    <?= $form->errorSummary($model); ?>
+    <?= $form->errorSummary([$model],['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
 
 
     <?= $form->field($model, 'title')->textInput(['maxlength' => true,'placeholder' => 'e.g. Meal Deals or Sushi Sets or Soft Drinks']) ?>
 
     <?= $form->field($model, 'title_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. Meal Deals or Sushi Sets or Soft Drinks']) ?>
-    
+
     <?= $form->field($model, 'subtitle')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'subtitle_ar')->textInput(['maxlength' => true]) ?>

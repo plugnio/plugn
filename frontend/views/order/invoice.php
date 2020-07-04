@@ -14,20 +14,9 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 ?>
 <!-- invoice functionality start -->
 <section class="invoice-print mb-1">
-    <div class="row">
-
-        <fieldset class="col-12 col-md-5 mb-1 mb-md-0">
-            <div class="input-group">
-                <input type="text" class="form-control" placeholder="Email" aria-describedby="button-addon2">
-                <div class="input-group-append" id="button-addon2">
-                    <button class="btn btn-outline-primary" type="button">Send Invoice</button>
-                </div>
-            </div>
-        </fieldset>
-        <div class="col-12 col-md-7 d-flex flex-column flex-md-row justify-content-end">
-            <button class="btn btn-primary btn-print mb-1 mb-md-0"> <i class="feather icon-file-text"></i> Print</button>
-        </div>
-    </div>
+  <div>
+      <button class="btn btn-primary btn-print mb-1 mb-md-0"> <i class="feather icon-file-text"></i> Print</button>
+  </div>
 </section>
 <!-- invoice functionality end -->
 <!-- invoice page -->
@@ -144,7 +133,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                             <b>Block:</b> <?= $model->block ?>,
                             <b>Street:</b> <?= $model->street ?>,
     <?= $model->avenue != null ? '<b>Avenue: </b>' . $model->avenue . ', ' : '' ?>
-                            <b>House:</b> <?= $model->house_number ?>,
+                            <b>House:</b> <?= $model->house_number ?>
                         </p>
 
 <?php } ?>
@@ -161,31 +150,6 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
         <div id="invoice-items-details" class="pt-1 invoice-items-table">
             <div class="row">
                 <div class="table-responsive col-12">
-                    <!-- <table class="table table-borderless">
-                        <thead>
-                            <tr>
-                                <th>TASK DESCRIPTION</th>
-                                <th>HOURS</th>
-                                <th>RATE</th>
-                                <th>AMOUNT</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Website Redesign</td>
-                                <td>60</td>
-                                <td>15 USD</td>
-                                <td>90000 USD</td>
-                            </tr>
-                            <tr>
-                                <td>Newsletter template design</td>
-                                <td>20</td>
-                                <td>12 USD</td>
-                                <td>24000 USD</td>
-                            </tr>
-                        </tbody>
-                    </table> -->
-
 
                     <?=
                     GridView::widget([

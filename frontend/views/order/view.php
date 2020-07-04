@@ -226,19 +226,19 @@ $this->params['breadcrumbs'][] = $this->title;
                     <tbody>
                         <tr>
                             <td colspan="2">Subtotal</td>
-                            <td><?= Yii::$app->formatter->asCurrency($model->subtotal_before_refund, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->subtotal_before_refund, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                         </tr>
                     </tbody>
                     <tbody>
                         <tr>
                             <td colspan="2">Delivery fee</td>
-                            <td><?= Yii::$app->formatter->asCurrency($model->delivery_fee, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->delivery_fee, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                         </tr>
                     </tbody>
                     <tbody>
                         <tr>
                             <td colspan="2">Total</td>
-                            <td><?= Yii::$app->formatter->asCurrency($model->total_price_before_refund, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->total_price_before_refund, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                         </tr>
                     </tbody>
 
@@ -255,7 +255,7 @@ $this->params['breadcrumbs'][] = $this->title;
                               <td class="type--subdued">
                                 Reason:  <?= $refund->reason ?   $refund->reason : ' –' ?>
                               </td>
-                              <td>-<?= Yii::$app->formatter->asCurrency($refund->refund_amount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                              <td style="float: right;">-<?= Yii::$app->formatter->asCurrency($refund->refund_amount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                           </tr>
                       </tbody>
 
@@ -265,7 +265,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <tbody class="order-details__summary__net-payment">
                         <tr>
                             <td class="type--bold" colspan="2">Net payment</td>
-                            <td>
+                            <td style="float: right;">
                               <?= Yii::$app->formatter->asCurrency($model->total_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
                             </td>
                         </tr>

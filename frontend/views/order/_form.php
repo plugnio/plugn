@@ -31,6 +31,10 @@ $js = "
         }
     });
 
+    $(document).on('wheel', 'input[type=number]', function (e) {
+        $(this).blur();
+    });
+
 ";
 $this->registerJs($js);
 
@@ -46,8 +50,9 @@ $this->registerJs($js);
     $form = ActiveForm::begin();
     ?>
 
+    <?= $form->errorSummary($model,['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
 
-    <?= $form->errorSummary($model); ?>
+
 
     <?php
     $orderModeOptions = [];

@@ -10,12 +10,17 @@ use yii\widgets\ActiveForm;
 
 <div class="restaurant-branch-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([         
+        'errorSummaryCssClass' => 'alert alert-danger'
+      ]);
+      ?>
+
+      <?= $form->errorSummary([$model],['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
 
     <?= $form->field($model, 'branch_name_en')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'branch_name_ar')->textInput(['maxlength' => true]) ?>
-    
+
     <?= $form->field($model, 'prep_time')->textInput(['maxlength' => true]) ?>
 
     <div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px; padding-bottom: 15px; background:#f4f6f9 ">

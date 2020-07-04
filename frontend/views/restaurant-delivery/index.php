@@ -24,6 +24,12 @@ $(function () {
 
   })
 
+  $(document).on('wheel', 'input[type=number]', function (e) {
+      $(this).blur();
+  });
+
+
+
 ";
 
 
@@ -46,7 +52,6 @@ if ($dataProvider) {
                         <div class="heading-elements">
                             <ul class="list-inline mb-0">
                                 <li><a data-action="collapse"><i class="feather icon-chevron-down"></i></a></li>
-                                <li><a data-action="expand"><i class="feather icon-maximize"></i></a></li>
                             </ul>
                           </div>
                         </div>
@@ -87,6 +92,10 @@ if ($dataProvider) {
                                             <td class="project-actions text-right">
                                               <div style="margin-right: auto; margin-left: auto; display: flex;">
 
+
+                                                <?=
+                                                Html::submitButton('<i class="feather icon-save"> </i> ', ['style' => 'margin-right: 20px;','class' => 'btn btn-success', 'name' => $restaurantDeliveryArea->area->area_id])
+                                                ?>
                                                 <?=
                                                 Html::a('<i class="fa fa-trash"></i> ', ['delete', 'area_id' => $restaurantDeliveryArea->area->area_id, 'restaurantUuid' => $restaurantDeliveryArea->restaurant_uuid], ['class' => 'btn btn-danger ',
                                                     'data' => [
@@ -96,9 +105,7 @@ if ($dataProvider) {
                                                 ?>
 
 
-                                                <?=
-                                                Html::submitButton('<i class="feather icon-save"> </i> ', ['style' => 'margin-left: 20px;','class' => 'btn btn-success', 'name' => $restaurantDeliveryArea->area->area_id])
-                                                ?>
+
 
 
                                               </div>

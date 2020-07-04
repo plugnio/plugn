@@ -14,10 +14,12 @@ use yii\helpers\ArrayHelper;
 <div class="order-item-form">
 
     <?php
-    $form = ActiveForm::begin();
+    $form = ActiveForm::begin([
+      'errorSummaryCssClass' => 'alert alert-danger'
+    ]);
     ?>
 
-    <?= $form->errorSummary($model); ?>
+    <?= $form->errorSummary($model,['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
 
     <?php
     if (isset($restaurantsItems)) {

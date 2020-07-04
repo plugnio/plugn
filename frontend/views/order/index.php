@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use common\models\Order;
 use yii\widgets\ActiveForm;
+use kartik\daterange\DateRangePicker;
 
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\OrderSearch */
@@ -33,6 +34,57 @@ $this->registerJs($js);
     </div>
 </div>
 
+
+   <div class="card">
+     <div class="card-header">
+         <?php $form = ActiveForm::begin(
+           [
+             'options' => [
+                 'style' => 'width: 100%;'
+              ]
+           ]
+         ); ?>
+
+
+         <?=
+
+         $form->field($restaurant_model, 'date_range_picker_with_time', [
+           'labelOptions' => ['style' => ' margin-bottom: 10px;   font-size: 1.32rem;' ],
+           'template' => '
+              {label}
+           <div class="position-relative has-icon-left">
+
+                {input}
+
+             <div class="form-control-position">
+              <i class="feather icon-calendar"></i>
+            </div>
+          </div>'
+
+         ])->widget(DateRangePicker::classname(), [
+
+             'presetDropdown' => false,
+             'convertFormat' => true,
+             'pluginOptions' => ['locale' => ['format' => 'Y-m-d H:m:s']],
+         ]);
+
+
+         ?>
+
+     <div class="form-group">
+         <?=
+         Html::submitButton('Export to Excel', ['class' => 'btn btn-success'])
+         ?>
+     </div>
+
+
+
+     <?php ActiveForm::end(); ?>
+
+
+
+     </div>
+   </div>
 
    <?php echo $this->render('_search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
 

@@ -3,7 +3,14 @@
 use yii\helpers\Html;
 use wbraganca\dynamicform\DynamicFormWidget;
 
+$js = "
+$(document).on('wheel', 'input[type=number]', function (e) {
+    $(this).blur();
+});
 
+";
+
+$this->registerJs($js);
 ?>
 
 <?php DynamicFormWidget::begin([

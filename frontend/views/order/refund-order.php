@@ -14,6 +14,18 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 $this->title = 'Refund';
 $this->params['breadcrumbs'][] = ['label' => 'Order #' . $model->order_uuid, 'url' => ['index', 'restaurantUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
+
+
+
+$js = "
+$(document).on('wheel', 'input[type=number]', function (e) {
+    $(this).blur();
+});
+
+";
+
+$this->registerJs($js);
+
 ?>
 
 <script>
@@ -38,7 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
         userInput = parseFloat(document.getElementById("refund_amount").value);
 
 
-        
+
         document.getElementById("refund_amount").value = userInput.toFixed(3) ;
         document.getElementById("refund_amount_btn").innerHTML = userInput.toFixed(3)  + ' KWD';
 

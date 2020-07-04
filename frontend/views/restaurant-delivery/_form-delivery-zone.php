@@ -6,6 +6,18 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model common\models\RestaurantDelivery */
 /* @var $form yii\widgets\ActiveForm */
+
+
+$js = "
+$(document).on('wheel', 'input[type=number]', function (e) {
+    $(this).blur();
+});
+
+";
+
+$this->registerJs($js);
+
+
 ?>
 
 <div class="restaurant-delivery-form">

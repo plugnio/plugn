@@ -22,6 +22,11 @@ $js = "
     $( '.ql-snow' ).css( 'border-radius', '0px' )
 
 
+    $(document).on('wheel', 'input[type=number]', function (e) {
+        $(this).blur();
+    });
+
+
 ";
 $this->registerJs($js);
 
@@ -46,8 +51,10 @@ $this->registerJs($js);
 
     $form = ActiveForm::begin([
                 'id' => 'dynamic-form',
+                'errorSummaryCssClass' => 'alert alert-danger'
     ]);
     ?>
+    <?= $form->errorSummary([$modelItem],['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
 
 
     <div class="card">
@@ -98,16 +105,13 @@ $this->registerJs($js);
                 'options' => ['accept' => 'image/*', 'multiple' => true
                 ],
                 'pluginOptions' => [
-                    'showUpload' => false,
+                    'showRemove' => false,
                     'initialPreview'=> $initialPreviewArray,
                     'initialPreviewAsData' => true,
-                    'showRemove' => true,
                     'allowedFileExtensions' => ['jpg', 'png', 'jpeg'],
                     'overwriteInitial' => true,
                     'uploadAsync' => true,
                     'showUploadedThumbs' => true,
-                    // 'initialPreviewCount' => 1,
-                    'validateInitialCount' => false,
                     'maxFileCount' => 10,
                     'initialPreviewShowDelete' => false,
                     'maxFileSize' => 30000

@@ -10628,3 +10628,16 @@ a.text-dark:hover, a.text-dark:focus {
     border-color : #F8F8F8;
   }
 }
+
+.has-error input{
+    border-color: #EA5455;
+}
+
+.help-block{
+    width: 100%;
+    margin-top: .25rem;
+    color: #EA5455;
+    list-style-type: none;
+    font-size: 0.875rem;
+
+}

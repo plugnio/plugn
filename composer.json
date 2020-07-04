@@ -25,7 +25,6 @@
         "yiisoft/yii2-bootstrap": "~2.0.0",
         "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
         "openbuildings/swiftmailer-css-inliner": "*",
-        "kartik-v/yii2-widget-fileinput": "dev-master",
         "wbraganca/yii2-dynamicform": "dev-master",
         "yiisoft/yii2-shell": "^2.0",
         "leandrogehlen/yii2-treegrid": "*",
@@ -34,7 +33,6 @@
         "liyunfang/yii2-widget-linkpager": "^1.0",
         "kartik-v/yii2-mpdf": "dev-master",
         "kartik-v/yii2-widget-datepicker": "@dev",
-        "kartik-v/yii2-widget-colorinput": "dev-master",
         "sentry/sdk": "2.1.0",
         "understeam/yii2-slack": "v0.3.0",
         "yiier/yii2-slack": "*",
@@ -44,7 +42,8 @@
         "kartik-v/yii2-widget-rangeinput": "dev-master",
         "lubosdz/yii2-ui-range-plus-minus": "^1.1",
         "bizley/quill": "^3.1",
-        "twitf/yii2-dropzone": "*"
+        "twitf/yii2-dropzone": "*",
+        "kartik-v/yii2-widget-fileinput": "@dev"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

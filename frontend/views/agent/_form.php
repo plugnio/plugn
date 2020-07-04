@@ -56,7 +56,7 @@ $js = "  $(function () {
     $('#timepicker').datetimepicker({
       format: 'LT'
     })
-    
+
     //Bootstrap Duallistbox
     $('.duallistbox').bootstrapDualListbox()
 
@@ -78,10 +78,13 @@ $js = "  $(function () {
 $this->registerJs($js);
 ?>
 
-<div class="agent-form">
+<div class="card agent-form">
 
-
+  <div class="card-body">
     <?php $form = ActiveForm::begin(); ?>
+
+    <?= $form->errorSummary($model,['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
+
 
     <?= $form->field($model, 'agent_name')->textInput(['maxlength' => true]) ?>
 
@@ -89,22 +92,26 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'tempPassword')->passwordInput(['maxlength' => true])?>
 
-    <?=
-    $form->field($model, 'email_notification', [
-        'template' => "<label style='display:block;' class='control-label' for='agent-agent_email'>Email Notification</label>\n{input}\n{hint}\n{error}"
-    ])->checkbox([
-        'label' => '',
-        'checked' => $model->email_notification == 0 ? false : true,
-        'data-bootstrap-switch' => '',
-        'data-off-color' => 'danger',
-        'data-on-color' => 'success'
-    ])
-    ?>            
+
+
+
+            <?=
+            $form->field($model, 'email_notification', [
+                'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Email notification</span>{input}<label class='custom-control-label' for='customSwitch1'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
+            ])->checkbox([
+                'checked' => $model->email_notification == 0 ? false : true,
+                'id' => 'customSwitch1',
+                'class' => 'custom-control-input'
+                    ], false)->label(false)
+            ?>
+
+
 
     <div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px; padding-bottom: 15px; background:#f4f6f9 ">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
     </div>
-    
+
     <?php ActiveForm::end(); ?>
 
+</div>
 </div>

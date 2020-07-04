@@ -37,8 +37,9 @@ $this->registerJs($js);
 
 
 
-<div class="agent-assignment-form">
+<div class="card agent-assignment-form">
 
+    <div class="card-body">
     <?php
 
 
@@ -57,10 +58,13 @@ $this->registerJs($js);
                 ->one();
     }
 
-    $form = ActiveForm::begin(['id' => 'agent']);
+    $form = ActiveForm::begin([
+      'errorSummaryCssClass' => 'alert alert-danger'
+    ]);
+
     ?>
 
-    <?= $form->errorSummary($model); ?>
+    <?= $form->errorSummary($model,['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
 
 
     <?php
@@ -85,4 +89,5 @@ $this->registerJs($js);
 
     <?php ActiveForm::end(); ?>
 
+</div>
 </div>

@@ -32,6 +32,7 @@ class Category extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
+            [['title','title_ar'], 'required'],
             [['sort_number'], 'integer', 'min'=> 0],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['title', 'title_ar', 'subtitle', 'subtitle_ar'], 'string', 'max' => 255],
@@ -61,7 +62,7 @@ class Category extends \yii\db\ActiveRecord {
     {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-    
+
     /**
      * Gets query for [[CategoryItems]].
      *
