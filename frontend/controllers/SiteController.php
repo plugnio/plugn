@@ -374,7 +374,7 @@ class SiteController extends Controller {
                     ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')
                     ->sum('order_item.qty');
-
+                    
             array_push($sold_item_chart_data_this_week, (int) ($number_of_all_sold_item_last_6_days_only));
 
             $number_of_all_sold_item_last_5_days_only = OrderItem::find()
@@ -665,7 +665,7 @@ class SiteController extends Controller {
                     ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 6 DAY) ')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_this_week, (float) ($number_of_all_revenue_generated_last_7_days_only));
+            array_push($revenue_generated_chart_data_this_week, number_format($number_of_all_revenue_generated_last_7_days_only, 3));
 
             $number_of_all_revenue_generated_last_6_days_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -676,7 +676,7 @@ class SiteController extends Controller {
                     ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 5 DAY) ')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_this_week, (float) ($number_of_all_revenue_generated_last_6_days_only));
+            array_push($revenue_generated_chart_data_this_week, number_format($number_of_all_revenue_generated_last_6_days_only, 3));
 
             $number_of_all_revenue_generated_last_5_days_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -687,7 +687,7 @@ class SiteController extends Controller {
                     ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 4 DAY) ')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_this_week, (float) ($number_of_all_revenue_generated_last_5_days_only));
+            array_push($revenue_generated_chart_data_this_week,  number_format($number_of_all_revenue_generated_last_5_days_only, 3));
 
             $number_of_all_revenue_generated_last_4_days_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -698,7 +698,8 @@ class SiteController extends Controller {
                     ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 3 DAY) ')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_this_week, (float) ($number_of_all_revenue_generated_last_4_days_only));
+            array_push($revenue_generated_chart_data_this_week, number_format($number_of_all_revenue_generated_last_4_days_only, 3));
+
 
             $number_of_all_revenue_generated_last_3_days_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -709,7 +710,8 @@ class SiteController extends Controller {
                     ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 2 DAY) ')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_this_week, (float) ($number_of_all_revenue_generated_last_3_days_only));
+            array_push($revenue_generated_chart_data_this_week, number_format($number_of_all_revenue_generated_last_3_days_only, 3));
+
 
             $number_of_all_revenue_generated_last_2_days_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -720,7 +722,7 @@ class SiteController extends Controller {
                     ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 1 DAY) ')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_this_week, (float) ($number_of_all_revenue_generated_last_2_days_only));
+            array_push($revenue_generated_chart_data_this_week, number_format($number_of_all_revenue_generated_last_2_days_only, 3));
 
 
             $number_of_all_revenue_generated_today_only = Order::find()
@@ -732,7 +734,7 @@ class SiteController extends Controller {
                     ->andWhere(['DATE(order_created_at)' => new Expression('CURDATE()')])
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_this_week, (float) ($number_of_all_revenue_generated_today_only));
+            array_push($revenue_generated_chart_data_this_week, number_format($number_of_all_revenue_generated_today_only, 3));
 
             //last month
             $number_of_all_revenue_generated_last_two_months_only = Order::find()
@@ -745,7 +747,7 @@ class SiteController extends Controller {
                     ->andWhere('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_last_month, (float) ($number_of_all_revenue_generated_last_two_months_only));
+            array_push($revenue_generated_chart_data_last_month, number_format($number_of_all_revenue_generated_last_two_months_only, 3));
 
             $number_of_all_revenue_generated_last_month_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -757,11 +759,11 @@ class SiteController extends Controller {
                     ->andWhere('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_last_month, (float) ($number_of_all_revenue_generated_last_month_only));
+            array_push($revenue_generated_chart_data_last_month, number_format($number_of_all_revenue_generated_last_month_only, 3));
 
-            //last month
-            array_push($revenue_generated_chart_data_last_three_months, (float) ($number_of_all_revenue_generated_last_two_months_only));
-            array_push($revenue_generated_chart_data_last_three_months, (float) ($number_of_all_revenue_generated_last_month_only));
+            //last 3 months
+            array_push($revenue_generated_chart_data_last_three_months, number_format($number_of_all_revenue_generated_last_two_months_only, 3));
+            array_push($revenue_generated_chart_data_last_three_months, number_format($number_of_all_revenue_generated_last_month_only, 3));
 
             $number_of_all_revenue_generated_current_month_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -773,8 +775,7 @@ class SiteController extends Controller {
                     ->andWhere('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_last_three_months, (float) ($number_of_all_revenue_generated_current_month_only));
-
+            array_push($revenue_generated_chart_data_last_three_months, number_format($number_of_all_revenue_generated_current_month_only, 3));
 
 
             return $this->render('index', [

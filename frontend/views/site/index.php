@@ -341,69 +341,77 @@ $this->registerJs($js);
 
     //Get customer gained
     document.getElementById("getCustomerGainedLast7DaysData").addEventListener("click", function(){
-    $('#dropdownCustomerGained').html('Last 7 days');
-    $('.number-of-customer-gained').html(<?= $number_of_all_customer_gained_this_week ?>);
-    addData(customerGainedChart,<?= json_encode($customer_chart_data_this_week) ?>);
+      $('#dropdownCustomerGained').html('Last 7 days');
+      $('.number-of-customer-gained').html(<?= $number_of_all_customer_gained_this_week ?>);
+      addData(customerGainedChart,<?= json_encode($customer_chart_data_this_week) ?>);
     });
     document.getElementById("getCustomerGainedLastMonth").addEventListener("click", function(){
-    $('#dropdownCustomerGained').html('Last Month');
-    $('.number-of-customer-gained').html(<?= $number_of_all_customer_gained_last_month ?>);
-    addData(customerGainedChart,<?= json_encode($customer_chart_data_last_month) ?>);
+      $('#dropdownCustomerGained').html('Last Month');
+      $('.number-of-customer-gained').html(<?= $number_of_all_customer_gained_last_month ?>);
+      addData(customerGainedChart,<?= json_encode($customer_chart_data_last_month) ?>);
     });
     document.getElementById("getCustomerGainedLast3Months").addEventListener("click", function(){
-    $('#dropdownCustomerGained').html('Last 3 Months');
-    $('.number-of-customer-gained').html(<?= $number_of_all_customer_gained_last_three_months ?>);
-    addData(customerGainedChart,<?= json_encode($customer_chart_data_last_three_months) ?>);
+      $('#dropdownCustomerGained').html('Last 3 Months');
+      $('.number-of-customer-gained').html(<?= $number_of_all_customer_gained_last_three_months ?>);
+      addData(customerGainedChart,<?= json_encode($customer_chart_data_last_three_months) ?>);
     });
+
+
+
     // Get Revenue Generated
     document.getElementById("getRevenueGeneratedLast7DaysData").addEventListener("click", function(){
-    $('#dropdownRevenueGenerated').html('Last 7 days');
-    $('.number-of-revenue-generated').html (<?= number_format($number_of_all_revenue_generated_this_week, 4, '.', '');  ?>);
-    addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_this_week) ?>);
+      $('#dropdownRevenueGenerated').html('Last 7 days');
+      $('.number-of-revenue-generated').html (<?= number_format($number_of_all_revenue_generated_this_week, 3);  ?>);
+      addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_this_week) ?>);
     });
     document.getElementById("getRevenueGeneratedLastMonth").addEventListener("click", function(){
-    $('#dropdownRevenueGenerated').html('Last Month');
-    $('.number-of-revenue-generated').html (<?= number_format($number_of_all_revenue_generated_last_month, 4, '.', '');  ?>);
-    addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_month) ?>);
+      $('#dropdownRevenueGenerated').html('Last Month');
+      $('.number-of-revenue-generated').html (<?= number_format($number_of_all_revenue_generated_last_month, 3);  ?>);
+      addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_month) ?>);
     });
     document.getElementById("getRevenueGeneratedLast3Months").addEventListener("click", function(){
-    $('#dropdownRevenueGenerated').html('Last 3 Months');
-    $('.number-of-revenue-generated').html (<?= number_format($number_of_all_revenue_generated_last_three_months, 4, '.', '');  ?>);
-    addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_three_months) ?>);
+      $('#dropdownRevenueGenerated').html('Last 3 Months');
+      $('.number-of-revenue-generated').html (<?= number_format($number_of_all_revenue_generated_last_three_months, 3);  ?>);
+      addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_three_months) ?>);
     });
+
+
     // Get Sold Items
     document.getElementById("getSoldItemsLast7DaysData").addEventListener("click", function(){
-    $('#dropdownSoldItems').html('Last 7 days');
-    $('.number-of-sold-items').html(<?= $number_of_all_sold_item_this_week ?>);
-    addData(soldItemsChart,<?= json_encode($sold_item_chart_data_this_week) ?>);
+      $('#dropdownSoldItems').html('Last 7 days');
+      $('.number-of-sold-items').html(<?= $number_of_all_sold_item_this_week ?>);
+      addData(soldItemsChart,<?= json_encode($sold_item_chart_data_this_week) ?>);
     });
     document.getElementById("getSoldItemsLastMonth").addEventListener("click", function(){
-    $('#dropdownSoldItems').html('Last Month');
-    $('.number-of-sold-items').html(<?= $number_of_all_sold_item_last_month ?>);
-    addData(soldItemsChart,<?= json_encode($sold_item_chart_data_last_month) ?>);
+      $('#dropdownSoldItems').html('Last Month');
+      $('.number-of-sold-items').html(<?= $number_of_all_sold_item_last_month ?>);
+      addData(soldItemsChart,<?= json_encode($sold_item_chart_data_last_month) ?>);
     });
     document.getElementById("getSoldItemsLast3Months").addEventListener("click", function(){
-    $('#dropdownSoldItems').html('Last 3 Months');
-    $('.number-of-sold-items').html(<?= $number_of_all_sold_item_last_three_months ?>);
-    addData(soldItemsChart,<?= json_encode([$sold_item_chart_data_last_three_months]) ?>);
+      $('#dropdownSoldItems').html('Last 3 Months');
+      $('.number-of-sold-items').html(<?= $number_of_all_sold_item_last_three_months ?>);
+      addData(soldItemsChart,<?= json_encode([$sold_item_chart_data_last_three_months]) ?>);
     });
+
+
     // Get Order Recevied
     document.getElementById("getOrderReceivedLast7DaysData").addEventListener("click", function(){
-    $('#dropdownOrdersReceived').html('Last 7 days');
-    $('.number-of-orders-received').html(<?= $number_of_all_orders_received_this_week ?>);
-    addData(orderReceivedChart,<?= json_encode($orders_received_chart_data_this_week) ?>);
+      $('#dropdownOrdersReceived').html('Last 7 days');
+      $('.number-of-orders-received').html(<?= $number_of_all_orders_received_this_week ?>);
+      addData(orderReceivedChart,<?= json_encode($orders_received_chart_data_this_week) ?>);
     });
     document.getElementById("getOrderReceivedLastMonth").addEventListener("click", function(){
-    $('#dropdownOrdersReceived').html('Last Month');
-    $('.number-of-orders-received').html(<?= $number_of_all_orders_received_last_month ?>);
-    addData(orderReceivedChart,<?= json_encode($orders_received_chart_data_last_month) ?>);
+      $('#dropdownOrdersReceived').html('Last Month');
+      $('.number-of-orders-received').html(<?= $number_of_all_orders_received_last_month ?>);
+      addData(orderReceivedChart,<?= json_encode($orders_received_chart_data_last_month) ?>);
     });
     document.getElementById("getOrderReceivedLast3Months").addEventListener("click", function(){
-    $('#dropdownOrdersReceived').html('Last 3 Months');
-    $('.number-of-orders-received').html(<?= $number_of_all_orders_received_last_three_months ?>);
-    addData(orderReceivedChart,<?= json_encode($orders_received_chart_data_last_three_months) ?>);
+      $('#dropdownOrdersReceived').html('Last 3 Months');
+      $('.number-of-orders-received').html(<?= $number_of_all_orders_received_last_three_months ?>);
+      addData(orderReceivedChart,<?= json_encode($orders_received_chart_data_last_three_months) ?>);
     });
-    });
+
+  });
 
 
 </script>
@@ -461,7 +469,7 @@ $this->registerJs($js);
                     </div>
                     <div style="  margin-bottom: 0.5rem;  margin-top: 1rem !important;">
                       <h2 style="  display: contents;" class="text-bold-700 mt-1 number-of-revenue-generated">
-                          <?= number_format($number_of_all_revenue_generated_this_week, 3, '.', '');  ?>
+                          <?= number_format($number_of_all_revenue_generated_this_week,3);  ?>
                       </h2>
                       <h2 style="  display: contents;">
                           KWD

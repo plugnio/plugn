@@ -186,14 +186,6 @@ class Payment extends \yii\db\ActiveRecord {
 
             // Net amount after deducting gateway fee
             $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee;
-        }else {
-            Yii::error('[TAP Payment Issue > ' . $paymentRecord->customer->customer_name . ']'
-                    . $paymentRecord->customer->customer_name .
-                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) .
-                    ' and has failed at gateway. Maybe card issue.', __METHOD__);
-
-            Yii::error('[Response from TAP for Failed Payment] ' .
-                    print_r($responseContent, true), __METHOD__);
         }
 
         $paymentRecord->save();

@@ -276,13 +276,6 @@ class OrderController extends Controller {
 
                         } else {
 
-                            Yii::error('[TAP Payment Issue > ' . $paymentRecord->custoemr_name . ']'
-                                    . $paymentRecord->custoemr_name .
-                                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) .
-                                    ' and has failed at gateway. Maybe card issue.', __METHOD__);
-
-
-
                             $response = [
                                 'operation' => 'error',
                                 'message' => $payment->getErrors()
