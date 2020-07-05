@@ -36,6 +36,8 @@ use yii\behaviors\AttributeBehavior;
  * @property int $subtotal
  * @property int $total_price
  * @property int $items_has_been_restocked
+ * @property int $latitude
+ * @property int $longitude
 
  * @property int $subtotal_before_refund
  * @property int $total_price_before_refund
@@ -87,6 +89,7 @@ class Order extends \yii\db\ActiveRecord {
             [['payment_method_id'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
+            [['latitude', 'longitude'], 'number'],
             [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer', 'min' => 0],
             [['items_has_been_restocked'], 'integer'],
             ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_PARTIALLY_REFUNDED,self::STATUS_CANCELED, self::STATUS_DRAFT, self::STATUS_ABANDONED_CHECKOUT]],
@@ -264,6 +267,8 @@ class Order extends \yii\db\ActiveRecord {
             'order_created_at' => 'Order Created At',
             'order_updated_at' => 'Order Updated At',
             'tracking_link' => 'Tracking link',
+            'latitude' => 'Latitude',
+            'longitude' => 'Longitude',
         ];
     }
 
