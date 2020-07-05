@@ -390,7 +390,7 @@ $this->registerJs($js);
     document.getElementById("getSoldItemsLast3Months").addEventListener("click", function(){
       $('#dropdownSoldItems').html('Last 3 Months');
       $('.number-of-sold-items').html(<?= $number_of_all_sold_item_last_three_months ?>);
-      addData(soldItemsChart,<?= json_encode([$sold_item_chart_data_last_three_months]) ?>);
+      addData(soldItemsChart,<?= json_encode($sold_item_chart_data_last_three_months) ?>);
     });
 
 

@@ -56,7 +56,7 @@ $this->registerJs($js);
               'stock_qty',
               'unit_sold',
               'item_price:currency',
-              
+
             ],
             'layout' => '{summary}{items}{pager}',
             'tableOptions' => ['class' => 'table data-list-view'],

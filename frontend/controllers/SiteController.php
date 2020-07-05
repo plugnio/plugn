@@ -374,7 +374,7 @@ class SiteController extends Controller {
                     ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')
                     ->sum('order_item.qty');
-                    
+
             array_push($sold_item_chart_data_this_week, (int) ($number_of_all_sold_item_last_6_days_only));
 
             $number_of_all_sold_item_last_5_days_only = OrderItem::find()
@@ -491,7 +491,6 @@ class SiteController extends Controller {
                     ->sum('order_item.qty');
 
             array_push($sold_item_chart_data_last_three_months, (int) ($number_of_all_sold_item_current_month_only));
-
 
 
 
