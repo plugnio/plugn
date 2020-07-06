@@ -132,7 +132,7 @@ class Payment extends \yii\db\ActiveRecord {
 
 
         // Request response about it from TAP
-        Yii::$app->tapPayments->setApiKeys($paymentRecord->restaurant->live_api_key, $paymentRecord->restaurant->test_api_key);
+        Yii::$app->tapPayments->setApiKeys($paymentRecord->restaurant->live_api_key, $paymentRecord->restaurant->test_api_key	);
 
         $response = Yii::$app->tapPayments->retrieveCharge($id);
         $responseContent = json_decode($response->content);
@@ -157,10 +157,6 @@ class Payment extends \yii\db\ActiveRecord {
             Yii::info("[" . $paymentRecord->restaurant->name . ": " . $paymentRecord->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $paymentRecord->order->payment_method_name, __METHOD__);
 
 
-            foreach ($paymentRecord->order->getOrderItems()->all() as $orderItem) {
-                $orderItem->item->decreaseStockQty($orderItem->qty);
-            }
-
             // KNET Gateway Fee Calculation
             if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
 
@@ -181,8 +177,10 @@ class Payment extends \yii\db\ActiveRecord {
 
 
             // Update payment method used and the order id assigned to it
-            $paymentRecord->payment_mode = $responseContent->source->payment_method;
-            $paymentRecord->payment_gateway_order_id = $responseContent->reference->payment;
+            if( isset($responseContent->source->payment_method) && $responseContent->source->payment_method )
+              $paymentRecord->payment_mode = $responseContent->source->payment_method;
+            if( isset($responseContent->reference->payment) && $responseContent->reference->payment )
+              $paymentRecord->payment_gateway_order_id = $responseContent->reference->payment;
 
             // Net amount after deducting gateway fee
             $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee;
@@ -203,8 +201,11 @@ class Payment extends \yii\db\ActiveRecord {
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-        if ($this->payment_current_status == 'CAPTURED')
-            $this->order->sendPaymentConfirmationEmail();
+        if ($this->payment_current_status == 'CAPTURED'){
+          $this->order->changeOrderStatusToPending();
+          $this->order->sendPaymentConfirmationEmail();
+
+        }
     }
 
     /**

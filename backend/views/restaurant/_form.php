@@ -98,6 +98,8 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'restaurant_domain')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'app_id')->textInput(['maxlength' => true]) ?>
+
     <?=
     $form->field($model, 'restaurant_thumbnail_image')->widget(FileInput::classname(), [
         'options' => ['accept' => 'image/*', 'multiple' => false
@@ -161,6 +163,12 @@ $this->registerJs($js);
     <?= $form->field($model, 'store_branch_name')->textInput() ?>
 
     <?= $form->field($model, 'platform_fee')->textInput([ 'maxlength' => true, 'placeholder' => 'Platform fee']) ?>
+
+    <?= $form->field($model, 'armada_api_key')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'google_analytics_id')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'facebook_pixil_id')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'custom_css')->textarea(['rows' => '12']) ?>
 

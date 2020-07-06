@@ -36,6 +36,8 @@ use yii\behaviors\AttributeBehavior;
  * @property int $subtotal
  * @property int $total_price
  * @property int $items_has_been_restocked
+ * @property int $latitude
+ * @property int $longitude
 
  * @property int $subtotal_before_refund
  * @property int $total_price_before_refund
@@ -128,6 +130,7 @@ class Order extends \yii\db\ActiveRecord {
             [['payment_method_id'], 'validatePaymentMethodId', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['payment_uuid'], 'string', 'max' => 36],
             ['estimated_time_of_arrival', 'safe'],
+            [[ 'latitude', 'longitude'], 'safe'],
             [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
             [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name', 'payment_method_name_ar', 'tracking_link'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
@@ -264,6 +267,8 @@ class Order extends \yii\db\ActiveRecord {
             'order_created_at' => 'Order Created At',
             'order_updated_at' => 'Order Updated At',
             'tracking_link' => 'Tracking link',
+            'latitude' => 'Latitude',
+            'longitude' => 'Longitude',
         ];
     }
 

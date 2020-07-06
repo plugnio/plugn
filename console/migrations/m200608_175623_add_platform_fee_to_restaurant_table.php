@@ -3,9 +3,9 @@
 use yii\db\Migration;
 
 /**
- * Class m200617_122344_add_platform_fee
+ * Class m200608_175623_add_platform_fee_to_restaurant_table
  */
-class m200617_122344_add_platform_fee extends Migration
+class m200608_175623_add_platform_fee_to_restaurant_table extends Migration
 {
     /**
      * {@inheritdoc}

@@ -305,7 +305,6 @@ class OrderController extends Controller {
             // your html content input
             'content' => $content,
             // any css to be embedded if required
-            'cssFile' => '@frontend/web/css/invoice_1.css',
             // set mPDF properties on the fly
             'options' => [], //['title' => 'Booking #'.$id],
         ]);

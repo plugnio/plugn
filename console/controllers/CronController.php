@@ -19,17 +19,12 @@ use yii\db\Expression;
 class CronController extends \yii\console\Controller {
 
   public function actionIndex() {
-    $orders = Order::find();
+    $items = Item::find();
 
-    foreach ($orders->all() as $order) {
-
-      if($order->order_mode == Order::ORDER_MODE_DELIVERY){
-        $eta =   date("Y-m-d H:i:s", strtotime('+' . $order->restaurantDelivery->delivery_time . ' minutes',strtotime($order->order_created_at)));
-        $order->estimated_time_of_arrival = $eta;
-        $order->save(false);
+    foreach ($items->all() as $item) {
+        $item->unit_sold = $item->getSoldUnits() ? $item->getSoldUnits() : 0;
+        $item->save(false);
       }
-
-    }
 
     $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::BOLD);
     return self::EXIT_CODE_NORMAL;
