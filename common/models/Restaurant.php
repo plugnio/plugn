@@ -44,6 +44,7 @@ use yii\behaviors\AttributeBehavior;
  * @property Order[] $orders
  * @property Refund[] $refunds
  * @property Item[] $items
+ * @property OpeningHour[] $openingHours
  * @property RestaurantDelivery[] $restaurantDeliveryAreas
  * @property RestaurantBranch[] $restaurantBranches
  * @property Area[] $areas
@@ -51,8 +52,6 @@ use yii\behaviors\AttributeBehavior;
  * @property RestaurantTheme $restaurantTheme
  * @property PaymentMethod[] $paymentMethods
  * @property Agent[] $agents
- * @property WorkingHours[] $workingHours
- * @property WorkingDay[] $workingDays
  */
 class Restaurant extends \yii\db\ActiveRecord {
 
@@ -566,22 +565,15 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
-     * Gets query for [[WorkingHours]].
+     * Gets query for [[OpeningHours]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getWorkingHours() {
-        return $this->hasMany(WorkingHours::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getOpeningHours()
+    {
+        return $this->hasMany(OpeningHour::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
-    /**
-     * Gets query for [[WorkingDays]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getWorkingDays() {
-        return $this->hasMany(WorkingDay::className(), ['working_day_id' => 'working_day_id'])->viaTable('working_hours', ['restaurant_uuid' => 'restaurant_uuid']);
-    }
 
     /**
      * Gets query for [[Orders]].

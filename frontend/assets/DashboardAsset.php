@@ -54,7 +54,8 @@ class DashboardAsset extends AssetBundle {
         'app-assets/css/pages/invoice.css',
 
 
-        // 'app-assets/css/plugins/forms/validation/form-validation.css',
+        'app-assets/vendors/css/pickers/pickadate/pickadate.css',
+
 
     ];
 
@@ -95,9 +96,14 @@ class DashboardAsset extends AssetBundle {
         // 'app-assets/js/scripts/editors/editor-quill.js',
         'app-assets/js/scripts/pages/invoice.js',
         'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/js/scripts/customizer.js?id=bd6e1f733770a42402a7',
-        // 'app-assets/vendors/js/forms/validation/jqBootstrapValidation.js',
-        // 'app-assets/js/scripts/forms/validation/form-validation.js',
 
+
+
+      'app-assets/vendors/js/pickers/pickadate/picker.js',
+      'app-assets/vendors/js/pickers/pickadate/picker.date.js',
+      'app-assets/vendors/js/pickers/pickadate/picker.time.js',
+      'app-assets/vendors/js/pickers/pickadate/legacy.js',
+      'app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js',
     ];
 
     public $depends = [

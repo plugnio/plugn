@@ -128,6 +128,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'restaurant_created_at',
             'restaurant_updated_at',
             'platform_fee',
+            'facebook_pixil_id',
+            'google_analytics_id',
             'business_id',
             'developer_id',
             'business_entity_id',
