@@ -40,7 +40,7 @@ $this->registerJs($js);
                   'customer_name',
                   'customer_phone_number',
                   'customer_email:email',
-                  'customer_created_at:datetime',
+                  'customer_created_at',
                   [
                       'header' => 'Actions',
                       'class' => 'yii\grid\ActionColumn',

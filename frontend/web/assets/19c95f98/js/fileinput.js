@@ -1916,7 +1916,7 @@
                     showRemove: true,
                     showUpload: true,
                     showDownload: true,
-                    showZoom: true,
+                    showZoom: false,
                     showDrag: true,
                     removeIcon: '<i class="glyphicon glyphicon-trash"></i>',
                     removeClass: 'btn btn-sm btn-kv btn-default btn-outline-secondary',

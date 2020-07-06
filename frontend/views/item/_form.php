@@ -107,6 +107,8 @@ $this->registerJs($js);
                 ],
                 'pluginOptions' => [
                     'showRemove' => false,
+                    'showUpload' => false,
+                    'showZoom' => false,
                     'initialPreview'=> $initialPreviewArray,
                     'initialPreviewAsData' => true,
                     'allowedFileExtensions' => ['jpg', 'png', 'jpeg'],

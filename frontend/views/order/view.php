@@ -91,9 +91,9 @@ $this->params['breadcrumbs'][] = $this->title;
                           echo Html::a('Mark as Complete', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_COMPLETE], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
                       }
 
-//                      if ($model->order_status != Order::STATUS_CANCELED) {
-//                          echo Html::a('Mark as cancelled', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_CANCELED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-danger']);
-//                      }
+                     if ($model->order_status != Order::STATUS_CANCELED) {
+                         echo Html::a('Mark as cancelled', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_CANCELED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-danger']);
+                     }
                   }
                 ?>
             </p>

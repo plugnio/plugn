@@ -371,7 +371,7 @@ $this->registerJs($js);
     });
     document.getElementById("getRevenueGeneratedLast3Months").addEventListener("click", function(){
       $('#dropdownRevenueGenerated').html('Last 3 Months');
-      $('.number-of-revenue-generated').html (<?= number_format($number_of_all_revenue_generated_last_three_months, 3);  ?>);
+      $('.number-of-revenue-generated').html (<?= $number_of_all_revenue_generated_last_three_months;  ?>);
       addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_three_months) ?>);
     });
 

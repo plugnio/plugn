@@ -126,16 +126,6 @@ class SiteController extends Controller {
                     ->andWhere(['DATE(order_created_at)' => new Expression('CURDATE()')])
                     ->count();
 
-            $number_of_all_orders_received_last_three_months = Order::find()
-                    ->where(['order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
-                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
-                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 3 MONTH)')])
-                    ->count();
-
             $number_of_all_orders_received_last_month = Order::find()
                     ->where(['order_status' => Order::STATUS_PENDING])
                     ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
@@ -294,6 +284,11 @@ class SiteController extends Controller {
             array_push($orders_received_chart_data_last_three_months, (int) ($number_of_all_orders_received_current_month_only));
 
 
+            $number_of_all_orders_received_last_three_months = 0;
+
+            foreach ($orders_received_chart_data_last_three_months as $orderReceived) {
+                $number_of_all_orders_received_last_three_months += $orderReceived;
+            }
 
 
             //Sold items
@@ -314,17 +309,6 @@ class SiteController extends Controller {
                     ->sum('order_item.qty');
 
 
-
-            $number_of_all_sold_item_last_three_months = OrderItem::find()
-                    ->joinWith('order')
-                    ->where(['order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
-                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
-                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 3 MONTH)')])
-                    ->sum('order_item.qty');
 
             $number_of_all_sold_item_last_month = OrderItem::find()
                     ->joinWith('order')
@@ -493,6 +477,14 @@ class SiteController extends Controller {
             array_push($sold_item_chart_data_last_three_months, (int) ($number_of_all_sold_item_current_month_only));
 
 
+            $number_of_all_sold_item_last_three_months = 0;
+
+            foreach ($sold_item_chart_data_last_three_months as $soldItem) {
+                $number_of_all_sold_item_last_three_months += $soldItem;
+            }
+
+
+
 
             //Customers
             $customer_chart_data_this_week = [];
@@ -508,10 +500,6 @@ class SiteController extends Controller {
                     ->count();
 
 
-            $number_of_all_customer_gained_last_three_months = Customer::find()
-                    ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'customer.customer_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 3 MONTH)')])
-                    ->count(); //19
 
             $number_of_all_customer_gained_last_month = Customer::find()
                     ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -606,6 +594,13 @@ class SiteController extends Controller {
             array_push($customer_chart_data_last_three_months, (int) ($number_of_all_customers_gained_current_month_only));
 
 
+            $number_of_all_customer_gained_last_three_months = 0;
+
+            foreach ($customer_chart_data_last_three_months as $customerGained) {
+                $number_of_all_customer_gained_last_three_months += $customerGained;
+            }
+
+
             //Revenue
 
             $revenue_generated_chart_data_this_week = [];
@@ -624,14 +619,7 @@ class SiteController extends Controller {
                     ->sum('total_price');
 
 
-            $number_of_all_revenue_generated_last_three_months = Order::find()
-                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
-                    ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
-                    ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
-                    ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
-                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 3 MONTH)')])
-                    ->sum('total_price'); //434.5
+
 
             $number_of_all_revenue_generated_last_month = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -775,6 +763,15 @@ class SiteController extends Controller {
                     ->sum('total_price');
 
             array_push($revenue_generated_chart_data_last_three_months, number_format($number_of_all_revenue_generated_current_month_only, 3));
+
+
+
+            $number_of_all_revenue_generated_last_three_months = 0;
+
+            foreach ($revenue_generated_chart_data_last_three_months as $revenueGenerated) {
+                $number_of_all_revenue_generated_last_three_months += $revenueGenerated;
+            }
+
 
 
             return $this->render('index', [
