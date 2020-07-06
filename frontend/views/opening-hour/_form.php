@@ -16,12 +16,12 @@ use common\models\OpeningHour;
 
 
 <!-- DataTable starts -->
-<div class="table-responsive">
+<div class="card table-responsive">
   <?php $form = ActiveForm::begin(); ?>
 
+  <div class="card-body">
 
-
-    <table class="table data-list-view">
+    <table class="table">
         <thead>
             <tr>
                 <th></th>
@@ -55,6 +55,7 @@ use common\models\OpeningHour;
 
     <?php ActiveForm::end(); ?>
 
+</div>
 </div>
 <!-- DataTable ends -->
 
