@@ -94,6 +94,12 @@ class OrderController extends Controller {
                     $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
                     $order->house_number = Yii::$app->request->getBodyParam("house_number");
                     $order->special_directions = Yii::$app->request->getBodyParam("special_directions"); //optional
+
+                    if( Yii::$app->request->getBodyParam("deliver_location_latitude"))
+                      $order->latitude = Yii::$app->request->getBodyParam("deliver_location_latitude"); //optional
+                    if( Yii::$app->request->getBodyParam("deliver_location_longitude"))
+                      $order->longitude = Yii::$app->request->getBodyParam("deliver_location_longitude"); //optional
+
                 } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
                     $order->restaurant_branch_id = Yii::$app->request->getBodyParam("restaurant_branch_id");
                 }

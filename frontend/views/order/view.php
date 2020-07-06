@@ -47,6 +47,12 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
 
         <?php
+              if ($model->latitude  && $model->longitude  ) {
+                  echo Html::a('Get directions', 'http://maps.google.com/maps/place/' . $model->latitude  . ',' . $model->longitude, ['class' => 'btn btn-warning', 'style'=>'margin-left: 5px;']) ;
+              }
+        ?>
+
+        <?php
               // if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT ) {
               //     echo Html::a('Refund', ['refund-order', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid,], ['class' => 'btn btn-warning', 'style'=>'margin-left: 5px;']) ;
               // }
