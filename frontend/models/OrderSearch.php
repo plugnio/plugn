@@ -52,6 +52,7 @@ class OrderSearch extends Order {
         // add conditions that should always apply here
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+                'pagination' => false
         ]);
 
         $this->load($params);
@@ -108,6 +109,7 @@ class OrderSearch extends Order {
         // add conditions that should always apply here
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+                'pagination' => false
         ]);
 
         $this->load($params);

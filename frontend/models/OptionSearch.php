@@ -46,6 +46,7 @@ class OptionSearch extends Option
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+                'pagination' => false
         ]);
 
         $this->load($params);

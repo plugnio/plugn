@@ -46,6 +46,7 @@ class AgentSearch extends Agent
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+                'pagination' => false
         ]);
 
         $this->load($params);

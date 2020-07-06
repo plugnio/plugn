@@ -47,6 +47,7 @@ class OrderItemExtraOptionSearch extends OrderItemExtraOption
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+                'pagination' => false
         ]);
 
         $this->load($params);

@@ -36,7 +36,7 @@ class CategorySearch extends Category
      *
      * @param array $params
      * @param sting $restaurantUuid
-     * 
+     *
      * @return ActiveDataProvider
      */
     public function search($params, $restaurantUuid)
@@ -47,6 +47,7 @@ class CategorySearch extends Category
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => false
         ]);
 
         $this->load($params);

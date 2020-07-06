@@ -227,7 +227,7 @@ class RestaurantController extends Controller {
 
         $lastFiveMonths = date('M', strtotime('-5 months'));
 
-        array_push($revenue_generated_chart_data, (int) ($revenue_generated_last_five_months_month));
+        array_push($revenue_generated_chart_data, number_format($revenue_generated_last_five_months_month));
 
         array_push($months, $lastFiveMonths);
 
@@ -244,7 +244,7 @@ class RestaurantController extends Controller {
 
         $lastFoureMonths = date('M', strtotime('-4 months'));
 
-        array_push($revenue_generated_chart_data, (int) ($revenue_generated_last_four_months_month));
+        array_push($revenue_generated_chart_data, number_format($revenue_generated_last_four_months_month,3));
 
         array_push($months, $lastFoureMonths);
 
@@ -260,7 +260,7 @@ class RestaurantController extends Controller {
 
         $lastThreeMonths = date('M', strtotime('-3 months'));
 
-        array_push($revenue_generated_chart_data, (int) ($revenue_generated_last_three_months_month));
+        array_push($revenue_generated_chart_data, number_format($revenue_generated_last_three_months_month,3));
 
         array_push($months, $lastThreeMonths);
 
@@ -276,7 +276,7 @@ class RestaurantController extends Controller {
 
         $lastTwoMonths = date('M', strtotime('-2 months'));
 
-        array_push($revenue_generated_chart_data, (int) ($revenue_generated_last_two_months_month));
+        array_push($revenue_generated_chart_data, number_format($revenue_generated_last_two_months_month,3));
 
         array_push($months, $lastTwoMonths);
 
@@ -292,7 +292,7 @@ class RestaurantController extends Controller {
 
         $lastMonth = date('M', strtotime('-1 months'));
 
-        array_push($revenue_generated_chart_data, (int) ($revenue_generated_last_month));
+        array_push($revenue_generated_chart_data, number_format($revenue_generated_last_month,3));
 
         array_push($months, $lastMonth);
 
