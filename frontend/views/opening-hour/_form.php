@@ -7,6 +7,18 @@ use common\models\OpeningHour;
 /* @var $this yii\web\View */
 /* @var $model common\models\OpeningHour */
 /* @var $form yii\widgets\ActiveForm */
+
+
+$js = "
+
+    $('thead').hide();
+    $('.top').hide();
+    $('.bottom').hide();
+
+";
+$this->registerJs($js);
+
+
 ?>
 
 
@@ -16,17 +28,17 @@ use common\models\OpeningHour;
 
 
 <!-- DataTable starts -->
-<div class="card table-responsive">
+<div class="table-responsive">
   <?php $form = ActiveForm::begin(); ?>
 
-  <div class="card-body">
 
-    <table class="table">
+
+    <table class="table data-list-view">
         <thead>
             <tr>
                 <th></th>
-                <th></th>
-                <th></th>
+                <th>NAME</th>
+                <th>CATEGORY</th>
             </tr>
         </thead>
         <tbody>
@@ -55,7 +67,6 @@ use common\models\OpeningHour;
 
     <?php ActiveForm::end(); ?>
 
-</div>
 </div>
 <!-- DataTable ends -->
 
