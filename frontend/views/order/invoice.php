@@ -24,9 +24,9 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
     <div id="invoice-template" class="card-body">
         <!-- Invoice Company Details -->
         <div id="invoice-company-details" class="row">
-            <div class="col-sm-6 col-12 text-left pt-1">
+            <div class="col-12  pt-1">
                 <div class="media pt-1">
-                    <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" />
+                  <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: auto; margin-right: auto; display:block" />
 
                 </div>
             </div>
@@ -61,10 +61,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy H:mm') ?>
                     </p>
 
-                    <h6 class="mt-2">Payment Method</h6>
-                    <p>
-<?= $model->payment_method_name ?>
-                    </p>
+
 
                 </div>
 
@@ -126,7 +123,10 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
                         <h6 class="mt-2">Type</h6>
                         <p>  Delivery </p>
-
+                        <h6 class="mt-2">Payment Method</h6>
+                        <p>
+    <?= $model->payment_method_name ?>
+                        </p>
                         <h6 class="mt-2">Address</h6>
                         <p>
                             <b>Area:</b> <?= $model->area_name ?>,

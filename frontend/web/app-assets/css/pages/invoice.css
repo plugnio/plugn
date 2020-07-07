@@ -14,7 +14,7 @@
   margin-bottom : 0;
 }
 .invoice-page .invoice-items-table table, .invoice-page .invoice-total-table table {
-  border : 2px solid #F8F8F8;
+  border : 2px solid #cfcfcf7d;
 }
 
 @media print {
