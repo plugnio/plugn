@@ -24,8 +24,8 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
     <div id="invoice-template" class="card-body">
         <!-- Invoice Company Details -->
         <div id="invoice-company-details" class="row">
-            <div class="col-12  pt-1">
-                <div class="media pt-1">
+            <div class="col-12  ">
+                <div class="media " style="margin-bttom: 20px">
                   <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: auto; margin-right: auto; display:block" />
 
                 </div>
@@ -185,7 +185,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                             ],
                         ],
                         'layout' => '{items}',
-                        'tableOptions' => ['class' => 'table table-borderless'],
+                        'tableOptions' => ['class' => 'table table-bordered table-hover'],
                     ]);
                     ?>
                 </div>
@@ -195,7 +195,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
             <div class="row">
                 <div class="col-7">
                     <div class="table-responsive">
-                        <table class="table table-borderless">
+                        <table class="table table-bordered table-hover">
                             <tbody>
                                 <tr>
                                     <th>SUBTOTAL</th>

@@ -14,13 +14,17 @@
   margin-bottom : 0;
 }
 .invoice-page .invoice-items-table table, .invoice-page .invoice-total-table table {
-  border : 2px solid #cfcfcf7d;
+  border : 2px solid #F8F8F8;
 }
 
 @media print {
   body {
     font-size: 14pt;
   }
+  .invoice-page .invoice-items-table table, .invoice-page .invoice-total-table table {
+    border : 2px solid #cfcfcf7d;
+  }
+
   .content-header, .buy-now, .btn-print, .footer, .open, .main-menu, .invoice-print {
     display : none;
   }
