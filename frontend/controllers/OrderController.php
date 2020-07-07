@@ -127,13 +127,7 @@ class OrderController extends Controller {
                         },
                     ],
                     'total_price_before_refund:currency',
-                    [
-                        'attribute' => 'order_created_at',
-                        "format" => "raw",
-                        "value" => function($model) {
-                            return Yii::$app->formatter->asRelativeTime($model->order_created_at);
-                        }
-                    ],
+                    'order_created_at'
                 ]
             ]);
         }
