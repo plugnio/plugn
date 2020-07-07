@@ -139,7 +139,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                 <td><?= $model->area_name ?></td>
                                 <td><?= $model->block ?></td>
                                 <td><?= $model->street ?></td>
-                                <td> <?= $model->avenue != null ? $model->avenue : '' ?></td>
+                                 <?= $model->avenue != null ? '<td>' . $model->avenue . '</td>' : '' ?></td>
                                 <td> <?= $model->house_number ?></td>
                             </tbody>
                         </table>
