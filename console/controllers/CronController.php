@@ -19,27 +19,6 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-  public function actionIndex() {
-    $restaurants = Restaurant::find();
-
-    foreach ($restaurants->all() as $restaurant) {
-
-        for($i = 0; $i < 7; ++$i) {
-            $opening_hour = new OpeningHour();
-            $opening_hour->restaurant_uuid = $restaurant->restaurant_uuid;
-            $opening_hour->day_of_week = $i;
-            $opening_hour->open_time = 0;
-            $opening_hour->close_time = 0;
-            $opening_hour->save();
-        }
-
-      }
-
-    $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::BOLD);
-    return self::EXIT_CODE_NORMAL;
-
-}
-
     /**
      * Update refund status  for all refunds record
      */

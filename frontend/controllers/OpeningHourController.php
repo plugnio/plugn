@@ -15,6 +15,9 @@ use yii\base\Model;
  */
 class OpeningHourController extends Controller {
 
+  public $enableCsrfValidation = false;
+
+
     /**
      * {@inheritdoc}
      */
