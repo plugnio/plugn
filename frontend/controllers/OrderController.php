@@ -126,7 +126,7 @@ class OrderController extends Controller {
                                 return $data->paymentMethod->payment_method_name;
                         },
                     ],
-                    'total_price_before_refund:currency',
+                    'total_price_before_refund',
                     'order_created_at:datetime'
                 ]
             ]);
