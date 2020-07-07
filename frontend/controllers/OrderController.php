@@ -69,7 +69,6 @@ class OrderController extends Controller {
                     ->andWhere(['between', 'order_created_at', $start_date, $end_date])
                     ->andWhere([ '!=' , 'order_status' , Order::STATUS_DRAFT])
                     ->andWhere([ '!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
-                    ->orderBy(['order_created_at' => SORT_ASC])
                     ->all();
 
 
@@ -126,8 +125,14 @@ class OrderController extends Controller {
                                 return $data->paymentMethod->payment_method_name;
                         },
                     ],
-                    'total_price_before_refund',
-                    'order_created_at:datetime'
+                    'total_price_before_refund:currency',
+                    [
+                        'attribute' => 'order_created_at',
+                        "format" => "raw",
+                        "value" => function($model) {
+                            return Yii::$app->formatter->asRelativeTime($model->order_created_at);
+                        }
+                    ],
                 ]
             ]);
         }
@@ -208,36 +213,6 @@ class OrderController extends Controller {
         }
 
         return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid, 'errorMessage' => $errorMessage, 'successMessage' => $successMessage,]);
-    }
-
-    /**
-     * Change order status
-     *
-     * @param type $order_uuid
-     * @param type $restaurantUuid
-     * @param type $status
-     * @return type
-     */
-    public function actionViewInvoice($order_uuid, $restaurantUuid) {
-        $order_model = $this->findModel($order_uuid, $restaurantUuid);
-
-        // Item
-        $orderItems = new \yii\data\ActiveDataProvider([
-            'query' => $order_model->getOrderItems(),
-            'sort' => false
-        ]);
-
-        // Item extra optn
-        $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
-            'query' => $order_model->getOrderItemExtraOptions()
-        ]);
-
-
-        return $this->render('invoice', [
-                    'model' => $order_model,
-                    'orderItems' => $orderItems,
-                    'itemsExtraOpitons' => $itemsExtraOpitons,
-        ]);
     }
 
     /**
