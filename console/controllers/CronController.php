@@ -8,6 +8,7 @@ use common\models\OrderItem;
 use common\models\Payment;
 use common\models\Item;
 use common\models\Order;
+use common\models\OpeningHour;
 use common\models\ItemImage;
 use \DateTime;
 use yii\helpers\Console;
@@ -19,11 +20,19 @@ use yii\db\Expression;
 class CronController extends \yii\console\Controller {
 
   public function actionIndex() {
-    $items = Item::find();
+    $restaurants = Restaurant::find();
 
-    foreach ($items->all() as $item) {
-        $item->unit_sold = $item->getSoldUnits() ? $item->getSoldUnits() : 0;
-        $item->save(false);
+    foreach ($restaurants->all() as $restaurant) {
+
+        for($i = 0; $i < 7; ++$i) {
+            $opening_hour = new OpeningHour();
+            $opening_hour->restaurant_uuid = $restaurant->restaurant_uuid;
+            $opening_hour->day_of_week = $i;
+            $opening_hour->open_time = 0;
+            $opening_hour->close_time = 0;
+            $opening_hour->save();
+        }
+
       }
 
     $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::BOLD);
