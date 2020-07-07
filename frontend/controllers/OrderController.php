@@ -234,14 +234,14 @@ class OrderController extends Controller {
     }
 
     /**
-     * Download a PDF  order's invoice
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * Change order status
+     *
+     * @param type $order_uuid
+     * @param type $restaurantUuid
+     * @param type $status
+     * @return type
      */
-    public function actionDownloadInvoice($restaurantUuid, $order_uuid) {
-
-
+    public function actionViewInvoice($order_uuid, $restaurantUuid) {
         $order_model = $this->findModel($order_uuid, $restaurantUuid);
 
         // Item
@@ -255,38 +255,12 @@ class OrderController extends Controller {
             'query' => $order_model->getOrderItemExtraOptions()
         ]);
 
-        $this->layout = 'pdf';
 
-
-        $content = $this->render('invoice', [
-            'model' => $order_model,
-            'orderItems' => $orderItems,
-            'itemsExtraOpitons' => $itemsExtraOpitons
+        return $this->render('invoice', [
+                    'model' => $order_model,
+                    'orderItems' => $orderItems,
+                    'itemsExtraOpitons' => $itemsExtraOpitons,
         ]);
-
-//
-//        $content = $this->render('invoice', [
-//            'model' => $order_model,
-//            'orderItems ' => $orderItems,
-//        ]);
-
-        $pdf = new Pdf([
-            'mode' => Pdf::MODE_UTF8,
-            // A4 paper format
-            'format' => Pdf::FORMAT_A4,
-            // portrait orientation
-            'orientation' => Pdf::ORIENT_PORTRAIT,
-            // stream to browser inline
-            'destination' => Pdf::DEST_BROWSER,
-            // your html content input
-            'content' => $content,
-            // any css to be embedded if required
-            // set mPDF properties on the fly
-            'options' => [], //['title' => 'Booking #'.$id],
-        ]);
-
-        header('Access-Control-Allow-Origin: *');
-        return $pdf->render();
     }
 
     /**
