@@ -632,14 +632,14 @@ class SiteController extends Controller {
                     ->sum('total_price'); //434.5
 
 
-            // $number_of_all_revenue_generated_this_week = Order::find()
-            //         ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-            //         ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
-            //         ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
-            //         ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
-            //         ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
-            //         ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
-            //         ->sum('total_price');
+            $number_of_all_revenue_generated_this_week = Order::find()
+                    ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                    ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                    ->andWhere(['>', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
+                    ->sum('total_price');
 
 
             //Chart
@@ -723,11 +723,11 @@ class SiteController extends Controller {
             array_push($revenue_generated_chart_data_this_week,  number_format((float)$number_of_all_revenue_generated_today_only, 2, '.', ''));
 
 
-            $number_of_all_revenue_generated_this_week = 0;
-
-            foreach ($revenue_generated_chart_data_this_week as $revenueGenerated) {
-                $number_of_all_revenue_generated_this_week += $revenueGenerated ? floatval($revenueGenerated) : 0;
-            }
+            // $number_of_all_revenue_generated_this_week = 0;
+            //
+            // foreach ($revenue_generated_chart_data_this_week as $revenueGenerated) {
+            //     $number_of_all_revenue_generated_this_week += $revenueGenerated ? floatval($revenueGenerated) : 0;
+            // }
 
 
             //last month

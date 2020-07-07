@@ -69,6 +69,7 @@ class OrderController extends Controller {
                     ->andWhere(['between', 'order_created_at', $start_date, $end_date])
                     ->andWhere([ '!=' , 'order_status' , Order::STATUS_DRAFT])
                     ->andWhere([ '!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
+                     ->orderBy(['order_created_at' => SORT_ASC])
                     ->all();
 
 
