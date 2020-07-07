@@ -27,6 +27,7 @@ use yii\behaviors\AttributeBehavior;
  * @property string|null $restaurant_created_at
  * @property string|null $restaurant_updated_at
  * @property boolean $restaurant_email_notification
+ * @property boolean $show_opening_hours
  * @property boolean $armada_api_key
  * @property int $phone_number_display
  * @property int $store_branch_name
@@ -104,7 +105,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'app_id' ,'armada_api_key','store_branch_name'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 8, 'max' => 8],
             [['phone_number'], 'integer', 'min' => 0],
-            [['restaurant_email_notification','phone_number_display','store_layout'], 'integer'],
+            [['restaurant_email_notification','phone_number_display','store_layout','show_opening_hours'], 'integer'],
             ['restaurant_email', 'email'],
             [['restaurant_uuid'], 'unique'],
         ];
@@ -137,6 +138,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             'restaurant_updated_at' => 'Store Updated At',
             'armada_api_key' => 'Armada Api Key',
             'restaurant_email_notification' => 'Email Notification',
+            'show_opening_hours' => 'Show Opening hours',
             'phone_number_display' => 'Phone number display',
             'store_branch_name' => 'Branch name',
             'custom_css' => 'Custom css',

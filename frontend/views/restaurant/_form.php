@@ -218,18 +218,23 @@ use common\models\Restaurant;
                 ], false)->label(false)
         ?>
 
-<<<<<<< HEAD
+        <?=
+        $form->field($model, 'show_opening_hours', [
+            'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Show Opening hours</span>{input}<label class='custom-control-label' for='customSwitch1'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
+        ])->checkbox([
+            'checked' => $model->show_opening_hours == 0 ? false : true,
+            'id' => 'customSwitch1',
+            'class' => 'custom-control-input'
+                ], false)->label(false)
+        ?>
 
 
             <?= $form->field($model, 'armada_api_key')->textInput(['maxlength' => true]) ?>
 
 
-        <div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px; padding-bottom: 15px; background:#f4f6f9 ">
-=======
     <div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px; padding-bottom: 15px; background:#f4f6f9 ">
->>>>>>> master
         <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
-        </div>
+    </div>
 
 <?php ActiveForm::end(); ?>
 
