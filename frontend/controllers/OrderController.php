@@ -69,7 +69,7 @@ class OrderController extends Controller {
                     ->andWhere(['between', 'order_created_at', $start_date, $end_date])
                     ->andWhere([ '!=' , 'order_status' , Order::STATUS_DRAFT])
                     ->andWhere([ '!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
-                    ->orderBy(['order_created_at' => SORT_ASC])
+                     ->orderBy(['order_created_at' => SORT_ASC])
                     ->all();
 
 
@@ -127,7 +127,7 @@ class OrderController extends Controller {
                         },
                     ],
                     'total_price_before_refund:currency',
-                    'order_created_at:datetime'
+                    'order_created_at'
                 ]
             ]);
         }
@@ -218,6 +218,23 @@ class OrderController extends Controller {
      * @param type $status
      * @return type
      */
+    public function actionChangeOrderStatus($order_uuid, $restaurantUuid, $status) {
+        $order_model = $this->findModel($order_uuid, $restaurantUuid);
+
+        $order_model->order_status = $status;
+        $order_model->save(false);
+
+        return $this->redirect(['view', 'id' => $order_model->order_uuid, 'restaurantUuid' => $restaurantUuid]);
+    }
+
+    /**
+     * Change order status
+     *
+     * @param type $order_uuid
+     * @param type $restaurantUuid
+     * @param type $status
+     * @return type
+     */
     public function actionViewInvoice($order_uuid, $restaurantUuid) {
         $order_model = $this->findModel($order_uuid, $restaurantUuid);
 
@@ -238,79 +255,6 @@ class OrderController extends Controller {
                     'orderItems' => $orderItems,
                     'itemsExtraOpitons' => $itemsExtraOpitons,
         ]);
-    }
-
-    /**
-     * Change order status
-     *
-     * @param type $order_uuid
-     * @param type $restaurantUuid
-     * @param type $status
-     * @return type
-     */
-    public function actionChangeOrderStatus($order_uuid, $restaurantUuid, $status) {
-        $order_model = $this->findModel($order_uuid, $restaurantUuid);
-
-        $order_model->order_status = $status;
-        $order_model->save(false);
-
-        return $this->redirect(['view', 'id' => $order_model->order_uuid, 'restaurantUuid' => $restaurantUuid]);
-    }
-
-    /**
-     * Download a PDF  order's invoice
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDownloadInvoice($restaurantUuid, $order_uuid) {
-
-
-        $order_model = $this->findModel($order_uuid, $restaurantUuid);
-
-        // Item
-        $orderItems = new \yii\data\ActiveDataProvider([
-            'query' => $order_model->getOrderItems(),
-            'sort' => false
-        ]);
-
-        // Item extra optn
-        $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
-            'query' => $order_model->getOrderItemExtraOptions()
-        ]);
-
-        $this->layout = 'pdf';
-
-
-        $content = $this->render('invoice', [
-            'model' => $order_model,
-            'orderItems' => $orderItems,
-            'itemsExtraOpitons' => $itemsExtraOpitons
-        ]);
-
-//
-//        $content = $this->render('invoice', [
-//            'model' => $order_model,
-//            'orderItems ' => $orderItems,
-//        ]);
-
-        $pdf = new Pdf([
-            'mode' => Pdf::MODE_UTF8,
-            // A4 paper format
-            'format' => Pdf::FORMAT_A4,
-            // portrait orientation
-            'orientation' => Pdf::ORIENT_PORTRAIT,
-            // stream to browser inline
-            'destination' => Pdf::DEST_BROWSER,
-            // your html content input
-            'content' => $content,
-            // any css to be embedded if required
-            // set mPDF properties on the fly
-            'options' => [], //['title' => 'Booking #'.$id],
-        ]);
-
-        header('Access-Control-Allow-Origin: *');
-        return $pdf->render();
     }
 
     /**

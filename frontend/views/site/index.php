@@ -23,7 +23,7 @@ $js = "
 $this->registerJs($js);
 ?>
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
 
 <!-- <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script> -->
@@ -360,20 +360,20 @@ $this->registerJs($js);
 
     // Get Revenue Generated
     document.getElementById("getRevenueGeneratedLast7DaysData").addEventListener("click", function(){
-      $('#dropdownRevenueGenerated').html('Last 7 days');
-      $('.number-of-revenue-generated').html (<?= number_format($number_of_all_revenue_generated_this_week, 3);  ?>);
-      addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_this_week) ?>);
-    });
-    document.getElementById("getRevenueGeneratedLastMonth").addEventListener("click", function(){
-      $('#dropdownRevenueGenerated').html('Last Month');
-      $('.number-of-revenue-generated').html (<?= number_format($number_of_all_revenue_generated_last_month, 3);  ?>);
-      addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_month) ?>);
-    });
-    document.getElementById("getRevenueGeneratedLast3Months").addEventListener("click", function(){
-      $('#dropdownRevenueGenerated').html('Last 3 Months');
-      $('.number-of-revenue-generated').html (<?= $number_of_all_revenue_generated_last_three_months;  ?>);
-      addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_three_months) ?>);
-    });
+   $('#dropdownRevenueGenerated').html('Last 7 days');
+   $('.number-of-revenue-generated').html (<?= number_format((float)$number_of_all_revenue_generated_this_week, 2, '.', '');  ?>);
+   addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_this_week) ?>);
+ });
+ document.getElementById("getRevenueGeneratedLastMonth").addEventListener("click", function(){
+   $('#dropdownRevenueGenerated').html('Last Month');
+   $('.number-of-revenue-generated').html (<?= number_format((float)$number_of_all_revenue_generated_last_month, 2, '.', '');  ?>);
+   addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_month) ?>);
+ });
+ document.getElementById("getRevenueGeneratedLast3Months").addEventListener("click", function(){
+   $('#dropdownRevenueGenerated').html('Last 3 Months');
+   $('.number-of-revenue-generated').html (<?= number_format((float)$number_of_all_revenue_generated_last_three_months, 2, '.', '');  ?>);
+   addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_three_months) ?>);
+ });
 
 
     // Get Sold Items
