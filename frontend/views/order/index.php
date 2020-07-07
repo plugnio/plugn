@@ -18,6 +18,7 @@ $js = "
 $(function () {
   $('.summary').insertAfter('.top');
 
+  $('table.data-list-view.dataTable tbody td').css('padding', '10px');
 
   $('#restaurant-date_range_picker_with_time').attr('autocomplete','off');
 
@@ -216,7 +217,7 @@ $this->registerJs($js);
                         },
                         'update' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;"><i class="feather icon-edit"></i></span>', ['update', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
+                                            '<span style="margin-right: 20px;"><i class="feather feather icon-printer"></i></span>', ['view-invoice', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
                                         'data-pjax' => '0',
                                             ]
                             );

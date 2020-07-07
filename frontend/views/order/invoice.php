@@ -41,7 +41,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
             <div class="col-sm-6 col-12 text-left">
 
                 <div class="invoice-details mt-2">
-                    <h6>INVOICE NO.</h6>
+                    <h6 class="mt-2">INVOICE NO.</h6>
                     <p> <?= '#' . $model->order_uuid ?></p>
                     <h6 class="mt-2">INVOICE DATE</h6>
                     <p>
@@ -70,28 +70,25 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
                 </div>
                 <div class="recipient-contact pb-2">
-<?php if ($model->customer_email) { ?>
 
-
-                        <p>
-                            <i class="feather icon-mail"></i>
-    <?= $model->customer_email ?>
-                        </p>
-
-<?php } ?>
-
-
-
-                        <p>
-                            <i class="feather icon-user"></i>
-    <?= $model->customer_name ?>
-                        </p>
-
-
-                    <p>
-                        <i class="feather icon-phone"></i>
-<?= $model->customer_phone_number ?>
-                    </p>
+                  <table class="table table-bordered table-hover" style="margin-top:29px !important;">
+                      <tbody>
+                          <tr>
+                              <th>Customer name</th>
+                              <td><?= $model->customer_name ?></td>
+                          </tr>
+                          <tr>
+                              <th>Customer phone number</th>
+                              <td><?= $model->customer_phone_number ?></td>
+                          </tr>
+                          <?php if ($model->customer_email) { ?>
+                            <tr>
+                                <th>Customer email address</th>
+                                <td><?= $model->customer_email ?></td>
+                            </tr>
+                          <?php } ?>
+                      </tbody>
+                  </table>
                 </div>
             </div>
 
@@ -113,29 +110,39 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 <?php if ($model->order_mode == Order::ORDER_MODE_PICK_UP) { ?>
 
                         <h6 class="mt-2">Type</h6>
-                        <p>  Pick up </p>
+                        <p style="line-height: 1.5rem;margin-top: 0;margin-bottom: 1rem;"> Pick up </p>
                         <h6 class="mt-2">Pickup from:</h6>
-                        <p>  <?= $model->restaurantBranch->branch_name_en ?>   </p>
+                        <p style="line-height: 1.5rem;margin-top: 0;margin-bottom: 1rem;">  <?= $model->restaurantBranch->branch_name_en ?>   </p>
 
 <?php } ?>
 
                     <?php if ($model->order_mode == Order::ORDER_MODE_DELIVERY) { ?>
 
                         <h6 class="mt-2">Type</h6>
-                        <p>  Delivery </p>
+                        <p style="line-height: 1.5rem;margin-top: 0;margin-bottom: 1rem;">  Delivery </p>
                         <h6 class="mt-2">Payment Method</h6>
                         <p>
     <?= $model->payment_method_name ?>
                         </p>
-                        <h6 class="mt-2">Address</h6>
-                        <p>
-                            <b>Area:</b> <?= $model->area_name ?>,
-                            <b>Block:</b> <?= $model->block ?>,
-                            <b>Street:</b> <?= $model->street ?>,
-    <?= $model->avenue != null ? '<b>Avenue: </b>' . $model->avenue . ', ' : '' ?>
-                            <b>House:</b> <?= $model->house_number ?>
-                        </p>
+                        <table class="table table-bordered table-hover" style="margin-top: 1.5rem !important;">
+                          <thead>
+                              <tr>
+                                  <th>Area</th>
+                                  <th>Block</th>
+                                  <th>Street</th>
+                                    <?= $model->avenue != null ? '<th>Avenue</th>' : '' ?>
+                                  <th>House</th>
+                              </tr>
+                          </thead>
 
+                            <tbody>
+                                <td><?= $model->area_name ?></td>
+                                <td><?= $model->block ?></td>
+                                <td><?= $model->street ?></td>
+                                <td> <?= $model->avenue != null ? $model->avenue : '' ?></td>
+                                <td> <?= $model->house_number ?></td>
+                            </tbody>
+                        </table>
 <?php } ?>
 
 
@@ -193,7 +200,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
         </div>
         <div id="invoice-total-details" class="invoice-total-table">
             <div class="row">
-                <div class="col-7">
+                <div class="col-12">
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover">
                             <tbody>
