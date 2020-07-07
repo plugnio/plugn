@@ -75,11 +75,6 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                 <div class="recipient-contact pb-2">
 <?php if ($model->customer_email) { ?>
 
-                        <p>
-                            <i class="feather icon-user"></i>
-    <?= $model->customer_name ?>
-                        </p>
-
 
                         <p>
                             <i class="feather icon-mail"></i>
@@ -89,6 +84,11 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 <?php } ?>
 
 
+
+                        <p>
+                            <i class="feather icon-user"></i>
+    <?= $model->customer_name ?>
+                        </p>
 
 
                     <p>

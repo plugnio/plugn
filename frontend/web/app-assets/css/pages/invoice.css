@@ -19,7 +19,7 @@
 
 @media print {
   body {
-    font-size: 20pt;
+    font-size: 15pt;
   }
   .content-header, .buy-now, .btn-print, .footer, .open, .main-menu, .invoice-print {
     display : none;
