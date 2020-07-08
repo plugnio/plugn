@@ -113,6 +113,11 @@ $this->registerJs($js);
         ]
     ]);
     ?>
+
+    <?= $form->field($model, 'restaurant_thumbnail_image')->textInput(['maxlength' => true]) ?>
+
+
+
     <?=
     $form->field($model, 'restaurant_logo')->widget(FileInput::classname(), [
         'options' => ['accept' => 'image/*', 'multiple' => false
