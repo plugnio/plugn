@@ -26,6 +26,7 @@ $this->registerJs($js);
 
 <section id="data-list-view" class="data-list-view-header">
 
+
 <!-- Data list view starts -->
 <div class="action-btns d-none">
     <div class="btn-dropdown mr-1 mb-1">
@@ -39,6 +40,12 @@ $this->registerJs($js);
    <?php echo $this->render('_search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
 
 
+   <?php if($dataProvider->getCount() == 0 ){  ?>
+     <div style="padding-left:14px">
+     <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'    padding: 0.85rem 1.7rem;']) ?>
+   </div>
+   <?php } ?>
+   
     <!-- DataTable starts -->
     <div class="table-responsive">
 
