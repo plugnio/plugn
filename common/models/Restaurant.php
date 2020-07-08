@@ -101,6 +101,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['custom_css'], 'string'],
             [['platform_fee'], 'number'],
+            [['instagram_url'], 'url'],
             [['date_range_picker_with_time','google_analytics_id', 'facebook_pixil_id'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'app_id' ,'armada_api_key','store_branch_name'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 8, 'max' => 8],
@@ -145,7 +146,8 @@ class Restaurant extends \yii\db\ActiveRecord {
             'platform_fee' => 'Platform fee',
             'store_layout' => 'Store layout',
             'google_analytics_id' => 'Google Analytics ID',
-            'facebook_pixil_id' => 'Facebook Pixil ID'
+            'facebook_pixil_id' => 'Facebook Pixil ID',
+            'instagram_url' => 'Instagram Url',
         ];
     }
 

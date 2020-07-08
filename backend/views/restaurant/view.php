@@ -124,6 +124,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'owner_number',
             'restaurant_email:email',
+            'instagram_url:url',
             'iban',
             'restaurant_created_at',
             'restaurant_updated_at',

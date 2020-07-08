@@ -63,13 +63,17 @@ use common\models\Restaurant;
         $sotredRestaurantPaymentMethod = ArrayHelper::getColumn($sotredRestaurantPaymentMethod, 'payment_method_id');
     }
 
-    $form = ActiveForm::begin();
+
+    $form = ActiveForm::begin([
+                'id' => 'dynamic-form',
+                'errorSummaryCssClass' => 'alert alert-danger'
+    ]);
     ?>
+
+
     <div class="card-body">
 
-        <?= $form->errorSummary($model); ?>
-
-
+      <?= $form->errorSummary([$model],['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
 
 
         <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
@@ -207,6 +211,11 @@ use common\models\Restaurant;
 
         <?= $form->field($model, 'restaurant_email')->input('email') ?>
 
+        <?= $form->field($model, 'instagram_url')->textInput(['maxlength' => true]) ?>
+
+        <?php
+        // $form->field($model, 'armada_api_key')->textInput(['maxlength' => true])
+        ?>
 
         <?=
         $form->field($model, 'restaurant_email_notification', [
@@ -229,7 +238,7 @@ use common\models\Restaurant;
         ?>
 
 
-            <?= $form->field($model, 'armada_api_key')->textInput(['maxlength' => true]) ?>
+
 
 
     <div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px; padding-bottom: 15px; background:#f4f6f9 ">
