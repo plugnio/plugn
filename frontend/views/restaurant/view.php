@@ -120,14 +120,14 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                         ],
                         'restaurant_email:email',
-                        // [
-                        //     'attribute' => 'instagram_url',
-                        //     'format' => 'html',
-                        //     'value' => function ($data) {
-                        //         return '<a  href="' . $data->instagram_url .'">'. $data->instagram_url  .'</a>';
-                        //     },
-                        //     'visible' => $model->instagram_url != null,
-                        // ],
+                        [
+                            'attribute' => 'instagram_url',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return '<a  href="' . $data->instagram_url .'">'. $data->instagram_url  .'</a>';
+                            },
+                            'visible' => $model->instagram_url != null,
+                        ],
                         [
                             'attribute' => 'armada_api_key',
                             'format' => 'html',
