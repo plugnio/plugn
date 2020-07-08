@@ -702,7 +702,7 @@ $this->registerJs($js);
                         </div>
                         <div class="card-footer clearfix" style="background: white">
                            <?=
-                           Html::a('View All Orders', ['order/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn  btn-secondary float-right'])
+                           Html::a('View All Orders', ['order/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn  btn-primary float-right'])
                            ?>
                        </div>
                     </div>
