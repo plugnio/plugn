@@ -172,6 +172,10 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'custom_css')->textarea(['rows' => '12']) ?>
 
+    <?= $form->field($model, 'business_id')->textInput() ?>
+
+    <?= $form->field($model, 'business_entity_id')->textInput() ?>
+
     <?= $form->field($model, 'developer_id')->textInput() ?>
 
     <?= $form->field($model, 'merchant_id')->textInput() ?>
