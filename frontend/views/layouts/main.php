@@ -109,7 +109,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                     <li class="nav-item mr-auto">
                         <?=
                         Html::a('<img src="' . $restaurant_model->getRestaurantLogoUrl() . '"alt="' . $restaurant_model->name . ' Logo" class="round"  alt="avatar" height="40" width="40" ">'
-                                . '<h2 class="brand-text mb-0"  style=" white-space: break-spaces;font-size: 20px;">' . $restaurant_model->name . '</h2>'
+                                . '<h2 class="brand-text mb-0"  style="font-size: 20px; width: 190px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">' . $restaurant_model->name . '</h2>'
                                 , ['site/index', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'navbar-brand']);
                         ?>
                     </li>
@@ -216,7 +216,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         ?>
                     </li>
 
-      
+
 
                     <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
                     <li class=" nav-item <?= $this->context->route == 'restaurant-theme/index' ? 'active' : '' ?> ">
