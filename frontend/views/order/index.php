@@ -108,14 +108,6 @@ $this->registerJs($js);
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
-
-
-  'rowOptions'   =>
-     function ($model) {
-                    $order_view_page_url =   yii\helpers\Url::to(['order/view','id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid]);
-                    return ['onclick' => 'location.href="'.$order_view_page_url.'"'];
-                },
-
             'columns' => [
               ['class' => 'yii\grid\SerialColumn'],
 
@@ -216,6 +208,13 @@ $this->registerJs($js);
                     'class' => 'yii\grid\ActionColumn',
                     'template' => ' {view} {update} {delete}',
                     'buttons' => [
+                        'view' => function ($url, $model) {
+                            return Html::a(
+                                            '<span style="margin-right: 20px;"><i class="feather icon-eye"></i></span>', ['view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
+                                        'data-pjax' => '0',
+                                            ]
+                            );
+                        },
                         'update' => function ($url, $model) {
                             return Html::a(
                                             '<span style="margin-right: 20px;"><i class="feather feather icon-printer"></i></span>', ['view-invoice', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
