@@ -23,13 +23,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="alert alert-danger alert-dismissible">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-        <h5><i class="icon fas fa-ban"></i> Warning!</h5>
+        <h5><i class="icon fa fa-ban"></i> Warning!</h5>
         <?= ($errorMessage) ?>
     </div>
 <?php } elseif ($successMessage && $errorMessage == null) { ?>
     <div class="alert alert-success alert-dismissible">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-        <h5><i class="icon fas fa-check"></i> Success!</h5>
+        <h5><i class="icon fa fa-check"></i> Success!</h5>
         <?= ($successMessage) ?>
     </div>
 <?php } ?>
@@ -219,7 +219,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo 'Partially refunded';
                     } elseif ($model->order_status == Order::STATUS_REFUNDED) {
                         echo 'Refunded';
-                    } elseif ($model->order_status == Order::STATUS_COMPLETE) {
+                    } else if ($model->order_status != Order::STATUS_REFUNDED && $model->order_status != Order::STATUS_PARTIALLY_REFUNDED && $model->payment_method_id != 3 && $model->payment->payment_current_status == 'CAPTURED') {
                         echo 'Paid';
                     } else {
                         echo 'Payment pending';
