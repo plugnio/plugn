@@ -228,18 +228,18 @@ use common\models\Restaurant;
         ?>
 
         <?=
-        $form->field($model, 'show_opening_hours', [
-            'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Show Opening hours</span>{input}<label class='custom-control-label' for='customSwitch2'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
+        $form->field($model, 'schedule_order', [
+            'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Schedule Order</span>{input}<label class='custom-control-label' for='scheduleOrder'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
         ])->checkbox([
-            'checked' => $model->show_opening_hours == 0 ? false : true,
-            'id' => 'customSwitch2',
+            'checked' => $model->schedule_order == 0 ? false : true,
+            'id' => 'scheduleOrder',
             'class' => 'custom-control-input'
                 ], false)->label(false)
         ?>
 
-
-
-
+        <?=
+          $form->field($model, 'schedule_interval')->textInput(['maxlength' => true,'type' => 'number'])
+        ?>
 
     <div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px; padding-bottom: 15px; background:#f4f6f9 ">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>

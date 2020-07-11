@@ -12,6 +12,7 @@ use Yii;
  * @property int $day_of_week
  * @property string $open_time
  * @property string $close_time
+ * @property string $is_closed
  *
  * @property Restaurant $restaurant
  */
@@ -19,14 +20,15 @@ class OpeningHour extends \yii\db\ActiveRecord
 {
 
     //Values for `day_of_week`
-    const DAY_OF_WEEK_SATURDAY= 0;
-    const DAY_OF_WEEK_SUNDAY = 1;
-    const DAY_OF_WEEK_MONDAY = 2;
-    const DAY_OF_WEEK_TUESDAY = 3;
-    const DAY_OF_WEEK_WEDNESDAY = 4;
-    const DAY_OF_WEEK_THURSDAY= 5;
-    const DAY_OF_WEEK_FRIDAY= 6;
+    const DAY_OF_WEEK_SUNDAY = 0;
+    const DAY_OF_WEEK_MONDAY = 1;
+    const DAY_OF_WEEK_TUESDAY = 2;
+    const DAY_OF_WEEK_WEDNESDAY = 3;
+    const DAY_OF_WEEK_THURSDAY= 4;
+    const DAY_OF_WEEK_FRIDAY= 5;
+    const DAY_OF_WEEK_SATURDAY= 6;
 
+    public $open_24_hrs;
 
     /**
      * {@inheritdoc}
@@ -43,7 +45,7 @@ class OpeningHour extends \yii\db\ActiveRecord
     {
         return [
             [['restaurant_uuid', 'day_of_week', 'open_time', 'close_time'], 'required'],
-            [['day_of_week'], 'integer'],
+            [['day_of_week','is_closed'], 'integer'],
             [['open_time', 'close_time'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
@@ -79,8 +81,6 @@ class OpeningHour extends \yii\db\ActiveRecord
                 break;
 
         }
-
-        return "Couldnt find a status";
     }
 
 

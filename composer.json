@@ -43,7 +43,8 @@
         "lubosdz/yii2-ui-range-plus-minus": "^1.1",
         "bizley/quill": "^3.1",
         "twitf/yii2-dropzone": "*",
-        "kartik-v/yii2-widget-fileinput": "@dev"
+        "kartik-v/yii2-widget-fileinput": "@dev",
+        "janisto/yii2-timepicker": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

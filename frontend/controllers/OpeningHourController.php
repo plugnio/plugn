@@ -40,10 +40,11 @@ class OpeningHourController extends Controller {
 
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
-        $models = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
-        ->orderBy(['day_of_week' => SORT_ASC])
-        ->all();
+        $daily_hours = new OpeningHour();
 
+        $models = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
+                      ->orderBy(['day_of_week' => SORT_ASC])
+                      ->all();
 
 
         if (Model::loadMultiple($models, Yii::$app->request->post()) && Model::validateMultiple($models)) {
@@ -51,15 +52,12 @@ class OpeningHourController extends Controller {
                 $opening_hour->save(false);
             }
 
-                        return $this->render('index', [
-                                    'models' => $models,
-                                    'restaurantUuid' => $restaurantUuid,
-                        ]);
         }
 
 
             return $this->render('index', [
                         'models' => $models,
+                        'daily_hours' => $daily_hours,
                         'restaurantUuid' => $restaurantUuid,
             ]);
 

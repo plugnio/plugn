@@ -36,6 +36,8 @@ use yii\behaviors\AttributeBehavior;
  * @property int $platform_fee
  * @property int $facebook_pixil_id
  * @property int $google_analytics_id
+ * @property int $schedule_order
+ * @property int $schedule_interval
 
  *
  *
@@ -106,7 +108,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'app_id' ,'armada_api_key','store_branch_name'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 8, 'max' => 8],
             [['phone_number'], 'integer', 'min' => 0],
-            [['restaurant_email_notification','phone_number_display','store_layout','show_opening_hours'], 'integer'],
+            [['restaurant_email_notification','schedule_order','schedule_interval','phone_number_display','store_layout','show_opening_hours'], 'integer'],
             ['restaurant_email', 'email'],
             [['restaurant_uuid'], 'unique'],
         ];
@@ -148,6 +150,8 @@ class Restaurant extends \yii\db\ActiveRecord {
             'google_analytics_id' => 'Google Analytics ID',
             'facebook_pixil_id' => 'Facebook Pixil ID',
             'instagram_url' => 'Instagram Url',
+            'schedule_order' => 'Schedule Order',
+            'schedule_interval' => 'Schedule Interval',
         ];
     }
 
@@ -373,6 +377,18 @@ class Restaurant extends \yii\db\ActiveRecord {
             $restaurant_theme = new RestaurantTheme();
             $restaurant_theme->restaurant_uuid = $this->restaurant_uuid;
             $restaurant_theme->save();
+
+
+            //Add opening hrs
+            for($i = 0; $i < 7; ++$i) {
+                $opening_hour = new OpeningHour();
+                $opening_hour->restaurant_uuid = $this->restaurant_uuid;
+                $opening_hour->day_of_week = $i;
+                $opening_hour->open_time = 0;
+                $opening_hour->close_time = '23:59:59';
+                $opening_hour->save();
+            }
+
         }
     }
 
@@ -411,6 +427,30 @@ class Restaurant extends \yii\db\ActiveRecord {
 
         return $photo_url;
     }
+
+    public function isOpen()
+    {
+        $opening_hours_model = OpeningHour::find()->where(['day_of_week' => date('w')])->one();
+
+        if(!$opening_hours_model->is_closed && date('H:i:s') >= $opening_hours_model->open_time && date('H:i:s') <= $opening_hours_model->close_time)
+          return true;
+
+        return false;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function extraFields()
+    {
+      return [
+          'isOpen' => function($restaurant){
+              return $restaurant->isOpen();
+          }
+      ];
+    }
+
 
     /**
      * Delete Restaurant's logo
@@ -568,6 +608,9 @@ class Restaurant extends \yii\db\ActiveRecord {
         return $this->hasMany(PaymentMethod::className(), ['payment_method_id' => 'payment_method_id'])->viaTable('restaurant_payment_method', ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+
+
+
     /**
      * Gets query for [[OpeningHours]].
      *
@@ -577,7 +620,6 @@ class Restaurant extends \yii\db\ActiveRecord {
     {
         return $this->hasMany(OpeningHour::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-
 
     /**
      * Gets query for [[Orders]].
