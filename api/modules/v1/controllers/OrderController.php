@@ -67,7 +67,7 @@ class OrderController extends Controller {
 
         if ($restaurant_model) {
 
-            if ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) {
+            if ($restaurant_model->isOpen()) {
 
 
                 $order = new Order();
@@ -320,10 +320,10 @@ class OrderController extends Controller {
                 if (array_key_exists('operation', $response) && $response['operation'] == 'error') {
                     $order->delete();
                 }
-            } else if ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_CLOSE) {
+            } else {
                 $response = [
                     'operation' => 'error',
-                    'message' => 'Store is close',
+                    'message' => 'Store is closed',
                 ];
             }
         } else {

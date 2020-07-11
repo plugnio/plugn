@@ -113,10 +113,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                         ],
                         [
-                            'attribute' => 'show_opening_hours',
+                            'attribute' => 'schedule_order',
                             'format' => 'html',
                             'value' => function ($data) {
-                               return $data->show_opening_hours ? 'Yes' : 'No';
+                               return $data->schedule_order ? 'Yes' : 'No';
                             },
                         ],
                         'restaurant_email:email',
