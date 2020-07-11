@@ -27,7 +27,7 @@ class ArmadaDelivery extends Component {
      */
     public $keyToUse;
 
-    public $liveApiEndpoint = "https://api.tap.company/v2";
+    public $liveApiEndpoint = "https://api.armadadelivery.com/v0/deliveries";
 
     public $testApiEndpoint = "https://api-simulation-env.herokuapp.com/v0";
 
