@@ -10,6 +10,7 @@ use common\models\RestaurantBranch;
 use common\models\Restaurant;
 use common\models\RestaurantTheme;
 use common\models\OpeningHour;
+use common\models\RestaurantDelivery;
 
 class RestaurantController extends Controller {
 
@@ -61,34 +62,46 @@ class RestaurantController extends Controller {
 
 
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
+        $area_id = Yii::$app->request->get("area_id");
 
         if (Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->exists()) {
+          $deliveryArea = RestaurantDelivery::find()->where(['restaurant_uuid' => $restaurant_uuid , 'area_id' =>$area_id ])->one();
 
-            for ($i = 0; $i <= OpeningHour::DAY_OF_WEEK_SATURDAY; $i++) {
-                
-          
-                
-                $deliveryDate = strtotime("+$i day");
+          $delivery_time = [];
 
 
+            if($deliveryArea){
 
-                $opening_hrs = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => $i])->one();
+              for ($i = 0; $i <= OpeningHour::DAY_OF_WEEK_SATURDAY; $i++) {
 
-                
-                if($opening_hrs->is_closed) 
-                    continue;
-                      
+                  $deliveryDate = strtotime("+$i day");
 
-                $delivery_time [$i] = [
-                    'shortDate' => date("d M", $deliveryDate),
-                    'dayOfWeek' => date("w", $deliveryDate),
-                    'day' => $i == 0 ? 'Today' : ($i == 1 ? 'Tomorrow' : date("D", $deliveryDate)),
-                    'times' => $opening_hrs->getDeliveryTimes()
-                ];
+                  $opening_hrs = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => $i])->one();
+
+                  if($opening_hrs->is_closed)
+                      continue;
+
+                  $deliveryTimes = $opening_hrs->getDeliveryTimes($deliveryArea->delivery_time);
+
+                  if(count($deliveryTimes) > 0) {
+                    array_push($delivery_time, [
+                        'shortDate' => date("d M", $deliveryDate),
+                        'dayOfWeek' => date("w", $deliveryDate),
+                        'day' => $i == 0 ? 'Today' : ($i == 1 ? 'Tomorrow' : date("D", $deliveryDate)),
+                        'times' => $deliveryTimes
+                    ]);
+                  }
+
+              }
+
+              return $delivery_time;
+
+            } else {
+              return [
+                  'operation' => 'error',
+                  'message' => "Unfortunately we don't currently deliver to the selected area."
+              ];
             }
-
-
-            return $delivery_time;
         } else
             return [
                 'operation' => 'error',
