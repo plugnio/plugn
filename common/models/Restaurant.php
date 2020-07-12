@@ -384,8 +384,8 @@ class Restaurant extends \yii\db\ActiveRecord {
                 $opening_hour = new OpeningHour();
                 $opening_hour->restaurant_uuid = $this->restaurant_uuid;
                 $opening_hour->day_of_week = $i;
-                $opening_hour->open_time = 0;
-                $opening_hour->close_time = '23:59:59';
+                $opening_hour->open_at = 0;
+                $opening_hour->close_at = '23:59:59';
                 $opening_hour->save();
             }
 
@@ -432,7 +432,7 @@ class Restaurant extends \yii\db\ActiveRecord {
     {
         $opening_hours_model = OpeningHour::find()->where(['day_of_week' => date('w')])->one();
 
-        if(!$opening_hours_model->is_closed && date('H:i:s') >= $opening_hours_model->open_time && date('H:i:s') <= $opening_hours_model->close_time)
+        if(!$opening_hours_model->is_closed && date('H:i:s') >= $opening_hours_model->open_at && date('H:i:s') <= $opening_hours_model->close_at)
           return true;
 
         return false;

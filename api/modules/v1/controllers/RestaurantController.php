@@ -9,6 +9,7 @@ use common\models\City;
 use common\models\RestaurantBranch;
 use common\models\Restaurant;
 use common\models\RestaurantTheme;
+use common\models\OpeningHour;
 
 class RestaurantController extends Controller {
 
@@ -56,6 +57,48 @@ class RestaurantController extends Controller {
     /**
      * Return Restaurant's branches
      */
+    public function actionGetOpeningHours() {
+
+
+        $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
+
+        if (Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->exists()) {
+
+            for ($i = 0; $i <= OpeningHour::DAY_OF_WEEK_SATURDAY; $i++) {
+                
+          
+                
+                $deliveryDate = strtotime("+$i day");
+
+
+
+                $opening_hrs = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => $i])->one();
+
+                
+                if($opening_hrs->is_closed) 
+                    continue;
+                      
+
+                $delivery_time [$i] = [
+                    'shortDate' => date("d M", $deliveryDate),
+                    'dayOfWeek' => date("w", $deliveryDate),
+                    'day' => $i == 0 ? 'Today' : ($i == 1 ? 'Tomorrow' : date("D", $deliveryDate)),
+                    'times' => $opening_hrs->getDeliveryTimes()
+                ];
+            }
+
+
+            return $delivery_time;
+        } else
+            return [
+                'operation' => 'error',
+                'message' => 'Restaurant Uuid is invalid'
+            ];
+    }
+
+    /**
+     * Return Restaurant's branches
+     */
     public function actionListAllRestaurantsBranches($id) {
 
         $restaurantBranches = RestaurantBranch::find()
@@ -77,7 +120,7 @@ class RestaurantController extends Controller {
     public function actionGetRestaurantData($branch_name) {
 
         $restaurant = Restaurant::find()
-                ->select(['restaurant_uuid', 'name', 'logo', 'tagline', 'restaurant_domain','app_id','google_analytics_id','facebook_pixil_id','custom_css'])
+                ->select(['restaurant_uuid', 'name', 'logo', 'tagline', 'restaurant_domain', 'app_id', 'google_analytics_id', 'facebook_pixil_id', 'custom_css'])
                 ->where(['store_branch_name' => $branch_name])
                 ->one();
 
@@ -97,7 +140,7 @@ class RestaurantController extends Controller {
                 'google_analytics_id' => $restaurant->google_analytics_id,
                 'facebook_pixil_id' => $restaurant->facebook_pixil_id,
                 'custom_css' => $restaurant->custom_css,
-                'theme_color'=> $themeColor->primary,
+                'theme_color' => $themeColor->primary,
             ];
         } else {
             return [

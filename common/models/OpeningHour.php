@@ -10,43 +10,40 @@ use Yii;
  * @property int $opening_hour_id
  * @property string $restaurant_uuid
  * @property int $day_of_week
- * @property string $open_time
- * @property string $close_time
+ * @property string $open_at
+ * @property string $close_at
  * @property string $is_closed
  *
  * @property Restaurant $restaurant
  */
-class OpeningHour extends \yii\db\ActiveRecord
-{
+class OpeningHour extends \yii\db\ActiveRecord {
 
     //Values for `day_of_week`
     const DAY_OF_WEEK_SUNDAY = 0;
     const DAY_OF_WEEK_MONDAY = 1;
     const DAY_OF_WEEK_TUESDAY = 2;
     const DAY_OF_WEEK_WEDNESDAY = 3;
-    const DAY_OF_WEEK_THURSDAY= 4;
-    const DAY_OF_WEEK_FRIDAY= 5;
-    const DAY_OF_WEEK_SATURDAY= 6;
+    const DAY_OF_WEEK_THURSDAY = 4;
+    const DAY_OF_WEEK_FRIDAY = 5;
+    const DAY_OF_WEEK_SATURDAY = 6;
 
     public $open_24_hrs;
 
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'opening_hour';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
-    {
+    public function rules() {
         return [
-            [['restaurant_uuid', 'day_of_week', 'open_time', 'close_time'], 'required'],
-            [['day_of_week','is_closed'], 'integer'],
-            [['open_time', 'close_time'], 'safe'],
+            [['restaurant_uuid', 'day_of_week', 'open_at', 'close_at'], 'required'],
+            [['day_of_week', 'is_closed'], 'integer'],
+            [['open_at', 'close_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
@@ -79,23 +76,72 @@ class OpeningHour extends \yii\db\ActiveRecord
             case self::DAY_OF_WEEK_FRIDAY:
                 return "Friday";
                 break;
-
         }
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function fields() {
+        $fields = parent::fields();
+
+        // remove fields that contain sensitive information
+        unset($fields['restaurant_uuid']);
+        unset($fields['opening_hour_id']);
+
+        return $fields;
+    }
 
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'opening_hour_id' => 'Opening Hour ID',
             'restaurant_uuid' => 'Restaurant Uuid',
             'day_of_week' => 'Day Of Week',
-            'open_time' => 'Open Time',
-            'close_time' => 'Close Time',
+            'open_at' => 'Open at',
+            'close_at' => 'Close at',
         ];
+    }
+
+    public function getDeliveryTimes() {
+
+        $startTime = date('h:i A', strtotime($this->open_at));
+
+        $time_interval = [];
+        $startTime = date('h:i A', strtotime($this->open_at));
+
+
+
+        for ($i = 0; strtotime($startTime) <= strtotime($this->close_at); $i++) {
+
+            $endTime = date('h:i A', strtotime($startTime) + intval($this->restaurant->schedule_interval) * 60);
+            
+            if ($this->day_of_week == date('w', strtotime("today")) && date('H:i A', strtotime("now")) < date('H:i A', strtotime($startTime))) {
+
+                array_push($time_interval, [
+                    'time' => date('h:i A', strtotime($startTime)),
+                    'time_text' =>  strtotime($endTime) <= strtotime($this->close_at) ? $startTime . ' - ' .date('h:i A', strtotime($endTime)) : $startTime . ' - ' .date('h:i A', strtotime($this->close_at))
+                ]);
+            } else if ($this->day_of_week != date('w', strtotime("today"))) {
+                $time_interval[$i] = [
+                    'time' => date('h:i A', strtotime($startTime)),
+                    'time_text' =>  strtotime($endTime) <= strtotime($this->close_at) ? $startTime . ' - ' .date('h:i A', strtotime($endTime)) : $startTime . ' - ' .date('h:i A', strtotime($this->close_at))
+                ];
+            }
+
+
+
+            if (date("Y/m/d", strtotime($startTime) + intval($this->restaurant->schedule_interval) * 60) != date("Y/m/d", strtotime($startTime)))
+                break;
+
+
+            $startTime = date('h:i A', strtotime($startTime) + intval($this->restaurant->schedule_interval) * 60);
+        }
+
+
+        return $time_interval;
     }
 
     /**
@@ -103,8 +149,8 @@ class OpeningHour extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
-    {
+    public function getRestaurant() {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
 }

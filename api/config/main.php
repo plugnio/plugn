@@ -62,9 +62,11 @@ return [
                     'controller' => 'v1/restaurant',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET get-opening-hours' => 'get-opening-hours',
                         'GET branches/<id>' => 'list-all-restaurants-branches',
                         'GET get-restaurant-data/<branch_name>' => 'get-restaurant-data',
                         // OPTIONS VERBS
+                        'OPTIONS get-opening-hours' => 'options',
                         'OPTIONS branches/<id>' => 'options',
                         'OPTIONS get-restaurant-data/<branch_name>' => 'options',
                     ]

@@ -74,10 +74,10 @@ $this->registerJs($js);
                     Set Daily
                 </td>
                 <td style="padding: 5px  15px">
-                    <?= $form->field($daily_hours, "open_time" )->textInput(['class' => 'form-control pickatime-format','id'=>'dailyOpenTime', 'style'=>'position: initial;','value'=>'00:00'])->label('Opens at'); ?>
+                    <?= $form->field($daily_hours, "open_at" )->textInput(['class' => 'form-control pickatime-format','id'=>'dailyOpenTime', 'style'=>'position: initial;','value'=>'00:00'])->label('Opens at'); ?>
                 </td>
                 <td style="padding: 5px  15px" >
-                    <?= $form->field($daily_hours, "close_time")->textInput(['class' => 'form-control pickatime-format', 'id'=>'dailyCloseTime','style'=>'position: initial;','value'=>'00:00'])->label('Closes at'); ?>
+                    <?= $form->field($daily_hours, "close_at")->textInput(['class' => 'form-control pickatime-format', 'id'=>'dailyCloseTime','style'=>'position: initial;','value'=>'00:00'])->label('Closes at'); ?>
                 </td>
               </tr>
 
@@ -101,10 +101,10 @@ $this->registerJs($js);
                         <?= $model->getDayOfWeek() ?>
                       </td>
                       <td style="padding: 5px  15px">
-                          <?= $form->field($model, "[$index]open_time" )->textInput(['class' => 'form-control pickatime-format', 'style'=>'position: initial;','id' =>'OpenTime'.$index])->label('Opens at'); ?>
+                          <?= $form->field($model, "[$index]open_at" )->textInput(['class' => 'form-control pickatime-format', 'style'=>'position: initial;','id' =>'OpenTime'.$index])->label('Opens at'); ?>
                       </td>
                       <td style="padding: 5px  15px" >
-                          <?= $form->field($model, "[$index]close_time")->textInput(['class' => 'form-control pickatime-format', 'style'=>'position: initial;','id' =>'CloseTime'.$index])->label('Closes at'); ?>
+                          <?= $form->field($model, "[$index]close_at")->textInput(['class' => 'form-control pickatime-format', 'style'=>'position: initial;','id' =>'CloseTime'.$index])->label('Closes at'); ?>
                       </td>
                     </tr>
 
