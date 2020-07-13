@@ -227,14 +227,14 @@ use common\models\Restaurant;
                 ], false)->label(false)
         ?>
 
-        <?=
-        $form->field($model, 'show_opening_hours', [
-            'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Show Opening hours</span>{input}<label class='custom-control-label' for='customSwitch2'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
-        ])->checkbox([
-            'checked' => $model->show_opening_hours == 0 ? false : true,
-            'id' => 'customSwitch2',
-            'class' => 'custom-control-input'
-                ], false)->label(false)
+        <?php
+        // $form->field($model, 'show_opening_hours', [
+        //     'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Show Opening hours</span>{input}<label class='custom-control-label' for='customSwitch2'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
+        // ])->checkbox([
+        //     'checked' => $model->show_opening_hours == 0 ? false : true,
+        //     'id' => 'customSwitch2',
+        //     'class' => 'custom-control-input'
+        //         ], false)->label(false)
         ?>
 
 

@@ -112,13 +112,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                return $data->restaurant_email_notification ? 'Yes' : 'No';
                             },
                         ],
-                        [
-                            'attribute' => 'show_opening_hours',
-                            'format' => 'html',
-                            'value' => function ($data) {
-                               return $data->show_opening_hours ? 'Yes' : 'No';
-                            },
-                        ],
+                        // [
+                        //     'attribute' => 'show_opening_hours',
+                        //     'format' => 'html',
+                        //     'value' => function ($data) {
+                        //        return $data->show_opening_hours ? 'Yes' : 'No';
+                        //     },
+                        // ],
                         'restaurant_email:email',
                         [
                             'attribute' => 'instagram_url',
