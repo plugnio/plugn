@@ -87,7 +87,7 @@ class RestaurantController extends Controller {
                     array_push($delivery_time, [
                         'shortDate' => date("d M", $deliveryDate),
                         'dayOfWeek' => date("w", $deliveryDate),
-                        'day' => $i == 0 ? 'Today' : ($i == 1 ? 'Tomorrow' : date("D", $deliveryDate)),
+                        'day' => $i == 0 ? 'Today' : ($i == 1 ? 'Tomorrow' : date("l", $deliveryDate)),
                         'times' => $deliveryTimes
                     ]);
                   }
