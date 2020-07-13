@@ -76,7 +76,7 @@ class RestaurantController extends Controller {
 
                   $deliveryDate = strtotime("+$i day");
 
-                  $opening_hrs = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => $i])->one();
+                  $opening_hrs = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => date('w' , $deliveryDate)])->one();
 
                   if($opening_hrs->is_closed)
                       continue;
@@ -87,7 +87,7 @@ class RestaurantController extends Controller {
                     array_push($delivery_time, [
                         'shortDate' => date("d M", $deliveryDate),
                         'dayOfWeek' => date("w", $deliveryDate),
-                        'day' => $i == 0 ? 'Today' : ($i == 1 ? 'Tomorrow' : date("l", $deliveryDate)),
+                        'day' => $i ==  date('w' , $deliveryDate) ? 'Today' : ($i ==  date('w' , strtotime("+1 day")) ? 'Tomorrow' : date("l", $deliveryDate)),
                         'times' => $deliveryTimes
                     ]);
                   }
