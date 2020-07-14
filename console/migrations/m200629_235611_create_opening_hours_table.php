@@ -24,8 +24,8 @@ class m200629_235611_create_opening_hours_table extends Migration
           'opening_hour_id' => $this->primaryKey(),
           'restaurant_uuid' => $this->char(60)->notNull(),
           'day_of_week' => $this->smallInteger()->notNull(),
-          'open_at' => $this->time()->notNull(),
-          'close_at' => $this->time()->notNull(),
+          'open_time' => $this->time()->notNull(),
+          'close_time' => $this->time()->notNull(),
         ],$tableOptions);
 
         // creates index for column `restaurant_uuid`
