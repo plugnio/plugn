@@ -63,11 +63,12 @@ class RestaurantController extends Controller {
 
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
         $area_id = Yii::$app->request->get("area_id");
+        $isOpen = false;
 
-        if (Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->exists()) {
+        if ($restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->one()) {
           $deliveryArea = RestaurantDelivery::find()->where(['restaurant_uuid' => $restaurant_uuid , 'area_id' =>$area_id ])->one();
 
-          $delivery_time = [];
+          $schedule_time = [];
 
 
             if($deliveryArea){
@@ -81,20 +82,28 @@ class RestaurantController extends Controller {
                   if($opening_hrs->is_closed)
                       continue;
 
-                  $deliveryTimes = $opening_hrs->getDeliveryTimes($deliveryArea->delivery_time);
 
-                  if(count($deliveryTimes) > 0) {
-                    array_push($delivery_time, [
+                  $scheduleOrder = $opening_hrs->getDeliveryTimes($deliveryArea->delivery_time, date("Y-m-d", $deliveryDate));
+
+                  if(count($scheduleOrder) > 0) {
+                    array_push($schedule_time, [
                         'shortDate' => date("d M", $deliveryDate),
                         'dayOfWeek' => date("w", $deliveryDate),
-                        'day' => $i ==  date('w' , $deliveryDate) ? 'Today' : ($i ==  date('w' , strtotime("+1 day")) ? 'Tomorrow' : date("l", $deliveryDate)),
-                        'times' => $deliveryTimes
+                        'day' => date("w", strtotime("now")) ==  date('w' , $deliveryDate) ? 'Today' : (date("w", strtotime("+1 day")) ==  date('w' , $deliveryDate)  ? 'Tomorrow' : date("l", $deliveryDate)),
+                        'scheduleTimeSlots' => $scheduleOrder
                     ]);
                   }
 
               }
 
-              return $delivery_time;
+
+
+             return [
+                    'ASAP' => $restaurant_model->isOpen() ? date("Y-m-d H:i A", strtotime('+' . $deliveryArea->delivery_time . ' minutes',  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s')))) : null,
+                    'scheduleOrder' =>$restaurant_model->schedule_order ?  $schedule_time : null
+                ];
+
+
 
             } else {
               return [

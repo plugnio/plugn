@@ -105,9 +105,9 @@ class OpeningHour extends \yii\db\ActiveRecord {
         ];
     }
 
-    public function getDeliveryTimes($delivery_time) {
-
+    public function getDeliveryTimes($delivery_time, $date) {
         $startTime = date('h:i A', strtotime($this->open_at));
+
 
         $time_interval = [];
         $startTime = date('h:i A', strtotime($this->open_at));
@@ -123,13 +123,15 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
               if(strtotime($startTime) < strtotime($this->close_at) &&  strtotime($startTime)  >  strtotime("now")+ (intval($delivery_time) * 60) ){
                 array_push($time_interval, [
-                    'time' => date('h:i A', strtotime($startTime)),
+                    'date' =>  $date,
+                    'time' =>  date('h:i A', strtotime($startTime)),
                     'time_text' =>  strtotime($endTime) <= strtotime($this->close_at) ? $startTime . ' - ' .date('h:i A', strtotime($endTime)) : $startTime . ' - ' .date('h:i A', strtotime($this->close_at))
                 ]);
               }
 
             } else if ($this->day_of_week != date('w', strtotime("today"))  && strtotime($startTime) < strtotime($this->close_at)) {
                 $time_interval[$i] = [
+                    'date' =>  $date,
                     'time' => date('h:i A', strtotime($startTime)),
                     'time_text' =>  strtotime($endTime) <= strtotime($this->close_at) ? $startTime . ' - ' .date('h:i A', strtotime($endTime)) : $startTime . ' - ' .date('h:i A', strtotime($this->close_at))
                 ];
