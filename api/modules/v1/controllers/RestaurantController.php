@@ -88,6 +88,7 @@ class RestaurantController extends Controller {
                   if(count($scheduleOrder) > 0) {
                     array_push($schedule_time, [
                         'shortDate' => date("d M", $deliveryDate),
+                        'longDate' => date("Y-m-d", $deliveryDate),
                         'dayOfWeek' => date("w", $deliveryDate),
                         'day' => date("w", strtotime("now")) ==  date('w' , $deliveryDate) ? 'Today' : (date("w", strtotime("+1 day")) ==  date('w' , $deliveryDate)  ? 'Tomorrow' : date("l", $deliveryDate)),
                         'scheduleTimeSlots' => $scheduleOrder
