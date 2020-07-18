@@ -24,7 +24,7 @@ $(document).ready(function() {
       sLengthMenu: "_MENU_",
       sSearch: ""
     },
-    aLengthMenu: [[5, 10, 15, 20], [5, 10, 15, 20]],
+    aLengthMenu: [[5, 10, 15, 20, 50, 100], [5, 10, 15, 20, 50, 100]],
     select: {
       style: "multi"
     },
