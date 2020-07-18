@@ -112,7 +112,7 @@ class RestaurantController extends Controller {
                 'columns' => [
                     'item_name',
                     [
-                      'label' => 'Sold items',
+                      'attribute' => 'Sold items',
                         'format' => 'html',
                         'value' => function ($data) {
                             return $data->getThisWeekSoldUnits();
@@ -151,7 +151,7 @@ class RestaurantController extends Controller {
                     'columns' => [
                         'item_name',
                         [
-                            'label' => 'role',
+                          'attribute' => 'Sold items',
                             'format' => 'html',
                             'value' => function ($data) {
 
@@ -190,7 +190,7 @@ class RestaurantController extends Controller {
                     'columns' => [
                         'item_name',
                         [
-                            'label' => 'role',
+                          'attribute' => 'Sold items',
                             'format' => 'html',
                             'value' => function ($data) {
 

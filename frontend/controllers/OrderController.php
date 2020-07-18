@@ -69,7 +69,7 @@ class OrderController extends Controller {
                     ->andWhere(['between', 'order_created_at', $start_date, $end_date])
                     ->andWhere([ '!=' , 'order_status' , Order::STATUS_DRAFT])
                     ->andWhere([ '!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
-                     ->orderBy(['order_created_at' => SORT_ASC])
+                    ->orderBy(['order_created_at' => SORT_ASC])
                     ->all();
 
 
@@ -117,7 +117,7 @@ class OrderController extends Controller {
                         }
                     ],
                     [
-                        'label' => 'Payment',
+                        'attribute' => 'Payment method',
                         "format" => "raw",
                         "value" => function($data) {
                             if ($data->payment_uuid)
