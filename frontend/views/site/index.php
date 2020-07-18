@@ -341,276 +341,271 @@ $this->registerJs($js);
 
     //Get customer gained
     document.getElementById("getCustomerGainedLast7DaysData").addEventListener("click", function(){
-      $('#dropdownCustomerGained').html('Last 7 days');
-      $('.number-of-customer-gained').html(<?= $number_of_all_customer_gained_this_week ?>);
-      addData(customerGainedChart,<?= json_encode($customer_chart_data_this_week) ?>);
+    $('#dropdownCustomerGained').html('Last 7 days');
+    $('.number-of-customer-gained').html(<?= $number_of_all_customer_gained_this_week ?>);
+    addData(customerGainedChart,<?= json_encode($customer_chart_data_this_week) ?>);
     });
     document.getElementById("getCustomerGainedLastMonth").addEventListener("click", function(){
-      $('#dropdownCustomerGained').html('Last Month');
-      $('.number-of-customer-gained').html(<?= $number_of_all_customer_gained_last_month ?>);
-      addData(customerGainedChart,<?= json_encode($customer_chart_data_last_month) ?>);
+    $('#dropdownCustomerGained').html('Last Month');
+    $('.number-of-customer-gained').html(<?= $number_of_all_customer_gained_last_month ?>);
+    addData(customerGainedChart,<?= json_encode($customer_chart_data_last_month) ?>);
     });
     document.getElementById("getCustomerGainedLast3Months").addEventListener("click", function(){
-      $('#dropdownCustomerGained').html('Last 3 Months');
-      $('.number-of-customer-gained').html(<?= $number_of_all_customer_gained_last_three_months ?>);
-      addData(customerGainedChart,<?= json_encode($customer_chart_data_last_three_months) ?>);
+    $('#dropdownCustomerGained').html('Last 3 Months');
+    $('.number-of-customer-gained').html(<?= $number_of_all_customer_gained_last_three_months ?>);
+    addData(customerGainedChart,<?= json_encode($customer_chart_data_last_three_months) ?>);
     });
-
-
-
     // Get Revenue Generated
     document.getElementById("getRevenueGeneratedLast7DaysData").addEventListener("click", function(){
-   $('#dropdownRevenueGenerated').html('Last 7 days');
-   $('.number-of-revenue-generated').html (<?= number_format((float)$number_of_all_revenue_generated_this_week, 2, '.', '');  ?>);
-   addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_this_week) ?>);
- });
- document.getElementById("getRevenueGeneratedLastMonth").addEventListener("click", function(){
-   $('#dropdownRevenueGenerated').html('Last Month');
-   $('.number-of-revenue-generated').html (<?= number_format((float)$number_of_all_revenue_generated_last_month, 2, '.', '');  ?>);
-   addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_month) ?>);
- });
- document.getElementById("getRevenueGeneratedLast3Months").addEventListener("click", function(){
-   $('#dropdownRevenueGenerated').html('Last 3 Months');
-   $('.number-of-revenue-generated').html (<?= number_format((float)$number_of_all_revenue_generated_last_three_months, 2, '.', '');  ?>);
-   addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_three_months) ?>);
- });
-
-
+    $('#dropdownRevenueGenerated').html('Last 7 days');
+    $('.number-of-revenue-generated').html (<?= number_format((float) $number_of_all_revenue_generated_this_week, 2, '.', ''); ?>);
+    addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_this_week) ?>);
+    });
+    document.getElementById("getRevenueGeneratedLastMonth").addEventListener("click", function(){
+    $('#dropdownRevenueGenerated').html('Last Month');
+    $('.number-of-revenue-generated').html (<?= number_format((float) $number_of_all_revenue_generated_last_month, 2, '.', ''); ?>);
+    addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_month) ?>);
+    });
+    document.getElementById("getRevenueGeneratedLast3Months").addEventListener("click", function(){
+    $('#dropdownRevenueGenerated').html('Last 3 Months');
+    $('.number-of-revenue-generated').html (<?= number_format((float) $number_of_all_revenue_generated_last_three_months, 2, '.', ''); ?>);
+    addData(revenueGeneratedChart,<?= json_encode($revenue_generated_chart_data_last_three_months) ?>);
+    });
     // Get Sold Items
     document.getElementById("getSoldItemsLast7DaysData").addEventListener("click", function(){
-      $('#dropdownSoldItems').html('Last 7 days');
-      $('.number-of-sold-items').html(<?= $number_of_all_sold_item_this_week ?>);
-      addData(soldItemsChart,<?= json_encode($sold_item_chart_data_this_week) ?>);
+    $('#dropdownSoldItems').html('Last 7 days');
+    $('.number-of-sold-items').html(<?= $number_of_all_sold_item_this_week ?>);
+    addData(soldItemsChart,<?= json_encode($sold_item_chart_data_this_week) ?>);
     });
     document.getElementById("getSoldItemsLastMonth").addEventListener("click", function(){
-      $('#dropdownSoldItems').html('Last Month');
-      $('.number-of-sold-items').html(<?= $number_of_all_sold_item_last_month ?>);
-      addData(soldItemsChart,<?= json_encode($sold_item_chart_data_last_month) ?>);
+    $('#dropdownSoldItems').html('Last Month');
+    $('.number-of-sold-items').html(<?= $number_of_all_sold_item_last_month ?>);
+    addData(soldItemsChart,<?= json_encode($sold_item_chart_data_last_month) ?>);
     });
     document.getElementById("getSoldItemsLast3Months").addEventListener("click", function(){
-      $('#dropdownSoldItems').html('Last 3 Months');
-      $('.number-of-sold-items').html(<?= $number_of_all_sold_item_last_three_months ?>);
-      addData(soldItemsChart,<?= json_encode($sold_item_chart_data_last_three_months) ?>);
+    $('#dropdownSoldItems').html('Last 3 Months');
+    $('.number-of-sold-items').html(<?= $number_of_all_sold_item_last_three_months ?>);
+    addData(soldItemsChart,<?= json_encode($sold_item_chart_data_last_three_months) ?>);
     });
-
-
     // Get Order Recevied
     document.getElementById("getOrderReceivedLast7DaysData").addEventListener("click", function(){
-      $('#dropdownOrdersReceived').html('Last 7 days');
-      $('.number-of-orders-received').html(<?= $number_of_all_orders_received_this_week ?>);
-      addData(orderReceivedChart,<?= json_encode($orders_received_chart_data_this_week) ?>);
+    $('#dropdownOrdersReceived').html('Last 7 days');
+    $('.number-of-orders-received').html(<?= $number_of_all_orders_received_this_week ?>);
+    addData(orderReceivedChart,<?= json_encode($orders_received_chart_data_this_week) ?>);
     });
     document.getElementById("getOrderReceivedLastMonth").addEventListener("click", function(){
-      $('#dropdownOrdersReceived').html('Last Month');
-      $('.number-of-orders-received').html(<?= $number_of_all_orders_received_last_month ?>);
-      addData(orderReceivedChart,<?= json_encode($orders_received_chart_data_last_month) ?>);
+    $('#dropdownOrdersReceived').html('Last Month');
+    $('.number-of-orders-received').html(<?= $number_of_all_orders_received_last_month ?>);
+    addData(orderReceivedChart,<?= json_encode($orders_received_chart_data_last_month) ?>);
     });
     document.getElementById("getOrderReceivedLast3Months").addEventListener("click", function(){
-      $('#dropdownOrdersReceived').html('Last 3 Months');
-      $('.number-of-orders-received').html(<?= $number_of_all_orders_received_last_three_months ?>);
-      addData(orderReceivedChart,<?= json_encode($orders_received_chart_data_last_three_months) ?>);
+    $('#dropdownOrdersReceived').html('Last 3 Months');
+    $('.number-of-orders-received').html(<?= $number_of_all_orders_received_last_three_months ?>);
+    addData(orderReceivedChart,<?= json_encode($orders_received_chart_data_last_three_months) ?>);
     });
-
-  });
+    });
 
 
 </script>
 
 <!-- Dashboard Ecommerce Starts -->
 <section id="dashboard-ecommerce">
-    <div class="row">
-        <div class="col-lg-3 col-sm-6 col-12">
-            <div class="card">
-                <div style="padding:21px">
-                    <div class="avatar bg-rgba-primary p-50 m-0">
-                        <div class="avatar-content">
-                            <i class="feather icon-users text-primary font-medium-5"></i>
-                        </div>
-                    </div>
-                    <div class="dropdown chart-dropdown" style="float:right">
-                        <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px; padding-right: 0px;" type="button" id="dropdownCustomerGained" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownCustomerGained">
+    <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
 
-                            <button   id="getCustomerGainedLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
-                            <button   id="getCustomerGainedLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
-                            <button   id="getCustomerGainedLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
-
-                        </div>
-                    </div>
-
-                    <h2 class="text-bold-700 mt-1 number-of-customer-gained">
-                        <?= $number_of_all_customer_gained_this_week ? $number_of_all_customer_gained_this_week : 0 ?>
-                    </h2>
-                    <p class="mb-0">Customer Gained</p>
-                </div>
-                <div class="card-content">
-                    <div id="customer-gained-chart"></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-sm-6 col-12">
-            <div class="card">
-                <div style="padding:21px">
-                    <div class="avatar bg-rgba-success p-50 m-0">
-                        <div class="avatar-content">
-                            <i class="feather icon-credit-card text-success font-medium-5"></i>
-                        </div>
-                    </div>
-                    <div class="dropdown chart-dropdown" style="float:right">
-                        <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px;    padding-right: 0px;" type="button" id="dropdownRevenueGenerated" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownRevenueGenerated">
-                            <button id="getRevenueGeneratedLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
-                            <button id="getRevenueGeneratedLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
-                            <button id="getRevenueGeneratedLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
-
-                        </div>
-                    </div>
-                    <div style="  margin-bottom: 0.5rem;  margin-top: 1rem !important;">
-                      <h2 style="  display: contents;" class="text-bold-700 mt-1 number-of-revenue-generated">
-                          <?= number_format($number_of_all_revenue_generated_this_week,3);  ?>
-                      </h2>
-                      <h2 style="  display: contents;">
-                          KWD
-                      </h2>
-                    </div>
-                    <p class="mb-0">Revenue Generated</p>
-                </div>
-
-                <div class="card-content">
-                    <div id="revenue-generated-chart"></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-sm-6 col-12">
-            <div class="card">
-                <div style="padding:21px">
-                    <div class="avatar bg-rgba-danger p-50 m-0">
-                        <div class="avatar-content">
-                            <i class="feather icon-shopping-cart text-danger font-medium-5"></i>
-                        </div>
-                    </div>
-                    <div class="dropdown chart-dropdown" style="float:right">
-                        <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px;    padding-right: 0px;" type="button" id="dropdownSoldItems" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownSoldItems">
-                            <button   id="getSoldItemsLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
-                            <button   id="getSoldItemsLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
-                            <button   id="getSoldItemsLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
-                        </div>
-
-                    </div>
-                    <h2 class="text-bold-700 mt-1 number-of-sold-items">
-                        <?= $number_of_all_sold_item_this_week ? $number_of_all_sold_item_this_week : 0 ?>
-                    </h2>
-                    <p class="mb-0">Sold Items</p>
-                </div>
-                <div class="card-content">
-                    <div id="sold-item-chart"></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-sm-6 col-12">
-            <div class="card">
-                <div style="padding:21px">
-                    <div class="avatar bg-rgba-warning p-50 m-0">
-                        <div class="avatar-content">
-                            <i class="feather icon-package text-warning font-medium-5"></i>
-                        </div>
-                    </div>
-                    <div class="dropdown chart-dropdown" style="float:right">
-                        <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px;    padding-right: 0px;" type="button" id="dropdownOrdersReceived" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownOrdersReceived">
-                            <button   id="getOrderReceivedLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
-                            <button   id="getOrderReceivedLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
-                            <button   id="getOrderReceivedLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
-                        </div>
-                    </div>
-                    <h2 class="text-bold-700 mt-1 number-of-orders-received">
-                        <?= $number_of_all_orders_received_this_week ? $number_of_all_orders_received_this_week : 0 ?>
-                    </h2>
-                    <p class="mb-0">Orders Received</p>
-                </div>
-
-
-
-                <div class="card-content">
-                    <div id="orders-recevied-chart"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-lg-3 col-sm-6 col-12">
-            <div class="card text-center">
-
-                <div class="card-content">
-
-
-                    <div class="card-body">
-                        <div class="avatar bg-rgba-primary p-50 m-0 mb-1">
+        <div class="row">
+            <div class="col-lg-3 col-sm-6 col-12">
+                <div class="card">
+                    <div style="padding:21px">
+                        <div class="avatar bg-rgba-primary p-50 m-0">
                             <div class="avatar-content">
                                 <i class="feather icon-users text-primary font-medium-5"></i>
                             </div>
                         </div>
-                        <h2 class="text-bold-700"><?= $today_customer_gained ?></h2>
-                        <p class="mb-0 line-ellipsis">Today's Customer Gained</p>
+                        <div class="dropdown chart-dropdown" style="float:right">
+                            <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px; padding-right: 0px;" type="button" id="dropdownCustomerGained" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownCustomerGained">
 
+                                <button   id="getCustomerGainedLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
+                                <button   id="getCustomerGainedLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
+                                <button   id="getCustomerGainedLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
 
+                            </div>
+                        </div>
+
+                        <h2 class="text-bold-700 mt-1 number-of-customer-gained">
+                            <?= $number_of_all_customer_gained_this_week ? $number_of_all_customer_gained_this_week : 0 ?>
+                        </h2>
+                        <p class="mb-0">Customer Gained</p>
+                    </div>
+                    <div class="card-content">
+                        <div id="customer-gained-chart"></div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-3 col-sm-6 col-12">
-            <div class="card text-center">
-                <div class="card-content">
-                    <div class="card-body">
-                        <div class="avatar bg-rgba-success p-50 m-0 mb-1">
+            <div class="col-lg-3 col-sm-6 col-12">
+                <div class="card">
+                    <div style="padding:21px">
+                        <div class="avatar bg-rgba-success p-50 m-0">
                             <div class="avatar-content">
                                 <i class="feather icon-credit-card text-success font-medium-5"></i>
                             </div>
                         </div>
-                        <h2 class="text-bold-700">  <?= Yii::$app->formatter->asCurrency($today_revenue_generated, 'KWD', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></h2>
-                        <p class="mb-0 line-ellipsis">Today's Revenue Generated</p>
+                        <div class="dropdown chart-dropdown" style="float:right">
+                            <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px;    padding-right: 0px;" type="button" id="dropdownRevenueGenerated" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownRevenueGenerated">
+                                <button id="getRevenueGeneratedLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
+                                <button id="getRevenueGeneratedLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
+                                <button id="getRevenueGeneratedLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
+
+                            </div>
+                        </div>
+                        <div style="  margin-bottom: 0.5rem;  margin-top: 1rem !important;">
+                            <h2 style="  display: contents;" class="text-bold-700 mt-1 number-of-revenue-generated">
+                                <?= number_format($number_of_all_revenue_generated_this_week, 3); ?>
+                            </h2>
+                            <h2 style="  display: contents;">
+                                KWD
+                            </h2>
+                        </div>
+                        <p class="mb-0">Revenue Generated</p>
+                    </div>
+
+                    <div class="card-content">
+                        <div id="revenue-generated-chart"></div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-3 col-sm-6 col-12">
-            <div class="card text-center">
-                <div class="card-content">
-                    <div class="card-body">
-                        <div class="avatar bg-rgba-danger p-50 m-0 mb-1">
+            <div class="col-lg-3 col-sm-6 col-12">
+                <div class="card">
+                    <div style="padding:21px">
+                        <div class="avatar bg-rgba-danger p-50 m-0">
                             <div class="avatar-content">
                                 <i class="feather icon-shopping-cart text-danger font-medium-5"></i>
                             </div>
                         </div>
-                        <h2 class="text-bold-700"><?= $today_sold_items ?></h2>
-                        <p class="mb-0 line-ellipsis">Today's Sold Items</p>
+                        <div class="dropdown chart-dropdown" style="float:right">
+                            <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px;    padding-right: 0px;" type="button" id="dropdownSoldItems" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownSoldItems">
+                                <button   id="getSoldItemsLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
+                                <button   id="getSoldItemsLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
+                                <button   id="getSoldItemsLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
+                            </div>
+
+                        </div>
+                        <h2 class="text-bold-700 mt-1 number-of-sold-items">
+                            <?= $number_of_all_sold_item_this_week ? $number_of_all_sold_item_this_week : 0 ?>
+                        </h2>
+                        <p class="mb-0">Sold Items</p>
+                    </div>
+                    <div class="card-content">
+                        <div id="sold-item-chart"></div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-3 col-sm-6 col-12">
-            <div class="card text-center">
-                <div class="card-content">
-                    <div class="card-body">
-                        <div class="avatar bg-rgba-warning p-50 m-0 mb-1">
+            <div class="col-lg-3 col-sm-6 col-12">
+                <div class="card">
+                    <div style="padding:21px">
+                        <div class="avatar bg-rgba-warning p-50 m-0">
                             <div class="avatar-content">
                                 <i class="feather icon-package text-warning font-medium-5"></i>
                             </div>
                         </div>
-                        <h2 class="text-bold-700"><?= $today_orders_received ?></h2>
-                        <p class="mb-0 line-ellipsis">Today's Orders Received</p>
+                        <div class="dropdown chart-dropdown" style="float:right">
+                            <button class="btn btn-sm border-0 dropdown-toggle" style="font-size:15px;    padding-right: 0px;" type="button" id="dropdownOrdersReceived" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownOrdersReceived">
+                                <button   id="getOrderReceivedLast7DaysData" class="dropdown-item" style="width:100%">Last 7 Days</button>
+                                <button   id="getOrderReceivedLastMonth" class="dropdown-item" style="width:100%">Last Month</button>
+                                <button   id="getOrderReceivedLast3Months" class="dropdown-item" style="width:100%">Last 3 Months</button>
+                            </div>
+                        </div>
+                        <h2 class="text-bold-700 mt-1 number-of-orders-received">
+                            <?= $number_of_all_orders_received_this_week ? $number_of_all_orders_received_this_week : 0 ?>
+                        </h2>
+                        <p class="mb-0">Orders Received</p>
+                    </div>
+
+
+
+                    <div class="card-content">
+                        <div id="orders-recevied-chart"></div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
+        <div class="row">
+            <div class="col-lg-3 col-sm-6 col-12">
+                <div class="card text-center">
+
+                    <div class="card-content">
+
+
+                        <div class="card-body">
+                            <div class="avatar bg-rgba-primary p-50 m-0 mb-1">
+                                <div class="avatar-content">
+                                    <i class="feather icon-users text-primary font-medium-5"></i>
+                                </div>
+                            </div>
+                            <h2 class="text-bold-700"><?= $today_customer_gained ?></h2>
+                            <p class="mb-0 line-ellipsis">Today's Customer Gained</p>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6 col-12">
+                <div class="card text-center">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="avatar bg-rgba-success p-50 m-0 mb-1">
+                                <div class="avatar-content">
+                                    <i class="feather icon-credit-card text-success font-medium-5"></i>
+                                </div>
+                            </div>
+                            <h2 class="text-bold-700">  <?= Yii::$app->formatter->asCurrency($today_revenue_generated, 'KWD', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></h2>
+                            <p class="mb-0 line-ellipsis">Today's Revenue Generated</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6 col-12">
+                <div class="card text-center">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="avatar bg-rgba-danger p-50 m-0 mb-1">
+                                <div class="avatar-content">
+                                    <i class="feather icon-shopping-cart text-danger font-medium-5"></i>
+                                </div>
+                            </div>
+                            <h2 class="text-bold-700"><?= $today_sold_items ?></h2>
+                            <p class="mb-0 line-ellipsis">Today's Sold Items</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6 col-12">
+                <div class="card text-center">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="avatar bg-rgba-warning p-50 m-0 mb-1">
+                                <div class="avatar-content">
+                                    <i class="feather icon-package text-warning font-medium-5"></i>
+                                </div>
+                            </div>
+                            <h2 class="text-bold-700"><?= $today_orders_received ?></h2>
+                            <p class="mb-0 line-ellipsis">Today's Orders Received</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php } ?>
+    
     <div class="row">
         <div class=" col-12">
             <div class="row">
@@ -701,10 +696,10 @@ $this->registerJs($js);
                             </div>
                         </div>
                         <div class="card-footer clearfix" style="background: white">
-                           <?=
-                           Html::a('View All Orders', ['order/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn  btn-primary float-right'])
-                           ?>
-                       </div>
+                            <?=
+                            Html::a('View All Orders', ['order/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn  btn-primary float-right'])
+                            ?>
+                        </div>
                     </div>
 
                 </div>

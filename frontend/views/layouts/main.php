@@ -197,6 +197,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         )
                         ?>
                     </li>
+                      <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
                     <li class=" nav-item <?= $this->context->route == 'restaurant/analytic' ? 'active' : '' ?> ">
 
                         <?=
@@ -215,10 +216,6 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         )
                         ?>
                     </li>
-
-
-
-                    <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
                     <li class=" nav-item <?= $this->context->route == 'restaurant-theme/index' ? 'active' : '' ?> ">
 
                             <?=
