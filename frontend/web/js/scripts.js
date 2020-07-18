@@ -180,9 +180,9 @@
                     aux[level] = i;
                     currentWidgetOptions.fields.forEach(function(input) {
                         var id = input.id.replace("{}", aux.join('-'));
-                        if ($("#" + currentWidgetOptions.formId).yiiActiveForm("find", id) !== "undefined") {
-                            $("#" + currentWidgetOptions.formId).yiiActiveForm("remove", id);
-                        }
+//                        if ($("#" + currentWidgetOptions.formId).yiiActiveForm("find", id) !== "undefined") {
+//                            $("#" + currentWidgetOptions.formId).yiiActiveForm("remove", id);
+//                        }
                     });
                 }
             });
@@ -195,9 +195,9 @@
 
             widgetOptions.fields.forEach(function(input) {
                 var id = input.id.replace("{}", identifiers.join('-'));
-                if ($("#" + widgetOptions.formId).yiiActiveForm("find", id) !== "undefined") {
-                    $("#" + widgetOptions.formId).yiiActiveForm("remove", id);
-                }
+//                if ($("#" + widgetOptions.formId).yiiActiveForm("find", id) !== "undefined") {
+//                    $("#" + widgetOptions.formId).yiiActiveForm("remove", id);
+//                }
             });
         }
     };

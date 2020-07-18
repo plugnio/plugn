@@ -124,8 +124,8 @@ class OrderController extends Controller {
 
 
                             //optional field
-                            if (array_key_exists("customer_instruction", $item) && $item["customer_instruction"] != null)
-                                $orderItem->customer_instruction = $item["customer_instruction"];
+                            if (array_key_exists("customer_instructions", $item) && $item["customer_instructions"] != null)
+                                $orderItem->customer_instruction = $item["customer_instructions"];
 
                             if ($orderItem->save()) {
 

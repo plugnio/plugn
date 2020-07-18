@@ -1,5 +1,4 @@
 <?php
-
 /* @var $this yii\web\View */
 /* @var $name string */
 /* @var $message string */
@@ -11,17 +10,24 @@ $this->title = $name;
 ?>
 <div class="site-error">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <!-- error 404 -->
+    <section class="row flexbox-container">
+        <div class="col-xl-7 col-md-8 col-12 d-flex justify-content-center">
+            <div class="card auth-card bg-transparent shadow-none rounded-0 mb-0 w-100">
+                <div class="card-content">
+                    <div class="card-body text-center">
+                        <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/app-assets/images/pages/404.png' ?>" class="img-fluid align-self-center" alt="branding logo">
+                        <h1 class="font-large-2 my-1"> <?= $this->title ?></h1>
+                        <p class="p-2">
+                            <?= nl2br(Html::encode($message)) ?>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- error 404 end -->
 
-    <div class="alert alert-danger">
-        <?= nl2br(Html::encode($message)) ?>
-    </div>
 
-    <p>
-        The above error occurred while the Web server was processing your request.
-    </p>
-    <p>
-        Please contact us if you think this is a server error. Thank you.
-    </p>
 
 </div>

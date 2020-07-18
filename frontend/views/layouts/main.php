@@ -197,6 +197,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         )
                         ?>
                     </li>
+                      <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
                     <li class=" nav-item <?= $this->context->route == 'restaurant/analytic' ? 'active' : '' ?> ">
 
                         <?=
@@ -215,18 +216,6 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         )
                         ?>
                     </li>
-                    <li class=" nav-item <?= $this->context->route == 'opening-hour/index' ? 'active' : '' ?> ">
-
-                                        <?=
-                                        Html::a(
-                                                Html::tag('i', '', ['class' => 'feather icon-clock']) .
-                                                Html::tag('span', 'Opening Hours'), ['opening-hour/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
-                                        )
-                                        ?>
-                                    </li>
-
-
-                    <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
                     <li class=" nav-item <?= $this->context->route == 'restaurant-theme/index' ? 'active' : '' ?> ">
 
                             <?=

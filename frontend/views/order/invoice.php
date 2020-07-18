@@ -45,19 +45,6 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                     <p> <?= '#' . $model->order_uuid ?></p>
                     <h6 class="mt-2">INVOICE DATE</h6>
                     <p>
-<?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy') ?>
-                    </p>
-
-                    <?php if ($model->order_mode == Order::ORDER_MODE_PICK_UP) { ?>
-
-                      <h6 class="mt-2">Preparation time</h6>
-
-                    <?php } else { ?>
-                      <h6 class="mt-2">Expected Delivery Time</h6>
-
-                    <?php } ?>
-
-                    <p>
 <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy H:mm') ?>
                     </p>
 
@@ -70,6 +57,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
                 </div>
                 <div class="recipient-contact pb-2">
+                <div class="table-responsive">
 
                   <table class="table table-bordered table-hover" style="margin-top:29px !important;">
                       <tbody>
@@ -90,40 +78,43 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                       </tbody>
                   </table>
                 </div>
+                </div>
             </div>
 
             <div class="col-sm-6 col-12 text-left">
 
                 <div class="invoice-details mt-2">
-
-
-                    <h6 class="mt-2">Expected Delivery Time</h6>
-                    <p>
-<?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy H:mm') ?>
-                    </p>
+                  <h6 class="mt-2">Payment Method</h6>
+                  <p>
+                    <?= $model->payment_method_name ?>
+                  </p>
 
 
                 </div>
 
                 <div class="recipient-info my-2">
 
-<?php if ($model->order_mode == Order::ORDER_MODE_PICK_UP) { ?>
+                                      <?php if ($model->order_mode == Order::ORDER_MODE_PICK_UP) { ?>
 
-                        <h6 class="mt-2">Type</h6>
-                        <p style="line-height: 1.5rem;margin-top: 0;margin-bottom: 1rem;"> Pick up </p>
-                        <h6 class="mt-2">Pickup from:</h6>
-                        <p style="line-height: 1.5rem;margin-top: 0;margin-bottom: 1rem;">  <?= $model->restaurantBranch->branch_name_en ?>   </p>
+                                        <h6 class="mt-2">Preparation time</h6>
 
-<?php } ?>
+                                      <?php } else { ?>
+                                        <h6 class="mt-2">Expected Delivery Time</h6>
+
+                                      <?php } ?>
+
+                                      <p>
+                                <?= \Yii::$app->formatter->asDatetime($model->estimated_time_of_arrival, 'MMM dd, yyyy H:mm') ?>
+                                      </p>
+
+
+                            </div>
+                <div class="recipient-info my-2">
 
                     <?php if ($model->order_mode == Order::ORDER_MODE_DELIVERY) { ?>
 
-                        <h6 class="mt-2">Type</h6>
-                        <p style="line-height: 1.5rem;margin-top: 0;margin-bottom: 1rem;">  Delivery </p>
-                        <h6 class="mt-2">Payment Method</h6>
-                        <p>
-    <?= $model->payment_method_name ?>
-                        </p>
+
+                        <div class="table-responsive">
                         <table class="table table-bordered table-hover" style="margin-top: 1.5rem !important;">
                           <thead>
                               <tr>
@@ -132,6 +123,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                   <th>Street</th>
                                     <?= $model->avenue != null ? '<th>Avenue</th>' : '' ?>
                                   <th>House</th>
+                                  <th>Special Directions</th>
                               </tr>
                           </thead>
 
@@ -141,11 +133,13 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                 <td><?= $model->street ?></td>
                                  <?= $model->avenue != null ? '<td>' . $model->avenue . '</td>' : '' ?></td>
                                 <td> <?= $model->house_number ?></td>
+                                <td> <?= $model->special_directions ?></td>
                             </tbody>
                         </table>
 <?php } ?>
 
 
+                </div>
                 </div>
 
             </div>

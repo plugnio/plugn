@@ -27,7 +27,14 @@ $this->registerJs($js);
 
 <section id="data-list-view" class="data-list-view-header">
 
-<!-- Data list view starts -->
+  <!-- Data list view starts -->
+  <div class="action-btns d-none">
+      <div class="btn-dropdown mr-1 mb-1">
+          <div class="btn-group dropdown actions-dropodown">
+             <?= Html::a('<i class="fa fa-file-excel-o"></i> Export to excel', ['export-to-excel','restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']) ?>
+          </div>
+      </div>
+  </div>
 
     <!-- DataTable starts -->
     <div class="table-responsive">
@@ -40,6 +47,13 @@ $this->registerJs($js);
                   'customer_name',
                   'customer_phone_number',
                   'customer_email:email',
+                  [
+                      'label' => 'Number of orders',
+                      "format" => "raw",
+                      "value" => function($model) {
+                          return  $model->getOrders()->count();
+                      }
+                  ],
                   'customer_created_at',
                   [
                       'header' => 'Actions',

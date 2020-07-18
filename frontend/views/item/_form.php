@@ -34,9 +34,8 @@ $this->registerJs($js);
 ?>
 
 
-<div class="card item-form">
+<div class="item-form">
 
-  <div class="card-body">
 
 
     <?php
@@ -238,5 +237,4 @@ $this->registerJs($js);
 
     <?php ActiveForm::end(); ?>
 
-</div>
 </div>

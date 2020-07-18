@@ -68,7 +68,7 @@ class CustomerController extends Controller {
 
         // Customer's Orders Data
         $customersOrdersData = new \yii\data\ActiveDataProvider([
-            'query' => $model->getOrders()->orderBy(['order_created_at' => SORT_DESC]),
+            'query' => $model->getOrders()->orderBy(['order_created_at' => SORT_ASC]),
         ]);
 
 
@@ -78,6 +78,40 @@ class CustomerController extends Controller {
         ]);
     }
 
+    /**
+    * Export customers data to excel
+    * @return mixed
+    */
+    public function actionExportToExcel($restaurantUuid){
+           $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+
+           $model = Customer::find()
+           ->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
+           ->orderBy(['customer_created_at' => SORT_DESC])
+           ->all();
+
+           header('Access-Control-Allow-Origin: *');
+           header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+           header("Content-Disposition: attachment;filename=\"customers.xlsx\"");
+           header("Cache-Control: max-age=0");
+           \moonland\phpexcel\Excel::export([
+               'isMultipleSheet' => false,
+               'models' => $model,
+               'columns' => [
+                   'customer_name',
+                   'customer_phone_number',
+                   'customer_email',
+                   [
+                       'attribute' => 'Number of orders',
+                       "format" => "raw",
+                       "value" => function($model) {
+                           return  $model->getOrders()->count();
+                       }
+                   ],
+                   'customer_created_at',
+               ]
+           ]);
+    }
 
     /**
      * Deletes an existing Customer model.

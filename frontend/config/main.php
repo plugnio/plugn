@@ -16,6 +16,9 @@ return [
         'request' => [
             'csrfParam' => '_csrf-frontend',
         ],
+        'assetManager' => [
+          'linkAssets' => true,
+      ],
         'user' => [
             'identityClass' => 'common\models\Agent',
             'enableAutoLogin' => true,
