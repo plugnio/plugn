@@ -605,7 +605,7 @@ $this->registerJs($js);
             </div>
         </div>
     <?php } ?>
-    
+
     <div class="row">
         <div class=" col-12">
             <div class="row">
@@ -721,7 +721,7 @@ $this->registerJs($js);
                                 <?php if ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_CLOSE) { ?>
 
                                     <p style="font-size: 20px; margin-top: 65px; padding-left: 20px; margin-bottom: 65px; text-align: center; padding-right: 20px;">
-                                        Your store is open you can accept orders!
+                                        Your store is closed you can't accept orders!
                                     </p>
 
                                     <?=
