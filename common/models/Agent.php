@@ -7,6 +7,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use yii\web\IdentityInterface;
 use yii\db\ActiveQuery;
+use common\models\AgentToken;
 
 /**
  * This is the model class for table "agent".
