@@ -22,12 +22,12 @@ use yii\behaviors\AttributeBehavior;
  * @property string $unit_type
  * @property string $block
  * @property string $street
- * @property string|null $avenue
+ * @property string $avenue
  * @property string $house_number
- * @property string|null $special_directions
+ * @property string $special_directions
  * @property string $customer_name
  * @property string $customer_phone_number
- * @property string|null $customer_email
+ * @property string $customer_email
  * @property int $payment_method_id
  * @property string $payment_method_name
  * @property string $payment_method_name_ar
@@ -38,6 +38,9 @@ use yii\behaviors\AttributeBehavior;
  * @property int $items_has_been_restocked
  * @property int $latitude
  * @property int $longitude
+ * @property boolean $is_order_scheduled
+ * @property datetime $scheduled_time_start_from
+ * @property datetime $scheduled_time_to
 
  * @property int $subtotal_before_refund
  * @property int $total_price_before_refund
@@ -85,17 +88,21 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['customer_name', 'customer_phone_number', 'order_mode'], 'required'],
+            [['customer_name', 'customer_phone_number', 'order_mode','is_order_scheduled'], 'required'],
             [['payment_method_id'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer', 'min' => 0],
-            [['items_has_been_restocked'], 'integer'],
+            [['items_has_been_restocked','is_order_scheduled'], 'integer'],
             ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_PARTIALLY_REFUNDED,self::STATUS_CANCELED, self::STATUS_DRAFT, self::STATUS_ABANDONED_CHECKOUT]],
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
             ['restaurant_branch_id', function ($attribute, $params, $validator) {
                     if (!$this->restaurant_branch_id && $this->order_mode == Order::ORDER_MODE_PICK_UP)
                         $this->addError($attribute, 'Branch name cannot be blank.');
+                }, 'skipOnError' => false, 'skipOnEmpty' => false],
+            [['scheduled_time_start_from','scheduled_time_to'], function ($attribute, $params, $validator) {
+                    if ($this->is_order_scheduled && (!$this->scheduled_time_start_from || !$this->scheduled_time_to) )
+                        $this->addError($attribute, $attribute . ' cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['area_id', function ($attribute, $params, $validator) {
                     if (!$this->area_id && $this->order_mode == Order::ORDER_MODE_DELIVERY)
@@ -129,8 +136,7 @@ class Order extends \yii\db\ActiveRecord {
             [['customer_email'], 'email'],
             [['payment_method_id'], 'validatePaymentMethodId', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['payment_uuid'], 'string', 'max' => 36],
-            ['estimated_time_of_arrival', 'safe'],
-            [[ 'latitude', 'longitude'], 'safe'],
+            [['estimated_time_of_arrival','scheduled_time_start_from','scheduled_time_to',  'latitude', 'longitude'], 'safe'],
             [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
             [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name', 'payment_method_name_ar', 'tracking_link'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
@@ -255,20 +261,23 @@ class Order extends \yii\db\ActiveRecord {
             'house_number' => 'House Number',
             'special_directions' => 'Special Directions',
             'customer_name' => 'Customer Name',
-            'customer_phone_number' => 'Customer Phone Number',
+            'customer_phone_number' => 'Phone Number',
             'customer_email' => 'Customer Email',
             'payment_method_id' => 'Payment Method ID',
             'payment_method_name' => 'Payment Method Name',
             'payment_method_name_ar' => 'Payment Method Name [Arabic]',
-            'order_status' => 'Order Status',
-            'total_price' => 'Total Price',
-            'total_price_before_refund' => 'Total Price',
+            'order_status' => 'Status',
+            'total_price' => 'Price',
+            'total_price_before_refund' => 'Total price before refund',
             'subtotal' => 'Subtotal',
             'order_created_at' => 'Order Created At',
             'order_updated_at' => 'Order Updated At',
             'tracking_link' => 'Tracking link',
             'latitude' => 'Latitude',
             'longitude' => 'Longitude',
+            'estimated_time_of_arrival' => 'Expected at',
+            'is_order_scheduled' => 'Is order scheduled',
+
         ];
     }
 
@@ -497,7 +506,14 @@ class Order extends \yii\db\ActiveRecord {
             if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
                 //set ETA value
                 \Yii::$app->timeZone = 'Asia/Kuwait';
-                $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $this->restaurantDelivery->delivery_time . ' minutes',  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
+
+                if($this->is_order_scheduled)
+                  $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($this->scheduled_time_start_from));
+                else
+                  $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $this->restaurantDelivery->delivery_time . ' minutes',  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))  ));
+
+
+
 
                 $this->delivery_time = $this->restaurantDelivery->delivery_time;
                 $this->save(false);

@@ -67,8 +67,6 @@ class OrderController extends Controller {
 
         if ($restaurant_model) {
 
-            if ($restaurant_model->isOpen()) {
-
 
                 $order = new Order();
 
@@ -98,6 +96,16 @@ class OrderController extends Controller {
                       $order->latitude = Yii::$app->request->getBodyParam("deliver_location_latitude"); //optional
                     if( Yii::$app->request->getBodyParam("deliver_location_longitude"))
                       $order->longitude = Yii::$app->request->getBodyParam("deliver_location_longitude"); //optional
+
+                      //Preorder
+                      if( Yii::$app->request->getBodyParam("is_order_scheduled") !== null)
+                        $order->is_order_scheduled = Yii::$app->request->getBodyParam("is_order_scheduled");
+
+                      if($order->is_order_scheduled != null && $order->is_order_scheduled  == true){
+                        $order->scheduled_time_start_from = Yii::$app->request->getBodyParam("scheduled_time_start_from");
+                        $order->scheduled_time_to = Yii::$app->request->getBodyParam("scheduled_time_to");
+                      }
+
 
                 } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
                     $order->restaurant_branch_id = Yii::$app->request->getBodyParam("restaurant_branch_id");
@@ -174,6 +182,16 @@ class OrderController extends Controller {
                         'message' => $order->getErrors(),
                     ];
                 }
+
+                if (!$order->is_order_scheduled && !$restaurant_model->isOpen()   ) {
+                    $response = [
+                        'operation' => 'error',
+                        'message' => 'Store is closed',
+                    ];
+                }
+
+
+
 
                 if ($response == null) {
 
@@ -316,16 +334,10 @@ class OrderController extends Controller {
                 }
 
 
-
                 if (array_key_exists('operation', $response) && $response['operation'] == 'error') {
                     $order->delete();
                 }
-            } else {
-                $response = [
-                    'operation' => 'error',
-                    'message' => 'Store is closed',
-                ];
-            }
+
         } else {
             $response = [
                 'operation' => 'error',

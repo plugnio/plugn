@@ -431,6 +431,8 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function isOpen()
     {
       $opening_hours_model = OpeningHour::find()->where(['restaurant_uuid' => $this->restaurant_uuid ,'day_of_week' => date('w',strtotime("now"))])->one();
+
+      
       if($opening_hours_model){
         if(!$opening_hours_model->is_closed && date("w", strtotime("now")) ==  $opening_hours_model->day_of_week && strtotime("now") > strtotime($opening_hours_model->open_at)  && strtotime("now") <  strtotime($opening_hours_model->close_at) )
           return true;

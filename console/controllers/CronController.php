@@ -35,6 +35,11 @@ class CronController extends \yii\console\Controller {
                 $opening_hour->save();
             }
         }
+
+
+        $this->stdout("Thanks Big Boss \n", Console::FG_RED, Console::BOLD);
+
+
     }
 
     /**

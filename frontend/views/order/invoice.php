@@ -14,9 +14,9 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 ?>
 <!-- invoice functionality start -->
 <section class="invoice-print mb-1">
-  <div>
-      <button class="btn btn-primary btn-print mb-1 mb-md-0"> <i class="feather icon-file-text"></i> Print</button>
-  </div>
+    <div>
+        <button class="btn btn-primary btn-print mb-1 mb-md-0"> <i class="feather icon-file-text"></i> Print</button>
+    </div>
 </section>
 <!-- invoice functionality end -->
 <!-- invoice page -->
@@ -26,7 +26,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
         <div id="invoice-company-details" class="row">
             <div class="col-12  ">
                 <div class="media " style="margin-bttom: 20px">
-                  <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: auto; margin-right: auto; display:block" />
+                    <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: auto; margin-right: auto; display:block" />
 
                 </div>
             </div>
@@ -40,106 +40,106 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
         <div id="invoice-customer-details" class="row pt-2">
             <div class="col-sm-6 col-12 text-left">
 
-                <div class="invoice-details mt-2">
+                <div class="invoice-details my-2">
                     <h6 class="mt-2">INVOICE NO.</h6>
                     <p> <?= '#' . $model->order_uuid ?></p>
-                    <h6 class="mt-2">INVOICE DATE</h6>
+                    <h6 class="mt-2">Payment Method</h6>
                     <p>
-<?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy H:mm') ?>
+                        <?= $model->payment_method_name ?>
                     </p>
+                    <h6 class="mt-2">When</h6>
+                    <p>  <?= $model->is_order_scheduled ? 'Scheduled' : 'As soon as possible'; ?> </p>
 
 
 
                 </div>
 
-                <div class="recipient-info my-2">
-
-
-                </div>
                 <div class="recipient-contact pb-2">
-                <div class="table-responsive">
+                    <div class="table-responsive">
 
-                  <table class="table table-bordered table-hover" style="margin-top:29px !important;">
-                      <tbody>
-                          <tr>
-                              <th>Customer name</th>
-                              <td><?= $model->customer_name ?></td>
-                          </tr>
-                          <tr>
-                              <th>Customer phone number</th>
-                              <td><?= $model->customer_phone_number ?></td>
-                          </tr>
-                          <?php if ($model->customer_email) { ?>
-                            <tr>
-                                <th>Customer email address</th>
-                                <td><?= $model->customer_email ?></td>
-                            </tr>
-                          <?php } ?>
-                      </tbody>
-                  </table>
-                </div>
+                        <table class="table table-bordered table-hover" style="margin-top:29px !important;">
+                            <tbody>
+                                <tr>
+                                    <th>Customer name</th>
+                                    <td><?= $model->customer_name ?></td>
+                                </tr>
+                                <tr>
+                                    <th>Customer phone number</th>
+                                    <td><?= $model->customer_phone_number ?></td>
+                                </tr>
+                                <?php if ($model->customer_email) { ?>
+                                    <tr>
+                                        <th>Customer email address</th>
+                                        <td><?= $model->customer_email ?></td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <div class="col-sm-6 col-12 text-left">
 
-                <div class="invoice-details mt-2">
-                  <h6 class="mt-2">Payment Method</h6>
-                  <p>
-                    <?= $model->payment_method_name ?>
-                  </p>
+
+                <div class="invoice-details my-2">
+
+                    <h6 class="mt-2">INVOICE DATE</h6>
+                    <p>
+                        <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy H:mm') ?>
+                    </p>
+
+
+
+
+                    <?php if ($model->order_mode == Order::ORDER_MODE_PICK_UP) { ?>
+
+                        <h6 class="mt-2">Type</h6>
+                        <p>  Pick up </p>
+
+                    <?php } else { ?>
+                        <h6 class="mt-2">Type</h6>
+                        <p>  Delivery </p>
+                    <?php } ?>
+
+                    <h6 class="mt-2">Expected at</h6>
+                    <p>
+                      <?= \Yii::$app->formatter->asDatetime($model->estimated_time_of_arrival, 'MMM dd, yyyy H:mm') ?>
+                    </p>
 
 
                 </div>
-
-                <div class="recipient-info my-2">
-
-                                      <?php if ($model->order_mode == Order::ORDER_MODE_PICK_UP) { ?>
-
-                                        <h6 class="mt-2">Preparation time</h6>
-
-                                      <?php } else { ?>
-                                        <h6 class="mt-2">Expected Delivery Time</h6>
-
-                                      <?php } ?>
-
-                                      <p>
-                                <?= \Yii::$app->formatter->asDatetime($model->estimated_time_of_arrival, 'MMM dd, yyyy H:mm') ?>
-                                      </p>
-
-
-                            </div>
                 <div class="recipient-info my-2">
 
                     <?php if ($model->order_mode == Order::ORDER_MODE_DELIVERY) { ?>
 
 
                         <div class="table-responsive">
-                        <table class="table table-bordered table-hover" style="margin-top: 1.5rem !important;">
-                          <thead>
-                              <tr>
-                                  <th>Area</th>
-                                  <th>Block</th>
-                                  <th>Street</th>
-                                    <?= $model->avenue != null ? '<th>Avenue</th>' : '' ?>
-                                  <th>House</th>
-                                  <th>Special Directions</th>
-                              </tr>
-                          </thead>
+                            <table class="table table-bordered table-hover" style="margin-top: 1.5rem !important;">
+                                <thead>
+                                    <tr>
+                                        <th>Area</th>
+                                        <th>Block</th>
+                                        <th>Street</th>
+                                        <?= $model->avenue != null ? '<th>Avenue</th>' : '' ?>
+                                        <th>House</th>
+                                        <th>Special Directions</th>
+                                    </tr>
+                                </thead>
 
-                            <tbody>
+                                <tbody>
                                 <td><?= $model->area_name ?></td>
                                 <td><?= $model->block ?></td>
                                 <td><?= $model->street ?></td>
-                                 <?= $model->avenue != null ? '<td>' . $model->avenue . '</td>' : '' ?></td>
+                                <?= $model->avenue != null ? '<td>' . $model->avenue . '</td>' : '' ?></td>
                                 <td> <?= $model->house_number ?></td>
                                 <td> <?= $model->special_directions ?></td>
-                            </tbody>
-                        </table>
-<?php } ?>
+                                </tbody>
+                            </table>
+                        <?php } ?>
 
 
-                </div>
+                    </div>
                 </div>
 
             </div>

@@ -14,7 +14,7 @@ use yii\db\Expression;
  * @property string $customer_phone_number
  * @property string|null $customer_email
  * @property string $customer_created_at
- * @property string $customer_updated_at 
+ * @property string $customer_updated_at
  *
  * @property Order[] $orders
  * @property Restaurant $restaurant
@@ -65,7 +65,7 @@ class Customer extends \yii\db\ActiveRecord {
             'customer_id' => 'Customer ID',
             'restaurant_uuid' => 'Restaurant UUID',
             'customer_name' => 'Customer Name',
-            'customer_phone_number' => 'Customer Phone Number',
+            'customer_phone_number' => 'Phone Number',
             'customer_email' => 'Customer Email',
             'customer_created_at' => 'Customer Created At',
             'customer_updated_at' => 'Customer Updated At',
@@ -80,7 +80,7 @@ class Customer extends \yii\db\ActiveRecord {
     public function getOrders() {
         return $this->hasMany(Order::className(), ['customer_id' => 'customer_id']);
     }
-    
+
     /**
      * Gets query for [[Orders]].
      *

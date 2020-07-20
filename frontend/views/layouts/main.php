@@ -226,7 +226,14 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                             ?>
                         </li>
                     <?php } ?>
-
+                    <li class=" nav-item <?= $this->context->route == 'opening-hour/index' ? 'active' : '' ?> ">
+                          <?=
+                          Html::a(
+                                  Html::tag('i', '', ['class' => 'feather icon-clock']) .
+                                  Html::tag('span', 'Opening Hours'), ['opening-hour/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                          )
+                          ?>
+                    </li>
                     <li class=" nav-item <?= $this->context->route == 'restaurant-delivery/index' ? 'active' : '' ?> ">
 
                         <?=

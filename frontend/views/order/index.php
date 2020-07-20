@@ -111,11 +111,18 @@ $this->registerJs($js);
             'columns' => [
               ['class' => 'yii\grid\SerialColumn'],
 
+                // [
+                //     'label' => 'Order ID',
+                //     "format" => "raw",
+                //     "value" => function($model) {
+                //         return '#' . $model->order_uuid;
+                //     }
+                // ],
                 [
-                    'label' => 'Order ID',
+                    'label' => 'Time',
                     "format" => "raw",
                     "value" => function($model) {
-                        return '#' . $model->order_uuid;
+                        return  date('h:i A - M d', strtotime($model->order_created_at));
                     }
                 ],
                 [
@@ -130,6 +137,13 @@ $this->registerJs($js);
                     },
                 ],
                 'customer_phone_number',
+                [
+                    'label' => 'When',
+                    'format' => 'raw',
+                    'value' => function ($data) {
+                            return $data->is_order_scheduled ? 'Scheduled' : 'As soon as possible';
+                    },
+                ],
                 [
                     'attribute' => 'order_status',
                     "format" => "raw",
@@ -202,7 +216,6 @@ $this->registerJs($js);
                     },
                 ],
                 'total_price:currency',
-                'order_created_at:datetime',
                 [
                     'header' => 'Action',
                     'class' => 'yii\grid\ActionColumn',

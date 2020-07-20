@@ -119,8 +119,27 @@ $this->params['breadcrumbs'][] = $this->title;
                         // 'total_price:currency',
                         // 'subtotal:currency',
                         // 'delivery_fee:currency',
-                        'order_created_at:datetime',
-                        'estimated_time_of_arrival:datetime',
+                        [
+                          'attribute' => 'order_created_at',
+                            "format" => "raw",
+                            "value" => function($model) {
+                                return  date('h:i A - d M, Y', strtotime($model->order_created_at));
+                            }
+                        ],
+                        [
+                            'label' => 'When',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                    return $data->is_order_scheduled ? 'Scheduled' : 'As soon as possible';
+                            },
+                        ],
+                        [
+                            'attribute' => 'estimated_time_of_arrival',
+                            "format" => "raw",
+                            "value" => function($model) {
+                                return  date('h:i A - d M, Y', strtotime($model->estimated_time_of_arrival));
+                            }
+                        ],
                         [
                             'attribute' => 'special_directions',
                             'format' => 'html',
