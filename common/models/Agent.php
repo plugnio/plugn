@@ -7,6 +7,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use yii\web\IdentityInterface;
 use yii\db\ActiveQuery;
+use common\models\AgentToken;
 
 /**
  * This is the model class for table "agent".
@@ -31,7 +32,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
 
-    
+
     /**
      * Field for temporary password. If set, it will overwrite the old password on save
      * @var string
@@ -142,6 +143,34 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     public static function findIdentityByAccessToken($token, $type = null) {
         throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
     }
+
+    /**
+* Create an Access Token Record for this agent
+* if the agent already has one, it will return it instead
+* @return \common\models\AgentToken
+*/
+public function getAccessToken() {
+   // Return existing inactive token if found
+   $token = AgentToken::findOne([
+               'agent_id' => $this->agent_id,
+               'token_status' => AgentToken::STATUS_ACTIVE
+   ]);
+
+   if ($token) {
+       return $token;
+   }
+
+   // Create new inactive token
+
+   $token = new AgentToken();
+   $token->agent_id = $this->agent_id;
+   $token->token_value = AgentToken::generateUniqueTokenString();
+   $token->token_status = AgentToken::STATUS_ACTIVE;
+   $token->save();
+
+   return $token;
+}
+
 
     /**
      * Finds user by username
@@ -275,5 +304,5 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     {
         return $this->hasMany(AgentAssignment::className(), ['agent_id' => 'agent_id']);
     }
-    
+
 }
