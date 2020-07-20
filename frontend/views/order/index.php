@@ -119,7 +119,7 @@ $this->registerJs($js);
                 //     }
                 // ],
                 [
-                    'label' => 'Time',
+                    'attribute' => 'order_created_at',
                     "format" => "raw",
                     "value" => function($model) {
                         return  date('h:i A - M d', strtotime($model->order_created_at));

@@ -31,6 +31,7 @@ class CronController extends \yii\console\Controller {
                 $opening_hour->restaurant_uuid = $restaurant->restaurant_uuid;
                 $opening_hour->day_of_week = $i;
                 $opening_hour->open_at = 0;
+                $opening_hour->is_closed = 0;
                 $opening_hour->close_at = '23:59:59';
                 $opening_hour->save();
             }

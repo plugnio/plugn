@@ -88,7 +88,7 @@ class RestaurantController extends Controller {
                     array_push($schedule_time, [
                         'date' => date("c", $deliveryDate),
                         'dayOfWeek' => date("w", $deliveryDate),
-                        'day' => date("w", strtotime("now")) ==  date('w' , $deliveryDate) ? 'Today' : (date("w", strtotime("+1 day")) ==  date('w' , $deliveryDate)  ? 'Tomorrow' : date("l", $deliveryDate)),
+                        // 'day' => date('c' , $deliveryDate) ,
                         'scheduleTimeSlots' => $scheduleOrder
                     ]);
                   }
@@ -96,10 +96,11 @@ class RestaurantController extends Controller {
               }
 
 
+              $asap = date("c", strtotime('+' . $deliveryArea->delivery_time . ' minutes',  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
 
              return [
-                    'ASAP' => $restaurant_model->isOpen() ? date("c", strtotime('+' . $deliveryArea->delivery_time . ' minutes',  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s')))) : null,
-                    'scheduleOrder' =>$restaurant_model->schedule_order ?  $schedule_time : null
+                    'ASAP' => $restaurant_model->isOpen() ?  (date('Y-m-d' , strtotime($asap) ) == date('Y-m-d' , strtotime("now") ) ? $asap : null)  : null,
+                    'scheduleOrder' => $restaurant_model->schedule_order ?  ($schedule_time  ? $schedule_time  : null): null
                 ];
 
 

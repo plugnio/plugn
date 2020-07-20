@@ -52,18 +52,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                             <ul class="nav navbar-nav">
                                 <li class="nav-item mobile-menu d-xl-none mr-auto"><a class="nav-link nav-menu-main menu-toggle hidden-xs" href="#"><i class="ficon feather icon-menu"></i></a></li>
                             </ul>
-                            <ul class="nav navbar-nav bookmark-icons">
-                                  <li class="nav-item d-none d-lg-block">
-
-                                      <?php
-                                          if($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN)
-                                            echo Html::a('Busy', ['mark-as-busy', 'restaurantUuid' => $restaurant_model->restaurant_uuid ],['class' => 'btn btn-danger  waves-effect waves-light']);
-                                          else if ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_BUSY)
-                                            echo Html::a('Open', ['mark-as-open','restaurantUuid' => $restaurant_model->restaurant_uuid ],['class' => 'btn btn-success  waves-effect waves-light']);
-
-                                      ?>
-                                  </li>
-                          </ul>
+                        
                         </div>
 
 

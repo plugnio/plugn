@@ -857,19 +857,19 @@ class SiteController extends Controller {
 
 
 
-    public function actionMarkAsBusy($restaurantUuid) {
-      if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
-        $managedRestaurant->markAsBusy();
-        return $this->redirect(['vendor-dashboard', 'id' => $restaurantUuid]);
-      }
-    }
-
-    public function actionMarkAsOpen($restaurantUuid) {
-      if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
-        $managedRestaurant->markAsOpen();
-        return $this->redirect(['vendor-dashboard', 'id' => $restaurantUuid]);
-      }
-    }
+    // public function actionMarkAsBusy($restaurantUuid) {
+    //   if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+    //     $managedRestaurant->markAsBusy();
+    //     return $this->redirect(['vendor-dashboard', 'id' => $restaurantUuid]);
+    //   }
+    // }
+    //
+    // public function actionMarkAsOpen($restaurantUuid) {
+    //   if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+    //     $managedRestaurant->markAsOpen();
+    //     return $this->redirect(['vendor-dashboard', 'id' => $restaurantUuid]);
+    //   }
+    // }
 
     public function actionExportThisWeekSoldItems($restaurantUuid) {
         if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {

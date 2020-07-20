@@ -98,8 +98,8 @@ class OrderController extends Controller {
                       $order->longitude = Yii::$app->request->getBodyParam("deliver_location_longitude"); //optional
 
                       //Preorder
-                      if( Yii::$app->request->getBodyParam("is_order_scheduled") !== null)
-                        $order->is_order_scheduled = Yii::$app->request->getBodyParam("is_order_scheduled");
+                      // if( Yii::$app->request->getBodyParam("is_order_scheduled") !== null)
+                        $order->is_order_scheduled = Yii::$app->request->getBodyParam("is_order_scheduled") ? Yii::$app->request->getBodyParam("is_order_scheduled") : 0;
 
 
                       if($order->is_order_scheduled != null && $order->is_order_scheduled  == true){

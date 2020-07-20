@@ -430,7 +430,7 @@ class Restaurant extends \yii\db\ActiveRecord {
 
 
       if($opening_hours_model){
-        if($this->restaurant_status == static::RESTAURANT_STATUS_OPEN  && !$opening_hours_model->is_closed && date("w", strtotime("now")) ==  $opening_hours_model->day_of_week && strtotime("now") > strtotime($opening_hours_model->open_at)  && strtotime("now") <  strtotime($opening_hours_model->close_at) )
+        if(!$opening_hours_model->is_closed && date("w", strtotime("now")) ==  $opening_hours_model->day_of_week && strtotime("now") > strtotime($opening_hours_model->open_at)  && strtotime("now") <  strtotime($opening_hours_model->close_at) )
           return true;
       }
 
