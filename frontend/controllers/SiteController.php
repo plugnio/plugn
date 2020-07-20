@@ -41,7 +41,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'promote-to-open', 'promote-to-close', 'pay', 'callback', 'vendor-dashboard', 'export-today-sold-items', 'export-this-week-sold-items', 'export-this-months-sold-items'],
+                        'actions' => ['logout', 'promote-to-open', 'promote-to-close', 'pay', 'callback', 'vendor-dashboard', 'mark-as-busy', 'mark-as-open', 'export-today-sold-items', 'export-this-week-sold-items', 'export-this-months-sold-items'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -91,6 +91,7 @@ class SiteController extends Controller {
             }
         }
     }
+
 
     /**
      * Displays vendor dashboard homepage.
@@ -852,6 +853,22 @@ class SiteController extends Controller {
                 ],
             ]);
         }
+    }
+
+
+
+    public function actionMarkAsBusy($restaurantUuid) {
+      if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+        $managedRestaurant->markAsBusy();
+        return $this->redirect(['vendor-dashboard', 'id' => $restaurantUuid]);
+      }
+    }
+
+    public function actionMarkAsOpen($restaurantUuid) {
+      if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+        $managedRestaurant->markAsOpen();
+        return $this->redirect(['vendor-dashboard', 'id' => $restaurantUuid]);
+      }
     }
 
     public function actionExportThisWeekSoldItems($restaurantUuid) {

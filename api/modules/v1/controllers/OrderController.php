@@ -101,9 +101,10 @@ class OrderController extends Controller {
                       if( Yii::$app->request->getBodyParam("is_order_scheduled") !== null)
                         $order->is_order_scheduled = Yii::$app->request->getBodyParam("is_order_scheduled");
 
+
                       if($order->is_order_scheduled != null && $order->is_order_scheduled  == true){
-                        $order->scheduled_time_start_from = Yii::$app->request->getBodyParam("scheduled_time_start_from");
-                        $order->scheduled_time_to = Yii::$app->request->getBodyParam("scheduled_time_to");
+                        $order->scheduled_time_start_from =   date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_start_from")));
+                        $order->scheduled_time_to =   date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_to")));
                       }
 
 

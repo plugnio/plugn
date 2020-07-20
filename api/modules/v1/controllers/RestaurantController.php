@@ -63,7 +63,6 @@ class RestaurantController extends Controller {
 
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
         $area_id = Yii::$app->request->get("area_id");
-        $isOpen = false;
 
         if ($restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->one()) {
           $deliveryArea = RestaurantDelivery::find()->where(['restaurant_uuid' => $restaurant_uuid , 'area_id' =>$area_id ])->one();

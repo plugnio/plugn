@@ -61,7 +61,6 @@ class Restaurant extends \yii\db\ActiveRecord {
     //Values for `restaurant_status`
     const RESTAURANT_STATUS_OPEN = 1;
     const RESTAURANT_STATUS_BUSY = 2;
-    const RESTAURANT_STATUS_CLOSE = 3;
 
     //Values for `phone_number_display`
     const PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER  = 1;
@@ -96,7 +95,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['restaurant_status', 'support_delivery', 'support_pick_up'], 'integer', 'min' => 0],
-            ['restaurant_status', 'in', 'range' => [self::RESTAURANT_STATUS_OPEN, self::RESTAURANT_STATUS_BUSY, self::RESTAURANT_STATUS_CLOSE]],
+            ['restaurant_status', 'in', 'range' => [self::RESTAURANT_STATUS_OPEN, self::RESTAURANT_STATUS_BUSY]],
             ['store_layout', 'in', 'range' => [self::STORE_LAYOUT_LIST, self::STORE_LAYOUT_GRID]],
             ['phone_number_display', 'in', 'range' => [self::PHONE_NUMBER_DISPLAY_ICON, self::PHONE_NUMBER_DISPLAY_SHOW_PHONE_NUMBER, self::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER]],
             [['restaurant_created_at', 'restaurant_updated_at'], 'safe'],
@@ -193,9 +192,6 @@ class Restaurant extends \yii\db\ActiveRecord {
                 break;
             case self::RESTAURANT_STATUS_BUSY:
                 return "Busy";
-                break;
-            case self::RESTAURANT_STATUS_CLOSE:
-                return "Closed";
                 break;
         }
 
@@ -432,9 +428,9 @@ class Restaurant extends \yii\db\ActiveRecord {
     {
       $opening_hours_model = OpeningHour::find()->where(['restaurant_uuid' => $this->restaurant_uuid ,'day_of_week' => date('w',strtotime("now"))])->one();
 
-      
+
       if($opening_hours_model){
-        if(!$opening_hours_model->is_closed && date("w", strtotime("now")) ==  $opening_hours_model->day_of_week && strtotime("now") > strtotime($opening_hours_model->open_at)  && strtotime("now") <  strtotime($opening_hours_model->close_at) )
+        if($this->restaurant_status == static::RESTAURANT_STATUS_OPEN  && !$opening_hours_model->is_closed && date("w", strtotime("now")) ==  $opening_hours_model->day_of_week && strtotime("now") > strtotime($opening_hours_model->open_at)  && strtotime("now") <  strtotime($opening_hours_model->close_at) )
           return true;
       }
 
@@ -499,26 +495,18 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
-     * Promotes current restaurant to open restaurant while disabling rest
-     */
-    public function promoteToOpenRestaurant() {
-        $this->restaurant_status = Restaurant::RESTAURANT_STATUS_OPEN;
-        $this->save(false);
-    }
-
-    /**
-     * Promotes current restaurant to close restaurant while disabling rest
-     */
-    public function promoteToCloseRestaurant() {
-        $this->restaurant_status = Restaurant::RESTAURANT_STATUS_CLOSE;
-        $this->save(false);
-    }
-
-    /**
      * Promotes current restaurant to busy restaurant while disabling rest
      */
-    public function promoteToBusyRestaurant() {
+    public function markAsBusy() {
         $this->restaurant_status = Restaurant::RESTAURANT_STATUS_BUSY;
+        $this->save(false);
+    }
+
+    /**
+     * Promotes current restaurant to open restaurant while disabling rest
+     */
+    public function markAsOpen() {
+        $this->restaurant_status = Restaurant::RESTAURANT_STATUS_OPEN;
         $this->save(false);
     }
 

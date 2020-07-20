@@ -707,46 +707,6 @@ $this->registerJs($js);
         </div>
 
     </div>
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-end">
-                    <h4 class="mb-0">Restaurant Status</h4>
-                </div>
-                <div class="card-content">
-                    <div class="card-body px-0 pb-0">
-
-                        <div class="col-12">
-                            <div class="form-group">
-                                <?php if ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_CLOSE) { ?>
-
-                                    <p style="font-size: 20px; margin-top: 65px; padding-left: 20px; margin-bottom: 65px; text-align: center; padding-right: 20px;">
-                                        Your store is closed you can't accept orders!
-                                    </p>
-
-                                    <?=
-                                    Html::a('Open your store', ['promote-to-open', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn mb-1 btn-success btn-lg btn-block']);
-                                    ?>
-
-                                <?php } elseif ($restaurant_model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) {
-                                    ?>
-                                    <p style="font-size: 20px; margin-top: 65px; padding-left: 20px; margin-bottom: 65px; text-align: center; padding-right: 20px;">
-                                        Your store is open you can accept orders!
-                                    </p>
-
-                                    <?=
-                                    Html::a('Close your store', ['promote-to-close', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn mb-1 btn-danger btn-lg btn-block']);
-                                    ?>
-
-                                <?php } ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </div>
 
 </section>

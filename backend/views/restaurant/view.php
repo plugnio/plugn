@@ -71,18 +71,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ?>
         <?php } ?>
 
-        <?php if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_CLOSE) { ?>
-            <?=
-            Html::a('Close', ['promote-to-close', 'id' => $model->restaurant_uuid], [
-                'class' => 'btn btn-danger',
-                'data' => [
-                    'confirm' => 'Are you sure you want to promote this project to close?',
-                    'method' => 'post',
-                ],
-            ])
-            ?>
-        <?php } ?>
-
     </p>
 
     <?=
