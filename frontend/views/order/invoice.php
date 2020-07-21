@@ -86,7 +86,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
                     <h6 class="mt-2">INVOICE DATE</h6>
                     <p>
-                        <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy H:mm') ?>
+                        <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy h:mm') ?>
                     </p>
 
 
@@ -104,7 +104,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
                     <h6 class="mt-2">Expected at</h6>
                     <p>
-                      <?= \Yii::$app->formatter->asDatetime($model->estimated_time_of_arrival, 'MMM dd, yyyy H:mm') ?>
+                      <?= \Yii::$app->formatter->asDatetime($model->estimated_time_of_arrival, 'MMM dd, yyyy h:mm') ?>
                     </p>
 
 
