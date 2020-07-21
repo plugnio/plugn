@@ -109,15 +109,13 @@ $this->registerJs($js);
         GridView::widget([
             'dataProvider' => $dataProvider,
             'columns' => [
-              ['class' => 'yii\grid\SerialColumn'],
-
-                // [
-                //     'label' => 'Order ID',
-                //     "format" => "raw",
-                //     "value" => function($model) {
-                //         return '#' . $model->order_uuid;
-                //     }
-                // ],
+              [
+                   'label' => 'Order ID',
+                   "format" => "raw",
+                   "value" => function($model) {
+                       return '#' . $model->order_uuid;
+                   }
+               ],
                 [
                     'attribute' => 'order_created_at',
                     "format" => "raw",
@@ -209,10 +207,10 @@ $this->registerJs($js);
                     'label' => 'Payment',
                     "format" => "raw",
                     "value" => function($data) {
-                        if ($data->payment_uuid)
-                            return $data->payment->payment_current_status;
-                        else
                             return $data->paymentMethod->payment_method_name;
+                    },
+                    "visible" => function($data) {
+                            return $data->payment->payment_current_status;
                     },
                 ],
                 'total_price:currency',
