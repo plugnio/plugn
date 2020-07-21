@@ -81,6 +81,10 @@ class OrderController extends Controller {
 
                 //save Customer address
                 $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
+                
+                //Preorder
+                // if( Yii::$app->request->getBodyParam("is_order_scheduled") !== null)
+                  $order->is_order_scheduled = Yii::$app->request->getBodyParam("is_order_scheduled") ? Yii::$app->request->getBodyParam("is_order_scheduled") : 0;
 
                 //if the order mode = 1 => Delivery
                 if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
@@ -98,10 +102,6 @@ class OrderController extends Controller {
                       $order->longitude = Yii::$app->request->getBodyParam("deliver_location_longitude"); //optional
 
                       //Preorder
-                      // if( Yii::$app->request->getBodyParam("is_order_scheduled") !== null)
-                        $order->is_order_scheduled = Yii::$app->request->getBodyParam("is_order_scheduled") ? Yii::$app->request->getBodyParam("is_order_scheduled") : 0;
-
-
                       if($order->is_order_scheduled != null && $order->is_order_scheduled  == true){
                         $order->scheduled_time_start_from =   date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_start_from")));
                         $order->scheduled_time_to =   date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_to")));
