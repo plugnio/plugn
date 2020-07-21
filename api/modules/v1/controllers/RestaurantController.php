@@ -88,18 +88,17 @@ class RestaurantController extends Controller {
                     array_push($schedule_time, [
                         'date' => date("c", $deliveryDate),
                         'dayOfWeek' => date("w", $deliveryDate),
-                        // 'day' => date('c' , $deliveryDate) ,
                         'scheduleTimeSlots' => $scheduleOrder
                     ]);
                   }
 
               }
 
-
+              $todayOpeningHours = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => date('w' , strtotime("now"))])->one();
               $asap = date("c", strtotime('+' . $deliveryArea->delivery_time . ' minutes',  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
 
              return [
-                    'ASAP' => $restaurant_model->isOpen() ?  (date('Y-m-d' , strtotime($asap) ) == date('Y-m-d' , strtotime("now") ) ? $asap : null)  : null,
+                    'ASAP' => strtotime($asap) <= strtotime($todayOpeningHours->close_at) && date('H:i' , strtotime($asap) ) != '00:00' ? $asap : null,
                     'scheduleOrder' => $restaurant_model->schedule_order ?  ($schedule_time  ? $schedule_time  : null): null
                 ];
 

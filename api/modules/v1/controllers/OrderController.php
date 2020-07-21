@@ -187,7 +187,7 @@ class OrderController extends Controller {
                 if (!$order->is_order_scheduled && !$restaurant_model->isOpen()   ) {
                     $response = [
                         'operation' => 'error',
-                        'message' => 'Store is closed',
+                        'message' => $restaurant_model->name .' is currently closed and is not accepting orders at this time',
                     ];
                 }
 
