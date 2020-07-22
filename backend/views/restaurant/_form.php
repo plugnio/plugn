@@ -152,6 +152,16 @@ $this->registerJs($js);
     );
     ?>
 
+
+        <?=
+        $form->field($model, 'schedule_order')->dropDownList(
+                [
+            1 => 'Yes',
+            0 => 'No',
+                ]
+        );
+        ?>
+
     <?= $form->field($model, 'phone_number')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'restaurant_email')->input('email') ?>
