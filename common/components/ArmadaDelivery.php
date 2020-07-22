@@ -29,7 +29,7 @@ class ArmadaDelivery extends Component {
 
     public $liveApiEndpoint = "https://api.armadadelivery.com/v0/deliveries";
 
-    public $testApiEndpoint = "https://api-simulation-env.herokuapp.com/v0";
+    public $testApiEndpoint = "https://api-simulation-env.herokuapp.com/v0/deliveries";
 
     private $apiEndpoint;
 
@@ -66,7 +66,6 @@ class ArmadaDelivery extends Component {
      * Create a delivery request
      */
     public function createDelivery($model) {
-        $deliveryEndpoint = $this->apiEndpoint . "/deliveries";
 
         $deliveryParams = [
             "platformName" => "pos",
@@ -88,7 +87,7 @@ class ArmadaDelivery extends Component {
         $client = new Client();
         $response = $client->createRequest()
                 ->setMethod('POST')
-                ->setUrl($deliveryEndpoint)
+                ->setUrl($this->apiEndpoint)
                 ->setData($deliveryParams)
                 ->addHeaders([
                     'authorization' => 'Key ' . $model->restaurant->armada_api_key,

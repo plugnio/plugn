@@ -192,16 +192,16 @@ class OrderController extends Controller {
         $successMessage = null;
 
         if ($createDeliveryApiResponse->isOk) {
+
             $order_model->tracking_link = $createDeliveryApiResponse->data['trackingLink'];
             $order_model->save(false);
             $successMessage = 'Your request has been successfully submitted';
         } else {
-
-            // if ($createDeliveryApiResponse->client)
-            //     $errorMessage = 'Invalid api key';
-            // else if ($createDeliveryApiResponse->data['errors'])
-            //     $errorMessage = json_encode($createDeliveryApiResponse->data['errors'][0]['description'], true);
-
+          
+            if ($createDeliveryApiResponse->client)
+                $errorMessage = 'Invalid api key';
+            else if ($createDeliveryApiResponse->data['errors'])
+                $errorMessage = json_encode($createDeliveryApiResponse->data['errors'][0]['description'], true);
 
 
             return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid, 'errorMessage' => json_encode($createDeliveryApiResponse)]);
