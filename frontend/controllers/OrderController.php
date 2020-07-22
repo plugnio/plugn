@@ -200,11 +200,11 @@ class OrderController extends Controller {
             // if ($createDeliveryApiResponse->client)
             //     $errorMessage = 'Invalid api key';
             // else if ($createDeliveryApiResponse->data['errors'])
-                $errorMessage = json_encode($createDeliveryApiResponse->data['errors'][0]['description'], true);
+            //     $errorMessage = json_encode($createDeliveryApiResponse->data['errors'][0]['description'], true);
 
 
 
-            return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid, 'errorMessage' => $errorMessage]);
+            return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid, 'errorMessage' => json_encode($createDeliveryApiResponse)]);
         }
 
         return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid, 'errorMessage' => $errorMessage, 'successMessage' => $successMessage,]);
