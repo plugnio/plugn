@@ -61,7 +61,13 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
 
         <?php
-        if ($model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->armada_api_key != null && $model->tracking_link == null) {
+
+        $currentTime = strtotime('now');
+        $deliveryTime = strtotime($model->estimated_time_of_arrival);
+        $difference = round(abs($deliveryTime - $currentTime) / 3600,2);
+
+
+        if ($difference <= 1 && $model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->armada_api_key != null && $model->tracking_link == null) {
             echo Html::a('Request a driver', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary']);
         }
         ?>
