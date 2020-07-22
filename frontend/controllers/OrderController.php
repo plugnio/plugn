@@ -197,9 +197,9 @@ class OrderController extends Controller {
             $successMessage = 'Your request has been successfully submitted';
         } else {
 
-            if ($createDeliveryApiResponse->client)
-                $errorMessage = 'Invalid api key';
-            else if ($createDeliveryApiResponse->data['errors'])
+            // if ($createDeliveryApiResponse->client)
+            //     $errorMessage = 'Invalid api key';
+            // else if ($createDeliveryApiResponse->data['errors'])
                 $errorMessage = json_encode($createDeliveryApiResponse->data['errors'][0]['description'], true);
 
 
