@@ -109,6 +109,7 @@ $this->registerJs($js);
         GridView::widget([
             'dataProvider' => $dataProvider,
             'columns' => [
+                 ['class' => 'yii\grid\SerialColumn'],
               [
                    'label' => 'Order ID',
                    "format" => "raw",
