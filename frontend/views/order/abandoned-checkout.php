@@ -23,14 +23,13 @@ $(function () {
 
 ";
 $this->registerJs($js);
-
 ?>
 
 
 <section id="data-list-view" class="data-list-view-header">
 
 
-   <?php echo $this->render('_search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
+    <?php echo $this->render('_search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
 
 
     <!-- DataTable starts -->
@@ -40,16 +39,14 @@ $this->registerJs($js);
         GridView::widget([
             'dataProvider' => $dataProvider,
             'rowOptions' => function($model) {
-        $url = Url::to(['order/view', 'id' => $model->order_uuid , 'restaurantUuid' => $model->restaurant_uuid]);
+                $url = Url::to(['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid]);
 
-        return [
-            'onclick' => "window.location.href='{$url}'"
-        ];
-    },
-
+                return [
+                    'onclick' => "window.location.href='{$url}'"
+                ];
+            },
             'columns' => [
-              ['class' => 'yii\grid\SerialColumn'],
-
+                ['class' => 'yii\grid\SerialColumn'],
                 [
                     'label' => 'Order ID',
                     "format" => "raw",
@@ -61,7 +58,7 @@ $this->registerJs($js);
                     'attribute' => 'order_created_at',
                     "format" => "raw",
                     "value" => function($model) {
-                        return  date('h:i A - M d', strtotime($model->order_created_at));
+                        return date('h:i A - M d', strtotime($model->order_created_at));
                     }
                 ],
                 [
@@ -80,7 +77,7 @@ $this->registerJs($js);
                     'label' => 'When',
                     'format' => 'raw',
                     'value' => function ($data) {
-                            return $data->is_order_scheduled ? 'Scheduled' : 'As soon as possible';
+                        return $data->is_order_scheduled ? 'Scheduled' : 'As soon as possible';
                     },
                 ],
                 [
@@ -127,5 +124,5 @@ $this->registerJs($js);
     </div>
     <!-- DataTable ends -->
 
-  </section>
+</section>
 <!-- Data list view end -->

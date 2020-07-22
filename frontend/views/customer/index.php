@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\CustomerSearch */
@@ -42,6 +43,13 @@ $this->registerJs($js);
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'rowOptions' => function($model) {
+                $url = Url::to(['customer/view', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid]);
+
+                return [
+                    'onclick' => "window.location.href='{$url}'"
+                ];
+            },
               'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
                   'customer_name',

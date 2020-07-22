@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\ItemSearch */
@@ -47,6 +48,13 @@ $this->registerJs($js);
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'rowOptions' => function($model) {
+                $url = Url::to(['item/update', 'id' => $model->item_uuid, 'restaurantUuid' => $model->restaurant_uuid]);
+
+                return [
+                    'onclick' => "window.location.href='{$url}'"
+                ];
+            },
             'columns' => [
               'sort_number',
               [

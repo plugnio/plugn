@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\CategorySearch */
@@ -45,13 +46,20 @@ $this->registerJs($js);
      <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'    padding: 0.85rem 1.7rem;']) ?>
    </div>
    <?php } ?>
-   
+
     <!-- DataTable starts -->
     <div class="table-responsive">
 
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'rowOptions' => function($model) {
+                $url = Url::to(['category/update', 'id' => $model->category_id, 'restaurantUuid' => $model->restaurant_uuid]);
+
+                return [
+                    'onclick' => "window.location.href='{$url}'"
+                ];
+            },
             'columns' => [
               ['class' => 'yii\grid\SerialColumn'],
 
