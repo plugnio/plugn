@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use common\models\Order;
 use yii\widgets\ActiveForm;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\OrderSearch */
@@ -16,6 +17,15 @@ $js = "
 $(function () {
   $('.summary').insertAfter('.top');
 });
+
+
+$('td').click(function (e) {
+      var restaurant_uuid = '$restaurant_model->restaurant_uuid';
+       var id = $(this).closest('tr').data('id');
+       if(e.target == this)
+           location.href = '" . Url::to(['order/view']) . "&id=' + id + '&restaurantUuid=' + restaurant_uuid;
+   });
+
 ";
 $this->registerJs($js);
 
@@ -34,6 +44,9 @@ $this->registerJs($js);
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'rowOptions'   => function ($model, $key, $index, $grid) {
+               return ['data-id' => $model->order_uuid];
+           },
             'columns' => [
               ['class' => 'yii\grid\SerialColumn'],
 
@@ -42,6 +55,13 @@ $this->registerJs($js);
                     "format" => "raw",
                     "value" => function($model) {
                         return '#' . $model->order_uuid;
+                    }
+                ],
+                [
+                    'attribute' => 'order_created_at',
+                    "format" => "raw",
+                    "value" => function($model) {
+                        return  date('h:i A - M d', strtotime($model->order_created_at));
                     }
                 ],
                 [
@@ -55,6 +75,14 @@ $this->registerJs($js);
                         return $data->customer_id ? true : false;
                     },
                 ],
+                'customer_phone_number',
+                [
+                    'label' => 'When',
+                    'format' => 'raw',
+                    'value' => function ($data) {
+                            return $data->is_order_scheduled ? 'Scheduled' : 'As soon as possible';
+                    },
+                ],
                 [
                     'label' => 'Payment',
                     "format" => "raw",
@@ -66,7 +94,6 @@ $this->registerJs($js);
                     },
                 ],
                 'total_price:currency',
-                'order_created_at:datetime',
                 [
                     'header' => 'Action',
                     'class' => 'yii\grid\ActionColumn',
