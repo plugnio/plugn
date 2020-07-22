@@ -227,14 +227,14 @@ use common\models\Restaurant;
                 ], false)->label(false)
         ?>
 
-        <?=
-        $form->field($model, 'schedule_order', [
-            'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Schedule Order</span>{input}<label class='custom-control-label' for='scheduleOrder'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
-        ])->checkbox([
-            'checked' => $model->schedule_order == 0 ? false : true,
-            'id' => 'scheduleOrder',
-            'class' => 'custom-control-input'
-                ], false)->label(false)
+        <?php
+        // echo $form->field($model, 'schedule_order', [
+        //     'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Schedule Order</span>{input}<label class='custom-control-label' for='scheduleOrder'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
+        // ])->checkbox([
+        //     'checked' => $model->schedule_order == 0 ? false : true,
+        //     'id' => 'scheduleOrder',
+        //     'class' => 'custom-control-input'
+        //         ], false)->label(false)
         ?>
 
         <?=

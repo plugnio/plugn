@@ -48,7 +48,7 @@ $this->registerJs($js);
         GridView::widget([
             'dataProvider' => $dataProvider,
             'columns' => [
-              ['class' => 'yii\grid\SerialColumn'],
+              'sort_number',
               [
                   'attribute' => 'Image',
                   'format' => 'html',
