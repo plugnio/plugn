@@ -5,6 +5,7 @@ use yii\grid\GridView;
 use common\models\Order;
 use yii\widgets\ActiveForm;
 use kartik\daterange\DateRangePicker;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\OrderSearch */
