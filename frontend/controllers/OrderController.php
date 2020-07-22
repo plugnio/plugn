@@ -301,6 +301,7 @@ class OrderController extends Controller {
         $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
 
         $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
+    $model->is_order_scheduled = 0;
 
         if ($model->load(Yii::$app->request->post())) {
             $model->payment_method_id = 3;
