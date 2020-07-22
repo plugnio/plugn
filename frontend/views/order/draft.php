@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use common\models\Order;
 use yii\widgets\ActiveForm;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\OrderSearch */
