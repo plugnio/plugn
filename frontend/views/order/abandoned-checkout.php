@@ -19,12 +19,7 @@ $(function () {
 });
 
 
-$('td').click(function (e) {
-      var restaurant_uuid = '$restaurant_model->restaurant_uuid';
-       var id = $(this).closest('tr').data('id');
-       if(e.target == this)
-           location.href = '" . Url::to(['order/view']) . "?id=' + id + '&restaurantUuid=' + restaurant_uuid;
-   });
+
 
 ";
 $this->registerJs($js);
@@ -44,9 +39,14 @@ $this->registerJs($js);
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
-            'rowOptions'   => function ($model, $key, $index, $grid) {
-               return ['data-id' => $model->order_uuid];
-           },
+            'rowOptions' => function($model) {
+        $url = Url::to(['order/view', 'id' => $model->order_uuid , 'restaurantUuid' => $model->restaurant_uuid]);
+
+        return [
+            'onclick' => "window.location.href='{$url}'"
+        ];
+    },
+
             'columns' => [
               ['class' => 'yii\grid\SerialColumn'],
 
