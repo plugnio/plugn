@@ -23,7 +23,7 @@ $('td').click(function (e) {
       var restaurant_uuid = '$restaurant_model->restaurant_uuid';
        var id = $(this).closest('tr').data('id');
        if(e.target == this)
-           location.href = '" . Url::to(['order/view']) . "&id=' + id + '&restaurantUuid=' + restaurant_uuid;
+           location.href = '" . Url::to(['order/view']) . "?id=' + id + '&restaurantUuid=' + restaurant_uuid;
    });
 
 ";
