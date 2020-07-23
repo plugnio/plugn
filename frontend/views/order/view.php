@@ -16,6 +16,17 @@ $this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index', 'resta
 $this->params['breadcrumbs'][] = $this->title;
 
 \yii\web\YiiAsset::register($this);
+
+
+$js = "
+$(function () {
+  $('.summary').insertAfter('.top');
+  $('.top').css('display', 'none');
+});
+
+";
+$this->registerJs($js);
+
 ?>
 
 
@@ -38,19 +49,19 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?php
               if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT) {
-                  echo Html::a('<i class="feather icon-file-text"></i> View Invoice', ['view-invoice',  'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], ['class' => 'btn btn-outline-primary']);
+                  echo Html::a('<i class="feather icon-file-text"></i> View Invoice', ['view-invoice',  'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], ['class' => 'btn btn-outline-primary mr-1 mb-1' , 'style' => 'margin-right: 7px']);
               }
         ?>
 
         <?php
               if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT) {
-                  echo Html::a('Update', ['update', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid,], ['class' => 'btn btn-primary', 'style'=>'margin-left: 5px;']);
+                  echo Html::a('Update', ['update', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid,], ['class' => 'btn btn-primary mr-1 mb-1', 'style'=>'margin-right: 7px;']);
               }
         ?>
 
         <?php
               if ($model->latitude  && $model->longitude  ) {
-                  echo Html::a('Get directions', 'https://www.google.com/maps/search/?api=1&query=' . $model->latitude  . ',' . $model->longitude, ['class' => 'btn btn-warning', 'style'=>'margin-left: 5px;']) ;
+                  echo Html::a('Get directions', 'https://www.google.com/maps/search/?api=1&query=' . $model->latitude  . ',' . $model->longitude, ['class' => 'btn btn-warning mr-1 mb-1', 'style'=>'margin-right: 7px;']);
               }
         ?>
 
@@ -68,10 +79,25 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
         if ($difference <= 1 && $model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->armada_api_key != null && $model->tracking_link == null) {
-            echo Html::a('Request a driver', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary']);
+            echo Html::a('Request a driver', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary mr-1 mb-1', 'style'=>'margin-right: 7px;']);
         }
         ?>
+
+
+        <?=
+        Html::a('Delete', ['delete', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
+            'class' => 'btn btn-danger mr-1 mb-1',
+            'data' => [
+                'confirm' => 'Are you sure you want to delete this order?',
+                'method' => 'post',
+            ],
+       'style'=>'margin-right: 7px;'
+     ]);
+        ?>
+
     </p>
+
+
 
 </div>
 
@@ -92,19 +118,19 @@ $this->params['breadcrumbs'][] = $this->title;
 
                   if (($model->order_status  != Order::STATUS_PARTIALLY_REFUNDED && $model->order_status  != Order::STATUS_REFUNDED  && $model->order_status  != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status  != Order::STATUS_DRAFT)) {
                       if ($model->order_status != Order::STATUS_BEING_PREPARED) {
-                          echo Html::a('Being Prepared', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_BEING_PREPARED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-primary']);
+                          echo Html::a('Being Prepared', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_BEING_PREPARED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-primary mr-1 mb-1']);
                       }
 
                       if ($model->order_status != Order::STATUS_OUT_FOR_DELIVERY) {
-                          echo Html::a('Out for Delivery', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_OUT_FOR_DELIVERY], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-info']);
+                          echo Html::a('Out for Delivery', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_OUT_FOR_DELIVERY], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-info mr-1 mb-1']);
                       }
 
                       if ($model->order_status != Order::STATUS_COMPLETE) {
-                          echo Html::a('Mark as Complete', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_COMPLETE], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
+                          echo Html::a('Mark as Complete', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_COMPLETE], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success mr-1 mb-1']);
                       }
 
                      if ($model->order_status != Order::STATUS_CANCELED) {
-                         echo Html::a('Mark as cancelled', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_CANCELED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-danger']);
+                         echo Html::a('Mark as cancelled', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_CANCELED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-danger mr-1 mb-1']);
                      }
                   }
                 ?>
@@ -129,7 +155,7 @@ $this->params['breadcrumbs'][] = $this->title;
                           'attribute' => 'order_created_at',
                             "format" => "raw",
                             "value" => function($model) {
-                                return  date('h:i A - d M, Y', strtotime($model->order_created_at));
+                                return  date('l d M, Y - h:i A', strtotime($model->order_created_at));
                             }
                         ],
                         [
@@ -143,7 +169,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'estimated_time_of_arrival',
                             "format" => "raw",
                             "value" => function($model) {
-                                return  date('h:i A - d M, Y', strtotime($model->estimated_time_of_arrival));
+                                return  date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival));
                             }
                         ],
                         [
@@ -171,10 +197,11 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
     <?php if ($orderItems->totalCount > 0) { ?>
+      <section id="data-list-view" class="data-list-view-header">
+
     <div class="card">
         <div class="card-body">
-            <div class="box-body table-responsive no-padding">
-
+          <div class="box-body table-responsive no-padding">
 
                 <?=
                 GridView::widget([
@@ -220,7 +247,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format' => 'currency'
                         ],
                     ],
-                    'layout' => '{items}{pager} ',
+                    'layout' => '{items}{pager}',
                     'tableOptions' => ['class' => 'table table-bordered table-hover'],
                 ]);
 
@@ -229,6 +256,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
     </div>
+  </section>
   <?php } ?>
 
     <?php

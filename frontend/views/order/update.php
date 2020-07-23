@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Order */
@@ -54,6 +55,13 @@ $this->registerJs($js);
             <?=
             GridView::widget([
                 'dataProvider' => $ordersItemDataProvider,
+                'rowOptions' => function($model) {
+                    $url = Url::to(['order-item/view', 'id' => $model->order_item_id, 'restaurantUuid' => $model->item->restaurant_uuid]);
+
+                    return [
+                        'onclick' => "window.location.href='{$url}'"
+                    ];
+                },
                 'columns' => [
                   ['class' => 'yii\grid\SerialColumn'],
                   'item_name',
@@ -76,37 +84,6 @@ $this->registerJs($js);
                       },
                       'format' => 'raw'
                   ],
-                    [
-                        'header' => 'Action',
-                        'class' => 'yii\grid\ActionColumn',
-                        'template' => ' {view} {update} {delete}',
-                        'buttons' => [
-                            'view' => function ($url, $model) {
-                                return Html::a(
-                                                '<span style="margin-right: 20px;"><i class="feather icon-eye"></i></span>', ['order-item/view', 'id' => $model->order_item_id, 'restaurantUuid' => $model->restaurant->restaurant_uuid], [
-                                            'data-pjax' => '0',
-                                                ]
-                                );
-                            },
-                            'update' => function ($url, $model) {
-                                return Html::a(
-                                                '<span style="margin-right: 20px;"><i class="feather icon-edit"></i></span>', ['order-item/update', 'id' => $model->order_item_id, 'restaurantUuid' => $model->restaurant->restaurant_uuid], [
-                                            'data-pjax' => '0',
-                                                ]
-                                );
-                            },
-                            'delete' => function ($url, $model) {
-                                return Html::a(
-                                                '<span style="margin-right: 20px;color: red;"><i class="feather icon-trash"></i></span>', ['order-item/delete', 'id' => $model->order_item_id, 'restaurantUuid' => $model->restaurant->restaurant_uuid], [
-                                            'title' => 'Delete',
-                                            'data' => [
-                                                'confirm' => 'Are you absolutely sure ? You will lose all the information about this option with this action.',
-                                                'method' => 'post',
-                                            ],
-                                ]);
-                            },
-                        ],
-                    ],
                 ],
                 'layout' => '{summary}{items}{pager}',
                 'tableOptions' => ['class' => 'table data-list-view'],

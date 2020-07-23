@@ -29,9 +29,9 @@ $this->registerJs($js);
 
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->order_item_id, 'restaurantUuid' =>$model->restaurant->restaurant_uuid ], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Update', ['update', 'id' => $model->order_item_id, 'restaurantUuid' =>$model->restaurant->restaurant_uuid ], ['class' => 'btn btn-primary  mr-1 mb-1']) ?>
         <?= Html::a('Delete', ['delete', 'id' => $model->order_item_id, 'restaurantUuid' =>$model->restaurant->restaurant_uuid], [
-            'class' => 'btn btn-danger',
+            'class' => 'btn btn-danger  mr-1 mb-1',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
                 'method' => 'post',
@@ -101,7 +101,7 @@ $this->registerJs($js);
                            'buttons' => [
                                'delete' => function ($url, $model) {
                                    return Html::a(
-                                       '<span style="margin-right: 20px; color: red;" class="nav-icon fa fa-trash"></span>',
+                                       '<span style="margin-right: 20px; color: red;" class="feather icon-trash"></span>',
                                        ['order-item-extra-option/delete', 'id' => $model->order_item_extra_option_id ,'restaurantUuid' =>$model->restaurant->restaurant_uuid],
                                        [
                                                'title' => 'Delete',
@@ -111,6 +111,10 @@ $this->registerJs($js);
                                                ],
                                    ]
                                    );
+
+
+
+
                                },
                            ],
                        ],

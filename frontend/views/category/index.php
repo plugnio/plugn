@@ -61,45 +61,17 @@ $this->registerJs($js);
                 ];
             },
             'columns' => [
-              ['class' => 'yii\grid\SerialColumn'],
-
-
+              [
+                  'label' => 'Sort #',
+                  'format' => 'html',
+                  'value' => function ($data) {
+                      return $data->sort_number;
+                  },
+              ],
                 'title',
                 'title_ar',
                 'subtitle',
                 'subtitle_ar',
-                [
-                    'label' => 'Sort #',
-                    'format' => 'html',
-                    'value' => function ($data) {
-                        return $data->sort_number;
-                    },
-                ],
-                [
-                    'header' => 'Actions',
-                    'class' => 'yii\grid\ActionColumn',
-                    'template' => ' {view} {update} {delete}',
-                    'buttons' => [
-                        'update' => function ($url, $model) {
-                            return Html::a(
-                                            '<span style="margin-right: 20px;" class="feather icon-edit"></span>', ['update', 'id' => $model->category_id, 'restaurantUuid' => $model->restaurant_uuid], [
-                                        'title' => $url,
-                                        'data-pjax' => '0',
-                                            ]
-                            );
-                        },
-                        'delete' => function ($url, $model) {
-                            return Html::a(
-                                            '<span style="margin-right: 20px;color: red;" class="feather icon-trash"></span>', ['delete', 'id' => $model->category_id, 'restaurantUuid' => $model->restaurant_uuid], [
-                                        'title' => 'Delete',
-                                        'data' => [
-                                            'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',
-                                            'method' => 'post',
-                                        ],
-                            ]);
-                        },
-                    ],
-                ],
             ],
             'layout' => '{summary}{items}{pager}',
             'tableOptions' => ['class' => 'table data-list-view'],

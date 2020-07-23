@@ -15,6 +15,18 @@ $this->params['breadcrumbs'][] = 'Update';
 ?>
 <div class="item-update">
 
+    <p>
+      <?=
+      Html::a('Delete', ['delete', 'id' => $modelItem->item_uuid, 'restaurantUuid' => $restaurantUuid], [
+          'class' => 'btn btn-danger',
+          'data' => [
+              'confirm' => 'Are you sure you want to delete this item?',
+              'method' => 'post',
+          ],
+      ])
+      ?>
+  </p>
+
     <?= $this->render('_form', [
                     'modelItem' => $modelItem,
                     'modelsOption' => (empty($modelsOption)) ? [new Option] : $modelsOption,

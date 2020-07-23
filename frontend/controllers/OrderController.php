@@ -197,7 +197,7 @@ class OrderController extends Controller {
             $order_model->save(false);
             $successMessage = 'Your request has been successfully submitted';
         } else {
-          
+
             if ($createDeliveryApiResponse->client)
                 $errorMessage = 'Invalid api key';
             else if ($createDeliveryApiResponse->data['errors'])
@@ -241,7 +241,7 @@ class OrderController extends Controller {
         // Item
         $orderItems = new \yii\data\ActiveDataProvider([
             'query' => $order_model->getOrderItems(),
-            'sort' => false
+            'sort' => false,
         ]);
 
         // Item extra optn
@@ -271,12 +271,14 @@ class OrderController extends Controller {
         // Item
         $orderItems = new \yii\data\ActiveDataProvider([
             'query' => $order_model->getOrderItems(),
-            'sort' => false
+            'sort' => false,
+            'pagination' => false
         ]);
 
         // Item extra optn
         $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
-            'query' => $order_model->getOrderItemExtraOptions()
+            'query' => $order_model->getOrderItemExtraOptions(),
+            'pagination' => false
         ]);
 
         return $this->render('view', [
@@ -346,7 +348,9 @@ class OrderController extends Controller {
 
         // order's Item
         $ordersItemDataProvider = new \yii\data\ActiveDataProvider([
-            'query' => $model->getOrderItems()
+            'query' => $model->getOrderItems(),
+            'pagination' => false
+
         ]);
 
 

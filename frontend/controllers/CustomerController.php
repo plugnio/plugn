@@ -69,6 +69,7 @@ class CustomerController extends Controller {
         // Customer's Orders Data
         $customersOrdersData = new \yii\data\ActiveDataProvider([
             'query' => $model->getOrders()->orderBy(['order_created_at' => SORT_ASC]),
+            'pagination' => false
         ]);
 
 

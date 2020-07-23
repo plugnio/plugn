@@ -67,7 +67,8 @@ class RestaurantController extends Controller {
 
         // Store theme color
         $storeThemeColors = new \yii\data\ActiveDataProvider([
-            'query' => $model->getRestaurantTheme()
+            'query' => $model->getRestaurantTheme(),
+            'pagination' => false
         ]);
 
 
@@ -198,7 +199,7 @@ class RestaurantController extends Controller {
     public function actionSendEmailToTap($id) {
         $model = $this->findModel($id);
         $model->sendStoreDataToTap();
-        
+
         return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
     }
 

@@ -126,7 +126,7 @@ GridView::widget([
             'attribute' => 'order_created_at',
             "format" => "raw",
             "value" => function($model) {
-                return date('h:i A - M d', strtotime($model->order_created_at));
+                return date('d M - h:i A', strtotime($model->order_created_at));
             }
         ],
         [
@@ -208,37 +208,6 @@ GridView::widget([
             },
         ],
         'total_price:currency',
-        [
-            'header' => 'Action',
-            'class' => 'yii\grid\ActionColumn',
-            'template' => ' {view} {update} {delete}',
-            'buttons' => [
-                'view' => function ($url, $model) {
-                    return Html::a(
-                                    '<span style="margin-right: 20px;"><i class="feather icon-eye"></i></span>', ['view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
-                                'data-pjax' => '0',
-                                    ]
-                    );
-                },
-                'update' => function ($url, $model) {
-                    return Html::a(
-                                    '<span style="margin-right: 20px;"><i class="feather feather icon-printer"></i></span>', ['view-invoice', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
-                                'data-pjax' => '0',
-                                    ]
-                    );
-                },
-                'delete' => function ($url, $model) {
-                    return Html::a(
-                                    '<span style="margin-right: 20px;color: red;"><i class="feather icon-trash"></i></span>', ['delete', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
-                                'title' => 'Delete',
-                                'data' => [
-                                    'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',
-                                    'method' => 'post',
-                                ],
-                    ]);
-                },
-            ],
-        ],
     ],
     'layout' => '{summary}{items}{pager}',
     'tableOptions' => ['class' => 'table data-list-view'],

@@ -16,7 +16,7 @@ use common\models\Agent;
 class AgentAssignmentController extends Controller {
 
      public $enableCsrfValidation = false;
-     
+
     /**
      * {@inheritdoc}
      */
@@ -38,6 +38,7 @@ class AgentAssignmentController extends Controller {
     public function actionIndex() {
         $dataProvider = new ActiveDataProvider([
             'query' => AgentAssignment::find(),
+            'pagination' => false
         ]);
 
         return $this->render('index', [

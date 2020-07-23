@@ -12,6 +12,18 @@ $this->params['breadcrumbs'][] = ['label' => 'Categories', 'url' => ['index', 'r
 $this->params['breadcrumbs'][] = 'Update';
 ?>
 <div class="category-update">
+  
+  <p>
+      <?=
+      Html::a('Delete', ['delete', 'id' => $model->category_id, 'restaurantUuid' => $model->restaurant_uuid], [
+          'class' => 'btn btn-danger',
+          'data' => [
+              'confirm' => 'Are you sure you want to delete this category?',
+              'method' => 'post',
+          ],
+      ])
+      ?>
+  </p>
 
     <?= $this->render('_form', [
         'model' => $model,

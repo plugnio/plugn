@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\grid\GridView;
 use common\models\Order;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Customer */
@@ -63,6 +64,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?=
                 GridView::widget([
                     'dataProvider' => $customersOrdersData,
+                    'rowOptions' => function($model) {
+                        $url = Url::to(['order/update', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid]);
+
+                        return [
+                            'onclick' => "window.location.href='{$url}'"
+                        ];
+                    },
                     'columns' => [
                       ['class' => 'yii\grid\SerialColumn'],
                       [
@@ -115,22 +123,6 @@ $this->params['breadcrumbs'][] = $this->title;
                               return Yii::$app->formatter->asRelativeTime($model->order_created_at);
                           }
                       ],
-                        [
-                            'header' => 'Action',
-                            'class' => 'yii\grid\ActionColumn',
-                            'template' => ' {view} {update} {delete}',
-                            'controller' => 'order',
-                            'buttons' => [
-                                'view' => function ($url, $model) {
-                                  return Html::a(
-                                                  '<span style="margin-right: 20px;" class="nav-icon fa fa-eye"></span>', ['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
-                                              'title' => 'View',
-                                              'data-pjax' => '0',
-                                                  ]
-                                    );
-                                },
-                            ],
-                        ],
                     ],
                     'layout' => '{summary}{items}{pager}',
                     'tableOptions' => ['class' => 'table data-list-view'],
@@ -142,3 +134,4 @@ $this->params['breadcrumbs'][] = $this->title;
 
           </section>
         <!-- Data list view end -->
+      </div>

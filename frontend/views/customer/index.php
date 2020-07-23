@@ -62,31 +62,12 @@ $this->registerJs($js);
                           return  $model->getOrders()->count();
                       }
                   ],
-                  'customer_created_at',
                   [
-                      'header' => 'Actions',
-                      'class' => 'yii\grid\ActionColumn',
-                      'template' => ' {view} {update} {delete}',
-                      'buttons' => [
-                          'view' => function ($url, $model) {
-                              return Html::a(
-                                              '<span style="margin-right: 20px;" class="feather icon-eye"></span>', ['view', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
-                                          'title' => 'View',
-                                          'data-pjax' => '0',
-                                              ]
-                              );
-                          },
-                          'delete' => function ($url, $model) {
-                              return Html::a(
-                                              '<span style="margin-right: 20px;color: red;" class="feather icon-trash"></span>', ['delete', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
-                                          'title' => 'Delete',
-                                          'data' => [
-                                              'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',
-                                              'method' => 'post',
-                                          ],
-                              ]);
-                          },
-                      ],
+                      'attribute' => 'customer_created_at',
+                      "format" => "raw",
+                      "value" => function($model) {
+                          return date('d M, Y - h:i A', strtotime($model->customer_created_at));
+                      }
                   ],
               ],
             'layout' => '{summary}{items}{pager}',
