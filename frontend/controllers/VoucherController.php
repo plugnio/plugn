@@ -76,8 +76,12 @@ class VoucherController extends Controller
           $model->restaurant_uuid = $restaurantUuid;
 
 
-          if ($model->load(Yii::$app->request->post()) && $model->save()) {
-              return $this->redirect(['view', 'id' => $model->voucher_id, 'restaurantUuid' => $restaurantUuid]);
+          if ($model->load(Yii::$app->request->post())) {
+
+              list($model->valid_from, $model->valid_until) = explode(' - ', $model->duration);
+
+              if($model->save())
+                return $this->redirect(['view', 'id' => $model->voucher_id, 'restaurantUuid' => $restaurantUuid]);
           }
 
           return $this->render('create', [
@@ -98,9 +102,13 @@ class VoucherController extends Controller
     public function actionUpdate($id, $restaurantUuid)
     {
         $model = $this->findModel($id, $restaurantUuid);
+        $model->duration =  date('Y-m-d', strtotime( $model->valid_from ))  . ' - '. date('Y-m-d', strtotime( $model->valid_until ));
+        
+        if ($model->load(Yii::$app->request->post())) {
+          list($model->valid_from, $model->valid_until) = explode(' - ', $model->duration);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->voucher_id]);
+          if($model->save())
+            return $this->redirect(['view', 'id' => $model->voucher_id, 'restaurantUuid' => $restaurantUuid]);
         }
 
         return $this->render('update', [

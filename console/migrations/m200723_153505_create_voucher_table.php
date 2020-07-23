@@ -33,6 +33,8 @@ class m200723_153505_create_voucher_table extends Migration {
             'max_redemption' => $this->integer()->defaultValue(0), //unlimited
             'limit_per_customer' => $this->integer()->defaultValue(0), //unlimited
             'minimum_order_amount' => $this->integer()->defaultValue(0),
+            'voucher_created_at' => $this->dateTime(),
+            'voucher_updated_at' => $this->dateTime(),
         ],$tableOptions);
 
 

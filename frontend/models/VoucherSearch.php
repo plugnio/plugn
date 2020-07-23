@@ -18,7 +18,7 @@ class VoucherSearch extends Voucher
     {
         return [
             [['voucher_id', 'discount_type', 'discount_amount','voucher_status', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'integer'],
-            [['restaurant_uuid', 'title', 'title_ar', 'code', 'valid_from', 'valid_until'], 'safe'],
+            [['restaurant_uuid', 'title', 'title_ar', 'code', 'valid_from', 'valid_until',  'voucher_created_at', 'voucher_updated_at'], 'safe'],
         ];
     }
 
@@ -68,6 +68,8 @@ class VoucherSearch extends Voucher
             'max_redemption' => $this->max_redemption,
             'limit_per_customer' => $this->limit_per_customer,
             'minimum_order_amount' => $this->minimum_order_amount,
+            'voucher_created_at' => $this->voucher_created_at,
+            'voucher_updated_at' => $this->voucher_updated_at,
         ]);
 
         $query->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])

@@ -2,6 +2,8 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\helpers\Url;
+use common\models\Voucher;
 
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\VoucherSearch */
@@ -10,14 +12,16 @@ $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
 
 $this->title = 'Vouchers';
 $this->params['breadcrumbs'][] = $this->title;
+
+$js = "
+$(function () {
+  $('.summary').insertAfter('.top');
+});
+";
+$this->registerJs($js);
+
 ?>
 <section id="data-list-view" class="data-list-view-header">
-
-  <?php if($dataProvider->getCount() == 0 ){  ?>
-    <div style="padding-left:14px">
-    <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'    padding: 0.85rem 1.7rem;']) ?>
-  </div>
-  <?php } ?>
 
   <!-- Data list view starts -->
   <div class="action-btns d-none">
@@ -27,6 +31,15 @@ $this->params['breadcrumbs'][] = $this->title;
           </div>
       </div>
   </div>
+
+
+
+     <?php if($dataProvider->getCount() == 0 ){  ?>
+       <div style="padding-left:14px">
+       <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'    padding: 0.85rem 1.7rem;']) ?>
+     </div>
+     <?php } ?>
+
 
   <div class="table-responsive">
 
@@ -42,20 +55,64 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
             'code',
-            'restaurant_uuid',
+            [
+                'label' => 'Redeemed',
+                "format" => "raw",
+                "value" => function($model) {
+                    return $model->getCustomerVouchers()->count();
+                }
+            ],
             'max_redemption',
-            'discount_amount',
+            [
+                'label' => 'Amount',
+                "format" => "raw",
+                "value" => function($model) {
+                    return   $model->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? $model->discount_amount . '%' : $model->discount_amount;
+                }
+            ],
             'minimum_order_amount',
-            'voucher_status',
+            [
+                'attribute' => 'voucher_status',
+                "format" => "raw",
+                "value" => function($model) {
+                    if ($model->voucher_status == Voucher::VOUCHER_STATUS_ACTIVE) {
+                        return '<div class="chip chip-success mr-1">
+                                          <div class="chip-body">
+                                              <span style="white-space: pre;" class="chip-text">' . $model->voucherStatus . '</span>
+                                          </div>
+                                      </div>';
+                    } else if ($model->voucher_status == Voucher::VOUCHER_STATUS_EXPIRED) {
+                        return '<div class="chip chip-danger mr-1">
+                                          <div class="chip-body">
+                                              <span class="chip-text" style="white-space: pre;">' . $model->voucherStatus . '</span>
+                                          </div>
+                                      </div>';
+                    }
+
+                }
+            ],
+            [
+                'attribute' => 'valid_from',
+                "format" => "raw",
+                "value" => function($model) {
+                    return date('Y-m-d', strtotime($model->valid_from));
+                }
+            ],
+            [
+                'attribute' => 'valid_until',
+                "format" => "raw",
+                "value" => function($model) {
+                    return date('Y-m-d', strtotime($model->valid_until));
+                }
+            ],
             //'discount_type',
-            //'start_at',
-            //'expiry_date',
             //'max_redemption',
             //'limit_per_customer',
             //'minimum_order_amount',
+          ],
+            'layout' => '{summary}{items}{pager}',
+            'tableOptions' => ['class' => 'table data-list-view']
 
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
     ]); ?>
 
 
