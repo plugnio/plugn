@@ -301,7 +301,7 @@ use common\models\Order;
                                                                             </tr>
                                                                             <tr>
                                                                                 <td align="left" style="font-size:0px;padding:10px 25px;padding-bottom:0;word-break:break-word;">
-                                                                                    <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">Date: <?= \Yii::$app->formatter->asDate('2020-04-21 20:59:24', 'medium'); ?></div>
+                                                                                    <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">Date: <?= \Yii::$app->formatter->asDate($order->order_created_at, 'medium'); ?></div>
                                                                                 </td>
                                                                             </tr>
                                                                             <tr>
