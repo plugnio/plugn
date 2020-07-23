@@ -120,7 +120,7 @@ $this->params['breadcrumbs'][] = $this->title;
                           'attribute' => 'order_created_at',
                           "format" => "raw",
                           "value" => function($model) {
-                              return Yii::$app->formatter->asRelativeTime($model->order_created_at);
+                              return date('d M - h:i A', strtotime($model->order_created_at));
                           }
                       ],
                     ],
