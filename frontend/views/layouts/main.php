@@ -52,7 +52,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                             <ul class="nav navbar-nav">
                                 <li class="nav-item mobile-menu d-xl-none mr-auto"><a class="nav-link nav-menu-main menu-toggle hidden-xs" href="#"><i class="ficon feather icon-menu"></i></a></li>
                             </ul>
-                        
+
                         </div>
 
 
@@ -249,6 +249,15 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         Html::a(
                                 Html::tag('i', '', ['class' => 'fa fa-truck']) .
                                 Html::tag('span', 'Delivery Zone'), ['restaurant-delivery/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                        )
+                        ?>
+                    </li>
+                    <li class=" nav-item <?= $this->context->route == 'voucher/index' ? 'active' : '' ?> ">
+
+                        <?=
+                        Html::a(
+                                Html::tag('i', '', ['class' => 'fa fa-tags']) .
+                                Html::tag('span', 'Vouchers'), ['voucher/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                         )
                         ?>
                     </li>

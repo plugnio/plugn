@@ -41,7 +41,7 @@ use yii\behaviors\AttributeBehavior;
  * @property boolean $is_order_scheduled
  * @property datetime $scheduled_time_start_from
  * @property datetime $scheduled_time_to
-
+ * @property int|null $voucher_id
  * @property int $subtotal_before_refund
  * @property int $total_price_before_refund
  * @property int $restaurant_branch_id
@@ -55,13 +55,14 @@ use yii\behaviors\AttributeBehavior;
  * @property Restaurant $restaurant
  * @property RestaurantDelivery $restaurantDelivery
  * @property Payment $payment
+ * @property Voucher $voucher
  * @property Refund[] $refunds
  * @property RefundedItem[] $refundedItems
  * @property OrderItem[] $orderItems
  */
 class Order extends \yii\db\ActiveRecord {
 
-    const STATUS_DRAFT  = 0;
+    const STATUS_DRAFT = 0;
     const STATUS_PENDING = 1;
     const STATUS_BEING_PREPARED = 2;
     const STATUS_OUT_FOR_DELIVERY = 3;
@@ -70,8 +71,6 @@ class Order extends \yii\db\ActiveRecord {
     const STATUS_PARTIALLY_REFUNDED = 6;
     const STATUS_REFUNDED = 7;
     const STATUS_ABANDONED_CHECKOUT = 9;
-
-
     const ORDER_MODE_DELIVERY = 1;
     const ORDER_MODE_PICK_UP = 2;
     const SCENARIO_CREATE_ORDER_BY_ADMIN = 'manual';
@@ -88,20 +87,20 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['customer_name', 'customer_phone_number', 'order_mode','is_order_scheduled'], 'required'],
+            [['customer_name', 'customer_phone_number', 'order_mode', 'is_order_scheduled'], 'required'],
             [['payment_method_id'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer', 'min' => 0],
-            [['items_has_been_restocked','is_order_scheduled'], 'integer'],
-            ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_PARTIALLY_REFUNDED,self::STATUS_CANCELED, self::STATUS_DRAFT, self::STATUS_ABANDONED_CHECKOUT]],
+            [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id'], 'integer'],
+            ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_PARTIALLY_REFUNDED, self::STATUS_CANCELED, self::STATUS_DRAFT, self::STATUS_ABANDONED_CHECKOUT]],
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
             ['restaurant_branch_id', function ($attribute, $params, $validator) {
                     if (!$this->restaurant_branch_id && $this->order_mode == Order::ORDER_MODE_PICK_UP)
                         $this->addError($attribute, 'Branch name cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
-            [['scheduled_time_start_from','scheduled_time_to'], function ($attribute, $params, $validator) {
-                    if ($this->is_order_scheduled && (!$this->scheduled_time_start_from || !$this->scheduled_time_to) )
+            [['scheduled_time_start_from', 'scheduled_time_to'], function ($attribute, $params, $validator) {
+                    if ($this->is_order_scheduled && (!$this->scheduled_time_start_from || !$this->scheduled_time_to))
                         $this->addError($attribute, $attribute . ' cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['area_id', function ($attribute, $params, $validator) {
@@ -129,14 +128,14 @@ class Order extends \yii\db\ActiveRecord {
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['customer_phone_number'], 'string', 'min' => 8, 'max' => 8],
             [['customer_phone_number'], 'number'],
-            [['total_price', 'total_price_before_refund','delivery_fee', 'subtotal', 'subtotal_before_refund'], 'number', 'min' => 0],
+            [['total_price', 'total_price_before_refund', 'delivery_fee', 'subtotal', 'subtotal_before_refund'], 'number', 'min' => 0],
             ['subtotal', 'validateMinCharge', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN, 'when' => function($model) {
                     return $model->order_mode == static::ORDER_MODE_DELIVERY;
                 }],
             [['customer_email'], 'email'],
             [['payment_method_id'], 'validatePaymentMethodId', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['payment_uuid'], 'string', 'max' => 36],
-            [['estimated_time_of_arrival','scheduled_time_start_from','scheduled_time_to',  'latitude', 'longitude'], 'safe'],
+            [['estimated_time_of_arrival', 'scheduled_time_start_from', 'scheduled_time_to', 'latitude', 'longitude'], 'safe'],
             [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
             [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name', 'payment_method_name_ar', 'tracking_link'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
@@ -144,6 +143,7 @@ class Order extends \yii\db\ActiveRecord {
             [['payment_method_id'], 'exist', 'skipOnError' => false, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => false, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
             [['restaurant_branch_id'], 'exist', 'skipOnError' => false, 'targetClass' => RestaurantBranch::className(), 'targetAttribute' => ['restaurant_branch_id' => 'restaurant_branch_id']],
+            [['voucher_id'], 'exist', 'skipOnError' => true, 'targetClass' => Voucher::className(), 'targetAttribute' => ['voucher_id' => 'voucher_id']],
         ];
     }
 
@@ -277,7 +277,7 @@ class Order extends \yii\db\ActiveRecord {
             'longitude' => 'Longitude',
             'estimated_time_of_arrival' => 'Expected at',
             'is_order_scheduled' => 'Is order scheduled',
-
+            'voucher_id' => 'Voucher ID',
         ];
     }
 
@@ -337,23 +337,20 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function restockAllItems() {
 
-    $orderItems = $this->getOrderItems();
-    // die($orderItems->count());
+        $orderItems = $this->getOrderItems();
+        // die($orderItems->count());
 
-    if($orderItems->count() > 0 ){
-        foreach ($orderItems->all() as $orderItem)
-          if($orderItem->item_uuid){
-
-
-
-              $orderItem->item->increaseStockQty($orderItem->qty);
-              $this->items_has_been_restocked = true;
-              $this->save(false);
-
-          }
-      }
+        if ($orderItems->count() > 0) {
+            foreach ($orderItems->all() as $orderItem)
+                if ($orderItem->item_uuid) {
 
 
+
+                    $orderItem->item->increaseStockQty($orderItem->qty);
+                    $this->items_has_been_restocked = true;
+                    $this->save(false);
+                }
+        }
     }
 
     /**
@@ -372,9 +369,9 @@ class Order extends \yii\db\ActiveRecord {
             $this->delivery_fee = $this->restaurantDelivery->delivery_fee;
 
 
-        if($this->order_status != Order::STATUS_REFUNDED && $this->order_status != Order::STATUS_PARTIALLY_REFUNDED) {
-          $this->subtotal_before_refund = $this->calculateOrderItemsTotalPrice();
-          $this->total_price_before_refund = $this->calculateOrderTotalPrice();
+        if ($this->order_status != Order::STATUS_REFUNDED && $this->order_status != Order::STATUS_PARTIALLY_REFUNDED) {
+            $this->subtotal_before_refund = $this->calculateOrderItemsTotalPrice();
+            $this->total_price_before_refund = $this->calculateOrderTotalPrice();
         }
 
 
@@ -451,54 +448,49 @@ class Order extends \yii\db\ActiveRecord {
         return parent::beforeDelete();
     }
 
-    public function beforeSave($insert)
-    {
+    public function beforeSave($insert) {
         if (!parent::beforeSave($insert)) {
             return false;
         }
 
-        if($insert && $this->scenario == self::SCENARIO_CREATE_ORDER_BY_ADMIN)
-          $this->order_status = self::STATUS_DRAFT;
+        if ($insert && $this->scenario == self::SCENARIO_CREATE_ORDER_BY_ADMIN)
+            $this->order_status = self::STATUS_DRAFT;
 
 
         return true;
     }
 
-
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-        if (!$insert && $this->payment && $this->items_has_been_restocked && isset($changedAttributes['order_status']) &&  $changedAttributes['order_status'] == self::STATUS_ABANDONED_CHECKOUT) {
+        if (!$insert && $this->payment && $this->items_has_been_restocked && isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_ABANDONED_CHECKOUT) {
 
-          $orderItems = $this->getOrderItems();
+            $orderItems = $this->getOrderItems();
 
-              foreach ($orderItems->all() as $orderItem){
+            foreach ($orderItems->all() as $orderItem) {
 
-                if($orderItem->item_uuid){
+                if ($orderItem->item_uuid) {
 
-                  if($orderItem->item->stock_qty >= $orderItem->qty){
-                    $orderItem->item->decreaseStockQty($orderItem->qty);
-                  } else {
+                    if ($orderItem->item->stock_qty >= $orderItem->qty) {
+                        $orderItem->item->decreaseStockQty($orderItem->qty);
+                    } else {
 
-                    \Yii::$app->mailer->compose([
-                                'html' => 'out-of-stock-order-html',
-                                    ], [
-                                'order' => $this
-                            ])
-                            ->setFrom([\Yii::$app->params['supportEmail']])
-                            ->setTo([$this->restaurant->restaurant_email, \Yii::$app->params['supportEmail']])
-                            ->setSubject('Order #' . $this->order_uuid)
-                            ->send();
-
-                  }
-
+                        \Yii::$app->mailer->compose([
+                                    'html' => 'out-of-stock-order-html',
+                                        ], [
+                                    'order' => $this
+                                ])
+                                ->setFrom([\Yii::$app->params['supportEmail']])
+                                ->setTo([$this->restaurant->restaurant_email, \Yii::$app->params['supportEmail']])
+                                ->setSubject('Order #' . $this->order_uuid)
+                                ->send();
+                    }
                 }
-              }
+            }
 
 
-          $this->items_has_been_restocked = false;
-          $this->save(false);
-
+            $this->items_has_been_restocked = false;
+            $this->save(false);
         }
 
         if ($insert) {
@@ -507,10 +499,10 @@ class Order extends \yii\db\ActiveRecord {
                 //set ETA value
                 \Yii::$app->timeZone = 'Asia/Kuwait';
 
-                if($this->is_order_scheduled)
-                  $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($this->scheduled_time_start_from));
+                if ($this->is_order_scheduled)
+                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($this->scheduled_time_start_from));
                 else
-                  $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $this->restaurantDelivery->delivery_time . ' minutes',  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))  ));
+                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $this->restaurantDelivery->delivery_time . ' minutes', Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
 
 
 
@@ -520,7 +512,7 @@ class Order extends \yii\db\ActiveRecord {
             } else {
                 //set ETA value
                 \Yii::$app->timeZone = 'Asia/Kuwait';
-                $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $this->restaurantBranch->prep_time . ' minutes',  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
+                $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $this->restaurantBranch->prep_time . ' minutes', Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
 
                 $this->delivery_time = $this->restaurantBranch->prep_time;
             }
@@ -542,8 +534,8 @@ class Order extends \yii\db\ActiveRecord {
                 //Make sure customer name & email are correct
                 $this->customer_name = $customer_model->customer_name;
                 $this->customer_phone_number = $customer_model->customer_phone_number;
-                if($customer_model->customer_email != null)
-                 $this->customer_email = $customer_model->customer_email;
+                if ($customer_model->customer_email != null)
+                    $this->customer_email = $customer_model->customer_email;
             }
 
             $this->customer_id = $customer_model->customer_id;
@@ -652,18 +644,26 @@ class Order extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRefunds()
-    {
+    public function getRefunds() {
         return $this->hasMany(Refund::className(), ['order_uuid' => 'order_uuid']);
     }
 
+    /**
+     * Gets query for [[Voucher]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getVoucher()
+    {
+        return $this->hasOne(Voucher::className(), ['voucher_id' => 'voucher_id']);
+    }
+    
     /**
      * Gets query for [[RefundedItems]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRefundedItems()
-    {
+    public function getRefundedItems() {
         return $this->hasMany(RefundedItem::className(), ['order_uuid' => 'order_uuid']);
     }
 

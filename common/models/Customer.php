@@ -17,6 +17,7 @@ use yii\db\Expression;
  * @property string $customer_updated_at
  *
  * @property Order[] $orders
+ * @property CustomerVoucher[] $customerVouchers
  * @property Restaurant $restaurant
  */
 class Customer extends \yii\db\ActiveRecord {
@@ -80,7 +81,17 @@ class Customer extends \yii\db\ActiveRecord {
     public function getOrders() {
         return $this->hasMany(Order::className(), ['customer_id' => 'customer_id']);
     }
-
+    
+    /**
+     * Gets query for [[CustomerVouchers]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCustomerVouchers()
+    {
+        return $this->hasMany(CustomerVoucher::className(), ['customer_id' => 'customer_id']);
+    }
+    
     /**
      * Gets query for [[Orders]].
      *
