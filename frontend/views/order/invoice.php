@@ -224,12 +224,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                 </tr>
                                 <tr>
                                     <th>TOTAL</th>
-
-                                    <?php if ($model->voucher_id) { ?>
-                                        <td><?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount + $model->delivery_fee, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
-                                    <?php } else { ?>
-                                        <td><?= Yii::$app->formatter->asCurrency($model->total_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
-                                    <?php } ?>
+                                    <td><?= Yii::$app->formatter->asCurrency($model->total_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                                 </tr>
                             </tbody>
                         </table>

@@ -49,16 +49,20 @@ $this->registerJs($js);
     $form = ActiveForm::begin();
 
     echo $form->errorSummary($model);
-
-    echo $form->field($model, 'restaurant_delivery_area_array')->dropDownList(
-            $restaurantDeliveryArray, [
-        'class' => 'form-control select2',
-        'multiple' => 'multiple',
-        'value' => $sotredRestaurantDeliveryAreas
-            ]
-    );
     ?>
+    <div class="table-responsive">
 
+      <?php
+      echo $form->field($model, 'restaurant_delivery_area_array')->dropDownList(
+              $restaurantDeliveryArray, [
+          'class' => 'form-control select2',
+          'multiple' => 'multiple',
+          'value' => $sotredRestaurantDeliveryAreas
+              ]
+      );
+      ?>
+    </div>
+    
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>
