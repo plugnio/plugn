@@ -5,6 +5,7 @@ namespace api\modules\v1\controllers;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
+use common\models\Voucher;
 use common\models\Order;
 use common\models\OrderItem;
 use common\models\OrderItemExtraOption;
@@ -81,6 +82,10 @@ class OrderController extends Controller {
 
                 //save Customer address
                 $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
+
+                //Apply promo code
+                if(Yii::$app->request->getBodyParam("voucher_id"))
+                    $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
 
                 //Preorder
                 // if( Yii::$app->request->getBodyParam("is_order_scheduled") !== null)
@@ -395,6 +400,30 @@ class OrderController extends Controller {
             'operation' => 'success',
             'body' => $model
         ];
+    }
+
+    /**
+     * Whether is valid promo code or no
+     */
+    public function actionApplyPromoCode() {
+        $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
+        $phone_number = Yii::$app->request->get("phone_number");
+        $code = Yii::$app->request->get("code");
+
+        $voucher = Voucher::find()->where(['restaurant_uuid' => $restaurant_uuid, 'code' => $code, 'voucher_status' => Voucher::VOUCHER_STATUS_ACTIVE])->one();
+
+        if($voucher && $voucher->isValid($phone_number)){
+            return [
+                'operation' => 'success',
+                'voucher' => $voucher
+            ];
+        }
+
+        return [
+            'operation' => 'error',
+            'message' => 'Voucher code is invalid or expired'
+        ];
+
     }
 
     /**

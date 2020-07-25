@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\grid\GridView;
 use common\models\Order;
+use common\models\Voucher;
 
 $this->title = 'Invoice #' . $model->order_uuid;
 $this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index', 'restaurantUuid' => $model->restaurant_uuid]];
@@ -104,7 +105,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
                     <h6 class="mt-2">Expected at</h6>
                     <p>
-                      <?= \Yii::$app->formatter->asDatetime($model->estimated_time_of_arrival, 'MMM dd, yyyy h:mm a') ?>
+                        <?= \Yii::$app->formatter->asDatetime($model->estimated_time_of_arrival, 'MMM dd, yyyy h:mm a') ?>
                     </p>
 
 
@@ -202,13 +203,33 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                     <th>SUBTOTAL</th>
                                     <td><?= \Yii::$app->formatter->asCurrency($model->subtotal) ?></td>
                                 </tr>
+                                <?php
+                                if ($model->voucher_id) {
+                                    $voucherDiscount = $model->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($model->subtotal * ($model->voucher->discount_amount / 100)) : $model->voucher->discount_amount;
+                                    $subtotalAfterDiscount = $model->subtotal - $voucherDiscount;
+                                    ?>
+                                    <tr>
+                                        <th>Voucher Discount (<?= $model->voucher->code ?>)</th>
+                                        <td>-<?= Yii::$app->formatter->asCurrency($voucherDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Subtotal After Voucher</th>
+                                        <td><?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                                    </tr>
+                                <?php } ?>
+
                                 <tr>
                                     <th>Delivery fee</th>
                                     <td><?= \Yii::$app->formatter->asCurrency($model->delivery_fee) ?></td>
                                 </tr>
                                 <tr>
                                     <th>TOTAL</th>
-                                    <td><?= \Yii::$app->formatter->asCurrency($model->total_price) ?></td>
+
+                                    <?php if ($model->voucher_id) { ?>
+                                        <td><?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount + $model->delivery_fee, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                                    <?php } else { ?>
+                                        <td><?= Yii::$app->formatter->asCurrency($model->total_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                                    <?php } ?>
                                 </tr>
                             </tbody>
                         </table>

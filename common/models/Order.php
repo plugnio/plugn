@@ -134,6 +134,7 @@ class Order extends \yii\db\ActiveRecord {
                 }],
             [['customer_email'], 'email'],
             [['payment_method_id'], 'validatePaymentMethodId', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
+            [['voucher_id'], 'validateVoucherId', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['payment_uuid'], 'string', 'max' => 36],
             [['estimated_time_of_arrival', 'scheduled_time_start_from', 'scheduled_time_to', 'latitude', 'longitude'], 'safe'],
             [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
@@ -199,6 +200,18 @@ class Order extends \yii\db\ActiveRecord {
     public function validatePaymentMethodId($attribute) {
         if (!RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'payment_method_id' => $this->payment_method_id])->one())
             $this->addError($attribute, "Payment method id invalid.");
+    }
+
+    /**
+     * Validate promo code
+     * @param type $attribute
+     */
+    public function validateVoucherId($attribute) {
+
+        $voucher = Voucher::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'voucher_id' => $this->voucher_id, 'voucher_status' => Voucher::VOUCHER_STATUS_ACTIVE])->one();
+
+        if (!$voucher || !$response = $voucher->isValid($this->customer_phone_number))
+            $this->addError($attribute, "Voucher code is invalid or expired");
     }
 
     /**
@@ -423,16 +436,17 @@ class Order extends \yii\db\ActiveRecord {
      * Calculate order's total price
      */
     public function calculateOrderTotalPrice() {
-        $totalPrice = 0;
+        $totalPrice = $this->calculateOrderItemsTotalPrice();
 
-        foreach ($this->getOrderItems()->all() as $item) {
-            if ($item) {
-                $totalPrice += $item->calculateOrderItemPrice();
-            }
+        if($this->voucher){
+          $discountAmount = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->voucher->discount_amount /100)) : $this->voucher->discount_amount;
+          $totalPrice -= $discountAmount ;
         }
+
 
         if ($this->order_mode == static::ORDER_MODE_DELIVERY)
             $totalPrice += $this->restaurantDelivery->delivery_fee;
+
 
         return $totalPrice;
     }
@@ -455,6 +469,7 @@ class Order extends \yii\db\ActiveRecord {
 
         if ($insert && $this->scenario == self::SCENARIO_CREATE_ORDER_BY_ADMIN)
             $this->order_status = self::STATUS_DRAFT;
+
 
 
         return true;
@@ -539,6 +554,18 @@ class Order extends \yii\db\ActiveRecord {
             }
 
             $this->customer_id = $customer_model->customer_id;
+
+            if($this->voucher_id){
+
+                $voucher_model = Voucher::findOne($this->voucher_id);
+
+                if($voucher_model->isValid($this->customer_phone_number)){
+                  $customerVoucher = new CustomerVoucher();
+                  $customerVoucher->customer_id = $this->customer_id;
+                  $customerVoucher->voucher_id = $this->voucher_id;
+                  $customerVoucher->save();
+                }
+            }
 
 
             if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
@@ -657,7 +684,7 @@ class Order extends \yii\db\ActiveRecord {
     {
         return $this->hasOne(Voucher::className(), ['voucher_id' => 'voucher_id']);
     }
-    
+
     /**
      * Gets query for [[RefundedItems]].
      *

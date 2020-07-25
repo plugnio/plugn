@@ -5,78 +5,89 @@ use yii\widgets\ActiveForm;
 use common\models\Voucher;
 use kartik\daterange\DateRangePicker;
 
-
 /* @var $this yii\web\View */
 /* @var $model common\models\Voucher */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 <div class="card">
-<div class="card-body voucher-form">
+    <div class="card-body voucher-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+        <?php $form = ActiveForm::begin(); ?>
+        <div class="row">
+            <div class="col-12 col-sm-6 col-lg-6">
+                <?= $form->field($model, 'title')->textInput(['maxlength' => true, 'placeholder' => 'Free Delivery']) ?>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-6">
+                <?= $form->field($model, 'title_ar')->textInput(['maxlength' => true, 'placeholder' => 'توصيل مجاني']) ?>
+            </div>
+        </div>
+        <?= $form->field($model, 'code')->textInput(['maxlength' => true, 'placeholder' => '50OffOnFirstOrder']) ?>
 
-    <?= $form->field($model, 'title')->textInput(['maxlength' => true, 'placeholder' => 'Free Delivery']) ?>
+        <?=
+        $form->field($model, 'discount_type')->radioList([Voucher::DISCOUNT_TYPE_AMOUNT => 'Amount', Voucher::DISCOUNT_TYPE_PERCENTAGE => 'Percentage',], [
+            'style' => 'display:grid',
+            'item' => function($index, $label, $name, $checked, $value) {
 
-    <?= $form->field($model, 'title_ar')->textInput(['maxlength' => true, 'placeholder' => 'توصيل مجاني']) ?>
+                $return = '<label class="vs-radio-con">';
+                /* -----> */ if ($checked)
+                    $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                /* -----> */
+                else
+                    $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
+                $return .= '<span>' . ucwords($label) . '</span>';
+                $return .= '</label>';
 
-    <?= $form->field($model, 'code')->textInput(['maxlength' => true,'placeholder' => '50OffOnFirstOrder']) ?>
-
-    <?=
-    $form->field($model, 'discount_type')->radioList([Voucher::DISCOUNT_TYPE_AMOUNT => 'Amount', Voucher::DISCOUNT_TYPE_PERCENTAGE => 'Percentage',], [
-        'style' => 'display:grid',
-        'item' => function($index, $label, $name, $checked, $value) {
-
-            $return = '<label class="vs-radio-con">';
-            /* -----> */ if ($checked)
-                $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-            /* -----> */
-            else
-                $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-            $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
-            $return .= '<span>' . ucwords($label) . '</span>';
-            $return .= '</label>';
-
-            return $return;
-        }
+                return $return;
+            }
         ])->label('Discount Type : ');
-    ?>
+        ?>
+
+        <div class="row">
+            <div class="col-12 col-sm-6 col-lg-6">
 
 
-    <?= $form->field($model, 'discount_amount')->textInput() ?>
+                <?= $form->field($model, 'discount_amount')->textInput() ?>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-6">
 
-    <?=
-    $form->field($model, 'duration', [
-        'labelOptions' => ['class' => 'control-label'],
-        'template' => '
-      {label}
-   <div class="position-relative has-icon-left">
+                <?=
+                $form->field($model, 'duration', [
+                    'labelOptions' => ['class' => 'control-label'],
+                    'template' => '
+                    {label}
+                 <div class="position-relative has-icon-left">
 
-        {input}
+                      {input}
 
-     <div class="form-control-position">
-      <i class="feather icon-calendar"></i>
+                   <div class="form-control-position">
+                    <i class="feather icon-calendar"></i>
+                  </div>
+                </div>'
+                ])->widget(DateRangePicker::classname(), [
+                    'presetDropdown' => false,
+                    'convertFormat' => true,
+                    'value' => null,
+                    'pluginOptions' => ['locale' => ['format' => 'Y-m-d'],],
+                ]);
+                ?>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-sm-6 col-lg-4">
+                <?= $form->field($model, 'max_redemption')->textInput(['value' => $model->max_redemption ? $model->max_redemption : 0])->label('Max. Redemptions <span style="color: rgba(0,0,0,.45);">(0 = unlimited)</span>') ?>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4">
+                <?= $form->field($model, 'limit_per_customer')->textInput(['value' => $model->limit_per_customer ? $model->limit_per_customer : 0])->label('Limit Per Customer <span style="color: rgba(0,0,0,.45);">(0 = unlimited)</span>') ?>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4">
+                <?= $form->field($model, 'minimum_order_amount')->textInput(['value' => $model->minimum_order_amount ? $model->minimum_order_amount : 0])->label('Minimum Order Amount <span style="color: rgba(0,0,0,.45);">(0 = unlimited)</span>') ?>
+            </div>
+        </div>
+        <div class="form-group" style="background: #f4f6f9; padding-bottom: 0px; margin-bottom: 0px; padding-bottom: 15px; background:#f4f6f9 ">
+            <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
+        </div>
+        <?php ActiveForm::end(); ?>
+
     </div>
-  </div>'
-    ])->widget(DateRangePicker::classname(), [
-        'presetDropdown' => false,
-        'convertFormat' => true,
-        'pluginOptions' => ['locale' => ['format' => 'Y-m-d'],],
-    ]);
-    ?>
-
-    <?= $form->field($model, 'max_redemption')->textInput(['value' => 0])->label('Max. Redemptions <span style="color: rgba(0,0,0,.45);">(0 = unlimited)</span>') ?>
-
-    <?= $form->field($model, 'limit_per_customer')->textInput(['value' => 0])->label('Max. Redemptions <span style="color: rgba(0,0,0,.45);">(0 = unlimited)</span>') ?>
-
-
-    <?= $form->field($model, 'minimum_order_amount')->textInput(['value' => 0])->label('Max. Redemptions <span style="color: rgba(0,0,0,.45);">(0 = unlimited)</span>') ?>
-
-
-    <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
-    </div>
-
-    <?php ActiveForm::end(); ?>
-
-</div>
 </div>

@@ -29,8 +29,6 @@ $js = "
 
 ";
 $this->registerJs($js);
-
-
 ?>
 
 
@@ -54,7 +52,7 @@ $this->registerJs($js);
                 'errorSummaryCssClass' => 'alert alert-danger'
     ]);
     ?>
-    <?= $form->errorSummary([$modelItem],['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
+    <?= $form->errorSummary([$modelItem], ['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
 
 
     <div class="card">
@@ -66,41 +64,48 @@ $this->registerJs($js);
                 'value' => $itemCategoryValues
             ]);
             ?>
+            <div class="row">
+                <div class="col-12 col-sm-6 col-lg-6">
+                    <?= $form->field($modelItem, 'item_name')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger, Short sleeve t-shirt']) ?>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-6">
+                    <?= $form->field($modelItem, 'item_name_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger']) ?>
+                </div>
+            </div>
 
-            <?= $form->field($modelItem, 'item_name')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger, Short sleeve t-shirt']) ?>
+            <?= $form->field($modelItem, 'item_description')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL']) ?>
 
-            <?= $form->field($modelItem, 'item_name_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger']) ?>
+            <?= $form->field($modelItem, 'item_description_ar')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL']) ?>
+            <div class="row">
+                <div class="col-12 col-sm-6 col-lg-6">
 
-            <?= $form->field($modelItem, 'item_description')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' =>'FULL']) ?>
+                    <?= $form->field($modelItem, 'sort_number')->textInput(['type' => 'number']) ?>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-6">
 
-            <?= $form->field($modelItem, 'item_description_ar')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' =>'FULL']) ?>
-
-            <?= $form->field($modelItem, 'sort_number')->textInput(['type' => 'number']) ?>
-
-            <?= $form->field($modelItem, 'stock_qty')->textInput(['type' => 'number']) ?>
+                    <?= $form->field($modelItem, 'stock_qty')->textInput(['type' => 'number']) ?>
+                </div>
+            </div>
 
         </div>
     </div>
 
     <div class="card">
         <div class="card-body">
-          <?php
-          $initialPreviewArray = $modelItem->getItemImages()->asArray()->all();
-          $initialPreviewArray = ArrayHelper::getColumn($initialPreviewArray, 'product_file_name');
+            <?php
+            $initialPreviewArray = $modelItem->getItemImages()->asArray()->all();
+            $initialPreviewArray = ArrayHelper::getColumn($initialPreviewArray, 'product_file_name');
 
-          foreach ($initialPreviewArray as $key => $file_name)
-            $initialPreviewArray[$key] = "https://res.cloudinary.com/plugn/image/upload/restaurants/". $modelItem->restaurant->restaurant_uuid ."/items/". $file_name;
-
-
-          ?>
+            foreach ($initialPreviewArray as $key => $file_name)
+                $initialPreviewArray[$key] = "https://res.cloudinary.com/plugn/image/upload/restaurants/" . $modelItem->restaurant->restaurant_uuid . "/items/" . $file_name;
+            ?>
 
 
             <h5 style="margin-bottom: 20px;">
-              Media
+                Media
             </h5>
 
             <?php
-
             echo $form->field($modelItem, 'item_images[]')->widget(FileInput::classname(), [
                 'options' => ['accept' => 'image/*', 'multiple' => true
                 ],
@@ -108,7 +113,7 @@ $this->registerJs($js);
                     'showRemove' => false,
                     'showUpload' => false,
                     'showZoom' => false,
-                    'initialPreview'=> $initialPreviewArray,
+                    'initialPreview' => $initialPreviewArray,
                     'initialPreviewAsData' => true,
                     'allowedFileExtensions' => ['jpg', 'png', 'jpeg'],
                     'overwriteInitial' => true,

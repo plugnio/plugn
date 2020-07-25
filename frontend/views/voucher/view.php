@@ -42,6 +42,13 @@ $this->params['breadcrumbs'][] = $this->title;
                   },
               ],
               [
+                  'attribute' => 'discount_amount',
+                  'format' => 'html',
+                  'value' => function ($model) {
+                      return $model->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? $model->discount_amount .'%' :  $model->discount_amount;
+                  },
+              ],
+              [
                   'attribute' => 'valid_from',
                   "format" => "raw",
                   "value" => function($model) {

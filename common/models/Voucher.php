@@ -6,7 +6,8 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use yii\behaviors\AttributeBehavior;
-
+use common\models\Customer;
+use common\models\CustomerVoucher;
 
 /**
  * This is the model class for table "voucher".
@@ -31,35 +32,32 @@ use yii\behaviors\AttributeBehavior;
  * @property Order[] $orders
  * @property Restaurant $restaurantUu
  */
-class Voucher extends \yii\db\ActiveRecord
-{
+class Voucher extends \yii\db\ActiveRecord {
 
-   public $duration;
+    public $duration;
 
     //Values for `discount_type`
-    const DISCOUNT_TYPE_PERCENTAGE  = 1;
-    const DISCOUNT_TYPE_AMOUNT  = 2;
+    const DISCOUNT_TYPE_PERCENTAGE = 1;
+    const DISCOUNT_TYPE_AMOUNT = 2;
+
 
     //Values for `voucher_status`
-    const VOUCHER_STATUS_ACTIVE  = 1;
-    const VOUCHER_STATUS_EXPIRED  = 2;
-
+    const VOUCHER_STATUS_ACTIVE = 1;
+    const VOUCHER_STATUS_EXPIRED = 2;
 
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'voucher';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
-    {
+    public function rules() {
         return [
-            [['restaurant_uuid', 'title', 'title_ar', 'code','discount_type', 'discount_amount','max_redemption','limit_per_customer','minimum_order_amount' ], 'required'],
+            [['restaurant_uuid', 'title', 'title_ar', 'code', 'discount_type', 'discount_amount', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'required'],
             [['discount_type', 'voucher_status', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'integer'],
             [['valid_from', 'valid_until', 'duration'], 'safe'],
             ['discount_type', 'in', 'range' => [self::DISCOUNT_TYPE_PERCENTAGE, self::DISCOUNT_TYPE_AMOUNT]],
@@ -86,13 +84,10 @@ class Voucher extends \yii\db\ActiveRecord
         ];
     }
 
-
-
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'voucher_id' => 'Voucher ID',
             'restaurant_uuid' => 'Restaurant Uuid',
@@ -125,15 +120,51 @@ class Voucher extends \yii\db\ActiveRecord
         return "Couldnt find a status";
     }
 
+    public function isValid($phone_number) {
+        $isValid = true;
 
+        //Make sure today within selected duration
+        if ($this->valid_from && $this->valid_until) {
+            $today = date('Y-m-d');
+            $today = date('Y-m-d', strtotime($today));
+
+            $validFrom = date('Y-m-d', strtotime($this->valid_from));
+            $validUntil = date('Y-m-d', strtotime($this->valid_until));
+
+            if (($today >= $validFrom) && ($today <= $validUntil))
+                $isValid = true;
+            else
+                $isValid = false;
+        }
+
+        //Make sure we're nt exceeding max_redemption
+        // if ($this->max_redemption != 0 && $this->getCustomerVouchers()->count() >= $this->max_redemption)
+        //     $isValid = false;
+
+        //Make sure we're nt exceeding limit_per_customer
+        if($this->limit_per_customer != 0 ){
+          $customer_model = Customer::find()->where(['customer_phone_number' => $phone_number])->one();
+          if ($customer_model) {
+              $customerVoucher = CustomerVoucher::find()->where(['customer_id' => $customer_model->customer_id])->count();
+
+              if ($customerVoucher) {
+                  if ($customerVoucher >= $this->limit_per_customer)
+                      $isValid = false;
+              }
+
+          }
+        }
+
+
+        return $isValid ? $this : false;
+    }
 
     /**
      * Gets query for [[CustomerVouchers]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCustomerVouchers()
-    {
+    public function getCustomerVouchers() {
         return $this->hasMany(CustomerVoucher::className(), ['voucher_id' => 'voucher_id']);
     }
 
@@ -142,8 +173,7 @@ class Voucher extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrders()
-    {
+    public function getOrders() {
         return $this->hasMany(Order::className(), ['voucher_id' => 'voucher_id']);
     }
 
@@ -152,8 +182,8 @@ class Voucher extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
-    {
+    public function getRestaurant() {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
 }

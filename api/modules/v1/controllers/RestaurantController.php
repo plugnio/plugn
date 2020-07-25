@@ -55,6 +55,8 @@ class RestaurantController extends Controller {
         return $actions;
     }
 
+
+
     /**
      * Return Restaurant's branches
      */

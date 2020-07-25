@@ -5,6 +5,7 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\grid\GridView;
 use common\models\Order;
+use common\models\Voucher;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Order */
@@ -26,7 +27,6 @@ $(function () {
 
 ";
 $this->registerJs($js);
-
 ?>
 
 
@@ -48,38 +48,37 @@ $this->registerJs($js);
 
     <p>
         <?php
-              if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT) {
-                  echo Html::a('<i class="feather icon-file-text"></i> View Invoice', ['view-invoice',  'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], ['class' => 'btn btn-outline-primary mr-1 mb-1' , 'style' => 'margin-right: 7px']);
-              }
+        if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT) {
+            echo Html::a('<i class="feather icon-file-text"></i> View Invoice', ['view-invoice', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], ['class' => 'btn btn-outline-primary mr-1 mb-1', 'style' => 'margin-right: 7px']);
+        }
         ?>
 
         <?php
-              if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT) {
-                  echo Html::a('Update', ['update', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid,], ['class' => 'btn btn-primary mr-1 mb-1', 'style'=>'margin-right: 7px;']);
-              }
+        if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT) {
+            echo Html::a('Update', ['update', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid,], ['class' => 'btn btn-primary mr-1 mb-1', 'style' => 'margin-right: 7px;']);
+        }
         ?>
 
         <?php
-              if ($model->latitude  && $model->longitude  ) {
-                  echo Html::a('Get directions', 'https://www.google.com/maps/search/?api=1&query=' . $model->latitude  . ',' . $model->longitude, ['class' => 'btn btn-warning mr-1 mb-1', 'style'=>'margin-right: 7px;']);
-              }
+        if ($model->latitude && $model->longitude) {
+            echo Html::a('Get directions', 'https://www.google.com/maps/search/?api=1&query=' . $model->latitude . ',' . $model->longitude, ['class' => 'btn btn-warning mr-1 mb-1', 'style' => 'margin-right: 7px;']);
+        }
         ?>
 
         <?php
-              // if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT ) {
-              //     echo Html::a('Refund', ['refund-order', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid,], ['class' => 'btn btn-warning', 'style'=>'margin-left: 5px;']) ;
-              // }
+        // if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT ) {
+        //     echo Html::a('Refund', ['refund-order', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid,], ['class' => 'btn btn-warning', 'style'=>'margin-left: 5px;']) ;
+        // }
         ?>
 
         <?php
-
         $currentTime = strtotime('now');
         $deliveryTime = strtotime($model->estimated_time_of_arrival);
-        $difference = round(abs($deliveryTime - $currentTime) / 3600,2);
+        $difference = round(abs($deliveryTime - $currentTime) / 3600, 2);
 
 
         if ($difference <= 1 && $model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->armada_api_key != null && $model->tracking_link == null) {
-            echo Html::a('Request a driver', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary mr-1 mb-1', 'style'=>'margin-right: 7px;']);
+            echo Html::a('Request a driver', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary mr-1 mb-1', 'style' => 'margin-right: 7px;']);
         }
         ?>
 
@@ -91,8 +90,8 @@ $this->registerJs($js);
                 'confirm' => 'Are you sure you want to delete this order?',
                 'method' => 'post',
             ],
-       'style'=>'margin-right: 7px;'
-     ]);
+            'style' => 'margin-right: 7px;'
+        ]);
         ?>
 
     </p>
@@ -110,29 +109,28 @@ $this->registerJs($js);
 
             <p>
                 <?php
+                if ($model->order_status == Order::STATUS_DRAFT && $model->getOrderItems()->count()) {
+                    echo Html::a('Mark as pending', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_PENDING], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
+                }
 
-                  if ($model->order_status  == Order::STATUS_DRAFT  && $model->getOrderItems()->count()) {
-                      echo Html::a('Mark as pending', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_PENDING], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
-                  }
 
+                if (($model->order_status != Order::STATUS_PARTIALLY_REFUNDED && $model->order_status != Order::STATUS_REFUNDED && $model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT)) {
+                    if ($model->order_status != Order::STATUS_BEING_PREPARED) {
+                        echo Html::a('Being Prepared', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_BEING_PREPARED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-primary mr-1 mb-1']);
+                    }
 
-                  if (($model->order_status  != Order::STATUS_PARTIALLY_REFUNDED && $model->order_status  != Order::STATUS_REFUNDED  && $model->order_status  != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status  != Order::STATUS_DRAFT)) {
-                      if ($model->order_status != Order::STATUS_BEING_PREPARED) {
-                          echo Html::a('Being Prepared', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_BEING_PREPARED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-primary mr-1 mb-1']);
-                      }
+                    if ($model->order_status != Order::STATUS_OUT_FOR_DELIVERY) {
+                        echo Html::a('Out for Delivery', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_OUT_FOR_DELIVERY], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-info mr-1 mb-1']);
+                    }
 
-                      if ($model->order_status != Order::STATUS_OUT_FOR_DELIVERY) {
-                          echo Html::a('Out for Delivery', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_OUT_FOR_DELIVERY], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-info mr-1 mb-1']);
-                      }
+                    if ($model->order_status != Order::STATUS_COMPLETE) {
+                        echo Html::a('Mark as Complete', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_COMPLETE], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success mr-1 mb-1']);
+                    }
 
-                      if ($model->order_status != Order::STATUS_COMPLETE) {
-                          echo Html::a('Mark as Complete', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_COMPLETE], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success mr-1 mb-1']);
-                      }
-
-                     if ($model->order_status != Order::STATUS_CANCELED) {
-                         echo Html::a('Mark as cancelled', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_CANCELED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-danger mr-1 mb-1']);
-                     }
-                  }
+                    if ($model->order_status != Order::STATUS_CANCELED) {
+                        echo Html::a('Mark as cancelled', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_CANCELED], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-danger mr-1 mb-1']);
+                    }
+                }
                 ?>
             </p>
             <div class="box-body table-responsive no-padding">
@@ -152,24 +150,24 @@ $this->registerJs($js);
                         // 'subtotal:currency',
                         // 'delivery_fee:currency',
                         [
-                          'attribute' => 'order_created_at',
+                            'attribute' => 'order_created_at',
                             "format" => "raw",
                             "value" => function($model) {
-                                return  date('l d M, Y - h:i A', strtotime($model->order_created_at));
+                                return date('l d M, Y - h:i A', strtotime($model->order_created_at));
                             }
                         ],
                         [
                             'label' => 'When',
                             'format' => 'raw',
                             'value' => function ($data) {
-                                    return $data->is_order_scheduled ? 'Scheduled' : 'As soon as possible';
+                                return $data->is_order_scheduled ? 'Scheduled' : 'As soon as possible';
                             },
                         ],
                         [
                             'attribute' => 'estimated_time_of_arrival',
                             "format" => "raw",
                             "value" => function($model) {
-                                return  date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival));
+                                return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival));
                             }
                         ],
                         [
@@ -197,77 +195,77 @@ $this->registerJs($js);
         </div>
     </div>
     <?php if ($orderItems->totalCount > 0) { ?>
-      <section id="data-list-view" class="data-list-view-header">
+        <section id="data-list-view" class="data-list-view-header">
 
-    <div class="card">
-        <div class="card-body">
-          <div class="box-body table-responsive no-padding">
+            <div class="card">
+                <div class="card-body">
+                    <div class="box-body table-responsive no-padding">
 
-                <?=
-                GridView::widget([
-                    'dataProvider' => $orderItems,
-                    'sorter' => false,
-                    'columns' => [
-                      [
-                          'label' => 'Item image',
-                          'format' => 'html',
-                          'value' => function ($data) {
-                              $itemItmage = $data->getItemImages()->one();
-                              if ($itemItmage) {
-                                   return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/". $data->restaurant->restaurant_uuid ."/items/" . $itemItmage->product_file_name);
-                              }
-                          },
-                          'contentOptions' => ['style' => 'width: 100px;'],
-                      ],
-                        'item_name',
-                        'customer_instruction',
-                        'qty',
-                        [
-                            'label' => 'Extra Options',
-                            'value' => function ($data) {
-                                $extraOptions = '';
+                        <?=
+                        GridView::widget([
+                            'dataProvider' => $orderItems,
+                            'sorter' => false,
+                            'columns' => [
+                                [
+                                    'label' => 'Item image',
+                                    'format' => 'html',
+                                    'value' => function ($data) {
+                                        $itemItmage = $data->getItemImages()->one();
+                                        if ($itemItmage) {
+                                            return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/" . $data->restaurant->restaurant_uuid . "/items/" . $itemItmage->product_file_name);
+                                        }
+                                    },
+                                    'contentOptions' => ['style' => 'width: 100px;'],
+                                ],
+                                'item_name',
+                                'customer_instruction',
+                                'qty',
+                                [
+                                    'label' => 'Extra Options',
+                                    'value' => function ($data) {
+                                        $extraOptions = '';
 
-                                foreach ($data->orderItemExtraOptions as $key => $extraOption) {
-                                    if ($key == 0) {
-                                        $extraOptions .= $extraOption['extra_option_name'];
-                                    } else {
-                                        $extraOptions .= ', ' . $extraOption['extra_option_name'];
-                                    }
-                                }
+                                        foreach ($data->orderItemExtraOptions as $key => $extraOption) {
+                                            if ($key == 0) {
+                                                $extraOptions .= $extraOption['extra_option_name'];
+                                            } else {
+                                                $extraOptions .= ', ' . $extraOption['extra_option_name'];
+                                            }
+                                        }
 
-                                return $extraOptions;
-                            },
-                            'format' => 'raw'
-                        ],
-                        [
-                            'label' => 'Subtotal',
-                            'value' => function ($orderItem) {
-                                return $orderItem->item_price;
-                            },
-                            'format' => 'currency'
-                        ],
-                    ],
-                    'layout' => '{items}{pager}',
-                    'tableOptions' => ['class' => 'table table-bordered table-hover'],
-                ]);
+                                        return $extraOptions;
+                                    },
+                                    'format' => 'raw'
+                                ],
+                                [
+                                    'label' => 'Subtotal',
+                                    'value' => function ($orderItem) {
+                                        return $orderItem->item_price;
+                                    },
+                                    'format' => 'currency'
+                                ],
+                            ],
+                            'layout' => '{items}{pager}',
+                            'tableOptions' => ['class' => 'table table-bordered table-hover'],
+                        ]);
+                        ?>
 
-                ?>
-
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-  </section>
-  <?php } ?>
+        </section>
+    <?php } ?>
 
     <?php
-          $totalNumberOfItems = $model->getOrderItems()->count();
-          $refunds = $model->getRefunds();
+    $totalNumberOfItems = $model->getOrderItems()->count();
+    $refunds = $model->getRefunds();
 
-          if ($totalNumberOfItems > 0 || $refunds->count() > 0) { ?>
+    if ($totalNumberOfItems > 0 || $refunds->count() > 0) {
+        ?>
         <div class="card">
             <div class="card-body">
                 <h3>
-                  <?php
+                    <?php
                     if ($model->order_status == Order::STATUS_PARTIALLY_REFUNDED) {
                         echo 'Partially refunded';
                     } elseif ($model->order_status == Order::STATUS_REFUNDED) {
@@ -277,7 +275,7 @@ $this->registerJs($js);
                     } else {
                         echo 'Payment pending';
                     }
-                  ?>
+                    ?>
                 </h3>
 
 
@@ -285,19 +283,38 @@ $this->registerJs($js);
                     <tbody>
                         <tr>
                             <td colspan="2">Subtotal</td>
-                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->subtotal_before_refund, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->subtotal, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                         </tr>
                     </tbody>
+                    <?php
+                    if ($model->voucher_id) {
+                        $voucherDiscount = $model->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($model->subtotal * ($model->voucher->discount_amount / 100)) : $model->voucher->discount_amount;
+                        $subtotalAfterDiscount = $model->subtotal - $voucherDiscount;
+                        ?>
+                        <tbody>
+                            <tr>
+                                <td colspan="2">Voucher Discount (<?= $model->voucher->code ?>)</td>
+                                <td style="float: right;">-<?= Yii::$app->formatter->asCurrency($voucherDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td colspan="2">Subtotal After Voucher</td>
+                                <td style="float: right;"><?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                            </tr>
+                        </tbody>
+                    <?php } ?>
                     <tbody>
                         <tr>
                             <td colspan="2">Delivery fee</td>
                             <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->delivery_fee, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                         </tr>
                     </tbody>
+
                     <tbody>
                         <tr>
                             <td colspan="2">Total</td>
-                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->total_price_before_refund, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->total_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                         </tr>
                     </tbody>
 
@@ -306,27 +323,28 @@ $this->registerJs($js);
                             <td colspan="3" class="order-details-summary-table__separator"><hr /></td>
                         </tr>
                     </tbody>
-                    <?php if ($model->order_status == Order::STATUS_REFUNDED ||$model->order_status == Order::STATUS_PARTIALLY_REFUNDED && ($refunds->count() > 0)) {
-                      foreach ($refunds->all() as $refund) { ?>
-                        <tbody class="order-details__summary__refund-lines">
-                          <tr class="order-details__summary__detail-line-row">
-                              <td>Refunded</td>
-                              <td class="type--subdued">
-                                Reason:  <?= $refund->reason ?   $refund->reason : ' –' ?>
-                              </td>
-                              <td style="float: right;">-<?= Yii::$app->formatter->asCurrency($refund->refund_amount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
-                          </tr>
-                      </tbody>
+                    <?php
+                    if ($model->order_status == Order::STATUS_REFUNDED || $model->order_status == Order::STATUS_PARTIALLY_REFUNDED && ($refunds->count() > 0)) {
+                        foreach ($refunds->all() as $refund) {
+                            ?>
+                            <tbody class="order-details__summary__refund-lines">
+                                <tr class="order-details__summary__detail-line-row">
+                                    <td>Refunded</td>
+                                    <td class="type--subdued">
+                                        Reason:  <?= $refund->reason ? $refund->reason : ' –' ?>
+                                    </td>
+                                    <td style="float: right;">-<?= Yii::$app->formatter->asCurrency($refund->refund_amount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                                </tr>
+                            </tbody>
 
-                  <?php    }
-                  }
-                  ?>
+                            <?php
+                        }
+                    }
+                    ?>
                     <tbody class="order-details__summary__net-payment">
                         <tr>
                             <td class="type--bold" colspan="2">Net payment</td>
-                            <td style="float: right;">
-                              <?= Yii::$app->formatter->asCurrency($model->total_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
-                            </td>
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->total_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                         </tr>
                     </tbody>
                 </table>
@@ -336,37 +354,37 @@ $this->registerJs($js);
     <?php } ?>
 
     <?php
-
     // order's Item
     $refundDataProvider = new \yii\data\ActiveDataProvider([
         'query' => $model->getRefunds()
     ]);
 
 
-     if ($refundDataProvider->totalCount > 0  && $model->payment) { ?>
+    if ($refundDataProvider->totalCount > 0 && $model->payment) {
+        ?>
         <div class="card">
             <div class="card-body">
 
-              <h3 style="margin-bottom: 20px;"> Refunds  </h3>
+                <h3 style="margin-bottom: 20px;"> Refunds  </h3>
 
 
-              <?=
-                  GridView::widget([
-                      'dataProvider' => $refundDataProvider,
-                      'sorter' => false,
-                      'columns' => [
+                <?=
+                GridView::widget([
+                    'dataProvider' => $refundDataProvider,
+                    'sorter' => false,
+                    'columns' => [
                         'refund_id',
                         'refund_amount:currency',
                         'refund_status',
-                      ],
-                      'layout' => '{items}{pager} ',
-                      'tableOptions' => ['class' => 'table table-bordered table-hover'],
-                  ]);
-              ?>
+                    ],
+                    'layout' => '{items}{pager} ',
+                    'tableOptions' => ['class' => 'table table-bordered table-hover'],
+                ]);
+                ?>
             </div>
         </div>
 
-    <?php } ?>
+<?php } ?>
 
     <div class="card">
         <div class="card-body">

@@ -105,12 +105,14 @@ return [
                         'POST <id>' => 'place-an-order',
                         'GET check-for-pending-orders/<restaurant_uuid>' => 'check-pending-orders',
                         'GET callback' => 'callback',
+                        'GET apply-promo-code' => 'apply-promo-code',
                         'GET <id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS <id>' => 'options',
                         'OPTIONS check-for-pending-orders/<restaurant_uuid>' => 'options',
                         'OPTIONS callback' => 'options',
+                        'OPTIONS apply-promo-code' => 'options',
                         'OPTIONS <id>/<restaurant_uuid>' => 'options',
                     ]
                 ],

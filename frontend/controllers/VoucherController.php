@@ -78,6 +78,7 @@ class VoucherController extends Controller
 
           if ($model->load(Yii::$app->request->post())) {
 
+            if( $model->duration && $model->duration != null )
               list($model->valid_from, $model->valid_until) = explode(' - ', $model->duration);
 
               if($model->save())
@@ -103,9 +104,11 @@ class VoucherController extends Controller
     {
         $model = $this->findModel($id, $restaurantUuid);
         $model->duration =  date('Y-m-d', strtotime( $model->valid_from ))  . ' - '. date('Y-m-d', strtotime( $model->valid_until ));
-        
+
         if ($model->load(Yii::$app->request->post())) {
-          list($model->valid_from, $model->valid_until) = explode(' - ', $model->duration);
+
+          if($model->duration)
+              list($model->valid_from, $model->valid_until) = explode(' - ', $model->duration);
 
           if($model->save())
             return $this->redirect(['view', 'id' => $model->voucher_id, 'restaurantUuid' => $restaurantUuid]);
@@ -127,7 +130,8 @@ class VoucherController extends Controller
     {
         $this->findModel($id, $restaurantUuid)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+
     }
 
     /**
