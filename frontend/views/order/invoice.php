@@ -234,7 +234,10 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                 </div>
             </div>
         </div>
-
+        <?php
+            if($model->armada_qr_code_link) { ?>
+                <img src="<?= $model->armada_qr_code_link ?>" width="100" height="100" />
+       <?php } ?>
     </div>
 </section>
 <!-- invoice page end -->
