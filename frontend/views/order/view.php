@@ -187,14 +187,14 @@ $this->registerJs($js);
                             },
                             'visible' => $model->armada_tracking_link != null,
                         ],
-                        [
-                            'attribute' => 'armada_delivery_code',
-                            'format' => 'raw',
-                            'value' => function ($data) {
-                                return  Html::a($data->armada_delivery_code, \yii\helpers\Url::to($data->armada_delivery_code, true),['target' => '_blank']);
-                            },
-                            'visible' => $model->armada_delivery_code != null,
-                        ],
+                        // [
+                        //     'attribute' => 'armada_delivery_code',
+                        //     'format' => 'raw',
+                        //     'value' => function ($data) {
+                        //         return  Html::a($data->armada_delivery_code, \yii\helpers\Url::to($data->armada_delivery_code, true),['target' => '_blank']);
+                        //     },
+                        //     'visible' => $model->armada_delivery_code != null,
+                        // ],
                     ],
                     'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
                 ])
