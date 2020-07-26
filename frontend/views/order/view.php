@@ -78,7 +78,7 @@ $this->registerJs($js);
         $difference = round(abs($deliveryTime - $currentTime) / 3600,2);
 
 
-        if ($difference <= 1 && $model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->armada_api_key != null && $model->tracking_link == null) {
+        if ($difference <= 1 && $model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->armada_api_key != null && $model->armada_tracking_link == null) {
             echo Html::a('Request a driver', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary mr-1 mb-1', 'style'=>'margin-right: 7px;']);
         }
         ?>
@@ -181,12 +181,12 @@ $this->registerJs($js);
                             'visible' => $model->special_directions,
                         ],
                         [
-                            'attribute' => 'tracking_link',
-                            'format' => 'html',
+                            'attribute' => 'armada_tracking_link',
+                            'format' => 'raw',
                             'value' => function ($data) {
-                                return '<a target="_blank" href=' . $data->tracking_link . '>' . $data->tracking_link . '</a>';
+                                return  Html::a($data->armada_tracking_link, \yii\helpers\Url::to($data->armada_tracking_link, true),['target' => '_blank']);
                             },
-                            'visible' => $model->tracking_link != null,
+                            'visible' => $model->armada_tracking_link != null,
                         ],
                     ],
                     'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
