@@ -180,14 +180,14 @@ $this->registerJs($js);
                             },
                             'visible' => $model->special_directions,
                         ],
-                        // [
-                        //     'attribute' => 'armada_tracking_link',
-                        //     'format' => 'raw',
-                        //     'value' => function ($data) {
-                        //         return  Html::a($data->armada_tracking_link, \yii\helpers\Url::to($data->armada_tracking_link, true),['target' => '_blank']);
-                        //     },
-                        //     'visible' => $model->armada_tracking_link != null,
-                        // ],
+                        [
+                            'attribute' => 'armada_tracking_link',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return  Html::a($data->armada_tracking_link, \yii\helpers\Url::to($data->armada_tracking_link, true),['target' => '_blank']);
+                            },
+                            'visible' => $model->armada_tracking_link != null,
+                        ],
                     ],
                     'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
                 ])
