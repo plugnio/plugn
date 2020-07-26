@@ -27,7 +27,13 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
         <div id="invoice-company-details" class="row">
             <div class="col-12  ">
                 <div class="media " style="margin-bttom: 20px">
-                    <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: auto; margin-right: auto; display:block" />
+                    <?php
+                        if($model->armada_qr_code_link) { ?>
+                            <img src="<?= $model->armada_qr_code_link ?>" width="100" height="100" />
+                            <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: 320px;margin-right: auto;display: block;" />
+                   <?php } else { ?>
+                     <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: auto; margin-right: auto; display:block" />
+                    <?php }  ?>
 
                 </div>
             </div>
@@ -234,10 +240,6 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                 </div>
             </div>
         </div>
-        <?php
-            if($model->armada_qr_code_link) { ?>
-                <img src="<?= $model->armada_qr_code_link ?>" width="100" height="100" />
-       <?php } ?>
     </div>
 </section>
 <!-- invoice page end -->
