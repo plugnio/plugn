@@ -252,15 +252,15 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         )
                         ?>
                     </li>
-                    <li class=" nav-item <?= $this->context->route == 'voucher/index' ? 'active' : '' ?> ">
+                    <!-- <li class=" nav-item <?= $this->context->route == 'voucher/index' ? 'active' : '' ?> "> -->
 
-                        <?=
-                        Html::a(
-                                Html::tag('i', '', ['class' => 'fa fa-tags']) .
-                                Html::tag('span', 'Vouchers'), ['voucher/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
-                        )
+                        <?php
+                        // Html::a(
+                        //         Html::tag('i', '', ['class' => 'fa fa-tags']) .
+                        //         Html::tag('span', 'Vouchers'), ['voucher/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                        // )
                         ?>
-                    </li>
+                    <!-- </li> -->
                     <li class=" nav-item <?= $this->context->route == 'restaurant-branch/index' ? 'active' : '' ?> ">
 
                         <?=
