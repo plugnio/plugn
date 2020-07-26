@@ -77,8 +77,13 @@ $this->registerJs($js);
         $difference = round(abs($deliveryTime - $currentTime) / 3600, 2);
 
 
+<<<<<<< HEAD
         if ($difference <= 1 && $model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->armada_api_key != null && $model->tracking_link == null) {
             echo Html::a('Request a driver', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary mr-1 mb-1', 'style' => 'margin-right: 7px;']);
+=======
+        if ($difference <= 1 && $model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->armada_api_key != null && $model->armada_tracking_link == null) {
+            echo Html::a('Request a driver', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary mr-1 mb-1', 'style'=>'margin-right: 7px;']);
+>>>>>>> master
         }
         ?>
 
@@ -178,14 +183,14 @@ $this->registerJs($js);
                             },
                             'visible' => $model->special_directions,
                         ],
-                        [
-                            'attribute' => 'tracking_link',
-                            'format' => 'html',
-                            'value' => function ($data) {
-                                return '<a target="_blank" href=' . $data->tracking_link . '>' . $data->tracking_link . '</a>';
-                            },
-                            'visible' => $model->tracking_link != null,
-                        ],
+                        // [
+                        //     'attribute' => 'armada_tracking_link',
+                        //     'format' => 'raw',
+                        //     'value' => function ($data) {
+                        //         return  Html::a($data->armada_tracking_link, \yii\helpers\Url::to($data->armada_tracking_link, true),['target' => '_blank']);
+                        //     },
+                        //     'visible' => $model->armada_tracking_link != null,
+                        // ],
                     ],
                     'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
                 ])

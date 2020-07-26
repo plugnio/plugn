@@ -41,7 +41,9 @@ use yii\behaviors\AttributeBehavior;
  * @property boolean $is_order_scheduled
  * @property datetime $scheduled_time_start_from
  * @property datetime $scheduled_time_to
- * @property int|null $voucher_id
+ * @property string $armada_tracking_link
+ * @property string $armada_qr_code_link
+* @property int|null $voucher_id
  * @property int $subtotal_before_refund
  * @property int $total_price_before_refund
  * @property int $restaurant_branch_id
@@ -138,7 +140,7 @@ class Order extends \yii\db\ActiveRecord {
             [['payment_uuid'], 'string', 'max' => 36],
             [['estimated_time_of_arrival', 'scheduled_time_start_from', 'scheduled_time_to', 'latitude', 'longitude'], 'safe'],
             [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
-            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name', 'payment_method_name_ar', 'tracking_link'], 'string', 'max' => 255],
+            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name', 'payment_method_name_ar', 'armada_tracking_link', 'armada_qr_code_link'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
             [['customer_id'], 'exist', 'skipOnError' => false, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
             [['payment_method_id'], 'exist', 'skipOnError' => false, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
@@ -285,7 +287,8 @@ class Order extends \yii\db\ActiveRecord {
             'subtotal' => 'Subtotal',
             'order_created_at' => 'Created At',
             'order_updated_at' => 'Updated At',
-            'tracking_link' => 'Tracking link',
+            'armada_tracking_link' => 'Tracking link',
+            'armada_qr_code_link' => 'QR Code link',
             'latitude' => 'Latitude',
             'longitude' => 'Longitude',
             'estimated_time_of_arrival' => 'Expected at',

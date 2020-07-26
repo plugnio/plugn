@@ -193,7 +193,8 @@ class OrderController extends Controller {
 
         if ($createDeliveryApiResponse->isOk) {
 
-            $order_model->tracking_link = $createDeliveryApiResponse->data['trackingLink'];
+            $order_model->armada_tracking_link = $createDeliveryApiResponse->data['trackingLink'];
+            $order_model->armada_qr_code_link = $createDeliveryApiResponse->data['qrCodeLink'];
             $order_model->save(false);
             $successMessage = 'Your request has been successfully submitted';
         } else {

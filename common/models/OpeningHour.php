@@ -120,10 +120,10 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
             if ($this->day_of_week == date('w', strtotime("today")) && date('H:i A', strtotime("now")) < date('H:i A', strtotime($startTime))) {
 
-              if(strtotime($startTime) < strtotime($this->close_at) &&  strtotime($startTime)  >  strtotime("now")+ (intval($delivery_time) * 60) ){
+              if(strtotime($startTime)  >  strtotime("now") + (intval($delivery_time) * 60) ){
                 array_push($time_interval, [
                     'date' =>  $date,
-                    'start_time' =>  date('c', strtotime($date . date('H:i',  strtotime($startTime))    )) ,
+                    'start_time' =>  date('c', strtotime($date . date('H:i',  strtotime($startTime)))) ,
                     'end_time' =>   date('H:i' , strtotime($endTime) ) != '00:00' ? date('c', strtotime($date . date('H:i',strtotime($endTime)))) : date('c', strtotime($date . date('H:i',strtotime($this->close_at)))),
                 ]);
               }

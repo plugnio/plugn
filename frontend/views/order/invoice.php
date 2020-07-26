@@ -124,7 +124,6 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                         <th>Street</th>
                                         <?= $model->avenue != null ? '<th>Avenue</th>' : '' ?>
                                         <th>House</th>
-                                        <th>Special Directions</th>
                                     </tr>
                                 </thead>
 
@@ -134,12 +133,15 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                 <td><?= $model->street ?></td>
                                 <?= $model->avenue != null ? '<td>' . $model->avenue . '</td>' : '' ?></td>
                                 <td> <?= $model->house_number ?></td>
+                                </tbody>
+                            </table>
+                            <table class="table table-bordered table-hover" style="margin-top: 1.5rem !important;">
+                                <tbody>
+                                <th>Special Directions</th>
                                 <td> <?= $model->special_directions ?></td>
                                 </tbody>
                             </table>
                         <?php } ?>
-
-
                     </div>
                 </div>
 
