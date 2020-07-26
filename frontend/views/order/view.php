@@ -288,7 +288,7 @@ $this->registerJs($js);
                         </tr>
                     </tbody>
                     <?php
-                    if ($model->voucher_id) {
+                    if ($model->voucher_id != null && $model->voucher_id) {
                         $voucherDiscount = $model->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($model->subtotal * ($model->voucher->discount_amount / 100)) : $model->voucher->discount_amount;
                         $subtotalAfterDiscount = $model->subtotal - $voucherDiscount;
                         ?>
