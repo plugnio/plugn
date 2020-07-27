@@ -119,7 +119,8 @@ GridView::widget([
             'label' => 'Order ID',
             "format" => "raw",
             "value" => function($model) {
-                return '#' . $model->order_uuid;
+              return   Html::a('#' . $model->order_uuid , ['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid]); 
+
             }
         ],
         [
