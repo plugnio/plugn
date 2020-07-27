@@ -14,8 +14,6 @@ use common\models\CustomerVoucher;
  *
  * @property int $voucher_id
  * @property string $restaurant_uuid
- * @property string $title
- * @property string $title_ar
  * @property string $code
  * @property int $discount_type
  * @property int $discount_amount
@@ -57,14 +55,14 @@ class Voucher extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['restaurant_uuid', 'title', 'title_ar', 'code', 'discount_type', 'discount_amount', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'required'],
+            [['restaurant_uuid', 'code', 'discount_type', 'discount_amount', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'required'],
             [['discount_type', 'voucher_status', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'integer'],
             [['valid_from', 'valid_until', 'duration'], 'safe'],
             ['discount_type', 'in', 'range' => [self::DISCOUNT_TYPE_PERCENTAGE, self::DISCOUNT_TYPE_AMOUNT]],
             ['voucher_status', 'in', 'range' => [self::VOUCHER_STATUS_ACTIVE, self::VOUCHER_STATUS_EXPIRED]],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['voucher_created_at', 'voucher_updated_at'], 'safe'],
-            [['title', 'title_ar', 'code'], 'string', 'max' => 255],
+            [['code'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
@@ -91,8 +89,6 @@ class Voucher extends \yii\db\ActiveRecord {
         return [
             'voucher_id' => 'Voucher ID',
             'restaurant_uuid' => 'Restaurant Uuid',
-            'title' => 'Title',
-            'title_ar' => 'Title Ar',
             'code' => 'Code',
             'discount_type' => 'Discount Type',
             'discount_amount' => 'Discount Amount',

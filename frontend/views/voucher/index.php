@@ -95,14 +95,15 @@ $this->registerJs($js);
                 'attribute' => 'valid_from',
                 "format" => "raw",
                 "value" => function($model) {
-                    return date('Y-m-d', strtotime($model->valid_from));
+                    return $model->valid_from ? date('Y-m-d', strtotime($model->valid_from)) : null;
                 }
             ],
             [
                 'attribute' => 'valid_until',
                 "format" => "raw",
                 "value" => function($model) {
-                    return date('Y-m-d', strtotime($model->valid_until));
+                      return $model->valid_until ? date('Y-m-d', strtotime($model->valid_until)) : null;
+
                 }
             ],
             //'discount_type',

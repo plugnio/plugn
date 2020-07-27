@@ -18,7 +18,7 @@ class VoucherSearch extends Voucher
     {
         return [
             [['voucher_id', 'discount_type', 'discount_amount','voucher_status', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'integer'],
-            [['restaurant_uuid', 'title', 'title_ar', 'code', 'valid_from', 'valid_until',  'voucher_created_at', 'voucher_updated_at'], 'safe'],
+            [['restaurant_uuid', 'code', 'valid_from', 'valid_until',  'voucher_created_at', 'voucher_updated_at'], 'safe'],
         ];
     }
 
@@ -73,8 +73,6 @@ class VoucherSearch extends Voucher
         ]);
 
         $query->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
-            ->andFilterWhere(['like', 'title', $this->title])
-            ->andFilterWhere(['like', 'title_ar', $this->title_ar])
             ->andFilterWhere(['like', 'code', $this->code]);
 
         return $dataProvider;

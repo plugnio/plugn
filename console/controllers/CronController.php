@@ -5,6 +5,7 @@ namespace console\controllers;
 use Yii;
 use common\models\Restaurant;
 use common\models\OrderItem;
+use common\models\Voucher;
 use common\models\Payment;
 use common\models\Item;
 use common\models\Order;
@@ -19,29 +20,6 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-    public function actionIndex() {
-        $restaurants = Restaurant::find();
-
-        OpeningHour::deleteAll();
-
-        foreach ($restaurants->all() as $restaurant) {
-
-            for ($i = 0; $i < 7; ++$i) {
-                $opening_hour = new OpeningHour();
-                $opening_hour->restaurant_uuid = $restaurant->restaurant_uuid;
-                $opening_hour->day_of_week = $i;
-                $opening_hour->open_at = 0;
-                $opening_hour->is_closed = 0;
-                $opening_hour->close_at = '23:59:59';
-                $opening_hour->save();
-            }
-        }
-
-
-        $this->stdout("Thanks Big Boss \n", Console::FG_RED, Console::BOLD);
-
-
-    }
 
     /**
      * Update refund status  for all refunds record
@@ -63,6 +41,21 @@ class CronController extends \yii\console\Controller {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Update voucher status
+     */
+    public function actionUpdateVoucherStatus() {
+
+        $vouchers = Voucher::find()->all();
+
+        foreach ($vouchers as $voucher) {
+          if($voucher->valid_until && date('Y-m-d',strtotime('now')) == date('Y-m-d',strtotime($voucher->valid_until))) {
+            $voucher->voucher_status = Voucher::VOUCHER_STATUS_EXPIRED;
+            $voucher->save();
+          }
         }
     }
 

@@ -9,7 +9,7 @@ $this->params['restaurant_uuid'] = $restaurantUuid;
 
 
 $this->title = 'Create Voucher';
-$this->params['breadcrumbs'][] = ['label' => 'Vouchers', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Vouchers', 'url' => ['index', 'restaurantUuid' => $restaurantUuid]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="voucher-create">

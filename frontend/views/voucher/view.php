@@ -9,7 +9,7 @@ use common\models\Voucher;
 
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
-$this->title = $model->title;
+$this->title = $model->code;
 $this->params['breadcrumbs'][] = ['label' => 'Vouchers', 'url' => ['index', 'restaurantUuid' =>  $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -31,8 +31,6 @@ $this->params['breadcrumbs'][] = $this->title;
       <?= DetailView::widget([
           'model' => $model,
           'attributes' => [
-              'title',
-              'title_ar',
               'code',
               [
                   'attribute' => 'discount_type',

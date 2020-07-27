@@ -48,21 +48,6 @@ class VoucherController extends Controller
     }
 
     /**
-     * Displays a single Voucher model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id,$restaurantUuid)
-    {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
-
-        return $this->render('view', [
-            'model' => $this->findModel($id,$restaurantUuid),
-        ]);
-    }
-
-    /**
      * Creates a new Voucher model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
@@ -80,9 +65,10 @@ class VoucherController extends Controller
 
             if( $model->duration && $model->duration != null )
               list($model->valid_from, $model->valid_until) = explode(' - ', $model->duration);
+        
 
               if($model->save())
-                return $this->redirect(['view', 'id' => $model->voucher_id, 'restaurantUuid' => $restaurantUuid]);
+                return $this->redirect(['index',  'restaurantUuid' => $restaurantUuid]);
           }
 
           return $this->render('create', [
@@ -111,7 +97,7 @@ class VoucherController extends Controller
               list($model->valid_from, $model->valid_until) = explode(' - ', $model->duration);
 
           if($model->save())
-            return $this->redirect(['view', 'id' => $model->voucher_id, 'restaurantUuid' => $restaurantUuid]);
+            return $this->redirect(['index','restaurantUuid' => $restaurantUuid]);
         }
 
         return $this->render('update', [

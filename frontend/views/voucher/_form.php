@@ -9,18 +9,27 @@ use kartik\daterange\DateRangePicker;
 /* @var $model common\models\Voucher */
 /* @var $form yii\widgets\ActiveForm */
 ?>
+
+<?php
+
+if(!$model->isNewRecord){
+
+    echo Html::a('Delete', ['delete', 'id' => $model->voucher_id, 'restaurantUuid' =>  $model->restaurant_uuid], [
+      'class' => 'btn btn-danger  mr-1 mb-1',
+      'data' => [
+          'confirm' => 'Are you sure you want to delete this item?',
+          'method' => 'post',
+      ],
+  ]);
+}
+
+?>
+
 <div class="card">
     <div class="card-body voucher-form">
 
         <?php $form = ActiveForm::begin(); ?>
-        <div class="row">
-            <div class="col-12 col-sm-6 col-lg-6">
-                <?= $form->field($model, 'title')->textInput(['maxlength' => true, 'placeholder' => 'Free Delivery']) ?>
-            </div>
-            <div class="col-12 col-sm-6 col-lg-6">
-                <?= $form->field($model, 'title_ar')->textInput(['maxlength' => true, 'placeholder' => 'توصيل مجاني']) ?>
-            </div>
-        </div>
+
         <?= $form->field($model, 'code')->textInput(['maxlength' => true, 'placeholder' => '50OffOnFirstOrder']) ?>
 
         <?=

@@ -19,10 +19,6 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'restaurant_uuid') ?>
 
-    <?= $form->field($model, 'title') ?>
-
-    <?= $form->field($model, 'title_ar') ?>
-
     <?= $form->field($model, 'code') ?>
 
     <?php // echo $form->field($model, 'discount_type') ?>
