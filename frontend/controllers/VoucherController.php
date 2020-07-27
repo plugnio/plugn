@@ -65,7 +65,7 @@ class VoucherController extends Controller
 
             if( $model->duration && $model->duration != null )
               list($model->valid_from, $model->valid_until) = explode(' - ', $model->duration);
-        
+
 
               if($model->save())
                 return $this->redirect(['index',  'restaurantUuid' => $restaurantUuid]);
@@ -103,6 +103,24 @@ class VoucherController extends Controller
         return $this->render('update', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * Deletes an existing Voucher model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionChangeVoucherStatus($id, $restaurantUuid)
+    {
+        $model = $this->findModel($id, $restaurantUuid);
+
+        $model->voucher_status = $model->voucher_status == Voucher::VOUCHER_STATUS_ACTIVE ? Voucher::VOUCHER_STATUS_EXPIRED  : Voucher::VOUCHER_STATUS_ACTIVE;
+        $model->save();
+
+        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+
     }
 
     /**
