@@ -77,13 +77,9 @@ $this->registerJs($js);
         $difference = round(abs($deliveryTime - $currentTime) / 3600, 2);
 
 
-<<<<<<< HEAD
-        if ($difference <= 1 && $model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->armada_api_key != null && $model->tracking_link == null) {
-            echo Html::a('Request a driver', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary mr-1 mb-1', 'style' => 'margin-right: 7px;']);
-=======
+
         if ($difference <= 1 && $model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->armada_api_key != null && $model->armada_tracking_link == null) {
             echo Html::a('Request a driver', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary mr-1 mb-1', 'style'=>'margin-right: 7px;']);
->>>>>>> master
         }
         ?>
 
@@ -114,7 +110,7 @@ $this->registerJs($js);
 
             <p>
                 <?php
-                if ($model->order_status == Order::STATUS_DRAFT && $model->getOrderItems()->count()) {
+                if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Order::STATUS_ABANDONED_CHECKOUT) && $model->getOrderItems()->count()) {
                     echo Html::a('Mark as pending', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_PENDING], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
                 }
 
@@ -190,6 +186,14 @@ $this->registerJs($js);
                                 return  Html::a($data->armada_tracking_link, \yii\helpers\Url::to($data->armada_tracking_link, true),['target' => '_blank']);
                             },
                             'visible' => $model->armada_tracking_link != null,
+                        ],
+                        [
+                            'attribute' => 'armada_delivery_code',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return  Html::a($data->armada_delivery_code, \yii\helpers\Url::to($data->armada_delivery_code, true),['target' => '_blank']);
+                            },
+                            'visible' => $model->armada_delivery_code != null,
                         ],
                     ],
                     'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
@@ -292,7 +296,7 @@ $this->registerJs($js);
                         </tr>
                     </tbody>
                     <?php
-                    if ($model->voucher_id) {
+                    if ($model->voucher_id != null && $model->voucher_id) {
                         $voucherDiscount = $model->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($model->subtotal * ($model->voucher->discount_amount / 100)) : $model->voucher->discount_amount;
                         $subtotalAfterDiscount = $model->subtotal - $voucherDiscount;
                         ?>

@@ -66,7 +66,7 @@ class CronController extends \yii\console\Controller {
                 ->joinWith('order')
                 ->where(['!=', 'payment.payment_current_status', 'CAPTURED'])
                 ->andWhere(['order.items_has_been_restocked' => 0]) // if items hasnt been restocked
-                ->andWhere(['<', 'payment.payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')]);
+                ->andWhere(['<', 'payment.payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL  30 MINUTE)')]);
 
         foreach ($payments->all() as $payment) {
             $payment->order->restockAllItems();
@@ -80,8 +80,9 @@ class CronController extends \yii\console\Controller {
 
         $now = new DateTime('now');
         $payments = Payment::find()
-                ->where("received_callback = 0")
-                ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')])
+                ->where(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')])
+                ->andWhere(['>', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 MINUTE)')])
+                ->andWhere(['!=', 'payment_current_status', 'CAPTURED'])
                 ->all();
 
         if ($payments) {

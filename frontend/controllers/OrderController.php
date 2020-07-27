@@ -93,7 +93,14 @@ class OrderController extends Controller {
                         'attribute' => 'customer_name',
                         'format' => 'raw',
                         'value' => function ($data) {
-                            return $data->customer->customer_name;
+                            return $data->customer_name;
+                        },
+                    ],
+                    [
+                        'attribute' => 'customer_phone_number',
+                        'format' => 'raw',
+                        'value' => function ($data) {
+                            return $data->customer_phone_number;
                         },
                     ],
                     [
@@ -195,6 +202,7 @@ class OrderController extends Controller {
 
             $order_model->armada_tracking_link = $createDeliveryApiResponse->data['trackingLink'];
             $order_model->armada_qr_code_link = $createDeliveryApiResponse->data['qrCodeLink'];
+            $order_model->armada_delivery_code = $createDeliveryApiResponse->data['code'];
             $order_model->save(false);
             $successMessage = 'Your request has been successfully submitted';
         } else {
