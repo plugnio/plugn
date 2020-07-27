@@ -110,7 +110,7 @@ $this->registerJs($js);
 
             <p>
                 <?php
-                if ($model->order_status == Order::STATUS_DRAFT && $model->getOrderItems()->count()) {
+                if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Order::STATUS_ABANDONED_CHECKOUT) && $model->getOrderItems()->count()) {
                     echo Html::a('Mark as pending', ['change-order-status', 'order_uuid' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid, 'status' => Order::STATUS_PENDING], ['style' => 'margin-right: 10px;', 'class' => 'btn btn-success']);
                 }
 
