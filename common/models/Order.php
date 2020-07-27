@@ -499,7 +499,7 @@ class Order extends \yii\db\ActiveRecord {
                                         ], [
                                     'order' => $this
                                 ])
-                                ->setFrom([\Yii::$app->params['supportEmail']])
+                                ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
                                 ->setTo([$this->restaurant->restaurant_email, \Yii::$app->params['supportEmail']])
                                 ->setSubject('Order #' . $this->order_uuid)
                                 ->send();

@@ -65,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 GridView::widget([
                     'dataProvider' => $customersOrdersData,
                     'rowOptions' => function($model) {
-                        $url = Url::to(['order/update', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid]);
+                        $url = Url::to(['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid]);
 
                         return [
                             'onclick' => "window.location.href='{$url}'"
