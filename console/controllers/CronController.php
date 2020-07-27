@@ -87,8 +87,9 @@ class CronController extends \yii\console\Controller {
 
         $now = new DateTime('now');
         $payments = Payment::find()
-                ->where("received_callback = 0")
-                ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')])
+                ->where(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')])
+                ->andWhere(['>', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 3 HOUR)')])
+                ->andWhere(['!=', 'payment_current_status', 'CAPTURED'])
                 ->all();
 
         if ($payments) {
