@@ -89,7 +89,9 @@ class VoucherController extends Controller
     public function actionUpdate($id, $restaurantUuid)
     {
         $model = $this->findModel($id, $restaurantUuid);
-        $model->duration =  date('Y-m-d', strtotime( $model->valid_from ))  . ' - '. date('Y-m-d', strtotime( $model->valid_until ));
+
+        if($model->valid_from && $model->valid_until)
+          $model->duration =  date('Y-m-d', strtotime( $model->valid_from ))  . ' - '. date('Y-m-d', strtotime( $model->valid_until ));
 
         if ($model->load(Yii::$app->request->post())) {
 

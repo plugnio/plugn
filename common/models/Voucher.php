@@ -14,6 +14,8 @@ use common\models\CustomerVoucher;
  *
  * @property int $voucher_id
  * @property string $restaurant_uuid
+ * @property string $description
+ * @property string $description_ar
  * @property string $code
  * @property int $discount_type
  * @property int $discount_amount
@@ -62,7 +64,7 @@ class Voucher extends \yii\db\ActiveRecord {
             ['voucher_status', 'in', 'range' => [self::VOUCHER_STATUS_ACTIVE, self::VOUCHER_STATUS_EXPIRED]],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['voucher_created_at', 'voucher_updated_at'], 'safe'],
-            [['code'], 'string', 'max' => 255],
+            [['code','description','description_ar'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
@@ -89,6 +91,8 @@ class Voucher extends \yii\db\ActiveRecord {
         return [
             'voucher_id' => 'Voucher ID',
             'restaurant_uuid' => 'Restaurant Uuid',
+            'description' => 'Description',
+            'description_ar' => 'Description in Arabic',
             'code' => 'Code',
             'discount_type' => 'Discount Type',
             'discount_amount' => 'Discount Amount',
@@ -134,16 +138,19 @@ class Voucher extends \yii\db\ActiveRecord {
         }
 
         //Make sure we're nt exceeding max_redemption
-        // if ($this->max_redemption != 0 && $this->getCustomerVouchers()->count() >= $this->max_redemption)
-        //     $isValid = false;
+        if ($this->max_redemption != 0 && $this->getCustomerVouchers()->count() >= $this->max_redemption)
+            $isValid = false;
 
         //Make sure we're nt exceeding limit_per_customer
         if($this->limit_per_customer != 0 ){
-          $customer_model = Customer::find()->where(['customer_phone_number' => $phone_number])->one();
+
+          $customer_model = Customer::find()->where(['customer_phone_number' => $phone_number, 'restaurant_uuid' => $this->restaurant_uuid])->one();
+
           if ($customer_model) {
-              $customerVoucher = CustomerVoucher::find()->where(['customer_id' => $customer_model->customer_id])->count();
+              $customerVoucher = CustomerVoucher::find()->where(['customer_id' => $customer_model->customer_id, 'voucher_id' => $this->voucher_id])->count();
 
               if ($customerVoucher) {
+
                   if ($customerVoucher >= $this->limit_per_customer)
                       $isValid = false;
               }

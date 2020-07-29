@@ -62,7 +62,6 @@ $this->registerJs($js);
                         return $model->getCustomerVouchers()->count();
                     }
                 ],
-                'max_redemption',
                 [
                     'label' => 'Amount',
                     "format" => "raw",

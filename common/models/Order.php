@@ -210,9 +210,9 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function validateVoucherId($attribute) {
 
-        $voucher = Voucher::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'voucher_id' => $this->voucher_id, 'voucher_status' => Voucher::VOUCHER_STATUS_ACTIVE])->one();
+        $voucher = Voucher::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'voucher_id' => $this->voucher_id, 'voucher_status' => Voucher::VOUCHER_STATUS_ACTIVE])->exists();
 
-        if (!$voucher || !$response = $voucher->isValid($this->customer_phone_number))
+        if (!$voucher || !$this->voucher->isValid($this->customer_phone_number) || $this->calculateOrderItemsTotalPrice() < $this->voucher->minimum_order_amount)
             $this->addError($attribute, "Voucher code is invalid or expired");
     }
 
@@ -428,11 +428,12 @@ class Order extends \yii\db\ActiveRecord {
         $totalPrice = 0;
 
         foreach ($this->getOrderItems()->all() as $item) {
+
             if ($item) {
                 $totalPrice += $item->calculateOrderItemPrice();
+
             }
         }
-
         return $totalPrice;
     }
 

@@ -252,7 +252,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         )
                         ?>
                     </li>
-                    <?php if ($restaurant_model->restaurant_uuid == 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'){ ?>
+                    <?php if ($restaurant_model->restaurant_uuid == 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290' ||$restaurant_model->restaurant_uuid == 'rest_8ee880ff-c1d1-11ea-808a-0673128d0c9c' || $restaurant_model->restaurant_uuid == 'rest_9d65290b-b191-11ea-808a-0673128d0c9c' ){ ?>
                       <li class=" nav-item <?= $this->context->route == 'voucher/index' ? 'active' : '' ?> ">
                           <?=
                           Html::a(

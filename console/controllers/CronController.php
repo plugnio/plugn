@@ -52,7 +52,7 @@ class CronController extends \yii\console\Controller {
         $vouchers = Voucher::find()->all();
 
         foreach ($vouchers as $voucher) {
-          if($voucher->valid_until && date('Y-m-d',strtotime('now')) == date('Y-m-d',strtotime($voucher->valid_until))) {
+          if($voucher->valid_until && date('Y-m-d',strtotime('now')) >= date('Y-m-d',strtotime($voucher->valid_until))) {
             $voucher->voucher_status = Voucher::VOUCHER_STATUS_EXPIRED;
             $voucher->save();
           }

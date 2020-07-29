@@ -83,9 +83,7 @@ class OrderController extends Controller {
                 //save Customer address
                 $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
 
-                //Apply promo code
-                if(Yii::$app->request->getBodyParam("voucher_id"))
-                    $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
+
 
                 //Preorder
                 // if( Yii::$app->request->getBodyParam("is_order_scheduled") !== null)
@@ -197,6 +195,18 @@ class OrderController extends Controller {
                 }
 
 
+                //Apply promo code
+                if(Yii::$app->request->getBodyParam("voucher_id")){
+                  $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
+
+                  if(!$order->save()){
+                    $response = [
+                        'operation' => 'error',
+                        'message' => $order->getErrors(),
+                    ];
+                  }
+                }
+  
 
 
                 if ($response == null) {
