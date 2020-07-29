@@ -36,28 +36,28 @@ class AccountManager  extends BaseObject
             throw new \yii\web\BadRequestHttpException('ILLEGAL USAGE OF ACCOUNT OWNERSHIP MANAGER');
         }
 
-//        // Getting a list of Restaurants this agent manages
-//        $cacheDependency = Yii::createObject([
-//            'class' => 'yii\caching\DbDependency',
-//            'reusable' => true,
-//            'sql' => 'SELECT '.Yii::$app->user->identity->agent_id.', COUNT(*), SUM(restaurant_status), SUM(restaurant_updated_at) FROM restaurant WHERE agent_id='.Yii::$app->user->identity->agent_id,
-//            // we SELECT agent_id as well to make sure every cached sql statement is unique to this agent
-//            // don't want agents viewing the cached content of another agent
-//            // SUM of user_status is to bust the cache when status changes
-//        ]);
+          // Getting a list of Restaurants this agent manages
+//         $cacheDependency = Yii::createObject([
+//             'class' => 'yii\caching\DbDependency',
+//             'reusable' => true,
+//             'sql' => 'SELECT '.Yii::$app->user->identity->agent_id.', COUNT(*), SUM(agent_statuss) FROM agent WHERE agent_id='.Yii::$app->user->identity->agent_id,
 //
-//        $cacheDuration = 60*15; //15 minutes then delete from cache
+//             // we SELECT agent_id as well to make sure every cached sql statement is unique to this agent
+//             // don't want agents viewing the cached content of another agent
+//             // SUM of agent_status is to bust the cache when status changes
+//         ]);
 //
-//        $this->$_managedAccounts = Restaurant::getDb()->cache(function($db) {
-//            return Yii::$app->user->identity->getAccountsOwned()->all();
-//        }, $cacheDuration, $cacheDependency);
-//        
-        
+//         $cacheDuration = 60*15; //15 minutes then delete from cache
+//
+//         $this->_managedAccounts = Restaurant::getDb()->cache(function($db) {
+//             return Yii::$app->user->identity->getAccountsManaged()->all();
+//         }, $cacheDuration, $cacheDependency);
+
+
          // Getting a list of Restaurants this agent manages
         // No cache
-   
         $this->_managedAccounts = Yii::$app->user->identity->getAccountsManaged()->all();
-        
+
         parent::__construct($config);
     }
 
