@@ -15,9 +15,9 @@ $js = "
         let discountType = $('.discountType');
 
         $( window ).on( 'load', function() {
-            if ($model->discount_type == 1)
+            if ('$model->discount_type' == 1)
                 $('#discountAmount').text('%');
-            else   if ($model->discount_type == 2)
+            else   if ('$model->discount_type' == 2)
                 $('#discountAmount').text('KWD');
         });
 
