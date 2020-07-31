@@ -14,6 +14,10 @@ use yii\filters\VerbFilter;
  */
 class VoucherController extends Controller
 {
+
+   public $enableCsrfValidation = false;
+
+
     /**
      * {@inheritdoc}
      */
