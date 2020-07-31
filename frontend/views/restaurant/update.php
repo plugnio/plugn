@@ -15,6 +15,7 @@ $this->params['breadcrumbs'][] = 'Update';
 
     <?= $this->render('_form', [
         'model' => $model,
+        'store_theme_model' => $store_theme_model,
     ]) ?>
 
 </div>

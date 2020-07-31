@@ -136,7 +136,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             'support_pick_up' => 'Support Pick Up',
             'restaurant_delivery_area' => 'Delivery Areas',
             'date_range_picker_with_time' => 'Export orders data in a specific date range',
-            'phone_number' => 'Phone Number',
+            'phone_number' => "Store's phone number",
             'restaurant_email' => "Store's Email",
             'restaurant_created_at' => 'Store Created At',
             'restaurant_updated_at' => 'Store Updated At',

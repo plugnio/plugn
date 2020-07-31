@@ -48,7 +48,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         'name_ar',
                         'tagline',
                         'tagline_ar',
-                        'status',
                         [
                             'attribute' => 'thumbnail_image',
                             'format' => 'html',
@@ -85,6 +84,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                             'visible' => $model->phone_number != null,
                         ],
+                        'restaurant_email:email',
                         [
                             'attribute' => 'phone_number_display',
                             'format' => 'html',
@@ -119,7 +119,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                return $data->schedule_order ? 'Yes' : 'No';
                             },
                         ],
-                        'restaurant_email:email',
+                        'schedule_interval',
                         [
                             'attribute' => 'instagram_url',
                             'format' => 'html',

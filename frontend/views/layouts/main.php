@@ -225,15 +225,6 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         )
                         ?>
                     </li>
-                    <li class=" nav-item <?= $this->context->route == 'restaurant-theme/index' ? 'active' : '' ?> ">
-
-                            <?=
-                            Html::a(
-                                    Html::tag('i', '', ['class' => 'fa fa-paint-brush']) .
-                                    Html::tag('span', 'Theme'), ['restaurant-theme/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
-                            )
-                            ?>
-                        </li>
                     <?php } ?>
                     <li class=" nav-item <?= $this->context->route == 'opening-hour/index' ? 'active' : '' ?> ">
                           <?=

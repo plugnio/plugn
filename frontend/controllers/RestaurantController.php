@@ -8,6 +8,7 @@ use common\models\Order;
 use common\models\Item;
 use yii\db\Expression;
 use common\models\Customer;
+use common\models\RestaurantTheme;
 use common\models\AgentAssignment;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
@@ -502,6 +503,7 @@ class RestaurantController extends Controller {
 
         $model = $this->findModel($restaurantUuid);
 
+
         return $this->render('view', [
                     'model' => $model
         ]);
@@ -518,12 +520,14 @@ class RestaurantController extends Controller {
 
         $model = $this->findModel($id);
 
-        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
+        $store_theme_model = RestaurantTheme::findOne($model->restaurant_uuid);
+
+        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())  && $store_theme_model->load(Yii::$app->request->post())) {
 
             if (!$model->phone_number)
                 $model->phone_number_display = Restaurant::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER;
 
-            if ($model->save()) {
+            if ($model->save() && $store_theme_model->save()) {
 
                 $thumbnail_image = \yii\web\UploadedFile::getInstances($model, 'restaurant_thumbnail_image');
                 $logo = \yii\web\UploadedFile::getInstances($model, 'restaurant_logo');
@@ -544,6 +548,7 @@ class RestaurantController extends Controller {
 
         return $this->render('update', [
                     'model' => $model,
+                    'store_theme_model' => $store_theme_model,
         ]);
     }
 
