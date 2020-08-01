@@ -26,6 +26,19 @@ $js = "
         $(this).blur();
     });
 
+    $('.delete-button').click(function() {
+        var detail = $(this).closest('.option');
+        var updateType = detail.find('.update-type');
+        if (updateType.val() === " . json_encode(Option::UPDATE_TYPE_UPDATE) . ") {
+            //marking the row for deletion
+            updateType.val(" . json_encode(Option::UPDATE_TYPE_DELETE) . ");
+            detail.hide();
+        } else {
+            //if the row is a new row, delete the row
+            detail.remove();
+        }
+
+    });
 
 ";
 $this->registerJs($js);
@@ -37,28 +50,29 @@ $this->registerJs($js);
 
 
     <?php
-    $categoryQuery = Category::find()->where(['restaurant_uuid' => $modelItem->restaurant_uuid])->asArray()->all();
+    $categoryQuery = Category::find()->where(['restaurant_uuid' => $model->restaurant_uuid])->asArray()->all();
     $categoryArray = ArrayHelper::map($categoryQuery, 'category_id', 'title');
 
     $itemCategoryValues = [];
 
-    if ($modelItem->item_uuid != null) {
-        $selectedCategoryValues = $modelItem->getCategories()->asArray()->all();
+    if ($model->item_uuid != null) {
+        $selectedCategoryValues = $model->getCategories()->asArray()->all();
         $itemCategoryValues = ArrayHelper::getColumn($selectedCategoryValues, 'category_id');
     }
 
     $form = ActiveForm::begin([
                 'id' => 'dynamic-form',
-                'errorSummaryCssClass' => 'alert alert-danger'
+                'errorSummaryCssClass' => 'alert alert-danger',
+                'enableClientValidation' => false
     ]);
     ?>
-    <?= $form->errorSummary([$modelItem], ['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
+    <?= $form->errorSummary([$model], ['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
 
 
     <div class="card">
         <div class="card-body">
             <?=
-            $form->field($modelItem, 'items_category[]')->dropDownList($categoryArray, [
+            $form->field($model, 'items_category[]')->dropDownList($categoryArray, [
                 'class' => 'select2',
                 'multiple' => 'multiple',
                 'value' => $itemCategoryValues
@@ -66,24 +80,24 @@ $this->registerJs($js);
             ?>
             <div class="row">
                 <div class="col-12 col-sm-6 col-lg-6">
-                    <?= $form->field($modelItem, 'item_name')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger, Short sleeve t-shirt']) ?>
+                    <?= $form->field($model, 'item_name')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger, Short sleeve t-shirt']) ?>
                 </div>
                 <div class="col-12 col-sm-6 col-lg-6">
-                    <?= $form->field($modelItem, 'item_name_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger']) ?>
+                    <?= $form->field($model, 'item_name_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger']) ?>
                 </div>
             </div>
 
-            <?= $form->field($modelItem, 'item_description')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL']) ?>
+            <?= $form->field($model, 'item_description')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL']) ?>
 
-            <?= $form->field($modelItem, 'item_description_ar')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL']) ?>
+            <?= $form->field($model, 'item_description_ar')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL']) ?>
             <div class="row">
                 <div class="col-12 col-sm-6 col-lg-6">
 
-                    <?= $form->field($modelItem, 'sort_number')->textInput(['type' => 'number']) ?>
+                    <?= $form->field($model, 'sort_number')->textInput(['type' => 'number']) ?>
                 </div>
                 <div class="col-12 col-sm-6 col-lg-6">
 
-                    <?= $form->field($modelItem, 'stock_qty')->textInput(['type' => 'number']) ?>
+                    <?= $form->field($model, 'stock_qty')->textInput(['type' => 'number']) ?>
                 </div>
             </div>
 
@@ -93,11 +107,11 @@ $this->registerJs($js);
     <div class="card">
         <div class="card-body">
             <?php
-            $initialPreviewArray = $modelItem->getItemImages()->asArray()->all();
+            $initialPreviewArray = $model->getItemImages()->asArray()->all();
             $initialPreviewArray = ArrayHelper::getColumn($initialPreviewArray, 'product_file_name');
 
             foreach ($initialPreviewArray as $key => $file_name)
-                $initialPreviewArray[$key] = "https://res.cloudinary.com/plugn/image/upload/restaurants/" . $modelItem->restaurant->restaurant_uuid . "/items/" . $file_name;
+                $initialPreviewArray[$key] = "https://res.cloudinary.com/plugn/image/upload/restaurants/" . $model->restaurant->restaurant_uuid . "/items/" . $file_name;
             ?>
 
 
@@ -106,7 +120,7 @@ $this->registerJs($js);
             </h5>
 
             <?php
-            echo $form->field($modelItem, 'item_images[]')->widget(FileInput::classname(), [
+            echo $form->field($model, 'item_images[]')->widget(FileInput::classname(), [
                 'options' => ['accept' => 'image/*', 'multiple' => true
                 ],
                 'pluginOptions' => [
@@ -140,7 +154,7 @@ $this->registerJs($js);
 
 
             <?=
-            $form->field($modelItem, 'item_price', [
+            $form->field($model, 'item_price', [
                 'template' => "{label}"
                 . "<div class='input-group'> <div class='input-group-prepend'> <span class='input-group-text'>KWD</span> </div>{input}"
                 . "</div>"
@@ -148,7 +162,7 @@ $this->registerJs($js);
             ])->textInput([
                 'type' => 'number',
                 'step' => '.01',
-                'value' => $modelItem->item_price != null ? $modelItem->item_price : \Yii::$app->formatter->asDecimal(0, 2),
+                'value' => $model->item_price != null ? $model->item_price : \Yii::$app->formatter->asDecimal(0, 2),
                 'class' => 'form-control'
             ])->label(false)
             ?>
@@ -168,66 +182,29 @@ $this->registerJs($js);
                     <div class="line line-dashed"></div>
                 </div>
 
-                <?php
-                DynamicFormWidget::begin([
-                    'widgetContainer' => 'dynamicform_wrapper',
-                    'widgetBody' => '.container-items',
-                    'widgetItem' => '.option-item',
-                    'min' => 0,
-                    'insertButton' => '.add-option',
-                    'deleteButton' => '.remove-option',
-                    'model' => $modelsOption[0],
-                    'formId' => 'dynamic-form',
-                    'formFields' => [
-                        'option_name',
-                        'option_name_ar',
-                        'min_qty',
-                        'max_qty',
-                    ],
-                ]);
-                ?>
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>Options</th>
-                            <th style="width: 450px;">Extra Options</th>
-                            <th class="text-center" style="width: 90px;">
-                                <button type="button" class="add-option btn btn-success btn-xs"><span class="fa fa-plus"></span></button>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="container-items">
-                        <?php foreach ($modelsOption as $indexOption => $modelOption): ?>
-                            <tr class="option-item">
-                                <td class="vcenter">
-                                    <?php
-                                    // necessary for update action.
-                                    if (!$modelOption->isNewRecord) {
-                                        echo Html::activeHiddenInput($modelOption, "[{$indexOption}]option_id");
-                                    }
-                                    ?>
-                                    <?= $form->field($modelOption, "[{$indexOption}]option_name")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'e.g. Color']) ?>
-                                    <?= $form->field($modelOption, "[{$indexOption}]option_name_ar")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'على سبيل المثال اللون']) ?>
-                                    <?= $form->field($modelOption, "[{$indexOption}]min_qty")->label(false)->textInput(['type' => 'number', 'maxlength' => true, 'placeholder' => 'Minimum']) ?>
-                                    <?= $form->field($modelOption, "[{$indexOption}]max_qty")->label(false)->textInput(['type' => 'number', 'maxlength' => true, 'placeholder' => 'Maximum']) ?>
-                                </td>
-                                <td>
-                                    <?=
-                                    $this->render('_form-extra-options', [
-                                        'form' => $form,
-                                        'indexOption' => $indexOption,
-                                        'modelsExtraOption' => (empty($modelsExtraOption[$indexOption])) ? [[new ExtraOption]] : $modelsExtraOption[$indexOption],
-                                    ])
-                                    ?>
-                                </td>
-                                <td class="text-center vcenter" style="width: 90px; verti">
-                                    <button type="button" class="remove-option btn btn-danger btn-xs"><span class="fa fa-minus"></span></button>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-                <?php DynamicFormWidget::end(); ?>
+                <?php foreach ($modelOptions as $i => $modelOption) : ?>
+                     <div class="row option option-<?= $i ?>">
+
+                         <div class="col-md-10">
+                             <?= Html::activeHiddenInput($modelOption, "[$i]option_id") ?>
+                             <?= Html::activeHiddenInput($modelOption, "[$i]updateType", ['class' => 'update-type']) ?>
+                             <?= $form->field($modelOption, "[$i]option_name") ?>
+                             <?= $form->field($modelOption, "[$i]option_name_ar") ?>
+                             <?= $form->field($modelOption, "[$i]min_qty") ?>
+                             <?= $form->field($modelOption, "[$i]max_qty") ?>
+                         </div>
+
+
+                         <div class="col-md-2">
+                             <?= Html::button('x', ['class' => 'delete-button btn btn-danger', 'data-target' => "option-$i"]) ?>
+                         </div>
+                     </div>
+                 <?php endforeach; ?>
+
+
+                  <div class="form-group">
+                      <?= Html::submitButton('Add row', ['name' => 'addRow', 'value' => 'true', 'class' => 'btn btn-info']) ?>
+                  </div>
 
             </div>
 

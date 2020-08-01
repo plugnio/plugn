@@ -28,34 +28,35 @@ $this->registerJs($js);
         'extra_option_price',
     ],
 ]); ?>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th></th>
-            <th class="text-center">
-                <button type="button" class="add-extra-option btn btn-success btn-xs"><span class="fa fa-plus"></span></button>
-            </th>
-        </tr>
-    </thead>
-    <tbody class="container-extra-options">
+<div class="container-extra-options" style="margin-top: 10px;">
+
     <?php foreach ($modelsExtraOption as $indexExtraOption => $modelExtraOption): ?>
-        <tr class="extra-option">
-            <td class="vcenter">
-                <?php
-                    // necessary for update action.
-                    if (! $modelExtraOption->isNewRecord) {
-                        echo Html::activeHiddenInput($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_id");
-                    }
-                ?>
-                <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_name")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'e.g. Red, Black']) ?>
-                <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_name_ar")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'على سبيل المثال أحمر أسود']) ?>
-                <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_price")->label(false)->textInput(['type' => 'number', 'step' => '.01', 'maxlength' => true, 'placeholder' => 'Price']) ?>
-            </td>
-            <td class="text-center vcenter" style="width: 90px;">
-                <button type="button" class="remove-extra-option btn btn-danger btn-xs"><span class="fa fa-minus"></span></button>
-            </td>
-        </tr>
+
+              <div class="extra-option">
+                  <?php
+                  // necessary for update action.
+                  if (!$modelExtraOption->isNewRecord) {
+                      echo Html::activeHiddenInput($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_id");
+                  }
+                  ?>
+
+                  <div class="row" style="margin-top: 20px;   margin-bottom: 20px;">
+                      <div class="col-lg-4 col-md-12">
+                          <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_name")->textInput(['maxlength' => true, 'placeholder' => 'e.g. Red, Black']) ?>
+                      </div>
+                      <div class="col-lg-4 col-md-12">
+                          <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_name_ar")->textInput(['maxlength' => true, 'placeholder' => 'على سبيل المثال أحمر أسود']) ?>
+                      </div>
+                      <div class="col-lg-3 col-md-12">
+                          <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_price")->textInput(['type' => 'number', 'step' => '.01', 'maxlength' => true, 'placeholder' => 'Price']) ?>
+                      </div>
+                      <div class="col-lg-1 col-md-12">
+                          <button  style=" width: 100%; margin-left: auto;  margin-top: 15px; height: 40px;" type="button" class="remove-extra-option btn btn-danger"><span class="fa fa-trash"></span></button>
+                      </div>
+                  </div>
+              </div>
      <?php endforeach; ?>
-    </tbody>
-</table>
+   </div>
+   <button type="button" class="add-extra-option btn btn-outline-secondary">Add Option Value</button>
+
 <?php DynamicFormWidget::end(); ?>

@@ -9,15 +9,15 @@ use common\models\Option;
 
 $this->params['restaurant_uuid'] = $restaurantUuid;
 
-$this->title = 'Update Item: ' . $modelItem->item_name;
-$this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['index', 'restaurantUuid' => $modelItem->restaurant_uuid]];
+$this->title = 'Update Item: ' . $model->item_name;
+$this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['index', 'restaurantUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
 <div class="item-update">
 
     <p>
       <?=
-      Html::a('Delete', ['delete', 'id' => $modelItem->item_uuid, 'restaurantUuid' => $restaurantUuid], [
+      Html::a('Delete', ['delete', 'id' => $model->item_uuid, 'restaurantUuid' => $restaurantUuid], [
           'class' => 'btn btn-danger',
           'data' => [
               'confirm' => 'Are you sure you want to delete this item?',
@@ -28,10 +28,9 @@ $this->params['breadcrumbs'][] = 'Update';
   </p>
 
     <?= $this->render('_form', [
-                    'modelItem' => $modelItem,
-                    'modelsOption' => (empty($modelsOption)) ? [new Option] : $modelsOption,
-                    'modelsExtraOption' => (empty($modelsExtraOption)) ? [[new ExtraOption]] : $modelsExtraOption,
-                    'restaurantUuid' => $restaurantUuid
+      'model' => $model,
+      'modelOptions' => $modelOptions,
+      'restaurantUuid' => $restaurantUuid
     ]) ?>
 
 </div>
