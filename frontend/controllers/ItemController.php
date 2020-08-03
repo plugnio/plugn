@@ -177,7 +177,7 @@ class ItemController extends Controller {
         $formOptions = Yii::$app->request->post('Option', []);
         foreach ($formOptions as $i => $formOption) {
             //loading the models if they are not new
-            if (isset($formOption['id']) && isset($formOption['updateType']) && $formOption['updateType'] != Option::UPDATE_TYPE_CREATE) {
+            if (isset($formOption['option_id']) && isset($formOption['updateType']) && $formOption['updateType'] != Option::UPDATE_TYPE_CREATE) {
                 //making sure that it is actually a child of the main model
                 $modelOption = Option::findOne(['option_id' => $formOption['option_id'], 'item_uuid' => $model->item_uuid]);
                 $modelOption->setScenario(Option::SCENARIO_BATCH_UPDATE);
@@ -210,6 +210,7 @@ class ItemController extends Controller {
             if (Model::validateMultiple($modelOptions) && $model->validate()) {
                 $model->save();
                 foreach ($modelOptions as $modelOption) {
+
                     //details that has been flagged for deletion will be deleted
                     if ($modelOption->updateType == Option::UPDATE_TYPE_DELETE) {
                         $modelOption->delete();

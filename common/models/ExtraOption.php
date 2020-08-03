@@ -15,9 +15,31 @@ use Yii;
  *
  * @property Option $option
  * @property Item $item
- * @property OrderItemExtraOption[] $orderItemExtraOptions 
+ * @property OrderItemExtraOption[] $orderItemExtraOptions
  */
 class ExtraOption extends \yii\db\ActiveRecord {
+
+    /**
+     * these are flags that are used by the form to dictate how the loop will handle each item
+     */
+    const UPDATE_TYPE_CREATE = 'create';
+    const UPDATE_TYPE_UPDATE = 'update';
+    const UPDATE_TYPE_DELETE = 'delete';
+    const SCENARIO_BATCH_UPDATE = 'batchUpdate';
+
+    private $_updateType;
+
+    public function getUpdateType() {
+        if (empty($this->_updateType)) {
+            if ($this->isNewRecord) {
+                $this->_updateType = self::UPDATE_TYPE_CREATE;
+            } else {
+                $this->_updateType = self::UPDATE_TYPE_UPDATE;
+            }
+        }
+
+        return $this->_updateType;
+    }
 
     /**
      * {@inheritdoc}
@@ -31,9 +53,15 @@ class ExtraOption extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
+            ['updateType', 'required', 'on' => self::SCENARIO_BATCH_UPDATE],
+            ['updateType',
+                'in',
+                'range' => [self::UPDATE_TYPE_CREATE, self::UPDATE_TYPE_UPDATE, self::UPDATE_TYPE_DELETE],
+                'on' => self::SCENARIO_BATCH_UPDATE
+            ],
             [['extra_option_name', 'extra_option_name_ar', 'extra_option_price'], 'required'],
             [['option_id'], 'integer'],
-            [['extra_option_price'], 'number' , 'min'=> 0],
+            [['extra_option_price'], 'number', 'min' => 0],
             [['extra_option_name', 'extra_option_name_ar'], 'string', 'max' => 255],
             [['option_id'], 'exist', 'skipOnError' => true, 'targetClass' => Option::className(), 'targetAttribute' => ['option_id' => 'option_id']],
         ];
@@ -71,9 +99,9 @@ class ExtraOption extends \yii\db\ActiveRecord {
     }
 
     /**
-     * Gets query for [[OrderItemExtraOption]]. 
-     * 
-     * @return \yii\db\ActiveQuery 
+     * Gets query for [[OrderItemExtraOption]].
+     *
+     * @return \yii\db\ActiveQuery
      */
     public function getOrderItemExtraOptions() {
         return $this->hasMany(OrderItemExtraOption::className(), ['extra_option_id' => 'extra_option_id']);

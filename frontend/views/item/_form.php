@@ -30,10 +30,16 @@ $js = "
         var detail = $(this).closest('.option');
         var updateType = detail.find('.update-type');
         if (updateType.val() === " . json_encode(Option::UPDATE_TYPE_UPDATE) . ") {
+
             //marking the row for deletion
             updateType.val(" . json_encode(Option::UPDATE_TYPE_DELETE) . ");
+
+
+                      console.log(updateType.val());
             detail.hide();
         } else {
+          console.log('enter heree lseee');
+
             //if the row is a new row, delete the row
             detail.remove();
         }
@@ -115,9 +121,9 @@ $this->registerJs($js);
             ?>
 
 
-            <h5 style="margin-bottom: 20px;">
+            <h3 style="margin-bottom: 20px;">
                 Media
-            </h5>
+            </h3>
 
             <?php
             echo $form->field($model, 'item_images[]')->widget(FileInput::classname(), [
@@ -148,9 +154,9 @@ $this->registerJs($js);
 
     <div class="card">
         <div class="card-body">
-            <h5 style="margin-bottom: 20px;">
+            <h3  style="margin-bottom: 20px;">
                 Price
-            </h5>
+            </h3>
 
 
             <?=
@@ -169,46 +175,79 @@ $this->registerJs($js);
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-body">
-            <h5 style="margin-bottom: 20px;">
-                Options
-            </h5>
+    <div style="padding:21px">
+        <h3 style="margin-bottom: 20px;">
+            Options
+        </h3>
 
-            <div class="item-form">
+        <div class="item-form">
 
 
-                <div class="padding-v-md">
-                    <div class="line line-dashed"></div>
+            <div class="padding-v-md">
+                <div class="line line-dashed"></div>
+            </div>
+
+            <?php foreach ($modelOptions as $indexOption => $modelOption) : ?>
+                <div class="row card option option-<?= $indexOption ?>">
+
+                    <div class="card-header">
+                        <h4 class="card-title"><?= 'Option Set  ' . intval($indexOption + 1) ?></h4>
+                        <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
+                        <div class="heading-elements">
+                            <ul class="list-inline mb-0">
+                                <li><a data-action="collapse"><i class="feather icon-chevron-down"></i></a></li>
+                                <li><a data-action="close"><i class="delete-button feather icon-x"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+
+
+                    <div class="card-content collapse show">
+                        <div class="card-body">
+                            <?= Html::activeHiddenInput($modelOption, "[$indexOption]option_id") ?>
+                            <?= Html::activeHiddenInput($modelOption, "[$indexOption]updateType", ['class' => 'update-type']) ?>
+
+                            <div class="row">
+                                <div class="col-12 col-sm-6 col-lg-6">
+                                    <?= $form->field($modelOption, "[$indexOption]option_name")->label('Title') ?>
+                                </div>
+                                <div class="col-12 col-sm-6 col-lg-6">
+
+                                    <?= $form->field($modelOption, "[$indexOption]option_name_ar")->label('Title in Arabic') ?>
+                                </div>
+
+                                <div class="col-12 col-sm-6 col-lg-6">
+
+                                    <?= $form->field($modelOption, "[$indexOption]min_qty")->label('Min Selections <span style="color: rgba(0,0,0,.45);">(The minimum number of checkboxes that must be selected)</span>') ?>
+                                </div>
+
+                                <div class="col-12 col-sm-6 col-lg-6">
+
+                                    <?= $form->field($modelOption, "[$indexOption]max_qty")->label('Min Selections <span style="color: rgba(0,0,0,.45);">(The maximum number of checkboxes that may be selected)</span>') ?>
+
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <?= Html::submitButton('Create Extrsa Option Set', ['name' => 'addExtraOption', 'value' => 'true', 'class' => 'btn btn-primary']) ?>
+                            </div>
+
+                        </div>
+                    </div>
+
+
                 </div>
-
-                <?php foreach ($modelOptions as $i => $modelOption) : ?>
-                     <div class="row option option-<?= $i ?>">
-
-                         <div class="col-md-10">
-                             <?= Html::activeHiddenInput($modelOption, "[$i]option_id") ?>
-                             <?= Html::activeHiddenInput($modelOption, "[$i]updateType", ['class' => 'update-type']) ?>
-                             <?= $form->field($modelOption, "[$i]option_name") ?>
-                             <?= $form->field($modelOption, "[$i]option_name_ar") ?>
-                             <?= $form->field($modelOption, "[$i]min_qty") ?>
-                             <?= $form->field($modelOption, "[$i]max_qty") ?>
-                         </div>
+            <?php endforeach; ?>
 
 
-                         <div class="col-md-2">
-                             <?= Html::button('x', ['class' => 'delete-button btn btn-danger', 'data-target' => "option-$i"]) ?>
-                         </div>
-                     </div>
-                 <?php endforeach; ?>
-
-
-                  <div class="form-group">
-                      <?= Html::submitButton('Add row', ['name' => 'addRow', 'value' => 'true', 'class' => 'btn btn-info']) ?>
-                  </div>
-
+            <div class="form-group">
+                <?= Html::submitButton('Create Option Set', ['name' => 'addOption', 'value' => 'true', 'class' => 'btn btn-primary']) ?>
             </div>
 
         </div>
+
     </div>
 
 

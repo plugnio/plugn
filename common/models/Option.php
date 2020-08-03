@@ -89,8 +89,8 @@ class Option extends \yii\db\ActiveRecord {
         return [
             'option_id' => 'Option ID',
             'item_uuid' => 'Item Uuid',
-            'min_qty' => 'Minimum amount',
-            'max_qty' => 'Maximum amount',
+            'min_qty' => 'Min Selections',
+            'max_qty' => 'Max Selections',
             'option_name' => 'Option Name',
             'option_name_ar' => 'Option Name in Arabic',
         ];

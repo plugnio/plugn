@@ -21,6 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
     $this->render('_form', [
         'model' => $model,
         'modelOptions' => $modelOptions,
+        'modelExtraOptions' => $modelExtraOptions,
         'restaurantUuid' => $restaurantUuid
     ])
     ?>
