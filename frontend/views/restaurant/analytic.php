@@ -266,7 +266,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 38px, 0px);">
                                                     <?= Html::a('Today', ['export-today-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item']) ?>
                                                     <?= Html::a('Last 7 days', ['export-last-seven-days-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item']) ?>
-                                                    <?= Html::a('This month', ['export-this-months-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item']) ?>
+                                                    <?= Html::a('Current month', ['export-current-month-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item']) ?>
+                                                    <?= Html::a('Last month', ['export-last-month-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item']) ?>
                                                     <?= Html::a('Last 3 months', ['export-last-three-months-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item']) ?>
                                                 </div>
                                             </div>

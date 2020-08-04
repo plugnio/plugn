@@ -58,6 +58,7 @@ class RestaurantController extends Controller {
                     ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
                     ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
                     ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
                     ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     ->andWhere(['DATE(order.order_created_at)' => new Expression('CURDATE()')])
                     ->all();
@@ -97,6 +98,7 @@ class RestaurantController extends Controller {
                           ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
                           ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
                           ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+                          ->orWhere(['order_status' => Order::STATUS_CANCELED])
                           ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                           ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
                           ->all();
@@ -125,19 +127,61 @@ class RestaurantController extends Controller {
     }
 
 
-    public function actionExportThisMonthsSoldItems($restaurantUuid) {
+    public function actionExportCurrentMonthSoldItems($restaurantUuid) {
 
             if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
 
 
-                $this_month_sold_item = Item::find()
+                $current_month_sold_item = Item::find()
                         ->joinWith(['orderItems', 'orderItems.order'])
                         ->where(['order.order_status' => Order::STATUS_PENDING])
                         ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
                         ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
                         ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+                        ->orWhere(['order_status' => Order::STATUS_CANCELED])
                         ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                        ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
+                        ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                        ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
+                        ->all();
+
+                header('Access-Control-Allow-Origin: *');
+                header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
+                header("Cache-Control: max-age=0");
+
+                \moonland\phpexcel\Excel::export([
+                    'isMultipleSheet' => false,
+                    'models' => $current_month_sold_item,
+                    'columns' => [
+                        'item_name',
+                        [
+                          'attribute' => 'Sold items',
+                            'format' => 'html',
+                            'value' => function ($data) {
+
+                                return $data->getCurrentMonthSoldUnits();
+                            },
+                        ],
+                    ],
+                ]);
+            }
+        }
+
+    public function actionExportLastMonthSoldItems($restaurantUuid) {
+
+            if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+
+
+                $last_month_sold_item = Item::find()
+                        ->joinWith(['orderItems', 'orderItems.order'])
+                        ->where(['order.order_status' => Order::STATUS_PENDING])
+                        ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
+                        ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                        ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+                        ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                        ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                        ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                        ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
                         ->all();
 
                 header('Access-Control-Allow-Origin: *');
@@ -148,15 +192,16 @@ class RestaurantController extends Controller {
 
                 \moonland\phpexcel\Excel::export([
                     'isMultipleSheet' => false,
-                    'models' => $this_month_sold_item,
+                    'models' => $last_month_sold_item,
                     'columns' => [
                         'item_name',
+                        'order.order_created_at',
                         [
                           'attribute' => 'Sold items',
                             'format' => 'html',
                             'value' => function ($data) {
 
-                                return $data->getThisMonthSoldUnits();
+                                return $data->getLastMonthSoldUnits();
                             },
                         ],
                     ],
@@ -168,15 +213,16 @@ class RestaurantController extends Controller {
 
             if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
 
-
-                $this_month_sold_item = Item::find()
+                $last_three_month_sold_item = Item::find()
                         ->joinWith(['orderItems', 'orderItems.order'])
                         ->where(['order.order_status' => Order::STATUS_PENDING])
                         ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
                         ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
                         ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+                        ->orWhere(['order_status' => Order::STATUS_CANCELED])
                         ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                        ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
+                        ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                        ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
                         ->all();
 
                 header('Access-Control-Allow-Origin: *');
@@ -187,7 +233,7 @@ class RestaurantController extends Controller {
 
                 \moonland\phpexcel\Excel::export([
                     'isMultipleSheet' => false,
-                    'models' => $this_month_sold_item,
+                    'models' => $last_three_month_sold_item,
                     'columns' => [
                         'item_name',
                         [
@@ -195,7 +241,7 @@ class RestaurantController extends Controller {
                             'format' => 'html',
                             'value' => function ($data) {
 
-                                return $data->getThisMonthSoldUnits();
+                                return $data->getLastThreeMonthSoldUnits();
                             },
                         ],
                     ],
@@ -265,19 +311,19 @@ class RestaurantController extends Controller {
 
         array_push($months, $lastThreeMonths);
 
-        $revenue_generated_last_two_months_month = Order::find()
+        $revenue_generated_last_three_months_month = Order::find()
                 ->where(['restaurant_uuid' => $model->restaurant_uuid])
                 ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
                 ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
                 ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
                 ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
                 ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
+                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
                 ->sum('total_price');
 
         $lastTwoMonths = date('M', strtotime('-2 months'));
 
-        array_push($revenue_generated_chart_data, number_format($revenue_generated_last_two_months_month,3));
+        array_push($revenue_generated_chart_data, number_format($revenue_generated_last_three_months_month,3));
 
         array_push($months, $lastTwoMonths);
 
@@ -355,17 +401,17 @@ class RestaurantController extends Controller {
 
         array_push($order_recevied_chart_data, (int) ($order_recevied_last_three_months_month));
 
-        $order_recevied_last_two_months_month = Order::find()
+        $order_recevied_last_three_months_month = Order::find()
                 ->where(['restaurant_uuid' => $model->restaurant_uuid])
                 ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
                 ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
                 ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
                 ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
                 ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
+                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
                 ->count();
 
-        array_push($order_recevied_chart_data, (int) ($order_recevied_last_two_months_month));
+        array_push($order_recevied_chart_data, (int) ($order_recevied_last_three_months_month));
 
         $order_recevied_last_month = Order::find()
                 ->where(['restaurant_uuid' => $model->restaurant_uuid])
@@ -427,13 +473,13 @@ class RestaurantController extends Controller {
 
         array_push($customer_gained_chart_data, (int) ($customer_gained_last_three_months_month));
 
-        $customer_gained_last_two_months_month = Customer::find()
+        $customer_gained_last_three_months_month = Customer::find()
                 ->where(['restaurant_uuid' => $model->restaurant_uuid])
                 ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
+                ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
                 ->count();
 
-        array_push($customer_gained_chart_data, (int) ($customer_gained_last_two_months_month));
+        array_push($customer_gained_chart_data, (int) ($customer_gained_last_three_months_month));
 
         $customer_gained_last_month = Customer::find()
                 ->where(['restaurant_uuid' => $model->restaurant_uuid])
@@ -466,6 +512,7 @@ class RestaurantController extends Controller {
                 ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
                 ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
                 ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                ->orWhere(['order_status' => Order::STATUS_CANCELED])
                 ->where(['item.restaurant_uuid' => $model->restaurant_uuid])
                 ->orderBy(['order_item.qty' => SORT_ASC])
                 ->all();
@@ -474,10 +521,10 @@ class RestaurantController extends Controller {
         $most_selling_items_counter = 0;
 
         foreach ($sold_items as $key => $item) {
-            if ($most_selling_items_counter < 5 && $item->getThisMonthSoldUnits()) {
+            if ($most_selling_items_counter < 5) {
                 $most_selling_items_counter++;
                 array_push($most_selling_items_chart_data, $item->item_name);
-                array_push($number_of_sold_items_chart_data, $item->getThisMonthSoldUnits() ? $item->getThisMonthSoldUnits() : 0);
+                array_push($number_of_sold_items_chart_data, $item->getCurrentMonthSoldUnits() ? $item->getCurrentMonthSoldUnits() : 0);
             }
         }
 
@@ -490,8 +537,7 @@ class RestaurantController extends Controller {
                     'customer_gained_chart_data' => $customer_gained_chart_data,
                     'number_of_sold_items_chart_data' => $number_of_sold_items_chart_data,
                     'revenue_generated_chart_data' => $revenue_generated_chart_data,
-                    'order_recevied_chart_data' => $order_recevied_chart_data,
-                        // 'most_selling_items_chart_data' => $most_selling_items_chart_data,
+                    'order_recevied_chart_data' => $order_recevied_chart_data
         ]);
     }
 

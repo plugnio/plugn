@@ -41,7 +41,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'promote-to-open', 'promote-to-close', 'pay', 'callback', 'vendor-dashboard', 'mark-as-busy', 'mark-as-open', 'export-today-sold-items', 'export-this-week-sold-items', 'export-this-months-sold-items'],
+                        'actions' => ['logout', 'promote-to-open', 'promote-to-close', 'pay', 'callback', 'vendor-dashboard', 'mark-as-busy', 'mark-as-open'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -241,7 +241,7 @@ class SiteController extends Controller {
 
 
             //last month
-            $number_of_all_orders_received_last_two_months_only = Order::find()
+            $number_of_all_orders_received_last_three_months_only = Order::find()
                     ->where(['order_status' => Order::STATUS_PENDING])
                     ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
                     ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
@@ -249,10 +249,10 @@ class SiteController extends Controller {
                     ->orWhere(['order_status' => Order::STATUS_CANCELED])
                     ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
+                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
                     ->count();
 
-            array_push($orders_received_chart_data_last_month, (int) ($number_of_all_orders_received_last_two_months_only));
+            array_push($orders_received_chart_data_last_month, (int) ($number_of_all_orders_received_last_three_months_only));
 
             $number_of_all_orders_received_last_month_only = Order::find()
                     ->where(['order_status' => Order::STATUS_PENDING])
@@ -269,7 +269,7 @@ class SiteController extends Controller {
 
 
 
-            array_push($orders_received_chart_data_last_three_months, (int) ($number_of_all_orders_received_last_two_months_only));
+            array_push($orders_received_chart_data_last_three_months, (int) ($number_of_all_orders_received_last_three_months_only));
 
             array_push($orders_received_chart_data_last_three_months, (int) ($number_of_all_orders_received_last_month_only));
 
@@ -426,7 +426,7 @@ class SiteController extends Controller {
             }
 
             //last month
-            $number_of_all_sold_item_last_two_months_only = OrderItem::find()
+            $number_of_all_sold_item_last_three_months_only = OrderItem::find()
                     ->joinWith('order')
                     ->where(['order_status' => Order::STATUS_PENDING])
                     ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
@@ -435,10 +435,10 @@ class SiteController extends Controller {
                     ->orWhere(['order_status' => Order::STATUS_CANCELED])
                     ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
+                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
                     ->sum('order_item.qty');
 
-            array_push($sold_item_chart_data_last_month, (int) ($number_of_all_sold_item_last_two_months_only));
+            array_push($sold_item_chart_data_last_month, (int) ($number_of_all_sold_item_last_three_months_only));
 
             $number_of_all_sold_item_last_month_only = OrderItem::find()
                     ->joinWith('order')
@@ -456,7 +456,7 @@ class SiteController extends Controller {
 
 
 
-            array_push($sold_item_chart_data_last_three_months, (int) ($number_of_all_sold_item_last_two_months_only));
+            array_push($sold_item_chart_data_last_three_months, (int) ($number_of_all_sold_item_last_three_months_only));
 
             array_push($sold_item_chart_data_last_three_months, (int) ($number_of_all_sold_item_last_month_only));
 
@@ -565,13 +565,13 @@ class SiteController extends Controller {
 
 
             //last month
-            $number_of_all_customers_gained_last_two_months_only = Customer::find()
+            $number_of_all_customers_gained_last_three_months_only = Customer::find()
                     ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
+                    ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
                     ->count();
 
-            array_push($customer_chart_data_last_month, (int) ($number_of_all_customers_gained_last_two_months_only));
+            array_push($customer_chart_data_last_month, (int) ($number_of_all_customers_gained_last_three_months_only));
 
             $number_of_all_customers_gained_last_month_only = Customer::find()
                     ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -582,7 +582,7 @@ class SiteController extends Controller {
             array_push($customer_chart_data_last_month, (int) ($number_of_all_customers_gained_last_month_only));
 
             //last three month
-            array_push($customer_chart_data_last_three_months, (int) ($number_of_all_customers_gained_last_two_months_only));
+            array_push($customer_chart_data_last_three_months, (int) ($number_of_all_customers_gained_last_three_months_only));
 
             array_push($customer_chart_data_last_three_months, (int) ($number_of_all_customers_gained_last_month_only));
 
@@ -723,17 +723,17 @@ class SiteController extends Controller {
 
 
             //last month
-            $number_of_all_revenue_generated_last_two_months_only = Order::find()
+            $number_of_all_revenue_generated_last_three_months_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
                     ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
                     ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
                     ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
                     ->andWhere('YEAR(`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
+                    ->andWhere('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_last_month,  number_format((float)$number_of_all_revenue_generated_last_two_months_only, 2, '.', ''));
+            array_push($revenue_generated_chart_data_last_month,  number_format((float)$number_of_all_revenue_generated_last_three_months_only, 2, '.', ''));
 
             $number_of_all_revenue_generated_last_month_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -748,7 +748,7 @@ class SiteController extends Controller {
             array_push($revenue_generated_chart_data_last_month, number_format((float)$number_of_all_revenue_generated_last_month_only, 2, '.', ''));
 
             //last 3 months
-            array_push($revenue_generated_chart_data_last_three_months,  number_format((float)$number_of_all_revenue_generated_last_two_months_only, 2, '.', ''));
+            array_push($revenue_generated_chart_data_last_three_months,  number_format((float)$number_of_all_revenue_generated_last_three_months_only, 2, '.', ''));
             array_push($revenue_generated_chart_data_last_three_months,  number_format((float)$number_of_all_revenue_generated_last_month_only, 2, '.', ''));
 
             $number_of_all_revenue_generated_current_month_only = Order::find()
@@ -817,44 +817,6 @@ class SiteController extends Controller {
         }
     }
 
-    public function actionExportTodaySoldItems($restaurantUuid) {
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
-
-
-            $today_sold_item = Item::find()
-                    ->joinWith(['orderItems', 'orderItems.order'])
-                    ->where(['order.order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
-                    ->all();
-
-            header('Access-Control-Allow-Origin: *');
-            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
-            header("Cache-Control: max-age=0");
-
-
-            \moonland\phpexcel\Excel::export([
-                'isMultipleSheet' => false,
-                'models' => $today_sold_item,
-                'columns' => [
-                    'item_name',
-                    [
-                        'label' => 'role',
-                        'format' => 'html',
-                        'value' => function ($data) {
-
-                            return $data->getTodaySoldUnits();
-                        },
-                    ],
-                ],
-            ]);
-        }
-    }
-
 
 
     // public function actionMarkAsBusy($restaurantUuid) {
@@ -870,82 +832,6 @@ class SiteController extends Controller {
     //     return $this->redirect(['vendor-dashboard', 'id' => $restaurantUuid]);
     //   }
     // }
-
-    public function actionExportThisWeekSoldItems($restaurantUuid) {
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
-
-
-            $this_week_sold_item = Item::find()
-                    ->joinWith(['orderItems', 'orderItems.order'])
-                    ->where(['order.order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
-                    ->all();
-
-            header('Access-Control-Allow-Origin: *');
-            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
-            header("Cache-Control: max-age=0");
-
-
-            \moonland\phpexcel\Excel::export([
-                'isMultipleSheet' => false,
-                'models' => $this_week_sold_item,
-                'columns' => [
-                    'item_name',
-                    [
-                        'label' => 'role',
-                        'format' => 'html',
-                        'value' => function ($data) {
-                            return $data->getThisWeekSoldUnits();
-                        },
-                    ],
-                ],
-            ]);
-        }
-    }
-
-    public function actionExportThisMonthsSoldItems($restaurantUuid) {
-
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
-
-
-            $this_month_sold_item = Item::find()
-                    ->joinWith(['orderItems', 'orderItems.order'])
-                    ->where(['order.order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
-                    ->all();
-
-            header('Access-Control-Allow-Origin: *');
-            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
-            header("Cache-Control: max-age=0");
-
-
-            \moonland\phpexcel\Excel::export([
-                'isMultipleSheet' => false,
-                'models' => $this_month_sold_item,
-                'columns' => [
-                    'item_name',
-                    [
-                        'label' => 'role',
-                        'format' => 'html',
-                        'value' => function ($data) {
-
-                            return $data->getThisMonthSoldUnits();
-                        },
-                    ],
-                ],
-            ]);
-        }
-    }
 
     /**
      * Change restaurant status to become open

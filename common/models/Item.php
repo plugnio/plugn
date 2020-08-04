@@ -312,6 +312,7 @@ class Item extends \yii\db\ActiveRecord
             ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
             ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
             ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+            ->orWhere(['order_status' => Order::STATUS_CANCELED])
             ->sum('qty');
     }
 
@@ -326,6 +327,7 @@ class Item extends \yii\db\ActiveRecord
             ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
             ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
             ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+            ->orWhere(['order_status' => Order::STATUS_CANCELED])
             ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
             ->sum('qty');
     }
@@ -341,23 +343,63 @@ class Item extends \yii\db\ActiveRecord
             ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
             ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
             ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+            ->orWhere(['order_status' => Order::STATUS_CANCELED])
             ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
             ->sum('qty');
     }
+
     /**
      * Gets query for [[Options]].
      *
      */
-    public function getThisMonthSoldUnits(){
+    public function getCurrentMonthSoldUnits(){
       return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid'])
             ->joinWith('order')
             ->where(['order.order_status' => Order::STATUS_PENDING])
             ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
             ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
             ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-            ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
+            ->orWhere(['order_status' => Order::STATUS_CANCELED])
+            ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
             ->sum('qty');
     }
+
+    /**
+     * Gets query for [[Options]].
+     *
+     */
+    public function getLastMonthSoldUnits(){
+      return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid'])
+            ->joinWith('order')
+            ->where(['order.order_status' => Order::STATUS_PENDING])
+            ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
+            ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+            ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+            ->orWhere(['order_status' => Order::STATUS_CANCELED])
+            ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->sum('qty');
+    }
+
+    /**
+     * Gets query for [[Options]].
+     *
+     */
+    public function getLastThreeMonthSoldUnits(){
+      return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid'])
+            ->joinWith('order')
+            ->where(['order.order_status' => Order::STATUS_PENDING])
+            ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
+            ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+            ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+            ->orWhere(['order_status' => Order::STATUS_CANCELED])
+            ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
+            ->sum('qty');
+    }
+
+
 
     /**
      * Gets query for [[OrderItems]].
