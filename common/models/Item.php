@@ -53,7 +53,7 @@ class Item extends \yii\db\ActiveRecord
     {
         return [
             [['item_name', 'items_category'], 'required', 'on' => 'create'],
-            [['item_name', 'item_name_ar', 'item_price'], 'required'],
+            [['item_name', 'item_name_ar', 'item_price', 'stock_qty'], 'required'],
             [['sort_number', 'stock_qty'], 'integer', 'min' => 0],
             [['unit_sold'], 'integer', 'min' => 0],
             [['item_price'], 'number', 'min' => 0],

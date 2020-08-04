@@ -20,6 +20,32 @@ use Yii;
 class Option extends \yii\db\ActiveRecord {
 
     /**
+     * these are flags that are used by the form to dictate how the loop will handle each item
+     */
+    const UPDATE_TYPE_CREATE = 'create';
+    const UPDATE_TYPE_UPDATE = 'update';
+    const UPDATE_TYPE_DELETE = 'delete';
+    const SCENARIO_BATCH_UPDATE = 'batchUpdate';
+
+    private $_updateType;
+
+    public function getUpdateType() {
+        if (empty($this->_updateType)) {
+            if ($this->isNewRecord) {
+                $this->_updateType = self::UPDATE_TYPE_CREATE;
+            } else {
+                $this->_updateType = self::UPDATE_TYPE_UPDATE;
+            }
+        }
+
+        return $this->_updateType;
+    }
+
+    public function setUpdateType($value) {
+        $this->_updateType = $value;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public static function tableName() {
@@ -31,7 +57,13 @@ class Option extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['item_uuid', 'min_qty', 'option_name', 'option_name_ar'], 'required'],
+            ['updateType', 'required', 'on' => self::SCENARIO_BATCH_UPDATE],
+            ['updateType',
+                'in',
+                'range' => [self::UPDATE_TYPE_CREATE, self::UPDATE_TYPE_UPDATE, self::UPDATE_TYPE_DELETE],
+                'on' => self::SCENARIO_BATCH_UPDATE
+            ],
+            [[ 'min_qty', 'option_name', 'option_name_ar'], 'required'],
 //            ['max_qty', 'required', 'when' => function($model) {
 //                    return $model->min_qty != null;
 //                }
@@ -57,8 +89,8 @@ class Option extends \yii\db\ActiveRecord {
         return [
             'option_id' => 'Option ID',
             'item_uuid' => 'Item Uuid',
-            'min_qty' => 'Minimum amount',
-            'max_qty' => 'Maximum amount',
+            'min_qty' => 'Min Selections',
+            'max_qty' => 'Max Selections',
             'option_name' => 'Option Name',
             'option_name_ar' => 'Option Name in Arabic',
         ];
