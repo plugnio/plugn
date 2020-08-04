@@ -274,7 +274,7 @@ class RestaurantController extends Controller {
 
         $lastFiveMonths = date('M', strtotime('-5 months'));
 
-        array_push($revenue_generated_chart_data, $revenue_generated_last_five_months_month ? $revenue_generated_last_five_months_month : 0);
+        array_push($revenue_generated_chart_data, $revenue_generated_last_five_months_month ? (int) $revenue_generated_last_five_months_month : 0);
 
         array_push($months, $lastFiveMonths);
 
@@ -291,7 +291,7 @@ class RestaurantController extends Controller {
 
         $lastFoureMonths = date('M', strtotime('-4 months'));
 
-        array_push($revenue_generated_chart_data, $revenue_generated_last_four_months_month ? $revenue_generated_last_four_months_month : 0);
+        array_push($revenue_generated_chart_data, $revenue_generated_last_four_months_month ? (int) $revenue_generated_last_four_months_month : 0);
 
         array_push($months, $lastFoureMonths);
 
@@ -307,7 +307,7 @@ class RestaurantController extends Controller {
 
         $lastThreeMonths = date('M', strtotime('-3 months'));
 
-        array_push($revenue_generated_chart_data, $revenue_generated_last_three_months_month ? $revenue_generated_last_three_months_month : 0);
+        array_push($revenue_generated_chart_data, $revenue_generated_last_three_months_month ? (int) $revenue_generated_last_three_months_month : 0);
 
         array_push($months, $lastThreeMonths);
 
@@ -323,7 +323,7 @@ class RestaurantController extends Controller {
 
         $lastTwoMonths = date('M', strtotime('-2 months'));
 
-        array_push($revenue_generated_chart_data, $revenue_generated_last_two_months_month ? $revenue_generated_last_two_months_month : 0 );
+        array_push($revenue_generated_chart_data, $revenue_generated_last_two_months_month ? (int) $revenue_generated_last_two_months_month : 0 );
 
         array_push($months, $lastTwoMonths);
 
@@ -338,7 +338,7 @@ class RestaurantController extends Controller {
                 ->sum('total_price');
 
         $lastMonth = date('M', strtotime('-1 months'));
-        array_push($revenue_generated_chart_data, $revenue_generated_last_month ?  $revenue_generated_last_month : 0);
+        array_push($revenue_generated_chart_data, $revenue_generated_last_month ?  (int) $revenue_generated_last_month : 0);
         array_push($months, $lastMonth);
 
         $revenue_generated_current_month = Order::find()
@@ -353,7 +353,7 @@ class RestaurantController extends Controller {
 
         $currentMonth = date('M');
 
-        array_push($revenue_generated_chart_data, $revenue_generated_current_month ? $revenue_generated_current_month : 0);
+        array_push($revenue_generated_chart_data, $revenue_generated_current_month ? (int) $revenue_generated_current_month : 0);
 
         array_push($months, $currentMonth);
 
