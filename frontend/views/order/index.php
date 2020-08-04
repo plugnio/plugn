@@ -78,7 +78,11 @@ $this->registerJs($js);
             ])->widget(DateRangePicker::classname(), [
                 'presetDropdown' => false,
                 'convertFormat' => true,
-                'pluginOptions' => ['locale' => ['format' => 'Y-m-d H:m:s'],],
+                'pluginOptions' => [
+                  'timePicker'=>true,
+                  'timePickerIncrement'=>15,
+                  'locale'=>['format'=>'Y-m-d H:i:s']
+                ],
             ]);
             ?>
 

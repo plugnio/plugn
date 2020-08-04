@@ -274,7 +274,7 @@ class RestaurantController extends Controller {
 
         $lastFiveMonths = date('M', strtotime('-5 months'));
 
-        array_push($revenue_generated_chart_data, number_format($revenue_generated_last_five_months_month));
+        array_push($revenue_generated_chart_data, $revenue_generated_last_five_months_month ? $revenue_generated_last_five_months_month : 0);
 
         array_push($months, $lastFiveMonths);
 
@@ -291,7 +291,7 @@ class RestaurantController extends Controller {
 
         $lastFoureMonths = date('M', strtotime('-4 months'));
 
-        array_push($revenue_generated_chart_data, number_format($revenue_generated_last_four_months_month,3));
+        array_push($revenue_generated_chart_data, $revenue_generated_last_four_months_month ? $revenue_generated_last_four_months_month : 0);
 
         array_push($months, $lastFoureMonths);
 
@@ -307,23 +307,23 @@ class RestaurantController extends Controller {
 
         $lastThreeMonths = date('M', strtotime('-3 months'));
 
-        array_push($revenue_generated_chart_data, number_format($revenue_generated_last_three_months_month,3));
+        array_push($revenue_generated_chart_data, $revenue_generated_last_three_months_month ? $revenue_generated_last_three_months_month : 0);
 
         array_push($months, $lastThreeMonths);
 
-        $revenue_generated_last_three_months_month = Order::find()
+        $revenue_generated_last_two_months_month = Order::find()
                 ->where(['restaurant_uuid' => $model->restaurant_uuid])
                 ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
                 ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
                 ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
                 ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
                 ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
+                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
                 ->sum('total_price');
 
         $lastTwoMonths = date('M', strtotime('-2 months'));
 
-        array_push($revenue_generated_chart_data, number_format($revenue_generated_last_three_months_month,3));
+        array_push($revenue_generated_chart_data, $revenue_generated_last_two_months_month ? $revenue_generated_last_two_months_month : 0 );
 
         array_push($months, $lastTwoMonths);
 
@@ -338,9 +338,7 @@ class RestaurantController extends Controller {
                 ->sum('total_price');
 
         $lastMonth = date('M', strtotime('-1 months'));
-
-        array_push($revenue_generated_chart_data, number_format($revenue_generated_last_month,3));
-
+        array_push($revenue_generated_chart_data, $revenue_generated_last_month ?  $revenue_generated_last_month : 0);
         array_push($months, $lastMonth);
 
         $revenue_generated_current_month = Order::find()
@@ -355,7 +353,7 @@ class RestaurantController extends Controller {
 
         $currentMonth = date('M');
 
-        array_push($revenue_generated_chart_data, (int) ($revenue_generated_current_month));
+        array_push($revenue_generated_chart_data, $revenue_generated_current_month ? $revenue_generated_current_month : 0);
 
         array_push($months, $currentMonth);
 
@@ -372,7 +370,7 @@ class RestaurantController extends Controller {
                 ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 5 MONTH)')
                 ->count();
 
-        array_push($order_recevied_chart_data, (int) ($order_recevied_last_five_months_month));
+        array_push($order_recevied_chart_data, $order_recevied_last_five_months_month ? $order_recevied_last_five_months_month : 0 );
 
 
         $order_recevied_last_four_months_month = Order::find()
@@ -386,7 +384,7 @@ class RestaurantController extends Controller {
                 ->count();
 
 
-        array_push($order_recevied_chart_data, (int) ($order_recevied_last_four_months_month));
+        array_push($order_recevied_chart_data, $order_recevied_last_four_months_month ? $order_recevied_last_four_months_month : 0 );
 
 
         $order_recevied_last_three_months_month = Order::find()
@@ -399,19 +397,19 @@ class RestaurantController extends Controller {
                 ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
                 ->count();
 
-        array_push($order_recevied_chart_data, (int) ($order_recevied_last_three_months_month));
+        array_push($order_recevied_chart_data, $order_recevied_last_three_months_month ? $order_recevied_last_three_months_month : 0);
 
-        $order_recevied_last_three_months_month = Order::find()
+        $order_recevied_last_two_months_month = Order::find()
                 ->where(['restaurant_uuid' => $model->restaurant_uuid])
                 ->andWhere(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
                 ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
                 ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
                 ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
                 ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
+                ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
                 ->count();
 
-        array_push($order_recevied_chart_data, (int) ($order_recevied_last_three_months_month));
+        array_push($order_recevied_chart_data, $order_recevied_last_two_months_month ? $order_recevied_last_two_months_month : 0);
 
         $order_recevied_last_month = Order::find()
                 ->where(['restaurant_uuid' => $model->restaurant_uuid])
@@ -424,7 +422,7 @@ class RestaurantController extends Controller {
                 ->count();
 
 
-        array_push($order_recevied_chart_data, (int) ($order_recevied_last_month));
+        array_push($order_recevied_chart_data, $order_recevied_last_month ? $order_recevied_last_month : 0 );
 
 
         $order_recevied_current_month = Order::find()
@@ -438,7 +436,7 @@ class RestaurantController extends Controller {
                 ->count();
 
 
-        array_push($order_recevied_chart_data, (int) ($order_recevied_current_month));
+        array_push($order_recevied_chart_data, $order_recevied_current_month ? $order_recevied_current_month : 0 );
 
 
 
@@ -452,7 +450,7 @@ class RestaurantController extends Controller {
                 ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 5 MONTH)')
                 ->count();
 
-        array_push($customer_gained_chart_data, (int) ($customer_gained_last_five_months_month));
+        array_push($customer_gained_chart_data, $customer_gained_last_five_months_month ? $customer_gained_last_five_months_month : 0);
 
 
         $customer_gained_last_four_months_month = Customer::find()
@@ -462,7 +460,7 @@ class RestaurantController extends Controller {
                 ->count();
 
 
-        array_push($customer_gained_chart_data, (int) ($customer_gained_last_four_months_month));
+        array_push($customer_gained_chart_data, $customer_gained_last_four_months_month ? $customer_gained_last_four_months_month : 0);
 
 
         $customer_gained_last_three_months_month = Customer::find()
@@ -471,15 +469,15 @@ class RestaurantController extends Controller {
                 ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
                 ->count();
 
-        array_push($customer_gained_chart_data, (int) ($customer_gained_last_three_months_month));
+        array_push($customer_gained_chart_data, $customer_gained_last_three_months_month ? $customer_gained_last_three_months_month : 0);
 
-        $customer_gained_last_three_months_month = Customer::find()
+        $customer_gained_last_two_months_month = Customer::find()
                 ->where(['restaurant_uuid' => $model->restaurant_uuid])
                 ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
+                ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
                 ->count();
 
-        array_push($customer_gained_chart_data, (int) ($customer_gained_last_three_months_month));
+        array_push($customer_gained_chart_data, $customer_gained_last_two_months_month ? $customer_gained_last_two_months_month : 0);
 
         $customer_gained_last_month = Customer::find()
                 ->where(['restaurant_uuid' => $model->restaurant_uuid])
@@ -488,7 +486,7 @@ class RestaurantController extends Controller {
                 ->count();
 
 
-        array_push($customer_gained_chart_data, (int) ($customer_gained_last_month));
+        array_push($customer_gained_chart_data, $customer_gained_last_month ? $customer_gained_last_month : 0);
 
 
         $customer_gained_current_month = Customer::find()
@@ -498,7 +496,7 @@ class RestaurantController extends Controller {
                 ->count();
 
 
-        array_push($customer_gained_chart_data, (int) ($customer_gained_current_month));
+        array_push($customer_gained_chart_data, $customer_gained_current_month ? $customer_gained_current_month : 0);
 
 
         $most_selling_items_chart_data = [];
@@ -507,25 +505,16 @@ class RestaurantController extends Controller {
 
 
         $sold_items = \common\models\Item::find()
-                ->joinWith(['orderItems', 'order'])
-                ->where(['order_status' => Order::STATUS_PENDING])
-                ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
-                ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                ->orWhere(['order_status' => Order::STATUS_COMPLETE])
-                ->orWhere(['order_status' => Order::STATUS_CANCELED])
                 ->where(['item.restaurant_uuid' => $model->restaurant_uuid])
-                ->orderBy(['order_item.qty' => SORT_ASC])
+                ->orderBy(['unit_sold' => SORT_DESC])
+                ->limit(5)
                 ->all();
 
 
-        $most_selling_items_counter = 0;
 
         foreach ($sold_items as $key => $item) {
-            if ($most_selling_items_counter < 5) {
-                $most_selling_items_counter++;
                 array_push($most_selling_items_chart_data, $item->item_name);
-                array_push($number_of_sold_items_chart_data, $item->getCurrentMonthSoldUnits() ? $item->getCurrentMonthSoldUnits() : 0);
-            }
+                array_push($number_of_sold_items_chart_data, $item->unit_sold ? $item->unit_sold : 0);
         }
 
 
