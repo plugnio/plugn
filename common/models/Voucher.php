@@ -63,6 +63,7 @@ class Voucher extends \yii\db\ActiveRecord {
             ['discount_type', 'in', 'range' => [self::DISCOUNT_TYPE_PERCENTAGE, self::DISCOUNT_TYPE_AMOUNT]],
             ['voucher_status', 'in', 'range' => [self::VOUCHER_STATUS_ACTIVE, self::VOUCHER_STATUS_EXPIRED]],
             [['restaurant_uuid'], 'string', 'max' => 60],
+            [['discount_amount'], 'number', 'min' => 0],
             [['voucher_created_at', 'voucher_updated_at'], 'safe'],
             [['code','description','description_ar'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
