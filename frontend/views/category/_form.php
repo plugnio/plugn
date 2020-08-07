@@ -46,7 +46,7 @@ use yii\widgets\ActiveForm;
                 <?= $form->field($model, 'sort_number')->textInput() ?>
             </div>
         </div>
-        
+
         <div class="form-group" style="background: #f4f6f9; margin-bottom: 0px; padding-bottom: 0px; background:#f4f6f9 ">
             <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
         </div>
