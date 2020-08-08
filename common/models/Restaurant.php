@@ -69,8 +69,13 @@ class Restaurant extends \yii\db\ActiveRecord {
     const PHONE_NUMBER_DISPLAY_SHOW_PHONE_NUMBER = 3;
 
     //Values for `store_layout`
-    const STORE_LAYOUT_LIST  = 1;
-    const STORE_LAYOUT_GRID  = 2;
+    const STORE_LAYOUT_LIST_FULLWIDTH  = 1;
+    const STORE_LAYOUT_GRID_FULLWIDTH   = 2;
+    const STORE_LAYOUT_CATEGORY_FULLWIDTH   = 3;
+
+    const STORE_LAYOUT_LIST_HALFWIDTH  = 4;
+    const STORE_LAYOUT_GRID_HALFWIDTH   = 5;
+    const STORE_LAYOUT_CATEGORY_HALFWIDTH   = 6;
 
 
     public $restaurant_delivery_area;
@@ -98,7 +103,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['restaurant_status', 'support_delivery', 'support_pick_up'], 'integer', 'min' => 0],
             ['restaurant_status', 'in', 'range' => [self::RESTAURANT_STATUS_OPEN, self::RESTAURANT_STATUS_BUSY, self::RESTAURANT_STATUS_CLOSED]],
-            ['store_layout', 'in', 'range' => [self::STORE_LAYOUT_LIST, self::STORE_LAYOUT_GRID]],
+            ['store_layout', 'in', 'range' => [self::STORE_LAYOUT_LIST_FULLWIDTH, self::STORE_LAYOUT_GRID_FULLWIDTH , self::STORE_LAYOUT_CATEGORY_FULLWIDTH, self::STORE_LAYOUT_LIST_HALFWIDTH, self::STORE_LAYOUT_GRID_HALFWIDTH , self::STORE_LAYOUT_CATEGORY_HALFWIDTH ]],
             ['phone_number_display', 'in', 'range' => [self::PHONE_NUMBER_DISPLAY_ICON, self::PHONE_NUMBER_DISPLAY_SHOW_PHONE_NUMBER, self::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER]],
             [['restaurant_created_at', 'restaurant_updated_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
