@@ -105,26 +105,24 @@ class OpeningHour extends \yii\db\ActiveRecord {
         ];
     }
 
-    public function getDeliveryTimes($delivery_time, $date) {
+    public function getDeliveryTimes($delivery_time, $date, $startTime) {
 
 
         $time_interval = [];
-        $startTime = date('H:i', strtotime($this->open_at));
 
 
+        for ($i = 0; date('H:i A', strtotime($startTime)) <= date('H:i A', strtotime($this->close_at)); $i++) {
 
-        for ($i = 0; strtotime($startTime) <= strtotime($this->close_at); $i++) {
-
-            $endTime = date('H:i', strtotime($startTime) + intval($this->restaurant->schedule_interval) * 60);
+            $endTime = date('c', strtotime($startTime) + intval($this->restaurant->schedule_interval) * 60);
 
 
-            if ($this->day_of_week == date('w', strtotime("today")) && date('H:i A', strtotime("now")) < date('H:i A', strtotime($startTime))) {
+            if ($this->day_of_week == date('w', strtotime("today")) && date('c', strtotime("now")) < date('c', strtotime($startTime))) {
 
-              if(strtotime($startTime)  >  strtotime("now") + (intval($delivery_time) * 60) ){
+              if( date('c',strtotime($startTime))  >  date('c', strtotime("now") + (intval($delivery_time) * 60)) ){
                 array_push($time_interval, [
                     'date' =>  $date,
-                    'start_time' =>  date('c', strtotime($date . date('H:i',  strtotime($startTime)))) ,
-                    'end_time' =>   date('H:i' , strtotime($endTime) ) != '00:00' ? date('c', strtotime($date . date('H:i',strtotime($endTime)))) : date('c', strtotime($date . date('H:i',strtotime($this->close_at)))),
+                    'start_time' =>  date('c', strtotime($startTime)) ,
+                    'end_time' =>   date('c' , strtotime($endTime))
                 ]);
               }
 
@@ -132,9 +130,9 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
 
                   $time_interval[$i] = [
-                      'date' =>  $date,
-                      'start_time' =>  date('c', strtotime($date . date('H:i',strtotime($startTime)))) ,
-                      'end_time' =>   date('H:i' , strtotime($endTime) ) != '00:00' ? date('c', strtotime($date . date('H:i',strtotime($endTime)))) : date('c', strtotime($date . date('H:i',strtotime($this->close_at)))),
+                    'date' =>  $date,
+                    'start_time' =>  date('c', strtotime($startTime)) ,
+                    'end_time' =>   date('c' , strtotime($endTime))
                   ];
 
 
@@ -146,7 +144,7 @@ class OpeningHour extends \yii\db\ActiveRecord {
                 break;
 
 
-            $startTime = date('H:i', strtotime($startTime) + intval($this->restaurant->schedule_interval) * 60);
+            $startTime = date('c', strtotime($startTime) + intval($this->restaurant->schedule_interval) * 60);
 
 
 
