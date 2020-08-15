@@ -242,7 +242,6 @@ $this->registerJs($js);
                 $form->field($model, 'store_layout')->radioList([
                   Restaurant::STORE_LAYOUT_LIST_FULLWIDTH => 'List - Fullwidth',
                   Restaurant::STORE_LAYOUT_GRID_FULLWIDTH  => 'Grid - Fullwidth',
-                  Restaurant::STORE_LAYOUT_CATEGORY_FULLWIDTH  => 'Category - Fullwidth',
                   Restaurant::STORE_LAYOUT_LIST_HALFWIDTH => 'List - Half',
                   Restaurant::STORE_LAYOUT_GRID_HALFWIDTH => 'Grid - Half',
                   Restaurant::STORE_LAYOUT_CATEGORY_HALFWIDTH => 'Category - Half',
