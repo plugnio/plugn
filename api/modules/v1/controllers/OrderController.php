@@ -89,6 +89,14 @@ class OrderController extends Controller {
                 // if( Yii::$app->request->getBodyParam("is_order_scheduled") !== null)
                   $order->is_order_scheduled = Yii::$app->request->getBodyParam("is_order_scheduled") ? Yii::$app->request->getBodyParam("is_order_scheduled") : 0;
 
+
+
+                  //Apply promo code
+                  if(Yii::$app->request->getBodyParam("voucher_id")){
+                    $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
+                  }
+
+
                 //if the order mode = 1 => Delivery
                 if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
                     $order->area_id = Yii::$app->request->getBodyParam("area_id");
@@ -196,17 +204,18 @@ class OrderController extends Controller {
 
 
                 //Apply promo code
-                if(Yii::$app->request->getBodyParam("voucher_id")){
-                  $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
+                // if(Yii::$app->request->getBodyParam("voucher_id")){
+                //
+                //   $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
+                //
+                //   if(!$order->save()){
+                //     $response = [
+                //         'operation' => 'error',
+                //         'message' => $order->getErrors(),
+                //     ];
+                //   }
+                // }
 
-                  if(!$order->save()){
-                    $response = [
-                        'operation' => 'error',
-                        'message' => $order->getErrors(),
-                    ];
-                  }
-                }
-  
 
 
                 if ($response == null) {
