@@ -192,8 +192,8 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                             ],
                             [
                                 'label' => 'Subtotal',
-                                'value' => function ($item) {
-                                    return $item->calculateOrderItemPrice();
+                                'value' => function ($orderItem) {
+                                    return $orderItem->item_price;
                                 },
                                 'format' => 'currency'
                             ],
