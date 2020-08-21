@@ -54,13 +54,13 @@ use kartik\file\FileInput;
                 'showRemove' => false,
                 'showUpload' => false,
                 'showZoom' => false,
-                'initialPreview' => $model->category_image ? $model->getCategoryImage() : null,
+                'initialPreview' => $model->category_image ? $model->getCategoryImage() : false,
                 'initialPreviewAsData' => true,
                 'allowedFileExtensions' => ['jpg', 'png', 'jpeg'],
                 'overwriteInitial' => true,
                 'uploadAsync' => true,
                 'showUploadedThumbs' => true,
-                'maxFileCount' => 10,
+                'maxFileCount' => 1,
                 'initialPreviewShowDelete' => false,
                 'maxFileSize' => 30000
             ]
