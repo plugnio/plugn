@@ -241,7 +241,7 @@ $this->registerJs($js);
                 <?php
 
 
-                if($model->restaurant_uuid == 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'){
+                if($model->restaurant_uuid == 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290' || $model->restaurant_uuid == 'rest_73100b93-cf41-11ea-808a-0673128d0c9c'){
                   echo  $form->field($model, 'store_layout')->radioList([
                               Restaurant::STORE_LAYOUT_LIST_FULLWIDTH => 'List',
                               Restaurant::STORE_LAYOUT_GRID_FULLWIDTH  => 'Grid',
