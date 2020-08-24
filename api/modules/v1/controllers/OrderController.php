@@ -452,8 +452,12 @@ class OrderController extends Controller {
      * @return boolean
      */
     public function actionCheckPendingOrders($restaurant_uuid) {
-        return Order::find()->where(['restaurant_uuid' => $restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
-                        ->exists();
+        return Order::find()
+                        ->where([
+                          'restaurant_uuid' => $restaurant_uuid,
+                          'order_status' => Order::STATUS_PENDING,
+                          'is_order_scheduled' => false,
+                        ])->exists();
     }
 
 }
