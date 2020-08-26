@@ -109,7 +109,6 @@ $this->registerJs($js);
             'initialPreview' => $model->getThumbnailImage(),
             'initialPreviewAsData' => true,
             'overwriteInitial' => true,
-            'maxFileSize' => 2800
         ]
     ]);
     ?>
