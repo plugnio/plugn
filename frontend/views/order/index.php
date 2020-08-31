@@ -43,7 +43,7 @@ $this->registerJs($js);
     <div class="action-btns ">
         <div class="btn-dropdown mr-1 mb-1">
             <div class="btn-group dropdown actions-dropodown">
-                <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary']) ?>
+                <?= Html::a('<i class="feather icon-plus"></i> Create an order manually', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary']) ?>
             </div>
         </div>
     </div>
