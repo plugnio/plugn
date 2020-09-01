@@ -212,12 +212,12 @@ use common\models\Order;
                                                                                         </tr>
 
                                                                                         <?php
-                                                                                        if ($model->voucher_id) {
-                                                                                            $voucherDiscount = $model->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($model->subtotal * ($model->voucher->discount_amount / 100)) : $model->voucher->discount_amount;
-                                                                                            $subtotalAfterDiscount = $model->subtotal - $voucherDiscount;
+                                                                                        if ($order->voucher_id) {
+                                                                                            $voucherDiscount = $order->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($order->subtotal * ($order->voucher->discount_amount / 100)) : $order->voucher->discount_amount;
+                                                                                            $subtotalAfterDiscount = $order->subtotal - $voucherDiscount;
                                                                                             ?>
                                                                                             <td colspan="2" style="padding: 0 15px; padding-top:40px; vertical-align:top;">
-                                                                                                <p style="margin:0;padding:0;">Voucher Discount (<?= $model->voucher->code ?>)</p>
+                                                                                                <p style="margin:0;padding:0;">Voucher Discount (<?= $order->voucher->code ?>)</p>
                                                                                             </td>
                                                                                             <td style="color:#828585;padding-top:40px; text-align: right; vertical-align:top;">
                                                                                               -<?= Yii::$app->formatter->asCurrency($voucherDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
