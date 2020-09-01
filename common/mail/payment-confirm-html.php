@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use common\models\Order;
+use common\models\Voucher;
 
 /* @var $this yii\web\View */
 /* @var $order common\models\Order */
