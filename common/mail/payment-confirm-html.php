@@ -218,21 +218,21 @@ use common\models\Voucher;
                                                                                             $subtotalAfterDiscount = $order->subtotal - $voucherDiscount;
                                                                                             ?>
                                                                                               <tr>
-                                                                                            <td colspan="2" style="padding: 0 15px; padding-top:40px; vertical-align:top;">
+                                                                                            <td colspan="2" style="padding: 0 15px;  vertical-align:top;">
                                                                                                 <p style="margin:0;padding:0;">Voucher Discount (<?= $order->voucher->code ?>)</p>
                                                                                             </td>
-                                                                                            <td style="color:#828585;padding-top:40px; text-align: right; vertical-align:top;">
+                                                                                            <td style="color:#828585; text-align: right; vertical-align:top;">
                                                                                               -<?= Yii::$app->formatter->asCurrency($voucherDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
                                                                                             </td>
                                                                                           </tr>
 
 
                                                                                               <tr>
-                                                                                            <td colspan="2" style="padding: 0 15px; padding-top:40px; vertical-align:top;">
+                                                                                            <td colspan="2" style="padding: 0 15px;  vertical-align:top;">
                                                                                                 <p style="margin:0;padding:0;">Subtotal After Voucher</p>
                                                                                             </td>
 
-                                                                                            <td style="color:#828585;padding-top:40px; text-align: right; vertical-align:top;">
+                                                                                            <td style="color:#828585; text-align: right; vertical-align:top;">
                                                                                               <?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
                                                                                             </td>
                                                                                           </tr>
