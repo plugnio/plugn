@@ -212,7 +212,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                         <table class="table table-bordered table-hover">
                             <tbody>
                                 <tr>
-                                    <th>SUBTOTAL</th>
+                                    <th>Subtotal</th>
                                     <td><?= \Yii::$app->formatter->asCurrency($model->subtotal) ?></td>
                                 </tr>
                                 <?php
