@@ -7,14 +7,6 @@ use yii\helpers\Html;
 
 $resetLink = Yii::$app->urlManager->createAbsoluteUrl(['site/reset-password', 'token' => $agent->agent_password_reset_token]);
 ?>
-<div class="password-reset">
-    <p>Hello <?= Html::encode($agent->agent_email) ?>,</p>
-
-    <p>Follow the link below to reset your password:</p>
-
-    <p><?= Html::a(Html::encode($resetLink), $resetLink) ?></p>
-</div>
-
 
 <!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -154,17 +146,6 @@ $resetLink = Yii::$app->urlManager->createAbsoluteUrl(['site/reset-password', 't
                                                      class="" style="vertical-align:top;width:600px;"
                                                   >
                                                 <![endif]-->
-                                                    <div class="mj-column-per-100 outlook-group-fix" style="font-size:13px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
-                                                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
-                                                            <tr>
-                                                                <td align="left" style="font-size:0px;padding:0px 0px 0px 25px;padding-top:0px;padding-bottom:0px;word-break:break-word;">
-                                                                    <div style="font-family:Open Sans, Helvetica, Arial, sans-serif;font-size:11px;line-height:22px;text-align:left;color:#797e82;">
-                                                                        <p style="text-align: center; margin: 10px 0;">Lorem ipsum dolor sit&nbsp;| <a target="_blank" rel="noopener noreferrer" href="#"></a><span style="color:#797e82; text-decoration: underline"> View online version</span></p>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        </table>
-                                                    </div>
                                                     <!--[if mso | IE]>
                                                   </td>
                                                 
@@ -428,14 +409,7 @@ $resetLink = Yii::$app->urlManager->createAbsoluteUrl(['site/reset-password', 't
                                                     <![endif]-->
                                                                 </td>
                                                             </tr>
-                                                            <tr>
-                                                                <td align="center" style="font-size:0px;padding:0px 20px 0px 20px;padding-top:0px;padding-bottom:0px;word-break:break-word;">
-                                                                    <div style="font-family:Open Sans, Helvetica, Arial, sans-serif;font-size:11px;line-height:22px;text-align:center;color:#797e82;">
-                                                                        <p style="margin: 10px 0;"><a target="_blank" rel="noopener noreferrer" style="color:#313942" href="#"><span style="color:#313942">Page 1</span></a><span style="color:#797e82">&nbsp; &nbsp;|&nbsp; &nbsp;</span><a target="_blank" rel="noopener noreferrer" style="color:#313942" href="#"><span style="color:#313942">Page 2</span></a><span style="color:#797e82">&nbsp; &nbsp;|&nbsp; &nbsp;</span><a target="_blank" rel="noopener noreferrer" style="color:#313942" href="#"><span style="color:#313942">Page 3</span></a></p>
-                                                                        <p style="margin: 10px 0;">C<a target="_blank" rel="noopener noreferrer" style="color:inherit; text-decoration:none" href="[[UNSUB_LINK_EN]]">lick <span style="color:#313942"><u>here</u></span> to unsubscribe</a>.<br /><span style="font-size:10px">Created by&nbsp;</span><a target="_blank" rel="noopener noreferrer" style="font-size:10px; color:inherit; text-decoration: none" href="https://www.mailjet.com/?utm_source=saas_email_templates&amp;utm_medium=logo_footer_email&amp;utm_campaign=password_reset"><span style="color:#313942"><u>Mailjet</u></span></a></p>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
+                                                 
                                                         </table>
                                                     </div>
                                                     <!--[if mso | IE]>
