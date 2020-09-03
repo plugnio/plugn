@@ -64,7 +64,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                 <div class="recipient-contact pb-2">
                     <div class="table-responsive">
 
-                        <table class="table table-bordered table-hover" style="margin-top:29px !important;">
+                        <table class="table table-bordered table-hover" style="margin-top:1.5rem !important;">
                             <tbody>
                                 <tr>
                                     <th>Customer name</th>
@@ -141,12 +141,16 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                 <td> <?= $model->house_number ?></td>
                                 </tbody>
                             </table>
+                            <?php if ($model->special_directions) { ?>
+
                             <table class="table table-bordered table-hover" style="margin-top: 1.5rem !important;">
                                 <tbody>
                                 <th>Special Directions</th>
                                 <td> <?= $model->special_directions ?></td>
                                 </tbody>
                             </table>
+                          <?php } ?>
+
                         <?php } ?>
                     </div>
                 </div>
@@ -188,8 +192,8 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                             ],
                             [
                                 'label' => 'Subtotal',
-                                'value' => function ($item) {
-                                    return $item->calculateOrderItemPrice();
+                                'value' => function ($orderItem) {
+                                    return $orderItem->item_price;
                                 },
                                 'format' => 'currency'
                             ],
@@ -208,7 +212,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                         <table class="table table-bordered table-hover">
                             <tbody>
                                 <tr>
-                                    <th>SUBTOTAL</th>
+                                    <th>Subtotal</th>
                                     <td><?= \Yii::$app->formatter->asCurrency($model->subtotal) ?></td>
                                 </tr>
                                 <?php

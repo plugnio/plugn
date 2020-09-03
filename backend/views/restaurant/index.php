@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'restaurant_uuid',
             'name',
             'name_ar',
-            'restaurant_status',
+            'restaurant_domain',
             'app_id',
             'restaurant_created_at:datetime',
             'platform_fee:percent',

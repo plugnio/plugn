@@ -75,26 +75,20 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right">
 
-
-                                  <?= Html::a(
-                                              '<i class="feather icon-user"></i> Edit Profile',
-                                               ['agent/index', 'restaurantUuid' => $this->params['restaurant_uuid']],['class' => 'dropdown-item']) ?>
-
-
+                                    <?=
+                                    Html::a(
+                                            '<i class="feather icon-user"></i> Edit Profile', ['agent/index', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'dropdown-item'])
+                                    ?>
 
                                     <div class="dropdown-divider">
                                     </div>
-
-
                                     <?=
-                                       Html::a('<i class="feather icon-power"></i> Logout', ['site/logout'], ['class' => 'dropdown-item',
-                                           'data' => [
-                                               'method' => 'post',
-                                           ]
-                                       ])
+                                    Html::a('<i class="feather icon-power"></i> Logout', ['site/logout'], ['class' => 'dropdown-item',
+                                        'data' => [
+                                            'method' => 'post',
+                                        ]
+                                    ])
                                     ?>
-
-
                                 </div>
                             </li>
                         </ul>
@@ -123,7 +117,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         ?>
                     </li>
                     </a>
-                  </li>
+                    </li>
                 </ul>
             </div>
             <div class="shadow-bottom"></div>
@@ -155,7 +149,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'Order'), ['order/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                        Html::tag('span', 'Orders'), ['order/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
                                 )
                                 ?>
                             </li>
@@ -197,6 +191,21 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         )
                         ?>
                     </li>
+
+                    <?php if (
+                      $restaurant_model->restaurant_uuid == 'rest_068b3be0-ea30-11ea-808a-0673128d0c9c' ||
+                      $restaurant_model->restaurant_uuid == 'rest_1d40a718-beac-11ea-808a-0673128d0c9c' ||
+                       $restaurant_model->restaurant_uuid == 'rest_58fd80f4-ab79-11ea-8b7f-06d4853caaaa' || $restaurant_model->restaurant_uuid == 'rest_a2f833ef-a06c-11ea-8b7f-06d4853caaaa' || $restaurant_model->restaurant_uuid == 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290' || $restaurant_model->restaurant_uuid == 'rest_8ee880ff-c1d1-11ea-808a-0673128d0c9c' || $restaurant_model->restaurant_uuid == 'rest_9d65290b-b191-11ea-808a-0673128d0c9c') { ?>
+                        <li class=" nav-item <?= $this->context->route == 'voucher/index' ? 'active' : '' ?> ">
+                            <?=
+                            Html::a(
+                                    Html::tag('i', '', ['class' => 'fa fa-tags']) .
+                                    Html::tag('span', 'Vouchers'), ['voucher/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                            )
+                            ?>
+                        </li>
+                    <?php } ?>
+
                     <li class=" nav-item <?= $this->context->route == 'customer/index' ? 'active' : '' ?> ">
 
                         <?=
@@ -206,73 +215,77 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         )
                         ?>
                     </li>
-                      <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
-                    <li class=" nav-item <?= $this->context->route == 'restaurant/analytic' ? 'active' : '' ?> ">
-
-                        <?=
-                        Html::a(
-                                Html::tag('i', '', ['class' => 'fa fa-line-chart']) .
-                                Html::tag('span', 'Analytics'), ['restaurant/analytic', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
-                        )
-                        ?>
-                    </li>
-                    <li class=" nav-item <?= $this->context->route == 'restaurant/index' ? 'active' : '' ?> ">
-
-                        <?=
-                        Html::a(
-                                Html::tag('i', '', ['class' => 'feather icon-settings']) .
-                                Html::tag('span', 'Store Info'), ['restaurant/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
-                        )
-                        ?>
-                    </li>
-                    <?php } ?>
-                    <li class=" nav-item <?= $this->context->route == 'opening-hour/index' ? 'active' : '' ?> ">
-                          <?=
-                          Html::a(
-                                  Html::tag('i', '', ['class' => 'feather icon-clock']) .
-                                  Html::tag('span', 'Opening Hours'), ['opening-hour/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
-                          )
-                          ?>
-                    </li>
-                    <li class=" nav-item <?= $this->context->route == 'restaurant-delivery/index' ? 'active' : '' ?> ">
-
-                        <?=
-                        Html::a(
-                                Html::tag('i', '', ['class' => 'fa fa-truck']) .
-                                Html::tag('span', 'Delivery Zone'), ['restaurant-delivery/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
-                        )
-                        ?>
-                    </li>
-                    <?php if ($restaurant_model->restaurant_uuid == 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290' ||$restaurant_model->restaurant_uuid == 'rest_8ee880ff-c1d1-11ea-808a-0673128d0c9c' || $restaurant_model->restaurant_uuid == 'rest_9d65290b-b191-11ea-808a-0673128d0c9c' ){ ?>
-                      <li class=" nav-item <?= $this->context->route == 'voucher/index' ? 'active' : '' ?> ">
-                          <?=
-                          Html::a(
-                                  Html::tag('i', '', ['class' => 'fa fa-tags']) .
-                                  Html::tag('span', 'Vouchers'), ['voucher/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
-                          )
-                          ?>
-                      </li>
-                      <?php } ?>
-                    <li class=" nav-item <?= $this->context->route == 'restaurant-branch/index' ? 'active' : '' ?> ">
-
-                        <?=
-                        Html::a(
-                                Html::tag('i', '', ['class' => 'feather icon-home']) .
-                                Html::tag('span', "Store's Branches"), ['restaurant-branch/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
-                        )
-                        ?>
-                    </li>
                     <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
-                    <li class=" nav-item <?= $this->context->route == 'agent-assignment/index' ? 'active' : '' ?> ">
+                        <li class=" nav-item <?= $this->context->route == 'restaurant/analytic' ? 'active' : '' ?> ">
 
                             <?=
                             Html::a(
-                                    Html::tag('i', '', ['class' => 'feather icon-user-plus']) .
-                                    Html::tag('span', 'Staff Management'), ['agent-assignment/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                    Html::tag('i', '', ['class' => 'fa fa-line-chart']) .
+                                    Html::tag('span', 'Analytics'), ['restaurant/analytic', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                             )
                             ?>
                         </li>
                     <?php } ?>
+
+
+                    <li class=" nav-item">
+                        <a>
+                            <i class="feather icon-settings"></i>
+                            <span class="menu-title">Settings</span>
+                        </a>
+                        <ul class="menu-content">
+                            <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
+
+                                <li class=" nav-item <?= $this->context->route == 'restaurant/index' ? 'active' : '' ?> ">
+                                    <?=
+                                    Html::a(
+                                            Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                            Html::tag('span', 'Store Info'), ['restaurant/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                    )
+                                    ?>
+                                </li>
+                            <?php } ?>
+
+                            <li class=" nav-item <?= $this->context->route == 'opening-hour/index' ? 'active' : '' ?> ">
+                                <?=
+                                Html::a(
+                                        Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                        Html::tag('span', 'Opening Hours'), ['opening-hour/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                )
+                                ?>
+                            </li>
+                            <li class=" nav-item <?= $this->context->route == 'restaurant-delivery/index' ? 'active' : '' ?> ">
+                                <?=
+                                Html::a(
+                                        Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                        Html::tag('span', 'Delivery Zone'), ['restaurant-delivery/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                )
+                                ?>
+                            </li>
+                            <li class=" nav-item <?= $this->context->route == 'restaurant-branch/index' ? 'active' : '' ?> ">
+                                <?=
+                                Html::a(
+                                        Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                        Html::tag('span', "Store's Branches"), ['restaurant-branch/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                )
+                                ?>
+                            </li>
+                            <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
+                                <li class=" nav-item <?= $this->context->route == 'agent-assignment/index' ? 'active' : '' ?> ">
+
+                                    <?=
+                                    Html::a(
+                                            Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                            Html::tag('span', 'Staff Management'), ['agent-assignment/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                    )
+                                    ?>
+                                </li>
+                            <?php } ?>
+                        </ul>
+                    </li>
+
+
+
 
                     <?php if (count(Yii::$app->accountManager->getManagedAccounts()) > 1) { ?>
                         <li class=" navigation-header"><span>Your stores</span>

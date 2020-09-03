@@ -483,6 +483,15 @@ class Order extends \yii\db\ActiveRecord {
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
+        //Update delivery area
+        if (!$insert &&  $this->order_mode == static::ORDER_MODE_DELIVERY && isset($changedAttributes['area_id']) && $changedAttributes['area_id'] != $this->getOldAttribute('area_id')  && $this->area_id) {
+              $area_model = Area::findOne($this->area_id);
+              $this->area_name = $area_model->area_name;
+              $this->area_name_ar = $area_model->area_name_ar;
+              $this->save(false);
+        }
+
+
         if (!$insert && $this->payment && $this->items_has_been_restocked && isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_ABANDONED_CHECKOUT) {
 
             $orderItems = $this->getOrderItems();

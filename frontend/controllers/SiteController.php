@@ -37,7 +37,7 @@ class SiteController extends Controller {
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error', 'index', 'signup', 'check-for-new-orders', 'thank-you'],
+                        'actions' => ['login', 'error', 'index', 'signup', 'check-for-new-orders', 'thank-you', 'request-password-reset', 'reset-password'],
                         'allow' => true,
                     ],
                     [
@@ -78,10 +78,9 @@ class SiteController extends Controller {
      * @return mixed
      */
     public function actionIndex() {
-        $this->layout = 'landing';
 
         if (Yii::$app->user->isGuest)
-            return $this->render('landing');
+            return $this->redirect(['login']);
         else {
             foreach (Yii::$app->accountManager->getManagedAccounts() as $managedRestaurant) {
 
@@ -91,7 +90,6 @@ class SiteController extends Controller {
             }
         }
     }
-
 
     /**
      * Displays vendor dashboard homepage.
@@ -106,9 +104,6 @@ class SiteController extends Controller {
                     ->orderBy(['order_created_at' => SORT_DESC])
                     ->limit(5)
                     ->all();
-
-
-
 
             //Orders Recevied
             $orders_received_chart_data_this_week = [];
@@ -216,7 +211,7 @@ class SiteController extends Controller {
                     ->count();
 
 
-            array_push($orders_received_chart_data_this_week, $number_of_all_orders_received_last_2_days_only ?  (int) ($number_of_all_orders_received_last_2_days_only) : 0);
+            array_push($orders_received_chart_data_this_week, $number_of_all_orders_received_last_2_days_only ? (int) ($number_of_all_orders_received_last_2_days_only) : 0);
 
 
             $number_of_all_orders_received_today_only = Order::find()
@@ -301,7 +296,7 @@ class SiteController extends Controller {
             $number_of_all_orders_received_last_three_months = 0;
 
             foreach ($orders_received_chart_data_last_three_months as $orderReceived) {
-                $number_of_all_orders_received_last_three_months += $orderReceived ? intval($orderReceived) : 0 ;
+                $number_of_all_orders_received_last_three_months += $orderReceived ? intval($orderReceived) : 0;
             }
 
 
@@ -428,7 +423,7 @@ class SiteController extends Controller {
                     ->andWhere(['DATE(order.order_created_at)' => new Expression('CURDATE()')])
                     ->sum('order_item.qty');
 
-            array_push($sold_item_chart_data_this_week, $number_of_all_sold_item_today_only ?  (int) ($number_of_all_sold_item_today_only) : 0);
+            array_push($sold_item_chart_data_this_week, $number_of_all_sold_item_today_only ? (int) ($number_of_all_sold_item_today_only) : 0);
 
             $number_of_all_sold_item_this_week = 0;
 
@@ -475,13 +470,13 @@ class SiteController extends Controller {
                     ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
                     ->sum('order_item.qty');
 
-            array_push($sold_item_chart_data_last_month,$number_of_all_sold_item_last_month_only ?  (int) ($number_of_all_sold_item_last_month_only) : 0);
+            array_push($sold_item_chart_data_last_month, $number_of_all_sold_item_last_month_only ? (int) ($number_of_all_sold_item_last_month_only) : 0);
 
 
 
             array_push($sold_item_chart_data_last_three_months, $number_of_all_sold_item_last_three_months_only ? (int) ($number_of_all_sold_item_last_three_months_only) : 0);
 
-            array_push($sold_item_chart_data_last_three_months,  $number_of_all_sold_item_last_month_only ? (int) ($number_of_all_sold_item_last_month_only) : 0);
+            array_push($sold_item_chart_data_last_three_months, $number_of_all_sold_item_last_month_only ? (int) ($number_of_all_sold_item_last_month_only) : 0);
 
             $number_of_all_sold_item_current_month_only = OrderItem::find()
                     ->joinWith('order')
@@ -501,7 +496,7 @@ class SiteController extends Controller {
             $number_of_all_sold_item_last_three_months = 0;
 
             foreach ($sold_item_chart_data_last_three_months as $soldItem) {
-                $number_of_all_sold_item_last_three_months += $soldItem ? intval($soldItem)  : 0;
+                $number_of_all_sold_item_last_three_months += $soldItem ? intval($soldItem) : 0;
             }
 
 
@@ -627,7 +622,7 @@ class SiteController extends Controller {
             $number_of_all_customer_gained_last_three_months = 0;
 
             foreach ($customer_chart_data_last_three_months as $customerGained) {
-                $number_of_all_customer_gained_last_three_months += $customerGained ? intval($customerGained)  : 0 ;
+                $number_of_all_customer_gained_last_three_months += $customerGained ? intval($customerGained) : 0;
             }
 
 
@@ -660,9 +655,6 @@ class SiteController extends Controller {
                     ->andWhere('YEAR(`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
                     ->andWhere('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
                     ->sum('total_price'); //434.5
-
-
-
             //Chart
             $number_of_all_revenue_generated_last_7_days_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -673,7 +665,7 @@ class SiteController extends Controller {
                     ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 6 DAY) ')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_this_week,  number_format((float)$number_of_all_revenue_generated_last_7_days_only, 2, '.', ''));
+            array_push($revenue_generated_chart_data_this_week, number_format((float) $number_of_all_revenue_generated_last_7_days_only, 2, '.', ''));
 
             $number_of_all_revenue_generated_last_6_days_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -684,7 +676,7 @@ class SiteController extends Controller {
                     ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 5 DAY) ')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_this_week,  number_format((float)$number_of_all_revenue_generated_last_6_days_only, 2, '.', ''));
+            array_push($revenue_generated_chart_data_this_week, number_format((float) $number_of_all_revenue_generated_last_6_days_only, 2, '.', ''));
 
             $number_of_all_revenue_generated_last_5_days_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -695,7 +687,7 @@ class SiteController extends Controller {
                     ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 4 DAY) ')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_this_week,  number_format((float)$number_of_all_revenue_generated_last_5_days_only, 2, '.', ''));
+            array_push($revenue_generated_chart_data_this_week, number_format((float) $number_of_all_revenue_generated_last_5_days_only, 2, '.', ''));
 
             $number_of_all_revenue_generated_last_4_days_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -706,7 +698,7 @@ class SiteController extends Controller {
                     ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 3 DAY) ')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_this_week,  number_format((float)$number_of_all_revenue_generated_last_4_days_only, 2, '.', ''));
+            array_push($revenue_generated_chart_data_this_week, number_format((float) $number_of_all_revenue_generated_last_4_days_only, 2, '.', ''));
 
 
             $number_of_all_revenue_generated_last_3_days_only = Order::find()
@@ -718,7 +710,7 @@ class SiteController extends Controller {
                     ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 2 DAY) ')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_this_week,  number_format((float)$number_of_all_revenue_generated_last_3_days_only, 2, '.', ''));
+            array_push($revenue_generated_chart_data_this_week, number_format((float) $number_of_all_revenue_generated_last_3_days_only, 2, '.', ''));
 
 
             $number_of_all_revenue_generated_last_2_days_only = Order::find()
@@ -730,7 +722,7 @@ class SiteController extends Controller {
                     ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 1 DAY) ')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_this_week,  number_format((float)$number_of_all_revenue_generated_last_2_days_only, 2, '.', ''));
+            array_push($revenue_generated_chart_data_this_week, number_format((float) $number_of_all_revenue_generated_last_2_days_only, 2, '.', ''));
 
             $number_of_all_revenue_generated_today_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -741,7 +733,7 @@ class SiteController extends Controller {
                     ->andWhere(['DATE(order_created_at)' => new Expression('CURDATE()')])
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_this_week,  number_format((float)$number_of_all_revenue_generated_today_only, 2, '.', ''));
+            array_push($revenue_generated_chart_data_this_week, number_format((float) $number_of_all_revenue_generated_today_only, 2, '.', ''));
 
 
             $number_of_all_revenue_generated_this_week = 0;
@@ -772,7 +764,7 @@ class SiteController extends Controller {
                     ->andWhere('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_last_month,  $number_of_all_revenue_generated_last_two_months_only ? number_format((float)$number_of_all_revenue_generated_last_two_months_only, 2, '.', '') : 0);
+            array_push($revenue_generated_chart_data_last_month, $number_of_all_revenue_generated_last_two_months_only ? number_format((float) $number_of_all_revenue_generated_last_two_months_only, 2, '.', '') : 0);
 
             $number_of_all_revenue_generated_last_month_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -784,11 +776,11 @@ class SiteController extends Controller {
                     ->andWhere('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_last_month, $number_of_all_revenue_generated_last_month_only ? number_format((float)$number_of_all_revenue_generated_last_month_only, 2, '.', '') : 0);
+            array_push($revenue_generated_chart_data_last_month, $number_of_all_revenue_generated_last_month_only ? number_format((float) $number_of_all_revenue_generated_last_month_only, 2, '.', '') : 0);
 
             //last 3 months
-            array_push($revenue_generated_chart_data_last_three_months, $number_of_all_revenue_generated_last_three_months_only ?  number_format((float)$number_of_all_revenue_generated_last_three_months_only, 2, '.', '') : 0);
-            array_push($revenue_generated_chart_data_last_three_months,  $number_of_all_revenue_generated_last_month_only ? number_format((float)$number_of_all_revenue_generated_last_month_only, 2, '.', '') : 0);
+            array_push($revenue_generated_chart_data_last_three_months, $number_of_all_revenue_generated_last_three_months_only ? number_format((float) $number_of_all_revenue_generated_last_three_months_only, 2, '.', '') : 0);
+            array_push($revenue_generated_chart_data_last_three_months, $number_of_all_revenue_generated_last_month_only ? number_format((float) $number_of_all_revenue_generated_last_month_only, 2, '.', '') : 0);
 
             $number_of_all_revenue_generated_current_month_only = Order::find()
                     ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -800,7 +792,7 @@ class SiteController extends Controller {
                     ->andWhere('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
                     ->sum('total_price');
 
-            array_push($revenue_generated_chart_data_last_three_months,  $number_of_all_revenue_generated_current_month_only ? number_format((float)$number_of_all_revenue_generated_current_month_only, 2, '.', '') : 0);
+            array_push($revenue_generated_chart_data_last_three_months, $number_of_all_revenue_generated_current_month_only ? number_format((float) $number_of_all_revenue_generated_current_month_only, 2, '.', '') : 0);
 
 
             $number_of_all_revenue_generated_last_three_months = 0;
@@ -854,22 +846,6 @@ class SiteController extends Controller {
             ]);
         }
     }
-
-
-
-    // public function actionMarkAsBusy($restaurantUuid) {
-    //   if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
-    //     $managedRestaurant->markAsBusy();
-    //     return $this->redirect(['vendor-dashboard', 'id' => $restaurantUuid]);
-    //   }
-    // }
-    //
-    // public function actionMarkAsOpen($restaurantUuid) {
-    //   if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
-    //     $managedRestaurant->markAsOpen();
-    //     return $this->redirect(['vendor-dashboard', 'id' => $restaurantUuid]);
-    //   }
-    // }
 
     /**
      * Change restaurant status to become open
@@ -944,7 +920,7 @@ class SiteController extends Controller {
     public function actionLogout() {
         Yii::$app->user->logout();
 
-        return $this->goHome();
+        return $this->redirect('https://plugn.io/');
     }
 
     /**
@@ -997,9 +973,14 @@ class SiteController extends Controller {
      * @return mixed
      */
     public function actionRequestPasswordReset() {
+
+        $this->layout = 'login';
+
+
         $model = new PasswordResetRequestForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             if ($model->sendEmail()) {
+
                 Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
 
                 return $this->goHome();
@@ -1021,6 +1002,9 @@ class SiteController extends Controller {
      * @throws BadRequestHttpException
      */
     public function actionResetPassword($token) {
+        $this->layout = 'login';
+
+
         try {
             $model = new ResetPasswordForm($token);
         } catch (InvalidArgumentException $e) {

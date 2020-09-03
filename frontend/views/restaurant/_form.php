@@ -238,24 +238,59 @@ $this->registerJs($js);
 
             <div class="col-12 col-sm-6 col-lg-6">
 
-                <?=
-                $form->field($model, 'store_layout')->radioList([Restaurant::STORE_LAYOUT_LIST => 'List', Restaurant::STORE_LAYOUT_GRID => 'Grid'], [
-                    'style' => 'display:grid',
-                    'item' => function($index, $label, $name, $checked, $value) {
+                <?php
 
-                        $return = '<label class="vs-radio-con">';
-                        /* -----> */ if ($checked)
-                            $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                        /* -----> */
-                        else
-                            $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                        $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
-                        $return .= '<span>' . ucwords($label) . '</span>';
-                        $return .= '</label>';
 
-                        return $return;
-                    },
-                ]);
+                if(
+$model->restaurant_uuid == 'rest_d7f4f8b8-ebc7-11ea-808a-0673128d0c9c' ||
+$model->restaurant_uuid == 'rest_c2aff830-ebd4-11ea-808a-0673128d0c9c' ||
+$model->restaurant_uuid == 'rest_3afe275f-ebd4-11ea-808a-0673128d0c9c' ||
+                  $model->restaurant_uuid == 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290' || $model->restaurant_uuid == 'rest_73100b93-cf41-11ea-808a-0673128d0c9c'){
+                  echo  $form->field($model, 'store_layout')->radioList([
+                              Restaurant::STORE_LAYOUT_LIST_FULLWIDTH => 'List',
+                              Restaurant::STORE_LAYOUT_GRID_FULLWIDTH  => 'Grid',
+                              Restaurant::STORE_LAYOUT_LIST_HALFWIDTH => 'List - Half',
+                              Restaurant::STORE_LAYOUT_GRID_HALFWIDTH => 'Grid - Half',
+                              Restaurant::STORE_LAYOUT_CATEGORY_HALFWIDTH => 'Category - Half',
+                            ], [
+                                'style' => 'display:grid',
+                                'item' => function($index, $label, $name, $checked, $value) {
+
+                                    $return = '<label class="vs-radio-con">';
+                                    /* -----> */ if ($checked)
+                                        $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                                    /* -----> */
+                                    else
+                                        $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                                    $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
+                                    $return .= '<span>' . ucwords($label) . '</span>';
+                                    $return .= '</label>';
+
+                                    return $return;
+                                },
+                            ]);
+                } else {
+                  echo $form->field($model, 'store_layout')->radioList([
+                            Restaurant::STORE_LAYOUT_LIST_FULLWIDTH => 'List',
+                            Restaurant::STORE_LAYOUT_GRID_FULLWIDTH  => 'Grid'
+                          ], [
+                              'style' => 'display:grid',
+                              'item' => function($index, $label, $name, $checked, $value) {
+
+                                  $return = '<label class="vs-radio-con">';
+                                  /* -----> */ if ($checked)
+                                      $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                                  /* -----> */
+                                  else
+                                      $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                                  $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
+                                  $return .= '<span>' . ucwords($label) . '</span>';
+                                  $return .= '</label>';
+
+                                  return $return;
+                              },
+                          ]);
+                }
                 ?>
             </div>
         </div>

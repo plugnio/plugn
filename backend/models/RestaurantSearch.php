@@ -14,13 +14,16 @@ class RestaurantSearch extends Restaurant
     /**
      * {@inheritdoc}
      */
-    public function rules()
-    {
-        return [
-            [['restaurant_uuid', 'name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'phone_number', 'restaurant_created_at', 'restaurant_updated_at'], 'safe'],
-            [['status', 'support_delivery', 'support_pick_up'], 'integer'],
-        ];
-    }
+     public function rules()
+     {
+         return [
+             [['restaurant_uuid', 'name', 'name_ar' ,'app_id',  'restaurant_email', 'restaurant_created_at', 'restaurant_updated_at','restaurant_domain'], 'safe'],
+             [['restaurant_status'], 'integer'],
+             [['platform_fee'], 'number'],
+         ];
+     }
+
+
 
     /**
      * {@inheritdoc}
@@ -58,21 +61,14 @@ class RestaurantSearch extends Restaurant
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'status' => $this->status,
-            'support_delivery' => $this->support_delivery,
-            'support_pick_up' => $this->support_pick_up,
             'restaurant_created_at' => $this->restaurant_created_at,
             'restaurant_updated_at' => $this->restaurant_updated_at,
         ]);
 
         $query->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
+            ->andFilterWhere(['like', 'restaurant_domain', $this->restaurant_domain])
             ->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'name_ar', $this->name_ar])
-            ->andFilterWhere(['like', 'tagline', $this->tagline])
-            ->andFilterWhere(['like', 'tagline_ar', $this->tagline_ar])
-            ->andFilterWhere(['like', 'thumbnail_image', $this->thumbnail_image])
-            ->andFilterWhere(['like', 'logo', $this->logo])
-            ->andFilterWhere(['like', 'phone_number', $this->phone_number]);
+            ->andFilterWhere(['like', 'name_ar', $this->name_ar]);
 
         return $dataProvider;
     }

@@ -129,7 +129,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 curve: 'straight'
             },
             series: [{
-                    name: "Orders",
+                    name: "Customers",
                     data: <?= json_encode($customer_gained_chart_data) ?>,
                 }],
             grid: {
