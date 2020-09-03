@@ -78,10 +78,9 @@ class SiteController extends Controller {
      * @return mixed
      */
     public function actionIndex() {
-        $this->layout = 'landing';
 
         if (Yii::$app->user->isGuest)
-            return $this->render('landing');
+            return $this->render('login');
         else {
             foreach (Yii::$app->accountManager->getManagedAccounts() as $managedRestaurant) {
 
@@ -106,9 +105,6 @@ class SiteController extends Controller {
                     ->orderBy(['order_created_at' => SORT_DESC])
                     ->limit(5)
                     ->all();
-
-
-
 
             //Orders Recevied
             $orders_received_chart_data_this_week = [];
@@ -944,7 +940,7 @@ class SiteController extends Controller {
     public function actionLogout() {
         Yii::$app->user->logout();
 
-        return $this->goHome();
+        return $this->redirect('https://plugn.io/');
     }
 
     /**
