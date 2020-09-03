@@ -37,7 +37,7 @@ class SiteController extends Controller {
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error', 'index', 'signup', 'check-for-new-orders', 'thank-you'],
+                        'actions' => ['login', 'error', 'index', 'signup', 'check-for-new-orders', 'thank-you', 'request-password-reset', 'reset-password'],
                         'allow' => true,
                     ],
                     [
@@ -847,20 +847,6 @@ class SiteController extends Controller {
         }
     }
 
-    // public function actionMarkAsBusy($restaurantUuid) {
-    //   if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
-    //     $managedRestaurant->markAsBusy();
-    //     return $this->redirect(['vendor-dashboard', 'id' => $restaurantUuid]);
-    //   }
-    // }
-    //
-    // public function actionMarkAsOpen($restaurantUuid) {
-    //   if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
-    //     $managedRestaurant->markAsOpen();
-    //     return $this->redirect(['vendor-dashboard', 'id' => $restaurantUuid]);
-    //   }
-    // }
-
     /**
      * Change restaurant status to become open
      * @param integer $id => restaurant_uuid
@@ -987,9 +973,14 @@ class SiteController extends Controller {
      * @return mixed
      */
     public function actionRequestPasswordReset() {
+
+        $this->layout = 'login';
+
+
         $model = new PasswordResetRequestForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             if ($model->sendEmail()) {
+
                 Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
 
                 return $this->goHome();
@@ -1011,6 +1002,9 @@ class SiteController extends Controller {
      * @throws BadRequestHttpException
      */
     public function actionResetPassword($token) {
+        $this->layout = 'login';
+
+
         try {
             $model = new ResetPasswordForm($token);
         } catch (InvalidArgumentException $e) {

@@ -5,8 +5,8 @@
 
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-$this->title = 'Plugn Dashboard';
 
+$this->title = 'Plugn Dashboard';
 ?>
 
 
@@ -28,40 +28,42 @@ $this->title = 'Plugn Dashboard';
                         </div>
                         <p class="px-2">Welcome back, please login to your account.</p>
                         <div class="card-content" style="padding:21px">
-                              <?php $form = ActiveForm::begin(['id' => 'login-form', 'enableClientScript' => false]); ?>
-                              <div class="form-label-group form-group position-relative has-icon-left">
-                                  <?=
-                                  $form->field($model, 'email', ['options' => [
-                                          'tag' => 'div',
-                                          'class' => 'form-group field-loginform has-feedback required'
-                                      ],
-                                      'template' => '{input} <div class="form-control-position"> <i class="feather icon-user"></i> </div>{error}{hint}'
-                                  ])->textInput(['type' => 'email', 'placeholder' => 'Email','required' => true])
-                                  ?>
+                            <?php $form = ActiveForm::begin(['id' => 'login-form', 'enableClientScript' => false]); ?>
+                            <div class="form-label-group form-group position-relative has-icon-left">
+                                <?=
+                                $form->field($model, 'email', ['options' => [
+                                        'tag' => 'div',
+                                        'class' => 'form-group field-loginform has-feedback required'
+                                    ],
+                                    'template' => '{input} <div class="form-control-position"> <i class="feather icon-user"></i> </div>{error}{hint}'
+                                ])->textInput(['type' => 'email', 'placeholder' => 'Email', 'required' => true])
+                                ?>
 
-                              </div>
+                            </div>
 
-                              <div class="form-label-group form-group position-relative has-icon-left">
+                            <div class="form-label-group form-group position-relative has-icon-left">
 
-                              <?=
-                              $form->field($model, 'password', ['options' => [
-                                      'tag' => 'div',
-                                      'class' => 'form-group field-loginform has-feedback required'
-                                  ],
-                                  'template' => '{input}<div class="form-control-position"> <i class="feather icon-lock"></i> </div>{error}{hint}'
-                              ])->passwordInput(['placeholder' => 'Password','required' => true])
-                              ?>
+                                <?=
+                                $form->field($model, 'password', ['options' => [
+                                        'tag' => 'div',
+                                        'class' => 'form-group field-loginform has-feedback required'
+                                    ],
+                                    'template' => '{input}<div class="form-control-position"> <i class="feather icon-lock"></i> </div>{error}{hint}'
+                                ])->passwordInput(['placeholder' => 'Password', 'required' => true])
+                                ?>
 
-                              </div>
+                                <?=
+                                Html::a('Forgot Password?', ['request-password-reset'], ['class' => ''])
+                                ?>
 
-                              <div class="form-group">
-                                   <?= Html::submitButton('Login', ['class' => 'btn btn-primary float-left btn-inline', 'name' => 'login-button']) ?>
-                              </div>
-                              <!-- <div class="form-message">
-                                  <div id="lmsgSubmit" class="h3 text-center hidden"></div>
-                              </div> -->
+                            </div>
 
-                              <?php ActiveForm::end(); ?>
+                            <div class="form-group">
+                                <?= Html::submitButton('Login', ['class' => 'btn btn-primary float-left btn-inline', 'name' => 'login-button']) ?>
+                            </div>
+
+
+                            <?php ActiveForm::end(); ?>
 
                         </div>
 
