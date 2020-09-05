@@ -242,6 +242,7 @@ $this->registerJs($js);
 
 
                 if(
+$model->restaurant_uuid == 'rest_204f0963-e94f-11ea-808a-0673128d0c9c' ||
 $model->restaurant_uuid == 'rest_d7f4f8b8-ebc7-11ea-808a-0673128d0c9c' ||
 $model->restaurant_uuid == 'rest_c2aff830-ebd4-11ea-808a-0673128d0c9c' ||
 $model->restaurant_uuid == 'rest_3afe275f-ebd4-11ea-808a-0673128d0c9c' ||
