@@ -250,6 +250,7 @@ $model->restaurant_uuid == 'rest_3afe275f-ebd4-11ea-808a-0673128d0c9c' ||
                   echo  $form->field($model, 'store_layout')->radioList([
                               Restaurant::STORE_LAYOUT_LIST_FULLWIDTH => 'List',
                               Restaurant::STORE_LAYOUT_GRID_FULLWIDTH  => 'Grid',
+                              Restaurant::STORE_LAYOUT_CATEGORY_FULLWIDTH  => 'Category',
                               Restaurant::STORE_LAYOUT_LIST_HALFWIDTH => 'List - Half',
                               Restaurant::STORE_LAYOUT_GRID_HALFWIDTH => 'Grid - Half',
                               Restaurant::STORE_LAYOUT_CATEGORY_HALFWIDTH => 'Category - Half',
