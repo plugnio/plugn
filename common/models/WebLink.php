@@ -46,6 +46,9 @@ class WebLink extends \yii\db\ActiveRecord
             [['url','web_link_title','web_link_title_ar'], 'required'],
             ['web_link_type', 'in', 'range' => [self::WEB_LINK_TYPE_WEBSITE_URL, self::WEB_LINK_TYPE_FACEBOOK, self::WEB_LINK_TYPE_INSTAGRAM, self::WEB_LINK_TYPE_TWITTER, self::WEB_LINK_TYPE_SNAPCHAT, self::WEB_LINK_TYPE_WHATSAPP]],
             [['restaurant_uuid'], 'string', 'max' => 60],
+            ['url', 'url', 'when' => function($model) {
+                return $model->web_link_type == self::WEB_LINK_TYPE_WEBSITE_URL;
+            }],
             [['url', 'web_link_title','web_link_title_ar'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
