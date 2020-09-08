@@ -76,9 +76,9 @@ class Item extends \yii\db\ActiveRecord
         return [
             'item_uuid' => 'Item Uuid',
             'restaurant_uuid' => 'Restaurant Uuid',
-            'item_name' => 'Title',
+            'item_name' => 'Title in English',
             'item_name_ar' => 'Title in Arabic',
-            'item_description' => 'Item Description',
+            'item_description' => 'Item Description in English',
             'item_description_ar' => 'Item Description in Arabic',
             'sort_number' => 'Sort Number',
             'stock_qty' => 'Stock Qty',

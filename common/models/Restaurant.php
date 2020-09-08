@@ -6,6 +6,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use yii\behaviors\AttributeBehavior;
+use common\models\WebLink;
 
 /**
  * This is the model class for table "restaurant".
@@ -55,6 +56,9 @@ use yii\behaviors\AttributeBehavior;
  * @property RestaurantTheme $restaurantTheme
  * @property PaymentMethod[] $paymentMethods
  * @property Agent[] $agents
+ * @property WebLink[] $webLinks
+ * @property StoreWebLink[] $storeWebLinks
+
  */
 class Restaurant extends \yii\db\ActiveRecord {
 
@@ -125,12 +129,13 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function attributeLabels() {
         return [
             'restaurant_uuid' => 'Restaurant Uuid',
-            'name' => 'Name',
+            'name' => 'Name in English',
             'name_ar' => 'Name in Arabic',
-            'tagline' => 'Tagline',
+            'tagline' => 'Tagline in English',
             'tagline_ar' => 'Tagline in Arabic',
             'restaurant_domain' => 'Domain',
             'app_id' => 'App id',
+            'restaurant_payments_method' => 'Payment method',
             'restaurant_status' => 'Store Status',
             'thumbnail_image' => 'Header Image',
             'logo' => 'Logo',
@@ -210,24 +215,31 @@ class Restaurant extends \yii\db\ActiveRecord {
     /**
      * save restaurant payment method
      */
-    public function saveRestaurantPaymentMethod($payments_method) {
+    public function saveRestaurantPaymentMethod($payments_method = null) {
 
-        $sotred_restaurant_payment_method = RestaurantPaymentMethod::find()
-                ->where(['restaurant_uuid' => $this->restaurant_uuid])
-                ->all();
+        if($payments_method){
 
-        foreach ($sotred_restaurant_payment_method as $restaurant_payment_method) {
-            if (!in_array($restaurant_payment_method->payment_method_id, $payments_method)) {
-                RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $this->restaurant_uuid, 'payment_method_id' => $restaurant_payment_method->payment_method_id]);
-            }
+          $sotred_restaurant_payment_method = RestaurantPaymentMethod::find()
+                  ->where(['restaurant_uuid' => $this->restaurant_uuid])
+                  ->all();
+
+
+          foreach ($sotred_restaurant_payment_method as $restaurant_payment_method) {
+              if (!in_array($restaurant_payment_method->payment_method_id, $payments_method)) {
+                  RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $this->restaurant_uuid, 'payment_method_id' => $restaurant_payment_method->payment_method_id]);
+              }
+          }
+
+          foreach ($payments_method as $payment_method_id) {
+              $payments_method = new RestaurantPaymentMethod();
+              $payments_method->payment_method_id = $payment_method_id;
+              $payments_method->restaurant_uuid = $this->restaurant_uuid;
+              $payments_method->save();
+          }
+        } else {
+              RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
         }
 
-        foreach ($payments_method as $payment_method_id) {
-            $payments_method = new RestaurantPaymentMethod();
-            $payments_method->payment_method_id = $payment_method_id;
-            $payments_method->restaurant_uuid = $this->restaurant_uuid;
-            $payments_method->save();
-        }
     }
 
     /**
@@ -456,6 +468,9 @@ class Restaurant extends \yii\db\ActiveRecord {
       return [
           'isOpen' => function($restaurant){
               return $restaurant->isOpen();
+          },
+          'webLinks' => function($restaurant){
+              return $restaurant->getWebLinks()->all();
           }
       ];
     }
@@ -658,4 +673,24 @@ class Restaurant extends \yii\db\ActiveRecord {
         return $this->hasOne(RestaurantTheme::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    /**
+     * Gets query for [[WebLinks]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWebLinks()
+    {
+        return $this->hasMany(WebLink::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+
+    /**
+     * Gets query for [[StoreWebLinks]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStoreWebLinks()
+    {
+        return $this->hasMany(StoreWebLink::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
 }

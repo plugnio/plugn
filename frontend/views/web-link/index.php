@@ -5,21 +5,22 @@ use yii\grid\GridView;
 use yii\helpers\Url;
 
 /* @var $this yii\web\View */
+/* @var $searchModel frontend\models\WebLinkSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+
 $this->params['restaurant_uuid'] = $restaurantUuid;
 
-$this->title = 'Store Branches';
+$this->title = 'Web Links';
 $this->params['breadcrumbs'][] = $this->title;
 
 $js = "
-$(function () {
-  $('.summary').insertAfter('.top');
-});
+  $(function () {
+    $('.summary').insertAfter('.top');
+  });
 ";
+
 $this->registerJs($js);
-
 ?>
-
 
 <section id="data-list-view" class="data-list-view-header">
 
@@ -43,7 +44,7 @@ $this->registerJs($js);
         GridView::widget([
             'dataProvider' => $dataProvider,
             'rowOptions' => function($model) {
-                $url = Url::to(['restaurant-branch/view', 'id' => $model->restaurant_branch_id, 'restaurantUuid' => $model->restaurant_uuid]);
+                $url = Url::to(['web-link/update', 'id' => $model->web_link_id, 'restaurantUuid' => $model->restaurant_uuid]);
 
                 return [
                     'onclick' => "window.location.href='{$url}'"
@@ -51,9 +52,14 @@ $this->registerJs($js);
             },
             'columns' => [
               ['class' => 'yii\grid\SerialColumn'],
-              'branch_name_en',
-              'branch_name_ar',
-
+              [
+                  'label' => 'Type',
+                  "format" => "raw",
+                  "value" => function($model) {
+                      return $model->getWebLinkType();
+                  }
+              ],
+              'url:url',
             ],
             'layout' => '{summary}{items}{pager}',
             'tableOptions' => ['class' => 'table data-list-view'],
