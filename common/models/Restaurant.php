@@ -115,7 +115,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['instagram_url'], 'url'],
             [['date_range_picker_with_time','google_analytics_id', 'facebook_pixil_id'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'app_id' ,'armada_api_key','store_branch_name'], 'string', 'max' => 255],
-            [['phone_number'], 'string', 'min' => 8, 'max' => 8],
+            [['phone_number'], 'string', 'min' => 7, 'max' => 8],
             [['phone_number'], 'integer', 'min' => 0],
             [['restaurant_email_notification','schedule_order','schedule_interval','phone_number_display','store_layout','show_opening_hours'], 'integer'],
             ['restaurant_email', 'email'],
