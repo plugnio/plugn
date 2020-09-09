@@ -7,7 +7,7 @@ use yii\helpers\Html;
 $this->params['restaurant_uuid'] = $restaurantUuid;
 
 $this->title = 'Create Web Link';
-$this->params['breadcrumbs'][] = ['label' => 'Web Links', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Web Links', 'url' => ['index', 'restaurantUuid' => $restaurantUuid]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="web-link-create">

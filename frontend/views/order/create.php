@@ -9,7 +9,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 
 $this->title = 'Create Order';
-$this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index','restaurantUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="order-create">
