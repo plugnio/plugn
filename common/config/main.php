@@ -13,6 +13,8 @@ return [
         ],
         'formatter' => [
             'currencyCode' => 'KWD',
+                   'thousandSeparator' => ',',
+        'decimalSeparator' => '.',
             'defaultTimeZone' => 'Asia/Kuwait',
             'timeZone' => 'Asia/Kuwait',
             'timeFormat' => 'h:i:s'

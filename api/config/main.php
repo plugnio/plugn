@@ -107,6 +107,7 @@ return [
                         'GET callback' => 'callback',
                         'GET apply-promo-code' => 'apply-promo-code',
                         'GET <id>/<restaurant_uuid>' => 'order-details',
+                        'GET order-details/<id>/<restaurant_uuid>' => 'get-order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS <id>' => 'options',
@@ -114,6 +115,7 @@ return [
                         'OPTIONS callback' => 'options',
                         'OPTIONS apply-promo-code' => 'options',
                         'OPTIONS <id>/<restaurant_uuid>' => 'options',
+                        'OPTIONS order-details/<id>/<restaurant_uuid>' => 'options',
                     ]
                 ],
                 [//ZapierController

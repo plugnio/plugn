@@ -76,6 +76,7 @@ $this->registerJs($js);
                                 Order::STATUS_BEING_PREPARED => 'Being prepared',
                                 Order::STATUS_OUT_FOR_DELIVERY => 'Out for delivery',
                                 Order::STATUS_COMPLETE => 'Complete',
+                                Order::STATUS_ACCEPTED => 'Accepted',
                                 Order::STATUS_CANCELED => 'Canceled',
                                     ], ['class' => 'form-control', 'prompt' => 'Select order status']);
                             ?>

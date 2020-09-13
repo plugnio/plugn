@@ -107,20 +107,7 @@ class OrderController extends Controller {
                         'attribute' => 'order_status',
                         "format" => "raw",
                         "value" => function($model) {
-                            if ($model->order_status == Order::STATUS_PENDING)
-                                return $model->orderStatus;
-                            else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY)
-                                return $model->orderStatus;
-                            else if ($model->order_status == Order::STATUS_BEING_PREPARED)
-                                return $model->orderStatus;
-                            else if ($model->order_status == Order::STATUS_COMPLETE)
-                                return $model->orderStatus;
-                            else if ($model->order_status == Order::STATUS_CANCELED)
-                                return $model->orderStatus;
-                            else if ($model->order_status == Order::STATUS_REFUNDED)
-                                return $model->orderStatus;
-                            else if ($model->order_status == Order::STATUS_PARTIALLY_REFUNDED)
-                                return $model->orderStatus;
+                           return $model->orderStatusInEnglish;
                         }
                     ],
                     [

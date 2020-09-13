@@ -64,6 +64,7 @@ use yii\behaviors\AttributeBehavior;
  */
 class Order extends \yii\db\ActiveRecord {
 
+    //Values for `order_status`
     const STATUS_DRAFT = 0;
     const STATUS_PENDING = 1;
     const STATUS_BEING_PREPARED = 2;
@@ -73,9 +74,14 @@ class Order extends \yii\db\ActiveRecord {
     const STATUS_PARTIALLY_REFUNDED = 6;
     const STATUS_REFUNDED = 7;
     const STATUS_ABANDONED_CHECKOUT = 9;
+    const STATUS_ACCEPTED= 10;
+
+
+    //Values for `order_mode`
     const ORDER_MODE_DELIVERY = 1;
     const ORDER_MODE_PICK_UP = 2;
     const SCENARIO_CREATE_ORDER_BY_ADMIN = 'manual';
+
 
     /**
      * {@inheritdoc}
@@ -95,7 +101,7 @@ class Order extends \yii\db\ActiveRecord {
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer', 'min' => 0],
             [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id'], 'integer'],
-            ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_PARTIALLY_REFUNDED, self::STATUS_CANCELED, self::STATUS_DRAFT, self::STATUS_ABANDONED_CHECKOUT]],
+            ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_PARTIALLY_REFUNDED, self::STATUS_CANCELED, self::STATUS_DRAFT, self::STATUS_ABANDONED_CHECKOUT, self::STATUS_ACCEPTED]],
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
             ['restaurant_branch_id', function ($attribute, $params, $validator) {
                     if (!$this->restaurant_branch_id && $this->order_mode == Order::ORDER_MODE_PICK_UP)
@@ -195,6 +201,90 @@ class Order extends \yii\db\ActiveRecord {
         return $uuid;
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function extraFields()
+    {
+      return [
+          'orderStatusInEnglish',
+          'orderStatusInArabic',
+          'restaurant',
+          'orderItems' => function($order){
+              return $order->getOrderItems()->with('orderItemExtraOptions')->asArray()->all();
+          },
+          'restaurantBranch',
+          'payment'
+      ];
+    }
+
+    /**
+     * Returns String value of current status
+     * @return string
+     */
+    public function getOrderStatusInEnglish() {
+        switch ($this->order_status) {
+            case self::STATUS_PENDING:
+                return "Pending";
+                break;
+            case self::STATUS_BEING_PREPARED:
+                return "Being Prepared";
+                break;
+            case self::STATUS_OUT_FOR_DELIVERY:
+                return "Out for Delivery";
+                break;
+            case self::STATUS_COMPLETE:
+                return "Complete";
+                break;
+            case self::STATUS_CANCELED:
+                return "Canceled";
+                break;
+            case self::STATUS_PARTIALLY_REFUNDED:
+                return "Partially Refunded";
+                break;
+            case self::STATUS_REFUNDED:
+                return "Refunded";
+                break;
+            case self::STATUS_ACCEPTED:
+                return "Accepted";
+                break;
+        }
+    }
+
+    /**
+     * Returns String value of current status
+     * @return string
+     */
+    public function getorderStatusInArabic() {
+        switch ($this->order_status) {
+            case self::STATUS_PENDING:
+                return "قيد الانتظار";
+                break;
+            case self::STATUS_BEING_PREPARED:
+                return "يجري الاستعداد للطلب";
+                break;
+            case self::STATUS_OUT_FOR_DELIVERY:
+                return "خارج للتوصيل";
+                break;
+            case self::STATUS_COMPLETE:
+                return "تم الاستلام";
+                break;
+            case self::STATUS_CANCELED:
+                return "تم إلغاء الطلب";
+                break;
+            case self::STATUS_PARTIALLY_REFUNDED:
+                return "مسترد جزئيا";
+                break;
+            case self::STATUS_REFUNDED:
+                return "مسترد";
+                break;
+            case self::STATUS_ACCEPTED:
+                return "تم قبول الطلب";
+                break;
+        }
+    }
+
     /**
      * Check if the selected payment method id is exist in restaurant_payment_method
      * @param type $attribute
@@ -248,14 +338,6 @@ class Order extends \yii\db\ActiveRecord {
             $this->addError($attribute, "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency($this->restaurantDelivery->min_charge));
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function extraFields() {
-        return [
-            'orderStatus'
-        ];
-    }
 
     /**
      * {@inheritdoc}
@@ -395,30 +477,6 @@ class Order extends \yii\db\ActiveRecord {
         $this->subtotal = $this->calculateOrderItemsTotalPrice();
         $this->total_price = $this->calculateOrderTotalPrice();
         $this->save(false);
-    }
-
-    /**
-     * @return string text explaining Order Status
-     */
-    public function getOrderStatus() {
-        if ($this->order_status == self::STATUS_PENDING)
-            return 'Pending';
-        else if ($this->order_status == self::STATUS_BEING_PREPARED)
-            return 'Being Prepared';
-        else if ($this->order_status == self::STATUS_OUT_FOR_DELIVERY)
-            return 'Out for Delivery';
-        else if ($this->order_status == self::STATUS_COMPLETE)
-            return 'Complete';
-        else if ($this->order_status == self::STATUS_CANCELED)
-            return 'Canceled';
-        else if ($this->order_status == self::STATUS_REFUNDED)
-            return 'Refunded';
-        else if ($this->order_status == self::STATUS_PARTIALLY_REFUNDED)
-            return 'Partially refunded';
-        else if ($this->order_status == self::STATUS_ABANDONED_CHECKOUT)
-            return 'Abandoned checkouts';
-        else if ($this->order_status == self::STATUS_DRAFT)
-            return 'Draft';
     }
 
     /**

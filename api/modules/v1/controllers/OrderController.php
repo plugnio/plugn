@@ -400,6 +400,7 @@ class OrderController extends Controller {
 
     /**
      * Get Order detail
+     * WIll delete this fun after we merge with all stores
      * @param type $id
      * @param type $restaurant_uuid
      * @return type
@@ -420,6 +421,30 @@ class OrderController extends Controller {
             'body' => $model
         ];
     }
+
+
+        /**
+         * Get Order detail
+         * @param type $id
+         * @param type $restaurant_uuid
+         * @return type
+         */
+        public function actionGetOrderDetails($id, $restaurant_uuid) {
+            $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->one();
+
+
+            if (!$model) {
+                return [
+                    'operation' => 'error',
+                    'message' => 'Invalid order uuid'
+                ];
+            }
+
+            return [
+                'operation' => 'success',
+                'body' => $model
+            ];
+        }
 
     /**
      * Whether is valid promo code or no

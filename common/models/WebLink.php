@@ -119,7 +119,7 @@ class WebLink extends \yii\db\ActiveRecord
                 $this->url = 'https://www.snapchat.com/add/' . $this->url;
               }
               else if ( $this->web_link_type ==  self::WEB_LINK_TYPE_WHATSAPP ){
-                $this->url = ' https://wa.me/00965' . $this->url;
+                $this->url = ' https://wa.me/+965' . $this->url;
               }
 
 

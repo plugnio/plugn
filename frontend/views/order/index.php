@@ -159,43 +159,49 @@ GridView::widget([
                 if ($model->order_status == Order::STATUS_PENDING) {
                     return '<div class="chip chip-warning mr-1">
                                       <div class="chip-body">
-                                          <span style="white-space: pre;" class="chip-text">' . $model->orderStatus . '</span>
+                                          <span style="white-space: pre;" class="chip-text">' . $model->orderStatusInEnglish . '</span>
                                       </div>
                                   </div>';
                 } else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY) {
                     return '<div class="chip chip-info mr-1">
                                       <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatus . '</span>
+                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatusInEnglish . '</span>
+                                      </div>
+                                  </div>';
+                } else if ($model->order_status == Order::STATUS_ACCEPTED) {
+                    return '<div class="chip chip-warning mr-1">
+                                      <div class="chip-body">
+                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatusInEnglish . '</span>
                                       </div>
                                   </div>';
                 } else if ($model->order_status == Order::STATUS_BEING_PREPARED) {
-                    return '<div class="chip chip-primary mr-1">
+                    return '<div class="chip chip-info mr-1">
                                       <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatus . '</span>
+                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatusInEnglish . '</span>
                                       </div>
                                   </div>';
                 } else if ($model->order_status == Order::STATUS_COMPLETE) {
                     return '<div class="chip chip-success mr-1">
                                       <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatus . '</span>
+                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatusInEnglish . '</span>
                                       </div>
                                   </div>';
                 } else if ($model->order_status == Order::STATUS_CANCELED) {
                     return '<div class="chip chip-danger mr-1">
                                       <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatus . '</span>
+                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatusInEnglish . '</span>
                                       </div>
                                     </div>';
                 } else if ($model->order_status == Order::STATUS_PARTIALLY_REFUNDED) {
                     return '<div class="chip chip-danger mr-1">
                                       <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatus . '</span>
+                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatusInEnglish . '</span>
                                       </div>
                                    </div>';
                 } else if ($model->order_status == Order::STATUS_REFUNDED) {
                     return '<div class="chip chip-danger mr-1">
                                       <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatus . '</span>
+                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatusInEnglish . '</span>
                                       </div>
                                    </div>';
                 }
