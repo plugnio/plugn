@@ -17,11 +17,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="restaurant-view">
 
     <p>
-      <?php
-      // Html::a('Update', ['update-analytics-integration', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary'])
-      ?>
-
+      <?= Html::a('Update', ['update-analytics-integration', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
     </p>
+
     <div class="card">
         <div class="card-body">
             <div class="box-body table-responsive no-padding">
@@ -34,17 +32,16 @@ $this->params['breadcrumbs'][] = $this->title;
                           'attribute' => 'google_analytics_id',
                           'format' => 'html',
                           'value' => function ($data) {
-                              return $data->google_analytics_id;
+                              return $data->google_analytics_id ? $data->google_analytics_id : '(not set)';
                           },
-                          'visible' => $model->google_analytics_id != null,
                       ],
                       [
                           'attribute' => 'facebook_pixil_id',
                           'format' => 'html',
                           'value' => function ($data) {
-                              return $data->facebook_pixil_id;
+                              return $data->facebook_pixil_id ? $data->facebook_pixil_id : '(not set)';
+
                           },
-                          'visible' => $model->facebook_pixil_id != null,
                       ],
                     ],
                     'options' => ['class' => 'table table-hover text-nowrap table-bordered'],

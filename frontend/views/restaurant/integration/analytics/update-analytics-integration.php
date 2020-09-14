@@ -16,9 +16,9 @@ use common\models\Restaurant;
 
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
-$this->title = 'Update Store design and layout';
-$this->params['breadcrumbs'][] = ['label' => 'Design & layout', 'url' => ['view-design-layout','restaurantUuid' =>$model->restaurant_uuid]];
-$this->params['breadcrumbs'][] = 'Update design & layout';
+$this->title = 'Update Analytics integration';
+$this->params['breadcrumbs'][] = ['label' => 'Analytics integration', 'url' => ['view-analytics-integration','restaurantUuid' =>$model->restaurant_uuid]];
+$this->params['breadcrumbs'][] = 'Update Analytics integration';
 
 ?>
 

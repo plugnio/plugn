@@ -30,6 +30,8 @@ use common\models\WebLink;
  * @property boolean $restaurant_email_notification
  * @property boolean $show_opening_hours
  * @property boolean $armada_api_key
+ * @property boolean $mashkor_api_key
+ * @property boolean $mashkor_branch_id
  * @property int $phone_number_display
  * @property int $store_branch_name
  * @property int $custom_css
@@ -114,7 +116,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['platform_fee'], 'number'],
             [['instagram_url'], 'url'],
             [['date_range_picker_with_time','google_analytics_id', 'facebook_pixil_id'], 'safe'],
-            [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'app_id' ,'armada_api_key','store_branch_name'], 'string', 'max' => 255],
+            [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'app_id' ,'armada_api_key', 'mashkor_api_key','mashkor_branch_id','store_branch_name'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 7, 'max' => 8],
             [['phone_number'], 'integer', 'min' => 0],
             [['restaurant_email_notification','schedule_order','schedule_interval','phone_number_display','store_layout','show_opening_hours'], 'integer'],
@@ -150,6 +152,8 @@ class Restaurant extends \yii\db\ActiveRecord {
             'restaurant_created_at' => 'Store Created At',
             'restaurant_updated_at' => 'Store Updated At',
             'armada_api_key' => 'Armada Api Key',
+            'mashkor_api_key' => 'Mashkor Api Key',
+            'armada_branch_id' => 'Mashkor Branch ID',
             'restaurant_email_notification' => 'Email Notification',
             'show_opening_hours' => 'Show Opening hours',
             'phone_number_display' => 'Phone number display',

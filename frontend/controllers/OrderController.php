@@ -172,36 +172,38 @@ class OrderController extends Controller {
     }
 
     /**
-     * Request a driver from Armada
+     * Request a driver from Mashkor
      * @param type $order_uuid
      * @param type $restaurantUuid
      */
-    public function actionRequestDriverFromArmada($order_uuid, $restaurantUuid) {
+    public function actionRequestDriverFromMashkor($order_uuid, $restaurantUuid) {
 
         $order_model = $this->findModel($order_uuid, $restaurantUuid);
 
-        $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($order_model);
+        $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($order_model);
+
+        die(json_encode($createDeliveryApiResponse->data));
 
         $errorMessage = null;
         $successMessage = null;
 
-        if ($createDeliveryApiResponse->isOk) {
-
-            $order_model->armada_tracking_link = $createDeliveryApiResponse->data['trackingLink'];
-            $order_model->armada_qr_code_link = $createDeliveryApiResponse->data['qrCodeLink'];
-            $order_model->armada_delivery_code = $createDeliveryApiResponse->data['code'];
-            $order_model->save(false);
-            $successMessage = 'Your request has been successfully submitted';
-        } else {
-
-            if ($createDeliveryApiResponse->client)
-                $errorMessage = 'Invalid api key';
-            else if ($createDeliveryApiResponse->data['errors'])
-                $errorMessage = json_encode($createDeliveryApiResponse->data['errors'][0]['description'], true);
-
-
-            return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid, 'errorMessage' => json_encode($createDeliveryApiResponse)]);
-        }
+        // if ($createDeliveryApiResponse->isOk) {
+        //
+        //     $order_model->armada_tracking_link = $createDeliveryApiResponse->data['trackingLink'];
+        //     $order_model->armada_qr_code_link = $createDeliveryApiResponse->data['qrCodeLink'];
+        //     $order_model->armada_delivery_code = $createDeliveryApiResponse->data['code'];
+        //     $order_model->save(false);
+        //     $successMessage = 'Your request has been successfully submitted';
+        // } else {
+        //
+        //     if ($createDeliveryApiResponse->client)
+        //         $errorMessage = 'Invalid api key';
+        //     else if ($createDeliveryApiResponse->data['errors'])
+        //         $errorMessage = json_encode($createDeliveryApiResponse->data['errors'][0]['description'], true);
+        //
+        //
+        //     return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid, 'errorMessage' => json_encode($createDeliveryApiResponse)]);
+        // }
 
         return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid, 'errorMessage' => $errorMessage, 'successMessage' => $successMessage,]);
     }

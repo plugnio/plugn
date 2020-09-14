@@ -282,7 +282,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                               <span class="menu-title">Integrations</span>
                                           </a>
                                           <ul class="menu-content" style=" padding-left: 27px;">
-                                              <li  <?= $this->context->route == 'restaurant/view-analytics-integration' ? 'class="active"' : '' ?>>
+                                              <li  <?= $this->context->route == 'restaurant/view-analytics-integration' || $this->context->route == 'restaurant/update-analytics-integration' ? 'class="active"' : '' ?>>
                                                   <?=
                                                   Html::a(
                                                           Html::tag('i', '', ['class' => 'feather icon-circle']) .
@@ -290,7 +290,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                                   )
                                                   ?>
                                               </li>
-                                              <li  <?= $this->context->route == 'restaurant/view-delivery-integration' ? 'class="active"' : '' ?>>
+                                              <li  <?= $this->context->route == 'restaurant/view-delivery-integration' || $this->context->route == 'restaurant/update-delivery-integration' ? 'class="active"' : '' ?>>
                                                   <?=
                                                   Html::a(
                                                           Html::tag('i', '', ['class' => 'feather icon-circle']) .

@@ -72,15 +72,19 @@ $this->registerJs($js);
         ?>
 
         <?php
-        $currentTime = strtotime('now');
-        $deliveryTime = strtotime($model->estimated_time_of_arrival);
-        $difference = round(abs($deliveryTime - $currentTime) / 3600, 2);
+          $currentTime = strtotime('now');
+          $deliveryTime = strtotime($model->estimated_time_of_arrival);
+          $difference = round(abs($deliveryTime - $currentTime) / 3600, 2);
 
 
 
-        if ($difference <= 1 && $model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->armada_api_key != null && $model->armada_tracking_link == null) {
-            echo Html::a('Request a driver', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary mr-1 mb-1', 'style' => 'margin-right: 7px;']);
-        }
+          if ($difference <= 1 && $model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->armada_api_key != null && $model->armada_tracking_link == null) {
+              echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary mr-1 mb-1', 'style' => 'margin-right: 7px;']);
+          }
+
+          if ($difference <= 1 && $model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->maskor_api_key != null && $model->restaurant->maskor_branch_id != null) {
+              echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-info mr-1 mb-1', 'style' => 'margin-right: 7px;']);
+          }
         ?>
 
 

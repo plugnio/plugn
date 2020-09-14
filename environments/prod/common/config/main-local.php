@@ -79,5 +79,9 @@ return [
        'armadaDelivery' => [
             'keyToUse' => \common\components\ArmadaDelivery::USE_LIVE_KEY,
         ],
+        'mashkorDelivery' => [
+            'class' => 'common\components\MashkorDelivery',
+            'keyToUse' => \common\components\MashkorDelivery::USE_LIVE_KEY,
+        ],
     ],
 ];
