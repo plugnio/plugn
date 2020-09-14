@@ -171,13 +171,13 @@ class MashkorDelivery extends Component {
                 ->setUrl($this->apiEndpoint)
                 ->setData($mashkorParams)
                 ->addHeaders([
-                    'x-api-key' => $model->restaurant->mashkor_api_key,
+                    'x-api-key' => '637199C367D1D',
                     // 'Authorization' => 'Bearer plrWk7iC3Vh4299JcZbdMmVYUKGJCsGk' . $model->restaurant->armada_api_key,
                     'Authorization' => 'Bearer plrWk7iC3Vh4299JcZbdMmVYUKGJCsGk',
-                    'Content-Type' => 'application/json',
+                    'content-type' => 'application/json',
                 ])
                 ->send();
-
+        
         return $response;
     }
 
