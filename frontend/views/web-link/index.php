@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\helpers\Url;
+use common\models\WebLink;
 
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\WebLinkSearch */
@@ -59,7 +60,39 @@ $this->registerJs($js);
                       return $model->getWebLinkType();
                   }
               ],
-              'url:url',
+              [
+                'attribute' => 'url',
+                  "format" => "raw",
+                  "value" => function($model) {
+                    switch ($model->web_link_type) {
+
+                      case WebLink::WEB_LINK_TYPE_FACEBOOK:
+                        return '<a href="https://www.facebook.com/' .$model->url . '" >@' . $model->url .'</a>';
+                      break;
+
+                      case WebLink::WEB_LINK_TYPE_INSTAGRAM:
+                        return '<a href="https://www.instagram.com/' .$model->url . '" >@' . $model->url .'</a>';
+                      break;
+
+                      case WebLink::WEB_LINK_TYPE_TWITTER:
+                        return '<a href="https://www.twitter.com/' .$model->url . '" >@' . $model->url .'</a>';
+                      break;
+
+                      case WebLink::WEB_LINK_TYPE_SNAPCHAT:
+                        return '<a href="https://www.snapchat.com/add/' .$model->url . '" >@' . $model->url .'</a>';
+                      break;
+
+                      case WebLink::WEB_LINK_TYPE_WHATSAPP:
+                        return '<a href="https://wa.me/965' .$model->url . '" >+965' . $model->url .'</a>';
+                      break;
+
+                      default:
+                        return $model->url;
+                        break;
+                    }
+                      return $model->getWebLinkType();
+                  }
+              ],
             ],
             'layout' => '{summary}{items}{pager}',
             'tableOptions' => ['class' => 'table data-list-view'],

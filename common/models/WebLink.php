@@ -102,30 +102,30 @@ class WebLink extends \yii\db\ActiveRecord
       /**
        * {@inheritdoc}
        */
-      public function beforeSave($insert) {
-          if (parent::beforeSave($insert)) {
-
-
-              if ( $this->web_link_type ==  self::WEB_LINK_TYPE_FACEBOOK ){
-                $this->url = 'https://www.facebook.com/' . $this->url;
-              }
-              else if ( $this->web_link_type ==  self::WEB_LINK_TYPE_INSTAGRAM ){
-                $this->url = 'https://www.instagram.com/' . $this->url;
-              }
-              else if ( $this->web_link_type ==  self::WEB_LINK_TYPE_TWITTER ){
-                $this->url = 'https://www.twitter.com/' . $this->url;
-              }
-              else if ( $this->web_link_type ==  self::WEB_LINK_TYPE_SNAPCHAT ){
-                $this->url = 'https://www.snapchat.com/add/' . $this->url;
-              }
-              else if ( $this->web_link_type ==  self::WEB_LINK_TYPE_WHATSAPP ){
-                $this->url = ' https://wa.me/+965' . $this->url;
-              }
-
-
-              return true;
-          }
-      }
+      // public function beforeSave($insert) {
+      //     if (parent::beforeSave($insert)) {
+      //
+      //
+      //         if ( $this->web_link_type ==  self::WEB_LINK_TYPE_FACEBOOK ){
+      //           $this->url = 'https://www.facebook.com/' . $this->url;
+      //         }
+      //         else if ( $this->web_link_type ==  self::WEB_LINK_TYPE_INSTAGRAM ){
+      //           $this->url = 'https://www.instagram.com/' . $this->url;
+      //         }
+      //         else if ( $this->web_link_type ==  self::WEB_LINK_TYPE_TWITTER ){
+      //           $this->url = 'https://www.twitter.com/' . $this->url;
+      //         }
+      //         else if ( $this->web_link_type ==  self::WEB_LINK_TYPE_SNAPCHAT ){
+      //           $this->url = 'https://www.snapchat.com/add/' . $this->url;
+      //         }
+      //         else if ( $this->web_link_type ==  self::WEB_LINK_TYPE_WHATSAPP ){
+      //           $this->url = 'https://wa.me/+965' . $this->url;
+      //         }
+      //
+      //
+      //         return true;
+      //     }
+      // }
 
 
     /**
