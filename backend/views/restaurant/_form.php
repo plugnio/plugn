@@ -201,6 +201,10 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'test_api_key')->textInput() ?>
 
+    <?= $form->field($model, 'live_public_key')->textInput() ?>
+
+    <?= $form->field($model, 'test_public_key')->textInput() ?>
+
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>

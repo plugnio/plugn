@@ -236,6 +236,11 @@ class OrderController extends Controller {
                         $payment = new Payment;
                         $payment->restaurant_uuid = $restaurant_model->restaurant_uuid;
                         $payment->payment_mode = $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
+
+                        if($payment->payment_mode == TapPayments::GATEWAY_VISA_MASTERCARD && Yii::$app->request->getBodyParam("payment_token")){
+                          $payment->payment_token = Yii::$app->request->getBodyParam("payment_token");
+                        }
+
                         $payment->customer_id = $order->customer->customer_id; //customer id
                         $payment->order_uuid = $order->order_uuid;
                         $payment->payment_amount_charged = $order->total_price;
@@ -263,7 +268,7 @@ class OrderController extends Controller {
                                     $order->customer_phone_number,
                                     $order->restaurant->platform_fee,
                                     Url::to(['order/callback'], true),
-                                    $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD
+                                    $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : $payment->payment_token ? $payment->payment_token :  TapPayments::GATEWAY_VISA_MASTERCARD
                                   );
 
                             $responseContent = json_decode($response->content);
@@ -278,6 +283,7 @@ class OrderController extends Controller {
                                   return [
                                       'operation' => 'error',
                                       'message' => $errorMessage
+
                                   ];
                               }
 

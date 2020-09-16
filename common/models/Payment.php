@@ -22,6 +22,7 @@ use yii\web\NotFoundHttpException;
  * @property double $payment_amount_charged amount charged to customer
  * @property double $payment_net_amount net amount deposited into our account
  * @property double $payment_gateway_fee gateway fee charged
+ * @property double $payment_token
  * @property string $payment_udf1
  * @property string $payment_udf2
  * @property string $payment_udf3
@@ -55,7 +56,7 @@ class Payment extends \yii\db\ActiveRecord {
             [['payment_gateway_order_id', 'payment_current_status'], 'string'],
             [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee'], 'number'],
             [['payment_uuid'], 'string', 'max' => 36],
-            [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'response_message'], 'string', 'max' => 255],
+            [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'response_message','payment_token'], 'string', 'max' => 255],
             [['payment_uuid'], 'unique'],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
@@ -104,6 +105,7 @@ class Payment extends \yii\db\ActiveRecord {
             'payment_amount_charged' => Yii::t('app', 'Amount Charged'),
             'payment_net_amount' => Yii::t('app', 'Net Amount'),
             'payment_gateway_fee' => Yii::t('app', 'Gateway Fee'),
+            'payment_token' => Yii::t('app', 'Payment Token'),
             'payment_udf1' => Yii::t('app', 'Udf1'),
             'payment_udf2' => Yii::t('app', 'Udf2'),
             'payment_udf3' => Yii::t('app', 'Udf3'),
