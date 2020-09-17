@@ -264,7 +264,7 @@ class OrderController extends Controller {
                               if($payment->payment_token)
                                 $source_id = $payment->payment_token;
                               else
-                                $source_id = TapPayments::GATEWAY_VISA_MASTERCARD
+                                $source_id = TapPayments::GATEWAY_VISA_MASTERCARD;
                             }
                             $source_id
                             $response = Yii::$app->tapPayments->createCharge(
