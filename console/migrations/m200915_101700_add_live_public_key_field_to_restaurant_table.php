@@ -12,8 +12,8 @@ class m200915_101700_add_live_public_key_field_to_restaurant_table extends Migra
      */
     public function safeUp()
     {
-      $this->addColumn('restaurant', 'live_public_key', $this->string());
-      $this->addColumn('restaurant', 'test_public_key', $this->string());
+      $this->addColumn('restaurant', 'live_public_key', $this->string()->defaultValue(null));
+      $this->addColumn('restaurant', 'test_public_key', $this->string()->defaultValue(null));
     }
 
     /**
