@@ -266,7 +266,8 @@ class OrderController extends Controller {
                               else
                                 $source_id = TapPayments::GATEWAY_VISA_MASTERCARD;
                             }
-                            $source_id
+
+                            // $source_id
                             $response = Yii::$app->tapPayments->createCharge(
                                     "Order placed from: " . $order->customer_name, // Description
                                     $order->restaurant->name, //Statement Desc.
