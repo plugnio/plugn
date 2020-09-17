@@ -258,6 +258,15 @@ class OrderController extends Controller {
                             // Redirect to payment gateway
                             Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
 
+                            if($order->payment_method_id == 1){
+                              $source_id = TapPayments::GATEWAY_KNET;
+                            } else {
+                              if($payment->payment_token)
+                                $source_id = $payment->payment_token;
+                              else
+                                $source_id = TapPayments::GATEWAY_VISA_MASTERCARD
+                            }
+                            $source_id
                             $response = Yii::$app->tapPayments->createCharge(
                                     "Order placed from: " . $order->customer_name, // Description
                                     $order->restaurant->name, //Statement Desc.
@@ -269,7 +278,7 @@ class OrderController extends Controller {
                                     $order->restaurant->platform_fee,
                                     Url::to(['order/callback'], true),
                                     // $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET :  TapPayments::GATEWAY_VISA_MASTERCARD
-                                    $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : $payment->payment_token == null ? TapPayments::GATEWAY_VISA_MASTERCARD : $payment->payment_token
+                                    $source_id
                                   );
 
                             $responseContent = json_decode($response->content);
