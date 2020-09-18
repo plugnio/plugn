@@ -492,7 +492,26 @@ class TapPayments extends Component
                     'content-type' => 'application/json',
                 ])
                 ->send();
-    
+
+        return $response;
+    }
+
+    /**
+     * isValidToken
+     * @param  string $chargeId
+     */
+    public function retrieveToken($tokenId)
+    {
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setMethod('GET')
+                ->setUrl($this->apiEndpoint . "/tokens/" . $tokenId)
+                ->addHeaders([
+                    'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
+                    'content-type' => 'application/json',
+                ])
+                ->send();
+
         return $response;
     }
 

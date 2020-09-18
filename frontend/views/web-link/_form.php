@@ -89,7 +89,6 @@ $this->registerJs($js);
 
 
 if (!$model->isNewRecord) {
-
     echo Html::a('Delete', ['delete', 'id' => $model->web_link_id, 'restaurantUuid' => $model->restaurant_uuid], [
         'class' => 'btn btn-danger  mr-1 mb-1',
         'data' => [

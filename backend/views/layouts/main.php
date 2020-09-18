@@ -48,7 +48,8 @@ AppAsset::register($this);
             ['label' => 'Areas', 'url' => ['/area/index']],
             ['label' => 'Agent Assignment', 'url' => ['/agent-assignment/index']],
             ['label' => 'Payments Method', 'url' => ['/payment-method/index']],
-            ['label' => 'Restaurants', 'url' => ['/restaurant/index']]
+            ['label' => 'Restaurants', 'url' => ['/restaurant/index']],
+            ['label' => 'Bank', 'url' => ['/bank/index']]
         ];
 
         $menuItems[] = '<li>'

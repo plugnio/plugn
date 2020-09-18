@@ -25,6 +25,7 @@ use common\models\CustomerVoucher;
  * @property int|null $max_redemption
  * @property int|null $limit_per_customer
  * @property int|null $minimum_order_amount
+* @property  int|null $bank_id
  * @property string|null $voucher_created_at
  * @property string|null $voucher_updated_at
  *
@@ -57,7 +58,17 @@ class Voucher extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['restaurant_uuid', 'code', 'discount_type', 'discount_amount', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'required'],
+            [['restaurant_uuid',  'discount_type', 'discount_amount', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'required'],
+
+            ['code', 'required', 'when' => function($model) {
+                return $model->bank_id == null;
+            }],
+
+            ['bank_id', 'required', 'when' => function($model) {
+                return $model->code == null;
+            }],
+
+
             [['discount_type', 'voucher_status', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'integer'],
             [['valid_from', 'valid_until', 'duration'], 'safe'],
             ['discount_type', 'in', 'range' => [self::DISCOUNT_TYPE_PERCENTAGE, self::DISCOUNT_TYPE_AMOUNT]],
@@ -67,6 +78,7 @@ class Voucher extends \yii\db\ActiveRecord {
             [['voucher_created_at', 'voucher_updated_at'], 'safe'],
             [['code','description','description_ar'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
+            [['bank_id'], 'exist', 'skipOnError' => true, 'targetClass' => Bank::className(), 'targetAttribute' => ['bank_id' => 'bank_id']],
         ];
     }
 
@@ -100,6 +112,7 @@ class Voucher extends \yii\db\ActiveRecord {
             'voucher_status' => 'Voucher Status',
             'valid_from' => 'Valid From',
             'valid_until' => 'Valid Until',
+            'bank_id' => 'Bank Name',
             'voucher_created_at' => 'Created At',
             'voucher_updated_at' => 'Updated At',
             'max_redemption' => 'Max Redemption',
@@ -162,6 +175,18 @@ class Voucher extends \yii\db\ActiveRecord {
 
         return $isValid ? $this : false;
     }
+
+
+      /**
+        * Gets query for [[Bank]].
+        *
+        * @return \yii\db\ActiveQuery
+        */
+       public function getBank()
+       {
+           return $this->hasOne(Bank::className(), ['bank_id' => 'bank_id']);
+       }
+
 
     /**
      * Gets query for [[CustomerVouchers]].
