@@ -2,8 +2,10 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use common\models\Bank;
 use common\models\Voucher;
 use kartik\daterange\DateRangePicker;
+use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Voucher */
@@ -53,7 +55,20 @@ if (!$model->isNewRecord) {
 <div class="card">
     <div class="card-body voucher-form">
 
-        <?php $form = ActiveForm::begin(); ?>
+        <?php
+        $bankQuery = Bank::find()->asArray()->all();
+        $bankList = ArrayHelper::map($bankQuery, 'bank_id', 'bank_name');
+
+
+        $form = ActiveForm::begin([
+                    'errorSummaryCssClass' => 'alert alert-danger'
+        ]);
+        ?>
+
+        <?= $form->errorSummary([$model], ['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
+
+        <?= $form->field($model, 'bank_id')->dropDownList($bankList, ['prompt'=>'Select...'],['class' => 'form-control select2'])->label('Bank'); ?>
+
 
         <?= $form->field($model, 'code')->textInput(['maxlength' => true, 'placeholder' => '50OffOnFirstOrder']) ?>
 
@@ -68,7 +83,7 @@ if (!$model->isNewRecord) {
                 ?>
             </div>
             <div class="col-12 col-sm-6 col-lg-6">
-<?= $form->field($model, 'description_ar')->textInput(['maxlength' => true, 'placeholder' => 'على سبيل المثال احصل على خصم 50٪ على طلبك الأول.']) ?>
+                <?= $form->field($model, 'description_ar')->textInput(['maxlength' => true, 'placeholder' => 'على سبيل المثال احصل على خصم 50٪ على طلبك الأول.']) ?>
             </div>
         </div>
 
@@ -138,19 +153,19 @@ if (!$model->isNewRecord) {
         </div>
         <div class="row">
             <div class="col-12 col-sm-6 col-lg-4">
-<?= $form->field($model, 'max_redemption')->textInput(['value' => $model->max_redemption ? $model->max_redemption : 0])->label('Max. Redemptions <span style="color: rgba(0,0,0,.45);">(0 = unlimited)</span>') ?>
+                <?= $form->field($model, 'max_redemption')->textInput(['value' => $model->max_redemption ? $model->max_redemption : 0])->label('Max. Redemptions <span style="color: rgba(0,0,0,.45);">(0 = unlimited)</span>') ?>
             </div>
             <div class="col-12 col-sm-6 col-lg-4">
-<?= $form->field($model, 'limit_per_customer')->textInput(['value' => $model->limit_per_customer ? $model->limit_per_customer : 0])->label('Limit Per Customer <span style="color: rgba(0,0,0,.45);">(0 = unlimited)</span>') ?>
+                <?= $form->field($model, 'limit_per_customer')->textInput(['value' => $model->limit_per_customer ? $model->limit_per_customer : 0])->label('Limit Per Customer <span style="color: rgba(0,0,0,.45);">(0 = unlimited)</span>') ?>
             </div>
             <div class="col-12 col-sm-6 col-lg-4">
-<?= $form->field($model, 'minimum_order_amount')->textInput(['value' => $model->minimum_order_amount ? $model->minimum_order_amount : 0])->label('Minimum Order Amount ') ?>
+                <?= $form->field($model, 'minimum_order_amount')->textInput(['value' => $model->minimum_order_amount ? $model->minimum_order_amount : 0])->label('Minimum Order Amount ') ?>
             </div>
         </div>
         <div class="form-group" style="background: #f4f6f9; padding-bottom: 0px; margin-bottom: 0px; padding-bottom: 15px; background:#f4f6f9 ">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
+            <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
         </div>
-<?php ActiveForm::end(); ?>
+        <?php ActiveForm::end(); ?>
 
     </div>
 </div>

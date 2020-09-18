@@ -58,6 +58,7 @@ use common\models\WebLink;
  * @property Agent[] $agents
  * @property WebLink[] $webLinks
  * @property StoreWebLink[] $storeWebLinks
+	* @property Voucher[] $vouchers
 
  */
 class Restaurant extends \yii\db\ActiveRecord {
@@ -471,6 +472,9 @@ class Restaurant extends \yii\db\ActiveRecord {
           },
           'webLinks' => function($restaurant){
               return $restaurant->getWebLinks()->all();
+          },
+          'vouchers' => function($restaurant){
+              return $restaurant->getVouchers()->asArray()->all();
           }
       ];
     }
@@ -645,6 +649,17 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function getOrders() {
         return $this->hasMany(Order::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
+    /**
+   * Gets query for [[Vouchers]].
+   *
+   * @return \yii\db\ActiveQuery
+   */
+    public function getVouchers()
+    {
+        return $this->hasMany(Voucher::className(), ['restaurant_uuid' => 'restaurant_uuid'])->with('bank');
+    }
+
 
     /**
      * Gets query for [[Customers]].
