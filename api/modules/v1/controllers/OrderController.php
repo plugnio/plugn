@@ -236,6 +236,11 @@ class OrderController extends Controller {
                         $payment = new Payment;
                         $payment->restaurant_uuid = $restaurant_model->restaurant_uuid;
                         $payment->payment_mode = $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
+
+                        if($payment->payment_mode == TapPayments::GATEWAY_VISA_MASTERCARD && Yii::$app->request->getBodyParam("payment_token")){
+                          $payment->payment_token = Yii::$app->request->getBodyParam("payment_token");
+                        }
+
                         $payment->customer_id = $order->customer->customer_id; //customer id
                         $payment->order_uuid = $order->order_uuid;
                         $payment->payment_amount_charged = $order->total_price;
@@ -253,6 +258,16 @@ class OrderController extends Controller {
                             // Redirect to payment gateway
                             Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
 
+                            if($order->payment_method_id == 1){
+                              $source_id = TapPayments::GATEWAY_KNET;
+                            } else {
+                              if($payment->payment_token)
+                                $source_id = $payment->payment_token;
+                              else
+                                $source_id = TapPayments::GATEWAY_VISA_MASTERCARD;
+                            }
+
+                            // $source_id
                             $response = Yii::$app->tapPayments->createCharge(
                                     "Order placed from: " . $order->customer_name, // Description
                                     $order->restaurant->name, //Statement Desc.
@@ -263,7 +278,8 @@ class OrderController extends Controller {
                                     $order->customer_phone_number,
                                     $order->restaurant->platform_fee,
                                     Url::to(['order/callback'], true),
-                                    $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD
+                                    // $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET :  TapPayments::GATEWAY_VISA_MASTERCARD
+                                    $source_id
                                   );
 
                             $responseContent = json_decode($response->content);
@@ -278,6 +294,7 @@ class OrderController extends Controller {
                                   return [
                                       'operation' => 'error',
                                       'message' => $errorMessage
+
                                   ];
                               }
 
@@ -400,6 +417,7 @@ class OrderController extends Controller {
 
     /**
      * Get Order detail
+     * WIll delete this fun after we merge with all stores
      * @param type $id
      * @param type $restaurant_uuid
      * @return type
@@ -420,6 +438,30 @@ class OrderController extends Controller {
             'body' => $model
         ];
     }
+
+
+        /**
+         * Get Order detail
+         * @param type $id
+         * @param type $restaurant_uuid
+         * @return type
+         */
+        public function actionGetOrderDetails($id, $restaurant_uuid) {
+            $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->one();
+
+
+            if (!$model) {
+                return [
+                    'operation' => 'error',
+                    'message' => 'Invalid order uuid'
+                ];
+            }
+
+            return [
+                'operation' => 'success',
+                'body' => $model
+            ];
+        }
 
     /**
      * Whether is valid promo code or no

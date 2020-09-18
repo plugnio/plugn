@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -41,36 +42,17 @@ $this->registerJs($js);
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'rowOptions' => function($model) {
+                $url = Url::to(['restaurant-branch/view', 'id' => $model->restaurant_branch_id, 'restaurantUuid' => $model->restaurant_uuid]);
+
+                return [
+                    'onclick' => "window.location.href='{$url}'"
+                ];
+            },
             'columns' => [
               ['class' => 'yii\grid\SerialColumn'],
               'branch_name_en',
               'branch_name_ar',
-              [
-                'header' => 'Action',
-
-                  'class' => 'yii\grid\ActionColumn',
-                  'template' => ' {update} {delete}',
-                  'buttons' => [
-                      'update' => function ($url, $model) {
-                          return Html::a(
-                                          '<span style="margin-right: 20px;" class="nav-icon fa fa-edit"></span>', ['view', 'id' => $model->restaurant_branch_id, 'restaurantUuid' => $model->restaurant_uuid], [
-                                      'title' => 'Update',
-                                      'data-pjax' => '0',
-                                          ]
-                          );
-                      },
-                      'delete' => function ($url, $model) {
-                          return Html::a(
-                                          '<span style="margin-right: 20px;color: red;" class="nav-icon fa fa-trash"></span>', ['delete', 'id' => $model->restaurant_branch_id, 'restaurantUuid' => $model->restaurant_uuid], [
-                                      'title' => 'Delete',
-                                      'data' => [
-                                          'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',
-                                          'method' => 'post',
-                                      ],
-                          ]);
-                      },
-                  ],
-              ],
 
             ],
             'layout' => '{summary}{items}{pager}',

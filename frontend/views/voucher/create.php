@@ -7,7 +7,6 @@ use yii\helpers\Html;
 
 $this->params['restaurant_uuid'] = $restaurantUuid;
 
-
 $this->title = 'Create Voucher';
 $this->params['breadcrumbs'][] = ['label' => 'Vouchers', 'url' => ['index', 'restaurantUuid' => $restaurantUuid]];
 $this->params['breadcrumbs'][] = $this->title;
@@ -16,6 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= $this->render('_form', [
         'model' => $model,
+        'restaurantUuid' => $restaurantUuid
     ]) ?>
 
 </div>

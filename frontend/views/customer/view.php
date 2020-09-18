@@ -95,23 +95,23 @@ $this->params['breadcrumbs'][] = $this->title;
                           'format' => "raw",
                           'value' => function($model) {
                               if ($model->order_status == Order::STATUS_PENDING)
-                                  return '<span class="badge bg-warning" >' . $model->orderStatus . '</span>';
+                                  return '<span class="badge bg-warning" >' . $model->orderStatusInEnglish . '</span>';
                               else if ($model->order_status == Order::STATUS_DRAFT)
-                                  return '<span class="badge bg-info" >' . $model->orderStatus . '</span>';
+                                  return '<span class="badge bg-info" >' . $model->orderStatusInEnglish . '</span>';
                               else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY)
-                                  return '<span class="badge bg-info" >' . $model->orderStatus . '</span>';
+                                  return '<span class="badge bg-info" >' . $model->orderStatusInEnglish . '</span>';
                               else if ($model->order_status == Order::STATUS_BEING_PREPARED)
-                                  return '<span class="badge bg-primary" >' . $model->orderStatus . '</span>';
+                                  return '<span class="badge bg-primary" >' . $model->orderStatusInEnglish . '</span>';
                               else if ($model->order_status == Order::STATUS_COMPLETE)
-                                  return '<span class="badge bg-success" >' . $model->orderStatus . '</span>';
+                                  return '<span class="badge bg-success" >' . $model->orderStatusInEnglish . '</span>';
                               else if ($model->order_status == Order::STATUS_CANCELED)
-                                  return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
+                                  return '<span class="badge bg-danger" >' . $model->orderStatusInEnglish . '</span>';
                               else if ($model->order_status == Order::STATUS_PARTIALLY_REFUNDED)
-                                  return '<span class="badge bg-warning" >' . $model->orderStatus . '</span>';
+                                  return '<span class="badge bg-warning" >' . $model->orderStatusInEnglish . '</span>';
                               else if ($model->order_status == Order::STATUS_REFUNDED)
-                                  return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
+                                  return '<span class="badge bg-danger" >' . $model->orderStatusInEnglish . '</span>';
                               else if ($model->order_status == Order::STATUS_ABANDONED_CHECKOUT)
-                                  return '<span class="badge bg-danger" >' . $model->orderStatus . '</span>';
+                                  return '<span class="badge bg-danger" >' . $model->orderStatusInEnglish . '</span>';
                           }
                       ],
                       'delivery_fee:currency',

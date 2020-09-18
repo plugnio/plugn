@@ -78,6 +78,23 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'restaurant_uuid',
+            [
+                'label' => 'Payment Methods',
+                'value' => function ($data) {
+                    $paymentMethods = '';
+
+                    foreach ($data->getPaymentMethods()->all() as $key => $paymentMethod) {
+
+                        if ($key == 0)
+                            $paymentMethods .=  $paymentMethod['payment_method_name'] ;
+                        else
+                            $paymentMethods .= ', ' .  $paymentMethod['payment_method_name'] ;
+                    }
+
+                    return $paymentMethods;
+                },
+                'format' => 'raw'
+            ],
             'name',
             'name_ar',
             'tagline',

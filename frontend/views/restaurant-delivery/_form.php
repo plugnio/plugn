@@ -55,14 +55,14 @@ $this->registerJs($js);
       <?php
       echo $form->field($model, 'restaurant_delivery_area_array')->dropDownList(
               $restaurantDeliveryArray, [
-          'class' => 'form-control select2',
-          'multiple' => 'multiple',
-          'value' => $sotredRestaurantDeliveryAreas
+                'class' => 'form-control select2',
+                'multiple' => 'multiple',
+                'value' => $sotredRestaurantDeliveryAreas
               ]
-      );
+          );
       ?>
     </div>
-    
+
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>

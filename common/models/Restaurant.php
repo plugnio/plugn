@@ -6,6 +6,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use yii\behaviors\AttributeBehavior;
+use common\models\WebLink;
 
 /**
  * This is the model class for table "restaurant".
@@ -55,6 +56,9 @@ use yii\behaviors\AttributeBehavior;
  * @property RestaurantTheme $restaurantTheme
  * @property PaymentMethod[] $paymentMethods
  * @property Agent[] $agents
+ * @property WebLink[] $webLinks
+ * @property StoreWebLink[] $storeWebLinks
+
  */
 class Restaurant extends \yii\db\ActiveRecord {
 
@@ -71,9 +75,10 @@ class Restaurant extends \yii\db\ActiveRecord {
     //Values for `store_layout`
     const STORE_LAYOUT_LIST_FULLWIDTH  = 1;
     const STORE_LAYOUT_GRID_FULLWIDTH   = 2;
-    const STORE_LAYOUT_LIST_HALFWIDTH  = 3;
-    const STORE_LAYOUT_GRID_HALFWIDTH   = 4;
-    const STORE_LAYOUT_CATEGORY_HALFWIDTH   = 5;
+    const STORE_LAYOUT_CATEGORY_FULLWIDTH   = 3;
+    const STORE_LAYOUT_LIST_HALFWIDTH  = 4;
+    const STORE_LAYOUT_GRID_HALFWIDTH  = 5;
+    const STORE_LAYOUT_CATEGORY_HALFWIDTH  = 6;
 
 
     public $restaurant_delivery_area;
@@ -101,7 +106,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['restaurant_status', 'support_delivery', 'support_pick_up'], 'integer', 'min' => 0],
             ['restaurant_status', 'in', 'range' => [self::RESTAURANT_STATUS_OPEN, self::RESTAURANT_STATUS_BUSY, self::RESTAURANT_STATUS_CLOSED]],
-            ['store_layout', 'in', 'range' => [self::STORE_LAYOUT_LIST_FULLWIDTH, self::STORE_LAYOUT_GRID_FULLWIDTH, self::STORE_LAYOUT_LIST_HALFWIDTH, self::STORE_LAYOUT_GRID_HALFWIDTH , self::STORE_LAYOUT_CATEGORY_HALFWIDTH ]],
+            ['store_layout', 'in', 'range' => [self::STORE_LAYOUT_LIST_FULLWIDTH, self::STORE_LAYOUT_GRID_FULLWIDTH,self::STORE_LAYOUT_CATEGORY_FULLWIDTH , self::STORE_LAYOUT_LIST_HALFWIDTH, self::STORE_LAYOUT_GRID_HALFWIDTH , self::STORE_LAYOUT_CATEGORY_HALFWIDTH ]],
             ['phone_number_display', 'in', 'range' => [self::PHONE_NUMBER_DISPLAY_ICON, self::PHONE_NUMBER_DISPLAY_SHOW_PHONE_NUMBER, self::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER]],
             [['restaurant_created_at', 'restaurant_updated_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
@@ -110,7 +115,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['instagram_url'], 'url'],
             [['date_range_picker_with_time','google_analytics_id', 'facebook_pixil_id'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'app_id' ,'armada_api_key','store_branch_name'], 'string', 'max' => 255],
-            [['phone_number'], 'string', 'min' => 8, 'max' => 8],
+            [['phone_number'], 'string', 'min' => 7, 'max' => 8],
             [['phone_number'], 'integer', 'min' => 0],
             [['restaurant_email_notification','schedule_order','schedule_interval','phone_number_display','store_layout','show_opening_hours'], 'integer'],
             ['restaurant_email', 'email'],
@@ -124,12 +129,13 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function attributeLabels() {
         return [
             'restaurant_uuid' => 'Restaurant Uuid',
-            'name' => 'Name',
+            'name' => 'Name in English',
             'name_ar' => 'Name in Arabic',
-            'tagline' => 'Tagline',
+            'tagline' => 'Tagline in English',
             'tagline_ar' => 'Tagline in Arabic',
             'restaurant_domain' => 'Domain',
             'app_id' => 'App id',
+            'restaurant_payments_method' => 'Payment method',
             'restaurant_status' => 'Store Status',
             'thumbnail_image' => 'Header Image',
             'logo' => 'Logo',
@@ -209,24 +215,31 @@ class Restaurant extends \yii\db\ActiveRecord {
     /**
      * save restaurant payment method
      */
-    public function saveRestaurantPaymentMethod($payments_method) {
+    public function saveRestaurantPaymentMethod($payments_method = null) {
 
-        $sotred_restaurant_payment_method = RestaurantPaymentMethod::find()
-                ->where(['restaurant_uuid' => $this->restaurant_uuid])
-                ->all();
+        if($payments_method){
 
-        foreach ($sotred_restaurant_payment_method as $restaurant_payment_method) {
-            if (!in_array($restaurant_payment_method->payment_method_id, $payments_method)) {
-                RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $this->restaurant_uuid, 'payment_method_id' => $restaurant_payment_method->payment_method_id]);
-            }
+          $sotred_restaurant_payment_method = RestaurantPaymentMethod::find()
+                  ->where(['restaurant_uuid' => $this->restaurant_uuid])
+                  ->all();
+
+
+          foreach ($sotred_restaurant_payment_method as $restaurant_payment_method) {
+              if (!in_array($restaurant_payment_method->payment_method_id, $payments_method)) {
+                  RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $this->restaurant_uuid, 'payment_method_id' => $restaurant_payment_method->payment_method_id]);
+              }
+          }
+
+          foreach ($payments_method as $payment_method_id) {
+              $payments_method = new RestaurantPaymentMethod();
+              $payments_method->payment_method_id = $payment_method_id;
+              $payments_method->restaurant_uuid = $this->restaurant_uuid;
+              $payments_method->save();
+          }
+        } else {
+              RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
         }
 
-        foreach ($payments_method as $payment_method_id) {
-            $payments_method = new RestaurantPaymentMethod();
-            $payments_method->payment_method_id = $payment_method_id;
-            $payments_method->restaurant_uuid = $this->restaurant_uuid;
-            $payments_method->save();
-        }
     }
 
     /**
@@ -455,6 +468,9 @@ class Restaurant extends \yii\db\ActiveRecord {
       return [
           'isOpen' => function($restaurant){
               return $restaurant->isOpen();
+          },
+          'webLinks' => function($restaurant){
+              return $restaurant->getWebLinks()->all();
           }
       ];
     }
@@ -657,4 +673,24 @@ class Restaurant extends \yii\db\ActiveRecord {
         return $this->hasOne(RestaurantTheme::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    /**
+     * Gets query for [[WebLinks]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWebLinks()
+    {
+        return $this->hasMany(WebLink::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+
+    /**
+     * Gets query for [[StoreWebLinks]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStoreWebLinks()
+    {
+        return $this->hasMany(StoreWebLink::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
 }

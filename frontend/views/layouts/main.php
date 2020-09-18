@@ -144,7 +144,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                             <i class="feather icon-shopping-cart"></i>
                             <span class="menu-title">Orders</span>
                         </a>
-                        <ul class="menu-content">
+                        <ul class="menu-content" style="    padding-left: 17px;">
                             <li  <?= $this->context->route == 'order/index' ? 'class="active"' : '' ?>>
                                 <?=
                                 Html::a(
@@ -192,10 +192,13 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         ?>
                     </li>
 
-                    <?php if (
-                      $restaurant_model->restaurant_uuid == 'rest_068b3be0-ea30-11ea-808a-0673128d0c9c' ||
-                      $restaurant_model->restaurant_uuid == 'rest_1d40a718-beac-11ea-808a-0673128d0c9c' ||
-                       $restaurant_model->restaurant_uuid == 'rest_58fd80f4-ab79-11ea-8b7f-06d4853caaaa' || $restaurant_model->restaurant_uuid == 'rest_a2f833ef-a06c-11ea-8b7f-06d4853caaaa' || $restaurant_model->restaurant_uuid == 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290' || $restaurant_model->restaurant_uuid == 'rest_8ee880ff-c1d1-11ea-808a-0673128d0c9c' || $restaurant_model->restaurant_uuid == 'rest_9d65290b-b191-11ea-808a-0673128d0c9c') { ?>
+                    <?php
+                    // if (
+                    //    $restaurant_model->restaurant_uuid == 'rest_068b3be0-ea30-11ea-808a-0673128d0c9c' ||
+                    //    $restaurant_model->restaurant_uuid == 'rest_1d40a718-beac-11ea-808a-0673128d0c9c' ||
+                    //    $restaurant_model->restaurant_uuid == 'rest_58fd80f4-ab79-11ea-8b7f-06d4853caaaa' || $restaurant_model->restaurant_uuid == 'rest_a2f833ef-a06c-11ea-8b7f-06d4853caaaa' || $restaurant_model->restaurant_uuid == 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290' || $restaurant_model->restaurant_uuid == 'rest_8ee880ff-c1d1-11ea-808a-0673128d0c9c' || $restaurant_model->restaurant_uuid == 'rest_9d65290b-b191-11ea-808a-0673128d0c9c') {
+                         ?>
+
                         <li class=" nav-item <?= $this->context->route == 'voucher/index' ? 'active' : '' ?> ">
                             <?=
                             Html::a(
@@ -204,7 +207,9 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                             )
                             ?>
                         </li>
-                    <?php } ?>
+                    <?php
+                   // }
+                    ?>
 
                     <li class=" nav-item <?= $this->context->route == 'customer/index' ? 'active' : '' ?> ">
 
@@ -216,12 +221,12 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         ?>
                     </li>
                     <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
-                        <li class=" nav-item <?= $this->context->route == 'restaurant/analytic' ? 'active' : '' ?> ">
+                        <li class=" nav-item <?= $this->context->route == 'restaurant/statistics' ? 'active' : '' ?> ">
 
                             <?=
                             Html::a(
                                     Html::tag('i', '', ['class' => 'fa fa-line-chart']) .
-                                    Html::tag('span', 'Analytics'), ['restaurant/analytic', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                    Html::tag('span', 'Statistics'), ['restaurant/statistics', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                             )
                             ?>
                         </li>
@@ -233,10 +238,10 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                             <i class="feather icon-settings"></i>
                             <span class="menu-title">Settings</span>
                         </a>
-                        <ul class="menu-content">
+                        <ul class="menu-content" style="padding-left: 17px;">
                             <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
 
-                                <li class=" nav-item <?= $this->context->route == 'restaurant/index' ? 'active' : '' ?> ">
+                                <li class=" nav-item <?= $this->context->route == 'restaurant/index'  || $this->context->route == 'restaurant/update' ? 'active' : '' ?> ">
                                     <?=
                                     Html::a(
                                             Html::tag('i', '', ['class' => 'feather icon-circle']) .
@@ -244,6 +249,58 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                     )
                                     ?>
                                 </li>
+
+                                <li class=" nav-item <?= $this->context->route == 'restaurant/view-payment-settings'  || $this->context->route =='restaurant/update-payment-settings' ? 'active' : '' ?> ">
+                                    <?=
+                                    Html::a(
+                                            Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                            Html::tag('span', 'Payment Settings'), ['restaurant/view-payment-settings', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                    )
+                                    ?>
+                                </li>
+
+                                <li class=" nav-item <?= $this->context->route == 'restaurant/view-design-layout' || $this->context->route == 'restaurant/update-design-layout'  ? 'active' : '' ?> ">
+                                    <?=
+                                    Html::a(
+                                            Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                            Html::tag('span', 'Design & layout'), ['restaurant/view-design-layout', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                    )
+                                    ?>
+                                </li>
+                                <li class=" nav-item <?= $this->context->route == 'web-link/index' || $this->context->route == 'web-link/create'  ? 'active' : '' ?> ">
+                                    <?=
+                                    Html::a(
+                                            Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                            Html::tag('span', 'Web Links'), ['web-link/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                    )
+                                    ?>
+                                </li>
+
+                                      <li class=" nav-item">
+                                          <a>
+                                              <i class="feather icon-circle"></i>
+                                              <span class="menu-title">Integrations</span>
+                                          </a>
+                                          <ul class="menu-content" style=" padding-left: 27px;">
+                                              <li  <?= $this->context->route == 'restaurant/view-analytics-integration' ? 'class="active"' : '' ?>>
+                                                  <?=
+                                                  Html::a(
+                                                          Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                                          Html::tag('span', 'Analytics'), ['restaurant/view-analytics-integration', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                                  )
+                                                  ?>
+                                              </li>
+                                              <li  <?= $this->context->route == 'restaurant/view-delivery-integration' ? 'class="active"' : '' ?>>
+                                                  <?=
+                                                  Html::a(
+                                                          Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                                          Html::tag('span', 'Delivery'), ['restaurant/view-delivery-integration', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                                  )
+                                                  ?>
+                                              </li>
+                                          </ul>
+                                      </li>
+
                             <?php } ?>
 
                             <li class=" nav-item <?= $this->context->route == 'opening-hour/index' ? 'active' : '' ?> ">

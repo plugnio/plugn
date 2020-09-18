@@ -27,41 +27,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 DetailView::widget([
                     'model' => $model,
                     'attributes' => [
-                        [
-                            'label' => 'Payment Methods',
-                            'value' => function ($data) {
-                                $paymentMethods = '';
-
-                                foreach ($data->getPaymentMethods()->all() as $key => $paymentMethod) {
-
-                                    if ($key == 0)
-                                        $paymentMethods .= '<b>' . $paymentMethod['payment_method_name'] . '<b>';
-                                    else
-                                        $paymentMethods .= ', ' . '<b>' . $paymentMethod['payment_method_name'] . '<b>';
-                                }
-
-                                return $paymentMethods;
-                            },
-                            'format' => 'raw'
-                        ],
                         'name',
                         'name_ar',
                         'tagline',
                         'tagline_ar',
-                        [
-                            'attribute' => 'thumbnail_image',
-                            'format' => 'html',
-                            'value' => function ($data) {
-                                return Html::img($data->getRestaurantThumbnailImageUrl());
-                            },
-                        ],
-                        [
-                            'attribute' => 'logo',
-                            'format' => 'html',
-                            'value' => function ($data) {
-                                return Html::img($data->getRestaurantLogoUrl());
-                            },
-                        ],
                         [
                             'label' => 'Support Delivery',
                             'value' => function ($data) {
@@ -86,26 +55,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         'restaurant_email:email',
                         [
-                            'attribute' => 'phone_number_display',
-                            'format' => 'html',
-                            'value' => function ($data) {
-                                if ($data->phone_number_display == Restaurant::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER)
-                                    return "Dont show store's phone number";
-                                else if($data->phone_number_display == Restaurant::PHONE_NUMBER_DISPLAY_ICON)
-                                         return "📞";
-                                else if($data->phone_number_display == Restaurant::PHONE_NUMBER_DISPLAY_SHOW_PHONE_NUMBER)
-                                         return "+965" . $data->phone_number;
-                            },
-                        ],
-                        [
-                            'attribute' => 'store_layout',
-                            'format' => 'html',
-                            'value' => function ($data) {
-                                return $data->store_layout == 1 ? 'List' : 'Grid';
-                            },
-                            'visible' => $model->phone_number != null,
-                        ],
-                        [
                             'attribute' => 'restaurant_email_notification',
                             'format' => 'html',
                             'value' => function ($data) {
@@ -128,32 +77,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                             'visible' => $model->instagram_url != null,
                         ],
-                        [
-                            'attribute' => 'armada_api_key',
-                            'format' => 'html',
-                            'value' => function ($data) {
-                                return $data->armada_api_key;
-                            },
-                            'visible' => $model->armada_api_key != null,
-                        ],
-                        [
-                            'attribute' => 'google_analytics_id',
-                            'format' => 'html',
-                            'value' => function ($data) {
-                                return $data->google_analytics_id;
-                            },
-                            'visible' => $model->google_analytics_id != null,
-                        ],
-                        [
-                            'attribute' => 'facebook_pixil_id',
-                            'format' => 'html',
-                            'value' => function ($data) {
-                                return $data->facebook_pixil_id;
-                            },
-                            'visible' => $model->facebook_pixil_id != null,
-                        ],
-                        'restaurant_created_at',
-                        'restaurant_updated_at',
                     ],
                     'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
                 ])

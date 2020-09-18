@@ -254,7 +254,7 @@ class RestaurantController extends Controller {
     /**
      * @return mixed
      */
-    public function actionAnalytic($restaurantUuid) {
+    public function actionStatistics($restaurantUuid) {
 
         $model = $this->findModel($restaurantUuid);
 
@@ -519,7 +519,7 @@ class RestaurantController extends Controller {
 
 
 
-        return $this->render('analytic', [
+        return $this->render('statistics', [
                     'model' => $model,
                     'months' => $months,
                     'most_selling_items_chart_data' => $most_selling_items_chart_data,
@@ -545,6 +545,62 @@ class RestaurantController extends Controller {
     }
 
     /**
+     * Lists all Restaurant models.
+     * @return mixed
+     */
+    public function actionViewAnalyticsIntegration($restaurantUuid) {
+
+        $model = $this->findModel($restaurantUuid);
+
+        return $this->render('integration/analytics/view-analytics-integration', [
+                    'model' => $model
+        ]);
+    }
+
+    /**
+     * Lists all Restaurant models.
+     * @return mixed
+     */
+    public function actionViewDeliveryIntegration($restaurantUuid) {
+
+        $model = $this->findModel($restaurantUuid);
+
+        return $this->render('integration/delivery/view-delivery-integration', [
+                    'model' => $model
+        ]);
+    }
+
+    /**
+     * View payment settings page
+     * @return mixed
+     */
+    public function actionViewPaymentSettings($restaurantUuid) {
+
+        $model = $this->findModel($restaurantUuid);
+
+        return $this->render('payment-settings/view-payment-settings', [
+                    'model' => $model
+        ]);
+    }
+
+    /**
+    * View Design & layout page
+     * @return mixed
+     */
+    public function actionViewDesignLayout($restaurantUuid) {
+
+        $model = $this->findModel($restaurantUuid);
+
+        $store_theme_model = RestaurantTheme::findOne($model->restaurant_uuid);
+
+
+        return $this->render('design-layout/view-design-layout', [
+                    'model' => $model,
+                    'store_theme_model' => $store_theme_model
+        ]);
+    }
+
+    /**
      * Updates an existing Restaurant model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
@@ -555,35 +611,98 @@ class RestaurantController extends Controller {
 
         $model = $this->findModel($id);
 
-        $store_theme_model = RestaurantTheme::findOne($model->restaurant_uuid);
-
-        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())  && $store_theme_model->load(Yii::$app->request->post())) {
-
-            if (!$model->phone_number)
-                $model->phone_number_display = Restaurant::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER;
-
-            if ($model->save() && $store_theme_model->save()) {
-
-                $thumbnail_image = \yii\web\UploadedFile::getInstances($model, 'restaurant_thumbnail_image');
-                $logo = \yii\web\UploadedFile::getInstances($model, 'restaurant_logo');
-
-                if ($model->restaurant_payments_method)
-                    $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
-
-                if ($thumbnail_image)
-                    $model->uploadThumbnailImage($thumbnail_image[0]->tempName);
-
-                if ($logo)
-                    $model->uploadLogo($logo[0]->tempName);
-
-
-                return $this->redirect(['index', 'restaurantUuid' => $id]);
-            }
+        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())  && $model->save()) {
+          return $this->redirect(['index', 'restaurantUuid' => $id]);
         }
 
         return $this->render('update', [
+                    'model' => $model
+
+        ]);
+    }
+
+    /**
+     * Updates an existing payment method.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    // public function actionUpdateAnalyticsIntegration($id) {
+    //
+    //   $model = $this->findModel($id);
+    //
+    //   if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())  && $model->save()) {
+    //          return $this->redirect(['view-analytics-integration', 'restaurantUuid' => $id]);
+    //   }
+    //
+    //     return $this->render('integration/analytics/update-analytics-integration', [
+    //                 'model' => $model
+    //     ]);
+    // }
+
+    /**
+     * Updates an existing payment method.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionUpdateDesignLayout($id) {
+
+      $model = $this->findModel($id);
+
+      $store_theme_model = RestaurantTheme::findOne($model->restaurant_uuid);
+
+      if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())  && $store_theme_model->load(Yii::$app->request->post())) {
+
+          if (!$model->phone_number)
+              $model->phone_number_display = Restaurant::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER;
+
+          if ($model->save() && $store_theme_model->save()) {
+
+              $thumbnail_image = \yii\web\UploadedFile::getInstances($model, 'restaurant_thumbnail_image');
+              $logo = \yii\web\UploadedFile::getInstances($model, 'restaurant_logo');
+
+
+              if ($thumbnail_image)
+                  $model->uploadThumbnailImage($thumbnail_image[0]->tempName);
+
+              if ($logo)
+                  $model->uploadLogo($logo[0]->tempName);
+
+             return $this->redirect(['view-design-layout', 'restaurantUuid' => $id]);
+          }
+      }
+
+        return $this->render('design-layout/update-design-layout', [
                     'model' => $model,
-                    'store_theme_model' => $store_theme_model,
+                    'store_theme_model' =>  $store_theme_model
+        ]);
+    }
+
+    /**
+     * Updates an existing payment method.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionUpdatePaymentSettings($id) {
+
+        $model = $this->findModel($id);
+
+        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
+
+
+            if ($model->save()) {
+                $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
+                return $this->redirect(['view-payment-settings', 'restaurantUuid' => $id]);
+            }
+        }
+
+        return $this->render('payment-settings/update-payment-settings', [
+                    'model' => $model
         ]);
     }
 

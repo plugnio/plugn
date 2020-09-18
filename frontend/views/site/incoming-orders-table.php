@@ -33,7 +33,7 @@ foreach ($orders as $order) {
               Html::addCssClass($options, ['fa fa-circle font-small-3 text-danger mr-50']);
           }
 
-          echo Html::tag('i', '', $options) . $order->orderStatus
+          echo Html::tag('i', '', $options) . $order->orderStatusInEnglish
           ?>
         </td>
         <td>

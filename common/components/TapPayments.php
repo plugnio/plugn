@@ -492,7 +492,7 @@ class TapPayments extends Component
                     'content-type' => 'application/json',
                 ])
                 ->send();
-
+    
         return $response;
     }
 
