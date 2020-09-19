@@ -192,35 +192,30 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         ?>
                     </li>
 
-
-
-
-
-
-                        <li class=" nav-item">
-                            <a>
-                                <i class="fa  fa-tags"></i>
-                                <span class="menu-title">Discounts</span>
-                            </a>
-                            <ul class="menu-content" style="padding-left: 17px;">
-                                <li  <?= $this->context->route == 'voucher/index' ? 'class="active"' : '' ?>>
-                                    <?=
-                                    Html::a(
-                                            Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                            Html::tag('span', 'Voucher'), ['voucher/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
-                                    )
-                                    ?>
-                                </li>
-                                <li  <?= $this->context->route == 'bank-discount/index' ? 'class="active"' : '' ?>>
-                                    <?=
-                                    Html::a(
-                                            Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                            Html::tag('span', 'Bank Discount'), ['bank-discount/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
-                                    )
-                                    ?>
-                                </li>
-                            </ul>
-                        </li>
+                    <li class=" nav-item">
+                        <a>
+                            <i class="fa  fa-tags"></i>
+                            <span class="menu-title">Discounts</span>
+                        </a>
+                        <ul class="menu-content" style="padding-left: 17px;">
+                            <li  <?= $this->context->route == 'voucher/index' ? 'class="active"' : '' ?>>
+                                <?=
+                                Html::a(
+                                        Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                        Html::tag('span', 'Voucher'), ['voucher/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                )
+                                ?>
+                            </li>
+                            <li  <?= $this->context->route == 'bank-discount/index' ? 'class="active"' : '' ?>>
+                                <?=
+                                Html::a(
+                                        Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                        Html::tag('span', 'Bank Discount'), ['bank-discount/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                )
+                                ?>
+                            </li>
+                        </ul>
+                    </li>
 
                     <li class=" nav-item <?= $this->context->route == 'customer/index' ? 'active' : '' ?> ">
 

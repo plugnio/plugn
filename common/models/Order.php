@@ -49,8 +49,11 @@ use yii\behaviors\AttributeBehavior;
  * @property int $restaurant_branch_id
  * @property datetime $order_created_at
  * @property datetime $order_updated_at
+ * @property int|null $bank_discount_id
+
  *
- * @property Area $area
+ * @property Area
+ * @property BankDiscount $bankDiscount
  * @property RestaurantBranch $restaurantBranch
  * @property Customer $customer
  * @property PaymentMethod $paymentMethod
@@ -100,7 +103,7 @@ class Order extends \yii\db\ActiveRecord {
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer', 'min' => 0],
-            [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id'], 'integer'],
+            [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id','bank_discount_id'], 'integer'],
             ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_PARTIALLY_REFUNDED, self::STATUS_CANCELED, self::STATUS_DRAFT, self::STATUS_ABANDONED_CHECKOUT, self::STATUS_ACCEPTED]],
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
             ['restaurant_branch_id', function ($attribute, $params, $validator) {
@@ -148,6 +151,7 @@ class Order extends \yii\db\ActiveRecord {
             [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
             [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name', 'payment_method_name_ar', 'armada_tracking_link', 'armada_qr_code_link', 'armada_delivery_code'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
+            [['bank_discount_id'], 'exist', 'skipOnError' => true, 'targetClass' => BankDiscount::className(), 'targetAttribute' => ['bank_discount_id' => 'bank_discount_id']],
             [['customer_id'], 'exist', 'skipOnError' => false, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
             [['payment_method_id'], 'exist', 'skipOnError' => false, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => false, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
@@ -377,6 +381,7 @@ class Order extends \yii\db\ActiveRecord {
             'estimated_time_of_arrival' => 'Expected at',
             'is_order_scheduled' => 'Is order scheduled',
             'voucher_id' => 'Voucher ID',
+            'bank_discount_id' => 'Bank Discount ID',
         ];
     }
 
@@ -503,6 +508,11 @@ class Order extends \yii\db\ActiveRecord {
 
         if($this->voucher){
           $discountAmount = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->voucher->discount_amount /100)) : $this->voucher->discount_amount;
+          $totalPrice -= $discountAmount ;
+        }
+
+        else if($this->bank_discount_id){
+          $discountAmount = $this->bankDiscount->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->bankDiscount->discount_amount /100)) : $this->bankDiscount->discount_amount;
           $totalPrice -= $discountAmount ;
         }
 
@@ -655,6 +665,17 @@ class Order extends \yii\db\ActiveRecord {
 
             $this->save(false);
         }
+    }
+
+
+    /**
+     * Gets query for [[BankDiscount]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBankDiscount()
+    {
+        return $this->hasOne(BankDiscount::className(), ['bank_discount_id' => 'bank_discount_id']);
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace backend\models;
+namespace frontend\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -17,8 +17,8 @@ class BankDiscountSearch extends BankDiscount
     public function rules()
     {
         return [
-            [['bank_discount_id', 'bank_id', 'discount_type', 'discount_amount'], 'integer'],
-            [['restaurant_uuid'], 'safe'],
+            [['bank_discount_id', 'bank_id', 'discount_type', 'discount_amount', 'bank_discount_status', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'integer'],
+            [['restaurant_uuid', 'valid_from', 'valid_until', 'bank_discount_created_at', 'bank_discount_updated_at'], 'safe'],
         ];
     }
 
@@ -38,16 +38,18 @@ class BankDiscountSearch extends BankDiscount
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $restaurantUuid)
     {
-        $query = BankDiscount::find();
+        $query = BankDiscount::find()->where(['restaurant_uuid' => $restaurantUuid]);;
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => false
         ]);
 
+        
         $this->load($params);
 
         if (!$this->validate()) {
@@ -62,6 +64,14 @@ class BankDiscountSearch extends BankDiscount
             'bank_id' => $this->bank_id,
             'discount_type' => $this->discount_type,
             'discount_amount' => $this->discount_amount,
+            'bank_discount_status' => $this->bank_discount_status,
+            'valid_from' => $this->valid_from,
+            'valid_until' => $this->valid_until,
+            'max_redemption' => $this->max_redemption,
+            'limit_per_customer' => $this->limit_per_customer,
+            'minimum_order_amount' => $this->minimum_order_amount,
+            'bank_discount_created_at' => $this->bank_discount_created_at,
+            'bank_discount_updated_at' => $this->bank_discount_updated_at,
         ]);
 
         $query->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid]);

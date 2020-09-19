@@ -6,6 +6,7 @@ use yii\widgets\DetailView;
 use yii\grid\GridView;
 use common\models\Order;
 use common\models\Voucher;
+use common\models\BankDiscount;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Order */
@@ -365,6 +366,23 @@ DetailView::widget([
                         <tbody>
                             <tr>
                                 <td colspan="2">Subtotal After Voucher</td>
+                                <td style="float: right;"><?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                            </tr>
+                        </tbody>
+    <?php }
+    else if ($model->bank_discount_id != null && $model->bank_discount_id) {
+        $bankDiscount = $model->bankDiscount->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ? ($model->subtotal * ($model->bankDiscount->discount_amount / 100)) : $model->bankDiscount->discount_amount;
+        $subtotalAfterDiscount = $model->subtotal - $bankDiscount;
+        ?>
+                        <tbody>
+                            <tr>
+                                <td colspan="2">Bank Discount</td>
+                                <td style="float: right;">-<?= Yii::$app->formatter->asCurrency($bankDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td colspan="2">Subtotal After Bank Discount</td>
                                 <td style="float: right;"><?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                             </tr>
                         </tbody>

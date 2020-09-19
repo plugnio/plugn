@@ -9,8 +9,10 @@ use common\models\Voucher;
 use common\models\Bank;
 use common\models\Order;
 use common\models\OrderItem;
+use common\models\CustomerBankDiscount;
 use common\models\OrderItemExtraOption;
 use common\models\Restaurant;
+use common\models\BankDiscount;
 use common\models\Payment;
 use common\components\TapPayments;
 use yii\helpers\Url;
@@ -114,7 +116,7 @@ class OrderController extends Controller {
                     $order->longitude = Yii::$app->request->getBodyParam("deliver_location_longitude"); //optional
 
 
-                    
+
 //Preorder
                 if ($order->is_order_scheduled != null && $order->is_order_scheduled == true && $restaurant_model->schedule_order) {
                     $order->scheduled_time_start_from = date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_start_from")));
@@ -263,22 +265,27 @@ class OrderController extends Controller {
 
                                 $bank_name = Yii::$app->request->getBodyParam("bank_name");
 
-
-                                $voucher = Voucher::find()
-                                        ->innerJoin('bank', 'bank.bank_id = voucher.bank_id')
+                                $bank_discount_model = BankDiscount::find()
+                                        ->innerJoin('bank', 'bank.bank_id = bank_discount.bank_id')
                                         ->where(['bank.bank_name' => $bank_name])
+                                        ->andWhere(['restaurant_uuid' => $order->restaurant_uuid])
                                         ->one();
 
-                                if ($voucher) {
-                                    if ($voucher_model->isValid($this->customer_phone_number)) {
-                                        $customerVoucher = new CustomerVoucher();
-                                        $customerVoucher->customer_id = $this->customer_id;
-                                        $customerVoucher->voucher_id = $this->voucher_id;
-                                        $customerVoucher->save();
+
+                                if ($bank_discount_model) {
+                                    if ($bank_discount_model->isValid($order->customer_phone_number)) {
+                                        $customerBankDiscount = new CustomerBankDiscount();
+                                        $customerBankDiscount->customer_id = $order->customer_id;
+                                        $customerBankDiscount->bank_discount_id = $bank_discount_model->bank_discount_id;
+                                        $customerBankDiscount->save();
                                     }
-                                    $order->voucher_id = $voucher->voucher_id;
+
                                     $payment->payment_token = Yii::$app->request->getBodyParam("payment_token");
-                                    $order->updateOrderTotalPrice();
+
+                                    $order->bank_discount_id = $bank_discount_model->bank_discount_id;
+
+
+
                                 }
                             }
                         } catch (\Exception $e) {
@@ -291,6 +298,7 @@ class OrderController extends Controller {
                         }
                     }
 
+
                     $payment->customer_id = $order->customer->customer_id; //customer id
                     $payment->order_uuid = $order->order_uuid;
                     $payment->payment_amount_charged = $order->total_price;
@@ -300,7 +308,8 @@ class OrderController extends Controller {
 
                         //Update payment_uuid in order
                         $order->payment_uuid = $payment->payment_uuid;
-                        $order->save(false);
+                        $order->save();
+                        $order->updateOrderTotalPrice();
 
                         Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
 
@@ -503,27 +512,28 @@ class OrderController extends Controller {
     /**
      * Whether is valid promo code or no
      */
-    public function actionCreditCardDiscount() {
+    public function actionApplyBankDiscount() {
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
         $phone_number = Yii::$app->request->get("phone_number");
         $bank_name = Yii::$app->request->get("bank_name");
 
 
-        $voucher = Voucher::find()
-                ->innerJoin('bank', 'bank.bank_id = voucher.bank_id')
+        $bank_discount_model = BankDiscount::find()
+                ->innerJoin('bank', 'bank.bank_id = bank_discount.bank_id')
                 ->where(['bank.bank_name' => $bank_name])
+                ->andWhere(['restaurant_uuid' => $restaurant_uuid])
                 ->one();
 
-        if ($voucher && $voucher->isValid($phone_number)) {
+        if ($bank_discount_model && $bank_discount_model->isValid($phone_number)) {
             return [
                 'operation' => 'success',
-                'voucher' => $voucher
+                'bank_discount' => $bank_discount_model
             ];
         }
 
         return [
             'operation' => 'error',
-            'message' => 'Voucher code is invalid or expired'
+            'message' => 'Bank Discount is invalid or expired'
         ];
     }
 

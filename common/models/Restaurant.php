@@ -472,9 +472,6 @@ class Restaurant extends \yii\db\ActiveRecord {
           },
           'webLinks' => function($restaurant){
               return $restaurant->getWebLinks()->all();
-          },
-          'vouchers' => function($restaurant){
-              return $restaurant->getVouchers()->asArray()->all();
           }
       ];
     }

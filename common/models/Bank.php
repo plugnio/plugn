@@ -17,7 +17,7 @@ use Yii;
  * @property string $bank_updated_at
  * @property int $deleted
  *
- * @property Voucher[] $vouchers
+ * @property BankDiscount[] $bankDiscounts
  */
 class Bank extends \yii\db\ActiveRecord
 {
@@ -62,12 +62,12 @@ class Bank extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Vouchers]].
+     * Gets query for [[BankDiscounts]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getVouchers()
+    public function getBankDiscounts()
     {
-        return $this->hasMany(Voucher::className(), ['bank_id' => 'bank_id']);
+        return $this->hasMany(BankDiscount::className(), ['bank_id' => 'bank_id']);
     }
 }
