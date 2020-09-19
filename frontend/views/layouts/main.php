@@ -145,6 +145,14 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                             <span class="menu-title">Orders</span>
                         </a>
                         <ul class="menu-content" style="    padding-left: 17px;">
+                            <li  <?= $this->context->route == 'order/pending-orders' ? 'class="active"' : '' ?>>
+                                <?=
+                                Html::a(
+                                        Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                        Html::tag('span', 'Pending Orders'), ['order/pending-orders', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                )
+                                ?>
+                            </li>
                             <li  <?= $this->context->route == 'order/index' ? 'class="active"' : '' ?>>
                                 <?=
                                 Html::a(

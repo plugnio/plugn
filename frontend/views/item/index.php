@@ -27,11 +27,6 @@ $this->registerJs($js);
 <section id="data-list-view" class="data-list-view-header">
 
 
-<?php if($dataProvider->getCount() == 0 ){  ?>
-  <div style="padding-left:14px">
-  <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'    padding: 0.85rem 1.7rem;']) ?>
-</div>
-<?php } ?>
 
 <!-- Data list view starts -->
 <div class="action-btns d-none">
@@ -41,6 +36,17 @@ $this->registerJs($js);
         </div>
     </div>
 </div>
+
+
+
+<?php echo $this->render('_search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
+
+<?php if($dataProvider->getCount() == 0 ){  ?>
+  <div style="padding-left:14px">
+  <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'    padding: 0.85rem 1.7rem;']) ?>
+</div>
+<?php } ?>
+
 
     <!-- DataTable starts -->
     <div class="table-responsive">
@@ -56,7 +62,6 @@ $this->registerJs($js);
                 ];
             },
             'columns' => [
-              'sort_number',
               [
                   'attribute' => 'Image',
                   'format' => 'html',
@@ -67,10 +72,36 @@ $this->registerJs($js);
                       }
                   },
               ],
-              'item_name',
+              [
+                'label' => 'Category Name',
+                  'value' => function ($data) {
+                      $categoryName = '';
+
+                      foreach ($data->category as $key => $category) {
+                          if ($key == 0) {
+                              $categoryName .= $category['title'];
+                          } else {
+                              $categoryName .= ', ' .  $category['title'];
+                          }
+                      }
+
+                      return $categoryName;
+                  },
+                  'format' => 'raw'
+              ],
+              [
+                  'label' => 'Title',
+                  'format' => 'html',
+                  'value' => function ($data) {
+                      return $data->item_name;
+                  },
+              ],
+
               'stock_qty',
               'unit_sold',
+              'sort_number',
               'item_price:currency',
+
             ],
             'layout' => '{summary}{items}{pager}',
             'tableOptions' => ['class' => 'table data-list-view'],
@@ -81,4 +112,4 @@ $this->registerJs($js);
     <!-- DataTable ends -->
 
   </section>
-<!-- Data list view end -->
+  <!-- Data list view end -->

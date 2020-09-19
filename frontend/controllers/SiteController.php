@@ -947,25 +947,6 @@ class SiteController extends Controller {
         return $this->render('thankYou');
     }
 
-    /**
-     * Check for new orders
-     */
-    public function actionCheckForNewOrders($restaurant_uuid) {
-
-        $managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurant_uuid);
-
-        $this->layout = false;
-
-        $newOrders = Order::find()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
-                ->orderBy(['order_created_at' => SORT_DESC])
-                ->limit(5)
-                ->all();
-
-
-        return $this->render('incoming-orders-table', [
-                    'orders' => $newOrders
-        ]);
-    }
 
     /**
      * Requests password reset.
