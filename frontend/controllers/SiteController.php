@@ -11,12 +11,14 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use frontend\models\LoginForm;
+use frontend\models\OrderSearch;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use common\models\Restaurant;
 use common\models\OrderItem;
 use common\models\Order;
+use common\models\AgentAssignment;
 use common\models\Item;
 use common\models\Customer;
 use yii\db\Expression;
@@ -41,7 +43,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'promote-to-open', 'promote-to-close', 'pay', 'callback', 'vendor-dashboard', 'mark-as-busy', 'mark-as-open'],
+                        'actions' => ['logout', 'promote-to-open', 'promote-to-close', 'pay', 'callback', 'vendor-dashboard', 'real-time-orders','mark-as-busy', 'mark-as-open'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -84,11 +86,53 @@ class SiteController extends Controller {
         else {
             foreach (Yii::$app->accountManager->getManagedAccounts() as $managedRestaurant) {
 
-                return $this->redirect(['vendor-dashboard',
-                            'id' => $managedRestaurant->restaurant_uuid
-                ]);
+                if(AgentAssignment::isOwner($managedRestaurant->restaurant_uuid)){
+                  return $this->redirect(['vendor-dashboard',
+                              'id' => $managedRestaurant->restaurant_uuid
+                  ]);
+                } else {
+                  return $this->redirect(['real-time-orders',
+                              'restaurant_uuid' => $managedRestaurant->restaurant_uuid
+                  ]);
+                }
+
             }
         }
+    }
+
+    /**
+     * Check for new orders
+     */
+    public function actionCheckForNewOrders($restaurant_uuid) {
+
+        $this->layout = false;
+        $managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurant_uuid);
+
+        $searchModel = new OrderSearch();
+        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $restaurant_uuid);
+
+        return $this->render('incoming-orders-table', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider
+        ]);
+    }
+
+
+    /**
+     * Displays  Real time orders
+     *
+     * @return mixed
+     */
+    public function actionRealTimeOrders($restaurant_uuid) {
+
+          $searchModel = new OrderSearch();
+          $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $restaurant_uuid);
+
+          return $this->render('real-time-orders', [
+                      'searchModel' => $searchModel,
+                      'dataProvider' => $dataProvider,
+                      'restaurant_uuid' => $restaurant_uuid
+          ]);
     }
 
     /**
@@ -99,6 +143,7 @@ class SiteController extends Controller {
     public function actionVendorDashboard($id) {
 
         if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
+            if(AgentAssignment::isOwner($managedRestaurant->restaurant_uuid)){
 
             $incoming_orders = Order::find()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
                     ->orderBy(['order_created_at' => SORT_DESC])
@@ -109,7 +154,6 @@ class SiteController extends Controller {
             $orders_received_chart_data_this_week = [];
             $orders_received_chart_data_last_month = [];
             $orders_received_chart_data_last_three_months = [];
-
 
             // orders recevied
             $today_orders_received = Order::find()
@@ -132,8 +176,6 @@ class SiteController extends Controller {
                     ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
                     ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
                     ->count();
-
-
 
 
             //order recevied chart
@@ -170,7 +212,6 @@ class SiteController extends Controller {
                     ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 4 DAY) ')
                     ->count();
-
 
             array_push($orders_received_chart_data_this_week, $number_of_all_orders_received_last_5_days_only ? (int) ($number_of_all_orders_received_last_5_days_only) : 0);
 
@@ -472,8 +513,6 @@ class SiteController extends Controller {
 
             array_push($sold_item_chart_data_last_month, $number_of_all_sold_item_last_month_only ? (int) ($number_of_all_sold_item_last_month_only) : 0);
 
-
-
             array_push($sold_item_chart_data_last_three_months, $number_of_all_sold_item_last_three_months_only ? (int) ($number_of_all_sold_item_last_three_months_only) : 0);
 
             array_push($sold_item_chart_data_last_three_months, $number_of_all_sold_item_last_month_only ? (int) ($number_of_all_sold_item_last_month_only) : 0);
@@ -499,22 +538,16 @@ class SiteController extends Controller {
                 $number_of_all_sold_item_last_three_months += $soldItem ? intval($soldItem) : 0;
             }
 
-
-
-
             //Customers
             $customer_chart_data_this_week = [];
             $customer_chart_data_last_month = [];
             $customer_chart_data_last_three_months = [];
 
 
-
-
             $today_customer_gained = Customer::find()
                     ->where(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     ->andWhere(['DATE(customer_created_at)' => new Expression('CURDATE()')])
                     ->count();
-
 
 
             $number_of_all_customer_gained_last_month = Customer::find()
@@ -844,6 +877,12 @@ class SiteController extends Controller {
                         'orders_received_chart_data_last_month' => $orders_received_chart_data_last_month,
                         'orders_received_chart_data_last_three_months' => $orders_received_chart_data_last_three_months,
             ]);
+          } else {
+
+            return $this->redirect(['real-time-orders',
+                        'restaurant_uuid' => $managedRestaurant->restaurant_uuid
+            ]);
+          }
         }
     }
 

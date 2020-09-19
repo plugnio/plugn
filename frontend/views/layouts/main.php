@@ -57,9 +57,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
 
 
                         <ul class="nav navbar-nav float-left">
-                            <li class="dropdown dropdown-user nav-item">
 
-                            </li>
                         </ul>
 
                         <ul class="nav navbar-nav float-right">
@@ -127,6 +125,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
 
                 <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
 
+                  <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
 
                     <li class=" nav-item <?= $this->context->route == 'site/vendor-dashboard' ? 'active' : '' ?> ">
 
@@ -134,6 +133,17 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         Html::a(
                                 Html::tag('i', '', ['class' => ' feather icon-home']) .
                                 Html::tag('span', 'Dashboard'), ['site/vendor-dashboard', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                        )
+                        ?>
+                    </li>
+                  <?php } ?>
+
+
+                    <li  <?= $this->context->route == 'site/real-time-orders' ? 'class="active"' : '' ?>>
+                        <?=
+                        Html::a(
+                                Html::tag('i', '', ['class' => 'feather icon-server']) .
+                                Html::tag('span', 'Real Time Orders'), ['site/real-time-orders', 'restaurant_uuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
                         )
                         ?>
                     </li>
@@ -145,19 +155,12 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                             <span class="menu-title">Orders</span>
                         </a>
                         <ul class="menu-content" style="    padding-left: 17px;">
-                            <li  <?= $this->context->route == 'order/pending-orders' ? 'class="active"' : '' ?>>
-                                <?=
-                                Html::a(
-                                        Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'Pending Orders'), ['order/pending-orders', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
-                                )
-                                ?>
-                            </li>
+
                             <li  <?= $this->context->route == 'order/index' ? 'class="active"' : '' ?>>
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'Orders'), ['order/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                        Html::tag('span', 'All Orders'), ['order/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
                                 )
                                 ?>
                             </li>

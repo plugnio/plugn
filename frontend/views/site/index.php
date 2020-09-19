@@ -366,8 +366,11 @@ $this->registerJs($js);
 
 <!-- Dashboard Ecommerce Starts -->
 <section id="dashboard-ecommerce">
-    <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
-
+      <div>
+        <?=
+          Html::a('Go to real time orders page', ['site/real-time-orders', 'restaurant_uuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn  btn-primary', 'style' => 'margin-bottom: 20px'])
+        ?>
+      </div>
         <div class="row">
             <div class="col-lg-3 col-sm-6 col-12">
                 <div class="card">
@@ -560,7 +563,6 @@ $this->registerJs($js);
                 </div>
             </div>
         </div>
-    <?php } ?>
 
 </div>
 

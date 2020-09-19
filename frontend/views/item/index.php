@@ -72,6 +72,14 @@ $this->registerJs($js);
                       }
                   },
               ],
+
+              [
+                  'label' => 'Item Title',
+                  'format' => 'html',
+                  'value' => function ($data) {
+                      return $data->item_name;
+                  },
+              ],
               [
                 'label' => 'Category Name',
                   'value' => function ($data) {
@@ -89,14 +97,6 @@ $this->registerJs($js);
                   },
                   'format' => 'raw'
               ],
-              [
-                  'label' => 'Title',
-                  'format' => 'html',
-                  'value' => function ($data) {
-                      return $data->item_name;
-                  },
-              ],
-
               'stock_qty',
               'unit_sold',
               'sort_number',

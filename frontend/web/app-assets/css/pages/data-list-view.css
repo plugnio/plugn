@@ -423,3 +423,7 @@ _:-ms-lang(x) .table-responsive .top .dataTables_filter .form-control:after, .da
   -webkit-appearance : none;
   top : -10px;
 }
+
+.top{
+  padding: 0px !important;
+}

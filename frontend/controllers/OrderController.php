@@ -135,46 +135,6 @@ class OrderController extends Controller {
 
 
 
-      /**
-       * Check for new orders
-       */
-      public function actionCheckForNewOrders($restaurant_uuid) {
-
-
-          $this->layout = false;
-          $managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurant_uuid);
-
-
-                  $searchModel = new OrderSearch();
-                  $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $restaurant_uuid);
-
-
-      
-          return $this->render('incoming-orders-table', [
-              'searchModel' => $searchModel,
-              'dataProvider' => $dataProvider
-          ]);
-      }
-
-
-    /**
-     * Lists all draft Orders.
-     * @return mixed
-     */
-    public function actionPendingOrders($restaurantUuid) {
-
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
-
-        $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
-
-        return $this->render('pending-orders', [
-                    'searchModel' => $searchModel,
-                    'dataProvider' => $dataProvider,
-                    'restaurant_model' => $restaurant_model
-        ]);
-    }
-
     /**
      * Lists all draft Orders.
      * @return mixed
