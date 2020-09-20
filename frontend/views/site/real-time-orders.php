@@ -16,8 +16,6 @@ $this->params['breadcrumbs'][] = $this->title;
 $js = "
 $(function () {
   $('.summary').insertAfter('.top');
-   $('tbody').attr('id', 'new-order-table');
-
 });
 
 
@@ -152,7 +150,7 @@ var soundForNewOrders = new Audio("data:audio/wav;base64,//uQRAAAAWMSLwUIYAAsYkX
                 ],
                 'total_price:currency',
             ],
-            'layout' => '{summary}{items}{pager}',
+            'layout' => '{items}{pager}',
             'tableOptions' => ['class' => 'table data-list-view', 'id' => 'new-order-table'],
         ]);
         ?>
