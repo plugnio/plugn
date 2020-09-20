@@ -133,24 +133,12 @@ class MashkorDelivery extends Component {
     public function createOrder($model) {
 
         $mashkorParams = [
-              "branch_id" => $model->restaurant->mashkor_branch_id,
+              "branch_id" => 'adf7f8b5-d80a-4b68-ab1c-5e955f9f1adc',
               "customer_name" => $model->customer_name,
               "payment_type" => $model->payment_method_id == 3 ? self::PAYMENT_TYPE_COD : self::PAYMENT_TYPE_CARD,
               "mobile_number" =>  $model->customer_phone_number,
               "amount_to_collect" => $model->total_price,
               "vendor_order_id" => $model->order_uuid,
-              "pick_up" => [
-                  "customer_name" => $model->restaurant->name,
-                  "mobile_number" => $model->restaurant->phone_number,
-                  "latitude" => null,
-                  "longitude" => null,
-                  "area" => $model->area_name,
-                  "block" => $model->block,
-                  "street" => $model->street,
-                  // "building" => $model->house_number,
-                  // "landmark" => $model->house_number,
-                  // "address" => $model->house_number,
-              ],
               "drop_off" => [
                   "customer_name" => $model->restaurant->name,
                   "mobile_number" => $model->restaurant->phone_number,
@@ -159,9 +147,6 @@ class MashkorDelivery extends Component {
                   "area" => $model->area_name,
                   "block" => $model->block,
                   "street" => $model->street,
-                  // "building" => $model->house_number,
-                  // "landmark" => $model->house_number,
-                  // "address" => $model->house_number,
               ]
         ];
 
@@ -172,12 +157,11 @@ class MashkorDelivery extends Component {
                 ->setData($mashkorParams)
                 ->addHeaders([
                     'x-api-key' => '637199C367D1D',
-                    // 'Authorization' => 'Bearer plrWk7iC3Vh4299JcZbdMmVYUKGJCsGk' . $model->restaurant->armada_api_key,
                     'Authorization' => 'Bearer plrWk7iC3Vh4299JcZbdMmVYUKGJCsGk',
                     'content-type' => 'application/json',
                 ])
                 ->send();
-        
+
         return $response;
     }
 

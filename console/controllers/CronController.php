@@ -21,6 +21,17 @@ use yii\db\Expression;
 class CronController extends \yii\console\Controller {
 
 
+
+
+    public function actionCreateOrder() {
+
+      $order_model = Order::findOne('2BBNPG');
+      $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($order_model);
+      return $createDeliveryApiResponse;
+
+    }
+
+
     /**
      * Update refund status  for all refunds record
      */
