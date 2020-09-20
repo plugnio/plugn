@@ -152,7 +152,7 @@ $this->registerJs($js);
                             'status' => Order::STATUS_BEING_PREPARED
                                 ], [
                             'style' => 'margin-right: 10px;',
-                            'class' => 'btn btn-warning',
+                            'class' => 'btn btn-primary',
                         ]);
                     }
 

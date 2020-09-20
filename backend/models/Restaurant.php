@@ -92,7 +92,7 @@ class Restaurant extends \common\models\Restaurant {
                     'identification_issuing_country', 'identification_issuing_date', 'identification_title',
                     'identification_expiry_date', 'identification_file', 'identification_file_purpose',
                     'business_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
-                    'live_api_key', 'test_api_key', 'developer_id'
+                    'live_api_key', 'test_api_key', 'developer_id','live_public_key', 'test_public_key'
                 ],
                 'string', 'max' => 255
             ],
@@ -205,7 +205,7 @@ class Restaurant extends \common\models\Restaurant {
             //delete tmp files
             $this->deleteTempFiles();
         }
-        
+
     }
 
     /**
@@ -213,7 +213,7 @@ class Restaurant extends \common\models\Restaurant {
      * @return type
      */
     public function sendStoreDataToTap(){
-    
+
         return Yii::$app->mailer
                         ->compose(
                                 ['html' => 'new-agent-signed-up-html'], ['model' => $this]
@@ -224,7 +224,7 @@ class Restaurant extends \common\models\Restaurant {
                         ->setSubject('[Plugn] New Agent - ' . $this->name )
                         ->send();
     }
-    
+
     /**
      * Deletes the files associated with this project
      */
@@ -303,7 +303,7 @@ class Restaurant extends \common\models\Restaurant {
             $this->business_id = $businessApiResponse->data['id'];
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
             $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
-                      
+
         } else {
             return Yii::$app->session->setFlash('error', print_r('Business: ' . json_encode($businessApiResponse->data), true));
         }

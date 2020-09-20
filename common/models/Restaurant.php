@@ -107,6 +107,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png, pdf',  'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['restaurant_status', 'support_delivery', 'support_pick_up'], 'integer', 'min' => 0],
+            [['schedule_interval'], 'integer', 'min' => 5],
             ['restaurant_status', 'in', 'range' => [self::RESTAURANT_STATUS_OPEN, self::RESTAURANT_STATUS_BUSY, self::RESTAURANT_STATUS_CLOSED]],
             ['store_layout', 'in', 'range' => [self::STORE_LAYOUT_LIST_FULLWIDTH, self::STORE_LAYOUT_GRID_FULLWIDTH,self::STORE_LAYOUT_CATEGORY_FULLWIDTH , self::STORE_LAYOUT_LIST_HALFWIDTH, self::STORE_LAYOUT_GRID_HALFWIDTH , self::STORE_LAYOUT_CATEGORY_HALFWIDTH ]],
             ['phone_number_display', 'in', 'range' => [self::PHONE_NUMBER_DISPLAY_ICON, self::PHONE_NUMBER_DISPLAY_SHOW_PHONE_NUMBER, self::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER]],
@@ -119,7 +120,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'app_id' ,'armada_api_key', 'mashkor_api_key','mashkor_branch_id','store_branch_name'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 7, 'max' => 8],
             [['phone_number'], 'integer', 'min' => 0],
-            [['restaurant_email_notification','schedule_order','schedule_interval','phone_number_display','store_layout','show_opening_hours'], 'integer'],
+            [['restaurant_email_notification','schedule_order','phone_number_display','store_layout','show_opening_hours'], 'integer'],
             ['restaurant_email', 'email'],
             [['restaurant_uuid'], 'unique'],
         ];

@@ -2,49 +2,68 @@
 
 <?php
 use yii\helpers\Html;
-use common\models\Order;
+use yii\grid\GridView;
+use yii\widgets\ActiveForm;
+use yii\helpers\Url;
 
 
-if($orders){
-foreach ($orders as $order) {
-    ?>
-    <tr>
-        <td>
-            <?=
-            Html::a('#' . $order->order_uuid, ['order/view', 'id' => $order->order_uuid, 'restaurantUuid' => $order->restaurant_uuid],['target' => '_blank'])
-            ?>
-        </td>
-        <td>
+echo GridView::widget([
+    'dataProvider' => $dataProvider,
+    'rowOptions' => function($model) {
+        $url = Url::to(['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid]);
 
-          <?php
-          $options = ['class' => ''];
-
-          if ($order->order_status == Order::STATUS_PENDING) {
-              Html::addCssClass($options, ['fa fa-circle font-small-3 text-warning mr-50']);
-          } elseif ($order->order_status == Order::STATUS_BEING_PREPARED) {
-              Html::addCssClass($options, ['fa fa-circle font-small-3 text-primary mr-50']);
-          } elseif ($order->order_status == Order::STATUS_OUT_FOR_DELIVERY) {
-              Html::addCssClass($options, ['fa fa-circle font-small-3 text-info mr-50']);
-          } elseif ($order->order_status == Order::STATUS_COMPLETE) {
-              Html::addCssClass($options, ['fa fa-circle font-small-3 success-info mr-50']);
-          } elseif ($order->order_status == Order::STATUS_REFUNDED) {
-              Html::addCssClass($options, ['fa fa-circle font-small-3 text-danger mr-50']);
-          } elseif ($order->order_status == Order::STATUS_CANCELED) {
-              Html::addCssClass($options, ['fa fa-circle font-small-3 text-danger mr-50']);
-          }
-
-          echo Html::tag('i', '', $options) . $order->orderStatusInEnglish
-          ?>
-        </td>
-        <td>
-      <?= $order->customer_name ?>
-        </td>
-        <td>
-            <div class="sparkbar" data-color="#00a65a" data-height="20">
-                <?= Yii::$app->formatter->asRelativeTime($order->order_created_at); ?>
-            </div>
-        </td>
-    </tr>
-<?php } } else {?>
-<td>No results found.</td>
-<?php } ?>
+        return [
+            'onclick' => "window.location.href='{$url}'"
+        ];
+    },
+    'columns' => [
+        ['class' => 'yii\grid\SerialColumn'],
+        [
+            'label' => 'Order ID',
+            "format" => "raw",
+            "value" => function($model) {
+                return Html::a('#' . $model->order_uuid, ['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid]);
+            }
+        ],
+        [
+            'attribute' => 'order_created_at',
+            "format" => "raw",
+            "value" => function($model) {
+                return date('d M - h:i A', strtotime($model->order_created_at));
+            }
+        ],
+        [
+            'attribute' => 'customer_name',
+            'format' => 'raw',
+            'value' => function ($data) {
+                if ($data->customer_id)
+                    return Html::a($data->customer->customer_name, ['customer/view', 'id' => $data->customer_id, 'restaurantUuid' => $data->restaurant_uuid]);
+            },
+            'visible' => function ($data) {
+                return $data->customer_id ? true : false;
+            },
+        ],
+        'customer_phone_number',
+        [
+            'label' => 'When',
+            'format' => 'raw',
+            'value' => function ($data) {
+                return $data->is_order_scheduled ? 'Scheduled' : 'As soon as possible';
+            },
+        ],
+        [
+            'label' => 'Payment',
+            "format" => "raw",
+            "value" => function($data) {
+                if ($data->payment_uuid)
+                    return $data->payment->payment_current_status;
+                else
+                    return $data->paymentMethod->payment_method_name;
+            },
+        ],
+        'total_price:currency',
+    ],
+    'layout' => '{summary}{items}{pager}',
+    'tableOptions' => ['class' => 'table data-list-view', 'id' => 'new-order-table'],
+]);
+?>

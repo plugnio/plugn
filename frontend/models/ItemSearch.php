@@ -11,13 +11,17 @@ use common\models\Item;
  */
 class ItemSearch extends Item
 {
+
+    // public category_id;
+    public $category_id;
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['item_uuid', 'restaurant_uuid', 'item_name', 'item_name_ar', 'item_description', 'item_description_ar', 'item_image', 'item_created_at', 'item_updated_at'], 'safe'],
+            [['item_uuid', 'restaurant_uuid', 'item_name', 'item_name_ar', 'item_description', 'item_description_ar', 'item_image', 'item_created_at', 'item_updated_at','category_id'], 'safe'],
             [['sort_number', 'stock_qty', 'unit_sold'], 'integer'],
             [['item_price'], 'number'],
         ];
@@ -42,7 +46,7 @@ class ItemSearch extends Item
      */
     public function search($params, $restaurantUuid)
     {
-        $query = Item::find()->where(['restaurant_uuid' => $restaurantUuid]);;
+        $query = Item::find()->where(['item.restaurant_uuid' => $restaurantUuid])->innerJoinWith('category', true);
 
         // add conditions that should always apply here
 
@@ -51,6 +55,13 @@ class ItemSearch extends Item
             'pagination' => false
         ]);
 
+
+        $dataProvider->sort->attributes['category_id'] = [
+            'asc' => ['category.title' => SORT_ASC],
+            'desc' => ['category.title' => SORT_DESC],
+        ];
+
+
         $this->load($params);
 
         if (!$this->validate()) {
@@ -58,6 +69,7 @@ class ItemSearch extends Item
             // $query->where('0=1');
             return $dataProvider;
         }
+
 
         // grid filtering conditions
         $query->andFilterWhere([
@@ -72,6 +84,7 @@ class ItemSearch extends Item
         $query->andFilterWhere(['like', 'item_uuid', $this->item_uuid])
             ->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
             ->andFilterWhere(['like', 'item_name', $this->item_name])
+            ->andFilterWhere(['like', 'category.category_id', $this->category_id])
             ->andFilterWhere(['like', 'item_name_ar', $this->item_name_ar])
             ->andFilterWhere(['like', 'item_description', $this->item_description])
             ->andFilterWhere(['like', 'item_description_ar', $this->item_description_ar])

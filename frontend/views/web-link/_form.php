@@ -46,6 +46,12 @@ webLinkTypeInput.change(function(){
 
     }
 
+     // Email
+     else if (selection == 7){
+      document.getElementById('weblink-url_txt').innerHTML='Email';
+      document.getElementById('group-text').innerHTML='example@domain.com';
+    }
+
 
 });
 
@@ -80,7 +86,11 @@ webLinkTypeInput.change(function(){
       document.getElementById('weblink-url_txt').innerHTML='Phone Number';
     }
 
-
+    // Email
+    else if (selection == 7){
+    document.getElementById('weblink-url_txt').innerHTML='Email';
+    document.getElementById('group-text').innerHTML='example@domain.com';
+    }
 ";
 
 
@@ -120,6 +130,7 @@ if (!$model->isNewRecord) {
             WebLink::WEB_LINK_TYPE_TWITTER => 'Twitter',
             WebLink::WEB_LINK_TYPE_SNAPCHAT => 'Snapchat',
             WebLink::WEB_LINK_TYPE_WHATSAPP => 'WhatsApp',
+            WebLink::WEB_LINK_TYPE_EMAIL => 'Email',
           ], [
               'id' => 'webLinkTypeInput'
           ]);

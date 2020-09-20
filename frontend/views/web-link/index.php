@@ -86,6 +86,10 @@ $this->registerJs($js);
                         return '<a href="https://wa.me/965' .$model->url . '" >+965' . $model->url .'</a>';
                       break;
 
+                      case WebLink::WEB_LINK_TYPE_EMAIL:
+                        return '<a href="mailto:' .$model->url . '" >' . $model->url .'</a>';
+                      break;
+
                       default:
                         return $model->url;
                         break;
