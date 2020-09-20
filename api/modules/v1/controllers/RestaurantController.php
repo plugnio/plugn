@@ -90,16 +90,17 @@ class RestaurantController extends Controller {
 
                   $startTime =   date('c',strtotime( date('Y-m-d', strtotime($i == 0 ? "now" : $selectedDay)) . ' ' . $opening_hrs->open_at));
 
-                  $scheduleOrder = $opening_hrs->getDeliveryTimes($deliveryArea->delivery_time, date("Y-m-d", strtotime($startTime)) , $startTime);
+                  if($restaurant_model->schedule_order){
+                    $scheduleOrder = $opening_hrs->getDeliveryTimes($deliveryArea->delivery_time, date("Y-m-d", strtotime($startTime)) , $startTime);
 
-                  if(count($scheduleOrder) > 0) {
-                    array_push($schedule_time, [
-                        'date' => date("c", strtotime($startTime)),
-                        'dayOfWeek' => date("w", strtotime($startTime)),
-                        'scheduleTimeSlots' => $scheduleOrder
-                    ]);
-                  }
-
+                    if(count($scheduleOrder) > 0) {
+                      array_push($schedule_time, [
+                          'date' => date("c", strtotime($startTime)),
+                          'dayOfWeek' => date("w", strtotime($startTime)),
+                          'scheduleTimeSlots' => $scheduleOrder
+                      ]);
+                    }
+                }
               }
 
               $todayOpeningHours = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => date('w' , strtotime("now"))])->one();
