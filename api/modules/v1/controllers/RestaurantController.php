@@ -91,6 +91,7 @@ class RestaurantController extends Controller {
                   $startTime =   date('c',strtotime( date('Y-m-d', strtotime($i == 0 ? "now" : $selectedDay)) . ' ' . $opening_hrs->open_at));
 
                   if($restaurant_model->schedule_order){
+
                     $scheduleOrder = $opening_hrs->getDeliveryTimes($deliveryArea->delivery_time, date("Y-m-d", strtotime($startTime)) , $startTime);
 
                     if(count($scheduleOrder) > 0) {
@@ -100,7 +101,8 @@ class RestaurantController extends Controller {
                           'scheduleTimeSlots' => $scheduleOrder
                       ]);
                     }
-                }
+                  }
+
               }
 
               $todayOpeningHours = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => date('w' , strtotime("now"))])->one();

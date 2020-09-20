@@ -160,8 +160,7 @@ $this->registerJs($js);
         ?>
 
         <?=
-        $form->field($model, 'schedule_interval')->textInput(['maxlength' => true, 'type' => 'number'])->label('Schedule Interval <span style="color: rgba(0,0,0,.45);">(Period in minutes)</span>')
-        ?>
+        $form->field($model, 'schedule_interval')->textInput(['maxlength' => true, 'type' => 'number'])->label('Schedule Interval <span style="color: rgba(0,0,0,.45);">(Period in minutes)</span>') ?>
 
 
 
