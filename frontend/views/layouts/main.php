@@ -11,6 +11,7 @@ use frontend\assets\DashboardAsset;
 use common\widgets\Alert;
 use common\models\Restaurant;
 use common\models\AgentAssignment;
+use yii\helpers\Url;
 
 DashboardAsset::register($this);
 
@@ -52,13 +53,12 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                             <ul class="nav navbar-nav">
                                 <li class="nav-item mobile-menu d-xl-none mr-auto"><a class="nav-link nav-menu-main menu-toggle hidden-xs" href="#"><i class="ficon feather icon-menu"></i></a></li>
                             </ul>
+                            <ul class="nav navbar-nav float-left">
+                            </ul>
 
                         </div>
 
 
-                        <ul class="nav navbar-nav float-left">
-
-                        </ul>
 
                         <ul class="nav navbar-nav float-right">
                             <li class="dropdown dropdown-user nav-item"><a class="dropdown-toggle nav-link dropdown-user-link" href="#" data-toggle="dropdown">
@@ -293,19 +293,19 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                               <span class="menu-title">Integrations</span>
                                           </a>
                                           <ul class="menu-content" style=" padding-left: 27px;">
-                                              <li  <?= $this->context->route == 'restaurant/view-analytics-integration' || $this->context->route == 'restaurant/update-analytics-integration' ? 'class="active"' : '' ?>>
+                                              <li  <?= $this->context->route == 'restaurant/update-analytics-integration' ? 'class="active"' : '' ?>>
                                                   <?=
                                                   Html::a(
                                                           Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                                          Html::tag('span', 'Analytics'), ['restaurant/view-analytics-integration', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                                          Html::tag('span', 'Analytics'), ['restaurant/update-analytics-integration', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
                                                   )
                                                   ?>
                                               </li>
-                                              <li  <?= $this->context->route == 'restaurant/view-delivery-integration' || $this->context->route == 'restaurant/update-delivery-integration' ? 'class="active"' : '' ?>>
+                                              <li  <?= $this->context->route == 'restaurant/update-delivery-integration' ? 'class="active"' : '' ?>>
                                                   <?=
                                                   Html::a(
                                                           Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                                          Html::tag('span', 'Delivery'), ['restaurant/view-delivery-integration', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                                          Html::tag('span', 'Delivery'), ['restaurant/update-delivery-integration', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
                                                   )
                                                   ?>
                                               </li>
@@ -351,8 +351,6 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                             <?php } ?>
                         </ul>
                     </li>
-
-
 
 
                     <?php if (count(Yii::$app->accountManager->getManagedAccounts()) > 1) { ?>

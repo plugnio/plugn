@@ -133,7 +133,7 @@ class MashkorDelivery extends Component {
     public function createOrder($model) {
 
         $mashkorParams = [
-              "branch_id" => 'adf7f8b5-d80a-4b68-ab1c-5e955f9f1adc',
+              "branch_id" => $model->restaurant->mashkor_branch_id,
               "customer_name" => $model->customer_name,
               "payment_type" => $model->payment_method_id == 3 ? self::PAYMENT_TYPE_COD : self::PAYMENT_TYPE_CARD,
               "mobile_number" =>  $model->customer_phone_number,
@@ -154,6 +154,7 @@ class MashkorDelivery extends Component {
         $response = $client->createRequest()
                 ->setMethod('POST')
                 ->setUrl($this->apiEndpoint)
+                ->setFormat(Client::FORMAT_JSON)
                 ->setData($mashkorParams)
                 ->addHeaders([
                     'x-api-key' => '637199C367D1D',

@@ -35,7 +35,6 @@ class DashboardAsset extends AssetBundle {
         'app-assets/vendors/css/ui/prism.min.css',
         'app-assets/vendors/css/file-uploaders/dropzone.min.css',
         'assets/css/style.css',
-
         'app-assets/css/bootstrap.css',
         'app-assets/css/bootstrap-extended.css',
         'app-assets/css/colors.css',
@@ -45,19 +44,12 @@ class DashboardAsset extends AssetBundle {
         'app-assets/css/core/menu/menu-types/vertical-menu.css',
         'app-assets/css/core/colors/palette-gradient.css',
         'app-assets/css/plugins/file-uploaders/dropzone.css',
-        // 'app-assets/vendors/css/editors/quill/katex.min.css',
-        // 'app-assets/vendors/css/editors/quill/monokai-sublime.min.css',
         'app-assets/vendors/css/editors/quill/quill.snow.css',
-        // 'app-assets/vendors/css/editors/quill/quill.bubble.css',
         'app-assets/vendors/css/charts/apexcharts.css',
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
         'app-assets/css/pages/invoice.css',
-
-
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
-
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
-
     ];
 
     public $js = [
@@ -94,20 +86,12 @@ class DashboardAsset extends AssetBundle {
         'app-assets/vendors/js/editors/quill/quill.min.js',
         'app-assets/vendors/js/extensions/jquery.steps.min.js',
         'app-assets/vendors/js/forms/validation/jquery.validate.min.js',
-        // 'app-assets/js/scripts/editors/editor-quill.js',
         'app-assets/js/scripts/pages/invoice.js',
-        // 'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/js/scripts/customizer.js?id=bd6e1f733770a42402a7',
-        //
-
-      //
-      'app-assets/vendors/js/pickers/pickadate/picker.js',
-      'app-assets/vendors/js/pickers/pickadate/picker.date.js',
-      'app-assets/vendors/js/pickers/pickadate/picker.time.js',
-      'app-assets/vendors/js/pickers/pickadate/legacy.js',
-      'app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js',
-
-
-
+        'app-assets/vendors/js/pickers/pickadate/picker.js',
+        'app-assets/vendors/js/pickers/pickadate/picker.date.js',
+        'app-assets/vendors/js/pickers/pickadate/picker.time.js',
+        'app-assets/vendors/js/pickers/pickadate/legacy.js',
+        'app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js',
     ];
 
     public $depends = [

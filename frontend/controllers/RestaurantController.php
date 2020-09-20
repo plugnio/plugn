@@ -544,31 +544,6 @@ class RestaurantController extends Controller {
         ]);
     }
 
-    /**
-     * Lists all Restaurant models.
-     * @return mixed
-     */
-    public function actionViewAnalyticsIntegration($restaurantUuid) {
-
-        $model = $this->findModel($restaurantUuid);
-
-        return $this->render('integration/analytics/view-analytics-integration', [
-                    'model' => $model
-        ]);
-    }
-
-    /**
-     * Lists all Restaurant models.
-     * @return mixed
-     */
-    public function actionViewDeliveryIntegration($restaurantUuid) {
-
-        $model = $this->findModel($restaurantUuid);
-
-        return $this->render('integration/delivery/view-delivery-integration', [
-                    'model' => $model
-        ]);
-    }
 
     /**
      * View payment settings page
