@@ -133,7 +133,7 @@ class BankDiscountController extends Controller
       {
           $model = $this->findModel($id, $restaurantUuid);
 
-          $model->voucher_status = $model->voucher_status == BankDiscount::BANK_DISCOUNT_STATUS_ACTIVE ? BankDiscount::BANK_DISCOUNT_STATUS_EXPIRED  : BankDiscount::BANK_DISCOUNT_STATUS_ACTIVE;
+          $model->bank_discount_status = $model->bank_discount_status == BankDiscount::BANK_DISCOUNT_STATUS_ACTIVE ? BankDiscount::BANK_DISCOUNT_STATUS_EXPIRED  : BankDiscount::BANK_DISCOUNT_STATUS_ACTIVE;
           $model->save();
 
           return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
@@ -163,7 +163,7 @@ class BankDiscountController extends Controller
      * @return BankDiscount the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel($id, $restaurantUuid)
     {
         if (($model = BankDiscount::find()->where(['bank_discount_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
             return $model;

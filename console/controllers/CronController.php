@@ -6,6 +6,7 @@ use Yii;
 use common\models\Restaurant;
 use common\models\OrderItem;
 use common\models\Voucher;
+use common\models\BankDiscount;
 use common\models\Payment;
 use common\models\Item;
 use common\models\Order;
@@ -55,6 +56,16 @@ class CronController extends \yii\console\Controller {
           if($voucher->valid_until && date('Y-m-d',strtotime('now')) >= date('Y-m-d',strtotime($voucher->valid_until))) {
             $voucher->voucher_status = Voucher::VOUCHER_STATUS_EXPIRED;
             $voucher->save();
+          }
+        }
+
+        $bankDiscounts = BankDiscount::find()->all();
+
+
+        foreach ($bankDiscounts as $bankDiscount) {
+          if($bankDiscount->valid_until && date('Y-m-d',strtotime('now')) >= date('Y-m-d',strtotime($bankDiscount->valid_until))) {
+            $bankDiscount->bank_discount_status = BankDiscount::BANK_DISCOUNT_STATUS_EXPIRED;
+            $bankDiscount->save();
           }
         }
     }

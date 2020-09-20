@@ -85,7 +85,7 @@ $this->registerJs($js);
                         } else if ($model->bank_discount_status == BankDiscount::BANK_DISCOUNT_STATUS_EXPIRED) {
                             return '<div class="chip chip-danger mr-1">
                                             <div class="chip-body">
-                                                <span class="chip-text" style="white-space: pre;">' . $model->voucherStatus . '</span>
+                                                <span class="chip-text" style="white-space: pre;">' . $model->bankDiscountStatus . '</span>
                                             </div>
                                         </div>';
                         }
