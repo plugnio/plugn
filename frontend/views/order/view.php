@@ -97,10 +97,13 @@ $this->registerJs($js);
             if ($model->restaurant->armada_api_key != null && $model->armada_tracking_link == null)
                 echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary mr-1 mb-1', 'style' => 'margin-right: 7px;']);
 
-            if ($model->restaurant->maskor_api_key != null && $model->restaurant->maskor_branch_id != null)
-                echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-info mr-1 mb-1', 'style' => 'margin-right: 7px;']);
+            // if ($model->restaurant->maskor_branch_id != null)
+                // echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-info mr-1 mb-1', 'style' => 'margin-right: 7px;']);
         }
-        
+
+        echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-info mr-1 mb-1', 'style' => 'margin-right: 7px;']);
+
+
         ?>
 
     </div>
@@ -254,6 +257,40 @@ if ($model->order_status != Order::STATUS_CANCELED) {
                             },
                             'visible' => $model->armada_delivery_code != null,
                         ],
+                        [
+                            'attribute' => 'mashkor_tracking_link',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return Html::a($data->mashkor_tracking_link, \yii\helpers\Url::to($data->mashkor_tracking_link, true), ['target' => '_blank']);
+                            },
+                            'visible' => $model->mashkor_tracking_link != null,
+                        ],
+                        [
+                            'attribute' => 'mashkor_driver_name',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return $data->mashkor_driver_name ? $data->mashkor_driver_name : null;
+                            },
+                            'visible' => $model->mashkor_driver_name != null,
+                        ],
+                        [
+                            'attribute' => 'mashkor_driver_phone',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return $data->mashkor_driver_phone ? $data->mashkor_driver_phone : null;
+                            },
+                            'visible' => $model->mashkor_driver_phone != null,
+                        ],
+                        [
+                            'attribute' => 'mashkor_driver_name',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return $data->mashkor_driver_name ? $data->mashkor_driver_name : null;
+                            },
+                            'visible' => $model->mashkor_driver_name != null,
+                        ],
+
+
                     ],
                     'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
                 ])

@@ -608,7 +608,7 @@ class RestaurantController extends Controller {
       $model = $this->findModel($id);
 
       if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())  && $model->save()) {
-             return $this->redirect(['view-analytics-integration', 'restaurantUuid' => $id]);
+             return $this->redirect(['update-analytics-integration', 'id' => $id]);
       }
 
         return $this->render('integration/analytics/update-analytics-integration', [
@@ -628,7 +628,7 @@ class RestaurantController extends Controller {
       $model = $this->findModel($id);
 
       if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())  && $model->save()) {
-             return $this->redirect(['view-delivery-integration', 'restaurantUuid' => $id]);
+             return $this->redirect(['update-delivery-integration', 'id' => $id]);
       }
 
         return $this->render('integration/delivery/update-delivery-integration', [

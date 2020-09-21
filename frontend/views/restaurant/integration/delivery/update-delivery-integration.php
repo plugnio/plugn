@@ -44,28 +44,18 @@ $form = ActiveForm::begin([
                       </a>
 
                   </div>
+
                   <div class="card-body">
                       <form class="form">
-                          <div class="form-body row">
-                              <div class="col-12">
-                            <?= $form->field($model, 'mashkor_api_key',[
-                              'labelOptions' => [ 'style' => 'font-size: 0.875rem;'],
-                              'options' => ['style' => 'margin-bottom:  0px;'],
-                              ])->textInput(['maxlength' => true, 'style' => 'margin: 0.5rem 0px;','placeholder' => 'Mashkor Api Key']) ;
-                            ?>
-                          </div>
-
-                          <div class="col-12">
-
+                          <div class="form-body">
                             <?= $form->field($model, 'mashkor_branch_id',[
-                              'labelOptions' => [ 'style' => 'font-size: 0.875rem;'],
+                              'labelOptions' => [ 'style' => 'font-size: 0.875rem; '],
                               'options' => ['style' => 'margin-bottom:  0px;'],
-                              ])->textInput(['maxlength' => true, 'style' => 'margin: 0.5rem 0px;','placeholder' => 'Mashkor Branch ID']) ;
-                            ?>
-                          </div>
-
+                            ]
+                          )->textInput(['maxlength' => true, 'style' => 'margin-bottom:  0px;','placeholder' => 'Mashkor Branch id']) ?>
                           </div>
                   </div>
+
               </div>
           </div>
 
@@ -100,7 +90,7 @@ $form = ActiveForm::begin([
             </div>
 
       </div>
-      
+
   </div>
 
   <div class="form-group" style="background: #f4f6f9; margin-bottom: 0px;background:#f4f6f9; ">

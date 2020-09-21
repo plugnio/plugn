@@ -102,6 +102,7 @@ return [
                     'controller' => 'v1/order',
                     'pluralize' => false,
                     'patterns' => [
+                        'POST status-update-webhook' => 'update-mashkor-order-status',
                         'POST <id>' => 'place-an-order',
                         'GET check-for-pending-orders/<restaurant_uuid>' => 'check-pending-orders',
                         'GET callback' => 'callback',
@@ -110,6 +111,7 @@ return [
                         'GET order-details/<id>/<restaurant_uuid>' => 'get-order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS status-update-webhook' => 'options',
                         'OPTIONS <id>' => 'options',
                         'OPTIONS check-for-pending-orders/<restaurant_uuid>' => 'options',
                         'OPTIONS callback' => 'options',

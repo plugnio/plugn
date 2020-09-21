@@ -179,6 +179,8 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'armada_api_key')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'mashkor_branch_id')->textInput(['maxlength' => true]) ?>
+
     <?= $form->field($model, 'google_analytics_id')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'facebook_pixil_id')->textInput(['maxlength' => true]) ?>

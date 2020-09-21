@@ -49,13 +49,17 @@ class MashkorDelivery extends Component {
 
     private $apiEndpoint;
 
+    public $mashkorApiKey;
+
+    public $tokenId;
+
 
     /**
      * @inheritdoc
      */
     public function init() {
         // Fields required by default
-        $requiredAttributes = ['keyToUse'];
+        $requiredAttributes = ['keyToUse' , 'mashkorApiKey' , 'tokenId'];
 
         // Process Validation
         foreach ($requiredAttributes as $attribute) {
@@ -81,8 +85,8 @@ class MashkorDelivery extends Component {
     /**
      * Get order status
      */
-    public function getOrderStatus($model) {
-      switch ($model->order_status) {
+    public function getOrderStatus($order_status) {
+      switch ($order_status) {
           case self::ORDER_STATUS_NEW:
               return "New";
               break;
@@ -157,8 +161,8 @@ class MashkorDelivery extends Component {
                 ->setFormat(Client::FORMAT_JSON)
                 ->setData($mashkorParams)
                 ->addHeaders([
-                    'x-api-key' => '637199C367D1D',
-                    'Authorization' => 'Bearer plrWk7iC3Vh4299JcZbdMmVYUKGJCsGk',
+                    'x-api-key' => $this->mashkorApiKey,
+                    'Authorization' => 'Bearer ' . $this->tokenId,
                     'content-type' => 'application/json',
                 ])
                 ->send();

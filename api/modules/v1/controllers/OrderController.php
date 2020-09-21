@@ -69,295 +69,288 @@ class OrderController extends Controller {
         if ($restaurant_model) {
 
 
-                $order = new Order();
+            $order = new Order();
 
-                $order->restaurant_uuid = $restaurant_model->restaurant_uuid;
+            $order->restaurant_uuid = $restaurant_model->restaurant_uuid;
 
-                //Save Customer Info
-                $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
-                $order->customer_phone_number = strval(Yii::$app->request->getBodyParam("phone_number"));
-                $order->customer_email = Yii::$app->request->getBodyParam("email"); //optional
-                //payment method
-                $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
+            //Save Customer Info
+            $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
+            $order->customer_phone_number = strval(Yii::$app->request->getBodyParam("phone_number"));
+            $order->customer_email = Yii::$app->request->getBodyParam("email"); //optional
+            //payment method
+            $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
 
-                //save Customer address
-                $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
+            //save Customer address
+            $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
 
+
+
+            //Preorder
+            // if( Yii::$app->request->getBodyParam("is_order_scheduled") !== null)
+            $order->is_order_scheduled = Yii::$app->request->getBodyParam("is_order_scheduled") ? Yii::$app->request->getBodyParam("is_order_scheduled") : 0;
+
+
+
+            //Apply promo code
+            if (Yii::$app->request->getBodyParam("voucher_id")) {
+                $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
+            }
+
+
+            //if the order mode = 1 => Delivery
+            if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
+                $order->area_id = Yii::$app->request->getBodyParam("area_id");
+                $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
+                $order->block = Yii::$app->request->getBodyParam("block");
+                $order->street = Yii::$app->request->getBodyParam("street");
+                $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
+                $order->house_number = Yii::$app->request->getBodyParam("house_number");
+                $order->special_directions = Yii::$app->request->getBodyParam("special_directions"); //optional
+
+                if (Yii::$app->request->getBodyParam("deliver_location_latitude"))
+                    $order->latitude = Yii::$app->request->getBodyParam("deliver_location_latitude"); //optional
+                if (Yii::$app->request->getBodyParam("deliver_location_longitude"))
+                    $order->longitude = Yii::$app->request->getBodyParam("deliver_location_longitude"); //optional
 
 
                 //Preorder
-                // if( Yii::$app->request->getBodyParam("is_order_scheduled") !== null)
-                  $order->is_order_scheduled = Yii::$app->request->getBodyParam("is_order_scheduled") ? Yii::$app->request->getBodyParam("is_order_scheduled") : 0;
-
-
-
-                  //Apply promo code
-                  if(Yii::$app->request->getBodyParam("voucher_id")){
-                    $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
-                  }
-
-
-                //if the order mode = 1 => Delivery
-                if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
-                    $order->area_id = Yii::$app->request->getBodyParam("area_id");
-                    $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
-                    $order->block = Yii::$app->request->getBodyParam("block");
-                    $order->street = Yii::$app->request->getBodyParam("street");
-                    $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
-                    $order->house_number = Yii::$app->request->getBodyParam("house_number");
-                    $order->special_directions = Yii::$app->request->getBodyParam("special_directions"); //optional
-
-                    if( Yii::$app->request->getBodyParam("deliver_location_latitude"))
-                      $order->latitude = Yii::$app->request->getBodyParam("deliver_location_latitude"); //optional
-                    if( Yii::$app->request->getBodyParam("deliver_location_longitude"))
-                      $order->longitude = Yii::$app->request->getBodyParam("deliver_location_longitude"); //optional
-
-                      //Preorder
-                      if($order->is_order_scheduled != null && $order->is_order_scheduled  == true && $restaurant_model->schedule_order){
-                        $order->scheduled_time_start_from =   date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_start_from")));
-                        $order->scheduled_time_to =   date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_to")));
-                      }
-
-
-                } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
-                    $order->restaurant_branch_id = Yii::$app->request->getBodyParam("restaurant_branch_id");
+                if ($order->is_order_scheduled != null && $order->is_order_scheduled == true && $restaurant_model->schedule_order) {
+                    $order->scheduled_time_start_from = date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_start_from")));
+                    $order->scheduled_time_to = date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_to")));
                 }
+            } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
+                $order->restaurant_branch_id = Yii::$app->request->getBodyParam("restaurant_branch_id");
+            }
 
 
-                $response = [];
+            $response = [];
 
-                if ($order->save()) {
+            if ($order->save()) {
 
-                    $items = Yii::$app->request->getBodyParam("items");
-
-
-                    if ($items) {
-
-                        foreach ($items as $item) {
-
-                            //Save items to the above order
-                            $orderItem = new OrderItem;
-
-                            $orderItem->order_uuid = $order->order_uuid;
-                            $orderItem->item_uuid = $item["item_uuid"];
-                            $orderItem->qty = (int) $item["qty"];
+                $items = Yii::$app->request->getBodyParam("items");
 
 
-                            //optional field
-                            if (array_key_exists("customer_instructions", $item) && $item["customer_instructions"] != null)
-                                $orderItem->customer_instruction = $item["customer_instructions"];
+                if ($items) {
 
-                            if ($orderItem->save()) {
+                    foreach ($items as $item) {
+
+                        //Save items to the above order
+                        $orderItem = new OrderItem;
+
+                        $orderItem->order_uuid = $order->order_uuid;
+                        $orderItem->item_uuid = $item["item_uuid"];
+                        $orderItem->qty = (int) $item["qty"];
+
+
+                        //optional field
+                        if (array_key_exists("customer_instructions", $item) && $item["customer_instructions"] != null)
+                            $orderItem->customer_instruction = $item["customer_instructions"];
+
+                        if ($orderItem->save()) {
 
 //                                There seems to be an issue with your payment, please try again.
-                                if (array_key_exists('extraOptions', $item)) {
+                            if (array_key_exists('extraOptions', $item)) {
 
 
-                                    $extraOptionsArray = $item['extraOptions'];
+                                $extraOptionsArray = $item['extraOptions'];
 
 
-                                    if (isset($extraOptionsArray) && count($extraOptionsArray) > 0) {
+                                if (isset($extraOptionsArray) && count($extraOptionsArray) > 0) {
 
-                                        foreach ($extraOptionsArray as $key => $extraOption) {
+                                    foreach ($extraOptionsArray as $key => $extraOption) {
 
-                                            $orderItemExtraOption = new OrderItemExtraOption;
-                                            $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
-                                            $orderItemExtraOption->extra_option_id = $extraOption['extra_option_id'];
+                                        $orderItemExtraOption = new OrderItemExtraOption;
+                                        $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
+                                        $orderItemExtraOption->extra_option_id = $extraOption['extra_option_id'];
 
-                                            if (!$orderItemExtraOption->save()) {
+                                        if (!$orderItemExtraOption->save()) {
 
-                                                $response = [
-                                                    'operation' => 'error',
-                                                    'message' => $orderItemExtraOption->errors,
-                                                ];
-                                            }
+                                            $response = [
+                                                'operation' => 'error',
+                                                'message' => $orderItemExtraOption->errors,
+                                            ];
                                         }
                                     }
                                 }
-                            } else {
-
-                                $response = [
-                                    'operation' => 'error',
-                                    'message' => $orderItem->getErrors()
-                                ];
                             }
-                        }
-                    } else {
-                        $response = [
-                            'operation' => 'error',
-                            'message' => 'Item Uuid is invalid.'
-                        ];
-                    }
-                } else {
-                    $response = [
-                        'operation' => 'error',
-                        'message' => $order->getErrors(),
-                    ];
-                }
-
-                if (!$order->is_order_scheduled && !$restaurant_model->isOpen()   ) {
-                    $response = [
-                        'operation' => 'error',
-                        'message' => $restaurant_model->name .' is currently closed and is not accepting orders at this time',
-                    ];
-                }
-
-
-                //Apply promo code
-                // if(Yii::$app->request->getBodyParam("voucher_id")){
-                //
-                //   $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
-                //
-                //   if(!$order->save()){
-                //     $response = [
-                //         'operation' => 'error',
-                //         'message' => $order->getErrors(),
-                //     ];
-                //   }
-                // }
-
-
-
-                if ($response == null) {
-
-                    $order->updateOrderTotalPrice();
-                    if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->restaurantDelivery->min_charge) {
-                        $response = [
-                            'operation' => 'error',
-                            'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->restaurantDelivery->min_charge, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
-                        ];
-                    }
-
-
-                    //if payment method not cash redirect customer to payment gateway
-                    if ($response == null && $order->payment_method_id != 3) {
-
-                        // Create new payment record
-                        $payment = new Payment;
-                        $payment->restaurant_uuid = $restaurant_model->restaurant_uuid;
-                        $payment->payment_mode = $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
-
-                        if($payment->payment_mode == TapPayments::GATEWAY_VISA_MASTERCARD && Yii::$app->request->getBodyParam("payment_token")){
-                          $payment->payment_token = Yii::$app->request->getBodyParam("payment_token");
-                        }
-
-                        $payment->customer_id = $order->customer->customer_id; //customer id
-                        $payment->order_uuid = $order->order_uuid;
-                        $payment->payment_amount_charged = $order->total_price;
-                        $payment->payment_current_status = "Redirected to payment gateway";
-
-                        if ($payment->save()) {
-
-                            //Update payment_uuid in order
-                            $order->payment_uuid = $payment->payment_uuid;
-                            $order->save(false);
-
-                            Yii::info("[". $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
-
-
-                            // Redirect to payment gateway
-                            Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
-
-                            if($order->payment_method_id == 1){
-                              $source_id = TapPayments::GATEWAY_KNET;
-                            } else {
-                              if($payment->payment_token)
-                                $source_id = $payment->payment_token;
-                              else
-                                $source_id = TapPayments::GATEWAY_VISA_MASTERCARD;
-                            }
-
-                            // $source_id
-                            $response = Yii::$app->tapPayments->createCharge(
-                                    "Order placed from: " . $order->customer_name, // Description
-                                    $order->restaurant->name, //Statement Desc.
-                                    $payment->payment_uuid, // Reference
-                                    $order->total_price,
-                                    $order->customer_name,
-                                    $order->customer_email,
-                                    $order->customer_phone_number,
-                                    $order->restaurant->platform_fee,
-                                    Url::to(['order/callback'], true),
-                                    // $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET :  TapPayments::GATEWAY_VISA_MASTERCARD
-                                    $source_id
-                                  );
-
-                            $responseContent = json_decode($response->content);
-
-                            try {
-
-                              // Validate that theres no error from TAP gateway
-                              if (isset($responseContent->errors)) {
-                                  $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
-                                  \Yii::error($errorMessage, __METHOD__); // Log error faced by user
-
-                                  return [
-                                      'operation' => 'error',
-                                      'message' => $errorMessage
-
-                                  ];
-                              }
-
-                              if($responseContent->id) {
-
-                              $chargeId = $responseContent->id;
-                              $redirectUrl = $responseContent->transaction->url;
-
-                               $payment->payment_gateway_transaction_id = $chargeId;
-
-                               if(!$payment->save(false)){
-
-                                 \Yii::error($payment->errors, __METHOD__); // Log error faced by user
-
-                                 return [
-                                     'operation' => 'error',
-                                     'message' => $payment->getErrors()
-                                 ];
-
-                               }
-
-                             } else {
-                               \Yii::error('[Payment Issue > Charge id is missing ]' . $responseContent , __METHOD__); // Log error faced by user
-                             }
-
-
-                              return [
-                                  'operation' => 'redirecting',
-                                  'redirectUrl' => $redirectUrl,
-                              ];
-
-                            } catch (\Exception $e) {
-
-                              if($payment)
-                                 Yii::error('[TAP Payment Issue > ]' . json_encode($payment->getErrors()) , __METHOD__);
-
-                                Yii::error('[TAP Payment Issue > Charge id is missing]' . json_encode($responseContent) , __METHOD__);
-
-                               $response = [
-                                   'operation' => 'error',
-                                   'message' => $responseContent
-                               ];
-
-                          }
-
                         } else {
 
                             $response = [
                                 'operation' => 'error',
-                                'message' => $payment->getErrors()
+                                'message' => $orderItem->getErrors()
+                            ];
+                        }
+                    }
+                } else {
+                    $response = [
+                        'operation' => 'error',
+                        'message' => 'Item Uuid is invalid.'
+                    ];
+                }
+            } else {
+                $response = [
+                    'operation' => 'error',
+                    'message' => $order->getErrors(),
+                ];
+            }
+
+            if (!$order->is_order_scheduled && !$restaurant_model->isOpen()) {
+                $response = [
+                    'operation' => 'error',
+                    'message' => $restaurant_model->name . ' is currently closed and is not accepting orders at this time',
+                ];
+            }
+
+
+            //Apply promo code
+            // if(Yii::$app->request->getBodyParam("voucher_id")){
+            //
+                //   $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
+            //
+                //   if(!$order->save()){
+            //     $response = [
+            //         'operation' => 'error',
+            //         'message' => $order->getErrors(),
+            //     ];
+            //   }
+            // }
+
+
+
+            if ($response == null) {
+
+                $order->updateOrderTotalPrice();
+                if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->restaurantDelivery->min_charge) {
+                    $response = [
+                        'operation' => 'error',
+                        'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->restaurantDelivery->min_charge, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
+                    ];
+                }
+
+
+                //if payment method not cash redirect customer to payment gateway
+                if ($response == null && $order->payment_method_id != 3) {
+
+                    // Create new payment record
+                    $payment = new Payment;
+                    $payment->restaurant_uuid = $restaurant_model->restaurant_uuid;
+                    $payment->payment_mode = $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
+
+                    if ($payment->payment_mode == TapPayments::GATEWAY_VISA_MASTERCARD && Yii::$app->request->getBodyParam("payment_token")) {
+                        $payment->payment_token = Yii::$app->request->getBodyParam("payment_token");
+                    }
+
+                    $payment->customer_id = $order->customer->customer_id; //customer id
+                    $payment->order_uuid = $order->order_uuid;
+                    $payment->payment_amount_charged = $order->total_price;
+                    $payment->payment_current_status = "Redirected to payment gateway";
+
+                    if ($payment->save()) {
+
+                        //Update payment_uuid in order
+                        $order->payment_uuid = $payment->payment_uuid;
+                        $order->save(false);
+
+                        Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
+
+
+                        // Redirect to payment gateway
+                        Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
+
+                        if($order->payment_method_id == 1){
+                          $source_id = TapPayments::GATEWAY_KNET;
+                        } else {
+                          if($payment->payment_token)
+                            $source_id = $payment->payment_token;
+                          else
+                            $source_id = TapPayments::GATEWAY_VISA_MASTERCARD;
+                        }
+
+                        // $source_id
+                        $response = Yii::$app->tapPayments->createCharge(
+                                "Order placed from: " . $order->customer_name, // Description
+                                $order->restaurant->name, //Statement Desc.
+                                $payment->payment_uuid, // Reference
+                                $order->total_price,
+                                $order->customer_name,
+                                $order->customer_email,
+                                $order->customer_phone_number,
+                                $order->restaurant->platform_fee,
+                                Url::to(['order/callback'], true),
+                                // $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET :  TapPayments::GATEWAY_VISA_MASTERCARD
+                                $source_id
+                              );
+
+                        $responseContent = json_decode($response->content);
+
+                        try {
+
+                            // Validate that theres no error from TAP gateway
+                            if (isset($responseContent->errors)) {
+                                $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
+                                \Yii::error($errorMessage, __METHOD__); // Log error faced by user
+
+                                return [
+                                    'operation' => 'error',
+                                    'message' => $errorMessage
+                                ];
+                            }
+
+                            if ($responseContent->id) {
+
+                                $chargeId = $responseContent->id;
+                                $redirectUrl = $responseContent->transaction->url;
+
+                                $payment->payment_gateway_transaction_id = $chargeId;
+
+                                if (!$payment->save(false)) {
+
+                                    \Yii::error($payment->errors, __METHOD__); // Log error faced by user
+
+                                    return [
+                                        'operation' => 'error',
+                                        'message' => $payment->getErrors()
+                                    ];
+                                }
+                            } else {
+                                \Yii::error('[Payment Issue > Charge id is missing ]' . $responseContent, __METHOD__); // Log error faced by user
+                            }
+
+
+                            return [
+                                'operation' => 'redirecting',
+                                'redirectUrl' => $redirectUrl,
+                            ];
+                        } catch (\Exception $e) {
+
+                            if ($payment)
+                                Yii::error('[TAP Payment Issue > ]' . json_encode($payment->getErrors()), __METHOD__);
+
+                            Yii::error('[TAP Payment Issue > Charge id is missing]' . json_encode($responseContent), __METHOD__);
+
+                            $response = [
+                                'operation' => 'error',
+                                'message' => $responseContent
                             ];
                         }
                     } else {
 
+                        $response = [
+                            'operation' => 'error',
+                            'message' => $payment->getErrors()
+                        ];
+                    }
+                } else {
 
-                       //pay by Cash
-                        if ($response == null) {
 
-                            //Change order status to pending
-                            $order->changeOrderStatusToPending();
-                            $order->sendPaymentConfirmationEmail();
+                    //pay by Cash
+                    if ($response == null) {
 
-                            Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
+                        //Change order status to pending
+                        $order->changeOrderStatusToPending();
+                        $order->sendPaymentConfirmationEmail();
+
+                        Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
 
 
 //                            //Update product inventory
@@ -365,21 +358,20 @@ class OrderController extends Controller {
 //                                $orderItem->item->decreaseStockQty($orderItem->qty);
 //                            }
 
-                            $response = [
-                                'operation' => 'success',
-                                'order_uuid' => $order->order_uuid,
-                                'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
-                                'message' => 'Order created successfully',
-                            ];
-                        }
+                        $response = [
+                            'operation' => 'success',
+                            'order_uuid' => $order->order_uuid,
+                            'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
+                            'message' => 'Order created successfully',
+                        ];
                     }
                 }
+            }
 
 
-                if (array_key_exists('operation', $response) && $response['operation'] == 'error') {
-                    $order->delete();
-                }
-
+            if (array_key_exists('operation', $response) && $response['operation'] == 'error') {
+                $order->delete();
+            }
         } else {
             $response = [
                 'operation' => 'error',
@@ -439,29 +431,28 @@ class OrderController extends Controller {
         ];
     }
 
+    /**
+     * Get Order detail
+     * @param type $id
+     * @param type $restaurant_uuid
+     * @return type
+     */
+    public function actionGetOrderDetails($id, $restaurant_uuid) {
+        $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->one();
 
-        /**
-         * Get Order detail
-         * @param type $id
-         * @param type $restaurant_uuid
-         * @return type
-         */
-        public function actionGetOrderDetails($id, $restaurant_uuid) {
-            $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->one();
 
-
-            if (!$model) {
-                return [
-                    'operation' => 'error',
-                    'message' => 'Invalid order uuid'
-                ];
-            }
-
+        if (!$model) {
             return [
-                'operation' => 'success',
-                'body' => $model
+                'operation' => 'error',
+                'message' => 'Invalid order uuid'
             ];
         }
+
+        return [
+            'operation' => 'success',
+            'body' => $model
+        ];
+    }
 
     /**
      * Whether is valid promo code or no
@@ -473,7 +464,7 @@ class OrderController extends Controller {
 
         $voucher = Voucher::find()->where(['restaurant_uuid' => $restaurant_uuid, 'code' => $code, 'voucher_status' => Voucher::VOUCHER_STATUS_ACTIVE])->one();
 
-        if($voucher && $voucher->isValid($phone_number)){
+        if ($voucher && $voucher->isValid($phone_number)) {
             return [
                 'operation' => 'success',
                 'voucher' => $voucher
@@ -484,7 +475,6 @@ class OrderController extends Controller {
             'operation' => 'error',
             'message' => 'Voucher code is invalid or expired'
         ];
-
     }
 
     /**
@@ -496,9 +486,38 @@ class OrderController extends Controller {
     public function actionCheckPendingOrders($restaurant_uuid) {
         return Order::find()
                         ->where([
-                          'restaurant_uuid' => $restaurant_uuid,
-                          'order_status' => Order::STATUS_PENDING
+                            'restaurant_uuid' => $restaurant_uuid,
+                            'order_status' => Order::STATUS_PENDING
                         ])->exists();
+    }
+
+    /**
+     * Update order status
+     */
+    public function actionUpdateMashkorOrderStatus() {
+
+        $mashkor_order_number = Yii::$app->request->getBodyParam("order_number");
+        $mashkor_secret_token = Yii::$app->request->getBodyParam("webhook_token");
+
+        if ($mashkor_secret_token === 'token' && $order = Order::find()->where(['mashkor_order_number' => $mashkor_order_number])->one()) {
+
+            $order->mashkor_driver_name = Yii::$app->request->getBodyParam("driver_name");
+            $order->mashkor_driver_phone = Yii::$app->request->getBodyParam("driver_phone");
+            $order->mashkor_tracking_link = Yii::$app->request->getBodyParam("tracking_link");
+            $order->mashkor_order_status = Yii::$app->request->getBodyParam("order_status");
+
+
+            if ($order->save()) {
+                return [
+                    'operation' => 'success',
+                    'message' => 'Ran',
+                ];
+            }
+        }
+        return [
+            'operation' => 'error',
+            'message' => $order->getErrors(),
+        ];
     }
 
 }
