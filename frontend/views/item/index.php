@@ -93,6 +93,9 @@ $this->registerJs($js);
                           }
                       }
 
+                      if( $categoryName == '')
+                        return '(not set)';
+
                       return $categoryName;
                   },
                   'format' => 'raw'
