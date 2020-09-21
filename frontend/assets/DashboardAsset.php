@@ -50,6 +50,7 @@ class DashboardAsset extends AssetBundle {
         'app-assets/css/pages/invoice.css',
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
+        'css/bootstrap-duallistbox.css'
     ];
 
     public $js = [
@@ -92,6 +93,11 @@ class DashboardAsset extends AssetBundle {
         'app-assets/vendors/js/pickers/pickadate/picker.time.js',
         'app-assets/vendors/js/pickers/pickadate/legacy.js',
         'app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js',
+
+        // 'https://code.jquery.com/jquery-3.2.1.slim.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js',
+        'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js',
+        'js/jquery.bootstrap-duallistbox.min.js'
     ];
 
     public $depends = [

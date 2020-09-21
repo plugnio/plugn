@@ -20,7 +20,7 @@ use common\models\Restaurant;
 class RestaurantDeliveryController extends Controller {
 
     public $enableCsrfValidation = false;
-    
+
     /**
      * {@inheritdoc}
      */
@@ -74,7 +74,7 @@ class RestaurantDeliveryController extends Controller {
                         $restaurantDeliveryAreas->delivery_time_ar = $_POST['RestaurantDelivery']['delivery_time'];
                         $restaurantDeliveryAreas->min_charge = $_POST['RestaurantDelivery']['min_charge'];
                         $restaurantDeliveryAreas->save();
-                    } 
+                    }
                 }
             } else {
                 unset($dataProvider->query[$key]);
@@ -128,6 +128,15 @@ class RestaurantDeliveryController extends Controller {
         $model = new RestaurantDelivery();
         $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
 
+        $sotredRestaurantDeliveryAreas = RestaurantDelivery::find()
+                ->select('area_id')
+                ->asArray()
+                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->all();
+
+        $model->restaurant_delivery_area_array = ArrayHelper::getColumn($sotredRestaurantDeliveryAreas, 'area_id');
+
+
         if ($model->load(Yii::$app->request->post())) {
 
             if ($model->restaurant_delivery_area_array)
@@ -156,7 +165,7 @@ class RestaurantDeliveryController extends Controller {
 
        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
-                
+
         $model = new DeliveryZoneForm;
         $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
         $model->city_id = $city_id;
@@ -180,7 +189,7 @@ class RestaurantDeliveryController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionDelete($area_id, $restaurantUuid) {
-        
+
         $this->findModel($restaurantUuid, $area_id)->delete();
 
         return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
