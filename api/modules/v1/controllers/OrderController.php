@@ -116,8 +116,7 @@ class OrderController extends Controller {
                     $order->longitude = Yii::$app->request->getBodyParam("deliver_location_longitude"); //optional
 
 
-
-//Preorder
+                //Preorder
                 if ($order->is_order_scheduled != null && $order->is_order_scheduled == true && $restaurant_model->schedule_order) {
                     $order->scheduled_time_start_from = date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_start_from")));
                     $order->scheduled_time_to = date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_to")));
@@ -206,21 +205,6 @@ class OrderController extends Controller {
             }
 
 
-            //Apply promo code
-            // if(Yii::$app->request->getBodyParam("voucher_id")){
-            //
-                //   $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
-            //
-                //   if(!$order->save()){
-            //     $response = [
-            //         'operation' => 'error',
-            //         'message' => $order->getErrors(),
-            //     ];
-            //   }
-            // }
-
-
-
             if ($response == null) {
 
                 $order->updateOrderTotalPrice();
@@ -245,7 +229,6 @@ class OrderController extends Controller {
                         Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
 
                         $response = Yii::$app->tapPayments->retrieveToken(Yii::$app->request->getBodyParam("payment_token"));
-
 
                         $responseContent = json_decode($response->content);
 
@@ -308,7 +291,7 @@ class OrderController extends Controller {
 
                         //Update payment_uuid in order
                         $order->payment_uuid = $payment->payment_uuid;
-                        $order->save();
+                        $order->save(false);
                         $order->updateOrderTotalPrice();
 
                         Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
@@ -569,9 +552,56 @@ class OrderController extends Controller {
     public function actionCheckPendingOrders($restaurant_uuid) {
         return Order::find()
                         ->where([
-                          'restaurant_uuid' => $restaurant_uuid,
-                          'order_status' => Order::STATUS_PENDING
+                            'restaurant_uuid' => $restaurant_uuid,
+                            'order_status' => Order::STATUS_PENDING
                         ])->exists();
+    }
+
+    /**
+     * Update order status
+     */
+    public function actionUpdateMashkorOrderStatus() {
+
+        $mashkor_order_number = Yii::$app->request->getBodyParam("order_number");
+        $mashkor_secret_token = Yii::$app->request->getBodyParam("webhook_token");
+
+        if ($mashkor_secret_token === '2125bf59e5af2b8c8b5e8b3b19f13e1221') {
+
+          $order_model = Order::find()->where(['mashkor_order_number' => $mashkor_order_number])->one();
+
+          if(  $order_model ) {
+            $order_status =  Yii::$app->mashkorDelivery->getOrderStatus(Yii::$app->request->getBodyParam("order_status"));
+
+            $order_model->mashkor_driver_name = Yii::$app->request->getBodyParam("driver_name");
+            $order_model->mashkor_driver_phone = Yii::$app->request->getBodyParam("driver_phone");
+            $order_model->mashkor_tracking_link = Yii::$app->request->getBodyParam("tracking_link");
+            $order_model->mashkor_order_status = $order_status;
+
+            if ($order_model->save()) {
+                return [
+                    'operation' => 'success'
+                ];
+            } else {
+              return [
+                  'operation' => 'error',
+                  'message' => $order_model->getErrors(),
+              ];
+            }
+
+          } else {
+            return [
+                'operation' => 'error',
+                'message' => 'Invalid Order id',
+            ];
+          }
+
+        } else {
+          return [
+              'operation' => 'error',
+              'message' => 'Failed to authorize the request.',
+          ];
+        }
+
     }
 
 }

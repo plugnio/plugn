@@ -50,6 +50,10 @@ use yii\behaviors\AttributeBehavior;
  * @property datetime $order_created_at
  * @property datetime $order_updated_at
  * @property int|null $bank_discount_id
+ * @property string $mashkor_tracking_link
+ * @property string $mashkor_driver_name
+ * @property string $mashkor_driver_phone
+ * @property string $mashkor_order_status
 
  *
  * @property Area
@@ -98,7 +102,8 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['customer_name', 'customer_phone_number', 'order_mode', 'is_order_scheduled'], 'required'],
+            [['customer_name', 'customer_phone_number', 'order_mode'], 'required'],
+            [['is_order_scheduled'], 'required' , 'on' => 'create'],
             [['payment_method_id'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
@@ -150,6 +155,7 @@ class Order extends \yii\db\ActiveRecord {
             [['estimated_time_of_arrival', 'scheduled_time_start_from', 'scheduled_time_to', 'latitude', 'longitude'], 'safe'],
             [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
             [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name', 'payment_method_name_ar', 'armada_tracking_link', 'armada_qr_code_link', 'armada_delivery_code'], 'string', 'max' => 255],
+            [['mashkor_order_number' , 'mashkor_tracking_link' ,'mashkor_driver_name','mashkor_driver_phone','mashkor_order_status'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
             [['bank_discount_id'], 'exist', 'skipOnError' => true, 'targetClass' => BankDiscount::className(), 'targetAttribute' => ['bank_discount_id' => 'bank_discount_id']],
             [['customer_id'], 'exist', 'skipOnError' => false, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
@@ -382,6 +388,11 @@ class Order extends \yii\db\ActiveRecord {
             'is_order_scheduled' => 'Is order scheduled',
             'voucher_id' => 'Voucher ID',
             'bank_discount_id' => 'Bank Discount ID',
+            'mashkor_order_number' => 'Mashkor Order Number',
+            'mashkor_tracking_link' => 'Mashkor Order Tracking link',
+            'mashkor_driver_name' => 'Name of the driver',
+            'mashkor_driver_phone' => 'Driver phone number',
+            'mashkor_order_status' => 'Mashkor Order status'
         ];
     }
 

@@ -31,20 +31,23 @@ $this->registerJs($js);
 ?>
 
 
-<?php if ($errorMessage && $successMessage == null) { ?>
+<?php if (Yii::$app->session->getFlash('errorResponse') != null) { ?>
 
     <div class="alert alert-danger alert-dismissible">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         <h5><i class="icon fa fa-ban"></i> Warning!</h5>
-        <?= ($errorMessage) ?>
+        <?= (Yii::$app->session->getFlash('errorResponse')) ?>
     </div>
-<?php } elseif ($successMessage && $errorMessage == null) { ?>
+<?php } elseif (Yii::$app->session->getFlash('successResponse') != null) { ?>
     <div class="alert alert-success alert-dismissible">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         <h5><i class="icon fa fa-check"></i> Success!</h5>
-        <?= ($successMessage) ?>
+        <?= (Yii::$app->session->getFlash('successResponse')) ?>
     </div>
 <?php } ?>
+
+
+
 <div class="page-title">
 
     <p>
@@ -72,19 +75,6 @@ $this->registerJs($js);
         // }
         ?>
 
-        <?php
-        $currentTime = strtotime('now');
-        $deliveryTime = strtotime($model->estimated_time_of_arrival);
-        $difference = round(abs($deliveryTime - $currentTime) / 3600, 2);
-
-
-
-        if ($difference <= 1 && $model->order_mode == Order::ORDER_MODE_DELIVERY && $model->restaurant->armada_api_key != null && $model->armada_tracking_link == null) {
-            echo Html::a('Request a driver', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary mr-1 mb-1', 'style' => 'margin-right: 7px;']);
-        }
-        ?>
-
-
         <?=
         Html::a('Delete', ['delete', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
             'class' => 'btn btn-danger mr-1 mb-1',
@@ -96,7 +86,30 @@ $this->registerJs($js);
         ]);
         ?>
 
-    </p>
+    <div style="display: block">
+
+        <?php
+        $currentTime = strtotime('now');
+        $deliveryTime = strtotime($model->estimated_time_of_arrival);
+        $difference = round(abs($deliveryTime - $currentTime) / 3600, 2);
+
+
+        if ($difference <= 1 && $model->order_mode == Order::ORDER_MODE_DELIVERY) {
+            if ($model->restaurant->armada_api_key != null && $model->armada_tracking_link == null)
+                echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary mr-1 mb-1', 'style' => 'margin-right: 7px;']);
+
+            // if ($model->restaurant->maskor_branch_id != null && $model->mashkor_order_number == null)
+            //     echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-info mr-1 mb-1', 'style' => 'margin-right: 7px;']);
+        }
+
+        ?>
+
+    </div>
+
+
+
+
+</p>
 
 
 
@@ -111,156 +124,188 @@ $this->registerJs($js);
 
             <p style="margin-top: 1rem">
 
-                <?php
-                if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Order::STATUS_ABANDONED_CHECKOUT) && $model->getOrderItems()->count()) {
-                    echo Html::a('Mark as pending', [
-                        'change-order-status',
-                        'order_uuid' => $model->order_uuid,
-                        'restaurantUuid' => $model->restaurant_uuid,
-                        'status' => Order::STATUS_PENDING
-                            ], [
-                        'style' => 'margin-right: 10px;',
-                        'class' => 'btn btn-warning',
-                        'data' => [
-                            'confirm' => 'Are you sure you want to mark it as pending?',
-                            'method' => 'post',
-                        ]
-                    ]);
-                }
+<?php
+if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Order::STATUS_ABANDONED_CHECKOUT) && $model->getOrderItems()->count()) {
+    echo Html::a('Mark as pending', [
+        'change-order-status',
+        'order_uuid' => $model->order_uuid,
+        'restaurantUuid' => $model->restaurant_uuid,
+        'status' => Order::STATUS_PENDING
+            ], [
+        'style' => 'margin-right: 10px;',
+        'class' => ' mb-1  btn btn-warning',
+        'data' => [
+            'confirm' => 'Are you sure you want to mark it as pending?',
+            'method' => 'post',
+        ]
+    ]);
+} else if ($model->order_status == Order::STATUS_PENDING) {
+    echo Html::a('Accept order', [
+        'change-order-status',
+        'order_uuid' => $model->order_uuid,
+        'restaurantUuid' => $model->restaurant_uuid,
+        'status' => Order::STATUS_ACCEPTED
+            ], [
+        'style' => 'margin-right: 10px;',
+        'class' => ' mb-1  btn btn-success',
+    ]);
+} else if ($model->order_status == Order::STATUS_ACCEPTED) {
+    echo Html::a('Being Prepared', [
+        'change-order-status',
+        'order_uuid' => $model->order_uuid,
+        'restaurantUuid' => $model->restaurant_uuid,
+        'status' => Order::STATUS_BEING_PREPARED
+            ], [
+        'style' => 'margin-right: 10px;',
+        'class' => ' mb-1  btn btn-primary',
+    ]);
+} else if ($model->order_status == Order::STATUS_BEING_PREPARED) {
+    echo Html::a('Out for Delivery', [
+        'change-order-status',
+        'order_uuid' => $model->order_uuid,
+        'restaurantUuid' => $model->restaurant_uuid,
+        'status' => Order::STATUS_OUT_FOR_DELIVERY
+            ], [
+        'style' => 'margin-right: 10px;',
+        'class' => ' mb-1  btn btn-info',
+    ]);
+} else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY) {
+    echo Html::a('Mark as Complete', [
+        'change-order-status',
+        'order_uuid' => $model->order_uuid,
+        'restaurantUuid' => $model->restaurant_uuid,
+        'status' => Order::STATUS_COMPLETE
+            ], [
+        'style' => 'margin-right: 10px;',
+        'class' => ' mb-1  btn btn-success',
+    ]);
+}
 
-
-                    else if ($model->order_status == Order::STATUS_PENDING) {
-                        echo Html::a('Accept order', [
-                            'change-order-status',
-                            'order_uuid' => $model->order_uuid,
-                            'restaurantUuid' => $model->restaurant_uuid,
-                            'status' => Order::STATUS_ACCEPTED
-                                ], [
-                            'style' => 'margin-right: 10px;',
-                            'class' => 'btn btn-success',
-                        ]);
-                    }
-
-                    else if ($model->order_status == Order::STATUS_ACCEPTED) {
-                        echo Html::a('Being Prepared', [
-                            'change-order-status',
-                            'order_uuid' => $model->order_uuid,
-                            'restaurantUuid' => $model->restaurant_uuid,
-                            'status' => Order::STATUS_BEING_PREPARED
-                                ], [
-                            'style' => 'margin-right: 10px;',
-                            'class' => 'btn btn-primary',
-                        ]);
-                    }
-
-                    else if ($model->order_status == Order::STATUS_BEING_PREPARED) {
-                      echo Html::a('Out for Delivery', [
-                          'change-order-status',
-                          'order_uuid' => $model->order_uuid,
-                          'restaurantUuid' => $model->restaurant_uuid,
-                          'status' => Order::STATUS_OUT_FOR_DELIVERY
-                              ], [
-                          'style' => 'margin-right: 10px;',
-                          'class' => 'btn btn-info',
-                      ]);
-                    }
-
-                    else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY) {
-                        echo Html::a('Mark as Complete', [
-                            'change-order-status',
-                            'order_uuid' => $model->order_uuid,
-                            'restaurantUuid' => $model->restaurant_uuid,
-                            'status' => Order::STATUS_COMPLETE
-                                ], [
-                            'style' => 'margin-right: 10px;',
-                            'class' => 'btn btn-success',
-                        ]);
-                    }
-
-                    if ($model->order_status != Order::STATUS_CANCELED) {
-                        echo Html::a('Cancel order', [
-                            'change-order-status',
-                            'order_uuid' => $model->order_uuid,
-                            'restaurantUuid' => $model->restaurant_uuid,
-                            'status' => Order::STATUS_CANCELED
-                                ], [
-                            'style' => 'margin-right: 10px;',
-                            'class' => 'btn btn-outline-danger',
-                        ]);
-                    }
-
-                ?>
+if ($model->order_status != Order::STATUS_CANCELED) {
+    echo Html::a('Cancel order', [
+        'change-order-status',
+        'order_uuid' => $model->order_uuid,
+        'restaurantUuid' => $model->restaurant_uuid,
+        'status' => Order::STATUS_CANCELED
+            ], [
+        'style' => 'margin-right: 10px;',
+        'class' => ' mb-1  btn btn-outline-danger',
+    ]);
+}
+?>
             </p>
             <div class="box-body table-responsive no-padding">
 
-<?=
-DetailView::widget([
-    'model' => $model,
-    'attributes' => [
-        [
-            'attribute' => 'order_status',
-            'format' => 'html',
-            'value' => function ($data) {
-                return '<span  style="font-size:25px; font-weight: 700" >' . $data->orderStatusInEnglish . '</span>';
-            },
-        ],
-        // 'total_price:currency',
-        // 'subtotal:currency',
-        // 'delivery_fee:currency',
-        [
-            'attribute' => 'order_created_at',
-            "format" => "raw",
-            "value" => function($model) {
-                return date('l d M, Y - h:i A', strtotime($model->order_created_at));
-            }
-        ],
-        [
-            'label' => 'When',
-            'format' => 'raw',
-            'value' => function ($data) {
-                return $data->is_order_scheduled ? 'Scheduled' : 'As soon as possible';
-            },
-        ],
-        [
-            'attribute' => 'estimated_time_of_arrival',
-            "format" => "raw",
-            "value" => function($model) {
-                return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival));
-            }
-        ],
-        [
-            'attribute' => 'special_directions',
-            'format' => 'html',
-            'value' => function ($data) {
-                return $data->special_directions;
-            },
-            'visible' => $model->special_directions,
-        ],
-        [
-            'attribute' => 'armada_tracking_link',
-            'format' => 'raw',
-            'value' => function ($data) {
-                return Html::a($data->armada_tracking_link, \yii\helpers\Url::to($data->armada_tracking_link, true), ['target' => '_blank']);
-            },
-            'visible' => $model->armada_tracking_link != null,
-        ],
-        [
-            'attribute' => 'armada_delivery_code',
-            'format' => 'raw',
-            'value' => function ($data) {
-                return Html::a($data->armada_delivery_code, \yii\helpers\Url::to($data->armada_delivery_code, true), ['target' => '_blank']);
-            },
-            'visible' => $model->armada_delivery_code != null,
-        ],
-    ],
-    'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
-])
-?>
+                <?=
+                DetailView::widget([
+                    'model' => $model,
+                    'attributes' => [
+                        [
+                            'attribute' => 'order_status',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return '<span  style="font-size:25px; font-weight: 700" >' . $data->orderStatusInEnglish . '</span>';
+                            },
+                        ],
+                        // 'total_price:currency',
+                        // 'subtotal:currency',
+                        // 'delivery_fee:currency',
+                        [
+                            'attribute' => 'order_created_at',
+                            "format" => "raw",
+                            "value" => function($model) {
+                                return date('l d M, Y - h:i A', strtotime($model->order_created_at));
+                            }
+                        ],
+                        [
+                            'label' => 'When',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return $data->is_order_scheduled ? 'Scheduled' : 'As soon as possible';
+                            },
+                        ],
+                        [
+                            'attribute' => 'estimated_time_of_arrival',
+                            "format" => "raw",
+                            "value" => function($model) {
+                                return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival));
+                            }
+                        ],
+                        [
+                            'attribute' => 'special_directions',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return $data->special_directions;
+                            },
+                            'visible' => $model->special_directions,
+                        ],
+                        [
+                            'attribute' => 'armada_tracking_link',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return Html::a($data->armada_tracking_link, \yii\helpers\Url::to($data->armada_tracking_link, true), ['target' => '_blank']);
+                            },
+                            'visible' => $model->armada_tracking_link != null,
+                        ],
+                        [
+                            'attribute' => 'armada_delivery_code',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return Html::a($data->armada_delivery_code, \yii\helpers\Url::to($data->armada_delivery_code, true), ['target' => '_blank']);
+                            },
+                            'visible' => $model->armada_delivery_code != null,
+                        ],
+                        [
+                            'attribute' => 'mashkor_order_status',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return $data->mashkor_order_status ? '<span  style="font-size:20px; font-weight: 700" >' . $data->mashkor_order_status . '</span>' : null;
+                            },
+                            'visible' => $model->mashkor_order_status != null,
+                        ],
+                        [
+                            'attribute' => 'mashkor_tracking_link',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return Html::a($data->mashkor_tracking_link, \yii\helpers\Url::to($data->mashkor_tracking_link, true), ['target' => '_blank']);
+                            },
+                            'visible' => $model->mashkor_tracking_link != null,
+                        ],
+                        [
+                            'attribute' => 'mashkor_driver_name',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return $data->mashkor_driver_name ? $data->mashkor_driver_name : null;
+                            },
+                            'visible' => $model->mashkor_driver_name != null,
+                        ],
+                        [
+                            'attribute' => 'mashkor_driver_phone',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return $data->mashkor_driver_phone ? $data->mashkor_driver_phone : null;
+                            },
+                            'visible' => $model->mashkor_driver_phone != null,
+                        ],
+                        [
+                            'attribute' => 'mashkor_driver_name',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return $data->mashkor_driver_name ? $data->mashkor_driver_name : null;
+                            },
+                            'visible' => $model->mashkor_driver_name != null,
+                        ],
+
+
+                    ],
+                    'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
+                ])
+                ?>
 
             </div>
         </div>
     </div>
-<?php if ($orderItems->totalCount > 0) { ?>
+                <?php if ($orderItems->totalCount > 0) { ?>
         <section id="data-list-view" class="data-list-view-header">
 
             <div class="card">
@@ -322,26 +367,26 @@ DetailView::widget([
         </section>
 <?php } ?>
 
-    <?php
-    $totalNumberOfItems = $model->getOrderItems()->count();
-    $refunds = $model->getRefunds();
+<?php
+$totalNumberOfItems = $model->getOrderItems()->count();
+$refunds = $model->getRefunds();
 
-    if ($totalNumberOfItems > 0 || $refunds->count() > 0) {
-        ?>
+if ($totalNumberOfItems > 0 || $refunds->count() > 0) {
+    ?>
         <div class="card">
             <div class="card-body">
                 <h3>
-    <?php
-    if ($model->order_status == Order::STATUS_PARTIALLY_REFUNDED) {
-        echo 'Partially refunded';
-    } elseif ($model->order_status == Order::STATUS_REFUNDED) {
-        echo 'Refunded';
-    } else if ($model->order_status != Order::STATUS_REFUNDED && $model->order_status != Order::STATUS_PARTIALLY_REFUNDED && $model->payment_method_id != 3 && $model->payment->payment_current_status == 'CAPTURED') {
-        echo 'Paid';
-    } else {
-        echo 'Payment pending';
-    }
-    ?>
+        <?php
+        if ($model->order_status == Order::STATUS_PARTIALLY_REFUNDED) {
+            echo 'Partially refunded';
+        } elseif ($model->order_status == Order::STATUS_REFUNDED) {
+            echo 'Refunded';
+        } else if ($model->order_status != Order::STATUS_REFUNDED && $model->order_status != Order::STATUS_PARTIALLY_REFUNDED && $model->payment_method_id != 3 && $model->payment->payment_current_status == 'CAPTURED') {
+            echo 'Paid';
+        } else {
+            echo 'Payment pending';
+        }
+        ?>
                 </h3>
 
 
@@ -436,15 +481,15 @@ DetailView::widget([
         </div>
 <?php } ?>
 
-    <?php
-    // order's Item
-    $refundDataProvider = new \yii\data\ActiveDataProvider([
-        'query' => $model->getRefunds()
-    ]);
+<?php
+// order's Item
+$refundDataProvider = new \yii\data\ActiveDataProvider([
+    'query' => $model->getRefunds()
+        ]);
 
 
-    if ($refundDataProvider->totalCount > 0 && $model->payment) {
-        ?>
+if ($refundDataProvider->totalCount > 0 && $model->payment) {
+    ?>
         <div class="card">
             <div class="card-body">
 
@@ -467,7 +512,7 @@ DetailView::widget([
             </div>
         </div>
 
-<?php } ?>
+            <?php } ?>
 
     <div class="card">
         <div class="card-body">
@@ -479,61 +524,61 @@ DetailView::widget([
             <div class="box-body table-responsive no-padding">
 
                 </p>
-<?=
-DetailView::widget([
-    'model' => $model,
-    'attributes' => [
-        [
-            'label' => 'Payment type',
-            'format' => 'html',
-            'value' => function ($data) {
-                return $data->payment_method_name;
-            },
-        ],
-        [
-            'label' => 'Payment status',
-            'format' => 'html',
-            'value' => function ($data) {
-                if ($data->payment) {
-                    return $data->payment->payment_current_status == 'CAPTURED' ? '<span class="badge bg-success" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>' : '<span class="badge bg-danger" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>';
-                }
-            },
-            'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
-        ],
-        [
-            'label' => 'Gateway ID',
-            'format' => 'html',
-            'value' => function ($data) {
-                if ($data->payment) {
-                    return $data->payment->payment_gateway_order_id;
-                }
-            },
-            'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
-        ],
-        [
-            'label' => 'Received Callback',
-            'format' => 'html',
-            'value' => function ($data) {
-                if ($data->payment) {
-                    return $data->payment->received_callback == true ? 'True' : 'False';
-                }
-            },
-            'visible' => $model->payment_method_id != 3 && $model->payment
-        ],
-        [
-            'label' => 'Transaction ID',
-            'format' => 'html',
-            'value' => function ($data) {
-                if ($data->payment) {
-                    return $data->payment->payment_gateway_transaction_id;
-                }
-            },
-            'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
-        ],
-    ],
-    'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
-])
-?>
+                <?=
+                DetailView::widget([
+                    'model' => $model,
+                    'attributes' => [
+                        [
+                            'label' => 'Payment type',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return $data->payment_method_name;
+                            },
+                        ],
+                        [
+                            'label' => 'Payment status',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                if ($data->payment) {
+                                    return $data->payment->payment_current_status == 'CAPTURED' ? '<span class="badge bg-success" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>' : '<span class="badge bg-danger" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>';
+                                }
+                            },
+                            'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
+                        ],
+                        [
+                            'label' => 'Gateway ID',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                if ($data->payment) {
+                                    return $data->payment->payment_gateway_order_id;
+                                }
+                            },
+                            'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
+                        ],
+                        [
+                            'label' => 'Received Callback',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                if ($data->payment) {
+                                    return $data->payment->received_callback == true ? 'True' : 'False';
+                                }
+                            },
+                            'visible' => $model->payment_method_id != 3 && $model->payment
+                        ],
+                        [
+                            'label' => 'Transaction ID',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                if ($data->payment) {
+                                    return $data->payment->payment_gateway_transaction_id;
+                                }
+                            },
+                            'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
+                        ],
+                    ],
+                    'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
+                ])
+                ?>
 
             </div>
         </div>

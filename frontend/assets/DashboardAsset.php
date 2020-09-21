@@ -21,7 +21,7 @@ class DashboardAsset extends AssetBundle {
         'app-assets/css/pages/card-analytics.css',
         'app-assets/css/pages/dashboard-ecommerce.css',
         'app-assets/css/plugins/tour/tour.css',
-        'assets/css/style.css',
+        // 'assets/css/style.css',
         'https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600',
         'app-assets/css/pages/data-list-view.css',
         'app-assets/vendors/css/tables/datatable/datatables.min.css',
@@ -34,8 +34,7 @@ class DashboardAsset extends AssetBundle {
         'app-assets/vendors/css/vendors.min.css',
         'app-assets/vendors/css/ui/prism.min.css',
         'app-assets/vendors/css/file-uploaders/dropzone.min.css',
-        'assets/css/style.css',
-
+        // 'assets/css/style.css',
         'app-assets/css/bootstrap.css',
         'app-assets/css/bootstrap-extended.css',
         'app-assets/css/colors.css',
@@ -45,19 +44,13 @@ class DashboardAsset extends AssetBundle {
         'app-assets/css/core/menu/menu-types/vertical-menu.css',
         'app-assets/css/core/colors/palette-gradient.css',
         'app-assets/css/plugins/file-uploaders/dropzone.css',
-        // 'app-assets/vendors/css/editors/quill/katex.min.css',
-        // 'app-assets/vendors/css/editors/quill/monokai-sublime.min.css',
         'app-assets/vendors/css/editors/quill/quill.snow.css',
-        // 'app-assets/vendors/css/editors/quill/quill.bubble.css',
         'app-assets/vendors/css/charts/apexcharts.css',
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
         'app-assets/css/pages/invoice.css',
-
-
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
-
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
-
+        'css/bootstrap-duallistbox.css'
     ];
 
     public $js = [
@@ -94,20 +87,17 @@ class DashboardAsset extends AssetBundle {
         'app-assets/vendors/js/editors/quill/quill.min.js',
         'app-assets/vendors/js/extensions/jquery.steps.min.js',
         'app-assets/vendors/js/forms/validation/jquery.validate.min.js',
-        // 'app-assets/js/scripts/editors/editor-quill.js',
         'app-assets/js/scripts/pages/invoice.js',
-        // 'https://pixinvent.com/demo/vuexy-bootstrap-laravel-admin-template/demo-1/js/scripts/customizer.js?id=bd6e1f733770a42402a7',
-        //
+        'app-assets/vendors/js/pickers/pickadate/picker.js',
+        'app-assets/vendors/js/pickers/pickadate/picker.date.js',
+        'app-assets/vendors/js/pickers/pickadate/picker.time.js',
+        'app-assets/vendors/js/pickers/pickadate/legacy.js',
+        'app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js',
 
-      //
-      'app-assets/vendors/js/pickers/pickadate/picker.js',
-      'app-assets/vendors/js/pickers/pickadate/picker.date.js',
-      'app-assets/vendors/js/pickers/pickadate/picker.time.js',
-      'app-assets/vendors/js/pickers/pickadate/legacy.js',
-      'app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js',
-
-
-
+        // 'https://code.jquery.com/jquery-3.2.1.slim.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js',
+        'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js',
+        'js/jquery.bootstrap-duallistbox.min.js'
     ];
 
     public $depends = [

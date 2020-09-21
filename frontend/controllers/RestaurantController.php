@@ -544,31 +544,6 @@ class RestaurantController extends Controller {
         ]);
     }
 
-    /**
-     * Lists all Restaurant models.
-     * @return mixed
-     */
-    public function actionViewAnalyticsIntegration($restaurantUuid) {
-
-        $model = $this->findModel($restaurantUuid);
-
-        return $this->render('integration/analytics/view-analytics-integration', [
-                    'model' => $model
-        ]);
-    }
-
-    /**
-     * Lists all Restaurant models.
-     * @return mixed
-     */
-    public function actionViewDeliveryIntegration($restaurantUuid) {
-
-        $model = $this->findModel($restaurantUuid);
-
-        return $this->render('integration/delivery/view-delivery-integration', [
-                    'model' => $model
-        ]);
-    }
 
     /**
      * View payment settings page
@@ -622,24 +597,44 @@ class RestaurantController extends Controller {
     }
 
     /**
-     * Updates an existing payment method.
+     * Updates an existing Analytics integration.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    // public function actionUpdateAnalyticsIntegration($id) {
-    //
-    //   $model = $this->findModel($id);
-    //
-    //   if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())  && $model->save()) {
-    //          return $this->redirect(['view-analytics-integration', 'restaurantUuid' => $id]);
-    //   }
-    //
-    //     return $this->render('integration/analytics/update-analytics-integration', [
-    //                 'model' => $model
-    //     ]);
-    // }
+    public function actionUpdateAnalyticsIntegration($id) {
+
+      $model = $this->findModel($id);
+
+      if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())  && $model->save()) {
+             return $this->redirect(['update-analytics-integration', 'id' => $id]);
+      }
+
+        return $this->render('integration/analytics/update-analytics-integration', [
+                    'model' => $model
+        ]);
+    }
+
+    /**
+    * Updates an existing Delivery integration.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionUpdateDeliveryIntegration($id) {
+
+      $model = $this->findModel($id);
+
+      if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())  && $model->save()) {
+             return $this->redirect(['update-delivery-integration', 'id' => $id]);
+      }
+
+        return $this->render('integration/delivery/update-delivery-integration', [
+                    'model' => $model
+        ]);
+    }
 
     /**
      * Updates an existing payment method.

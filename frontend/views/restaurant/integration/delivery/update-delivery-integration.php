@@ -16,198 +16,86 @@ use common\models\Restaurant;
 
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
-$this->title = 'Update Store design and layout';
-$this->params['breadcrumbs'][] = ['label' => 'Design & layout', 'url' => ['view-design-layout','restaurantUuid' =>$model->restaurant_uuid]];
-$this->params['breadcrumbs'][] = 'Update design & layout';
+$this->title = 'Delivery integration';
+$this->params['breadcrumbs'][] = 'Delivery Integration';
+
+$form = ActiveForm::begin([
+            'id' => 'dynamic-form',
+            'errorSummaryCssClass' => 'alert alert-danger'
+]);
 
 ?>
 
-<div class="restaurant-form card">
+<?= $form->errorSummary([$model], ['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
 
-    <?php
+<div class="row">
+  <div class="col-12 col-sm-6 col-lg-6">
 
-    $form = ActiveForm::begin([
-                'id' => 'dynamic-form',
-                'errorSummaryCssClass' => 'alert alert-danger'
-    ]);
-    ?>
+          <div class="card">
+              <div class="card-content">
+                  <div class="card-body" style="padding-bottom: 0px;">
+                      <h4 class="card-title">Mashkor Delivery</h4>
+                      <a class="mb-4 text-primary-base hover:text-primary-700" rel="noopener noreferrer" target="_blank" href="https://www.plugn.io/local-delivery/mashkor">
+                        <span>Learn more about Mashkor Delivery
+                          <svg width="24" height="24" viewBox="0 0 24 24" class="inline"><g fill="none" fill-rule="evenodd"><path d="M0 0h24v24H0z"></path><path fill="#3852CA" fill-rule="nonzero" d="M7.333 7.2h4a.8.8 0 0 1 .1 1.594l-.1.006h-4a.488.488 0 0 0-.377.156.481.481 0 0 0-.15.289l-.006.088v7.334c0 .412.074.518.436.531l.097.002h7.334c.412 0 .518-.074.531-.436l.002-.097v-4a.8.8 0 0 1 1.594-.1l.006.1v4c0 1.273-.734 2.062-1.963 2.128l-.17.005H7.333c-1.273 0-2.062-.734-2.128-1.963l-.005-.17V9.333c0-.58.214-1.098.625-1.508a2.077 2.077 0 0 1 1.317-.617l.191-.008h4-4zM14 5.2h4.029l.052.004L18 5.2a.805.805 0 0 1 .566.234l-.077-.067a.804.804 0 0 1 .305.533l.002.017a.805.805 0 0 1 .004.065V10a.8.8 0 0 1-1.594.1L17.2 10l-.001-2.069-5.967 5.968a.8.8 0 0 1-1.041.077l-.09-.077a.8.8 0 0 1 0-1.131l5.968-5.969L14 6.8a.8.8 0 0 1-.1-1.594L14 5.2h4-4z"></path></g>
+                          </svg>
+                        </span>
 
+                      </a>
 
-    <div class="card-header">
-      <h3>Basic Info </h3>
-    </div>
-    <div class="card-body">
+                  </div>
 
-        <?= $form->errorSummary([$model], ['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
-
-
-
-        <div class="row">
-
-            <div class="col-12 col-sm-6 col-lg-6">
-                <?=
-                $form->field($model, 'restaurant_thumbnail_image', [
-                    'template' => "{label}"
-                    . "            <div class='input-group'>"
-                    . "             <div class='custom-file'>"
-                    . "                 {input}"
-                    . "                 <label class='custom-file-label' for='exampleInputFile'>Choose file</label>"
-                    . "             </div>"
-                    . "            </div>"
-                ])->fileInput([
-                    'multiple' => false,
-                    'accept' => 'image/*',
-                    'class' => 'custom-file-input',
-                ])
-                ?>
-            </div>
-
-            <div class="col-12 col-sm-6 col-lg-6">
-
-                <?=
-                $form->field($model, 'restaurant_logo', [
-                    'template' => "{label}"
-                    . "            <div class='input-group'>"
-                    . "             <div class='custom-file'>"
-                    . "                 {input}"
-                    . "                 <label class='custom-file-label' for='exampleInputFile'>Choose file</label>"
-                    . "             </div>"
-                    . "            </div>"
-                ])->fileInput([
-                    'multiple' => false,
-                    'accept' => 'image/*',
-                    'class' => 'custom-file-input',
-                ])
-                ?>
-            </div>
-        </div>
-
-
-
-        <div class="row">
-            <div class="col-12 col-sm-6 col-lg-6">
-
-                <div id="phoneNumberDisplay" <?= $model->phone_number ? "style = display:block " : "style = display:none " ?> >
-                    <?=
-                    $form->field($model, 'phone_number_display')->radioList(
-                            [2 => '📞', 3 => '+965 12345678', 1 => 'Dont show phone number button'], [
-                        'style' => 'display:grid',
-                        'item' => function($index, $label, $name, $checked, $value) {
-
-                            $return = '<label class="vs-radio-con">';
-                            /* -----> */ if ($checked)
-                                $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                            /* -----> */
-                            else
-                                $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                            $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
-                            $return .= '<span>' . ucwords($label) . '</span>';
-                            $return .= '</label>';
-
-                            return $return;
-                        }
+                  <div class="card-body">
+                      <form class="form">
+                          <div class="form-body">
+                            <?= $form->field($model, 'mashkor_branch_id',[
+                              'labelOptions' => [ 'style' => 'font-size: 0.875rem; '],
+                              'options' => ['style' => 'margin-bottom:  0px;'],
                             ]
-                    );
-                    ?>
-                </div>
-            </div>
+                          )->textInput(['maxlength' => true, 'style' => 'margin-bottom:  0px;','placeholder' => 'Mashkor Branch id']) ?>
+                          </div>
+                  </div>
 
-            <div class="col-12 col-sm-6 col-lg-6">
+              </div>
+          </div>
 
-                <?php
+    </div>
 
+    <div class="col-12 col-sm-6 col-lg-6">
 
-                if(
-$model->restaurant_uuid == 'rest_204f0963-e94f-11ea-808a-0673128d0c9c' ||
-$model->restaurant_uuid == 'rest_d7f4f8b8-ebc7-11ea-808a-0673128d0c9c' ||
-$model->restaurant_uuid == 'rest_c2aff830-ebd4-11ea-808a-0673128d0c9c' ||
-$model->restaurant_uuid == 'rest_3afe275f-ebd4-11ea-808a-0673128d0c9c' ||
-                  $model->restaurant_uuid == 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290' || $model->restaurant_uuid == 'rest_73100b93-cf41-11ea-808a-0673128d0c9c'){
-                  echo  $form->field($model, 'store_layout')->radioList([
-                              Restaurant::STORE_LAYOUT_LIST_FULLWIDTH => 'List',
-                              Restaurant::STORE_LAYOUT_GRID_FULLWIDTH  => 'Grid',
-                              Restaurant::STORE_LAYOUT_CATEGORY_FULLWIDTH  => 'Category',
-                              Restaurant::STORE_LAYOUT_LIST_HALFWIDTH => 'List - Half',
-                              Restaurant::STORE_LAYOUT_GRID_HALFWIDTH => 'Grid - Half',
-                              Restaurant::STORE_LAYOUT_CATEGORY_HALFWIDTH => 'Category - Half',
-                            ], [
-                                'style' => 'display:grid',
-                                'item' => function($index, $label, $name, $checked, $value) {
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-body" style="padding-bottom: 0px;">
+                        <h4 class="card-title">Armada Delivery</h4>
+                        <a class="mb-4 text-primary-base hover:text-primary-700" rel="noopener noreferrer" target="_blank" href="https://www.plugn.io/local-delivery/armada">
+                          <span class="block w-full inline" style="direction: ltr;">Learn more about Armada Delivery
+                            <svg width="24" height="24" viewBox="0 0 24 24" class="inline"><g fill="none" fill-rule="evenodd"><path d="M0 0h24v24H0z"></path><path fill="#3852CA" fill-rule="nonzero" d="M7.333 7.2h4a.8.8 0 0 1 .1 1.594l-.1.006h-4a.488.488 0 0 0-.377.156.481.481 0 0 0-.15.289l-.006.088v7.334c0 .412.074.518.436.531l.097.002h7.334c.412 0 .518-.074.531-.436l.002-.097v-4a.8.8 0 0 1 1.594-.1l.006.1v4c0 1.273-.734 2.062-1.963 2.128l-.17.005H7.333c-1.273 0-2.062-.734-2.128-1.963l-.005-.17V9.333c0-.58.214-1.098.625-1.508a2.077 2.077 0 0 1 1.317-.617l.191-.008h4-4zM14 5.2h4.029l.052.004L18 5.2a.805.805 0 0 1 .566.234l-.077-.067a.804.804 0 0 1 .305.533l.002.017a.805.805 0 0 1 .004.065V10a.8.8 0 0 1-1.594.1L17.2 10l-.001-2.069-5.967 5.968a.8.8 0 0 1-1.041.077l-.09-.077a.8.8 0 0 1 0-1.131l5.968-5.969L14 6.8a.8.8 0 0 1-.1-1.594L14 5.2h4-4z"></path></g>
+                            </svg>
+                          </span>
 
-                                    $return = '<label class="vs-radio-con">';
-                                    /* -----> */ if ($checked)
-                                        $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                                    /* -----> */
-                                    else
-                                        $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                                    $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
-                                    $return .= '<span>' . ucwords($label) . '</span>';
-                                    $return .= '</label>';
+                        </a>
 
-                                    return $return;
-                                },
-                            ]);
-                } else {
-                  echo $form->field($model, 'store_layout')->radioList([
-                            Restaurant::STORE_LAYOUT_LIST_FULLWIDTH => 'List',
-                            Restaurant::STORE_LAYOUT_GRID_FULLWIDTH  => 'Grid'
-                          ], [
-                              'style' => 'display:grid',
-                              'item' => function($index, $label, $name, $checked, $value) {
-
-                                  $return = '<label class="vs-radio-con">';
-                                  /* -----> */ if ($checked)
-                                      $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                                  /* -----> */
-                                  else
-                                      $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                                  $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
-                                  $return .= '<span>' . ucwords($label) . '</span>';
-                                  $return .= '</label>';
-
-                                  return $return;
-                              },
-                          ]);
-                }
-                ?>
-            </div>
-        </div>
-
-
-      </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <h3>Theme Color </h3>
-        </div>
-                <div class="card-body row">
-                    <div class="col-12">
-
-                        <div class="ant-form-item-label"><label class="" title="Primary Color">Primary Color</label></div>
-
-                        <div id="primary-wrapper" style=" cursor: pinter; width:100%;margin-bottom: 21px; position: relative;background:<?= $store_theme_model->primary ?>" class="text-center colors-container rounded text-white  height-40 d-flex align-items-center justify-content-center  my-1 shadow">
-                            <?=
-                            $form->field($store_theme_model, 'primary')->textInput(
-                                    [
-                                        'type' => 'color',
-                                        'style' => 'position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer;  top: 0;   right: 0;',
-                                        'id' => 'primaryColorInput'
-                            ])->label('');
-                            ?>
-                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form class="form">
+                            <div class="form-body">
+                              <?= $form->field($model, 'armada_api_key',[
+                                'labelOptions' => [ 'style' => 'font-size: 0.875rem; '],
+                                'options' => ['style' => 'margin-bottom:  0px;'],
+                              ]
+                            )->textInput(['maxlength' => true, 'style' => 'margin-bottom:  0px;','placeholder' => 'Armada Api Key']) ?>
+                            </div>
                     </div>
                 </div>
-
-
+            </div>
 
       </div>
 
+  </div>
 
-        <div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px; padding-bottom: 15px; background:#f4f6f9 ">
-            <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
-        </div>
+  <div class="form-group" style="background: #f4f6f9; margin-bottom: 0px;background:#f4f6f9; ">
+      <?= Html::submitButton('Save Changes', ['class' => 'btn btn-success', 'style' => 'font-size: 16px;font-weight: 600; height: 2.5rem; padding: 0px 1.5rem;']) ?>
+  </div>
+
 
         <?php ActiveForm::end(); ?>
-
-</div>

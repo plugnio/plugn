@@ -44,7 +44,10 @@
         "bizley/quill": "^3.1",
         "twitf/yii2-dropzone": "*",
         "kartik-v/yii2-widget-fileinput": "@dev",
-        "janisto/yii2-timepicker": "*"
+        "janisto/yii2-timepicker": "*",
+        "softark/yii2-dual-listbox": "dev-master",
+        "maksyutin/yii2-dual-list-box": "dev-master",
+        "ssimpson/yii2-dual-list-box": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

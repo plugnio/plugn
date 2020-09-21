@@ -174,6 +174,45 @@ class OrderController extends Controller {
     }
 
     /**
+     * Request a driver from Mashkor
+     * @param type $order_uuid
+     * @param type $restaurantUuid
+     */
+    public function actionRequestDriverFromMashkor($order_uuid, $restaurantUuid) {
+
+        $order_model = $this->findModel($order_uuid, $restaurantUuid);
+
+        $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($order_model);
+
+
+        if ($createDeliveryApiResponse->isOk) {
+
+            $order_model->mashkor_order_number = $createDeliveryApiResponse->data['data']['order_number'];
+            $order_model->save(false);
+            
+            Yii::$app->session->setFlash('successResponse', "Your request has been successfully submitted");
+
+        } else {
+
+            if ($createDeliveryApiResponse->client)
+                Yii::$app->session->setFlash('errorResponse', "Invalid api key");
+            else if ($createDeliveryApiResponse->data['errors'])
+                Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->data['errors'][0]['description']));
+            else  if ($createDeliveryApiResponse->data)
+               Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->data));
+            else
+               Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse));
+
+
+            return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid]);
+        }
+
+        return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid]);
+    }
+    
+    
+    
+     /**
      * Request a driver from Armada
      * @param type $order_uuid
      * @param type $restaurantUuid
@@ -184,8 +223,6 @@ class OrderController extends Controller {
 
         $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($order_model);
 
-        $errorMessage = null;
-        $successMessage = null;
 
         if ($createDeliveryApiResponse->isOk) {
 
@@ -193,19 +230,24 @@ class OrderController extends Controller {
             $order_model->armada_qr_code_link = $createDeliveryApiResponse->data['qrCodeLink'];
             $order_model->armada_delivery_code = $createDeliveryApiResponse->data['code'];
             $order_model->save(false);
-            $successMessage = 'Your request has been successfully submitted';
+            Yii::$app->session->setFlash('successResponse', "Your request has been successfully submitted");
+
         } else {
 
             if ($createDeliveryApiResponse->client)
-                $errorMessage = 'Invalid api key';
+                Yii::$app->session->setFlash('errorResponse', "Invalid api key");
             else if ($createDeliveryApiResponse->data['errors'])
-                $errorMessage = json_encode($createDeliveryApiResponse->data['errors'][0]['description'], true);
+                Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->data['errors'][0]['description']));
+            else  if ($createDeliveryApiResponse->data)
+               Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->data));
+            else
+               Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse));
 
 
-            return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid, 'errorMessage' => json_encode($createDeliveryApiResponse)]);
+            return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid]);
         }
 
-        return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid, 'errorMessage' => $errorMessage, 'successMessage' => $successMessage,]);
+        return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid]);
     }
 
     /**
@@ -261,9 +303,10 @@ class OrderController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id, $restaurantUuid, $errorMessage = null, $successMessage = null) {
+    public function actionView($id, $restaurantUuid) {
 
         $order_model = $this->findModel($id, $restaurantUuid);
+        
 
 
         // Item
@@ -282,8 +325,6 @@ class OrderController extends Controller {
         return $this->render('view', [
                     'model' => $order_model,
                     'orderItems' => $orderItems,
-                    'errorMessage' => $errorMessage,
-                    'successMessage' => $successMessage,
                     'itemsExtraOpitons' => $itemsExtraOpitons
         ]);
     }

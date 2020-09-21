@@ -63,6 +63,12 @@ return [
             'class' => 'common\components\ArmadaDelivery',
             'keyToUse' => \common\components\ArmadaDelivery::USE_LIVE_KEY,
         ],
+        'mashkorDelivery' => [
+            'class' => 'common\components\MashkorDelivery',
+            'keyToUse' => \common\components\MashkorDelivery::USE_LIVE_KEY,
+            'mashkorApiKey' => '637199C367D1D',
+            'tokenId' => 'plrWk7iC3Vh4299JcZbdMmVYUKGJCsGk',
+        ],
         'slack' => [
             'class' => 'understeam\slack\Client',
             'url' => 'https://hooks.slack.com/services/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',
