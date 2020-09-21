@@ -46,7 +46,7 @@ class ItemSearch extends Item
      */
     public function search($params, $restaurantUuid)
     {
-        $query = Item::find()->where(['item.restaurant_uuid' => $restaurantUuid])->innerJoinWith('category', true);
+        $query = Item::find()->where(['item.restaurant_uuid' => $restaurantUuid])->joinWith('category', true);
 
         // add conditions that should always apply here
 
