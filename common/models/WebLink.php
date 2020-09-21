@@ -27,7 +27,8 @@ class WebLink extends \yii\db\ActiveRecord
       const WEB_LINK_TYPE_INSTAGRAM = 3;
       const WEB_LINK_TYPE_TWITTER = 4;
       const WEB_LINK_TYPE_SNAPCHAT= 5;
-      const WEB_LINK_TYPE_WHATSAPP= 6;
+      const WEB_LINK_TYPE_WHATSAPP = 6;
+      const WEB_LINK_TYPE_EMAIL= 7;
 
     /**
      * {@inheritdoc}
@@ -44,7 +45,7 @@ class WebLink extends \yii\db\ActiveRecord
     {
         return [
             [['url','web_link_title','web_link_title_ar'], 'required'],
-            ['web_link_type', 'in', 'range' => [self::WEB_LINK_TYPE_WEBSITE_URL, self::WEB_LINK_TYPE_FACEBOOK, self::WEB_LINK_TYPE_INSTAGRAM, self::WEB_LINK_TYPE_TWITTER, self::WEB_LINK_TYPE_SNAPCHAT, self::WEB_LINK_TYPE_WHATSAPP]],
+            ['web_link_type', 'in', 'range' => [self::WEB_LINK_TYPE_WEBSITE_URL, self::WEB_LINK_TYPE_FACEBOOK, self::WEB_LINK_TYPE_INSTAGRAM, self::WEB_LINK_TYPE_TWITTER, self::WEB_LINK_TYPE_SNAPCHAT, self::WEB_LINK_TYPE_WHATSAPP, self::WEB_LINK_TYPE_EMAIL]],
             [['restaurant_uuid'], 'string', 'max' => 60],
             ['url', 'url', 'when' => function($model) {
                 return $model->web_link_type == self::WEB_LINK_TYPE_WEBSITE_URL;
@@ -92,6 +93,9 @@ class WebLink extends \yii\db\ActiveRecord
                 break;
             case self::WEB_LINK_TYPE_WHATSAPP:
                 return "WhatsApp";
+                break;
+            case self::WEB_LINK_TYPE_EMAIL:
+                return "Email";
                 break;
         }
 

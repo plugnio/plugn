@@ -79,150 +79,118 @@ $this->registerJs($js);
                 'presetDropdown' => false,
                 'convertFormat' => true,
                 'pluginOptions' => [
-                  'timePicker'=>true,
-                  'timePickerIncrement'=>15,
-                  'locale'=>['format'=>'Y-m-d H:i:s']
+                    'timePicker' => true,
+                    'timePickerIncrement' => 15,
+                    'locale' => ['format' => 'Y-m-d H:i:s']
                 ],
             ]);
             ?>
 
             <div class="form-group">
-            <?=
-            Html::submitButton('Export to Excel', ['class' => 'btn btn-success', 'id' => 'export-to-excel-btn', 'disabled' => true])
-            ?>
+                <?=
+                Html::submitButton('Export to Excel', ['class' => 'btn btn-success', 'id' => 'export-to-excel-btn', 'disabled' => true])
+                ?>
             </div>
 
 
 
-<?php ActiveForm::end(); ?>
+            <?php ActiveForm::end(); ?>
 
 
 
         </div>
     </div>
 
-<?php echo $this->render('_search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
+    <?php echo $this->render('_search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
 
 
     <!-- DataTable starts -->
     <div class="table-responsive">
 
-<?=
-GridView::widget([
-    'dataProvider' => $dataProvider,
-    'rowOptions' => function($model) {
-        $url = Url::to(['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid]);
+        <?=
+        GridView::widget([
+            'dataProvider' => $dataProvider,
+            'rowOptions' => function($model) {
+                $url = Url::to(['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid]);
 
-        return [
-            'onclick' => "window.location.href='{$url}'"
-        ];
-    },
-    'columns' => [
-        ['class' => 'yii\grid\SerialColumn'],
-        [
-            'label' => 'Order ID',
-            "format" => "raw",
-            "value" => function($model) {
-              return   Html::a('#' . $model->order_uuid , ['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid]);
-            }
-        ],
-        [
-            'attribute' => 'order_created_at',
-            "format" => "raw",
-            "value" => function($model) {
-                return date('d M - h:i A', strtotime($model->order_created_at));
-            }
-        ],
-        [
-            'attribute' => 'customer_name',
-            'format' => 'raw',
-            'value' => function ($data) {
-                if ($data->customer_id)
-                    return Html::a($data->customer->customer_name, ['customer/view', 'id' => $data->customer_id, 'restaurantUuid' => $data->restaurant_uuid]);
+                return [
+                    'onclick' => "window.location.href='{$url}'"
+                ];
             },
-            'visible' => function ($data) {
-                return $data->customer_id ? true : false;
-            },
-        ],
-        'customer_phone_number',
-        [
-            'label' => 'When',
-            'format' => 'raw',
-            'value' => function ($data) {
-                return $data->is_order_scheduled ? 'Scheduled' : 'As soon as possible';
-            },
-        ],
-        [
-            'attribute' => 'order_status',
-            "format" => "raw",
-            "value" => function($model) {
-                if ($model->order_status == Order::STATUS_PENDING) {
-                    return '<div class="chip chip-warning mr-1">
-                                      <div class="chip-body">
-                                          <span style="white-space: pre;" class="chip-text">' . $model->orderStatusInEnglish . '</span>
-                                      </div>
-                                  </div>';
-                } else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY) {
-                    return '<div class="chip chip-info mr-1">
-                                      <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatusInEnglish . '</span>
-                                      </div>
-                                  </div>';
-                } else if ($model->order_status == Order::STATUS_ACCEPTED) {
-                    return '<div class="chip chip-warning mr-1">
-                                      <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatusInEnglish . '</span>
-                                      </div>
-                                  </div>';
-                } else if ($model->order_status == Order::STATUS_BEING_PREPARED) {
-                    return '<div class="chip chip-info mr-1">
-                                      <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatusInEnglish . '</span>
-                                      </div>
-                                  </div>';
-                } else if ($model->order_status == Order::STATUS_COMPLETE) {
-                    return '<div class="chip chip-success mr-1">
-                                      <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatusInEnglish . '</span>
-                                      </div>
-                                  </div>';
-                } else if ($model->order_status == Order::STATUS_CANCELED) {
-                    return '<div class="chip chip-danger mr-1">
-                                      <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatusInEnglish . '</span>
-                                      </div>
-                                    </div>';
-                } else if ($model->order_status == Order::STATUS_PARTIALLY_REFUNDED) {
-                    return '<div class="chip chip-danger mr-1">
-                                      <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatusInEnglish . '</span>
-                                      </div>
-                                   </div>';
-                } else if ($model->order_status == Order::STATUS_REFUNDED) {
-                    return '<div class="chip chip-danger mr-1">
-                                      <div class="chip-body">
-                                          <span class="chip-text" style="white-space: pre;">' . $model->orderStatusInEnglish . '</span>
-                                      </div>
-                                   </div>';
-                }
-            }
-        ],
-        [
-            'label' => 'Payment',
-            "format" => "raw",
-            "value" => function($data) {
-                return $data->paymentMethod->payment_method_name;
-            },
-            "visible" => function($data) {
-                return $data->payment->payment_current_status;
-            },
-        ],
-        'total_price:currency',
-    ],
-    'layout' => '{summary}{items}{pager}',
-    'tableOptions' => ['class' => 'table data-list-view'],
-]);
-?>
+            'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
+                [
+                    'label' => 'Order ID',
+                    "format" => "raw",
+                    "value" => function($model) {
+                        return Html::a('#' . $model->order_uuid, ['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid]);
+                    }
+                ],
+                [
+                    'attribute' => 'order_created_at',
+                    "format" => "raw",
+                    "value" => function($model) {
+                        return date('d M - h:i A', strtotime($model->order_created_at));
+                    }
+                ],
+                [
+                    'attribute' => 'customer_name',
+                    'format' => 'raw',
+                    'value' => function ($data) {
+                        if ($data->customer_id)
+                            return Html::a($data->customer->customer_name, ['customer/view', 'id' => $data->customer_id, 'restaurantUuid' => $data->restaurant_uuid]);
+                    },
+                    'visible' => function ($data) {
+                        return $data->customer_id ? true : false;
+                    },
+                ],
+                'customer_phone_number',
+                [
+                    'label' => 'When',
+                    'format' => 'raw',
+                    'value' => function ($data) {
+                        return $data->is_order_scheduled ? 'Scheduled' : 'As soon as possible';
+                    },
+                ],
+                [
+                    'attribute' => 'order_status',
+                    "format" => "raw",
+                    "value" => function($model) {
+
+                        if ($model->order_status == Order::STATUS_PENDING)
+                            return '<i class="fa fa-circle font-small-3 text-warning mr-50"></i> <span class="text-warning">' . $model->orderStatusInEnglish . '</span>';
+                        else if ($model->order_status == Order::STATUS_ACCEPTED)
+                            return '<i class="fa fa-circle font-small-3 text-success mr-50"></i> <span class="text-success">' . $model->orderStatusInEnglish . '</span>';
+                        else if ($model->order_status == Order::STATUS_BEING_PREPARED)
+                            return '<i class="fa fa-circle font-small-3 text-primary mr-50"></i> <span class="text-primary">' . $model->orderStatusInEnglish . '</span>';
+                        else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY)
+                            return '<i class="fa fa-circle font-small-3 text-info mr-50"></i> <span class="text-info">' . $model->orderStatusInEnglish . '</span>';
+                        else if ($model->order_status == Order::STATUS_COMPLETE)
+                            return '<i class="fa fa-circle font-small-3 text-success mr-50"></i> <span class="text-success">' . $model->orderStatusInEnglish . '</span>';
+                        else if ($model->order_status == Order::STATUS_CANCELED)
+                            return '<i class="fa fa-circle font-small-3 text-danger mr-50"></i> <span class="text-danger">' . $model->orderStatusInEnglish . '</span>';
+                        else if ($model->order_status == Order::STATUS_PARTIALLY_REFUNDED)
+                            return '<i class="fa fa-circle font-small-3 text-danger mr-50"></i> <span class="text-danger">' . $model->orderStatusInEnglish . '</span>';
+                        else if ($model->order_status == Order::STATUS_REFUNDED)
+                            return '<i class="fa fa-circle font-small-3 text-danger mr-50"></i> <span class="text-danger">' . $model->orderStatusInEnglish . '</span>';
+                    }
+                ],
+                [
+                    'label' => 'Payment',
+                    "format" => "raw",
+                    "value" => function($data) {
+                        return $data->paymentMethod->payment_method_name;
+                    },
+                    "visible" => function($data) {
+                        return $data->payment->payment_current_status;
+                    },
+                ],
+                'total_price:currency',
+            ],
+            'layout' => '{summary}{items}{pager}',
+            'tableOptions' => ['class' => 'table data-list-view'],
+        ]);
+        ?>
 
     </div>
     <!-- DataTable ends -->
