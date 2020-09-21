@@ -97,12 +97,9 @@ $this->registerJs($js);
             if ($model->restaurant->armada_api_key != null && $model->armada_tracking_link == null)
                 echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary mr-1 mb-1', 'style' => 'margin-right: 7px;']);
 
-            // if ($model->restaurant->maskor_branch_id != null)
-                // echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-info mr-1 mb-1', 'style' => 'margin-right: 7px;']);
+            // if ($model->restaurant->maskor_branch_id != null && $model->mashkor_order_number == null)
+            //     echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-info mr-1 mb-1', 'style' => 'margin-right: 7px;']);
         }
-
-        echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-info mr-1 mb-1', 'style' => 'margin-right: 7px;']);
-
 
         ?>
 
@@ -135,7 +132,7 @@ if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Orde
         'status' => Order::STATUS_PENDING
             ], [
         'style' => 'margin-right: 10px;',
-        'class' => 'btn btn-warning',
+        'class' => ' mb-1  btn btn-warning',
         'data' => [
             'confirm' => 'Are you sure you want to mark it as pending?',
             'method' => 'post',
@@ -149,7 +146,7 @@ if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Orde
         'status' => Order::STATUS_ACCEPTED
             ], [
         'style' => 'margin-right: 10px;',
-        'class' => 'btn btn-success',
+        'class' => ' mb-1  btn btn-success',
     ]);
 } else if ($model->order_status == Order::STATUS_ACCEPTED) {
     echo Html::a('Being Prepared', [
@@ -159,7 +156,7 @@ if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Orde
         'status' => Order::STATUS_BEING_PREPARED
             ], [
         'style' => 'margin-right: 10px;',
-        'class' => 'btn btn-primary',
+        'class' => ' mb-1  btn btn-primary',
     ]);
 } else if ($model->order_status == Order::STATUS_BEING_PREPARED) {
     echo Html::a('Out for Delivery', [
@@ -169,7 +166,7 @@ if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Orde
         'status' => Order::STATUS_OUT_FOR_DELIVERY
             ], [
         'style' => 'margin-right: 10px;',
-        'class' => 'btn btn-info',
+        'class' => ' mb-1  btn btn-info',
     ]);
 } else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY) {
     echo Html::a('Mark as Complete', [
@@ -179,7 +176,7 @@ if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Orde
         'status' => Order::STATUS_COMPLETE
             ], [
         'style' => 'margin-right: 10px;',
-        'class' => 'btn btn-success',
+        'class' => ' mb-1  btn btn-success',
     ]);
 }
 
@@ -191,7 +188,7 @@ if ($model->order_status != Order::STATUS_CANCELED) {
         'status' => Order::STATUS_CANCELED
             ], [
         'style' => 'margin-right: 10px;',
-        'class' => 'btn btn-outline-danger',
+        'class' => ' mb-1  btn btn-outline-danger',
     ]);
 }
 ?>
@@ -256,6 +253,14 @@ if ($model->order_status != Order::STATUS_CANCELED) {
                                 return Html::a($data->armada_delivery_code, \yii\helpers\Url::to($data->armada_delivery_code, true), ['target' => '_blank']);
                             },
                             'visible' => $model->armada_delivery_code != null,
+                        ],
+                        [
+                            'attribute' => 'mashkor_order_status',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return $data->mashkor_order_status ? '<span  style="font-size:20px; font-weight: 700" >' . $data->mashkor_order_status . '</span>' : null;
+                            },
+                            'visible' => $model->mashkor_order_status != null,
                         ],
                         [
                             'attribute' => 'mashkor_tracking_link',

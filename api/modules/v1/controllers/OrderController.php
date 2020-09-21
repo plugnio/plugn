@@ -499,25 +499,43 @@ class OrderController extends Controller {
         $mashkor_order_number = Yii::$app->request->getBodyParam("order_number");
         $mashkor_secret_token = Yii::$app->request->getBodyParam("webhook_token");
 
-        if ($mashkor_secret_token === 'token' && $order = Order::find()->where(['mashkor_order_number' => $mashkor_order_number])->one()) {
+        if ($mashkor_secret_token === '2125bf59e5af2b8c8b5e8b3b19f13e1221') {
 
-            $order->mashkor_driver_name = Yii::$app->request->getBodyParam("driver_name");
-            $order->mashkor_driver_phone = Yii::$app->request->getBodyParam("driver_phone");
-            $order->mashkor_tracking_link = Yii::$app->request->getBodyParam("tracking_link");
-            $order->mashkor_order_status = Yii::$app->request->getBodyParam("order_status");
+          $order_model = Order::find()->where(['mashkor_order_number' => $mashkor_order_number])->one();
 
+          if(  $order_model ) {
+            $order_status =  Yii::$app->mashkorDelivery->getOrderStatus(Yii::$app->request->getBodyParam("order_status"));
 
-            if ($order->save()) {
+            $order_model->mashkor_driver_name = Yii::$app->request->getBodyParam("driver_name");
+            $order_model->mashkor_driver_phone = Yii::$app->request->getBodyParam("driver_phone");
+            $order_model->mashkor_tracking_link = Yii::$app->request->getBodyParam("tracking_link");
+            $order_model->mashkor_order_status = $order_status;
+
+            if ($order_model->save()) {
                 return [
-                    'operation' => 'success',
-                    'message' => 'Ran',
+                    'operation' => 'success'
                 ];
+            } else {
+              return [
+                  'operation' => 'error',
+                  'message' => $order_model->getErrors(),
+              ];
             }
+
+          } else {
+            return [
+                'operation' => 'error',
+                'message' => 'Invalid Order id',
+            ];
+          }
+
+        } else {
+          return [
+              'operation' => 'error',
+              'message' => 'Failed to authorize the request.',
+          ];
         }
-        return [
-            'operation' => 'error',
-            'message' => $order->getErrors(),
-        ];
+
     }
 
 }
