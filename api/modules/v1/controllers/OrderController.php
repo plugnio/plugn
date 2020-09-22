@@ -504,12 +504,11 @@ class OrderController extends Controller {
           $order_model = Order::find()->where(['mashkor_order_number' => $mashkor_order_number])->one();
 
           if(  $order_model ) {
-            $order_status =  Yii::$app->mashkorDelivery->getOrderStatus(Yii::$app->request->getBodyParam("order_status"));
 
             $order_model->mashkor_driver_name = Yii::$app->request->getBodyParam("driver_name");
             $order_model->mashkor_driver_phone = Yii::$app->request->getBodyParam("driver_phone");
             $order_model->mashkor_tracking_link = Yii::$app->request->getBodyParam("tracking_link");
-            $order_model->mashkor_order_status = $order_status;
+            $order_model->mashkor_order_status = Order::MASHKOR_ORDER_STATUS_CONFIRMED;
 
             if ($order_model->save()) {
                 return [

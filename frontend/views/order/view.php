@@ -266,7 +266,7 @@ if ($model->order_status != Order::STATUS_CANCELED) {
                             'attribute' => 'mashkor_order_status',
                             'format' => 'raw',
                             'value' => function ($data) {
-                                return $data->mashkor_order_status ? '<span  style="font-size:20px; font-weight: 700" >' . $data->mashkor_order_status . '</span>' : null;
+                                return $data->mashkor_order_status ? '<span  style="font-size:20px; font-weight: 700" >' . Yii::$app->mashkorDelivery->getOrderStatus($data->mashkor_order_status) . '</span>' : null;
                             },
                             'visible' => $model->mashkor_order_status != null,
                         ],
@@ -274,6 +274,8 @@ if ($model->order_status != Order::STATUS_CANCELED) {
                             'attribute' => 'mashkor_tracking_link',
                             'format' => 'raw',
                             'value' => function ($data) {
+
+
                                 return Html::a($data->mashkor_tracking_link, \yii\helpers\Url::to($data->mashkor_tracking_link, true), ['target' => '_blank']);
                             },
                             'visible' => $model->mashkor_tracking_link != null,

@@ -88,6 +88,19 @@ class Order extends \yii\db\ActiveRecord {
     const SCENARIO_CREATE_ORDER_BY_ADMIN = 'manual';
 
 
+    //Values for `mashkor_order_status`
+    const MASHKOR_ORDER_STATUS_NEW = 0;
+    const MASHKOR_ORDER_STATUS_CONFIRMED = 1;
+    const MASHKOR_ORDER_STATUS_ASSIGNED = 2;
+    const MASHKOR_ORDER_STATUS_PICKUP_STARTED = 3;
+    const MASHKOR_ORDER_STATUS_PICKED_UP = 4;
+    const MASHKOR_ORDER_STATUS_IN_DELIVERY = 5;
+    const MASHKOR_ORDER_STATUS_ARRIVED_DESTINATION = 6;
+    const MASHKOR_ORDER_STATUS_DELIVERED = 10;
+    const MASHKOR_ORDER_STATUS_CANCELED = 11;
+
+
+
     /**
      * {@inheritdoc}
      */
@@ -105,9 +118,22 @@ class Order extends \yii\db\ActiveRecord {
             [['payment_method_id'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
-            [['area_id', 'payment_method_id', 'order_status', 'customer_id'], 'integer', 'min' => 0],
+            [['area_id', 'payment_method_id', 'order_status','mashkor_order_status', 'customer_id'], 'integer', 'min' => 0],
             [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id'], 'integer'],
+            ['mashkor_order_status', 'in', 'range' => [
+              self::MASHKOR_ORDER_STATUS_NEW,
+              self::MASHKOR_ORDER_STATUS_CONFIRMED,
+              self::MASHKOR_ORDER_STATUS_ASSIGNED,
+              self::MASHKOR_ORDER_STATUS_PICKUP_STARTED,
+              self::MASHKOR_ORDER_STATUS_PICKED_UP,
+              self::MASHKOR_ORDER_STATUS_IN_DELIVERY,
+              self::MASHKOR_ORDER_STATUS_ARRIVED_DESTINATION,
+              self::MASHKOR_ORDER_STATUS_DELIVERED,
+              self::MASHKOR_ORDER_STATUS_CANCELED,
+            ]],
+
             ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_PARTIALLY_REFUNDED, self::STATUS_CANCELED, self::STATUS_DRAFT, self::STATUS_ABANDONED_CHECKOUT, self::STATUS_ACCEPTED]],
+
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
             ['restaurant_branch_id', function ($attribute, $params, $validator) {
                     if (!$this->restaurant_branch_id && $this->order_mode == Order::ORDER_MODE_PICK_UP)
@@ -153,7 +179,7 @@ class Order extends \yii\db\ActiveRecord {
             [['estimated_time_of_arrival', 'scheduled_time_start_from', 'scheduled_time_to', 'latitude', 'longitude'], 'safe'],
             [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
             [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name', 'payment_method_name_ar', 'armada_tracking_link', 'armada_qr_code_link', 'armada_delivery_code'], 'string', 'max' => 255],
-            [['mashkor_order_number' , 'mashkor_tracking_link' ,'mashkor_driver_name','mashkor_driver_phone','mashkor_order_status'], 'string', 'max' => 255],
+            [['mashkor_order_number' , 'mashkor_tracking_link' ,'mashkor_driver_name','mashkor_driver_phone'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
             [['customer_id'], 'exist', 'skipOnError' => false, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
             [['payment_method_id'], 'exist', 'skipOnError' => false, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
