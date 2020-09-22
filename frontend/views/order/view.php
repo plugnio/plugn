@@ -255,6 +255,14 @@ if ($model->order_status != Order::STATUS_CANCELED) {
                             'visible' => $model->armada_delivery_code != null,
                         ],
                         [
+                            'attribute' => 'mashkor_order_number',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return $data->mashkor_order_number ? $data->mashkor_order_number : null;
+                            },
+                            'visible' => $model->mashkor_order_number != null,
+                        ],
+                        [
                             'attribute' => 'mashkor_order_status',
                             'format' => 'raw',
                             'value' => function ($data) {

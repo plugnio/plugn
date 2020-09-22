@@ -188,8 +188,9 @@ class OrderController extends Controller {
         if ($createDeliveryApiResponse->isOk) {
 
             $order_model->mashkor_order_number = $createDeliveryApiResponse->data['data']['order_number'];
+            $order_model->mashkor_order_status = 'Confirmed';
             $order_model->save(false);
-            
+
             Yii::$app->session->setFlash('successResponse', "Your request has been successfully submitted");
 
         } else {
@@ -209,9 +210,9 @@ class OrderController extends Controller {
 
         return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid]);
     }
-    
-    
-    
+
+
+
      /**
      * Request a driver from Armada
      * @param type $order_uuid
@@ -306,7 +307,7 @@ class OrderController extends Controller {
     public function actionView($id, $restaurantUuid) {
 
         $order_model = $this->findModel($id, $restaurantUuid);
-        
+
 
 
         // Item
