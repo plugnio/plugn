@@ -98,8 +98,8 @@ $this->registerJs($js);
             if ($model->restaurant->armada_api_key != null && $model->armada_tracking_link == null)
                 echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary mr-1 mb-1', 'style' => 'margin-right: 7px;']);
 
-            // if ($model->restaurant->maskor_branch_id != null && $model->mashkor_order_number == null)
-            //     echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-info mr-1 mb-1', 'style' => 'margin-right: 7px;']);
+            if ($model->restaurant->mashkor_branch_id != null && $model->mashkor_order_number == null)
+                echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-info mr-1 mb-1', 'style' => 'margin-right: 7px;']);
         }
 
         ?>
@@ -256,10 +256,18 @@ if ($model->order_status != Order::STATUS_CANCELED) {
                             'visible' => $model->armada_delivery_code != null,
                         ],
                         [
+                            'attribute' => 'mashkor_order_number',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return $data->mashkor_order_number ? $data->mashkor_order_number : null;
+                            },
+                            'visible' => $model->mashkor_order_number != null,
+                        ],
+                        [
                             'attribute' => 'mashkor_order_status',
                             'format' => 'raw',
                             'value' => function ($data) {
-                                return $data->mashkor_order_status ? '<span  style="font-size:20px; font-weight: 700" >' . $data->mashkor_order_status . '</span>' : null;
+                                return $data->mashkor_order_status ? '<span  style="font-size:20px; font-weight: 700" >' . Yii::$app->mashkorDelivery->getOrderStatus($data->mashkor_order_status) . '</span>' : null;
                             },
                             'visible' => $model->mashkor_order_status != null,
                         ],
@@ -267,6 +275,8 @@ if ($model->order_status != Order::STATUS_CANCELED) {
                             'attribute' => 'mashkor_tracking_link',
                             'format' => 'raw',
                             'value' => function ($data) {
+
+
                                 return Html::a($data->mashkor_tracking_link, \yii\helpers\Url::to($data->mashkor_tracking_link, true), ['target' => '_blank']);
                             },
                             'visible' => $model->mashkor_tracking_link != null,
