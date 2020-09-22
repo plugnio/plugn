@@ -65,9 +65,7 @@ return [
         ],
         'mashkorDelivery' => [
             'class' => 'common\components\MashkorDelivery',
-            'keyToUse' => \common\components\MashkorDelivery::USE_LIVE_KEY,
-            'mashkorApiKey' => '637199C367D1D',
-            'tokenId' => 'plrWk7iC3Vh4299JcZbdMmVYUKGJCsGk',
+            'keyToUse' => \common\components\MashkorDelivery::USE_LIVE_KEY
         ],
         'slack' => [
             'class' => 'understeam\slack\Client',
