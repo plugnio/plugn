@@ -43,15 +43,22 @@ class MashkorDelivery extends Component {
      */
     public $keyToUse;
 
-    public $liveApiEndpoint = "https://ppd-api-services.mashkor.com/v1/b/ig/order/create";
+    public $liveApiEndpoint = " https://api-services.mashkor.com/v1/b/ig/order/create";
 
     public $testApiEndpoint = "https://ppd-api-services.mashkor.com/v1/b/ig/order/create";
 
+
+    private $liveAuthKey = "1JLmpNYOrt3MMELh1DoHUE4HemmNDecB";
+    private $testAuthKey = "plrWk7iC3Vh4299JcZbdMmVYUKGJCsGk";
+
+    private $liveApiKey = "FAA3A28663DBE";
+    private $testApiKey = "637199C367D1D";
+
     private $apiEndpoint;
 
-    public $mashkorApiKey;
+    public $apiKey;
 
-    public $tokenId;
+    public $authKey;
 
 
     /**
@@ -59,7 +66,7 @@ class MashkorDelivery extends Component {
      */
     public function init() {
         // Fields required by default
-        $requiredAttributes = ['keyToUse' , 'mashkorApiKey' , 'tokenId'];
+        $requiredAttributes = ['keyToUse'];
 
         // Process Validation
         foreach ($requiredAttributes as $attribute) {
@@ -74,8 +81,13 @@ class MashkorDelivery extends Component {
         // Set the API key we're going to use
         if ($this->keyToUse == self::USE_LIVE_KEY) {
             $this->apiEndpoint = $this->liveApiEndpoint;
+            $this->authKey = $this->liveAuthKey;
+            $this->apiKey = $this->liveApiKey;
         } else {
             $this->apiEndpoint = $this->testApiEndpoint;
+            $this->authKey = $this->testAuthKey;
+            $this->apiKey = $this->testApiKey;
+
         }
 
         parent::init();
@@ -161,8 +173,8 @@ class MashkorDelivery extends Component {
                 ->setFormat(Client::FORMAT_JSON)
                 ->setData($mashkorParams)
                 ->addHeaders([
-                    'x-api-key' => $this->mashkorApiKey,
-                    'Authorization' => 'Bearer ' . $this->tokenId,
+                    'x-api-key' => $this->apiKey,
+                    'Authorization' => 'Bearer ' . $this->authKey,
                     'content-type' => 'application/json',
                 ])
                 ->send();
