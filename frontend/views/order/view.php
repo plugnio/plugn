@@ -262,6 +262,7 @@ if ($model->order_status != Order::STATUS_CANCELED) {
                             },
                             'visible' => $model->mashkor_order_number != null,
                         ],
+                        'mashkor_order_status',
                         [
                             'attribute' => 'mashkor_order_status',
                             'format' => 'raw',
