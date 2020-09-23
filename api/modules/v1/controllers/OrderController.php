@@ -508,7 +508,7 @@ class OrderController extends Controller {
             $order_model->mashkor_driver_name = Yii::$app->request->getBodyParam("driver_name");
             $order_model->mashkor_driver_phone = Yii::$app->request->getBodyParam("driver_phone");
             $order_model->mashkor_tracking_link = Yii::$app->request->getBodyParam("tracking_link");
-            $order_model->mashkor_order_status = Order::MASHKOR_ORDER_STATUS_CONFIRMED;
+            $order_model->mashkor_order_status = Yii::$app->request->getBodyParam("order_status");
 
             if ($order_model->save()) {
                 return [
