@@ -38,12 +38,12 @@ class MashkorDelivery extends Component {
     const ORDER_STATUS_CANCELED = 11;
 
 
-     /**
-     * @var string Which key to use, test or live?
-     */
+   /**
+   * @var string Which key to use, test or live?
+   */
     public $keyToUse;
 
-    public $liveApiEndpoint = " https://api-services.mashkor.com/v1/b/ig/order/create";
+    public $liveApiEndpoint = "https://api-services.mashkor.com/v1/b/ig/order/create";
 
     public $testApiEndpoint = "https://ppd-api-services.mashkor.com/v1/b/ig/order/create";
 
