@@ -19,10 +19,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?=
     $this->render('_form', [
-        'model' => $model,
-        'modelOptions' => $modelOptions,
-        // 'modelExtraOptions' => $modelExtraOptions,
-        'restaurantUuid' => $restaurantUuid
+                    'modelItem' => $modelItem,
+                    'modelsOption' => (empty($modelsOption)) ? [new Option] : $modelsOption,
+                    'modelsExtraOption' => (empty($modelsExtraOption)) ? [[new ExtraOption]] : $modelsExtraOption,
+                    'restaurantUuid' => $restaurantUuid
     ])
     ?>
 
