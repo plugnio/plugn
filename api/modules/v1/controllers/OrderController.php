@@ -263,13 +263,12 @@ class OrderController extends Controller {
                                         $customerBankDiscount->save();
                                     }
 
-                                    $payment->payment_token = Yii::$app->request->getBodyParam("payment_token");
-
                                     $order->bank_discount_id = $bank_discount_model->bank_discount_id;
 
-
-
                                 }
+
+                                $payment->payment_token = Yii::$app->request->getBodyParam("payment_token");
+
                             }
                         } catch (\Exception $e) {
                             Yii::error('[TAP Payment Issue > Invalid Token ID]' . json_encode($responseContent), __METHOD__);
