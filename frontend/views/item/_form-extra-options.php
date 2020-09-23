@@ -2,73 +2,60 @@
 
 use yii\helpers\Html;
 use wbraganca\dynamicform\DynamicFormWidget;
-use common\models\ExtraOption;
-use yii\widgets\ActiveForm;
 
 $js = "
-
-
-    $( '.ql-snow' ).css( 'border-radius', '0px' )
-
-
-    $(document).on('wheel', 'input[type=number]', function (e) {
-        $(this).blur();
-    });
-
-    $('.delete-button').click(function() {
-        var detail = $(this).closest('.extra-option');
-        var updateType = detail.find('.update-type');
-        if (updateType.val() === " . json_encode(ExtraOption::UPDATE_TYPE_UPDATE) . ") {
-
-            //marking the row for deletion
-            updateType.val(" . json_encode(ExtraOption::UPDATE_TYPE_DELETE) . ");
-
-
-                      console.log(updateType.val());
-            detail.hide();
-        } else {
-          console.log('enter heree lseee');
-
-            //if the row is a new row, delete the row
-            detail.remove();
-        }
-
-    });
+$(document).on('wheel', 'input[type=number]', function (e) {
+    $(this).blur();
+});
 
 ";
+
 $this->registerJs($js);
 ?>
 
-                            <!-- Exxtra optn -->
-                            <?php foreach ($modelExtraOptions as $indexExtraOption => $modelExtraOption) : ?>
-                                <div class="row card extra-option extra-option-<?= $i ?>">
-                                  <div class="card-header">
-                                      <h4 class="card-title"><?= 'Option Values' ?></h4>
-                                  </div>
-
-
-                                        <div class="card-body">
-                                          <?= Html::activeHiddenInput($modelExtraOption,  "[{$indexOption}][{$indexExtraOption}]extra_option_id") ?>
-                                          <?= Html::activeHiddenInput($modelExtraOption,  "[{$indexOption}][{$indexExtraOption}]option_id") ?>
-                                          <?= Html::activeHiddenInput($modelExtraOption,  "[{$indexOption}][{$indexExtraOption}]updateType", ['class' => 'update-type']) ?>
-
-                                          <div class="row">
-                                              <div class="col-12 col-sm-4 col-lg-4">
-                                                  <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_name")->label('Option Value') ?>
-                                              </div>
-                                              <div class="col-12 col-sm-4 col-lg-4">
-
-                                                  <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_name_ar")->label('Option Value in Arabic') ?>
-                                              </div>
-
-                                              <div class="col-12 col-sm-4 col-lg-4">
-
-                                                  <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_price") ?>
-                                              </div>
-
-                                          </div>
-                                        </div>
-                                        <?= die(json_encode) ?>
-
-                                </div>
-                            <?php endforeach; ?>
+<?php DynamicFormWidget::begin([
+    'widgetContainer' => 'dynamicform_inner',
+    'widgetBody' => '.container-extra-options',
+    'widgetItem' => '.extra-option',
+    'min' => 1,
+    'insertButton' => '.add-extra-option',
+    'deleteButton' => '.remove-extra-option',
+    'model' => $modelsExtraOption[0],
+    'formId' => 'dynamic-form',
+    'formFields' => [
+        'extra_option_name',
+        'extra_option_name_ar',
+        'extra_option_price',
+    ],
+]); ?>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th></th>
+            <th class="text-center">
+                <button type="button" class="add-extra-option btn btn-success btn-xs"><span class="fa fa-plus"></span></button>
+            </th>
+        </tr>
+    </thead>
+    <tbody class="container-extra-options">
+    <?php foreach ($modelsExtraOption as $indexExtraOption => $modelExtraOption): ?>
+        <tr class="extra-option">
+            <td class="vcenter">
+                <?php
+                    // necessary for update action.
+                    if (! $modelExtraOption->isNewRecord) {
+                        echo Html::activeHiddenInput($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_id");
+                    }
+                ?>
+                <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_name")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'e.g. Red, Black']) ?>
+                <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_name_ar")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'على سبيل المثال أحمر أسود']) ?>
+                <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_price")->label(false)->textInput(['type' => 'number', 'step' => '.01', 'maxlength' => true, 'placeholder' => 'Price']) ?>
+            </td>
+            <td class="text-center vcenter" style="width: 90px;">
+                <button type="button" class="remove-extra-option btn btn-danger btn-xs"><span class="fa fa-minus"></span></button>
+            </td>
+        </tr>
+     <?php endforeach; ?>
+    </tbody>
+</table>
+<?php DynamicFormWidget::end(); ?>
