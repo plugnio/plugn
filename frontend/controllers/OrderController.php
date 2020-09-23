@@ -188,7 +188,7 @@ class OrderController extends Controller {
         if ($createDeliveryApiResponse->isOk) {
 
             $order_model->mashkor_order_number = $createDeliveryApiResponse->data['data']['order_number'];
-            $order_model->mashkor_order_status = 'Confirmed';
+            $order_model->mashkor_order_status = Order::MASHKOR_ORDER_STATUS_CONFIRMED;
             $order_model->save(false);
 
             Yii::$app->session->setFlash('successResponse', "Your request has been successfully submitted");
