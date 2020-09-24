@@ -173,7 +173,14 @@ class Order extends \yii\db\ActiveRecord {
             [['total_price', 'total_price_before_refund', 'delivery_fee', 'subtotal', 'subtotal_before_refund'], 'number', 'min' => 0],
             ['subtotal', 'validateMinCharge', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN, 'when' => function($model) {
                     return $model->order_mode == static::ORDER_MODE_DELIVERY;
-                }],
+                }
+            ],
+            [
+              'subtotal', function ($attribute, $params, $validator) {
+              if($this->voucher  && $this->calculateOrderItemsTotalPrice() < $this->voucher->minimum_order_amount)
+                        $this->addError('voucher_id', "We can't apply this code until you reach the minimum order total" );
+                }, 'skipOnError' => false, 'skipOnEmpty' => false
+            ],
             [['customer_email'], 'email'],
             [['payment_method_id'], 'validatePaymentMethodId', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['voucher_id'], 'validateVoucherId', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
@@ -338,7 +345,7 @@ class Order extends \yii\db\ActiveRecord {
 
         $voucher = Voucher::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'voucher_id' => $this->voucher_id, 'voucher_status' => Voucher::VOUCHER_STATUS_ACTIVE])->exists();
 
-        if (!$voucher || !$this->voucher->isValid($this->customer_phone_number) || $this->calculateOrderItemsTotalPrice() < $this->voucher->minimum_order_amount)
+        if (!$voucher || !$this->voucher->isValid($this->customer_phone_number))
             $this->addError($attribute, "Voucher code is invalid or expired");
     }
 
