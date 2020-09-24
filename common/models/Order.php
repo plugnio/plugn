@@ -178,7 +178,7 @@ class Order extends \yii\db\ActiveRecord {
             [
               'subtotal', function ($attribute, $params, $validator) {
               if($this->voucher  && $this->calculateOrderItemsTotalPrice() < $this->voucher->minimum_order_amount)
-                        $this->addError('voucher_id', "We can't apply this code until you reach the minimum order total" );
+                        $this->addError('voucher_id', "We can't apply this code until you reach the minimum order amount" );
                 }, 'skipOnError' => false, 'skipOnEmpty' => false
             ],
             [['customer_email'], 'email'],
