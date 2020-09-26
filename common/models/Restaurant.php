@@ -40,6 +40,8 @@ use common\models\WebLink;
  * @property int $google_analytics_id
  * @property int $schedule_order
  * @property int $schedule_interval
+ * @property string $live_public_key
+ * @property string $test_public_key
  *
  *
  * @property AgentAssignment[] $agentAssignments
@@ -116,8 +118,9 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['platform_fee'], 'number'],
             [['instagram_url'], 'url'],
             [['date_range_picker_with_time','google_analytics_id', 'facebook_pixil_id'], 'safe'],
-            [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'app_id' ,'armada_api_key','mashkor_branch_id','store_branch_name'], 'string', 'max' => 255],
+            [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'app_id' ,'armada_api_key','mashkor_branch_id','store_branch_name','live_public_key','test_public_key'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 7, 'max' => 8],
+            [['live_public_key','test_public_key'], 'default', 'value' => null],
             [['phone_number'], 'integer', 'min' => 0],
             [['restaurant_email_notification','schedule_order','phone_number_display','store_layout','show_opening_hours'], 'integer'],
             ['restaurant_email', 'email'],
