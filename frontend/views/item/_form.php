@@ -66,10 +66,10 @@ $this->registerJs($js);
             ?>
             <div class="row">
                 <div class="col-12 col-sm-6 col-lg-6">
-                    <?= $form->field($modelItem, 'item_name')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger, Short sleeve t-shirt']) ?>
+                    <?= $form->field($modelItem, 'item_name')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger, Short sleeve t-shirt', 'autocomplete' => 'off']) ?>
                 </div>
                 <div class="col-12 col-sm-6 col-lg-6">
-                    <?= $form->field($modelItem, 'item_name_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger']) ?>
+                    <?= $form->field($modelItem, 'item_name_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger', 'autocomplete' => 'off']) ?>
                 </div>
             </div>
 

@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use common\models\Order;
 use common\models\Voucher;
+use common\models\BankDiscount;
 
 /* @var $this yii\web\View */
 /* @var $order common\models\Order */
@@ -213,31 +214,58 @@ use common\models\Voucher;
                                                                                         </tr>
 
                                                                                         <?php
-                                                                                        if ($order->voucher_id) {
+                                                                                        if ($order->voucher_id != null && $order->voucher_id && $order->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY) {
                                                                                             $voucherDiscount = $order->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($order->subtotal * ($order->voucher->discount_amount / 100)) : $order->voucher->discount_amount;
                                                                                             $subtotalAfterDiscount = $order->subtotal - $voucherDiscount;
                                                                                             ?>
-                                                                                              <tr>
-                                                                                            <td colspan="2" style="padding: 0 15px;  vertical-align:top;">
-                                                                                                <p style="margin:0;padding:0;">Voucher Discount (<?= $order->voucher->code ?>)</p>
-                                                                                            </td>
-                                                                                            <td style="color:#828585; text-align: right; vertical-align:top;">
-                                                                                              -<?= Yii::$app->formatter->asCurrency($voucherDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
-                                                                                            </td>
-                                                                                          </tr>
+                                                                                            <tr>
+                                                                                                <td colspan="2" style="padding: 0 15px;  vertical-align:top;">
+                                                                                                    <p style="margin:0;padding:0;">Voucher Discount (<?= $order->voucher->code ?>)</p>
+                                                                                                </td>
+                                                                                                <td style="color:#828585; text-align: right; vertical-align:top;">
+                                                                                                    -<?= Yii::$app->formatter->asCurrency($voucherDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                                                                                                </td>
+                                                                                            </tr>
 
 
-                                                                                              <tr>
-                                                                                            <td colspan="2" style="padding: 0 15px;  vertical-align:top;">
-                                                                                                <p style="margin:0;padding:0;">Subtotal After Voucher</p>
-                                                                                            </td>
+                                                                                            <tr>
+                                                                                                <td colspan="2" style="padding: 0 15px;  vertical-align:top;">
+                                                                                                    <p style="margin:0;padding:0;">Subtotal After Voucher</p>
+                                                                                                </td>
 
-                                                                                            <td style="color:#828585; text-align: right; vertical-align:top;">
-                                                                                              <?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
-                                                                                            </td>
-                                                                                          </tr>
+                                                                                                <td style="color:#828585; text-align: right; vertical-align:top;">
+                                                                                                    <?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                                                                                                </td>
+                                                                                            </tr>
 
-                                                                                        <?php } ?>
+                                                                                            <?php
+                                                                                        } else if ($order->bank_discount_id != null && $order->bank_discount_id) {
+                                                                                            $bankDiscount = $order->bankDiscount->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ? ($order->subtotal * ($order->bankDiscount->discount_amount / 100)) : $order->bankDiscount->discount_amount;
+                                                                                            $subtotalAfterDiscount = $order->subtotal - $bankDiscount;
+                                                                                            ?>
+
+                                                                                            <tr>
+                                                                                                <td colspan="2" style="padding: 0 15px;  vertical-align:top;">
+                                                                                                    <p style="margin:0;padding:0;">Bank Discount</p>
+                                                                                                </td>
+                                                                                                <td style="color:#828585; text-align: right; vertical-align:top;">
+                                                                                                    -<?= Yii::$app->formatter->asCurrency($bankDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                                                                                                </td>
+                                                                                            </tr>
+
+
+
+                                                                                            <tr>
+                                                                                                <td colspan="2" style="padding: 0 15px;  vertical-align:top;">
+                                                                                                    <p style="margin:0;padding:0;">Subtotal After Bank Discount</p>
+                                                                                                </td>
+
+                                                                                                <td style="color:#828585; text-align: right; vertical-align:top;">
+                                                                                                    <?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        <?php }
+                                                                                        ?>
 
 
                                                                                         <!-- Delivery fee -->
@@ -250,6 +278,29 @@ use common\models\Voucher;
                                                                                                     <?= \Yii::$app->formatter->asCurrency($order->delivery_fee) ?>
                                                                                                 </td>
                                                                                             </tr>
+
+                                                                                            <?php if ($order->voucher_id != null && $order->voucher_id && $order->voucher->discount_type == Voucher::DISCOUNT_TYPE_FREE_DELIVERY) { ?>
+
+                                                                                                <tr>
+                                                                                                    <td colspan="2" style="padding: 0 15px;  vertical-align:top;">
+                                                                                                        <p style="margin:0;padding:0;">Voucher Discount (<?= $order->voucher->code ?>)</p>
+                                                                                                    </td>
+                                                                                                    <td style="color:#828585; text-align: right; vertical-align:top;">
+                                                                                                        -<?= Yii::$app->formatter->asCurrency($order->delivery_fee, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                                                                                                    </td>
+                                                                                                </tr>
+
+
+                                                                                                <tr>
+                                                                                                    <td colspan="2" style="padding: 0 15px;  vertical-align:top;">
+                                                                                                        <p style="margin:0;padding:0;">Delivery fee After Voucher</p>
+                                                                                                    </td>
+                                                                                                    <td style="color:#828585; text-align: right; vertical-align:top;">
+                                                                                                        <?= Yii::$app->formatter->asCurrency(0, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                                                                                                    </td>
+                                                                                                </tr>
+
+                                                                                            <?php } ?>
                                                                                         <?php } ?>
                                                                                     </table>
                                                                                 </td>
@@ -331,7 +382,7 @@ use common\models\Voucher;
                                                                             </tr>
                                                                             <tr>
                                                                                 <td align="left" style="font-size:0px;padding:10px 25px;padding-bottom:0;word-break:break-word;">
-                                                                                    <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">Date: <?=  date('M d, Y'); ?></div>
+                                                                                    <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">Date: <?= date('M d, Y'); ?></div>
                                                                                 </td>
                                                                             </tr>
                                                                             <tr>

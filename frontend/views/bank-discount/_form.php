@@ -13,6 +13,11 @@ use yii\helpers\ArrayHelper;
 
 
 $js = "
+
+
+        $('#bankdiscount-duration').attr('autocomplete','off');
+
+
         let discountType = $('.discountType');
 
         $( window ).on( 'load', function() {
@@ -106,6 +111,7 @@ if (!$model->isNewRecord) {
                     '<span id="discountAmount"></span>' .
                     '</div> {hint}{error}</div>',
                 ])->textInput([
+                'autocomplete' => 'off'
                 ])
                 ?>
 

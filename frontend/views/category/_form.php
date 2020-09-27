@@ -23,28 +23,28 @@ use kartik\file\FileInput;
 
         <div class="row">
             <div class="col-12 col-sm-6 col-lg-6">
-                <?= $form->field($model, 'title')->textInput(['maxlength' => true, 'placeholder' => 'e.g. Meal Deals or Sushi Sets or Soft Drinks']) ?>
+                <?= $form->field($model, 'title')->textInput(['maxlength' => true, 'placeholder' => 'e.g. Meal Deals or Sushi Sets or Soft Drinks', 'autocomplete' => 'off']) ?>
             </div>
 
             <div class="col-12 col-sm-6 col-lg-6">
 
-                <?= $form->field($model, 'title_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. Meal Deals or Sushi Sets or Soft Drinks']) ?>
+                <?= $form->field($model, 'title_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. Meal Deals or Sushi Sets or Soft Drinks', 'autocomplete' => 'off']) ?>
             </div>
         </div>
 
         <div class="row">
             <div class="col-12 col-sm-6 col-lg-6">
 
-                <?= $form->field($model, 'subtitle')->textInput(['maxlength' => true]) ?>
+                <?= $form->field($model, 'subtitle')->textInput(['maxlength' => true, 'autocomplete' => 'off']) ?>
             </div>
             <div class="col-12 col-sm-6 col-lg-6">
 
-                <?= $form->field($model, 'subtitle_ar')->textInput(['maxlength' => true]) ?>
+                <?= $form->field($model, 'subtitle_ar')->textInput(['maxlength' => true, 'autocomplete' => 'off']) ?>
             </div>
         </div>
 
 
-        <?= $form->field($model, 'sort_number')->textInput() ?>
+        <?= $form->field($model, 'sort_number')->textInput([ 'autocomplete' => 'off']) ?>
 
         <?php
         echo $form->field($model, 'image')->widget(FileInput::classname(), [

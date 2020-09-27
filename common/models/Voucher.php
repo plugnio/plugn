@@ -39,6 +39,7 @@ class Voucher extends \yii\db\ActiveRecord {
     //Values for `discount_type`
     const DISCOUNT_TYPE_PERCENTAGE = 1;
     const DISCOUNT_TYPE_AMOUNT = 2;
+    const DISCOUNT_TYPE_FREE_DELIVERY = 3;
 
 
     //Values for `voucher_status`
@@ -57,10 +58,13 @@ class Voucher extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['restaurant_uuid',  'discount_type', 'code' ,'discount_amount', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'required'],
+            [['restaurant_uuid',  'discount_type', 'code' , 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'required'],
+            ['discount_amount', 'required', 'when' => function($model) {
+               return $model->discount_type != self::DISCOUNT_TYPE_FREE_DELIVERY;
+           }],
             [['discount_type', 'voucher_status', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'integer'],
             [['valid_from', 'valid_until', 'duration'], 'safe'],
-            ['discount_type', 'in', 'range' => [self::DISCOUNT_TYPE_PERCENTAGE, self::DISCOUNT_TYPE_AMOUNT]],
+            ['discount_type', 'in', 'range' => [self::DISCOUNT_TYPE_PERCENTAGE, self::DISCOUNT_TYPE_AMOUNT, self::DISCOUNT_TYPE_FREE_DELIVERY]],
             ['voucher_status', 'in', 'range' => [self::VOUCHER_STATUS_ACTIVE, self::VOUCHER_STATUS_EXPIRED]],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['discount_amount'], 'number', 'min' => 0],

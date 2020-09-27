@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\grid\GridView;
 use common\models\Order;
+use common\models\BankDiscount;
 use common\models\Voucher;
 
 $this->title = 'Invoice #' . $model->order_uuid;
@@ -27,13 +28,12 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
         <div id="invoice-company-details" class="row">
             <div class="col-12  ">
                 <div class="media " style="margin-bttom: 20px">
-                    <?php
-                        if($model->armada_qr_code_link) { ?>
-                            <img src="<?= $model->armada_qr_code_link ?>" width="100" height="100" />
-                            <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: 320px;margin-right: auto;display: block;" />
-                   <?php } else { ?>
-                     <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: auto; margin-right: auto; display:block" />
-                    <?php }  ?>
+                    <?php if ($model->armada_qr_code_link) { ?>
+                        <img src="<?= $model->armada_qr_code_link ?>" width="100" height="100" />
+                        <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: 320px;margin-right: auto;display: block;" />
+                    <?php } else { ?>
+                        <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: auto; margin-right: auto; display:block" />
+                    <?php } ?>
 
                 </div>
             </div>
@@ -143,13 +143,13 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                             </table>
                             <?php if ($model->special_directions) { ?>
 
-                            <table class="table table-bordered table-hover" style="margin-top: 1.5rem !important;">
-                                <tbody>
-                                <th>Special Directions</th>
-                                <td> <?= $model->special_directions ?></td>
-                                </tbody>
-                            </table>
-                          <?php } ?>
+                                <table class="table table-bordered table-hover" style="margin-top: 1.5rem !important;">
+                                    <tbody>
+                                    <th>Special Directions</th>
+                                    <td> <?= $model->special_directions ?></td>
+                                    </tbody>
+                                </table>
+                            <?php } ?>
 
                         <?php } ?>
                     </div>
@@ -216,7 +216,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                     <td><?= \Yii::$app->formatter->asCurrency($model->subtotal) ?></td>
                                 </tr>
                                 <?php
-                                if ($model->voucher_id) {
+                                if ($model->voucher_id != null && $model->voucher_id && $model->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY) {
                                     $voucherDiscount = $model->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($model->subtotal * ($model->voucher->discount_amount / 100)) : $model->voucher->discount_amount;
                                     $subtotalAfterDiscount = $model->subtotal - $voucherDiscount;
                                     ?>
@@ -228,16 +228,49 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                         <th>Subtotal After Voucher</th>
                                         <td><?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                                     </tr>
-                                <?php } ?>
+                                    <?php
+                                } else if ($model->bank_discount_id != null && $model->bank_discount_id) {
+                                    $bankDiscount = $model->bankDiscount->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ? ($model->subtotal * ($model->bankDiscount->discount_amount / 100)) : $model->bankDiscount->discount_amount;
+                                    $subtotalAfterDiscount = $model->subtotal - $bankDiscount;
+                                    ?>
+                                    <tr>
+                                        <th>Bank Discount</th>
+                                        <td>-<?= Yii::$app->formatter->asCurrency($bankDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                                    </tr>
+                                <tbody>
+                                    <tr>
+                                        <th>Subtotal After Bank Discount</th>
+                                        <td><?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                                    </tr>
+                                </tbody>
+                            <?php } ?> 
+
+                            <?php if ($model->order_mode == Order::ORDER_MODE_DELIVERY) { ?>
 
                                 <tr>
                                     <th>Delivery fee</th>
                                     <td><?= \Yii::$app->formatter->asCurrency($model->delivery_fee) ?></td>
                                 </tr>
-                                <tr>
-                                    <th>TOTAL</th>
-                                    <td><?= Yii::$app->formatter->asCurrency($model->total_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
-                                </tr>
+
+                                <?php if ($model->voucher_id != null && $model->voucher_id && $model->voucher->discount_type == Voucher::DISCOUNT_TYPE_FREE_DELIVERY) { ?>
+                                    <tr>
+                                        <th>Voucher Discount (<?= $model->voucher->code ?>)</th>
+                                        <td>-<?= Yii::$app->formatter->asCurrency($model->delivery_fee, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <th>Delivery fee After Voucher</th>
+                                        <td><?= Yii::$app->formatter->asCurrency(0, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                                    </tr>
+                                <?php } ?>
+
+                            <?php } ?>
+
+                            <tr>
+                                <th>TOTAL</th>
+                                <td><?= Yii::$app->formatter->asCurrency($model->total_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>

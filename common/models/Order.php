@@ -177,7 +177,7 @@ class Order extends \yii\db\ActiveRecord {
             ],
             [
               'subtotal', function ($attribute, $params, $validator) {
-              if($this->voucher  && $this->calculateOrderItemsTotalPrice() < $this->voucher->minimum_order_amount)
+              if($this->voucher  && $this->voucher->minimum_order_amount !== 0 && $this->calculateOrderItemsTotalPrice() >= $this->voucher->minimum_order_amount)
                         $this->addError('voucher_id', "We can't apply this code until you reach the minimum order amount" );
                 }, 'skipOnError' => false, 'skipOnEmpty' => false
             ],
@@ -555,14 +555,16 @@ class Order extends \yii\db\ActiveRecord {
           $totalPrice -= $discountAmount ;
         }
 
-        else if($this->bank_discount_id){
+        else if($this->bank_discount_id && $this->bankDiscount->minimum_order_amount <= $totalPrice){
           $discountAmount = $this->bankDiscount->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->bankDiscount->discount_amount /100)) : $this->bankDiscount->discount_amount;
           $totalPrice -= $discountAmount ;
         }
 
 
-        if ($this->order_mode == static::ORDER_MODE_DELIVERY)
+
+        if ($this->order_mode == static::ORDER_MODE_DELIVERY && !$this->voucher  || ($this->voucher && $this->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY)){
             $totalPrice += $this->restaurantDelivery->delivery_fee;
+        }
 
 
         return $totalPrice;

@@ -252,6 +252,7 @@ class OrderController extends Controller {
                                         ->innerJoin('bank', 'bank.bank_id = bank_discount.bank_id')
                                         ->where(['bank.bank_name' => $bank_name])
                                         ->andWhere(['restaurant_uuid' => $order->restaurant_uuid])
+                                        ->andWhere(['<=' ,'minimum_order_amount' , $order->total_price])
                                         ->one();
 
 

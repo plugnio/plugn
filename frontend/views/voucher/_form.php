@@ -13,6 +13,8 @@ use yii\helpers\ArrayHelper;
 
 $js = "
 
+        $('#voucher-duration').attr('autocomplete','off');
+
         let discountType = $('.discountType');
 
         $( window ).on( 'load', function() {
@@ -20,8 +22,9 @@ $js = "
                 $('#discountAmount').text('%');
             else   if ('$model->discount_type' == 2)
                 $('#discountAmount').text('KWD');
-            else
-               $('#discountAmount').text('KWD');
+            else   if ('$model->discount_type' == 3)
+                $('#discount_amount_section').hide();
+
 
         });
 
@@ -32,6 +35,9 @@ $js = "
               $('#discountAmount').text('%');
           else   if (selection == 2)
               $('#discountAmount').text('KWD');
+          else   if (selection == 3)
+              $('#discount_amount_section').hide();
+
 
         });
 ";
@@ -62,7 +68,7 @@ if (!$model->isNewRecord) {
         <?= $form->errorSummary([$model], ['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
 
 
-        <?= $form->field($model, 'code')->textInput(['maxlength' => true, 'placeholder' => '50OffOnFirstOrder']) ?>
+        <?= $form->field($model, 'code')->textInput(['maxlength' => true, 'placeholder' => '50OffOnFirstOrder', 'autocomplete' => 'off']) ?>
 
 
         <div class="row">
@@ -70,17 +76,18 @@ if (!$model->isNewRecord) {
                 <?=
                 $form->field($model, 'description')->textInput([
                     'maxlength' => true,
+                    'autocomplete' => 'off',
                     'placeholder' => 'e.g. get 50% off on your first order.'])
                 ?>
             </div>
             <div class="col-12 col-sm-6 col-lg-6">
-                <?= $form->field($model, 'description_ar')->textInput(['maxlength' => true, 'placeholder' => 'على سبيل المثال احصل على خصم 50٪ على طلبك الأول.']) ?>
+                <?= $form->field($model, 'description_ar')->textInput(['maxlength' => true, 'placeholder' => 'على سبيل المثال احصل على خصم 50٪ على طلبك الأول.', 'autocomplete' => 'off']) ?>
             </div>
         </div>
 
 
         <?=
-        $form->field($model, 'discount_type')->radioList([Voucher::DISCOUNT_TYPE_AMOUNT => 'Amount', Voucher::DISCOUNT_TYPE_PERCENTAGE => 'Percentage',], [
+        $form->field($model, 'discount_type')->radioList([Voucher::DISCOUNT_TYPE_AMOUNT => 'Amount', Voucher::DISCOUNT_TYPE_PERCENTAGE => 'Percentage', Voucher::DISCOUNT_TYPE_FREE_DELIVERY => 'Free Delivery'], [
             'value' => $model->discount_type !== null ? $model->discount_type : Voucher::DISCOUNT_TYPE_AMOUNT,
             'style' => 'display:grid',
             'item' => function($index, $label, $name, $checked, $value) {
@@ -101,7 +108,7 @@ if (!$model->isNewRecord) {
         ?>
 
         <div class="row">
-            <div class="col-12 col-sm-6 col-lg-6">
+            <div class="col-12 col-sm-6 col-lg-6" id="discount_amount_section">
 
 
                 <?=
@@ -115,6 +122,7 @@ if (!$model->isNewRecord) {
                     '<span id="discountAmount"></span>' .
                     '</div> {hint}{error}</div>',
                 ])->textInput([
+                   'autocomplete' => 'off'
                 ])
                 ?>
 
