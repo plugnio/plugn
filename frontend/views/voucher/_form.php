@@ -14,7 +14,9 @@ use yii\helpers\ArrayHelper;
 $js = "
 
         $('#voucher-duration').attr('autocomplete','off');
+        $('#voucher-duration').attr('style', '  padding-right: 2rem !important; padding-left: 3rem !important; ');
 
+        
         let discountType = $('.discountType');
 
         $( window ).on( 'load', function() {
@@ -40,6 +42,9 @@ $js = "
 
 
         });
+
+
+
 ";
 
 $this->registerJs($js);
