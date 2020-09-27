@@ -125,6 +125,21 @@ class Voucher extends \yii\db\ActiveRecord {
         return "Couldnt find a status";
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
+    public function beforeSave($insert) {
+        if (parent::beforeSave($insert)) {
+
+          if($this->discount_type == self::DISCOUNT_TYPE_FREE_DELIVERY)
+            $this->discount_amount  = null;
+
+            return true;
+        }
+    }
+
+    
     public function isValid($phone_number) {
         $isValid = true;
 

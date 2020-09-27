@@ -16,14 +16,18 @@ $js = "
         $('#voucher-duration').attr('autocomplete','off');
         $('#voucher-duration').attr('style', '  padding-right: 2rem !important; padding-left: 3rem !important; ');
 
-        
+
         let discountType = $('.discountType');
 
         $( window ).on( 'load', function() {
-            if ('$model->discount_type' == 1)
-                $('#discountAmount').text('%');
-            else   if ('$model->discount_type' == 2)
-                $('#discountAmount').text('KWD');
+            if ('$model->discount_type' == 1){
+              $('#discountAmount').text('%');
+              $('#discount_amount_section').show();
+            }
+            else   if ('$model->discount_type' == 2){
+              $('#discountAmount').text('KWD');
+              $('#discount_amount_section').show();
+            }
             else   if ('$model->discount_type' == 3)
                 $('#discount_amount_section').hide();
 
@@ -33,12 +37,16 @@ $js = "
         discountType.change(function(){
           let selection = $(this).val();
 
-          if (selection == 1)
-              $('#discountAmount').text('%');
-          else   if (selection == 2)
-              $('#discountAmount').text('KWD');
+          if (selection == 1){
+            $('#discountAmount').text('%');
+            $('#discount_amount_section').show();
+          }
+          else   if (selection == 2){
+            $('#discountAmount').text('KWD');
+            $('#discount_amount_section').show();
+          }
           else   if (selection == 3)
-              $('#discount_amount_section').hide();
+          $('#discount_amount_section').hide();
 
 
         });
