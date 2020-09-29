@@ -128,6 +128,8 @@ class ItemController extends Controller
         $modelsExtraOption = [[new ExtraOption]];
 
         if ($modelItem->load(Yii::$app->request->post())) {
+
+
             $itemImages = \yii\web\UploadedFile::getInstances($modelItem, 'item_images');
 
             $modelsOption = Model::createMultiple(Option::classname());

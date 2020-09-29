@@ -13,61 +13,63 @@ use common\models\CategoryItem;
 <div class="card">
 
 
-  <!-- users filter start -->
-  <div class="card" style="margin-bottom: 0px;">
+    <!-- users filter start -->
+    <div class="card" style="margin-bottom: 0px;">
 
 
 
-      <div class="card-header">
-          <h4 class="card-title">Filters</h4>
-          <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
-          <div class="heading-elements">
-              <ul class="list-inline mb-0">
-                  <li><a data-action="collapse"><i class="feather icon-chevron-down"></i></a></li>
-                  <li><a data-action="close"><i class="feather icon-x"></i></a></li>
-              </ul>
-          </div>
-      </div>
-      <div class="card-content collapse show">
+        <div class="card-header">
+            <h4 class="card-title">Filters</h4>
+            <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
+            <div class="heading-elements">
+                <ul class="list-inline mb-0">
+                    <li><a data-action="collapse"><i class="feather icon-chevron-down"></i></a></li>
+                    <li><a data-action="close"><i class="feather icon-x"></i></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="card-content collapse show">
 
 
-          <div class="card-body">
-              <div class="users-list-filter">
-                  <form>
-                      <div class="row">
+            <div class="card-body">
+                <div class="users-list-filter">
+                    <form>
+
 
                         <?php
-
-                            $categoryQuery = CategoryItem::find()
-                                      ->innerJoin('item', 'item.item_uuid = category_item.item_uuid')
-                                      ->where(['item.restaurant_uuid' => $restaurant_uuid])
-                                      ->all();
-
-
-                            $categoryList = ArrayHelper::map($categoryQuery, 'category_id', 'category.title');
+                        $categoryQuery = CategoryItem::find()
+                                ->innerJoin('item', 'item.item_uuid = category_item.item_uuid')
+                                ->where(['item.restaurant_uuid' => $restaurant_uuid])
+                                ->all();
 
 
-                            $form = ActiveForm::begin([
-                                'action' => ['item/index', 'restaurantUuid' => $restaurant_uuid],
-                                'method' => 'get',
-                            ]);
+                        $categoryList = ArrayHelper::map($categoryQuery, 'category_id', 'category.title');
+
+
+                        $form = ActiveForm::begin([
+                                    'action' => ['item/index', 'restaurantUuid' => $restaurant_uuid],
+                                    'method' => 'get',
+                        ]);
                         ?>
 
+                        <div class="row">
+                            <div class="col-12 col-sm-6 col-lg-6">
+                                <?= $form->field($model, 'item_name') ?>
+                            </div>
 
-                        <div class="col-12 col-sm-6 col-lg-4">
-                          <?= $form->field($model, 'item_name') ?>
+                            <div class="col-12 col-sm-6 col-lg-6">
+                                <?= $form->field($model, 'item_name_ar') ?>
+                            </div>
                         </div>
+                        <div class="row">
+                            <div class="col-12 col-sm-6 col-lg-6">
+                                <?= $form->field($model, 'barcode') ?>
+                            </div>
+                            <div class="col-12 col-sm-6 col-lg-6">
+                                <?= $form->field($model, 'sku') ?>
+                            </div>
 
-                        <div class="col-12 col-sm-6 col-lg-4">
-                          <?= $form->field($model, 'item_name_ar') ?>
                         </div>
-                        <div class="col-12 col-sm-6 col-lg-4">
-                          <?=
-                            $form->field($model, 'category_id')->dropDownList($categoryList, ['class' => 'form-control', 'prompt' => 'Select category'])->label('Category Name');
-                          ?>
-                        </div>
-
-                      </div>
 
                         <div class="form-group">
                             <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
@@ -75,7 +77,7 @@ use common\models\CategoryItem;
                         </div>
                         <?php ActiveForm::end(); ?>
 
-                    </div>
+                </div>
                 </form>
             </div>
         </div>

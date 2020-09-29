@@ -42,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'item_description:html',
                         'item_description_ar:html',
                         'sort_number',
-                        'stock_qty',
+                        // 'stock_qty',
                         [
                             'attribute' => 'Image',
                             'format' => 'html',
@@ -133,7 +133,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'summaryOptions' => ['class' => "card-header"],
         ]);
         ?>
-            
+
     </div>
 
 </div>

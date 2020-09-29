@@ -100,7 +100,6 @@ $this->registerJs($js);
                   },
                   'format' => 'raw'
               ],
-              'stock_qty',
               'unit_sold',
               'sort_number',
               'item_price:currency',

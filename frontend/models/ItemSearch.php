@@ -21,7 +21,7 @@ class ItemSearch extends Item
     public function rules()
     {
         return [
-            [['item_uuid', 'restaurant_uuid', 'item_name', 'item_name_ar', 'item_description', 'item_description_ar', 'item_image', 'item_created_at', 'item_updated_at','category_id'], 'safe'],
+            [['item_uuid', 'restaurant_uuid', 'item_name', 'item_name_ar', 'item_description', 'item_description_ar', 'item_image', 'item_created_at', 'item_updated_at','category_id','barcode','sku'], 'safe'],
             [['sort_number', 'stock_qty', 'unit_sold'], 'integer'],
             [['item_price'], 'number'],
         ];
@@ -84,6 +84,8 @@ class ItemSearch extends Item
         $query->andFilterWhere(['like', 'item_uuid', $this->item_uuid])
             ->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
             ->andFilterWhere(['like', 'item_name', $this->item_name])
+            ->andFilterWhere(['like', 'barcode', $this->barcode])
+            ->andFilterWhere(['like', 'sku', $this->sku])
             ->andFilterWhere(['like', 'category.category_id', $this->category_id])
             ->andFilterWhere(['like', 'item_name_ar', $this->item_name_ar])
             ->andFilterWhere(['like', 'item_description', $this->item_description])

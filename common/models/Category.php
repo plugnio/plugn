@@ -123,7 +123,7 @@ class Category extends \yii\db\ActiveRecord {
                     ]
             );
 
-            //Delete old store's logo
+            //Delete old store's image
             if ($this->category_image) {
                 $this->deleteCategoryImage();
             }
@@ -135,6 +135,7 @@ class Category extends \yii\db\ActiveRecord {
             }
         } catch (\Cloudinary\Error $err) {
             Yii::error("Error when uploading category image to Cloudinry: " . json_encode($err));
+            Yii::error("Error when uploading category image to Cloudinry: ImageUrl Value " . json_encode($imageURL));
         }
     }
 

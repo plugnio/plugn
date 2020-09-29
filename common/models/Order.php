@@ -614,7 +614,7 @@ class Order extends \yii\db\ActiveRecord {
 
                 if ($orderItem->item_uuid) {
 
-                    if ($orderItem->item->stock_qty >= $orderItem->qty) {
+                    if (($orderItem->item->track_quantity && $orderItem->item->stock_qty >= $orderItem->qty) || !$orderItem->item->track_quantity) {
                         $orderItem->item->decreaseStockQty($orderItem->qty);
                     } else {
 
