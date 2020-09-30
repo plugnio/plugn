@@ -192,16 +192,36 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         )
                         ?>
                     </li>
+                    <li class=" nav-item">
+                        <a>
+                            <i class="fa fa-cubes"></i>
+                            <span class="menu-title">Items</span>
+                        </a>
+                        <ul class="menu-content" style="    padding-left: 17px;">
 
-                    <li class=" nav-item <?= $this->context->route == 'item/index' ? 'active' : '' ?> ">
+                            <li  <?= $this->context->route == 'item/index' ? 'class="active"' : '' ?>>
+                                <?=
+                                Html::a(
+                                        Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                        Html::tag('span', 'All Items'), ['item/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                )
+                                ?>
+                            </li>
 
-                        <?=
-                        Html::a(
-                                Html::tag('i', '', ['class' => 'fa fa-cubes']) .
-                                Html::tag('span', 'Items'), ['item/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
-                        )
-                        ?>
+
+                            <li  <?= $this->context->route == 'item/inventory' ? 'class="active"' : '' ?>>
+                                <?=
+                                Html::a(
+                                        Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                        Html::tag('span', 'Inventory'), ['item/inventory', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                )
+                                ?>
+                            </li>
+
+                        </ul>
                     </li>
+
+
 
                     <li class=" nav-item">
                         <a>

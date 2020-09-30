@@ -14,19 +14,19 @@ use common\models\ExtraOption;
 use wbraganca\dynamicform\DynamicFormWidget;
 use frontend\base\Model;
 use yii\helpers\ArrayHelper;
+use yii\data\ActiveDataProvider;
 
 /**
  * ItemController implements the CRUD actions for Item model.
  */
-class ItemController extends Controller
-{
+class ItemController extends Controller {
+
     public $enableCsrfValidation = false;
 
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -46,36 +46,34 @@ class ItemController extends Controller
         ];
     }
 
+    public function actionExportToExcel($restaurantUuid) {
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
-  public function actionExportToExcel($restaurantUuid){
-      $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $model = Item::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->all();
 
-      $model = Item::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->all();
-
-      header('Access-Control-Allow-Origin: *');
-      header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-      header("Content-Disposition: attachment;filename=\"products.xlsx\"");
-      header("Cache-Control: max-age=0");
+        header('Access-Control-Allow-Origin: *');
+        header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        header("Content-Disposition: attachment;filename=\"products.xlsx\"");
+        header("Cache-Control: max-age=0");
 
 
-      \moonland\phpexcel\Excel::export([
-        'isMultipleSheet' => false,
-        'models' => $model,
-        'columns' => [
-            'item_name',
-            'stock_qty',
-            'unit_sold',
-            'item_price:currency'
-        ],
-    ]);
-  }
+        \moonland\phpexcel\Excel::export([
+            'isMultipleSheet' => false,
+            'models' => $model,
+            'columns' => [
+                'item_name',
+                'stock_qty',
+                'unit_sold',
+                'item_price:currency'
+            ],
+        ]);
+    }
 
     /**
      * Lists all Item models.
      * @return mixed
      */
-    public function actionIndex($restaurantUuid)
-    {
+    public function actionIndex($restaurantUuid) {
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
         $searchModel = new ItemSearch();
@@ -89,37 +87,36 @@ class ItemController extends Controller
         ]);
     }
 
-
     /**
-     * Displays a single Item model.
-     * @param string $id
+     * Lists all Item models.
      * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
      */
-    // public function actionView($id, $restaurantUuid) {
-    //
-    //     $item_model = $this->findModel($id, $restaurantUuid);
-    //
-    //     // Item options
-    //     $itemOptionsDataProvider = new \yii\data\ActiveDataProvider([
-    //         'query' => $item_model->getOptions(),
-    //     ]);
-    //
-    //     return $this->render('view', [
-    //                 'model' => $this->findModel($id, $restaurantUuid),
-    //                 'itemOptionsDataProvider' => $itemOptionsDataProvider,
-    //                 'restaurantUuid' => $restaurantUuid
-    //     ]);
-    // }
+    public function actionInventory($restaurantUuid) {
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
+        $searchModel = new ItemSearch();
+        $dataProvider = $searchModel->searchTrackQuantity(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
+
+        foreach ($dataProvider->query->all() as $key => $item) {
+            if (isset($_POST[$item->item_uuid])) {
+                $item->stock_qty = $_POST['Item']['stock_qty'];
+                $item->save(false);
+            }
+        }
+
+        return $this->render('inventory', [
+                    'searchModel' => $searchModel,
+                    'dataProvider' => $dataProvider,
+                    'restaurant_model' => $restaurant_model
+        ]);
+    }
 
     /**
      * Creates a new Item model.
      * If creation is successful, the browser will be redirected to the 'index' page.
      * @return mixed
      */
-    public function actionCreate($restaurantUuid)
-    {
+    public function actionCreate($restaurantUuid) {
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
         $modelItem = new Item;
@@ -208,13 +205,27 @@ class ItemController extends Controller
     }
 
     /**
+     * Change item status
+     * @param type $id
+     * @param type $restaurantUuid
+     * @return type
+     */
+    public function actionChangeItemStatus($id, $restaurantUuid) {
+        $model = $this->findModel($id, $restaurantUuid);
+
+        $model->item_status = $model->item_status == Item::ITEM_STATUS_PUBLISH ? Item::ITEM_STATUS_UNPUBLISH : Item::ITEM_STATUS_PUBLISH;
+        $model->save(false);
+
+        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+    }
+
+    /**
      * Updates an existing Item model.
      * If update is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
      */
-    public function actionUpdate($id, $restaurantUuid)
-    {
+    public function actionUpdate($id, $restaurantUuid) {
         $modelItem = $this->findModel($id, $restaurantUuid);
         $modelsOption = $modelItem->getOptions()->all();
         $modelsExtraOption = [];
@@ -273,14 +284,14 @@ class ItemController extends Controller
                 try {
                     if ($flag = $modelItem->save(false)) {
 
-                      if ($modelItem->items_category) {
-                          $modelItem->saveItemsCategory($modelItem->items_category);
-                      } else {
-                        CategoryItem::deleteAll(['item_uuid' => $modelItem->item_uuid]);
-                      }
+                        if ($modelItem->items_category) {
+                            $modelItem->saveItemsCategory($modelItem->items_category);
+                        } else {
+                            CategoryItem::deleteAll(['item_uuid' => $modelItem->item_uuid]);
+                        }
 
-                      if (!empty($itemImages))
-                              $modelItem->uploadItemImage($itemImages);
+                        if (!empty($itemImages))
+                            $modelItem->uploadItemImage($itemImages);
 
 
                         Yii::info("[" . $modelItem->restaurant->name . ": " . $modelItem->item_name . " has been updated  " . '] ' . $modelItem->restaurant->restaurant_domain . '/product/' . $modelItem->item_uuid, __METHOD__);
@@ -343,8 +354,7 @@ class ItemController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id, $restaurantUuid)
-    {
+    public function actionDelete($id, $restaurantUuid) {
         $this->findModel($id, $restaurantUuid)->delete();
 
         return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
@@ -357,12 +367,12 @@ class ItemController extends Controller
      * @return Item the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $restaurantUuid)
-    {
+    protected function findModel($id, $restaurantUuid) {
         if (($model = Item::find()->where(['item_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
 }

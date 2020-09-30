@@ -94,4 +94,42 @@ class ItemSearch extends Item
 
         return $dataProvider;
     }
+
+    /**
+     * Creates data provider instance with search query applied
+     *
+     * @param array $params
+     * @param sting $restaurantUuid
+     *
+     * @return ActiveDataProvider
+     */
+    public function searchTrackQuantity($params, $restaurantUuid)
+    {
+        $query = Item::find()->where(['item.restaurant_uuid' => $restaurantUuid , 'track_quantity' => 1]);
+
+        // add conditions that should always apply here
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => false
+        ]);
+
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+
+        $query->andFilterWhere(['like', 'item_uuid', $this->item_uuid])
+            ->andFilterWhere(['like', 'item_name', $this->item_name])
+            ->andFilterWhere(['like', 'barcode', $this->barcode])
+            ->andFilterWhere(['like', 'sku', $this->sku])
+            ->andFilterWhere(['like', 'item_name_ar', $this->item_name_ar]);
+
+        return $dataProvider;
+    }
 }

@@ -41,6 +41,12 @@ class Item extends \yii\db\ActiveRecord
     public $items_category;
     public $item_images;
 
+
+    //Values for `item_status`
+    const ITEM_STATUS_PUBLISH = 1;
+    const ITEM_STATUS_UNPUBLISH =  2;
+
+
     /**
      * {@inheritdoc}
      */
@@ -55,12 +61,13 @@ class Item extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['item_name', 'items_category'], 'required', 'on' => 'create'],
-            [['item_name', 'item_name_ar', 'item_price'], 'required'],
+            [['item_name'], 'required', 'on' => 'create'],
+            [['item_name', 'item_name_ar', 'item_price', 'items_category'], 'required'],
             [['sort_number', 'stock_qty'], 'integer', 'min' => 0],
             [['unit_sold'], 'integer', 'min' => 0],
             [['item_price'], 'number', 'min' => 0],
             [['track_quantity'], 'integer'],
+            ['item_status', 'in', 'range' => [self::ITEM_STATUS_PUBLISH, self::ITEM_STATUS_UNPUBLISH]],
             ['stock_qty', 'required', 'when' => function($model) {
                 return $model->track_quantity;
             }],
@@ -95,6 +102,7 @@ class Item extends \yii\db\ActiveRecord
             'sku' => 'SKU (Stock Keeping Unit)',
             'item_image' => 'Item Image',
             'item_price' => 'Price',
+            'item_status' => 'Item Status',
             'items_category' => 'Category',
             'item_created_at' => 'Item Created At',
             'item_updated_at' => 'Item Updated At',

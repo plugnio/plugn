@@ -27,13 +27,13 @@ $js = "
     });
 
 
-
     $( window ).on( 'load', function() {
       console.log('$modelItem->track_quantity');
         if ('$modelItem->track_quantity' == 1)
           $('#stock_qty').show();
         else
           $('#stock_qty').hide();
+
     });
 
 
@@ -55,6 +55,7 @@ $js = "
 ";
 $this->registerJs($js);
 ?>
+
 
 
 <div class="item-form">
@@ -111,7 +112,6 @@ $this->registerJs($js);
         </div>
 
     </div>
-</div>
 
 <div class="card">
     <div class="card-body">
@@ -171,6 +171,7 @@ $this->registerJs($js);
         ])->textInput([
             'type' => 'number',
             'step' => '.01',
+            'style' => 'border-top-left-radius: unset !important; border-bottom-left-radius: unset !important;',
             'value' => $modelItem->item_price != null ? $modelItem->item_price : \Yii::$app->formatter->asDecimal(0, 2),
             'class' => 'form-control'
         ])->label(false)
@@ -281,8 +282,8 @@ $this->registerJs($js);
                                 ?>
                                 <?= $form->field($modelOption, "[{$indexOption}]option_name")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'e.g. Color']) ?>
                                 <?= $form->field($modelOption, "[{$indexOption}]option_name_ar")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'على سبيل المثال اللون']) ?>
-                                <?= $form->field($modelOption, "[{$indexOption}]min_qty")->label(false)->textInput(['type' => 'number', 'maxlength' => true, 'placeholder' => 'Minimum']) ?>
-                                <?= $form->field($modelOption, "[{$indexOption}]max_qty")->label(false)->textInput(['type' => 'number', 'maxlength' => true, 'placeholder' => 'Maximum']) ?>
+                                <?= $form->field($modelOption, "[{$indexOption}]min_qty")->label(false)->textInput(['type' => 'number', 'maxlength' => true, 'placeholder' => 'Minimum Selection']) ?>
+                                <?= $form->field($modelOption, "[{$indexOption}]max_qty")->label(false)->textInput(['type' => 'number', 'maxlength' => true, 'placeholder' => 'Maximum Selection']) ?>
                             </td>
                             <td>
                                 <?=
