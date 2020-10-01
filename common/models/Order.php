@@ -574,9 +574,8 @@ class Order extends \yii\db\ActiveRecord {
 
         $orderItems = OrderItem::find()->where(['order_uuid' => $this->order_uuid])->all();
 
-        foreach ($orderItems as $model) {
+        foreach ($orderItems as $model) 
             $model->delete();
-        }
 
         return parent::beforeDelete();
     }

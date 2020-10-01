@@ -58,6 +58,8 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
         ];
     }
 
+
+
     public function afterSave($insert, $changedAttributes) {
 
         $order_model = Order::findOne($this->orderItem->order_uuid);
@@ -99,18 +101,49 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
 
     public function beforeSave($insert) {
 
-
         $extra_option_model = ExtraOption::findOne($this->extra_option_id);
 
         if ($extra_option_model) {
+
+            //Update stock qty
+            $extra_option_model->decreaseStockQty();
+
             $this->extra_option_name = $extra_option_model->extra_option_name;
             $this->extra_option_name_ar = $extra_option_model->extra_option_name_ar;
             $this->extra_option_price = $extra_option_model->extra_option_price;
         } else
             return false;
 
+
+        if ($insert) {
+
+          $extra_option_model = ExtraOption::findOne($this->extra_option_id);
+
+          if ($extra_option_model ) {
+
+            if($extra_option_model->stock_qty !== null &&  $extra_option_model->stock_qty <= 0)
+                return $this->addError('qty', $extra_option_model->extra_option_name . " is currently out of stock and unavailable.");
+
+          }
+        }
+
+
+
         return parent::beforeSave($insert);
     }
+
+    public function beforeDelete() {
+
+      $extra_option_model = ExtraOption::findOne($this->extra_option_id);
+
+
+      if ($extra_option_model)
+          $extra_option_model->increaseStockQty(); //Update stock qty
+
+        return parent::beforeDelete();
+    }
+
+
 
     /**
      * Gets query for [[Order]].
