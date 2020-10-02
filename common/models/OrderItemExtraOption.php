@@ -34,8 +34,8 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['order_item_id'], 'required'],
-            [['order_item_id', 'extra_option_id'], 'integer', 'min' => 0],
+            [['order_item_id','qty', 'extra_option_id'], 'required'],
+            [['order_item_id', 'extra_option_id','qty'], 'integer', 'min' => 0],
             [['extra_option_id'], 'checkIfExtraOptionBelongToItem'],
             [['extra_option_price'], 'number', 'min' => 0],
             [['extra_option_name', 'extra_option_name_ar'], 'string', 'max' => 255],
@@ -53,12 +53,11 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
             'order_item_id' => 'Order Item ID',
             'extra_option_id' => 'Extra Option ID',
             'extra_option_name' => 'Extra Option Name',
+            'qty' => 'Quantity',
             'extra_option_name_ar' => 'Extra Option Name Ar',
             'extra_option_price' => 'Extra Option Price',
         ];
     }
-
-
 
     public function afterSave($insert, $changedAttributes) {
 
@@ -101,34 +100,51 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
 
     public function beforeSave($insert) {
 
-        $extra_option_model = ExtraOption::findOne($this->extra_option_id);
+
 
 
         if ($insert) {
+            $extra_option_model = ExtraOption::findOne($this->extra_option_id);
 
-          $extra_option_model = ExtraOption::findOne($this->extra_option_id);
 
-          if ($extra_option_model ) {
+            if ($extra_option_model) {
 
-            if($extra_option_model->stock_qty !== null &&  $extra_option_model->stock_qty <= 0)
+
+
+                if ($extra_option_model->stock_qty !== null && $extra_option_model->stock_qty <= 0)
+                    return $this->addError('qty', $extra_option_model->extra_option_name . " is currently out of stock and unavailable.");
+
+
+
+
+
+                if ($extra_option_model->stock_qty !== null && $extra_option_model->stock_qty < $this->qty)
+                    return $this->addError('qty', $extra_option_model->extra_option_name . " is currently out of stock and unavailable.");
+
+
+
+
+
+                if ($this->qty == 0)
+                    return $this->addError('qty', "Invalid input");
+
+
+
+
+                //Update stock qty
+                $extra_option_model->decreaseStockQty();
+
+                $this->extra_option_name = $extra_option_model->extra_option_name;
+                $this->extra_option_name_ar = $extra_option_model->extra_option_name_ar;
+                $this->extra_option_price = $extra_option_model->extra_option_price;
+            } else
+                return false;
+
+        } else {
+
+            if ($extra_option_model->stock_qty !== null && $extra_option_model->stock_qty >= $this->qty)
                 return $this->addError('qty', $extra_option_model->extra_option_name . " is currently out of stock and unavailable.");
-
-          }
         }
-
-
-
-        if ($extra_option_model) {
-
-            //Update stock qty
-            $extra_option_model->decreaseStockQty();
-
-            $this->extra_option_name = $extra_option_model->extra_option_name;
-            $this->extra_option_name_ar = $extra_option_model->extra_option_name_ar;
-            $this->extra_option_price = $extra_option_model->extra_option_price;
-        } else
-            return false;
-
 
 
 
@@ -138,16 +154,14 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
 
     public function beforeDelete() {
 
-      $extra_option_model = ExtraOption::findOne($this->extra_option_id);
+        $extra_option_model = ExtraOption::findOne($this->extra_option_id);
 
 
-      if ($extra_option_model)
-          $extra_option_model->increaseStockQty(); //Update stock qty
+        if ($extra_option_model)
+            $extra_option_model->increaseStockQty(); //Update stock qty
 
         return parent::beforeDelete();
     }
-
-
 
     /**
      * Gets query for [[Order]].
