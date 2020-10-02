@@ -103,17 +103,6 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
 
         $extra_option_model = ExtraOption::findOne($this->extra_option_id);
 
-        if ($extra_option_model) {
-
-            //Update stock qty
-            $extra_option_model->decreaseStockQty();
-
-            $this->extra_option_name = $extra_option_model->extra_option_name;
-            $this->extra_option_name_ar = $extra_option_model->extra_option_name_ar;
-            $this->extra_option_price = $extra_option_model->extra_option_price;
-        } else
-            return false;
-
 
         if ($insert) {
 
@@ -126,6 +115,21 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
 
           }
         }
+
+
+
+        if ($extra_option_model) {
+
+            //Update stock qty
+            $extra_option_model->decreaseStockQty();
+
+            $this->extra_option_name = $extra_option_model->extra_option_name;
+            $this->extra_option_name_ar = $extra_option_model->extra_option_name_ar;
+            $this->extra_option_price = $extra_option_model->extra_option_price;
+        } else
+            return false;
+
+
 
 
 
