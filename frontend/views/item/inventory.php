@@ -45,7 +45,8 @@ $this->registerJs($js);
         <table class="table data-list-view">
             <thead>
                 <tr>
-                    <th>Item</th>
+                    <th>Image</th>
+                    <th>Item name</th>
                     <th>SKU</th>
                     <th>Available</th>
                     <th>Edit quantity available</th>
@@ -62,19 +63,17 @@ $this->registerJs($js);
                         <td style="vertical-align: inherit;">
                             <?php
                             $itemItmage = $item->getItemImages()->one();
-                            if ($itemItmage) {
+                            if ($itemItmage)
                                 echo Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_60,w_60/restaurants/" . $item->restaurant->restaurant_uuid . "/items/" . $itemItmage->product_file_name, ['style' => 'border-radius: 3px;margin-right: 20px;']);
-                                echo  Html::a($item->item_name, ['item/update', 'id' => $item->item_uuid, 'restaurantUuid' => $restaurant_model->restaurant_uuid]) ;
-
-                            } else {
-
-
+                           else
                                 echo Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_60,w_60/no-image.jpg", ['style' => 'border-radius: 3px;margin-right: 20px;']);
-                                echo  Html::a($item->item_name, ['item/update', 'id' => $item->item_uuid, 'restaurantUuid' => $restaurant_model->restaurant_uuid]) ;
-                            }
                             ?>
                         </td>
+                        <td style="vertical-align: inherit;">
 
+                            <?= Html::a($item->item_name, ['item/update', 'id' => $item->item_uuid, 'restaurantUuid' => $item->restaurant_uuid]) ?>
+
+                        </td>
                         <td style="vertical-align: inherit;">
                             <?= $item->sku ? '<span style="color:black;">' . $item->sku . '</span>' : '<span style="color:#637381;"> No SKU </span>'; ?>
                         </td>

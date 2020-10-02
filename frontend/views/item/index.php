@@ -63,30 +63,29 @@ $this->registerJs($js);
             },
             'columns' => [
                 [
-                    'attribute' => 'Item',
+                    'label' => 'Image',
                     'format' => 'raw',
                     'value' => function ($item) {
-                        // $itemItmage = $data->getItemImages()->one();
-                        // if ($itemItmage)
-                        //     return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_60,w_60/restaurants/" . $data->restaurant->restaurant_uuid . "/items/" . $itemItmage->product_file_name ,['style' => 'border-radius: 3px;margin-right: 20px;']);
-                        // else
-                        //     return  Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_60,w_60/no-image.jpg",['style' => 'border-radius: 3px;margin-right: 20px;']);
-                        //
 
                             $itemItmage = $item->getItemImages()->one();
 
-                            if ($itemItmage) {
-                              return  Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_60,w_60/restaurants/" . $item->restaurant->restaurant_uuid . "/items/" . $itemItmage->product_file_name, ['style' => 'border-radius: 3px;margin-right: 20px;'])
-                                . $item->item_name;
-                            } else {
-                                return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_60,w_60/no-image.jpg", ['style' => 'border-radius: 3px;margin-right: 20px;'])
-                                . '<span>' . $item->item_name . '</span>';
-                            }
+                            if ($itemItmage)
+                              return  Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_60,w_60/restaurants/" . $item->restaurant->restaurant_uuid . "/items/" . $itemItmage->product_file_name, ['style' => 'border-radius: 3px;margin-right: 20px;']);
+                            else
+                                return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_60,w_60/no-image.jpg", ['style' => 'border-radius: 3px;margin-right: 20px;']);
+
 
                     },
                 ],
                 [
-                    'label' => 'Category Name',
+                           'label' => 'Item name',
+                           'format' => 'html',
+                           'value' => function ($data) {
+                               return $data->item_name;
+                           },
+                ],
+                [
+                    'label' => 'Category name',
                     'value' => function ($data) {
                         $categoryName = '';
 
@@ -108,7 +107,6 @@ $this->registerJs($js);
                 'unit_sold',
                 'sort_number',
                 'item_price:currency',
-
                 [
                     'attribute' => 'item_status',
                     "format" => "raw",
@@ -121,8 +119,6 @@ $this->registerJs($js);
                         }
                     }
                 ],
-
-
                 [
                     'header' => 'Action',
                     'class' => 'yii\grid\ActionColumn',

@@ -391,41 +391,41 @@ class Order extends \yii\db\ActiveRecord {
             'payment_uuid' => 'Payment Uuid',
             'restaurant_uuid' => 'Restaurant Uuid',
             'area_id' => 'Area ID',
-            'area_name' => 'Area Name',
-            'area_name_ar' => 'Area Name Ar',
-            'unit_type' => 'Unit Type',
+            'area_name' => 'Area name',
+            'area_name_ar' => 'Area name in Arabic',
+            'unit_type' => 'Unit type',
             'block' => 'Block',
             'street' => 'Street',
             'customer_id' => 'Customer ID',
             'avenue' => 'Avenue',
-            'house_number' => 'House Number',
-            'special_directions' => 'Special Directions',
-            'customer_name' => 'Customer Name',
-            'customer_phone_number' => 'Phone Number',
-            'customer_email' => 'Customer Email',
-            'payment_method_id' => 'Payment Method ID',
-            'payment_method_name' => 'Payment Method Name',
-            'payment_method_name_ar' => 'Payment Method Name [Arabic]',
+            'house_number' => 'House number',
+            'special_directions' => 'Special directions',
+            'customer_name' => 'Customer name',
+            'customer_phone_number' => 'Phone number',
+            'customer_email' => 'Customer email',
+            'payment_method_id' => 'Payment method ID',
+            'payment_method_name' => 'Payment method name',
+            'payment_method_name_ar' => 'Payment method name [Arabic]',
             'order_status' => 'Status',
             'total_price' => 'Price',
             'total_price_before_refund' => 'Total price before refund',
             'subtotal' => 'Subtotal',
-            'order_created_at' => 'Created At',
-            'order_updated_at' => 'Updated At',
+            'order_created_at' => 'Created at',
+            'order_updated_at' => 'Updated at',
             'armada_tracking_link' => 'Tracking link',
-            'armada_delivery_code' => 'Armada Delivery Code',
-            'armada_qr_code_link' => 'QR Code link',
+            'armada_delivery_code' => 'Armada delivery code',
+            'armada_qr_code_link' => 'QR code link',
             'latitude' => 'Latitude',
             'longitude' => 'Longitude',
             'estimated_time_of_arrival' => 'Expected at',
             'is_order_scheduled' => 'Is order scheduled',
             'voucher_id' => 'Voucher ID',
-            'bank_discount_id' => 'Bank Discount ID',
-            'mashkor_order_number' => 'Mashkor Order Number',
-            'mashkor_tracking_link' => 'Mashkor Order Tracking link',
+            'bank_discount_id' => 'Bank discount ID',
+            'mashkor_order_number' => 'Mashkor order number',
+            'mashkor_tracking_link' => 'Mashkor order tracking link',
             'mashkor_driver_name' => 'Name of the driver',
             'mashkor_driver_phone' => 'Driver phone number',
-            'mashkor_order_status' => 'Mashkor Order status'
+            'mashkor_order_status' => 'Mashkor order status'
         ];
     }
 
@@ -574,7 +574,7 @@ class Order extends \yii\db\ActiveRecord {
 
         $orderItems = OrderItem::find()->where(['order_uuid' => $this->order_uuid])->all();
 
-        foreach ($orderItems as $model) 
+        foreach ($orderItems as $model)
             $model->delete();
 
         return parent::beforeDelete();

@@ -88,24 +88,24 @@ class Item extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'item_uuid' => 'Item Uuid',
-            'restaurant_uuid' => 'Restaurant Uuid',
+            'item_uuid' => 'Item uuid',
+            'restaurant_uuid' => 'Restaurant uuid',
             'item_name' => 'Title in English',
             'item_name_ar' => 'Title in Arabic',
-            'item_description' => 'Item Description in English',
-            'item_description_ar' => 'Item Description in Arabic',
-            'sort_number' => 'Sort Number',
-            'stock_qty' => 'Stock Quantity',
-            'track_quantity' => 'Track Quantity',
-            'unit_sold' => 'Unit Sold',
+            'item_description' => 'Item description in English',
+            'item_description_ar' => 'Item description in Arabic',
+            'sort_number' => 'Sort number',
+            'stock_qty' => 'Stock quantity',
+            'track_quantity' => 'Track quantity',
+            'unit_sold' => 'Unit sold',
             'barcode' => 'Barcode (ISBN, UPC, GTIN, etc.)',
             'sku' => 'SKU (Stock Keeping Unit)',
-            'item_image' => 'Item Image',
+            'item_image' => 'Item image',
             'item_price' => 'Price',
-            'item_status' => 'Item Status',
+            'item_status' => 'Item status',
             'items_category' => 'Category',
-            'item_created_at' => 'Item Created At',
-            'item_updated_at' => 'Item Updated At',
+            'item_created_at' => 'Item created at',
+            'item_updated_at' => 'Item updated qt',
         ];
     }
 

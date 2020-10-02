@@ -395,7 +395,9 @@ $this->registerJs($js);
                         <h2 class="text-bold-700 mt-1 number-of-customer-gained">
                             <?= $number_of_all_customer_gained_this_week ? $number_of_all_customer_gained_this_week : 0 ?>
                         </h2>
-                        <p class="mb-0">Customer Gained</p>
+                        <p class="mb-0">
+                          <?= $number_of_all_customer_gained_this_week  <= 1 ? 'Customer Gained' : 'Customers Gained' ?>
+                        </p>
                     </div>
                     <div class="card-content">
                         <div id="customer-gained-chart"></div>
@@ -457,7 +459,9 @@ $this->registerJs($js);
                         <h2 class="text-bold-700 mt-1 number-of-sold-items">
                             <?= $number_of_all_sold_item_this_week ? $number_of_all_sold_item_this_week : 0 ?>
                         </h2>
-                        <p class="mb-0">Sold Items</p>
+                        <p class="mb-0">
+                          <?= $number_of_all_sold_item_this_week  <= 1? 'Sold Item' : 'Sold Items' ?>
+                        </p>
                     </div>
                     <div class="card-content">
                         <div id="sold-item-chart"></div>
@@ -484,7 +488,9 @@ $this->registerJs($js);
                         <h2 class="text-bold-700 mt-1 number-of-orders-received">
                             <?= $number_of_all_orders_received_this_week ? $number_of_all_orders_received_this_week : 0 ?>
                         </h2>
-                        <p class="mb-0">Orders Received</p>
+                        <p class="mb-0">
+                          <?= $number_of_all_orders_received_this_week <= 1 ? 'Order Received' : 'Orders Received' ?>
+                        </p>
                     </div>
 
 
@@ -510,8 +516,9 @@ $this->registerJs($js);
                                 </div>
                             </div>
                             <h2 class="text-bold-700"><?= $today_customer_gained ?></h2>
-                            <p class="mb-0 line-ellipsis">Today's Customer Gained</p>
-
+                            <p class="mb-0 line-ellipsis">
+                              <?= $today_customer_gained  <= 1 ? "Today's Customer Gained" : "Today's Customers Gained" ?>
+                            </p>
 
                         </div>
                     </div>
@@ -542,7 +549,9 @@ $this->registerJs($js);
                                 </div>
                             </div>
                             <h2 class="text-bold-700"><?= $today_sold_items ?></h2>
-                            <p class="mb-0 line-ellipsis">Today's Sold Items</p>
+                            <p class="mb-0 line-ellipsis">
+                              <?= $today_sold_items  <= 1 ? "Today's Sold Item" : "Today's Sold Items" ?>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -557,7 +566,9 @@ $this->registerJs($js);
                                 </div>
                             </div>
                             <h2 class="text-bold-700"><?= $today_orders_received ?></h2>
-                            <p class="mb-0 line-ellipsis">Today's Orders Received</p>
+                            <p class="mb-0 line-ellipsis">
+                              <?= $today_orders_received  <= 1 ? "Today's Order Received" : "Today's Orders Received" ?>
+                            </p>
                         </div>
                     </div>
                 </div>
