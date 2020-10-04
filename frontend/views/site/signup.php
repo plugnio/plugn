@@ -1,83 +1,63 @@
 <?php
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
-/* @var $model \frontend\models\ContactForm */
+/* @var $agent_model \frontend\models\ContactForm */
 
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use yii\captcha\Captcha;
 
-$this->title = 'Contact';
+$this->title = 'Signup';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
+<section class="row flexbox-container">
+    <div class="col-xl-8 col-10 d-flex justify-content-center">
+        <div class="card bg-authentication rounded-0 mb-0">
+            <div class="row m-0">
+                <div class="col-lg-6 d-lg-block d-none text-center align-self-center pl-0 pr-3 py-0">
+                    <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/app-assets/images/pages/register.jpg' ?>" class="img-fluid"  alt="alternative">
+
+                </div>
+                <div class="col-lg-6 col-12 p-0">
+                    <div class="card rounded-0 mb-0 p-2">
+                        <div class="card-header pt-50 pb-1">
+                            <div class="card-title">
+                                <h4 class="mb-0">Create Account</h4>
+                            </div>
+                        </div>
+                        <p class="px-2">Fill the below form to create a new account.</p>
+                        <div class="card-content">
+                            <div class="card-body pt-0">
+                              <?php $form = ActiveForm::begin(['id' => 'store-form', 'enableClientScript' => false]); ?>
+
+                                    <?= $form->field($store_model, 'name')->textInput(['maxlength' => true])->label('Business name in English') ?>
+
+                                    <?= $form->field($store_model, 'name_ar')->textInput(['maxlength' => true])->label('Business name in Arabic')  ?>
 
 
-<!-- Header -->
-<header id="header" class="ex-2-header">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12">
-                <h1>Sign Up</h1>
-                <p>Fill out the form below to sign up for a Plugn website. Already signed up? Then just 
-                    <?=
-                        Html::a('Log In', ['site/login'],['class' => 'black']);
-                    ?>
-                </p>
-                <!-- Sign Up Form -->
-                <div class="form-container">
-                    <?php $form = ActiveForm::begin(['id' => 'form-signup','enableClientScript' => false]); ?>
+                                    <?= $form->field($agent_model, 'agent_name')->textInput(['maxlength' => true])->label('Owner name') ?>
+
+                                    <?= $form->field($agent_model, 'agent_email')->textInput(['maxlength' => true])->label('Owner email')  ?>
 
 
-                    <?=
-                    $form->field($model, 'company_name', ['options' => [
-                            'tag' => 'div',
-                            'class' => 'form-group'
-                        ],
-                        'template' => '{input}{error}{hint}'
-                    ])->textInput(['text' => 'text', 'placeholder' => 'Company name'])
-                    ?>                   
-
-                    <?=
-                    $form->field($model, 'name', ['options' => [
-                            'tag' => 'div',
-                            'class' => 'form-group'
-                        ],
-                        'template' => '{input}{error}{hint}'
-                    ])->textInput(['text' => 'text', 'placeholder' => 'Name'])
-                    ?>
-
-                    <?=
-                    $form->field($model, 'phone', ['options' => [
-                            'tag' => 'div',
-                            'class' => 'form-group'
-                        ],
-                        'template' => '{input}{error}{hint}'
-                    ])->textInput(['text' => 'email', 'placeholder' => 'Phone'])
-                    ?>
+                                    <?= $form->field($agent_model, 'tempPassword')->passwordInput(['maxlength' => true]) ?>
 
 
-                    <?=
-                    $form->field($model, 'email', ['options' => [
-                            'tag' => 'div',
-                            'class' => 'form-group'
-                        ],
-                        'template' => '{input}{error}{hint}'
-                    ])->textInput(['type' => 'email', 'placeholder' => 'Email'])
-                    ?>
+                                    <?= Html::a('Login', ['site/login'], ['class' => 'btn btn-outline-primary float-left btn-inline mb-50']) ?>
+
+                                    <div class="form-group">
+                                        <?= Html::submitButton('Register', ['class' => 'btn btn-primary float-right btn-inline mb-50', 'name' => 'register-button']) ?>
+                                    </div>
 
 
-                    <div class="form-group">
-                        <?= Html::submitButton('SEND REQUEST', ['class' => 'form-control-submit-button', 'name' => 'signup-button']) ?>
+                              <?php ActiveForm::end(); ?>
+
+                            </div>
+                        </div>
                     </div>
-                 
-                     <?php ActiveForm::end(); ?>
-                </div> <!-- end of form container -->
-                <!-- end of sign up form -->
-
-            </div> <!-- end of col -->
-        </div> <!-- end of row -->
-    </div> <!-- end of container -->
-</header> <!-- end of ex-header -->
-<!-- end of header -->
-
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

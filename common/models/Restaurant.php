@@ -83,6 +83,7 @@ class Restaurant extends \yii\db\ActiveRecord {
     const STORE_LAYOUT_GRID_HALFWIDTH  = 5;
     const STORE_LAYOUT_CATEGORY_HALFWIDTH  = 6;
 
+    const SCENARIO_CREATE_STORE_BY_AGENT = 'create-by-agent';
 
     public $restaurant_delivery_area;
     public $restaurant_payments_method;
@@ -103,8 +104,9 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['name', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_domain', 'restaurant_email','store_branch_name','app_id'], 'required', 'on' => 'create'],
-            [['name', 'name_ar'], 'required'],
+            [['name', 'name_ar' ,'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_domain', 'restaurant_email','store_branch_name','app_id'], 'required', 'on' => 'create'],
+            [['name', 'name_ar'], 'required', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
+            [['restaurant_domain'], 'url'],
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png, pdf',  'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['restaurant_status', 'support_delivery', 'support_pick_up'], 'integer', 'min' => 0],
@@ -118,7 +120,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['platform_fee'], 'number'],
             [['instagram_url'], 'url'],
             [['date_range_picker_with_time','google_analytics_id', 'facebook_pixil_id'], 'safe'],
-            [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'restaurant_domain', 'app_id' ,'armada_api_key','mashkor_branch_id','store_branch_name','live_public_key','test_public_key'], 'string', 'max' => 255],
+            [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'app_id' ,'armada_api_key','mashkor_branch_id','store_branch_name','live_public_key','test_public_key'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 7, 'max' => 8],
             [['live_public_key','test_public_key'], 'default', 'value' => null],
             [['phone_number'], 'integer', 'min' => 0],

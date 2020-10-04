@@ -14,7 +14,7 @@ use frontend\models\LoginForm;
 use frontend\models\OrderSearch;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
-use frontend\models\SignupForm;
+use common\models\Agent;
 use common\models\Restaurant;
 use common\models\OrderItem;
 use common\models\Order;
@@ -43,7 +43,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'promote-to-open', 'promote-to-close', 'pay', 'callback', 'vendor-dashboard', 'real-time-orders','mark-as-busy', 'mark-as-open'],
+                        'actions' => ['logout', 'promote-to-open',  'promote-to-close', 'pay', 'callback', 'vendor-dashboard', 'real-time-orders','mark-as-busy', 'mark-as-open'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -962,6 +962,8 @@ class SiteController extends Controller {
         return $this->redirect('https://plugn.io/');
     }
 
+
+
     /**
      * Displays signup page.
      *
@@ -969,16 +971,33 @@ class SiteController extends Controller {
      */
     public function actionSignup() {
 
-        $this->layout = 'landing';
+        $this->layout = 'login';
 
-        $model = new SignupForm();
-        if ($model->load(Yii::$app->request->post()) && $model->sendEmail()) {
-            return $this->redirect(['thank-you']);
+        $store_model = new Restaurant();
+        $store_model->setScenario(Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
+
+        $agent_model = new Agent();
+        if ($agent_model->load(Yii::$app->request->post()) && $store_model->load(Yii::$app->request->post())) {
+
+            if( $agent_model->save() && $store_model->save()){
+
+              $assignment_agent_model = new AgentAssignment();
+              $assignment_agent_model->agent_id = $agent_model->agent_id;
+              $assignment_agent_model->assignment_agent_email = $agent_model->agent_email;
+              $assignment_agent_model->role = AgentAssignment::AGENT_ROLE_OWNER;
+              $assignment_agent_model->restaurant_uuid = $store_model->restaurant_uuid;
+
+              if($assignment_agent_model->save())
+                return $this->redirect(['login']);
+            }
+
         }
 
         return $this->render('signup', [
-                    'model' => $model,
+            'agent_model' => $agent_model,
+            'store_model' => $store_model
         ]);
+
     }
 
     public function actionThankYou() {

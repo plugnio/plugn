@@ -25,13 +25,16 @@ class LoginAsset extends AssetBundle {
   'app-assets/css/core/colors/palette-gradient.css',
   'app-assets/css/pages/authentication.css',
   'assets/css/style.css',
-
+  'app-assets/css/plugins/forms/wizard.css',
     ];
     public $js = [
       'app-assets/vendors/js/vendors.min.js',
       'app-assets/js/core/app-menu.js',
       'app-assets/js/core/app.js',
       'app-assets/js/scripts/components.js',
+      // 'app-assets/vendors/js/extensions/jquery.steps.min.js',
+      'app-assets/vendors/js/forms/validation/jquery.validate.min.js',
+      // 'app-assets/js/scripts/forms/wizard-steps.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',

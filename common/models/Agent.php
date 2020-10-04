@@ -51,7 +51,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      */
     public function rules() {
         return [
-            [['agent_name', 'agent_email'], 'required'],
+            [['agent_name', 'agent_email','tempPassword'], 'required'],
             [['agent_status','email_notification'], 'integer'],
             [['agent_created_at', 'agent_updated_at'], 'safe'],
             [['agent_name', 'agent_email', 'agent_password_hash', 'agent_password_reset_token'], 'string', 'max' => 255],
