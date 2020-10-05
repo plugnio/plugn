@@ -6,17 +6,22 @@ use yii\helpers\Html;
 /* @var $model common\models\Restaurant */
 ?>
 <div class="verify-form">
-    <h1>Dear <?= $agent_name ?>,</h1>
+    <h4>Dear <?= $agent_name ?>,</4>
 
 
-    <!-- <p class="lead"> -->
+    <p class="lead">
       We would like to remind you that Order #<?= $order->order_uuid ?> has been placed 10 minutes ago for total amount of <?= \Yii::$app->formatter->asCurrency($order->total_price) ?>.
+    </p>
 
 
-
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
       Best Regards,
       Plugn Team
-    <!-- </p> -->
-
 
 </div>
