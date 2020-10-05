@@ -8,7 +8,7 @@ $config = [
         ],
         'urlManager' => [
             'class' => 'yii\web\UrlManager',
-            'baseUrl' => '/~saoud/plugn/plugn-yii2/frontend/web/',
+            'baseUrl' => 'https://dashboard.dev.plugn.io',
             'enablePrettyUrl' => false,
             'showScriptName' => false,
         ],
