@@ -116,25 +116,25 @@ $this->registerJs($js);
 
     <?php
 
-      if(AgentAssignment::isOwner($restaurantUuid)){
-        echo $form->field($model, 'reminder_email', [
-            'template' => '
-            <div class="vs-checkbox-con vs-checkbox-primary">
-                {input}
-                <span class="vs-checkbox">
-                    <span class="vs-checkbox--check">
-                        <i class="vs-icon feather icon-check"></i>
-                    </span>
-                </span>
-                <span class="">Send me reminder email if order not accepted in 10 minutes</span>
-            </div>
-            <div class=\"col-lg-8\">{error}</div>
-            ',
-        ])->checkbox([
-            'checked' => $model->reminder_email ? true : false,
-            'id' => 'trackQuantityInput',
-          ], false);
-      }
+      // if(AgentAssignment::isOwner($restaurantUuid)){
+        // echo $form->field($model, 'reminder_email', [
+        //     'template' => '
+        //     <div class="vs-checkbox-con vs-checkbox-primary">
+        //         {input}
+        //         <span class="vs-checkbox">
+        //             <span class="vs-checkbox--check">
+        //                 <i class="vs-icon feather icon-check"></i>
+        //             </span>
+        //         </span>
+        //         <span class="">Send me reminder email if order not accepted in 10 minutes</span>
+        //     </div>
+        //     <div class=\"col-lg-8\">{error}</div>
+        //     ',
+        // ])->checkbox([
+        //     'checked' => $model->reminder_email ? true : false,
+        //     'id' => 'trackQuantityInput',
+        //   ], false);
+      // }
 
     ?>
 
