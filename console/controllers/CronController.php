@@ -136,7 +136,7 @@ class CronController extends \yii\console\Controller {
         $now = new DateTime('now');
         $orders = Order::find()
                 ->where(['order_status' => Order::STATUS_PENDING])
-                ->andWhere("reminder_sent = 0")
+                ->andWhere(['reminder_sent' => 0])
                 ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')])
                 ->all();
 
@@ -144,7 +144,8 @@ class CronController extends \yii\console\Controller {
 
             foreach ($orders as $order) {
 
-              foreach ($order->restaurant->getAgents()->where(['reminder_email' => 1])->all() as $agent) {
+              foreach ( $order->restaurant->getAgents()->where(['reminder_email' => 1])->all() as $agent) {
+
 
                   if ($agent) {
                     $result =  \Yii::$app->mailer->compose([
@@ -156,7 +157,6 @@ class CronController extends \yii\console\Controller {
                               ->setFrom([\Yii::$app->params['supportEmail'] => $order->restaurant->name])
                               ->setTo($agent->agent_email)
                               ->setSubject('Order #' . $order->order_uuid . ' from ' . $order->restaurant->name)
-                              ->setReplyTo([$order->restaurant->restaurant_email => $order->restaurant->name])
                               ->send();
                   }
               }

@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use common\models\AgentAssignment;
-
+use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
@@ -43,6 +43,15 @@ $this->registerJs($js);
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'rowOptions' => function($model) {
+                  if ($model->agent_id != Yii::$app->user->identity->agent_id) {
+                $url = Url::to(['update', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'restaurantUuid' => $model->restaurant_uuid]);
+
+                return [
+                    'onclick' => "window.location.href='{$url}'"
+                ];
+              }
+            },
             'columns' => [
               ['class' => 'yii\grid\SerialColumn'],
               'agent.agent_name',
@@ -55,45 +64,6 @@ $this->registerJs($js);
                   },
               ],
               'assignment_created_at',
-              [
-                  'class' => 'yii\grid\ActionColumn',
-                  'template' => ' {view} {update} {delete}',
-                  'visible' => AgentAssignment::isOwner($restaurant_uuid) ? true : false,
-                  'buttons' => [
-                      'view' => function ($url, $model) {
-                          if ($model->agent_id != Yii::$app->user->identity->agent_id) {
-                              return Html::a(
-                                              '<span style="margin-right: 20px;" class="nav-icon fa fa-eye"></span>', ['view', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'restaurantUuid' => $model->restaurant_uuid], [
-                                          'title' => 'View',
-                                          'data-pjax' => '0',
-                                              ]
-                              );
-                          }
-                      },
-                      'update' => function ($url, $model) {
-                          if ($model->agent_id != Yii::$app->user->identity->agent_id) {
-                              return Html::a(
-                                              '<span style="margin-right: 20px;" class="nav-icon fa fa-edit"></span>', ['update', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'restaurantUuid' => $model->restaurant_uuid], [
-                                          'title' => 'Update',
-                                          'data-pjax' => '0',
-                                              ]
-                              );
-                          }
-                      },
-                      'delete' => function ($url, $model) {
-                          if ($model->agent_id != Yii::$app->user->identity->agent_id) {
-                              return Html::a(
-                                              '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'restaurantUuid' => $model->restaurant_uuid], [
-                                          'title' => 'Delete',
-                                          'data' => [
-                                              'confirm' => 'Are you absolutely sure ? You will lose all the information about this agent with this action.',
-                                              'method' => 'post',
-                                          ],
-                              ]);
-                          }
-                      },
-                  ],
-              ],
             ],
             'layout' => '{summary}{items}{pager}',
             'tableOptions' => ['class' => 'table data-list-view'],
