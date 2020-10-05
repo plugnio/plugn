@@ -26,6 +26,17 @@ class CronController extends \yii\console\Controller {
     /**
      * Update refund status  for all refunds record
      */
+    public function actionUpdateOrdersRecord() {
+      Order::updateAll(['reminder_sent' => 1], 'reminder_sent = 0');
+
+      $this->stdout("Thank you Big Boss! \n", Console::FG_RED, Console::BOLD);
+      return self::EXIT_CODE_NORMAL;
+    }
+
+
+    /**
+     * Update refund status  for all refunds record
+     */
     public function actionUpdateRefundStatusMessage() {
 
         $restaurants = Restaurant::find()->all();
@@ -136,22 +147,21 @@ class CronController extends \yii\console\Controller {
               foreach ($order->restaurant->getAgents()->where(['reminder_email' => 1])->all() as $agent) {
 
                   if ($agent) {
-
-                      \Yii::$app->mailer->compose([
+                    $result =  \Yii::$app->mailer->compose([
                                   'html' => 'order-reminder-html',
                                       ], [
-                                  'order' => $this,
+                                  'order' => $order,
                                   'agent_name' => $agent->agent_name
                               ])
-                              ->setFrom([\Yii::$app->params['supportEmail'] => $this->restaurant->name])
+                              ->setFrom([\Yii::$app->params['supportEmail'] => $order->restaurant->name])
                               ->setTo($agent->agent_email)
-                              ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)
-                              ->setReplyTo([$this->restaurant->restaurant_email => $this->restaurant->name])
+                              ->setSubject('Order #' . $order->order_uuid . ' from ' . $order->restaurant->name)
+                              ->setReplyTo([$order->restaurant->restaurant_email => $order->restaurant->name])
                               ->send();
                   }
               }
 
-              $order->reminder_sent = true;
+              $order->reminder_sent = 1;
               $order->save(false);
             }
         }
