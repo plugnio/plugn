@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use common\models\AgentAssignment;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Agent */
@@ -92,19 +93,50 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'tempPassword')->passwordInput(['maxlength' => true])?>
 
+    <?=
+      $form->field($model, 'email_notification', [
+          'template' => '
+          <div class="vs-checkbox-con vs-checkbox-primary">
+              {input}
+              <span class="vs-checkbox">
+                  <span class="vs-checkbox--check">
+                      <i class="vs-icon feather icon-check"></i>
+                  </span>
+              </span>
+              <span class="">{label}</span>
+          </div>
+          <div class=\"col-lg-8\">{error}</div>
+          ',
+      ])->checkbox([
+          'checked' => $model->email_notification ? true : false,
+          'id' => 'trackQuantityInput',
+              ], false)
+    ?>
 
 
+    <?php
 
-            <?=
-            $form->field($model, 'email_notification', [
-                'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Email notification</span>{input}<label class='custom-control-label' for='customSwitch1'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
-            ])->checkbox([
-                'checked' => $model->email_notification == 0 ? false : true,
-                'id' => 'customSwitch1',
-                'class' => 'custom-control-input'
-                    ], false)->label(false)
-            ?>
+      if(AgentAssignment::isOwner($restaurantUuid)){
+        echo $form->field($model, 'reminder_email', [
+            'template' => '
+            <div class="vs-checkbox-con vs-checkbox-primary">
+                {input}
+                <span class="vs-checkbox">
+                    <span class="vs-checkbox--check">
+                        <i class="vs-icon feather icon-check"></i>
+                    </span>
+                </span>
+                <span class="">Send me reminder email if order not accepted in 10 minutes</span>
+            </div>
+            <div class=\"col-lg-8\">{error}</div>
+            ',
+        ])->checkbox([
+            'checked' => $model->reminder_email ? true : false,
+            'id' => 'trackQuantityInput',
+          ], false);
+      }
 
+    ?>
 
 
     <div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px; background:#f4f6f9 ">
