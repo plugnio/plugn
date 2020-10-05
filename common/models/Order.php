@@ -54,7 +54,7 @@ use yii\behaviors\AttributeBehavior;
  * @property string $mashkor_driver_name
  * @property string $mashkor_driver_phone
  * @property string $mashkor_order_status
-
+ * @property boolean $reminder_sent
  *
  * @property Area
  * @property BankDiscount $bankDiscount
@@ -121,7 +121,7 @@ class Order extends \yii\db\ActiveRecord {
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status','mashkor_order_status', 'customer_id'], 'integer', 'min' => 0],
-            [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id'], 'integer'],
+            [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id', 'reminder_sent'], 'integer'],
             ['mashkor_order_status', 'in', 'range' => [
               self::MASHKOR_ORDER_STATUS_NEW,
               self::MASHKOR_ORDER_STATUS_CONFIRMED,

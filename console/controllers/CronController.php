@@ -23,16 +23,6 @@ class CronController extends \yii\console\Controller {
 
 
 
-
-    public function actionCreateOrder() {
-
-      $order_model = Order::findOne('2BBNPG');
-      $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($order_model);
-      return $createDeliveryApiResponse;
-
-    }
-
-
     /**
      * Update refund status  for all refunds record
      */
@@ -124,6 +114,49 @@ class CronController extends \yii\console\Controller {
         }
 
         $this->stdout("Payments status updated successfully \n", Console::FG_RED, Console::BOLD);
+        return self::EXIT_CODE_NORMAL;
+    }
+
+    /**
+     * Method called to Send  reminder if order not picked up in 10 minutes
+     */
+    public function actionSendReminderEmail() {
+
+        $now = new DateTime('now');
+        $orders = Order::find()
+                ->where(['order_status' => Order::STATUS_PENDING])
+                ->andWhere("reminder_sent = 0")
+                ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')])
+                ->all();
+
+        if ($orders) {
+
+            foreach ($orders as $order) {
+
+              foreach ($order->restaurant->getAgents()->where(['reminder_email' => 1])->all() as $agent) {
+
+                  if ($agent) {
+
+                      \Yii::$app->mailer->compose([
+                                  'html' => 'order-reminder-html',
+                                      ], [
+                                  'order' => $this,
+                                  'agent_name' => $agent->agent_name
+                              ])
+                              ->setFrom([\Yii::$app->params['supportEmail'] => $this->restaurant->name])
+                              ->setTo($agent->agent_email)
+                              ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)
+                              ->setReplyTo([$this->restaurant->restaurant_email => $this->restaurant->name])
+                              ->send();
+                  }
+              }
+
+              $order->reminder_sent = true;
+              $order->save(false);
+            }
+        }
+
+        $this->stdout("Reminder email has been sent \n", Console::FG_RED, Console::BOLD);
         return self::EXIT_CODE_NORMAL;
     }
 
