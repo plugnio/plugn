@@ -483,15 +483,23 @@ class Order extends \yii\db\ActiveRecord {
     /**
      * Update order status to pending
      */
-    public function restockAllItems() {
+    public function restockItems() {
 
         $orderItems = $this->getOrderItems();
-        // die($orderItems->count());
+        $orderItemExtraOptions = $this->getOrderItemExtraOptions();
 
         if ($orderItems->count() > 0) {
             foreach ($orderItems->all() as $orderItem)
                 if ($orderItem->item_uuid) {
 
+                    $orderItemExtraOptions = $orderItem->getOrderItemExtraOptions();
+
+                    if ($orderItemExtraOptions->count() > 0) {
+                        foreach ($orderItemExtraOptions->all() as $orderItemExtraOption){
+                          if ($orderItemExtraOption->order_item_extra_option_id)
+                              $orderItemExtraOption->extraOption->increaseStockQty($orderItem->qty);
+                        }
+                    }
 
 
                     $orderItem->item->increaseStockQty($orderItem->qty);
@@ -499,6 +507,8 @@ class Order extends \yii\db\ActiveRecord {
                     $this->save(false);
                 }
         }
+
+
     }
 
     /**
@@ -572,10 +582,13 @@ class Order extends \yii\db\ActiveRecord {
 
     public function beforeDelete() {
 
+      if(!$this->items_has_been_restocked){
         $orderItems = OrderItem::find()->where(['order_uuid' => $this->order_uuid])->all();
 
         foreach ($orderItems as $model)
             $model->delete();
+      }
+
 
         return parent::beforeDelete();
     }
@@ -613,10 +626,36 @@ class Order extends \yii\db\ActiveRecord {
 
                 if ($orderItem->item_uuid) {
 
-                    if (($orderItem->item->track_quantity && $orderItem->item->stock_qty >= $orderItem->qty) || !$orderItem->item->track_quantity) {
-                        $orderItem->item->decreaseStockQty($orderItem->qty);
-                    } else {
+                    if (($orderItem->item->track_quantity && $orderItem->item->stock_qty >= $orderItem->qty) || !$orderItem->item->track_quantity){
+                      $orderItemExtraOptions = $orderItem->getOrderItemExtraOptions();
 
+
+                                            if ($orderItemExtraOptions->count() > 0) {
+                                                foreach ($orderItemExtraOptions->all() as $orderItemExtraOption){
+                                                  if ($orderItemExtraOption->extraOption && $orderItemExtraOption->extraOption->stock_qty >= $orderItemExtraOption->qty)
+                                                      $orderItemExtraOption->extraOption->decreaseStockQty($orderItemExtraOption->qty);
+                                                      else  {
+
+                                                               if($orderItemExtraOption->extraOption->stock_qty !== null){
+                                                                 \Yii::$app->mailer->compose([
+                                                                             'html' => 'out-of-stock-order-html',
+                                                                                 ], [
+                                                                             'order' => $this
+                                                                         ])
+                                                                         ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+                                                                         ->setTo([$this->restaurant->restaurant_email, \Yii::$app->params['supportEmail']])
+                                                                         ->setSubject('Order #' . $this->order_uuid)
+                                                                         ->send();
+                                                               }
+                                                         }
+                                                }
+                                              }
+
+                      $orderItem->item->decreaseStockQty($orderItem->qty);
+
+
+                    }
+                    else {
                         \Yii::$app->mailer->compose([
                                     'html' => 'out-of-stock-order-html',
                                         ], [

@@ -92,7 +92,7 @@ class CronController extends \yii\console\Controller {
                 ->andWhere(['<', 'payment.payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 15 MINUTE)')]);
 
         foreach ($payments->all() as $payment) {
-            $payment->order->restockAllItems();
+            $payment->order->restockItems();
         }
     }
 
