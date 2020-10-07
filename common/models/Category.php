@@ -123,7 +123,7 @@ class Category extends \yii\db\ActiveRecord {
                     ]
             );
 
-            //Delete old store's logo
+            //Delete old store's image
             if ($this->category_image) {
                 $this->deleteCategoryImage();
             }
@@ -135,6 +135,7 @@ class Category extends \yii\db\ActiveRecord {
             }
         } catch (\Cloudinary\Error $err) {
             Yii::error("Error when uploading category image to Cloudinry: " . json_encode($err));
+            Yii::error("Error when uploading category image to Cloudinry: ImageUrl Value " . json_encode($imageURL));
         }
     }
 
@@ -161,6 +162,7 @@ class Category extends \yii\db\ActiveRecord {
      */
     public function getItems() {
         return $this->hasMany(Item::className(), ['item_uuid' => 'item_uuid'])
+                        ->where(['item_status' => Item::ITEM_STATUS_PUBLISH])
                         ->viaTable('category_item', ['category_id' => 'category_id'])
                         ->orderBy(['sort_number' => SORT_ASC]);
     }

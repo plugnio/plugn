@@ -21,7 +21,7 @@ class ItemSearch extends Item
     public function rules()
     {
         return [
-            [['item_uuid', 'restaurant_uuid', 'item_name', 'item_name_ar', 'item_description', 'item_description_ar', 'item_image', 'item_created_at', 'item_updated_at','category_id'], 'safe'],
+            [['item_uuid', 'restaurant_uuid', 'item_name', 'item_name_ar', 'item_description', 'item_description_ar', 'item_image', 'item_created_at', 'item_updated_at','category_id','barcode','sku'], 'safe'],
             [['sort_number', 'stock_qty', 'unit_sold'], 'integer'],
             [['item_price'], 'number'],
         ];
@@ -84,11 +84,51 @@ class ItemSearch extends Item
         $query->andFilterWhere(['like', 'item_uuid', $this->item_uuid])
             ->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
             ->andFilterWhere(['like', 'item_name', $this->item_name])
+            ->andFilterWhere(['like', 'barcode', $this->barcode])
+            ->andFilterWhere(['like', 'sku', $this->sku])
             ->andFilterWhere(['like', 'category.category_id', $this->category_id])
             ->andFilterWhere(['like', 'item_name_ar', $this->item_name_ar])
             ->andFilterWhere(['like', 'item_description', $this->item_description])
             ->andFilterWhere(['like', 'item_description_ar', $this->item_description_ar])
             ->andFilterWhere(['like', 'item_image', $this->item_image]);
+
+        return $dataProvider;
+    }
+
+    /**
+     * Creates data provider instance with search query applied
+     *
+     * @param array $params
+     * @param sting $restaurantUuid
+     *
+     * @return ActiveDataProvider
+     */
+    public function searchTrackQuantity($params, $restaurantUuid)
+    {
+        $query = Item::find()->where(['item.restaurant_uuid' => $restaurantUuid , 'track_quantity' => 1]);
+
+        // add conditions that should always apply here
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => false
+        ]);
+
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+
+        $query->andFilterWhere(['like', 'item_uuid', $this->item_uuid])
+            ->andFilterWhere(['like', 'item_name', $this->item_name])
+            ->andFilterWhere(['like', 'barcode', $this->barcode])
+            ->andFilterWhere(['like', 'sku', $this->sku])
+            ->andFilterWhere(['like', 'item_name_ar', $this->item_name_ar]);
 
         return $dataProvider;
     }

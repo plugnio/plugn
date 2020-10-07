@@ -67,6 +67,14 @@ return [
             'class' => 'common\components\MashkorDelivery',
             'keyToUse' => \common\components\MashkorDelivery::USE_LIVE_KEY
         ],
+        'netlifyComponent' => [
+            'class' => 'common\components\NetlifyComponent',
+            'token' => '0_XaozvJbIP5eYVUbGVUbb7kD4Rtgoqm3SR5kmNnhyQ'
+        ],
+        'githubComponent' => [
+            'class' => 'common\components\GithubComponent',
+            'token' => '12f36b57c96399bbee096fa2c8f858d06eef883a'
+        ],
         'slack' => [
             'class' => 'understeam\slack\Client',
             'url' => 'https://hooks.slack.com/services/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',

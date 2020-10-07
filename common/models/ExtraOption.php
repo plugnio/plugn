@@ -12,7 +12,9 @@ use Yii;
  * @property string|null $extra_option_name
  * @property string|null $extra_option_name_ar
  * @property float|null $extra_option_price
- *
+
+ * @property int|null $stock_qty
+
  * @property Option $option
  * @property Item $item
  * @property OrderItemExtraOption[] $orderItemExtraOptions
@@ -61,7 +63,9 @@ class ExtraOption extends \yii\db\ActiveRecord {
             ],
             [['extra_option_name', 'extra_option_name_ar', 'extra_option_price'], 'required'],
             [['option_id'], 'integer'],
-            [['extra_option_price'], 'number', 'min' => 0],
+            [['extra_option_price', 'stock_qty'], 'number', 'min' => 0],
+            [['extra_option_price'], 'default', 'value' => 0],
+            [['stock_qty'], 'default', 'value' => null],
             [['extra_option_name', 'extra_option_name_ar'], 'string', 'max' => 255],
             [['option_id'], 'exist', 'skipOnError' => true, 'targetClass' => Option::className(), 'targetAttribute' => ['option_id' => 'option_id']],
         ];
@@ -77,8 +81,36 @@ class ExtraOption extends \yii\db\ActiveRecord {
             'extra_option_name' => 'Extra Option Name',
             'extra_option_name_ar' => 'Extra Option Name in Arabic',
             'extra_option_price' => 'Extra Option Price',
+            'stock_qty' => 'Stock Quantity',
         ];
     }
+
+
+    /**
+     * increase stock_qty
+     * @param type $qty
+     */
+    public function increaseStockQty()
+    {
+        if($this->stock_qty !== null && $this->stock_qty >= 0 ){
+          $this->stock_qty++;
+          $this->save(false);
+        }
+    }
+
+    /**
+     * decrease stock_qty
+     * @param type $qty
+     */
+    public function decreaseStockQty()
+    {
+        if($this->stock_qty !== null && $this->stock_qty > 0 ){
+          $this->stock_qty--;
+          $this->save(false);
+        }
+    }
+
+
 
     /**
      * Gets query for [[Option]].

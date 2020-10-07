@@ -18,6 +18,9 @@ use yii\behaviors\TimestampBehavior;
  * @property string|null $item_description
  * @property string|null $item_description_ar
  * @property int|null $sort_number
+ * @property int|null $track_quantity
+ * @property string $barcode
+ * @property string $sku
  * @property int|null $stock_qty
  * @property int|null $unit_sold
  * @property string|null $item_image
@@ -38,6 +41,12 @@ class Item extends \yii\db\ActiveRecord
     public $items_category;
     public $item_images;
 
+
+    //Values for `item_status`
+    const ITEM_STATUS_PUBLISH = 1;
+    const ITEM_STATUS_UNPUBLISH =  2;
+
+
     /**
      * {@inheritdoc}
      */
@@ -52,16 +61,21 @@ class Item extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['item_name', 'items_category'], 'required', 'on' => 'create'],
-            [['item_name', 'item_name_ar', 'item_price','stock_qty'], 'required'],
+            [['item_name'], 'required', 'on' => 'create'],
+            [['item_name', 'item_name_ar', 'item_price', 'items_category'], 'required'],
             [['sort_number', 'stock_qty'], 'integer', 'min' => 0],
             [['unit_sold'], 'integer', 'min' => 0],
             [['item_price'], 'number', 'min' => 0],
+            [['track_quantity'], 'integer'],
+            ['item_status', 'in', 'range' => [self::ITEM_STATUS_PUBLISH, self::ITEM_STATUS_UNPUBLISH]],
+            ['stock_qty', 'required', 'when' => function($model) {
+                return $model->track_quantity;
+            }],
             [['item_images'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 10],
             [['item_created_at', 'item_updated_at', 'items_category'], 'safe'],
             [['item_uuid'], 'string', 'max' => 300],
             [['restaurant_uuid'], 'string', 'max' => 60],
-            [['item_name', 'item_name_ar', 'item_image'], 'string', 'max' => 255],
+            [['item_name', 'item_name_ar', 'item_image','barcode', 'sku'], 'string', 'max' => 255],
             [['item_description', 'item_description_ar'], 'string', 'max' => 2000],
             [['item_uuid'], 'unique'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
@@ -74,20 +88,24 @@ class Item extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'item_uuid' => 'Item Uuid',
-            'restaurant_uuid' => 'Restaurant Uuid',
+            'item_uuid' => 'Item uuid',
+            'restaurant_uuid' => 'Restaurant uuid',
             'item_name' => 'Title in English',
             'item_name_ar' => 'Title in Arabic',
-            'item_description' => 'Item Description in English',
-            'item_description_ar' => 'Item Description in Arabic',
-            'sort_number' => 'Sort Number',
-            'stock_qty' => 'Stock Qty',
-            'unit_sold' => 'Unit Sold',
-            'item_image' => 'Item Image',
+            'item_description' => 'Item description in English',
+            'item_description_ar' => 'Item description in Arabic',
+            'sort_number' => 'Sort number',
+            'stock_qty' => 'Stock quantity',
+            'track_quantity' => 'Track quantity',
+            'unit_sold' => 'Unit sold',
+            'barcode' => 'Barcode (ISBN, UPC, GTIN, etc.)',
+            'sku' => 'SKU (Stock Keeping Unit)',
+            'item_image' => 'Item image',
             'item_price' => 'Price',
+            'item_status' => 'Item status',
             'items_category' => 'Category',
-            'item_created_at' => 'Item Created At',
-            'item_updated_at' => 'Item Updated At',
+            'item_created_at' => 'Item created at',
+            'item_updated_at' => 'Item updated qt',
         ];
     }
 
@@ -126,9 +144,11 @@ class Item extends \yii\db\ActiveRecord
      */
     public function increaseStockQty($qty)
     {
+      if($this->track_quantity)
         $this->stock_qty += $qty;
-        $this->unit_sold -= $qty;
-        $this->save(false);
+
+      $this->unit_sold -= $qty;
+      $this->save(false);
     }
 
     /**
@@ -137,7 +157,9 @@ class Item extends \yii\db\ActiveRecord
      */
     public function decreaseStockQty($qty)
     {
-        $this->stock_qty -= $qty;
+        if($this->track_quantity)
+          $this->stock_qty -= $qty;
+
         $this->unit_sold += $qty;
         $this->save(false);
     }
@@ -192,26 +214,6 @@ class Item extends \yii\db\ActiveRecord
             }
         }
     }
-
-
-    // /**
-    //  * Return item image url to dispaly it on backend
-    //  * @return string
-    //  */
-    // public function getItemImage()
-    // {
-    //     $photo_url = null;
-    //
-    //
-    //     if ($this->item_image) {
-    //         $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
-    //                 . $this->restaurant->restaurant_uuid . '/items/'
-    //                 . $this->item_image;
-    //         $photo_url = $url;
-    //     }
-    //
-    //     return $photo_url;
-    // }
 
 
     public function beforeDelete()

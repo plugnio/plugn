@@ -40,6 +40,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                             <td class="font-weight-bold">Email</td>
                                             <td><?= $model->agent_email ?></td>
                                         </tr>
+
+                                        <tr>
+                                            <td class="font-weight-bold">Reminder Email</td>
+                                            <td><?= $model->reminder_email ? 'True' : 'False'  ?></td>
+                                        </tr>
                                     </table>
                                 </div>
                                 <div class="col-12 col-md-12 col-lg-5">

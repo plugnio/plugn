@@ -27,9 +27,35 @@ $js = "
     });
 
 
+    $( window ).on( 'load', function() {
+      console.log('$modelItem->track_quantity');
+        if ('$modelItem->track_quantity' == 1)
+          $('#stock_qty').show();
+        else
+          $('#stock_qty').hide();
+
+    });
+
+
+    let trackQuantityInput = $('#trackQuantityInput');
+
+    trackQuantityInput.change(function(e){
+
+      let selection = trackQuantityInput.is(':checked');
+
+
+      if (selection == true)
+        $('#stock_qty').show();
+      else
+        $('#stock_qty').hide();
+
+    });
+
+
 ";
 $this->registerJs($js);
 ?>
+
 
 
 <div class="item-form">
@@ -76,170 +102,218 @@ $this->registerJs($js);
             <?= $form->field($modelItem, 'item_description')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL']) ?>
 
             <?= $form->field($modelItem, 'item_description_ar')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL']) ?>
-            <div class="row">
-                <div class="col-12 col-sm-6 col-lg-6">
 
-                    <?= $form->field($modelItem, 'sort_number')->textInput(['type' => 'number']) ?>
-                </div>
-                <div class="col-12 col-sm-6 col-lg-6">
 
-                    <?= $form->field($modelItem, 'stock_qty')->textInput(['type' => 'number']) ?>
-                </div>
-            </div>
+
+
+            <?= $form->field($modelItem, 'sort_number')->textInput(['type' => 'number']) ?>
+
 
         </div>
+
     </div>
 
-    <div class="card">
-        <div class="card-body">
+<div class="card">
+    <div class="card-body">
+        <?php
+        $initialPreviewArray = $modelItem->getItemImages()->asArray()->all();
+        $initialPreviewArray = ArrayHelper::getColumn($initialPreviewArray, 'product_file_name');
+
+        foreach ($initialPreviewArray as $key => $file_name)
+            $initialPreviewArray[$key] = "https://res.cloudinary.com/plugn/image/upload/restaurants/" . $modelItem->restaurant->restaurant_uuid . "/items/" . $file_name;
+        ?>
+
+
+        <h5 style="margin-bottom: 20px;">
+            Media
+        </h5>
+
+        <?php
+        echo $form->field($modelItem, 'item_images[]')->widget(FileInput::classname(), [
+            'options' => ['accept' => 'image/*', 'multiple' => true
+            ],
+            'pluginOptions' => [
+                'showRemove' => false,
+                'showUpload' => false,
+                'showZoom' => false,
+                'initialPreview' => $initialPreviewArray,
+                'initialPreviewAsData' => true,
+                'allowedFileExtensions' => ['jpg', 'png', 'jpeg'],
+                'overwriteInitial' => true,
+                'uploadAsync' => true,
+                'showUploadedThumbs' => true,
+                'maxFileCount' => 10,
+                'initialPreviewShowDelete' => false,
+                'maxFileSize' => 30000
+            ]
+        ])->label(false);
+        ?>
+
+
+
+    </div>
+</div>
+
+
+<div class="card">
+    <div class="card-body">
+        <h5 style="margin-bottom: 20px;">
+            Price
+        </h5>
+
+
+        <?=
+        $form->field($modelItem, 'item_price', [
+            'template' => "{label}"
+            . "<div class='input-group'> <div class='input-group-prepend'> <span class='input-group-text'>KWD</span> </div>{input}"
+            . "</div>"
+            . "{error}{hint}"
+        ])->textInput([
+            'type' => 'number',
+            'step' => '.01',
+            'style' => 'border-top-left-radius: unset !important; border-bottom-left-radius: unset !important;',
+            'value' => $modelItem->item_price != null ? $modelItem->item_price : \Yii::$app->formatter->asDecimal(0, 2),
+            'class' => 'form-control'
+        ])->label(false)
+        ?>
+    </div>
+</div>
+
+
+<div class="card">
+    <div class="card-body">
+        <h5 style="margin-bottom: 20px;">
+            Inventory
+        </h5>
+
+        <div class="row">
+
+          <div class="col-12 col-sm-6 col-lg-6">
+
+              <?= $form->field($modelItem, 'sku')->textInput(['maxlength' => true]) ?>
+          </div>
+
+          <div class="col-12 col-sm-6 col-lg-6">
+              <?= $form->field($modelItem, 'barcode')->textInput(['maxlength' => true]) ?>
+          </div>
+
+
+        </div>
+
+
+        <?=
+        $form->field($modelItem, 'track_quantity', [
+            'template' => '
+            <div class="vs-checkbox-con vs-checkbox-primary">
+                {input}
+                <span class="vs-checkbox">
+                    <span class="vs-checkbox--check">
+                        <i class="vs-icon feather icon-check"></i>
+                    </span>
+                </span>
+                <span class="">{label}</span>
+            </div>
+            <div class=\"col-lg-8\">{error}</div>
+            ',
+        ])->checkbox([
+            'checked' => $modelItem->track_quantity == 0 ? false : true,
+            'id' => 'trackQuantityInput',
+                ], false)
+        ?>
+
+        <div class="row" id="stock_qty">
+            <div class="col-6">
+                <?= $form->field($modelItem, 'stock_qty')->textInput(['type' => 'number']) ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h5 style="margin-bottom: 20px;">
+            Options
+        </h5>
+
+        <div class="item-form">
+
+
+            <div class="padding-v-md">
+                <div class="line line-dashed"></div>
+            </div>
+
             <?php
-            $initialPreviewArray = $modelItem->getItemImages()->asArray()->all();
-            $initialPreviewArray = ArrayHelper::getColumn($initialPreviewArray, 'product_file_name');
-
-            foreach ($initialPreviewArray as $key => $file_name)
-                $initialPreviewArray[$key] = "https://res.cloudinary.com/plugn/image/upload/restaurants/" . $modelItem->restaurant->restaurant_uuid . "/items/" . $file_name;
-            ?>
-
-
-            <h5 style="margin-bottom: 20px;">
-                Media
-            </h5>
-
-            <?php
-            echo $form->field($modelItem, 'item_images[]')->widget(FileInput::classname(), [
-                'options' => ['accept' => 'image/*', 'multiple' => true
+            DynamicFormWidget::begin([
+                'widgetContainer' => 'dynamicform_wrapper',
+                'widgetBody' => '.container-items',
+                'widgetItem' => '.option-item',
+                'min' => 0,
+                'insertButton' => '.add-option',
+                'deleteButton' => '.remove-option',
+                'model' => $modelsOption[0],
+                'formId' => 'dynamic-form',
+                'formFields' => [
+                    'option_name',
+                    'option_name_ar',
+                    'min_qty',
+                    'max_qty',
                 ],
-                'pluginOptions' => [
-                    'showRemove' => false,
-                    'showUpload' => false,
-                    'showZoom' => false,
-                    'initialPreview' => $initialPreviewArray,
-                    'initialPreviewAsData' => true,
-                    'allowedFileExtensions' => ['jpg', 'png', 'jpeg'],
-                    'overwriteInitial' => true,
-                    'uploadAsync' => true,
-                    'showUploadedThumbs' => true,
-                    'maxFileCount' => 10,
-                    'initialPreviewShowDelete' => false,
-                    'maxFileSize' => 30000
-                ]
-            ])->label(false);
+            ]);
             ?>
-
-
-
-        </div>
-    </div>
-
-
-    <div class="card">
-        <div class="card-body">
-            <h5 style="margin-bottom: 20px;">
-                Price
-            </h5>
-
-
-            <?=
-            $form->field($modelItem, 'item_price', [
-                'template' => "{label}"
-                . "<div class='input-group'> <div class='input-group-prepend'> <span class='input-group-text'>KWD</span> </div>{input}"
-                . "</div>"
-                . "{error}{hint}"
-            ])->textInput([
-                'type' => 'number',
-                'step' => '.01',
-                'value' => $modelItem->item_price != null ? $modelItem->item_price : \Yii::$app->formatter->asDecimal(0, 2),
-                'class' => 'form-control'
-            ])->label(false)
-            ?>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-body">
-            <h5 style="margin-bottom: 20px;">
-                Options
-            </h5>
-
-            <div class="item-form">
-
-
-                <div class="padding-v-md">
-                    <div class="line line-dashed"></div>
-                </div>
-
-                <?php
-                DynamicFormWidget::begin([
-                    'widgetContainer' => 'dynamicform_wrapper',
-                    'widgetBody' => '.container-items',
-                    'widgetItem' => '.option-item',
-                    'min' => 0,
-                    'insertButton' => '.add-option',
-                    'deleteButton' => '.remove-option',
-                    'model' => $modelsOption[0],
-                    'formId' => 'dynamic-form',
-                    'formFields' => [
-                        'option_name',
-                        'option_name_ar',
-                        'min_qty',
-                        'max_qty',
-                    ],
-                ]);
-                ?>
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>Options</th>
-                            <th style="width: 450px;">Extra Options</th>
-                            <th class="text-center" style="width: 90px;">
-                                <button type="button" class="add-option btn btn-success btn-xs"><span class="fa fa-plus"></span></button>
-                            </th>
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Options</th>
+                        <th style="width: 450px;">Extra Options</th>
+                        <th class="text-center" style="width: 90px;">
+                            <button type="button" class="add-option btn btn-success btn-xs"><span class="fa fa-plus"></span></button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="container-items">
+                    <?php foreach ($modelsOption as $indexOption => $modelOption): ?>
+                        <tr class="option-item">
+                            <td class="vcenter">
+                                <?php
+                                // necessary for update action.
+                                if (!$modelOption->isNewRecord) {
+                                    echo Html::activeHiddenInput($modelOption, "[{$indexOption}]option_id");
+                                }
+                                ?>
+                                <?= $form->field($modelOption, "[{$indexOption}]option_name")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'e.g. Color']) ?>
+                                <?= $form->field($modelOption, "[{$indexOption}]option_name_ar")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'على سبيل المثال اللون']) ?>
+                                <?= $form->field($modelOption, "[{$indexOption}]min_qty")->label(false)->textInput(['type' => 'number', 'maxlength' => true, 'placeholder' => 'Minimum Selection']) ?>
+                                <?= $form->field($modelOption, "[{$indexOption}]max_qty")->label(false)->textInput(['type' => 'number', 'maxlength' => true, 'placeholder' => 'Maximum Selection']) ?>
+                            </td>
+                            <td>
+                                <?=
+                                $this->render('_form-extra-options', [
+                                    'form' => $form,
+                                    'indexOption' => $indexOption,
+                                    'modelsExtraOption' => (empty($modelsExtraOption[$indexOption])) ? [[new ExtraOption]] : $modelsExtraOption[$indexOption],
+                                ])
+                                ?>
+                            </td>
+                            <td class="text-center vcenter" style="width: 90px; verti">
+                                <button type="button" class="remove-option btn btn-danger btn-xs"><span class="fa fa-minus"></span></button>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody class="container-items">
-                        <?php foreach ($modelsOption as $indexOption => $modelOption): ?>
-                            <tr class="option-item">
-                                <td class="vcenter">
-                                    <?php
-                                    // necessary for update action.
-                                    if (!$modelOption->isNewRecord) {
-                                        echo Html::activeHiddenInput($modelOption, "[{$indexOption}]option_id");
-                                    }
-                                    ?>
-                                    <?= $form->field($modelOption, "[{$indexOption}]option_name")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'e.g. Color']) ?>
-                                    <?= $form->field($modelOption, "[{$indexOption}]option_name_ar")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'على سبيل المثال اللون']) ?>
-                                    <?= $form->field($modelOption, "[{$indexOption}]min_qty")->label(false)->textInput(['type' => 'number', 'maxlength' => true, 'placeholder' => 'Minimum']) ?>
-                                    <?= $form->field($modelOption, "[{$indexOption}]max_qty")->label(false)->textInput(['type' => 'number', 'maxlength' => true, 'placeholder' => 'Maximum']) ?>
-                                </td>
-                                <td>
-                                    <?=
-                                    $this->render('_form-extra-options', [
-                                        'form' => $form,
-                                        'indexOption' => $indexOption,
-                                        'modelsExtraOption' => (empty($modelsExtraOption[$indexOption])) ? [[new ExtraOption]] : $modelsExtraOption[$indexOption],
-                                    ])
-                                    ?>
-                                </td>
-                                <td class="text-center vcenter" style="width: 90px; verti">
-                                    <button type="button" class="remove-option btn btn-danger btn-xs"><span class="fa fa-minus"></span></button>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-                <?php DynamicFormWidget::end(); ?>
-
-            </div>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            <?php DynamicFormWidget::end(); ?>
 
         </div>
+
     </div>
+</div>
 
 
 
-    <div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px; padding-bottom: 15px; background:#f4f6f9 ">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
-    </div>
+<div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px; padding-bottom: 15px; background:#f4f6f9 ">
+    <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
+</div>
 
-    <?php ActiveForm::end(); ?>
+<?php ActiveForm::end(); ?>
 
 </div>

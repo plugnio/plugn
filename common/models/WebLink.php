@@ -20,7 +20,6 @@ use Yii;
 class WebLink extends \yii\db\ActiveRecord
 {
 
-
       //Values for `web_link_type`
       const WEB_LINK_TYPE_WEBSITE_URL = 1;
       const WEB_LINK_TYPE_FACEBOOK = 2;
@@ -103,33 +102,18 @@ class WebLink extends \yii\db\ActiveRecord
     }
 
 
-      /**
-       * {@inheritdoc}
-       */
-      // public function beforeSave($insert) {
-      //     if (parent::beforeSave($insert)) {
-      //
-      //
-      //         if ( $this->web_link_type ==  self::WEB_LINK_TYPE_FACEBOOK ){
-      //           $this->url = 'https://www.facebook.com/' . $this->url;
-      //         }
-      //         else if ( $this->web_link_type ==  self::WEB_LINK_TYPE_INSTAGRAM ){
-      //           $this->url = 'https://www.instagram.com/' . $this->url;
-      //         }
-      //         else if ( $this->web_link_type ==  self::WEB_LINK_TYPE_TWITTER ){
-      //           $this->url = 'https://www.twitter.com/' . $this->url;
-      //         }
-      //         else if ( $this->web_link_type ==  self::WEB_LINK_TYPE_SNAPCHAT ){
-      //           $this->url = 'https://www.snapchat.com/add/' . $this->url;
-      //         }
-      //         else if ( $this->web_link_type ==  self::WEB_LINK_TYPE_WHATSAPP ){
-      //           $this->url = 'https://wa.me/+965' . $this->url;
-      //         }
-      //
-      //
-      //         return true;
-      //     }
-      // }
+    /**
+     * @inheritdoc
+     */
+    public function fields() {
+        $fields = parent::fields();
+
+        // remove fields that contain sensitive information
+        unset($fields['restaurant_uuid']);
+        unset($fields['web_link_id']);
+
+        return $fields;
+    }
 
 
     /**

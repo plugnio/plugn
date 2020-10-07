@@ -95,6 +95,19 @@ class OrderItem extends \yii\db\ActiveRecord {
         if ($this->item)
             $this->item->increaseStockQty($this->qty);
 
+
+        $orderItemsExtraOption = OrderItemExtraOption::find()->where(['order_item_id' => $this->order_item_id])->all();
+
+        if($orderItemsExtraOption) {
+
+          foreach ($orderItemsExtraOption as $orderItemExtraOption)
+             $orderItemExtraOption->delete();
+             
+        }
+
+
+
+
         return parent::beforeDelete();
     }
 
@@ -119,12 +132,12 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         if ($insert) {
 
-            if ($this->qty  > $this->item->stock_qty)
+            if ($this->item->track_quantity && $this->qty  > $this->item->stock_qty)
                 return $this->addError('qty', $this->item->item_name . " is currently out of stock and unavailable.");
         }
         else {
 
-            if ($this->qty > ( $this->item->stock_qty + $this->getOldAttribute('qty')))
+            if ($this->item->track_quantity && $this->qty > ( $this->item->stock_qty + $this->getOldAttribute('qty')))
                 return $this->addError('qty', $this->item->item_name . " is currently out of stock and unavailable.");
 
         }

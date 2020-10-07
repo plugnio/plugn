@@ -4,10 +4,9 @@ use yii\helpers\Html;
 use wbraganca\dynamicform\DynamicFormWidget;
 
 $js = "
-$(document).on('wheel', 'input[type=number]', function (e) {
-    $(this).blur();
-});
-
+  $(document).on('wheel', 'input[type=number]', function (e) {
+      $(this).blur();
+  });
 ";
 
 $this->registerJs($js);
@@ -50,6 +49,9 @@ $this->registerJs($js);
                 <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_name")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'e.g. Red, Black']) ?>
                 <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_name_ar")->label(false)->textInput(['maxlength' => true, 'placeholder' => 'على سبيل المثال أحمر أسود']) ?>
                 <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]extra_option_price")->label(false)->textInput(['type' => 'number', 'step' => '.01', 'maxlength' => true, 'placeholder' => 'Price']) ?>
+                <?= $form->field($modelExtraOption, "[{$indexOption}][{$indexExtraOption}]stock_qty")->label(false)->textInput(['type' => 'number', 'step' => '1', 'maxlength' => true, 'placeholder' => 'Stock Quantity']) ?>
+
+
             </td>
             <td class="text-center vcenter" style="width: 90px;">
                 <button type="button" class="remove-extra-option btn btn-danger btn-xs"><span class="fa fa-minus"></span></button>

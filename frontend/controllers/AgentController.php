@@ -39,17 +39,17 @@ class AgentController extends Controller {
         ];
     }
 
-    /**
-     * Displays a single Agent model.
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionIndex($restaurantUuid) {
-        return $this->render('view', [
-                    'model' => $this->findModel($restaurantUuid),
-                    'restaurantUuid' => $restaurantUuid
-        ]);
-    }
+    // /**
+    //  * Displays a single Agent model.
+    //  * @return mixed
+    //  * @throws NotFoundHttpException if the model cannot be found
+    //  */
+    // public function actionIndex($restaurantUuid) {
+    //     return $this->render('view', [
+    //                 'model' => $this->findModel($restaurantUuid),
+    //                 'restaurantUuid' => $restaurantUuid
+    //     ]);
+    // }
 
     /**
      * Updates an existing Agent model.
@@ -61,7 +61,7 @@ class AgentController extends Controller {
         $model = $this->findModel($restaurantUuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+            return $this->redirect(['update', 'restaurantUuid' => $restaurantUuid]);
         }
 
         return $this->render('update', [

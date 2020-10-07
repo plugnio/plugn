@@ -332,6 +332,14 @@ class Restaurant extends \yii\db\ActiveRecord {
         $fields = parent::fields();
 
         // remove fields that contain sensitive information
+        unset($fields['restaurant_email_notification']);
+        unset($fields['developer_id']);
+        unset($fields['platform_fee']);
+        unset($fields['store_branch_name']);
+        unset($fields['armada_api_key']);
+        unset($fields['mashkor_branch_id']);
+        unset($fields['app_id']);
+        unset($fields['restaurant_status']);
         unset($fields['vendor_sector']);
         unset($fields['business_id']);
         unset($fields['business_entity_id']);
