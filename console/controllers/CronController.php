@@ -48,7 +48,13 @@ class CronController extends \yii\console\Controller {
 
                     $createNewSiteResponse = Yii::$app->netlifyComponent->createSite('testName', 'test-name', 'test-sub-domain');
                     
-                    die(print_r(($createNewSiteResponse->data)));
+                    if($createNewSiteResponse->isOk){   
+                        //will save site id to deploy 
+                        $deploySiteResponse = Yii::$app->netlifyComponent->deploySite('testName', 'test-name', 'test-sub-domain');
+
+                    } else {
+                         die(print_r($createNewSiteResponse));
+                    }
                 } else {
                     die(print_r($commitBuildJsFileResponse));
                 }
