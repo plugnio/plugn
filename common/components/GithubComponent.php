@@ -10,7 +10,7 @@ use yii\base\InvalidConfigException;
 use common\models\PaymentMethod;
 
 /**
- * Github REST API class 
+ * Github REST API class
  *
  * @author Saoud Al-Turki <saoud@plugn.io>
  * @link http://www.plugn.io
@@ -18,6 +18,7 @@ use common\models\PaymentMethod;
 class GithubComponent extends Component {
 
     private $apiEndpoint = 'https://api.github.com';
+
     public $token;
 
     /**
@@ -46,7 +47,7 @@ class GithubComponent extends Component {
      */
     public function getLastCommit() {
         //TODO Bee3ly + saoud77 must be dynamic
-        $lastCommitEndpoint = $this->apiEndpoint . "/repos/saoud77/NEW_REPO_NAME/commits/main";
+        $lastCommitEndpoint = $this->apiEndpoint . "/repos/saoud77/plugn-ionic/commits/master";
 
 
         $client = new Client();
@@ -70,7 +71,7 @@ class GithubComponent extends Component {
      */
     public function createBranch($sha, $branch_name) {
         //TODO Bee3ly + saoud77 must be dynamic
-        $createBranchEndpoint = $this->apiEndpoint . "/repos/saoud77/NEW_REPO_NAME/git/refs";
+        $createBranchEndpoint = $this->apiEndpoint . "/repos/saoud77/plugn-ionic/git/refs";
 
         $branchParams = [
             "sha" => $sha,
@@ -99,7 +100,7 @@ class GithubComponent extends Component {
      */
     public function createFileContent($content, $branch_name) {
         //TODO Bee3ly + saoud77 must be dynamic
-        $createBranchEndpoint = $this->apiEndpoint . "/repos/saoud77/NEW_REPO_NAME/contents/build.js";
+        $createBranchEndpoint = $this->apiEndpoint . "/repos/saoud77/plugn-ionic/contents/build.js";
 
         $branchParams = [
             "message" => "first commit for A store",

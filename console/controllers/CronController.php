@@ -24,38 +24,47 @@ class CronController extends \yii\console\Controller {
 
     public function actionTest() {
 
-                            $createNewSiteResponse = Yii::$app->netlifyComponent->createSite('testName', 'testname.com', 'test-sub-domain');
-                    
-                    die(print_r(($createNewSiteResponse)));
-                    
         $getLastCommitResponse = Yii::$app->githubComponent->getLastCommit();
 
         if ($getLastCommitResponse->isOk) {
             $sha = $getLastCommitResponse->data['sha'];
 
-            $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, 'refs/heads/test');
+            //Replace test with store branch name
+
+            $branchName = 'refs/heads/' . 'test';
+            $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, $branchName);
 
             if ($createBranchResponse->isOk) {
+
                 $fileToBeUploaded = file_get_contents("build.js");
 
-                // Encode the image string data into base64 
+                // Encode the image string data into base64
                 $data = base64_encode($fileToBeUploaded);
 
+                //Replace test with store branch name
 
                 $commitBuildJsFileResponse = Yii::$app->githubComponent->createFileContent($data, 'test');
 
                 if ($commitBuildJsFileResponse->isOk) {
 
-                    $createNewSiteResponse = Yii::$app->netlifyComponent->createSite('testName', 'test-name', 'test-sub-domain');
-                    
-                    if($createNewSiteResponse->isOk){   
-                        //will save site id to deploy 
-                        $deploySiteResponse = Yii::$app->netlifyComponent->deploySite('testName', 'test-name', 'test-sub-domain');
+                  //Replace test with store domain name
+
+                    $createNewSiteResponse = Yii::$app->netlifyComponent->createSite('test-saoud.com');
+
+                    if($createNewSiteResponse->isOk){
+
+                        $site_id = $createNewSiteResponse->data['site_id'];
+                        //will save site id to deploy
+                        $deploySiteResponse = Yii::$app->netlifyComponent->deploySite($site_id);
+
+                        die(print_r($deploySiteResponse));
 
                     } else {
                          die(print_r($createNewSiteResponse));
                     }
                 } else {
+                    die(print_r($getLastCommitResponse->data));
+
                     die(print_r($commitBuildJsFileResponse));
                 }
             } else
@@ -88,7 +97,7 @@ class CronController extends \yii\console\Controller {
         $tagline = $restaurant->tagline ? $restaurant->tagline : $restaurant->name;
 
         $txt = "
-            
+
 
             var facebookPixilId = $facebook_pixil_id;
             var googleAnalyticsId = $google_analytics_id;
@@ -114,7 +123,7 @@ console.log('Pre build');
 
   if(facebookPixilId){
     facebookPixilCode = `
-      
+
       <!-- Facebook Pixel Code -->
       <script>
         !function(f,b,e,v,n,t,s)
@@ -197,7 +206,7 @@ console.log('Pre build');
 
 
   `+ facebookPixilCode + `
-  
+
 
 
   <script src='https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js'></script>
@@ -253,7 +262,7 @@ console.log('Pre build');
       }
     }
   }
-  
+
       `;
 
 
@@ -261,7 +270,7 @@ console.log('Pre build');
 
 
 
-                
+
 
 
 
@@ -293,7 +302,7 @@ console.log('Pre build');
   download('https://res.cloudinary.com/plugn/image/upload/w_384,h_384/restaurants/' + storeUuid + '/logo/' + storeLogo, 'src/assets/icons/icon-384x384.png', function () { });
   download('https://res.cloudinary.com/plugn/image/upload/w_512,h_512/restaurants/' + storeUuid + '/logo/' + storeLogo, 'src/assets/icons/icon-512x512.png', function () { });
 
-  
+
   var manifestFile = `
    {
     'name': '` + storeName + `',
@@ -367,7 +376,7 @@ console.log('Pre build');
     apiEndpoint: 'https://api.plugn.io/v1',
     restaurantUuid : `+ storeUuid +`
   };`;
-  
+
   fs.writeFileSync('src/environments/environment.'+  storeUuid  + '.ts', environmentFile);
 
 
@@ -564,15 +573,15 @@ console.log('Pre build');
       }
     }
   }`;
-  
-  
+
+
   fs.writeFileSync('angular.json', angularFile);
 
 
 
   var buildFileJs = `
   #!/usr/bin/env bash
-  
+
   ng build -c=`+storeName;
 
   fs.writeFileSync('build.sh', buildFileJs);

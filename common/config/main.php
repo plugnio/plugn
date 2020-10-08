@@ -69,7 +69,7 @@ return [
         ],
         'netlifyComponent' => [
             'class' => 'common\components\NetlifyComponent',
-            'token' => '0_XaozvJbIP5eYVUbGVUbb7kD4Rtgoqm3SR5kmNnhyQ'
+            'token' => 'dIaf1ZOTSo-XWIaf7OHy8AgZGMkg9l90E1RWPenKxCs'
         ],
         'githubComponent' => [
             'class' => 'common\components\GithubComponent',
