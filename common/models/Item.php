@@ -211,6 +211,8 @@ class Item extends \yii\db\ActiveRecord
                 }
             } catch (\Cloudinary\Error $err) {
                 Yii::error("Error when uploading item's image to Cloudinry: " . json_encode($err));
+                Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($imagesPath));
+
             }
         }
     }
