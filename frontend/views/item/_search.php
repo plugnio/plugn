@@ -68,6 +68,13 @@ use common\models\CategoryItem;
                             <div class="col-12 col-sm-6 col-lg-6">
                                 <?= $form->field($model, 'sku') ?>
                             </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-sm-6 col-lg-6">
+                                <?=
+                                $form->field($model, 'category_id')->dropDownList($categoryList, ['class' => 'form-control', 'prompt' => 'Select category'])->label('Category Name');
+                                ?>
+                            </div>
 
                         </div>
 

@@ -643,7 +643,7 @@ class Order extends \yii\db\ActiveRecord {
                                                                              'order' => $this
                                                                          ])
                                                                          ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
-                                                                         ->setTo([$this->restaurant->restaurant_email, \Yii::$app->params['supportEmail']])
+                                                                         ->setTo([$this->restaurant->restaurant_email])
                                                                          ->setSubject('Order #' . $this->order_uuid)
                                                                          ->send();
                                                                }
@@ -662,7 +662,7 @@ class Order extends \yii\db\ActiveRecord {
                                     'order' => $this
                                 ])
                                 ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
-                                ->setTo([$this->restaurant->restaurant_email, \Yii::$app->params['supportEmail']])
+                                ->setTo([$this->restaurant->restaurant_email])
                                 ->setSubject('Order #' . $this->order_uuid)
                                 ->send();
                     }
