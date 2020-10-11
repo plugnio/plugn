@@ -17,7 +17,7 @@ use common\models\PaymentMethod;
  */
 class GithubComponent extends Component {
 
-    private $apiEndpoint = 'https://api.github.com';
+    private $apiEndpoint = 'https://api.github.com/repos/plugnio/plugn-ionic';
 
     public $token;
 
@@ -46,8 +46,7 @@ class GithubComponent extends Component {
      * Returns the contents of a single commit reference
      */
     public function getLastCommit() {
-        //TODO Bee3ly + saoud77 must be dynamic
-        $lastCommitEndpoint = $this->apiEndpoint . "/repos/saoud77/plugn-ionic/commits/master";
+        $lastCommitEndpoint = $this->apiEndpoint . "/commits/automated";
 
 
         $client = new Client();
@@ -70,8 +69,7 @@ class GithubComponent extends Component {
      * @return type
      */
     public function createBranch($sha, $branch_name) {
-        //TODO Bee3ly + saoud77 must be dynamic
-        $createBranchEndpoint = $this->apiEndpoint . "/repos/saoud77/plugn-ionic/git/refs";
+        $createBranchEndpoint = $this->apiEndpoint . "/git/refs";
 
         $branchParams = [
             "sha" => $sha,
@@ -99,8 +97,7 @@ class GithubComponent extends Component {
      * @return type
      */
     public function createFileContent($content, $branch_name) {
-        //TODO Bee3ly + saoud77 must be dynamic
-        $createBranchEndpoint = $this->apiEndpoint . "/repos/saoud77/plugn-ionic/contents/build.js";
+        $createBranchEndpoint = $this->apiEndpoint . "/contents/build.js";
 
         $branchParams = [
             "message" => "first commit for A store",

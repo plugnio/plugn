@@ -31,15 +31,13 @@ $this->params['breadcrumbs'][] = $this->title;
                             <div class="card-body pt-0">
                               <?php $form = ActiveForm::begin(['id' => 'store-form', 'enableClientScript' => false]); ?>
 
-                                    <?= $form->field($store_model, 'name')->textInput(['maxlength' => true])->label('Business name in English') ?>
+                                    <?= $form->field($store_model, 'name')->textInput(['maxlength' => true])->label('Your store name in English') ?>
 
-                                    <?= $form->field($store_model, 'name_ar')->textInput(['maxlength' => true])->label('Business name in Arabic')  ?>
-
+                                    <?= $form->field($store_model, 'name_ar')->textInput(['maxlength' => true])->label('Your store name in Arabic')  ?>
 
                                     <?= $form->field($agent_model, 'agent_name')->textInput(['maxlength' => true])->label('Owner name') ?>
 
                                     <?= $form->field($agent_model, 'agent_email')->textInput(['maxlength' => true])->label('Owner email')  ?>
-
 
                                     <?= $form->field($agent_model, 'tempPassword')->passwordInput(['maxlength' => true]) ?>
 
