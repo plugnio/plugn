@@ -268,6 +268,9 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function getOrderStatusInEnglish() {
         switch ($this->order_status) {
+          case self::STATUS_DRAFT:
+              return "Draft";
+              break;
             case self::STATUS_PENDING:
                 return "Pending";
                 break;
@@ -291,6 +294,9 @@ class Order extends \yii\db\ActiveRecord {
                 break;
             case self::STATUS_ACCEPTED:
                 return "Accepted";
+                break;
+            case self::STATUS_ABANDONED_CHECKOUT:
+                return "Abandoned";
                 break;
         }
     }

@@ -124,7 +124,7 @@ $this->registerJs($js);
             <p style="margin-top: 1rem">
 
                 <?php
-                if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Order::STATUS_ABANDONED_CHECKOUT) && $model->getOrderItems()->count()) {
+                if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Order::STATUS_ABANDONED_CHECKOUT || $model->order_status == Order::STATUS_CANCELED ) && $model->getOrderItems()->count()) {
                     echo Html::a('Mark as pending', [
                         'change-order-status',
                         'order_uuid' => $model->order_uuid,
@@ -180,7 +180,7 @@ $this->registerJs($js);
                     ]);
                 }
 
-                if ($model->order_status != Order::STATUS_CANCELED) {
+                if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Order::STATUS_ABANDONED_CHECKOUT) {
                     echo Html::a('Cancel order', [
                         'change-order-status',
                         'order_uuid' => $model->order_uuid,
@@ -439,7 +439,7 @@ $this->registerJs($js);
                                     </tr>
                                 </tbody>
                             <?php }
-                            ?> 
+                            ?>
 
                     <tbody>
                         <tr>
