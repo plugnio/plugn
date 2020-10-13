@@ -40,6 +40,8 @@ return [
             'frontend/web/assets',
             'api/runtime',
             'api/web/assets',
+            'shortner/runtime',
+            'shortner/web/assets',
         ],
         'setExecutable' => [
             'yii',
@@ -51,6 +53,7 @@ return [
             'common/config/codeception-local.php',
             'frontend/config/main-local.php',
             'api/config/main-local.php',
+            'shortner/config/main-local.php',
         ],
     ],
     'Development [Khalid]' => [
@@ -88,6 +91,8 @@ return [
             'frontend/web/assets',
             'api/runtime',
             'api/web/assets',
+            'shortner/runtime',
+            'shortner/web/assets',
         ],
         'setExecutable' => [
             'yii',
@@ -99,6 +104,7 @@ return [
             'common/config/codeception-local.php',
             'frontend/config/main-local.php',
             'api/config/main-local.php',
+            'shortner/config/main-local.php',
         ],
     ],
     'Production' => [
@@ -112,6 +118,8 @@ return [
             'frontend/web/assets',
             'api/runtime',
             'api/web/assets',
+            'shortner/runtime',
+            'shortner/web/assets',
         ],
         'setExecutable' => [
             'yii',
@@ -120,6 +128,7 @@ return [
             'backend/config/main-local.php',
             'frontend/config/main-local.php',
             'api/config/main-local.php',
+            'shortner/config/main-local.php',
         ],
     ],
 ];
