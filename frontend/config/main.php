@@ -40,13 +40,6 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        'urlManager' => [
-       'enablePrettyUrl' => true,
-       'showScriptName' => false,
-       'rules' => [
-           'r/<payId>' => 'shortener/redirect',
-       ],
-   ],
         /*
         'urlManager' => [
             'enablePrettyUrl' => true,
