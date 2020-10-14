@@ -44,7 +44,7 @@ return [
                 'enablePrettyUrl' => true,
                 'showScriptName' => false,
                 'rules' => [
-                    'r/<orderId>' => 'shortener/redirect',
+                    '<orderId>' => 'shortener/redirect',
                 ],
             ],
     ],
