@@ -21,7 +21,9 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-
+  // public function actionIndex(){
+  //   return Yii::$app->smsComponent->sendSms('50604444', '12345');
+  // }
 
     /**
      * Update refund status  for all refunds record
