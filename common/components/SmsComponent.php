@@ -56,7 +56,6 @@ class SmsComponent extends Component
                 ->setData($smsParams)
                 ->send();
 
-        die($response);
         return $response;
     }
 }
