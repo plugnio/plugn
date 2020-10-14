@@ -22,6 +22,9 @@ use Yii;
  */
 class OrderItemExtraOption extends \yii\db\ActiveRecord {
 
+    const SCENARIO_CREATE_ORDER_ITEM_EXTRA_OPTION_BY_ADMIN = 'manual';
+
+
     /**
      * {@inheritdoc}
      */
@@ -34,7 +37,9 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['order_item_id','qty', 'extra_option_id'], 'required'],
+            [['order_item_id', 'extra_option_id'], 'required'],
+            [['qty'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_ITEM_EXTRA_OPTION_BY_ADMIN],
+            [['qty'], 'default', 'value' => 1 , 'on' =>  self::SCENARIO_CREATE_ORDER_ITEM_EXTRA_OPTION_BY_ADMIN],
             [['order_item_id', 'extra_option_id','qty'], 'integer', 'min' => 0],
             [['extra_option_id'], 'checkIfExtraOptionBelongToItem'],
             [['extra_option_price'], 'number', 'min' => 0],

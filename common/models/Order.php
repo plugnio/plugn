@@ -87,7 +87,6 @@ class Order extends \yii\db\ActiveRecord {
     //Values for `order_mode`
     const ORDER_MODE_DELIVERY = 1;
     const ORDER_MODE_PICK_UP = 2;
-    const SCENARIO_CREATE_ORDER_BY_ADMIN = 'manual';
 
 
     //Values for `mashkor_order_status`
@@ -101,6 +100,8 @@ class Order extends \yii\db\ActiveRecord {
     const MASHKOR_ORDER_STATUS_DELIVERED = 10;
     const MASHKOR_ORDER_STATUS_CANCELED = 11;
 
+
+    const SCENARIO_CREATE_ORDER_BY_ADMIN = 'manual';
 
 
     /**
@@ -616,9 +617,9 @@ class Order extends \yii\db\ActiveRecord {
         parent::afterSave($insert, $changedAttributes);
 
       //Send SMS To customer
-      // if (!$insert &&  isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_PENDING && $this->order_status == self::STATUS_ACCEPTED) {
-      //   return Yii::$app->smsComponent->sendSms('51113111', '12345');
-      // }
+      if (!$insert &&  $this->restaurant_uuid == 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290' && isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_PENDING && $this->order_status == self::STATUS_ACCEPTED) {
+        return Yii::$app->smsComponent->sendSms('51113111', $this->order_uuid);
+      }
 
       //Update delivery area
       if (!$insert &&  $this->order_mode == static::ORDER_MODE_DELIVERY && isset($changedAttributes['area_id']) && $changedAttributes['area_id'] != $this->getOldAttribute('area_id')  && $this->area_id) {
