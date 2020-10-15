@@ -47,7 +47,7 @@ class AgentController extends Controller
      */
     public function actionIndex()
     {
-	$searchModel = new AgentSearch();
+       $searchModel = new AgentSearch();
        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
        return $this->render('index', [
