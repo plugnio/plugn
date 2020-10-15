@@ -34,7 +34,6 @@ $this->params['breadcrumbs'][] = $this->title;
     </h1>
 
 
-
     <p>
         <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
         <?=
