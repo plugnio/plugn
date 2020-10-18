@@ -188,7 +188,7 @@ class CronController extends \yii\console\Controller {
         $orders = Order::find()
                 ->where(['order_status' => Order::STATUS_PENDING])
                 ->andWhere(['reminder_sent' => 0])
-                ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')])
+                ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 MINUTE)')])
                 ->all();
 
         if ($orders) {

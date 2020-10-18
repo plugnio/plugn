@@ -10,7 +10,7 @@ use yii\helpers\Html;
 
 
     <p class="lead">
-      We would like to remind you that Order #<?= $order->order_uuid ?> has been placed 10 minutes ago for total amount of <?= \Yii::$app->formatter->asCurrency($order->total_price) ?>
+      We would like to remind you that Order #<?= $order->order_uuid ?> has been placed 5 minutes ago for total amount of <?= \Yii::$app->formatter->asCurrency($order->total_price) ?>
 
 
 
