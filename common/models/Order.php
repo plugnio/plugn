@@ -34,6 +34,7 @@ use yii\behaviors\AttributeBehavior;
  * @property int|null $order_status
  * @property int $order_mode
  * @property int $subtotal
+ * @property int $sms_sent
  * @property int $total_price
  * @property int $items_has_been_restocked
  * @property int $latitude
@@ -122,7 +123,7 @@ class Order extends \yii\db\ActiveRecord {
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status','mashkor_order_status', 'customer_id'], 'integer', 'min' => 0],
-            [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id', 'reminder_sent'], 'integer'],
+            [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id', 'reminder_sent', 'sms_sent'], 'integer'],
             ['mashkor_order_status', 'in', 'range' => [
               self::MASHKOR_ORDER_STATUS_NEW,
               self::MASHKOR_ORDER_STATUS_CONFIRMED,
@@ -617,8 +618,23 @@ class Order extends \yii\db\ActiveRecord {
         parent::afterSave($insert, $changedAttributes);
 
       //Send SMS To customer
-      if (!$insert &&  $this->restaurant_uuid == 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290' && isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_PENDING && $this->order_status == self::STATUS_ACCEPTED) {
-        return Yii::$app->smsComponent->sendSms($this->customer_phone_number, $this->order_uuid);
+      if (!$insert &&  $this->restaurant_uuid == 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290' && !$this->sms_sent && isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_PENDING && $this->order_status == self::STATUS_ACCEPTED) {
+
+        try {
+          $response = Yii::$app->smsComponent->sendSms($this->customer_phone_number, $this->order_uuid);
+
+          if(!$response->isOk)
+            Yii::error('Error while Sending SMS' . json_encode($response));
+          else {
+            $this->sms_sent = 1;
+            $this->save(false);
+          }
+
+        } catch (\Exception $err) {
+          Yii::error('Error while Sending SMS.' . json_encode($err));
+        }
+
+
       }
 
       //Update delivery area

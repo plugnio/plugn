@@ -21,15 +21,63 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-  // public function actionIndex(){
-  //   return Yii::$app->smsComponent->sendSms('50604444', '12345');
-  // }
+  public function actionIndex(){
+
+          $great_steak = Restaurant::findOne('rest_6df8c9dc-f285-11ea-808a-0673128d0c9c');
+
+          $greatSteakCoutner = 0;
+
+          foreach ($great_steak->getItems()->all() as $item) {
+
+              $item->track_quantity = 0;
+
+              $item->save(false);
+              $greatSteakCoutner++;
+
+          }
+
+
+          $doner = Restaurant::findOne('rest_7f4299c0-f28e-11ea-808a-0673128d0c9c');
+
+          $donerCoutner = 0;
+
+          foreach ($doner->getItems()->all() as $item) {
+
+              $item->track_quantity = 0;
+
+              $item->save(false);
+              $donerCoutner++;
+
+          }
+
+
+          $rustica = Restaurant::findOne('rest_1bd43ee4-f292-11ea-808a-0673128d0c9c');
+
+          $rusticaCoutner = 0;
+
+          foreach ($rustica->getItems()->all() as $item) {
+
+              $item->track_quantity = 0;
+
+              $item->save(false);
+              $rusticaCoutner++;
+
+          }
+
+
+          $this->stdout("Thank you Big Boss!  \n", Console::FG_RED, Console::BOLD);
+          $this->stdout("Great steak qty =>>>>> " . $greatSteakCoutner, Console::FG_RED, Console::BOLD);
+          $this->stdout("Doner qty =>>>>> " . $donerCoutner, Console::FG_RED, Console::BOLD);
+          $this->stdout("RusticaCoutner qty =>>>>> " . $rusticaCoutner, Console::FG_RED, Console::BOLD);
+          return self::EXIT_CODE_NORMAL;
+  }
 
     /**
      * Update refund status  for all refunds record
      */
     public function actionUpdateOrdersRecord() {
       Order::updateAll(['reminder_sent' => 1], 'reminder_sent = 0');
+      Order::updateAll(['sms_sent' => 1], 'sms_sent = 0');
 
       $this->stdout("Thank you Big Boss! \n", Console::FG_RED, Console::BOLD);
       return self::EXIT_CODE_NORMAL;
@@ -132,7 +180,7 @@ class CronController extends \yii\console\Controller {
     }
 
     /**
-     * Method called to Send  reminder if order not picked up in 10 minutes
+     * Method called to Send  reminder if order not picked up in 5 minutes
      */
     public function actionSendReminderEmail() {
 

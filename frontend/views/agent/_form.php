@@ -126,7 +126,7 @@ $this->registerJs($js);
                         <i class="vs-icon feather icon-check"></i>
                     </span>
                 </span>
-                <span class="">Send me reminder email if order not accepted in 10 minutes</span>
+                <span class="">Send me reminder email if order not accepted in 5 minutes</span>
             </div>
             <div class=\"col-lg-8\">{error}</div>
             ',
