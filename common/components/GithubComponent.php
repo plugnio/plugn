@@ -46,7 +46,7 @@ class GithubComponent extends Component {
      * Returns the contents of a single commit reference
      */
     public function getLastCommit() {
-        $lastCommitEndpoint = $this->apiEndpoint . "/commits/automated";
+        $lastCommitEndpoint = $this->apiEndpoint . "/commits/develop";
 
 
         $client = new Client();
