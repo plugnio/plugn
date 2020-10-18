@@ -9,3 +9,12 @@
 
 # Every day at midnight
 0 0 * * * php ~/www/yii  cron/update-voucher-status > /dev/null 2>&1
+
+# Build every 10 sec
+* * * * * php ~/www/yii  cron/update-voucher-status > /dev/null 2>&1
+* * * * * sleep 10 && php ~/www/yii  cron/update-voucher-status > /dev/null 2>&1
+* * * * * sleep 20 && php ~/www/yii  cron/update-voucher-status > /dev/null 2>&1
+* * * * * sleep 30 && php ~/www/yii  cron/update-voucher-status > /dev/null 2>&1
+* * * * * sleep 40 && php ~/www/yii  cron/update-voucher-status > /dev/null 2>&1
+* * * * * sleep 50 && php ~/www/yii  cron/update-voucher-status > /dev/null 2>&1
+
