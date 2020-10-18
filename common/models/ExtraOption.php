@@ -85,31 +85,30 @@ class ExtraOption extends \yii\db\ActiveRecord {
         ];
     }
 
-
     /**
      * increase stock_qty
      * @param type $qty
      */
-    public function increaseStockQty()
+    public function increaseStockQty($qty)
     {
         if($this->stock_qty !== null && $this->stock_qty >= 0 ){
-          $this->stock_qty++;
+          $this->stock_qty += $qty;
           $this->save(false);
         }
     }
+
 
     /**
      * decrease stock_qty
      * @param type $qty
      */
-    public function decreaseStockQty()
+    public function decreaseStockQty($qty)
     {
         if($this->stock_qty !== null && $this->stock_qty > 0 ){
-          $this->stock_qty--;
+          $this->stock_qty -= $qty;
           $this->save(false);
         }
     }
-
 
 
     /**

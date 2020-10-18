@@ -53,6 +53,7 @@ class OrderItemExtraOptionController extends Controller {
 
         if ($order_item_model = OrderItem::find()->where(['order_item_id' => $id])->one()) {
             $model = new OrderItemExtraOption();
+            $model->setScenario(OrderItemExtraOption::SCENARIO_CREATE_ORDER_ITEM_EXTRA_OPTION_BY_ADMIN);
             $model->order_item_id = $id;
 
             //Get item's extra options to retrieve it on create-form page

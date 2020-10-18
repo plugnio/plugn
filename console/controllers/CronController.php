@@ -5,6 +5,7 @@ namespace console\controllers;
 use Yii;
 use common\models\Restaurant;
 use common\models\OrderItem;
+use common\models\Queue;
 use common\models\Voucher;
 use common\models\BankDiscount;
 use common\models\Payment;
@@ -81,14 +82,25 @@ class CronController extends \yii\console\Controller {
     }
 
     public function actionIndex() {
-        $myFolder = mkdir('test');
-        $myfile = fopen("test/build.js", "w") or die("Unable to open file!");
 
-        $restaurant = Restaurant::find()->one();
+        $now = new DateTime('now');
+        $queue = Queue::find()
+                ->joinWith('restaurant')
+                ->andWhere(['queue_status' => Queue::QUEUE_STATUS_PENDING])
+                ->orderBy(['queue_created_at' => SORT_ASC])
+                ->one();
+
+        if($queue && $queue->restaurant_uuid){
+          $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
+          $queue->save();
+
+        $restaurant = $queue->restaurant;
+        $myFolder = mkdir(strtolower($restaurant->name));
+        $myfile = fopen($restaurant->name . "/build.js", "w") or die("Unable to open file!");
 
         $themeColor = RestaurantTheme::find()
                 ->select(['primary'])
-                ->where(['restaurant_uuid' => $restaurant->restaurant_uuid])
+                ->where(['restaurant_uuid' => $queue->restaurant_uuid])
                 ->one();
 
 
@@ -98,8 +110,6 @@ class CronController extends \yii\console\Controller {
         $tagline = $restaurant->tagline ? $restaurant->tagline : $restaurant->name;
 
         $txt = "
-
-
 
                 var facebookPixilId = $facebook_pixil_id;
                 var googleAnalyticsId = $google_analytics_id;
@@ -177,7 +187,7 @@ class CronController extends \yii\console\Controller {
                                         <meta name='viewport' content='viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no'/>
                                         <meta name='format-detection' content='telephone=no'/>
                                         <meta name='msapplication-tap-highlight' content='no'/>
-                                        <link rel='icon' type='image/png' href='https://res.cloudinary.com/plugn/image/upload/w_16,h_16/restaurants/` + storeUuid + `/logo/` + storeLogo + `'/>
+                                        <link rel='icon' type='image/png' href='https://res.cloudinary.com/plugn/image/upload/w_100,h_100/restaurants/` + storeUuid + `/logo/` + storeLogo + `'/>
                                         <link rel='apple-touch-icon' href='https://res.cloudinary.com/plugn/image/upload/w_300,h_300,b_rgb:ffffff/restaurants/` + storeUuid + `/logo/` + storeLogo + `'/>
                                         <link rel='apple-touch-startup-image' href='https://res.cloudinary.com/plugn/image/upload/w_200,h_200,b_rgb:ffffff/restaurants/` + storeUuid + `/logo/` + storeLogo + `'/>
                                         <!-- add to homescreen for ios -->
@@ -529,7 +539,13 @@ class CronController extends \yii\console\Controller {
 
         fclose($myfile);
 
+
+        $queue->queue_status = Queue::QUEUE_STATUS_COMPLETE;
+        $queue->save();
+
         $this->stdout("File has been created! \n", Console::FG_RED, Console::BOLD);
+      }
+
         return self::EXIT_CODE_NORMAL;
     }
 
@@ -597,11 +613,12 @@ class CronController extends \yii\console\Controller {
         $payments = Payment::find()
                 ->joinWith('order')
                 ->where(['!=', 'payment.payment_current_status', 'CAPTURED'])
+                ->andWhere(['order.order_status' => Order::STATUS_ABANDONED_CHECKOUT])
                 ->andWhere(['order.items_has_been_restocked' => 0]) // if items hasnt been restocked
                 ->andWhere(['<', 'payment.payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 15 MINUTE)')]);
 
         foreach ($payments->all() as $payment) {
-            $payment->order->restockAllItems();
+            $payment->order->restockItems();
         }
     }
 

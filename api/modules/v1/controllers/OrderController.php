@@ -577,6 +577,17 @@ class OrderController extends Controller {
             $order_model->mashkor_tracking_link = Yii::$app->request->getBodyParam("tracking_link");
             $order_model->mashkor_order_status = Yii::$app->request->getBodyParam("order_status");
 
+
+
+
+            if( $order_model->mashkor_order_status == Order::MASHKOR_ORDER_STATUS_IN_DELIVERY ) // In delivery
+                $order_model->order_status = Order::STATUS_OUT_FOR_DELIVERY;
+
+            if( $order_model->mashkor_order_status == Order::MASHKOR_ORDER_STATUS_DELIVERED ) // Delivered
+                $order_model->order_status = Order::STATUS_COMPLETE;
+
+
+
             if ($order_model->save()) {
                 return [
                     'operation' => 'success'

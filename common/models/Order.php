@@ -87,7 +87,6 @@ class Order extends \yii\db\ActiveRecord {
     //Values for `order_mode`
     const ORDER_MODE_DELIVERY = 1;
     const ORDER_MODE_PICK_UP = 2;
-    const SCENARIO_CREATE_ORDER_BY_ADMIN = 'manual';
 
 
     //Values for `mashkor_order_status`
@@ -101,6 +100,8 @@ class Order extends \yii\db\ActiveRecord {
     const MASHKOR_ORDER_STATUS_DELIVERED = 10;
     const MASHKOR_ORDER_STATUS_CANCELED = 11;
 
+
+    const SCENARIO_CREATE_ORDER_BY_ADMIN = 'manual';
 
 
     /**
@@ -268,6 +269,9 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function getOrderStatusInEnglish() {
         switch ($this->order_status) {
+          case self::STATUS_DRAFT:
+              return "Draft";
+              break;
             case self::STATUS_PENDING:
                 return "Pending";
                 break;
@@ -291,6 +295,9 @@ class Order extends \yii\db\ActiveRecord {
                 break;
             case self::STATUS_ACCEPTED:
                 return "Accepted";
+                break;
+            case self::STATUS_ABANDONED_CHECKOUT:
+                return "Abandoned";
                 break;
         }
     }
@@ -483,15 +490,23 @@ class Order extends \yii\db\ActiveRecord {
     /**
      * Update order status to pending
      */
-    public function restockAllItems() {
+    public function restockItems() {
 
         $orderItems = $this->getOrderItems();
-        // die($orderItems->count());
+        $orderItemExtraOptions = $this->getOrderItemExtraOptions();
 
         if ($orderItems->count() > 0) {
             foreach ($orderItems->all() as $orderItem)
                 if ($orderItem->item_uuid) {
 
+                    $orderItemExtraOptions = $orderItem->getOrderItemExtraOptions();
+
+                    if ($orderItemExtraOptions->count() > 0) {
+                        foreach ($orderItemExtraOptions->all() as $orderItemExtraOption){
+                          if ($orderItemExtraOption->order_item_extra_option_id)
+                              $orderItemExtraOption->extraOption->increaseStockQty($orderItem->qty);
+                        }
+                    }
 
 
                     $orderItem->item->increaseStockQty($orderItem->qty);
@@ -499,6 +514,8 @@ class Order extends \yii\db\ActiveRecord {
                     $this->save(false);
                 }
         }
+
+
     }
 
     /**
@@ -572,10 +589,13 @@ class Order extends \yii\db\ActiveRecord {
 
     public function beforeDelete() {
 
+      if(!$this->items_has_been_restocked){
         $orderItems = OrderItem::find()->where(['order_uuid' => $this->order_uuid])->all();
 
         foreach ($orderItems as $model)
             $model->delete();
+      }
+
 
         return parent::beforeDelete();
     }
@@ -596,13 +616,18 @@ class Order extends \yii\db\ActiveRecord {
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-        //Update delivery area
-        if (!$insert &&  $this->order_mode == static::ORDER_MODE_DELIVERY && isset($changedAttributes['area_id']) && $changedAttributes['area_id'] != $this->getOldAttribute('area_id')  && $this->area_id) {
-              $area_model = Area::findOne($this->area_id);
-              $this->area_name = $area_model->area_name;
-              $this->area_name_ar = $area_model->area_name_ar;
-              $this->save(false);
-        }
+      //Send SMS To customer
+      if (!$insert &&  $this->restaurant_uuid == 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290' && isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_PENDING && $this->order_status == self::STATUS_ACCEPTED) {
+        return Yii::$app->smsComponent->sendSms($this->customer_phone_number, $this->order_uuid);
+      }
+
+      //Update delivery area
+      if (!$insert &&  $this->order_mode == static::ORDER_MODE_DELIVERY && isset($changedAttributes['area_id']) && $changedAttributes['area_id'] != $this->getOldAttribute('area_id')  && $this->area_id) {
+            $area_model = Area::findOne($this->area_id);
+            $this->area_name = $area_model->area_name;
+            $this->area_name_ar = $area_model->area_name_ar;
+            $this->save(false);
+      }
 
 
         if (!$insert && $this->payment && $this->items_has_been_restocked && isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_ABANDONED_CHECKOUT) {
@@ -613,17 +638,43 @@ class Order extends \yii\db\ActiveRecord {
 
                 if ($orderItem->item_uuid) {
 
-                    if (($orderItem->item->track_quantity && $orderItem->item->stock_qty >= $orderItem->qty) || !$orderItem->item->track_quantity) {
-                        $orderItem->item->decreaseStockQty($orderItem->qty);
-                    } else {
+                    if (($orderItem->item->track_quantity && $orderItem->item->stock_qty >= $orderItem->qty) || !$orderItem->item->track_quantity){
+                      $orderItemExtraOptions = $orderItem->getOrderItemExtraOptions();
 
+
+                                            if ($orderItemExtraOptions->count() > 0) {
+                                                foreach ($orderItemExtraOptions->all() as $orderItemExtraOption){
+                                                  if ($orderItemExtraOption->extraOption && $orderItemExtraOption->extraOption->stock_qty >= $orderItemExtraOption->qty)
+                                                      $orderItemExtraOption->extraOption->decreaseStockQty($orderItemExtraOption->qty);
+                                                      else  {
+
+                                                               if($orderItemExtraOption->extraOption->stock_qty !== null){
+                                                                 \Yii::$app->mailer->compose([
+                                                                             'html' => 'out-of-stock-order-html',
+                                                                                 ], [
+                                                                             'order' => $this
+                                                                         ])
+                                                                         ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+                                                                         ->setTo([$this->restaurant->restaurant_email])
+                                                                         ->setSubject('Order #' . $this->order_uuid)
+                                                                         ->send();
+                                                               }
+                                                         }
+                                                }
+                                              }
+
+                      $orderItem->item->decreaseStockQty($orderItem->qty);
+
+
+                    }
+                    else {
                         \Yii::$app->mailer->compose([
                                     'html' => 'out-of-stock-order-html',
                                         ], [
                                     'order' => $this
                                 ])
                                 ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
-                                ->setTo([$this->restaurant->restaurant_email, \Yii::$app->params['supportEmail']])
+                                ->setTo([$this->restaurant->restaurant_email])
                                 ->setSubject('Order #' . $this->order_uuid)
                                 ->send();
                     }

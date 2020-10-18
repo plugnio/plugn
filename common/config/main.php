@@ -63,6 +63,9 @@ return [
             'class' => 'common\components\ArmadaDelivery',
             'keyToUse' => \common\components\ArmadaDelivery::USE_LIVE_KEY,
         ],
+        'smsComponent' => [
+            'class' => 'common\components\SmsComponent'
+        ],
         'mashkorDelivery' => [
             'class' => 'common\components\MashkorDelivery',
             'keyToUse' => \common\components\MashkorDelivery::USE_LIVE_KEY

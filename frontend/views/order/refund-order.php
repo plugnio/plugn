@@ -93,8 +93,6 @@ $this->registerJs($js);
 
     function decrementRefundedAmount(maxQty, refunded_qty, itemPrice) {
 
-        console.log(refunded_qty);
-
         inputValue = document.getElementById(refunded_qty).value;
 
         if (inputValue > 0) {

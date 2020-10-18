@@ -163,6 +163,7 @@ class MashkorDelivery extends Component {
                   "area" => $model->area_name,
                   "block" => $model->block,
                   "street" => $model->street,
+                  "building" => $model->house_number
               ]
         ];
 

@@ -100,7 +100,7 @@ class GithubComponent extends Component {
         $createBranchEndpoint = $this->apiEndpoint . "/contents/build.js";
 
         $branchParams = [
-            "message" => "first commit for A store",
+            "message" => "first commit for $branch_name store",
             "content" => $content,
             "branch" => $branch_name
         ];

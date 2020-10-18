@@ -29,27 +29,43 @@ $this->params['breadcrumbs'][] = $this->title;
                         <p class="px-2">Fill the below form to create a new account.</p>
                         <div class="card-content">
                             <div class="card-body pt-0">
-                              <?php $form = ActiveForm::begin(['id' => 'store-form', 'enableClientScript' => false]); ?>
+                                <?php $form = ActiveForm::begin(['id' => 'store-form', 'enableClientScript' => false]); ?>
 
-                                    <?= $form->field($store_model, 'name')->textInput(['maxlength' => true])->label('Your store name in English') ?>
+                                <?= $form->field($store_model, 'name')->textInput(['maxlength' => true])->label('Your store name in English') ?>
 
-                                    <?= $form->field($store_model, 'name_ar')->textInput(['maxlength' => true])->label('Your store name in Arabic')  ?>
+                                <?= $form->field($store_model, 'name_ar')->textInput(['maxlength' => true])->label('Your store name in Arabic') ?>
 
-                                    <?= $form->field($agent_model, 'agent_name')->textInput(['maxlength' => true])->label('Owner name') ?>
+                                <?=
+                                $form->field($store_model, 'restaurant_domain', [
+                                    'template' => "{label}"
+                                    . "<div class='input-group'>
+                                           {input}
+                                            <div class='input-group-append'>
+                                                <span class='input-group-text' id='basic-addon2'>.plugn.store</span>
+                                            </div>
+                                       "
+                                    . "</div>"
+                                    . "{error}{hint}"
+                                ])->textInput([
+                                    'class' => 'form-control'
+                                ])->label('Store URL')
+                                ?>
 
-                                    <?= $form->field($agent_model, 'agent_email')->textInput(['maxlength' => true])->label('Owner email')  ?>
+                                <?= $form->field($agent_model, 'agent_name')->textInput(['maxlength' => true])->label('Owner name') ?>
 
-                                    <?= $form->field($agent_model, 'tempPassword')->passwordInput(['maxlength' => true]) ?>
+                                <?= $form->field($agent_model, 'agent_email')->textInput(['maxlength' => true])->label('Owner email') ?>
 
-
-                                    <?= Html::a('Login', ['site/login'], ['class' => 'btn btn-outline-primary float-left btn-inline mb-50']) ?>
-
-                                    <div class="form-group">
-                                        <?= Html::submitButton('Register', ['class' => 'btn btn-primary float-right btn-inline mb-50', 'name' => 'register-button']) ?>
-                                    </div>
+                                <?= $form->field($agent_model, 'tempPassword')->passwordInput(['maxlength' => true]) ?>
 
 
-                              <?php ActiveForm::end(); ?>
+                                <?= Html::a('Login', ['site/login'], ['class' => 'btn btn-outline-primary float-left btn-inline mb-50']) ?>
+
+                                <div class="form-group">
+                                    <?= Html::submitButton('Register', ['class' => 'btn btn-primary float-right btn-inline mb-50', 'name' => 'register-button']) ?>
+                                </div>
+
+
+                                <?php ActiveForm::end(); ?>
 
                             </div>
                         </div>

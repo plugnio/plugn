@@ -98,9 +98,13 @@ $this->registerJs($js);
             if ($model->restaurant->armada_api_key != null && $model->armada_tracking_link == null)
                 echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary mr-1 mb-1', 'style' => 'margin-right: 7px;']);
 
-            if ($model->restaurant->mashkor_branch_id != null && $model->mashkor_order_number == null)
+            if ($model->restaurant->mashkor_branch_id != null && $model->mashkor_order_number == null && $model->restaurant_uuid != 'rest_1276d589-f41c-11ea-808a-0673128d0c9c' )
                 echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-info mr-1 mb-1', 'style' => 'margin-right: 7px;']);
         }
+
+        if($model->restaurant_uuid == 'rest_1276d589-f41c-11ea-808a-0673128d0c9c')
+          echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'restaurantUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-info mr-1 mb-1', 'style' => 'margin-right: 7px;']);
+
         ?>
 
     </div>
@@ -124,7 +128,7 @@ $this->registerJs($js);
             <p style="margin-top: 1rem">
 
                 <?php
-                if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Order::STATUS_ABANDONED_CHECKOUT) && $model->getOrderItems()->count()) {
+                if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Order::STATUS_ABANDONED_CHECKOUT || $model->order_status == Order::STATUS_CANCELED ) && $model->getOrderItems()->count()) {
                     echo Html::a('Mark as pending', [
                         'change-order-status',
                         'order_uuid' => $model->order_uuid,
@@ -180,7 +184,7 @@ $this->registerJs($js);
                     ]);
                 }
 
-                if ($model->order_status != Order::STATUS_CANCELED) {
+                if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Order::STATUS_ABANDONED_CHECKOUT) {
                     echo Html::a('Cancel order', [
                         'change-order-status',
                         'order_uuid' => $model->order_uuid,
@@ -439,7 +443,7 @@ $this->registerJs($js);
                                     </tr>
                                 </tbody>
                             <?php }
-                            ?> 
+                            ?>
 
                     <tbody>
                         <tr>

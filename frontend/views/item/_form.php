@@ -28,7 +28,6 @@ $js = "
 
 
     $( window ).on( 'load', function() {
-      console.log('$modelItem->track_quantity');
         if ('$modelItem->track_quantity' == 1)
           $('#stock_qty').show();
         else
@@ -295,6 +294,7 @@ $this->registerJs($js);
                                 ?>
                             </td>
                             <td class="text-center vcenter" style="width: 90px; verti">
+                                <button type="button" class="add-option btn btn-success btn-xs" style="margin-bottom:10px"><span class="fa fa-plus"></span></button>
                                 <button type="button" class="remove-option btn btn-danger btn-xs"><span class="fa fa-minus"></span></button>
                             </td>
                         </tr>
