@@ -57,8 +57,6 @@ class OrderItemExtraOptionController extends Controller {
             $model->order_item_id = $id;
 
             //Get item's extra options to retrieve it on create-form page
-            //todo retrieve item's extra optn only
-
             $extraOptions = $order_item_model->item->getExtraOptions()->all();
 
             foreach ($extraOptions as $key => $extraOption) {

@@ -1,0 +1,164 @@
+<?php
+
+namespace common\models;
+
+use Yii;
+use yii\db\Expression;
+
+/**
+ * This is the model class for table "queue".
+ *
+ * @property int $queue_id
+ * @property string $restaurant_uuid
+ * @property int|null $queue_status
+ * @property string|null $queue_created_at
+ * @property string|null $queue_updated_at
+ * @property string|null $queue_start_at
+ * @property string|null $queue_end_at
+ *
+ * @property Restaurant $restaurantUu
+ */
+class Queue extends \yii\db\ActiveRecord {
+
+    //Values for `queue_status`
+    const QUEUE_STATUS_PENDING = 1;
+    const QUEUE_STATUS_CREATING = 2;
+    const QUEUE_STATUS_COMPLETE = 3;
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName() {
+        return 'queue';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules() {
+        return [
+            [['restaurant_uuid', 'queue_status'], 'required'],
+            [['queue_status'], 'integer'],
+            [['queue_start_at', 'queue_end_at'], 'safe'],
+            [['restaurant_uuid'], 'string', 'max' => 60],
+            [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
+        ];
+    }
+
+    /**
+     *
+     * @return type
+     */
+    public function behaviors() {
+        return [
+            [
+                'class' => \yii\behaviors\TimestampBehavior::className(),
+                'createdAtAttribute' => 'queue_created_at',
+                'updatedAtAttribute' => 'queue_updated_at',
+                'value' => new Expression('NOW()'),
+            ],
+        ];
+    }
+
+    public function beforeSave($insert) {
+
+        if ($this->queue_status == self::QUEUE_STATUS_COMPLETE) {
+
+            $store_model = $this->restaurant;
+
+            $getLastCommitResponse = Yii::$app->githubComponent->getLastCommit();
+
+            if ($getLastCommitResponse->isOk) {
+                $sha = $getLastCommitResponse->data['sha'];
+
+                //Replace test with store branch name
+                $branchName = 'refs/heads/' . $store_model->store_branch_name;
+                $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, $branchName);
+
+                if ($createBranchResponse->isOk) {
+
+                    $fileToBeUploaded = file_get_contents($store_model->store_branch_name . "/build.js");
+
+                    // Encode the image string data into base64
+                    $data = base64_encode($fileToBeUploaded);
+
+                    //Replace test with store branch name
+                    $commitBuildJsFileResponse = Yii::$app->githubComponent->createFileContent($data, $store_model->store_branch_name);
+
+                    if ($commitBuildJsFileResponse->isOk) {
+
+                        //Replace test with store domain name
+                        $url = parse_url($store_model->restaurant_domain);
+                        $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
+
+                        if ($createNewSiteResponse->isOk) {
+
+                            $site_id = $createNewSiteResponse->data['site_id'];
+                            $store_model->site_id = $site_id;
+                            $store_model->save(false);
+
+                            //will save site id to deploy
+                            $deploySiteResponse = Yii::$app->netlifyComponent->deploySite($site_id);
+                            if ($deploySiteResponse->isOk) {
+                                $deploySiteResponse = Yii::$app->netlifyComponent->deploySite($site_id);
+
+                                $provisionSSLResponse = Yii::$app->netlifyComponent->provisionSSL($site_id);
+                            } else {
+                                die(print_r($deploySiteResponse));
+                            }
+                        } else {
+                            die(print_r($createNewSiteResponse));
+                        }
+                    } else {
+                        die(print_r($getLastCommitResponse->data));
+
+                        die(print_r($commitBuildJsFileResponse));
+                    }
+                } else
+                //TO DO log an error to slack error with github
+                    die(print_r($createBranchResponse));
+            } else {
+                //TO DO log an error to slack error with github
+                die(print_r($getLastCommitResponse));
+            }
+
+            $dirPath = $store_model->store_branch_name;
+            $file_pointer = $dirPath . '/build.js';
+
+            // Use unlink() function to delete a file  
+            if (!unlink($file_pointer)) {
+                Yii::error("$file_pointer cannot be deleted due to an error", __METHOD__);
+            } else {
+                if (!rmdir($dirPath)) {
+                    Yii::error("Could not remove $dirPath", __METHOD__);
+                }
+            }
+        }
+        return parent::beforeSave($insert);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels() {
+        return [
+            'queue_id' => 'Queue ID',
+            'restaurant_uuid' => 'Restaurant Uuid',
+            'queue_status' => 'Queue Status',
+            'queue_created_at' => 'Queue Created At',
+            'queue_updated_at' => 'Queue Updated At',
+            'queue_start_at' => 'Queue Start At',
+            'queue_end_at' => 'Queue End At',
+        ];
+    }
+
+    /**
+     * Gets query for [[RestaurantUu]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurant() {
+        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+}
