@@ -98,14 +98,14 @@ class Queue extends \yii\db\ActiveRecord {
                             $store_model->save(false);
 
                             //will save site id to deploy
-                            $deploySiteResponse = Yii::$app->netlifyComponent->deploySite($site_id);
-                            if ($deploySiteResponse->isOk) {
-                                $deploySiteResponse = Yii::$app->netlifyComponent->deploySite($site_id);
-
-                                $provisionSSLResponse = Yii::$app->netlifyComponent->provisionSSL($site_id);
-                            } else {
-                                die(print_r($deploySiteResponse));
-                            }
+                            // $deploySiteResponse = Yii::$app->netlifyComponent->deploySite($site_id);
+                            // if ($deploySiteResponse->isOk) {
+                            //     $deploySiteResponse = Yii::$app->netlifyComponent->deploySite($site_id);
+                            //
+                            //     $provisionSSLResponse = Yii::$app->netlifyComponent->provisionSSL($site_id);
+                            // } else {
+                            //     die(print_r($deploySiteResponse));
+                            // }
                         } else {
                             die(print_r($createNewSiteResponse));
                         }
@@ -125,7 +125,7 @@ class Queue extends \yii\db\ActiveRecord {
             $dirPath = $store_model->store_branch_name;
             $file_pointer = $dirPath . '/build.js';
 
-            // Use unlink() function to delete a file  
+            // Use unlink() function to delete a file
             if (!unlink($file_pointer)) {
                 Yii::error("$file_pointer cannot be deleted due to an error", __METHOD__);
             } else {
