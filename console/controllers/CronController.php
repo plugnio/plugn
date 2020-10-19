@@ -275,7 +275,7 @@ class CronController extends \yii\console\Controller {
                 var environmentFile = `export const environment = {
                 production: true,
                 envName: 'prod',
-                apiEndpoint: 'https://api.plugn.io/v1',
+                apiEndpoint: 'https://api.dev.plugn.io/v1',
                 restaurantUuid : '`+ storeUuid +`'
                 };`;
                 fs.writeFileSync('src/environments/environment.'+  storebranchName  + '.ts', environmentFile);
