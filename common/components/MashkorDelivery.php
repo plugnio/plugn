@@ -156,14 +156,14 @@ class MashkorDelivery extends Component {
               "amount_to_collect" => $model->total_price,
               "vendor_order_id" => $model->order_uuid,
               "drop_off" => [
-                  "customer_name" => $model->restaurant->name,
-                  "mobile_number" => $model->restaurant->phone_number,
                   "latitude" => null,
                   "longitude" => null,
                   "area" => $model->area_name,
                   "block" => $model->block,
                   "street" => $model->street,
-                  "building" => $model->house_number
+                  "building" => $model->house_number,
+                  "landmark" => $model->avenue ? $model->avenue : null,
+                  "specific_driver_instructions" => $model->special_directions,
               ]
         ];
 
