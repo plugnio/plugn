@@ -308,7 +308,7 @@ class CronController extends \yii\console\Controller {
                     " . '"output"' . ": " . '"assets"' . "
                 },
                 {
-                    " . '"glob"' . ": " . '"**/* .svg"' . ",
+                    " . '"glob"' . ": " . '"**/*.svg"' . ",
                     " . '"input"' . ": " . '"node_modules/ionicons/dist/ionicons/svg"' . ",
                     " . '"output"' . ": " . '"./svg"' . "
                 },
