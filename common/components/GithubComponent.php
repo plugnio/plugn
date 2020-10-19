@@ -21,12 +21,14 @@ class GithubComponent extends Component {
 
     public $token;
 
+    public $branch;
+
     /**
      * @inheritdoc
      */
     public function init() {
         // Fields required by default
-        $requiredAttributes = ['token'];
+        $requiredAttributes = ['token', 'branch'];
 
         // Process Validation
         foreach ($requiredAttributes as $attribute) {
@@ -46,7 +48,7 @@ class GithubComponent extends Component {
      * Returns the contents of a single commit reference
      */
     public function getLastCommit() {
-        $lastCommitEndpoint = $this->apiEndpoint . "/commits/develop";
+        $lastCommitEndpoint = $this->apiEndpoint . "/commits/" . $this->branch;
 
 
         $client = new Client();

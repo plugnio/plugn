@@ -97,6 +97,11 @@ class Queue extends \yii\db\ActiveRecord {
                             $store_model->site_id = $site_id;
                             $store_model->save(false);
 
+                            $provisionSSLResponse = Yii::$app->netlifyComponent->provisionSSL($site_id);
+
+                            if(!$provisionSSLResponse->isOk)
+                              die(print_r($provisionSSLResponse));
+
                             //will save site id to deploy
                             // $deploySiteResponse = Yii::$app->netlifyComponent->deploySite($site_id);
                             // if ($deploySiteResponse->isOk) {

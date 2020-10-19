@@ -83,5 +83,9 @@ return [
             'class' => 'common\components\MashkorDelivery',
             'keyToUse' => \common\components\MashkorDelivery::USE_LIVE_KEY,
         ],
+        'githubComponent' => [
+            'class' => 'common\components\GithubComponent',
+            'branch' => 'master'
+        ],
     ],
 ];
