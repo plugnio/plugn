@@ -98,49 +98,54 @@ class Queue extends \yii\db\ActiveRecord {
                             $store_model->save(false);
 
                             $provisionSSLResponse = Yii::$app->netlifyComponent->provisionSSL($site_id);
-
-                            if(!$provisionSSLResponse->isOk)
-                              die(print_r($provisionSSLResponse));
-
-                            //will save site id to deploy
-                            // $deploySiteResponse = Yii::$app->netlifyComponent->deploySite($site_id);
-                            // if ($deploySiteResponse->isOk) {
-                            //     $deploySiteResponse = Yii::$app->netlifyComponent->deploySite($site_id);
-                            //
-                            //     $provisionSSLResponse = Yii::$app->netlifyComponent->provisionSSL($site_id);
-                            // } else {
-                            //     die(print_r($deploySiteResponse));
-                            // }
+                            if(!$provisionSSLResponse->isOk){
+                              Yii::error('[Netlify > provisionSSL]' . json_encode($provisionSSLResponse->data), __METHOD__);
+                              $this->deleteBuildJsFolder();
+                              return false;
+                            }
                         } else {
-                            die(print_r($createNewSiteResponse));
+                            Yii::error('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data), __METHOD__);
+                            $this->deleteBuildJsFolder();
+                            return false;
                         }
                     } else {
-                        die(print_r($getLastCommitResponse->data));
-
-                        die(print_r($commitBuildJsFileResponse));
+                      Yii::error('[Github > Commit build JS]' . json_encode($commitBuildJsFileResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
+                      $this->deleteBuildJsFolder();
+                      return false;
                     }
-                } else
-                //TO DO log an error to slack error with github
-                    die(print_r($createBranchResponse));
-            } else {
-                //TO DO log an error to slack error with github
-                die(print_r($getLastCommitResponse));
-            }
-
-            $dirPath = $store_model->store_branch_name;
-            $file_pointer = $dirPath . '/build.js';
-
-            // Use unlink() function to delete a file
-            if (!unlink($file_pointer)) {
-                Yii::error("$file_pointer cannot be deleted due to an error", __METHOD__);
-            } else {
-                if (!rmdir($dirPath)) {
-                    Yii::error("Could not remove $dirPath", __METHOD__);
+                } else{
+                  Yii::error('[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
+                  $this->deleteBuildJsFolder();
+                  return false;
                 }
+
+            } else {
+                Yii::error('[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
+                $this->deleteBuildJsFolder();
+                return false;
             }
+
+            $this->deleteBuildJsFolder();
         }
         return parent::beforeSave($insert);
     }
+
+
+    public function deleteBuildJsFolder(){
+      $dirPath = $this->restaurant->store_branch_name;
+      $file_pointer = $dirPath . '/build.js';
+
+      // Use unlink() function to delete a file
+      if (!unlink($file_pointer)) {
+          Yii::error("$file_pointer cannot be deleted due to an error", __METHOD__);
+      } else {
+          if (!rmdir($dirPath)) {
+              Yii::error("Could not remove $dirPath", __METHOD__);
+          }
+      }
+    }
+
+
 
     /**
      * {@inheritdoc}
