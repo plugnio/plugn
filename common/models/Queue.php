@@ -97,12 +97,6 @@ class Queue extends \yii\db\ActiveRecord {
                             $store_model->site_id = $site_id;
                             $store_model->save(false);
 
-                            $provisionSSLResponse = Yii::$app->netlifyComponent->provisionSSL($site_id);
-                            if(!$provisionSSLResponse->isOk){
-                              Yii::error('[Netlify > provisionSSL]' . json_encode($provisionSSLResponse->data), __METHOD__);
-                              $this->deleteBuildJsFolder();
-                              return false;
-                            }
                         } else {
                             Yii::error('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data), __METHOD__);
                             $this->deleteBuildJsFolder();
