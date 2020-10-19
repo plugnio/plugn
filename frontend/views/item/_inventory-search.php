@@ -47,7 +47,7 @@ use common\models\CategoryItem;
 
 
                         $form = ActiveForm::begin([
-                                    'action' => ['item/index', 'restaurantUuid' => $restaurant_uuid],
+                                    'action' => ['item/inventory', 'restaurantUuid' => $restaurant_uuid],
                                     'method' => 'get',
                         ]);
                         ?>

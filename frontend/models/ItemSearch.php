@@ -105,7 +105,8 @@ class ItemSearch extends Item
      */
     public function searchTrackQuantity($params, $restaurantUuid)
     {
-        $query = Item::find()->where(['item.restaurant_uuid' => $restaurantUuid , 'track_quantity' => 1]);
+
+        $query = Item::find()->where(['item.restaurant_uuid' => $restaurantUuid , 'track_quantity' => 1])->joinWith('category', true);
 
         // add conditions that should always apply here
 
@@ -113,6 +114,12 @@ class ItemSearch extends Item
             'query' => $query,
             'pagination' => false
         ]);
+
+
+        $dataProvider->sort->attributes['category_id'] = [
+            'asc' => ['category.title' => SORT_ASC],
+            'desc' => ['category.title' => SORT_DESC],
+        ];
 
 
         $this->load($params);
@@ -124,11 +131,26 @@ class ItemSearch extends Item
         }
 
 
+        // grid filtering conditions
+        $query->andFilterWhere([
+            'sort_number' => $this->sort_number,
+            'stock_qty' => $this->stock_qty,
+            'unit_sold' => $this->unit_sold,
+            'item_price' => $this->item_price,
+            'item_created_at' => $this->item_created_at,
+            'item_updated_at' => $this->item_updated_at,
+        ]);
+
         $query->andFilterWhere(['like', 'item_uuid', $this->item_uuid])
+            ->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
             ->andFilterWhere(['like', 'item_name', $this->item_name])
             ->andFilterWhere(['like', 'barcode', $this->barcode])
             ->andFilterWhere(['like', 'sku', $this->sku])
-            ->andFilterWhere(['like', 'item_name_ar', $this->item_name_ar]);
+            ->andFilterWhere(['like', 'category.category_id', $this->category_id])
+            ->andFilterWhere(['like', 'item_name_ar', $this->item_name_ar])
+            ->andFilterWhere(['like', 'item_description', $this->item_description])
+            ->andFilterWhere(['like', 'item_description_ar', $this->item_description_ar])
+            ->andFilterWhere(['like', 'item_image', $this->item_image]);
 
         return $dataProvider;
     }
