@@ -162,7 +162,7 @@ class MashkorDelivery extends Component {
                   "block" => $model->block,
                   "street" => $model->street,
                   "building" => $model->house_number,
-                  "landmark" => $model->avenue ? $model->avenue : null,
+                  "landmark" => $model->avenue ? 'Avenue: ' . $model->avenue : null,
                   "specific_driver_instructions" => $model->special_directions,
               ]
         ];
