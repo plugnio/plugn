@@ -90,7 +90,7 @@ $this->registerJs($js);
             </div>
             <div class="row">
                 <div class="col-12 col-sm-4  col-md-4 col-lg-4">
-                    <?= $form->field($model, 'street')->input('number') ?>
+                    <?= $form->field($model, 'street')->textInput(['maxlength' => true]) ?>
                 </div>
 
                 <div class="col-12 col-sm-4  col-md-4 col-lg-4">
