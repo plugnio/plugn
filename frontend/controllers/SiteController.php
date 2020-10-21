@@ -43,7 +43,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'promote-to-open',  'promote-to-close', 'pay', 'callback', 'vendor-dashboard', 'real-time-orders','mark-as-busy', 'mark-as-open'],
+                        'actions' => ['logout', 'promote-to-open',  'home', 'promote-to-close', 'pay', 'callback', 'vendor-dashboard', 'real-time-orders','mark-as-busy', 'mark-as-open'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -87,7 +87,7 @@ class SiteController extends Controller {
             foreach (Yii::$app->accountManager->getManagedAccounts() as $managedRestaurant) {
 
                 if(AgentAssignment::isOwner($managedRestaurant->restaurant_uuid)){
-                  return $this->redirect(['vendor-dashboard',
+                  return $this->redirect(['home',
                               'id' => $managedRestaurant->restaurant_uuid
                   ]);
                 } else {
@@ -99,6 +99,24 @@ class SiteController extends Controller {
             }
         }
     }
+
+    /**
+     * Displays homepage.
+     *
+     * @return mixed
+     */
+    public function actionHome($id) {
+
+        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
+
+            return $this->render('home', [
+                        'restaurant_model' => $managedRestaurant
+            ]);
+        }
+    }
+
+
+
 
     /**
      * Check for new orders

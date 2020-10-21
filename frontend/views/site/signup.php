@@ -7,7 +7,7 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use yii\captcha\Captcha;
 
-$this->title = 'Signup';
+$this->title = 'Create an Online Store';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -23,13 +23,19 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="card rounded-0 mb-0 p-2">
                         <div class="card-header pt-50 pb-1">
                             <div class="card-title">
-                                <h4 class="mb-0">Create Account</h4>
+                                <h4 class="mb-0">Create an Online Store</h4>
                             </div>
                         </div>
-                        <p class="px-2">Fill the below form to create a new account.</p>
+                        <p class="px-2">Fill the below form to create an online store.</p>
                         <div class="card-content">
                             <div class="card-body pt-0">
                                 <?php $form = ActiveForm::begin(['id' => 'store-form', 'enableClientScript' => false]); ?>
+
+
+                                <?= $form->field($agent_model, 'agent_name')->textInput(['maxlength' => true])->label('Name') ?>
+
+                                <?= $form->field($agent_model, 'agent_email')->textInput(['maxlength' => true])->label('Email') ?>
+
 
                                 <?= $form->field($store_model, 'name')->textInput(['maxlength' => true])->label('Your store name in English') ?>
 
@@ -51,9 +57,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ])->label('Store URL')
                                 ?>
 
-                                <?= $form->field($agent_model, 'agent_name')->textInput(['maxlength' => true])->label('Owner name') ?>
-
-                                <?= $form->field($agent_model, 'agent_email')->textInput(['maxlength' => true])->label('Owner email') ?>
 
                                 <?= $form->field($agent_model, 'tempPassword')->passwordInput(['maxlength' => true]) ?>
 
@@ -61,7 +64,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <?= Html::a('Login', ['site/login'], ['class' => 'btn btn-outline-primary float-left btn-inline mb-50']) ?>
 
                                 <div class="form-group">
-                                    <?= Html::submitButton('Register', ['class' => 'btn btn-primary float-right btn-inline mb-50', 'name' => 'register-button']) ?>
+                                    <?= Html::submitButton('Create', ['class' => 'btn btn-primary float-right btn-inline mb-50', 'name' => 'register-button']) ?>
                                 </div>
 
 

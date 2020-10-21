@@ -11,6 +11,7 @@ use common\models\BankDiscount;
 use common\models\Payment;
 use common\models\Item;
 use common\models\Order;
+use common\models\Subscription;
 use common\models\OpeningHour;
 use common\models\ItemImage;
 use common\models\RestaurantTheme;
@@ -22,6 +23,48 @@ use yii\db\Expression;
  * All Cron actions related to this project
  */
 class CronController extends \yii\console\Controller {
+
+
+    public function actionNotifyAgentsForSubscriptionThatWillExpireSoon(){
+
+      $now = new DateTime('now');
+      $subscriptions = Subscription::find()
+              ->where(['subscription_status' => Subscription::STATUS_ACTIVE])
+              ->andWhere(['notified_email' => 0])
+              ->andWhere(['>', 'subscription_end_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
+              ->all();
+
+      foreach ($subscriptions as $subscription) {
+
+
+        foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
+          $result = \Yii::$app->mailer->compose([
+                      'html' => 'subscription-will-expire-soon-html',
+                          ], [
+                      'subscription' => $subscription,
+                      'agent_name' => $agent->agent_name,
+                  ])
+                  ->setFrom([\Yii::$app->params['supportEmail']])
+                  ->setTo($agent->agent_email)
+                  ->setSubject('Your Subscription is Expiring')
+                  ->send();
+
+            if($result){
+              $subscription->notified_email = 1;
+              $subscription->save(false);
+            }
+        }
+      }
+
+      $this->stdout("Email sent to all agents of employer that have applicants will expire soon \n", Console::FG_RED, Console::NORMAL);
+      return self::EXIT_CODE_NORMAL;
+
+       // $origin =  new DateTime(date('Y-m-d'));
+       // $target =  new DateTime(date('Y-m-d', strtotime($sub->subscription_end_at)));
+       // $interval = $origin->diff($target);
+       // echo $interval->format('%a');
+
+    }
 
     public function actionCreateBuildJsFile() {
 

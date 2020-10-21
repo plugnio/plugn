@@ -57,7 +57,7 @@ $this->title = 'Plugn Dashboard';
                                 ?>
 
                             </div>
-                            <?= Html::a('Register', ['site/signup'], ['class' => 'btn btn-outline-primary float-left btn-inline mb-50']) ?>
+                            <?= Html::a('Create Your Store', ['site/signup'], ['class' => 'btn btn-outline-primary float-left btn-inline mb-50']) ?>
 
                             <div class="form-group">
                                 <?= Html::submitButton('Login', ['class' => 'btn btn-primary float-right btn-inline mb-50', 'name' => 'login-button']) ?>

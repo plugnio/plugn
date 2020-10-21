@@ -79,7 +79,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                     ?>
 
                                     <div class="dropdown-divider"> </div>
-                                    
+
                                     <?=
                                     Html::a('<i class="feather icon-power"></i> Logout', ['site/logout'], ['class' => 'dropdown-item',
                                         'data' => [
@@ -108,11 +108,19 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
             <div class="navbar-header">
                 <ul class="nav navbar-nav flex-row">
                     <li class="nav-item mr-auto">
-                        <?=
-                        Html::a('<img src="' . $restaurant_model->getRestaurantLogoUrl() . '" class="round"  height="40" width="40" ">'
-                                . '<h2 class="brand-text mb-0"  style="font-size: 20px; width: 190px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">' . $restaurant_model->name . '</h2>'
-                                , ['site/index', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'navbar-brand']);
+                        <?php
+                        if($restaurant_model->logo) {
+                          echo           Html::a('<img src="' . $restaurant_model->getRestaurantLogoUrl() . '" class="round"  height="40" width="40" ">'
+                                            . '<h2 class="brand-text mb-0"  style="font-size: 20px; width: 190px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">' . $restaurant_model->name . '</h2>'
+                                            , ['site/index', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'navbar-brand']);
+                        } else {
+                          echo         Html::a('<img src="https://res.cloudinary.com/plugn/image/upload/plugn-icon.png" class="round"  height="40" width="40" ">'
+                                          . '<h2 class="brand-text mb-0"  style="font-size: 20px; width: 190px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">' . $restaurant_model->name . '</h2>'
+                                          , ['site/index', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'navbar-brand']);
+                        }
+
                         ?>
+
                     </li>
                     </a>
                     </li>
@@ -124,6 +132,16 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
 
 
                 <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
+
+                  <li class=" nav-item <?= $this->context->route == 'site/home' ? 'active' : '' ?> ">
+
+                      <?=
+                      Html::a(
+                              Html::tag('i', '', ['class' => ' feather icon-home']) .
+                              Html::tag('span', 'Home'), ['site/home', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                      )
+                      ?>
+                  </li>
 
                   <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
 

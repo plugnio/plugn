@@ -9,51 +9,51 @@ return [
             'password' => '',
             'charset' => 'utf8',
         ],
-        'log' => [
-            'targets' => [
-                [
-                    'class' => 'notamedia\sentry\SentryTarget',
-                    'dsn' => 'https://f6033f8f46ba451abbf4fa2730e8305a:7266a5e7beca44ff96fb32294ca35557@o70039.ingest.sentry.io/5220572',
-                    'levels' => ['error', 'warning'],
-                    'except' => [
-                        'yii\web\BadRequestHttpException',
-                        'yii\web\UnauthorizedHttpException',
-                        'yii\web\NotFoundHttpException',
-                        'yii\web\HttpException:400',
-                        'yii\web\HttpException:401',
-                        'yii\web\HttpException:404',
-                    ],
-                    'clientOptions' => [
-                        //which environment are we running this on?
-                        'environment' => 'staging',
-                    ],
-                    'context' => true // Write the context information. The default is true.
-                ],
-                [
-                    'class' => 'common\components\SlackLogger',
-                    'logVars' => [],
-                    'levels' => ['info', 'warning','error'],
-                    'categories' => ['backend\*', 'frontend\*', 'common\*', 'console\*','api\*'],
-                ],
-            ],
-        ],
-        'mailer' => [
-            'class' => 'yii\swiftmailer\Mailer',
-            'viewPath' => '@common/mail',
-            'transport' => [
-                'class' => 'Swift_SmtpTransport',
-                'host' => 'smtp.sendgrid.net',
-                'username' => 'apikey',
-                'password' => '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',
-                'port' => '587',
-                'encryption' => 'tls',
-                'plugins' => [
-                    [
-                        'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
-                    ],
-                ],
-            ],
-        ],
+        // 'log' => [
+        //     'targets' => [
+        //         [
+        //             'class' => 'notamedia\sentry\SentryTarget',
+        //             'dsn' => 'https://f6033f8f46ba451abbf4fa2730e8305a:7266a5e7beca44ff96fb32294ca35557@o70039.ingest.sentry.io/5220572',
+        //             'levels' => ['error', 'warning'],
+        //             'except' => [
+        //                 'yii\web\BadRequestHttpException',
+        //                 'yii\web\UnauthorizedHttpException',
+        //                 'yii\web\NotFoundHttpException',
+        //                 'yii\web\HttpException:400',
+        //                 'yii\web\HttpException:401',
+        //                 'yii\web\HttpException:404',
+        //             ],
+        //             'clientOptions' => [
+        //                 //which environment are we running this on?
+        //                 'environment' => 'staging',
+        //             ],
+        //             'context' => true // Write the context information. The default is true.
+        //         ],
+        //         [
+        //             'class' => 'common\components\SlackLogger',
+        //             'logVars' => [],
+        //             'levels' => ['info', 'warning','error'],
+        //             'categories' => ['backend\*', 'frontend\*', 'common\*', 'console\*','api\*'],
+        //         ],
+        //     ],
+        // ],
+        // 'mailer' => [
+        //     'class' => 'yii\swiftmailer\Mailer',
+        //     'viewPath' => '@common/mail',
+        //     'transport' => [
+        //         'class' => 'Swift_SmtpTransport',
+        //         'host' => 'smtp.sendgrid.net',
+        //         'username' => 'apikey',
+        //         'password' => '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',
+        //         'port' => '587',
+        //         'encryption' => 'tls',
+        //         'plugins' => [
+        //             [
+        //                 'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
+        //             ],
+        //         ],
+        //     ],
+        // ],
         'tapPayments' => [
             'gatewayToUse' => \common\components\TapPayments::USE_TEST_GATEWAY,
         ],

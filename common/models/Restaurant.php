@@ -61,8 +61,9 @@ use common\models\WebLink;
  * @property Agent[] $agents
  * @property WebLink[] $webLinks
  * @property StoreWebLink[] $storeWebLinks
-	* @property Voucher[] $vouchers
-  * @property Queue[] $queues
+* @property Voucher[] $vouchers
+* @property Queue[] $queues
+* @property Subscription[] $subscriptions
 
  */
 class Restaurant extends \yii\db\ActiveRecord {
@@ -617,6 +618,29 @@ class Restaurant extends \yii\db\ActiveRecord {
         return $this->hasMany(Agent::className(), ['agent_id' => 'agent_id'])
                         ->via('agentAssignments');
     }
+
+
+      /**
+       * Return owner of this store
+       */
+      public function getOwnerAgent() {
+          return $this->hasMany(Agent::className(), ['agent_id' => 'agent_id'])
+                          ->via('agentAssignments', function($query) {
+                              return $query->andWhere(['agent_assignment.role' => AgentAssignment::AGENT_ROLE_OWNER]);
+                          });
+      }
+
+
+     /**
+      * Gets query for [[Subscriptions]].
+      *
+      * @return \yii\db\ActiveQuery
+      */
+     public function getSubscriptions()
+     {
+         return $this->hasMany(Subscription::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+     }
+
 
     /**
      * Gets query for [[RestaurantDeliveryAreas]].
