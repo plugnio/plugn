@@ -56,7 +56,7 @@ $this->registerJs($js);
             GridView::widget([
                 'dataProvider' => $ordersItemDataProvider,
                 'rowOptions' => function($model) {
-                    $url = Url::to(['order-item/view', 'id' => $model->order_item_id, 'restaurantUuid' => $model->item->restaurant_uuid]);
+                    $url = Url::to(['order-item/view', 'id' => $model->order_item_id, 'restaurantUuid' => $model->order->restaurant_uuid]);
 
                     return [
                         'onclick' => "window.location.href='{$url}'"
