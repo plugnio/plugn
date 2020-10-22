@@ -10,11 +10,13 @@ use Yii;
  * @property int $subscription_uuid
  * @property string|null $restaurant_uuid
  * @property int $plan_id
+ * @property int $payment_uuid
  * @property int $subscription_status
  * @property int $notified_email
  * @property string|null $subscription_start_at
  * @property string|null $subscription_end_at
  *
+ * @property SubscriptionPayment $payment
  * @property Plan $plan
  * @property Restaurant $restaurant
  */
@@ -39,7 +41,9 @@ class Subscription extends \yii\db\ActiveRecord {
             [['plan_id', 'subscription_status', 'notified_email'], 'integer'],
             [['subscription_start_at', 'subscription_end_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
+            // [['payment_uuid'], 'string', 'max' => 36],
             [['plan_id'], 'exist', 'skipOnError' => true, 'targetClass' => Plan::className(), 'targetAttribute' => ['plan_id' => 'plan_id']],
+            [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => SubscriptionPayment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
@@ -77,6 +81,7 @@ class Subscription extends \yii\db\ActiveRecord {
     public function attributeLabels() {
         return [
             'subscription_uuid' => 'Subscription Uuid',
+            'payment_uuid' => 'Payment Uuid',
             'restaurant_uuid' => 'Restaurant Uuid',
             'plan_id' => 'Plan ID',
             'subscription_start_at' => 'Subscription Start At',
@@ -107,15 +112,11 @@ class Subscription extends \yii\db\ActiveRecord {
             $this->subscription_end_at = date('Y-m-d', strtotime(date('Y-m-d') . " + $vaid_for MONTHS"));
 
 
-        foreach ($this->restaurant->getSubscriptions()->where(['<>', 'subscription_uuid' , $this->subscription_uuid])->all() as $subscription) {
-            $subscription->subscription_status = self::STATUS_INACTIVE;
-            $subscription->save(false);
-        }
+        // if($this->payment_uuid){
+        //   Subscription::updateAll(['subscription_status' => self::STATUS_INACTIVE], ['and',  ['subscription_status' => self::STATUS_ACTIVE ] , ['restaurant_uuid' => $this->restaurant_uuid  ]]);
+        //   $this->subscription_status = self::STATUS_ACTIVE;
+        // }
 
-        Subscription::updateAll(['subscription_status' => self::STATUS_INACTIVE], ['and',  ['subscription_status' => self::STATUS_ACTIVE ] , ['restaurant_uuid' => $this->restaurant_uuid  ]]);
-
-        if($insert)
-            $this->subscription_status = self::STATUS_ACTIVE;
 
         return parent::beforeSave($insert);
     }
@@ -147,6 +148,18 @@ class Subscription extends \yii\db\ActiveRecord {
 
         return parent::beforeDelete();
     }
+
+    /**
+     * Gets query for [[PaymentUu]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPayment()
+    {
+        return $this->hasOne(SubscriptionPayment::className(), ['payment_uuid' => 'payment_uuid']);
+    }
+
+
     /**
      * Gets query for [[Plan]].
      *
