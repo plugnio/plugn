@@ -39,11 +39,11 @@ class SiteController extends Controller {
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error', 'index', 'signup', 'check-for-new-orders', 'thank-you', 'request-password-reset', 'reset-password'],
+                        'actions' => ['login', 'error', 'plan', 'index', 'signup', 'check-for-new-orders', 'thank-you', 'request-password-reset', 'reset-password'],
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'promote-to-open',  'home', 'promote-to-close', 'pay', 'callback', 'vendor-dashboard', 'real-time-orders','mark-as-busy', 'mark-as-open'],
+                        'actions' => ['logout', 'promote-to-open',  'connect-domain','promote-to-close', 'pay', 'callback', 'vendor-dashboard', 'real-time-orders','mark-as-busy', 'mark-as-open'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -100,22 +100,6 @@ class SiteController extends Controller {
         }
     }
 
-    /**
-     * Displays homepage.
-     *
-     * @return mixed
-     */
-    public function actionHome($id) {
-
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
-
-            return $this->render('home', [
-                        'restaurant_model' => $managedRestaurant
-            ]);
-        }
-    }
-
-
 
 
     /**
@@ -133,6 +117,39 @@ class SiteController extends Controller {
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider
         ]);
+    }
+
+
+    /**
+     * Displays  Real time orders
+     *
+     * @return mixed
+     */
+    public function actionConnectDomain($id) {
+      if ($model = Yii::$app->accountManager->getManagedAccount($id)) {
+
+
+          return $this->render('connect-domain', [
+                      'restaurant_model' => $managedRestaurant
+          ]);
+        }
+
+    }
+
+
+    /**
+     * Displays  Real time orders
+     *
+     * @return mixed
+     */
+    public function actionPlan($id) {
+      if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
+
+          return $this->render('plan', [
+                      'restaurant_model' => $managedRestaurant
+          ]);
+        }
+
     }
 
 

@@ -1,0 +1,59 @@
+<?php
+
+use common\models\Restaurant;
+use yii\helpers\Html;
+use common\models\Order;
+use common\models\AgentAssignment;
+use yii\grid\GridView;
+use yii\widgets\ActiveForm;
+
+/* @var $this yii\web\View */
+
+$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->title = 'Connect existing domain';
+?>
+
+<section>
+    <div class="card" style="    width: 70%;
+         margin: auto;">
+        <div class="card-header">
+            <h3>Domain</h3>
+        </div>
+
+        <div class="card-body">
+            <div class="card-content">
+
+               <?php if($restaurant_model->restaurant_domain == null){ ?> 
+                   
+                <?php $form = ActiveForm::begin(); ?>
+
+                <?=
+                $form->field($restaurant_model, 'restaurant_domain', [
+                    'template' => "{label}"
+                    . "
+                   {input}
+                  <p style='font-size: 12px; font-weight: 400; line-height: 2rem; text-transform: initial; letter-spacing: initial; color: #637381;'>Enter the domain you want to connect.</p>"
+                    . "</div>"
+                    . "{error}{hint}"
+                ])->textInput([
+                    'class' => 'form-control'
+                ])->label(false)
+                ?>
+
+
+                <div class="form-group">
+                    <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => '    float: right;']) ?>
+                </div>
+
+                <?php ActiveForm::end();
+                
+             } else { ?>
+                
+                <?= '<p>' . $restaurant_model->restaurant_domain  . '</p>'?>
+             <?php } ?>
+
+            </div>
+        </div>
+
+    </div>
+</section>
