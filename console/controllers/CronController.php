@@ -11,6 +11,7 @@ use common\models\Payment;
 use common\models\Item;
 use common\models\Order;
 use common\models\OpeningHour;
+use common\models\ExtraOption;
 use common\models\ItemImage;
 use \DateTime;
 use yii\helpers\Console;
@@ -23,52 +24,17 @@ class CronController extends \yii\console\Controller {
 
   public function actionIndex(){
 
-          $great_steak = Restaurant::findOne('rest_6df8c9dc-f285-11ea-808a-0673128d0c9c');
-
-          $greatSteakCoutner = 0;
-
-          foreach ($great_steak->getItems()->all() as $item) {
-
-              $item->track_quantity = 0;
-
-              $item->save(false);
-              $greatSteakCoutner++;
-
+        $extraOptions = ExtraOption::find()->where(['extra_option_price' => null])->all();
+        foreach ($extraOptions as  $extraOption) {
+          if($extraOption->extra_option_price == null){
+            $extraOption->extra_option_price = 0;
+            $extraOption->save(false);
           }
 
+        }
 
-          $doner = Restaurant::findOne('rest_7f4299c0-f28e-11ea-808a-0673128d0c9c');
+        $this->stdout("Thank you Big Boss! \n", Console::FG_RED, Console::BOLD);
 
-          $donerCoutner = 0;
-
-          foreach ($doner->getItems()->all() as $item) {
-
-              $item->track_quantity = 0;
-
-              $item->save(false);
-              $donerCoutner++;
-
-          }
-
-
-          $rustica = Restaurant::findOne('rest_1bd43ee4-f292-11ea-808a-0673128d0c9c');
-
-          $rusticaCoutner = 0;
-
-          foreach ($rustica->getItems()->all() as $item) {
-
-              $item->track_quantity = 0;
-
-              $item->save(false);
-              $rusticaCoutner++;
-
-          }
-
-
-          $this->stdout("Thank you Big Boss!  \n", Console::FG_RED, Console::BOLD);
-          $this->stdout("Great steak qty =>>>>> " . $greatSteakCoutner, Console::FG_RED, Console::BOLD);
-          $this->stdout("Doner qty =>>>>> " . $donerCoutner, Console::FG_RED, Console::BOLD);
-          $this->stdout("RusticaCoutner qty =>>>>> " . $rusticaCoutner, Console::FG_RED, Console::BOLD);
           return self::EXIT_CODE_NORMAL;
   }
 
