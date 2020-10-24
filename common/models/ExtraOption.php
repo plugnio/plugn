@@ -111,6 +111,16 @@ class ExtraOption extends \yii\db\ActiveRecord {
     }
 
 
+    public function beforeSave($insert) {
+        if ($this->extra_option_price == null) {
+          $this->extra_option_price = 0;
+        }
+
+
+        return parent::beforeSave($insert);
+    }
+
+
     /**
      * Gets query for [[Option]].
      *

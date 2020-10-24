@@ -22,34 +22,6 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-  public function actionIndex(){
-
-        $extraOptions = ExtraOption::find()->where(['extra_option_price' => null])->all();
-        foreach ($extraOptions as  $extraOption) {
-          if($extraOption->extra_option_price == null){
-            $extraOption->extra_option_price = 0;
-            $extraOption->save(false);
-          }
-
-        }
-
-        $this->stdout("Thank you Big Boss! \n", Console::FG_RED, Console::BOLD);
-
-          return self::EXIT_CODE_NORMAL;
-  }
-
-    /**
-     * Update refund status  for all refunds record
-     */
-    public function actionUpdateOrdersRecord() {
-      Order::updateAll(['reminder_sent' => 1], 'reminder_sent = 0');
-      Order::updateAll(['sms_sent' => 1], 'sms_sent = 0');
-
-      $this->stdout("Thank you Big Boss! \n", Console::FG_RED, Console::BOLD);
-      return self::EXIT_CODE_NORMAL;
-    }
-
-
     /**
      * Update refund status  for all refunds record
      */
