@@ -124,7 +124,7 @@ class Subscription extends \yii\db\ActiveRecord {
     public function afterSave($insert, $changedAttributes) {
 
         $restaurant_model = $this->restaurant ;
-        $activeSubscription = $this->restaurant->getSubscriptions()->where(['subscription_status' => self::STATUS_ACTIVE])->one();
+        $activeSubscription = $this->restaurant->getSubscriptions()->where(['subscription_status' => self::STATUS_ACTIVE])->with(['plan'])->one();
         $restaurant_model->platform_fee = $activeSubscription->plan->platform_fee;
 
         $restaurant_model->save(false);

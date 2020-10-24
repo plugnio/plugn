@@ -51,7 +51,7 @@ class m201020_133036_create_plan_table extends Migration
             'subscription_uuid' => $this->char(60)->unique(),
             'restaurant_uuid' => $this->char(60),
             'plan_id' => $this->integer()->notNull(),
-            'subscription_status' => $this->tinyInteger(1)->unsigned()->defaultValue(1),
+            'subscription_status' => $this->tinyInteger(1)->unsigned()->defaultValue(10),
             'notified_email' => $this->tinyInteger(1)->unsigned()->defaultValue(0)->notNull(),
             'subscription_start_at' => $this->datetime()->notNull(),
             'subscription_end_at' => $this->datetime(),

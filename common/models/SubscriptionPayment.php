@@ -130,7 +130,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         $plugn_store = Restaurant::findOne('rest_1d40a718-beac-11ea-808a-0673128d0c9c');
 
         // Request response about it from TAP
-        Yii::$app->tapPayments->setApiKeys($plugn_store->live_api_key, $plugn_store->test_api_key	);
+        Yii::$app->tapPayments->setApiKeys($plugn_store->test_api_key, $plugn_store->test_api_key	);
 
         $response = Yii::$app->tapPayments->retrieveCharge($id);
         $responseContent = json_decode($response->content);
@@ -152,7 +152,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         // On Successful Payments
         if ($responseContent->status == 'CAPTURED') {
 
-            Yii::info("[" . $plugn_store->name . ": " . $paymentRecord->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $paymentRecord->order->payment_method_name, __METHOD__);
+            // Yii::info("[" . $plugn_store->name . ": " . $paymentRecord->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $paymentRecord->order->payment_method_name, __METHOD__);
 
 
             // KNET Gateway Fee Calculation
