@@ -26,6 +26,7 @@ use common\models\SubscriptionPayment;
 use yii\db\Expression;
 use yii\helpers\Url;
 use common\components\TapPayments;
+use yii\web\NotFoundHttpException;
 
 /**
  * Site controller
@@ -257,9 +258,13 @@ class SiteController extends Controller {
                 return $this->redirect($paymentRecord->restaurant->restaurant_domain . '/payment-failed/' . $paymentRecord->order_uuid);
             }
 
-            // Redirect back to app
-            // $paymentRecord->order->changeOrderStatusToPending();
-            return $this->redirect($paymentRecord->restaurant->restaurant_domain . '/payment-success/' . $paymentRecord->order_uuid . '/' . $paymentRecord->payment_uuid);
+
+            // Redirect back to current plan page
+
+            return $this->redirect(['current-plan',
+              'id' => $paymentRecord->restaurant_uuid
+            ]);
+
         } catch (\Exception $e) {
             throw new NotFoundHttpException($e->getMessage());
         }

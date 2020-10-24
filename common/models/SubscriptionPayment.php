@@ -53,7 +53,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
             [['payment_gateway_order_id', 'payment_current_status'], 'string'],
             [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee'], 'number'],
             [['payment_uuid'], 'string', 'max' => 36],
-            [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'response_message','payment_token'], 'string', 'max' => 255],
+            [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'response_message', 'payment_token'], 'string', 'max' => 255],
             [['payment_uuid'], 'unique'],
             [['subscription_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Subscription::className(), 'targetAttribute' => ['subscription_uuid' => 'subscription_uuid']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
@@ -114,6 +114,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         ];
     }
 
+
     /**
      * Update Payment's Status from TAP Payments
      * @param  [type]  $id                           [description]
@@ -130,7 +131,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         $plugn_store = Restaurant::findOne('rest_1d40a718-beac-11ea-808a-0673128d0c9c');
 
         // Request response about it from TAP
-        Yii::$app->tapPayments->setApiKeys($plugn_store->test_api_key, $plugn_store->test_api_key	);
+        Yii::$app->tapPayments->setApiKeys($plugn_store->test_api_key, $plugn_store->test_api_key);
 
         $response = Yii::$app->tapPayments->retrieveCharge($id);
         $responseContent = json_decode($response->content);
@@ -153,8 +154,6 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         if ($responseContent->status == 'CAPTURED') {
 
             // Yii::info("[" . $plugn_store->name . ": " . $paymentRecord->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $paymentRecord->order->payment_method_name, __METHOD__);
-
-
             // KNET Gateway Fee Calculation
             // if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
             //
@@ -163,7 +162,6 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
             //     else
             //         $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minKnetGatewayFee;
             // }
-
             // Creditcard Gateway Fee Calculation
             // if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_VISA_MASTERCARD) {
             //
@@ -172,13 +170,11 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
             //     else
             //         $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minCreditcardGatewayFee;
             // }
-
-
             // Update payment method used and the order id assigned to it
-            if( isset($responseContent->source->payment_method) && $responseContent->source->payment_method )
-              $paymentRecord->payment_mode = $responseContent->source->payment_method;
-            if( isset($responseContent->reference->payment) && $responseContent->reference->payment )
-              $paymentRecord->payment_gateway_order_id = $responseContent->reference->payment;
+            if (isset($responseContent->source->payment_method) && $responseContent->source->payment_method)
+                $paymentRecord->payment_mode = $responseContent->source->payment_method;
+            if (isset($responseContent->reference->payment) && $responseContent->reference->payment)
+                $paymentRecord->payment_gateway_order_id = $responseContent->reference->payment;
 
             // Net amount after deducting gateway fee
             $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee;
@@ -192,7 +188,12 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
                     print_r($responseContent, true), __METHOD__);
         }
 
-        $paymentRecord->save();
+        if($paymentRecord->save()){
+          Subscription::updateAll(['subscription_status' => Subscription::STATUS_INACTIVE], ['and', ['subscription_status' => Subscription::STATUS_ACTIVE], ['restaurant_uuid' => $paymentRecord->restaurant_uuid]]);
+            $subscription_model = $paymentRecord->subscription;
+            $subscription_model->subscription_status = Subscription::STATUS_ACTIVE;
+            $subscription_model->save(false);
+        }
 
         if ($isError) {
             throw new \Exception($errorMessage);
@@ -212,7 +213,6 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         //   $this->order->sendPaymentConfirmationEmail();
         // }
     }
-
 
     /**
      * @return \yii\db\ActiveQuery
