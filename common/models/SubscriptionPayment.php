@@ -189,7 +189,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         }
 
         if($paymentRecord->save()){
-          Subscription::updateAll(['subscription_status' => Subscription::STATUS_INACTIVE], ['and', ['subscription_status' => Subscription::STATUS_ACTIVE], ['restaurant_uuid' => $paymentRecord->restaurant_uuid]]);
+            Subscription::updateAll(['subscription_status' => Subscription::STATUS_INACTIVE], ['and', ['subscription_status' => Subscription::STATUS_ACTIVE], ['restaurant_uuid' => $paymentRecord->restaurant_uuid]]);
             $subscription_model = $paymentRecord->subscription;
             $subscription_model->subscription_status = Subscription::STATUS_ACTIVE;
             $subscription_model->save(false);

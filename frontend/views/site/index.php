@@ -422,7 +422,8 @@ $this->registerJs($js);
 
         </div>
     </div>
-
+    <?php
+    if(!str_contains($restaurant_model->restaurant_domain, '.plugn.store') ){ ?>
     <div class="card">
         <div class="card-body">
             <div class="row">
@@ -449,6 +450,7 @@ $this->registerJs($js);
         </div>
     </div>
 
+      <?php } ?>
 
     <div class="card">
         <div class="card-body">

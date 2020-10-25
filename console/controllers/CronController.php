@@ -25,6 +25,23 @@ use yii\db\Expression;
 class CronController extends \yii\console\Controller {
 
 
+    public function actionIndex(){
+        $restaurants = Restaurant::find()->all();
+
+        foreach ($restaurants as  $restaurant) {
+          $restaurant->company_name = $restaurant->name;
+
+          if($restaurant->live_api_key && $restaurant->test_api_key)
+            $restaurant->is_tap_enable = 1;
+
+          $restaurant->save();
+        }
+
+        $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
+        return self::EXIT_CODE_NORMAL;
+    }
+
+
     public function actionNotifyAgentsForSubscriptionThatWillExpireSoon(){
 
       $now = new DateTime('now');
@@ -80,8 +97,10 @@ class CronController extends \yii\console\Controller {
           $queue->save();
 
         $restaurant = $queue->restaurant;
+        $store_name =  strtolower( str_replace(' ', '_', $restaurant->name));
+
         $myFolder = mkdir(strtolower($restaurant->name));
-        $myfile = fopen($restaurant->name . "/build.js", "w") or die("Unable to open file!");
+        $myfile = fopen($store_name . "/build.js", "w") or die("Unable to open file!");
 
         $themeColor = RestaurantTheme::find()
                 ->select(['primary'])

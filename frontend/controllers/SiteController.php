@@ -92,7 +92,7 @@ class SiteController extends Controller {
             foreach (Yii::$app->accountManager->getManagedAccounts() as $managedRestaurant) {
 
                 if (AgentAssignment::isOwner($managedRestaurant->restaurant_uuid)) {
-                    return $this->redirect(['home',
+                    return $this->redirect(['vendor-dashboard',
                                 'id' => $managedRestaurant->restaurant_uuid
                     ]);
                 } else {
@@ -1174,8 +1174,21 @@ class SiteController extends Controller {
                 $assignment_agent_model->role = AgentAssignment::AGENT_ROLE_OWNER;
                 $assignment_agent_model->restaurant_uuid = $store_model->restaurant_uuid;
 
-                if ($assignment_agent_model->save())
-                    return $this->redirect(['login']);
+                if ($assignment_agent_model->save()){
+                  $model = new LoginForm();
+                  $model->email  = $agent_model->agent_email;
+                  $model->password  = $agent_model->tempPassword;
+
+                  if ($managedRestaurant = $model->login()) {
+                      return $this->redirect(['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
+                  } else {
+                      $model->password = '';
+
+                      return $this->render('login', [
+                                  'model' => $model,
+                      ]);
+                  }
+                }
             }
         }
 

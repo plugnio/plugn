@@ -58,6 +58,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
             [['agent_name', 'agent_email', 'agent_password_hash', 'agent_password_reset_token'], 'string', 'max' => 255],
             [['agent_auth_key'], 'string', 'max' => 32],
             [['agent_email'], 'unique'],
+            [['agent_email'], 'email'],
             [['tempPassword'], 'required', 'on' => 'create'],
             [['tempPassword'], 'safe'],
             [['agent_password_reset_token'], 'unique'],

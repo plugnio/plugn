@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use Yii;
 use common\models\Restaurant;
+use common\models\RestaurantPaymentMethod;
 use common\models\Order;
 use common\models\Item;
 use yii\db\Expression;
@@ -549,14 +550,66 @@ class RestaurantController extends Controller {
      * View payment settings page
      * @return mixed
      */
-    public function actionViewPaymentSettings($restaurantUuid) {
+    public function actionViewPaymentMethods($restaurantUuid) {
 
         $model = $this->findModel($restaurantUuid);
+        $isCashOnDeliveryEnabled = $model->getPaymentMethods()->where(['payment_method_id' => 3 ])->exists();
 
-        return $this->render('payment-settings/view-payment-settings', [
-                    'model' => $model
+        return $this->render('payment-methods', [
+                    'model' => $model,
+                    'isCashOnDeliveryEnabled' => $isCashOnDeliveryEnabled
         ]);
     }
+
+    /**
+     * Create tap account
+     * @param type $id
+     * @return type
+     */
+    public function actionCreateTapAccount($id) {
+
+        $model = $this->findModel($id);
+
+        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())  && $model->save()) {
+          return $this->redirect(['view-payment-methods',  'restaurantUuid' =>  $model->restaurant_uuid]);
+        }
+
+        return $this->render('create-tap-account', [
+                    'model' => $model
+
+        ]);
+    }
+
+    /**
+     *  Enable Cash on delivery
+     */
+    public function actionEnableCod($restaurantUuid) {
+        $model = $this->findModel($restaurantUuid);
+
+        if(!$model->getRestaurantPaymentMethods()->where(['payment_method_id' => 3 ])->exists()){
+
+          $payments_method = new RestaurantPaymentMethod();
+          $payments_method->payment_method_id = 3; //Cash
+          $payments_method->restaurant_uuid = $model->restaurant_uuid;
+          if(!$payments_method->save()){
+            die(json_encode($payments_method->errors));
+          }
+        }
+        return $this->redirect(['view-payment-methods',  'restaurantUuid' =>  $model->restaurant_uuid]);
+    }
+
+    /**
+     *  Disable Cash on delivery
+     */
+    public function actionDisableCod($restaurantUuid) {
+      $model = $this->findModel($restaurantUuid);
+
+      if($casOnDelivery = $model->getRestaurantPaymentMethods()->where(['payment_method_id' => 3 ])->one())
+        $casOnDelivery->delete();
+
+        return $this->redirect(['view-payment-methods',  'restaurantUuid' =>  $model->restaurant_uuid]);
+    }
+
 
     /**
     * View Design & layout page
@@ -676,30 +729,7 @@ class RestaurantController extends Controller {
         ]);
     }
 
-    /**
-     * Updates an existing payment method.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdatePaymentSettings($id) {
 
-        $model = $this->findModel($id);
-
-        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
-
-
-            if ($model->save()) {
-                $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
-                return $this->redirect(['view-payment-settings', 'restaurantUuid' => $id]);
-            }
-        }
-
-        return $this->render('payment-settings/update-payment-settings', [
-                    'model' => $model
-        ]);
-    }
 
     /**
      * Finds the Restaurant model based on its primary key value.

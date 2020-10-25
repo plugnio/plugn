@@ -295,11 +295,11 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                     ?>
                                 </li>
 
-                                <li class=" nav-item <?= $this->context->route == 'restaurant/view-payment-settings' || $this->context->route == 'restaurant/update-payment-settings' ? 'active' : '' ?> ">
+                                <li class=" nav-item <?= $this->context->route == 'restaurant/view-payment-methods'  ? 'active' : '' ?> ">
                                     <?=
                                     Html::a(
                                             Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                            Html::tag('span', 'Payment Settings'), ['restaurant/view-payment-settings', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                            Html::tag('span', 'Payment Methods'), ['restaurant/view-payment-methods', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                                     )
                                     ?>
                                 </li>
@@ -417,7 +417,15 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         }
                     }
                     ?>
+                    <li class=" nav-item">
 
+                        <?=
+                        Html::a(
+                                Html::tag('i', '', ['class' => 'feather icon-eye']) .
+                                Html::tag('span', 'Online Store'), $restaurant_model->restaurant_domain, ['class' => 'menu-title']
+                        )
+                        ?>
+                    </li>
                 </ul>
 
             </div>

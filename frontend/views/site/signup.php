@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                 <?= $form->field($agent_model, 'agent_name')->textInput(['maxlength' => true])->label('Name') ?>
 
-                                <?= $form->field($agent_model, 'agent_email')->textInput(['maxlength' => true])->label('Email') ?>
+                                <?= $form->field($agent_model, 'agent_email')->textInput(['maxlength' => true,'type' => 'email'])->label('Email') ?>
 
 
                                 <?= $form->field($store_model, 'name')->textInput(['maxlength' => true])->label('Your store name in English') ?>
