@@ -151,6 +151,8 @@ class TapPayments extends Component
      */
     public function uploadFileToTap($file_path, $purpose, $title)
     {
+
+
         $fileEndpoint = $this->apiEndpoint . "/files";
 
         $fileParams = [
@@ -158,7 +160,6 @@ class TapPayments extends Component
             "title" => $title,
             "file_link_create" => '0'
         ];
-
 
 
         $client = new Client();
@@ -183,6 +184,8 @@ class TapPayments extends Component
      */
     public function createBussiness($restaurant)
     {
+
+
         $bussinessEndpoint = $this->apiEndpoint . "/business";
 
         $bussinessParams = [

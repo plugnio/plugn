@@ -289,16 +289,6 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
-     * Processes file uploads if there are file inputs available
-     */
-    public function processFileUploads() {
-
-        $this->_uploadTempFile($this->restaurant_authorized_signature_file, 'authorized_signature_file');
-        $this->_uploadTempFile($this->restaurant_commercial_license_file, 'commercial_license_file');
-        $this->_uploadTempFile($this->owner_identification_file, 'identification_file');
-    }
-
-    /**
      * Upload a File to cloudinary
      * @param type $imageURL
      */
@@ -324,42 +314,16 @@ class Restaurant extends \yii\db\ActiveRecord {
         }
     }
 
-    /**
-     * Processes a file upload
-     * @param UploadedFile $file instance of yii\web\UploadedFile that will be uploaded into the attribute
-     * @param string $attribute attribute of this model that will be updated if the file is successfully uploaded
-     */
-    public function _uploadTempFile($file, $attribute) {
-
-        if ($file) {
-            $filename = Yii::$app->security->generateRandomString() . "." . $file->extension;
-            $uploadPath = Yii::getAlias('@projectFiles');
-
-            $file->saveAs($uploadPath . "/" . $filename);
-
-            // Delete old file that was stored within the attribute if exists
-            $oldFile = $uploadPath . "/" . $this[$attribute];
-            if ($this[$attribute] && file_exists($oldFile)) {
-                unlink($oldFile);
-            }
-
-            // Set this models attribute to the new filename
-            $this[$attribute] = $filename;
-        }
-    }
-
     public function uploadDocumentsToTap() {
-
-        $this->processFileUploads();
 
         if ($this->authorized_signature_expiry_date && $this->authorized_signature_issuing_date && $this->authorized_signature_issuing_country && $this->authorized_signature_file_purpose && $this->authorized_signature_title) {
 
             //Upload Authorized Signature file
             $response = Yii::$app->tapPayments->uploadFileToTap(
-                    Yii::getAlias('@projectFiles') . "/" . $this->authorized_signature_file, $this->authorized_signature_file_purpose, $this->authorized_signature_title);
+                    Yii::getAlias('@privateDocuments') . "/" . $this->authorized_signature_file, $this->authorized_signature_file_purpose, $this->authorized_signature_title);
             if ($response->isOk) {
-
                 $this->authorized_signature_file_id = $response->data['id'];
+                unlink(Yii::getAlias('@privateDocuments') . "/" . $this->authorized_signature_file, $this->authorized_signature_file_purpose, $this->authorized_signature_title);
             } else {
                 return Yii::$app->session->setFlash('error', print_r('Error when uploading authorized signature document: ' . json_encode($response->data), true));
             }
@@ -370,24 +334,26 @@ class Restaurant extends \yii\db\ActiveRecord {
 
             //Upload Authorized Signature file
             $response = Yii::$app->tapPayments->uploadFileToTap(
-                    Yii::getAlias('@projectFiles') . "/" . $this->commercial_license_file, $this->commercial_license_file_purpose, $this->commercial_license_title);
+                    Yii::getAlias('@privateDocuments') . "/" . $this->commercial_license_file, $this->commercial_license_file_purpose, $this->commercial_license_title);
 
             if ($response->isOk) {
 
                 $this->commercial_license_file_id = $response->data['id'];
+                unlink(Yii::getAlias('@privateDocuments') . "/" . $this->commercial_license_file);
             } else {
                 return Yii::$app->session->setFlash('error', print_r('Error when uploading commercial license document: ' . json_encode($response->data), true));
             }
         }
 
 
-
         //Upload Owner civil id
         $response = Yii::$app->tapPayments->uploadFileToTap(
-                Yii::getAlias('@projectFiles') . "/" . $this->identification_file, $this->identification_file_purpose, $this->identification_title);
+                Yii::getAlias('@privateDocuments') . "/" . $this->identification_file, $this->identification_file_purpose, $this->identification_title);
+
 
         if ($response->isOk) {
             $this->identification_file_id = $response->data['id'];
+            unlink(Yii::getAlias('@privateDocuments') . "/" . $this->identification_file);
         }
     }
 
@@ -400,7 +366,6 @@ class Restaurant extends \yii\db\ActiveRecord {
 
         //Create a business for a vendor on Tap
         $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
-
 
         if ($businessApiResponse->isOk) {
 
@@ -424,6 +389,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         //Create an Operator
         $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id, $this->developer_id);
 
+        die(json_encode($operatorApiResponse->data));
 
         if ($operatorApiResponse->isOk) {
             $this->operator_id = $operatorApiResponse->data['id'];
@@ -650,6 +616,7 @@ class Restaurant extends \yii\db\ActiveRecord {
 
 
         if ($this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT) {
+            die('enter else');
             //delete tmp files
             $this->deleteTempFiles();
         }

@@ -186,18 +186,20 @@ class Item extends \yii\db\ActiveRecord
     public function uploadItemImage($imagesPath)
     {
         //deleteallofThem
-        foreach ($this->getItemImages()->all() as  $itemImage) {
-          $itemImage->delete();
-        }
+//        foreach ($this->getItemImages()->all() as  $itemImage) {
+//          $itemImage->delete();
+//        }
 
         foreach ($imagesPath as $key => $path) {
+            
+          
             $filename = Yii::$app->security->generateRandomString();
 
             $itemName = str_replace(' ', '', $this->item_name);
 
             try {
                 $result = Yii::$app->cloudinaryManager->upload(
-                    $path->tempName,
+                    $path['file'],
                     [
                 'public_id' => "restaurants/" . $this->restaurant_uuid . "/items/" . $filename
                     ]
@@ -209,6 +211,9 @@ class Item extends \yii\db\ActiveRecord
                     $item_image_model->product_file_name = basename($result['url']);
                     $item_image_model->save(false);
                 }
+                
+                unlink($path['file']);
+                
             } catch (\Cloudinary\Error $err) {
                 Yii::error("Error when uploading item's image to Cloudinry: " . json_encode($err));
                 Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($imagesPath));

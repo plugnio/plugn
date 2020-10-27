@@ -313,6 +313,15 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                     ?>
                                 </li>
 
+                                <li class=" nav-item <?= $this->context->route == 'site/current-plan' || $this->context->route == 'restaurant/update-payment-settings' ? 'active' : '' ?> ">
+                                    <?=
+                                    Html::a(
+                                            Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                            Html::tag('span', 'Domains'), ['site/domains', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                    )
+                                    ?>
+                                </li>
+
                                 <li class=" nav-item <?= $this->context->route == 'restaurant/view-design-layout' || $this->context->route == 'restaurant/update-design-layout' ? 'active' : '' ?> ">
                                     <?=
                                     Html::a(
@@ -394,7 +403,15 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                             <?php } ?>
                         </ul>
                     </li>
+                    <li class=" nav-item">
 
+                        <?=
+                        Html::a(
+                                Html::tag('i', '', ['class' => 'feather icon-eye']) .
+                                Html::tag('span', 'Online Store'), $restaurant_model->restaurant_domain, ['class' => 'menu-title']
+                        )
+                        ?>
+                    </li>
 
                     <?php if (count(Yii::$app->accountManager->getManagedAccounts()) > 1) { ?>
                         <li class=" navigation-header"><span>Your stores</span>
@@ -417,15 +434,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         }
                     }
                     ?>
-                    <li class=" nav-item">
 
-                        <?=
-                        Html::a(
-                                Html::tag('i', '', ['class' => 'feather icon-eye']) .
-                                Html::tag('span', 'Online Store'), $restaurant_model->restaurant_domain, ['class' => 'menu-title']
-                        )
-                        ?>
-                    </li>
                 </ul>
 
             </div>

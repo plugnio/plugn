@@ -44,7 +44,7 @@ class SiteController extends Controller {
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error', 'current-plan', 'compare-plan', 'index', 'signup', 'check-for-new-orders', 'thank-you', 'request-password-reset', 'reset-password'],
+                        'actions' => ['login', 'error', 'current-plan', 'domains', 'compare-plan', 'index', 'signup', 'check-for-new-orders', 'thank-you', 'request-password-reset', 'reset-password'],
                         'allow' => true,
                     ],
                     [
@@ -121,15 +121,57 @@ class SiteController extends Controller {
         ]);
     }
 
+
+    /**
+     * View Stores domains
+     *
+     * @return mixed
+     */
+    public function actionDomains($id) {
+        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
+
+            return $this->render('domains', [
+                        'restaurant_model' => $managedRestaurant
+            ]);
+        }
+    }
+
     /**
      * Displays  Real time orders
      *
      * @return mixed
      */
     public function actionConnectDomain($id) {
-        if ($model = Yii::$app->accountManager->getManagedAccount($id)) {
+        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
+
+            $old_domain = $managedRestaurant->restaurant_domain;
+
+            if ($managedRestaurant->load(Yii::$app->request->post())) {
 
 
+                if ($old_domain != $managedRestaurant->restaurant_domain) {
+
+                   $managedRestaurant->restaurant_domain = rtrim($managedRestaurant->restaurant_domain, '/');
+
+                   if( $managedRestaurant->save()){
+                     \Yii::$app->mailer->compose([
+                                 'html' => 'domain-update-request',
+                                     ], [
+                                 'new_domain' => $managedRestaurant->restaurant_domain,
+                                 'old_domain' => $old_domain
+                             ])
+                             ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                             ->setTo(Yii::$app->params['supportEmail'])
+                             ->setSubject('[Plugn] CONTACT INFORMATION UPDATE REQUEST')
+                             ->send();
+
+                     return $this->redirect(['domains',
+                                 'id' => $managedRestaurant->restaurant_uuid
+                     ]);
+                   }
+
+                }
+            }
             return $this->render('connect-domain', [
                         'restaurant_model' => $managedRestaurant
             ]);
@@ -262,9 +304,8 @@ class SiteController extends Controller {
             // Redirect back to current plan page
 
             return $this->redirect(['current-plan',
-              'id' => $paymentRecord->restaurant_uuid
+                        'id' => $paymentRecord->restaurant_uuid
             ]);
-
         } catch (\Exception $e) {
             throw new NotFoundHttpException($e->getMessage());
         }
@@ -1174,20 +1215,20 @@ class SiteController extends Controller {
                 $assignment_agent_model->role = AgentAssignment::AGENT_ROLE_OWNER;
                 $assignment_agent_model->restaurant_uuid = $store_model->restaurant_uuid;
 
-                if ($assignment_agent_model->save()){
-                  $model = new LoginForm();
-                  $model->email  = $agent_model->agent_email;
-                  $model->password  = $agent_model->tempPassword;
+                if ($assignment_agent_model->save()) {
+                    $model = new LoginForm();
+                    $model->email = $agent_model->agent_email;
+                    $model->password = $agent_model->tempPassword;
 
-                  if ($managedRestaurant = $model->login()) {
-                      return $this->redirect(['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
-                  } else {
-                      $model->password = '';
+                    if ($managedRestaurant = $model->login()) {
+                        return $this->redirect(['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
+                    } else {
+                        $model->password = '';
 
-                      return $this->render('login', [
-                                  'model' => $model,
-                      ]);
-                  }
+                        return $this->render('login', [
+                                    'model' => $model,
+                        ]);
+                    }
                 }
             }
         }

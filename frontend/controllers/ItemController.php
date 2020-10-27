@@ -15,6 +15,7 @@ use wbraganca\dynamicform\DynamicFormWidget;
 use frontend\base\Model;
 use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
+use common\components\FileUploader;
 
 /**
  * ItemController implements the CRUD actions for Item model.
@@ -112,6 +113,31 @@ class ItemController extends Controller {
     }
 
     /**
+     * Delete item image
+     * @param type $restaurantUuid
+     * @param type $itemUuid
+     * @return boolean
+     */
+    public function actionDeleteItemImage($restaurantUuid, $itemUuid) {
+
+
+        $model = $this->findModel($itemUuid, $restaurantUuid);
+
+
+        $file_name = Yii::$app->request->getBodyParam("file");
+
+        if ($model && $file_name) {
+
+            $item_image = \common\models\ItemImage::find()->where(['item_uuid' => $itemUuid, 'product_file_name' => $file_name])->one();
+
+            $item_image->delete();
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Creates a new Item model.
      * If creation is successful, the browser will be redirected to the 'index' page.
      * @return mixed
@@ -127,7 +153,37 @@ class ItemController extends Controller {
         if ($modelItem->load(Yii::$app->request->post())) {
 
 
-            $itemImages = \yii\web\UploadedFile::getInstances($modelItem, 'item_images');
+//            $itemImages = \yii\web\UploadedFile::getInstances($modelItem, 'item_images');
+            // initialize FileUploader
+            $FileUploader = new FileUploader('item_images', array(
+                'limit' => 10,
+                'maxSize' => null,
+                'extensions' => null,
+                'uploadDir' => 'uploads/',
+                'title' => 'name'
+            ));
+
+            // call to upload the files
+            $data = $FileUploader->upload();
+
+            // if uploaded and success
+            if ($data['isSuccess'] && count($data['files']) > 0) {
+                // get uploaded files
+                $uploadedFiles = $data['files'];
+            }
+            // if warnings
+//            if ($data['hasWarnings']) {
+//                // get warnings
+//                $warnings = $data['warnings'];
+//
+//                echo '<pre>';
+//                print_r($warnings);
+//                echo '</pre>';
+//                exit;
+//            }
+            // get the fileList
+            $itemImages = $FileUploader->getFileList();
+
 
             $modelsOption = Model::createMultiple(Option::classname());
             Model::loadMultiple($modelsOption, Yii::$app->request->post());
@@ -243,7 +299,35 @@ class ItemController extends Controller {
 
 
         if ($modelItem->load(Yii::$app->request->post())) {
-            $itemImages = \yii\web\UploadedFile::getInstances($modelItem, 'item_images');
+            // initialize FileUploader
+            $FileUploader = new FileUploader('item_images', array(
+                'limit' => 10,
+                'maxSize' => null,
+                'extensions' => null,
+                'uploadDir' => 'uploads/',
+                'title' => 'name'
+            ));
+
+            // call to upload the files
+            $data = $FileUploader->upload();
+
+            // if uploaded and success
+            if ($data['isSuccess'] && count($data['files']) > 0) {
+                // get uploaded files
+                $uploadedFiles = $data['files'];
+            }
+            // if warnings
+//            if ($data['hasWarnings']) {
+//                // get warnings
+//                $warnings = $data['warnings'];
+//
+//                echo '<pre>';
+//                print_r($warnings);
+//                echo '</pre>';
+//                exit;
+//            }
+            // get the fileList
+            $itemImages = $FileUploader->getFileList();
 
 
             // reset

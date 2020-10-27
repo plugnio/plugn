@@ -17,14 +17,12 @@ $this->title = 'Connect existing domain';
     <div class="card" style="    width: 70%;
          margin: auto;">
         <div class="card-header">
-            <h3>Domain</h3>
+            <h5>Domain</h5>
         </div>
 
         <div class="card-body">
             <div class="card-content">
 
-               <?php if($restaurant_model->restaurant_domain == null){ ?> 
-                   
                 <?php $form = ActiveForm::begin(); ?>
 
                 <?=
@@ -36,7 +34,8 @@ $this->title = 'Connect existing domain';
                     . "</div>"
                     . "{error}{hint}"
                 ])->textInput([
-                    'class' => 'form-control'
+                    'class' => 'form-control',
+                    'type' => 'url'
                 ])->label(false)
                 ?>
 
@@ -45,12 +44,7 @@ $this->title = 'Connect existing domain';
                     <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => '    float: right;']) ?>
                 </div>
 
-                <?php ActiveForm::end();
-                
-             } else { ?>
-                
-                <?= '<p>' . $restaurant_model->restaurant_domain  . '</p>'?>
-             <?php } ?>
+                <?php ActiveForm::end();  ?>
 
             </div>
         </div>

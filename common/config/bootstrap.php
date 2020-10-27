@@ -8,3 +8,7 @@ Yii::setAlias('@api', dirname(dirname(__DIR__)) . '/api');
 
 //Image Upload Paths
 Yii::setAlias('projectFiles','@backend/web/uploads/project-files');
+
+
+//Image Upload Paths
+Yii::setAlias('privateDocuments','@frontend/web');

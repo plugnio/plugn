@@ -423,7 +423,7 @@ $this->registerJs($js);
         </div>
     </div>
     <?php
-    if(!str_contains($restaurant_model->restaurant_domain, '.plugn.store') ){ ?>
+    if(str_contains($restaurant_model->restaurant_domain, '.plugn.store') ){ ?>
     <div class="card">
         <div class="card-body">
             <div class="row">
@@ -435,7 +435,7 @@ $this->registerJs($js);
                     <div>
                         <div>
                             <div>
-                                <?= Html::a('Add domain', ['site/connect-domain', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+                                <?= Html::a('Add domain', ['site/domains', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
                             </div>
                         </div>
                     </div>
@@ -473,6 +473,28 @@ $this->registerJs($js);
                         <img src="https://res.cloudinary.com/plugn/image/upload/c_scale,h_120,w_100/v1603286062/a64ef20cde1af82ef69556c7ab33c727_pa1xe7.svg" width="120" alt="" />
                     </div>
                 </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-9">
+                    <div>
+                        <h3><span>Online payments</span></h3>
+                    </div>
+                    <p>Enable and manage your store's payment providers.</p>
+                    <div>
+                        <div>
+                            <div>
+                                <?= Html::a('View payment settings page', ['restaurant/view-payment-methods', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
         </div>

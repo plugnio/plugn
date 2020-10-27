@@ -8,6 +8,7 @@ use frontend\models\CategorySearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use common\components\FileUploader;
 
 /**
  * CategoryController implements the CRUD actions for Category model.
@@ -58,6 +59,33 @@ class CategoryController extends Controller {
         ]);
     }
 
+
+    /**
+     * Delete category image
+     * @param type $restaurantUuid
+     * @param type $itemUuid
+     * @return boolean
+     */
+    public function actionDeleteCategoryImage($restaurantUuid, $categoryId) {
+
+
+        $model = $this->findModel($categoryId, $restaurantUuid);
+
+
+        $file_name = Yii::$app->request->getBodyParam("file");
+
+        if ($model && $model->category_image == $file_name) {
+          $model->deleteCategoryImage();
+
+            $model->category_image = null;
+            $model->save(false);
+
+            return true;
+        }
+        return false;
+    }
+
+
     /**
      * Displays a single Category model.
      * @param integer $id
@@ -82,9 +110,35 @@ class CategoryController extends Controller {
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
-            $categoryImage = \yii\web\UploadedFile::getInstances($model, 'image');
+            // $categoryImage = \yii\web\UploadedFile::getInstances($model, 'image');
+
+
+
+            // initialize FileUploader
+            $FileUploader = new FileUploader('category_image', array(
+                'limit' => 1,
+                'maxSize' => null,
+                'extensions' => null,
+                'uploadDir' => 'uploads/',
+                'title' => 'name'
+            ));
+
+            // call to upload the files
+            $data = $FileUploader->upload();
+
+            // if uploaded and success
+            if ($data['isSuccess'] && count($data['files']) > 0) {
+                // get uploaded files
+                $uploadedFiles = $data['files'];
+            }
+
+            // get the fileList
+            $categoryImage = $FileUploader->getFileList();
+
+
+
             if ($categoryImage)
-                $model->uploadCategoryImage($categoryImage[0]->tempName);
+                $model->uploadCategoryImage($categoryImage[0]['file']);
 
 
             return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
@@ -109,9 +163,33 @@ class CategoryController extends Controller {
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
 
-            $categoryImage = \yii\web\UploadedFile::getInstances($model, 'image');
+            // $categoryImage = \yii\web\UploadedFile::getInstances($model, 'image');
+
+            // initialize FileUploader
+            $FileUploader = new FileUploader('category_image', array(
+                'limit' => 1,
+                'maxSize' => null,
+                'extensions' => null,
+                'uploadDir' => 'uploads/',
+                'title' => 'name'
+            ));
+
+            // call to upload the files
+            $data = $FileUploader->upload();
+
+            // if uploaded and success
+            if ($data['isSuccess'] && count($data['files']) > 0) {
+                // get uploaded files
+                $uploadedFiles = $data['files'];
+            }
+
+            // get the fileList
+            $categoryImage = $FileUploader->getFileList();
+
+
+
             if ($categoryImage)
-                $model->uploadCategoryImage($categoryImage[0]->tempName);
+            $model->uploadCategoryImage($categoryImage[0]['file']);
 
             return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
         }

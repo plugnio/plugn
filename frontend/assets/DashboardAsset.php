@@ -50,7 +50,18 @@ class DashboardAsset extends AssetBundle {
         'app-assets/css/pages/invoice.css',
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
-        'css/bootstrap-duallistbox.css'
+        'css/bootstrap-duallistbox.css',
+
+
+
+        'https://fonts.googleapis.com/css?family=Roboto:400,700',
+        'fileuploader/dist/font/font-fileuploader.css',
+        'fileuploader/dist/jquery.fileuploader.min.css',
+        'fileuploader/dist/css/jquery.fileuploader-theme-boxafter.css'
+
+
+
+
     ];
 
     public $js = [
@@ -97,7 +108,14 @@ class DashboardAsset extends AssetBundle {
         // 'https://code.jquery.com/jquery-3.2.1.slim.min.js',
         'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js',
         'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js',
-        'js/jquery.bootstrap-duallistbox.min.js'
+        'js/jquery.bootstrap-duallistbox.min.js',
+
+        // 'https://code.jquery.com/jquery-3.2.1.min.js',
+        'fileuploader/dist/jquery.fileuploader.min.js',
+        'fileuploader/dist/js/custom.js'
+
+
+
     ];
 
     public $depends = [
