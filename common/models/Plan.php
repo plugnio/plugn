@@ -31,7 +31,7 @@ class Plan extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name'], 'required'],
+            [['name', 'description'], 'required'],
             [['valid_for'], 'integer'],
             [['price', 'platform_fee'], 'number'],
             [['name'], 'string', 'max' => 255],
@@ -46,6 +46,7 @@ class Plan extends \yii\db\ActiveRecord
         return [
             'plan_id' => 'Plan ID',
             'name' => 'Name',
+            'description' => 'Description',
             'price' => 'Price',
             'platform_fee' => 'Platform Fee',
         ];

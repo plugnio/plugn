@@ -547,10 +547,12 @@ class RestaurantController extends Controller {
 
         $model = $this->findModel($restaurantUuid);
         $isCashOnDeliveryEnabled = $model->getPaymentMethods()->where(['payment_method_id' => 3])->exists();
+        $isOnlinePaymentEnabled = $model->getPaymentMethods()->where(['payment_method_id' => 1])->exists();
 
         return $this->render('payment-methods', [
-                    'model' => $model,
-                    'isCashOnDeliveryEnabled' => $isCashOnDeliveryEnabled
+                  'model' => $model,
+                  'isCashOnDeliveryEnabled' => $isCashOnDeliveryEnabled,
+                  'isOnlinePaymentEnabled' => $isOnlinePaymentEnabled
         ]);
     }
 
@@ -646,6 +648,7 @@ class RestaurantController extends Controller {
             $model->createAnAccountOnTap();
 
             if ($model->validate() && $model->save()) {
+
                 return $this->redirect(['view-payment-methods', 'restaurantUuid' => $model->restaurant_uuid]);
             } else {
                 Yii::$app->session->setFlash('error', print_r($model->errors, true));
@@ -656,6 +659,48 @@ class RestaurantController extends Controller {
                     'model' => $model
         ]);
     }
+
+    /**
+     *  Enable OnlinePayment on delivery
+     */
+    public function actionEnableOnlinePayment($restaurantUuid) {
+        $model = $this->findModel($restaurantUuid);
+
+        if (!$model->getRestaurantPaymentMethods()->where(['payment_method_id' => 1])->exists()) {
+
+            $payments_method = new RestaurantPaymentMethod();
+            $payments_method->payment_method_id = 1; //K-net
+            $payments_method->restaurant_uuid = $model->restaurant_uuid;
+            $payments_method->save(false);
+        }
+
+        if (!$model->getRestaurantPaymentMethods()->where(['payment_method_id' => 2])->exists()) {
+
+            $payments_method = new RestaurantPaymentMethod();
+            $payments_method->payment_method_id = 2; //Credit Card
+            $payments_method->restaurant_uuid = $model->restaurant_uuid;
+            $payments_method->save(false);
+        }
+
+
+        return $this->redirect(['view-payment-methods', 'restaurantUuid' => $model->restaurant_uuid]);
+    }
+
+    /**
+     *  Disable OnlinePayment on delivery
+     */
+    public function actionDisableOnlinePayment($restaurantUuid) {
+        $model = $this->findModel($restaurantUuid);
+
+        $online_payments = $model->getRestaurantPaymentMethods()->where(['<>','payment_method_id' , 3])->all();
+
+        foreach ($online_payments as $key => $online_payment) {
+          $online_payment->delete();
+        }
+
+        return $this->redirect(['view-payment-methods', 'restaurantUuid' => $model->restaurant_uuid]);
+    }
+
 
     /**
      *  Enable Cash on delivery
@@ -681,8 +726,8 @@ class RestaurantController extends Controller {
     public function actionDisableCod($restaurantUuid) {
         $model = $this->findModel($restaurantUuid);
 
-        if ($casOnDelivery = $model->getRestaurantPaymentMethods()->where(['payment_method_id' => 3])->one())
-            $casOnDelivery->delete();
+        if ($cashOnDelivery = $model->getRestaurantPaymentMethods()->where(['payment_method_id' => 3])->one())
+            $cashOnDelivery->delete();
 
         return $this->redirect(['view-payment-methods', 'restaurantUuid' => $model->restaurant_uuid]);
     }

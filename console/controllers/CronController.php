@@ -10,6 +10,7 @@ use common\models\Voucher;
 use common\models\BankDiscount;
 use common\models\Payment;
 use common\models\Item;
+use common\models\Plan;
 use common\models\Order;
 use common\models\Subscription;
 use common\models\OpeningHour;
@@ -28,13 +29,32 @@ class CronController extends \yii\console\Controller {
     public function actionIndex(){
         $restaurants = Restaurant::find()->all();
 
+        $freePlan = Plan::find()->where(['valid_for' => 0])->one();
+        $premPlan = Plan::find()->where(['platform_fee' => 0])->one();
+
+
         foreach ($restaurants as  $restaurant) {
-          $restaurant->company_name = $restaurant->name;
+          if($restaurant){
+            $restaurant->company_name = $restaurant->name;
 
-          if($restaurant->live_api_key && $restaurant->test_api_key)
-            $restaurant->is_tap_enable = 1;
+            if($restaurant->live_api_key && $restaurant->test_api_key)
+              $restaurant->is_tap_enable = 1;
 
-          $restaurant->save();
+              $subscription = new Subscription();
+              $subscription->restaurant_uuid = $restaurant->restaurant_uuid;
+              $subscription->subscription_start_at = $restaurant->restaurant_created_at;
+              $subscription->subscription_status = Subscription::STATUS_ACTIVE;
+
+          if($restaurant->platform_fee == 0)
+            $subscription->plan_id = $premPlan->plan_id; //Prem
+          else
+            $subscription->plan_id = $freePlan->plan_id; //Free
+
+            $subscription->save(false);
+
+            $restaurant->save();
+          }
+
         }
 
         $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
@@ -42,46 +62,51 @@ class CronController extends \yii\console\Controller {
     }
 
 
-    public function actionNotifyAgentsForSubscriptionThatWillExpireSoon(){
+    // public function actionNotifyAgentsForSubscriptionThatWillExpireSoon(){
 
-      $now = new DateTime('now');
-      $subscriptions = Subscription::find()
-              ->where(['subscription_status' => Subscription::STATUS_ACTIVE])
-              ->andWhere(['notified_email' => 0])
-              ->andWhere(['>', 'subscription_end_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
-              ->all();
+      // $now = new DateTime('now');
+      // $subscriptions = Subscription::find()
+      //         ->where(['subscription_status' => Subscription::STATUS_ACTIVE])
+      //         ->andWhere(['notified_email' => 0])
+      //         ->andWhere(['not', ['subscription_end_at' => null]])
+      //
+      //         ->andWhere(['<=' ,'subscription_end_at', date('Y-m-d H:i:s', strtotime('+5 days'))])
+      //
+      //         ->all();
 
-      foreach ($subscriptions as $subscription) {
+
+      // foreach ($subscriptions as $subscription) {
+      //   echo (json_encode(($subscription->subscription_end_at)) . "\r\n");
 
 
-        foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
-          $result = \Yii::$app->mailer->compose([
-                      'html' => 'subscription-will-expire-soon-html',
-                          ], [
-                      'subscription' => $subscription,
-                      'agent_name' => $agent->agent_name,
-                  ])
-                  ->setFrom([\Yii::$app->params['supportEmail']])
-                  ->setTo($agent->agent_email)
-                  ->setSubject('Your Subscription is Expiring')
-                  ->send();
+        // foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
+        //   $result = \Yii::$app->mailer->compose([
+        //               'html' => 'subscription-will-expire-soon-html',
+        //                   ], [
+        //               'subscription' => $subscription,
+        //               'agent_name' => $agent->agent_name,
+        //           ])
+        //           ->setFrom([\Yii::$app->params['supportEmail']])
+        //           ->setTo($agent->agent_email)
+        //           ->setSubject('Your Subscription is Expiring')
+        //           ->send();
+        //
+        //     if($result){
+        //       $subscription->notified_email = 1;
+        //       $subscription->save(false);
+        //     }
+        // }
+      // }
 
-            if($result){
-              $subscription->notified_email = 1;
-              $subscription->save(false);
-            }
-        }
-      }
-
-      $this->stdout("Email sent to all agents of employer that have applicants will expire soon \n", Console::FG_RED, Console::NORMAL);
-      return self::EXIT_CODE_NORMAL;
+      // $this->stdout("Email sent to all agents of employer that have applicants will expire soon \n", Console::FG_RED, Console::NORMAL);
+      // return self::EXIT_CODE_NORMAL;
 
        // $origin =  new DateTime(date('Y-m-d'));
        // $target =  new DateTime(date('Y-m-d', strtotime($sub->subscription_end_at)));
        // $interval = $origin->diff($target);
        // echo $interval->format('%a');
 
-    }
+    // }
 
     public function actionCreateBuildJsFile() {
 
@@ -600,6 +625,7 @@ class CronController extends \yii\console\Controller {
             }
         }
     }
+
 
     public function actionUpdateStockQty() {
 

@@ -313,7 +313,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                     ?>
                                 </li>
 
-                                <li class=" nav-item <?= $this->context->route == 'site/current-plan' || $this->context->route == 'restaurant/update-payment-settings' ? 'active' : '' ?> ">
+                                <li class=" nav-item <?= $this->context->route == 'site/domains'  ? 'active' : '' ?> ">
                                     <?=
                                     Html::a(
                                             Html::tag('i', '', ['class' => 'feather icon-circle']) .

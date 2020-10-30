@@ -14,8 +14,8 @@ $this->title = 'Connect existing domain';
 ?>
 
 <section>
-    <div class="card" style="    width: 70%;
-         margin: auto;">
+  <div class="card">
+
         <div class="card-header">
             <h5>Domain</h5>
         </div>
@@ -41,7 +41,7 @@ $this->title = 'Connect existing domain';
 
 
                 <div class="form-group">
-                    <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => '    float: right;']) ?>
+                    <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => '    float: left;']) ?>
                 </div>
 
                 <?php ActiveForm::end();  ?>

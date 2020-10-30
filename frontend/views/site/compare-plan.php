@@ -81,32 +81,33 @@ margin: 0 0 20px;
 
 
     <div class="row" style="  padding-bottom: 3.2rem;text-align: center;width: 80%;  margin: auto;">
+        <?php foreach ($availablePlans as  $plan) { ?>
             <div class="col-6">
               <div class="card">
                 <div class="card-body">
                   <div class="card-content">
                     <strong class="pricing__tag">
-                      <span class="pricing__currency">KWD</span>0
-                      <span class="pricing__period"> per year</span>
+                      <span class="pricing__currency">KWD</span><?= $plan->price ?>
+                      <span class="pricing__period">per year</span>
                     </strong>
 
                     <?php
-                      if($plan_id ==  1)
+                      if($selectedPlan->plan_id == $plan->plan_id)
                         echo  Html::a('Current plan', ['update'], ['class' => 'btn btn-primary btn-lg disabled' , 'style'=>'    margin: 1.5rem 0;']);
                       else
-                        echo  Html::a('Choose this plan', ['pay'], ['class' => 'btn btn-primary btn-lg' , 'style'=>'    margin: 1.5rem 0;']);
+                        echo  Html::a('Choose this plan', [$plan->price > 0 ? 'confirm-plan' : 'downgrade-to-free-plan',  'id' => $restaurant_model->restaurant_uuid, 'selectedPlanId' => $plan->plan_id], ['class' => 'btn btn-primary btn-lg' , 'style'=>'    margin: 1.5rem 0;']);
                     ?>
 
-                    <h2 class="next-heading next-heading--1">Free plan</h2>
+                    <h2 class="next-heading next-heading--1"><?= $plan->name ?></h2>
 
                     <p class="pricing__description">
-                      Ideal for startups and small businesses
+                      <?= $plan->description ?>
                     </p>
 
                     <ul class="pricing__list">
                        <h2 class="ui-heading">Platform fee</h2>
                        <li class="">
-                          5% <br/> commission charged on each order received.
+                          <?= \Yii::$app->formatter->asPercent($plan->platform_fee, 0); ?> <br/> commission charged on each order received.
                        </li>
 
                     </ul>
@@ -115,36 +116,8 @@ margin: 0 0 20px;
                 </div>
               </div>
             </div>
+            <?php } ?>
 
-            <div class="col-6">
-              <div class="card">
-                <div class="card-body">
-                  <div class="card-content">
-                    <strong class="pricing__tag">
-                      <span class="pricing__currency">KWD</span>200
-                      <span class="pricing__period"> per year</span>
-                    </strong>
-
-                    <?php
-                      if($plan_id ==  2)
-                        echo  Html::a('Current plan', ['update'], ['class' => 'btn btn-primary btn-lg disabled' , 'style'=>'    margin: 1.5rem 0;']);
-                      else
-                      echo  Html::a('Choose this plan', ['pay',  'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary btn-lg' , 'style'=>'    margin: 1.5rem 0;']);
-                    ?>
-                    <h2 class="next-heading next-heading--1">Premium plan</h2>
-
-                    <p class="pricing__description">Ideal for stores making a large number of sales</p>
-
-                    <ul class="pricing__list">
-                       <h2 class="ui-heading">Platform fee</h2>
-                       <li class="">
-                         0% <br/> commission charged on each order received.
-                       </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
 
     </div>
 </section>

@@ -6,7 +6,7 @@
 ?>
 Hello Big Boss,
 
-Store's domain name has been chnaged <br/>
+Store's domain name has been chnaged <br/><br/>
 
 Old domain: <?= $old_domain ?> <br/>
 New domain: <?= $new_domain ?>

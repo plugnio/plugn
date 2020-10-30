@@ -14,7 +14,7 @@ $this->title = 'Domains';
 ?>
 
 <section>
-    <div class="card" style="width: 75%;margin: 0px;">
+    <div class="card">
 
         <div class="card-header">
             <h5>Primary domain</h5>

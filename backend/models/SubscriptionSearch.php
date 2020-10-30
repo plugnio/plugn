@@ -46,7 +46,7 @@ class SubscriptionSearch extends Subscription
      */
     public function search($params)
     {
-        $query = Subscription::find();
+        $query = Subscription::find()->joinWith(['plan','restaurant']);;
 
         // add conditions that should always apply here
 

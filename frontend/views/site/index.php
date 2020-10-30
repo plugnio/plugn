@@ -478,6 +478,8 @@ $this->registerJs($js);
         </div>
     </div>
 
+    <?php if( !$restaurant_model->is_tap_enable ){ ?>
+
     <div class="card">
         <div class="card-body">
             <div class="row">
@@ -499,6 +501,8 @@ $this->registerJs($js);
 
         </div>
     </div>
+
+  <?php } ?>
 
 
 

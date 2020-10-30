@@ -93,13 +93,6 @@ $this->registerJs($js);
         $deliveryTime = strtotime($model->estimated_time_of_arrival);
         $difference = round(abs($deliveryTime - $currentTime) / 3600, 2);
 
-        $origin =  new DateTime(date('Y-m-d'))
-        $target =  new DateTime(date('Y-m-d', strtotime($sub->subscription_end_at)));
-        $interval = $origin->diff($target);
-        echo $interval->format('%R%a days');
-
-
-
 
         if ($difference <= 1 && $model->order_mode == Order::ORDER_MODE_DELIVERY) {
             if ($model->restaurant->armada_api_key != null && $model->armada_tracking_link == null)

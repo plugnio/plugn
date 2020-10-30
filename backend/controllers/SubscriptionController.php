@@ -76,6 +76,30 @@ class SubscriptionController extends Controller
     }
 
 
+        /**
+         * Updates an existing Subscription model.
+         * If update is successful, the browser will be redirected to the 'view' page.
+         * @param string $id
+         * @return mixed
+         * @throws NotFoundHttpException if the model cannot be found
+         */
+        public function actionUpdate($id)
+        {
+            $model = $this->findModel($id);
+
+            if ($model->load(Yii::$app->request->post())) {
+                $model->subscription_status = Subscription::STATUS_ACTIVE;
+
+            if($model->save())
+              return $this->redirect(['view', 'id' => $model->subscription_uuid]);
+
+            }
+
+            return $this->render('update', [
+                'model' => $model,
+            ]);
+        }
+
     /**
      * Deletes an existing Subscription model.
      * If deletion is successful, the browser will be redirected to the 'index' page.

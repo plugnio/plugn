@@ -31,6 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'plan_id',
             'name',
+            'description',
             'price',
             'platform_fee',
         ],

@@ -14,6 +14,24 @@ $this->title = 'Plan';
 ?>
 
 <section>
+
+  <?php if (Yii::$app->session->getFlash('error') != null) { ?>
+
+      <div class="alert alert-danger alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+          <h5><i class="icon fa fa-ban"></i> Warning!</h5>
+          <?= (Yii::$app->session->getFlash('error')) ?>
+      </div>
+  <?php } elseif (Yii::$app->session->getFlash('success') != null) { ?>
+      <div class="alert alert-success alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+          <h5><i class="icon fa fa-check"></i> Success!</h5>
+          <?= (Yii::$app->session->getFlash('success')) ?>
+      </div>
+  <?php } ?>
+
+
+
   <div class="row">
       <!-- account start -->
       <div class="col-4">

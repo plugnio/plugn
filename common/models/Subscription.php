@@ -16,7 +16,7 @@ use Yii;
  * @property string|null $subscription_start_at
  * @property string|null $subscription_end_at
  *
- * @property SubscriptionPayment $payment
+ * @property SubscriptionPayment $subscriptionPayment
  * @property Plan $plan
  * @property Restaurant $restaurant
  */
@@ -41,10 +41,11 @@ class Subscription extends \yii\db\ActiveRecord {
             [['plan_id', 'subscription_status', 'notified_email'], 'integer'],
             [['subscription_start_at', 'subscription_end_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
-            // [['payment_uuid'], 'string', 'max' => 36],
+            [['payment_uuid'], 'string', 'max' => 36],
             [['plan_id'], 'exist', 'skipOnError' => true, 'targetClass' => Plan::className(), 'targetAttribute' => ['plan_id' => 'plan_id']],
             [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => SubscriptionPayment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
+            [['payment_method_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
         ];
     }
 
@@ -70,7 +71,13 @@ class Subscription extends \yii\db\ActiveRecord {
                 'class' => \yii\behaviors\TimestampBehavior::className(),
                 'createdAtAttribute' => 'subscription_start_at',
                 'updatedAtAttribute' => false,
-                'value' => new \yii\db\Expression('NOW()'),
+                'value' => function() {
+                  //TODO
+                    if (!$this->subscription_start_at)
+                        $this->subscription_start_at = new \yii\db\Expression('NOW()');
+
+                    return $this->subscription_start_at;
+                },
             ],
         ];
     }
@@ -108,26 +115,29 @@ class Subscription extends \yii\db\ActiveRecord {
     public function beforeSave($insert) {
 
         $vaid_for = $this->plan->valid_for;
-        if ($vaid_for)
-            $this->subscription_end_at = date('Y-m-d', strtotime(date('Y-m-d') . " + $vaid_for MONTHS"));
+        if ($vaid_for && !$this->subscription_end_at)
+            $this->subscription_end_at = date('Y-m-d', strtotime(date('Y-m-d',  strtotime($this->subscription_start_at)) . " + $vaid_for MONTHS"));
+
+          if($this->payment_uuid && $this->subscriptionPayment->payment_current_status == 'CAPTURED' || $this->plan->price == 0){
+            Subscription::updateAll(['subscription_status' => self::STATUS_INACTIVE], ['and',  ['subscription_status' => self::STATUS_ACTIVE ] , ['restaurant_uuid' => $this->restaurant_uuid  ]]);
+            $this->subscription_status = self::STATUS_ACTIVE;
+          }
 
 
-        // if($this->payment_uuid){
-        //   Subscription::updateAll(['subscription_status' => self::STATUS_INACTIVE], ['and',  ['subscription_status' => self::STATUS_ACTIVE ] , ['restaurant_uuid' => $this->restaurant_uuid  ]]);
-        //   $this->subscription_status = self::STATUS_ACTIVE;
-        // }
-
+          if($this->plan->valid_for == 0)
+             $this->subscription_end_at = null;
 
         return parent::beforeSave($insert);
     }
 
     public function afterSave($insert, $changedAttributes) {
 
-        $restaurant_model = $this->restaurant ;
-        $activeSubscription = $this->restaurant->getSubscriptions()->where(['subscription_status' => self::STATUS_ACTIVE])->with(['plan'])->one();
-        $restaurant_model->platform_fee = $activeSubscription->plan->platform_fee;
+        if($insert && $this->subscription_status ==  self::STATUS_ACTIVE){
+          $restaurant_model = $this->restaurant;
+          $restaurant_model->platform_fee = $this->plan->platform_fee;
 
-        $restaurant_model->save(false);
+          $restaurant_model->save(false);
+        }
 
 
         return parent::afterSave($insert, $changedAttributes);
@@ -136,15 +146,12 @@ class Subscription extends \yii\db\ActiveRecord {
     public function beforeDelete() {
 
 
-        if($this->subscription_status == self::STATUS_ACTIVE){
+       $freePlan = Plan::find()->where(['valid_for' => 0])->one();
 
-           $freePlan = Plan::find()->where(['valid_for' => 0])->one();
-
-           $subscription = new Subscription();
-           $subscription->restaurant_uuid = $this->restaurant_uuid;
-           $subscription->plan_id = $freePlan->plan_id;
-           $subscription->save(false);
-        }
+       $subscription = new Subscription();
+       $subscription->restaurant_uuid = $this->restaurant_uuid;
+       $subscription->plan_id = $freePlan->plan_id;
+       $subscription->save(false);
 
         return parent::beforeDelete();
     }
@@ -154,9 +161,19 @@ class Subscription extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPayment()
+    public function getSubscriptionPayment()
     {
         return $this->hasOne(SubscriptionPayment::className(), ['payment_uuid' => 'payment_uuid']);
+    }
+
+    /**
+     * Gets query for [[PaymentUu]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPaymentMethod()
+    {
+        return $this->hasOne(PaymentMethod::className(), ['payment_method_id' => 'payment_method_id']);
     }
 
 

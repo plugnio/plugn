@@ -389,8 +389,6 @@ class Restaurant extends \yii\db\ActiveRecord {
         //Create an Operator
         $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id, $this->developer_id);
 
-        die(json_encode($operatorApiResponse->data));
-
         if ($operatorApiResponse->isOk) {
             $this->operator_id = $operatorApiResponse->data['id'];
             $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
@@ -579,6 +577,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         }
 
 
+
         if ($this->live_api_key && $this->test_api_key)
             $this->is_tap_enable = 1;
         else
@@ -593,16 +592,16 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function deleteTempFiles() {
 
-        if ($this->authorized_signature_file && file_exists(Yii::getAlias('@projectFiles') . "/" . $this->authorized_signature_file)) {
-            $this->uploadFileToCloudinary(Yii::getAlias('@projectFiles') . "/" . $this->authorized_signature_file, $this->authorized_signature_file, 'authorized_signature_file');
+        if ($this->authorized_signature_file && file_exists(Yii::getAlias('@privateDocuments') . "/" . $this->authorized_signature_file)) {
+            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/" . $this->authorized_signature_file, $this->authorized_signature_file, 'authorized_signature_file');
         }
 
-        if ($this->commercial_license_file && file_exists(Yii::getAlias('@projectFiles') . "/" . $this->commercial_license_file)) {
-            $this->uploadFileToCloudinary(Yii::getAlias('@projectFiles') . "/" . $this->commercial_license_file, $this->commercial_license_file, 'commercial_license_file');
+        if ($this->commercial_license_file && file_exists(Yii::getAlias('@privateDocuments') . "/" . $this->commercial_license_file)) {
+            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/" . $this->commercial_license_file, $this->commercial_license_file, 'commercial_license_file');
         }
 
-        if ($this->identification_file && file_exists(Yii::getAlias('@projectFiles') . "/" . $this->identification_file)) {
-            $this->uploadFileToCloudinary(Yii::getAlias('@projectFiles') . "/" . $this->identification_file, $this->identification_file, 'identification_file');
+        if ($this->identification_file && file_exists(Yii::getAlias('@privateDocuments') . "/" . $this->identification_file)) {
+            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/" . $this->identification_file, $this->identification_file, 'identification_file');
         }
     }
 
@@ -613,7 +612,6 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
-
 
         if ($this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT) {
             die('enter else');
@@ -647,6 +645,16 @@ class Restaurant extends \yii\db\ActiveRecord {
         }
 
         if ($insert) {
+
+          $freePlan = Plan::find()->where(['valid_for' => 0])->one();
+
+          $subscription = new Subscription();
+          $subscription->restaurant_uuid = $this->restaurant_uuid;
+          $subscription->plan_id = $freePlan->plan_id; //Free plan by default
+          $subscription->subscription_status = Subscription::STATUS_ACTIVE; //Free plan by default
+          $subscription->save();
+
+
             $restaurant_theme = new RestaurantTheme();
             $restaurant_theme->restaurant_uuid = $this->restaurant_uuid;
             $restaurant_theme->save();
@@ -952,6 +960,7 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function getRestaurantTheme() {
         return $this->hasOne(RestaurantTheme::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
 
     /**
      * Gets query for [[WebLinks]].

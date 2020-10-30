@@ -18,6 +18,8 @@ use common\models\Agent;
 use common\models\Restaurant;
 use common\models\OrderItem;
 use common\models\Order;
+use common\models\Plan;
+use common\models\PaymentMethod;
 use common\models\Subscription;
 use common\models\AgentAssignment;
 use common\models\Item;
@@ -44,11 +46,11 @@ class SiteController extends Controller {
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error', 'current-plan', 'domains', 'compare-plan', 'index', 'signup', 'check-for-new-orders', 'thank-you', 'request-password-reset', 'reset-password'],
+                        'actions' => ['login', 'error',  'index', 'signup', 'check-for-new-orders', 'thank-you', 'request-password-reset', 'reset-password'],
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'promote-to-open', 'connect-domain', 'promote-to-close', 'pay', 'callback', 'vendor-dashboard', 'real-time-orders', 'mark-as-busy', 'mark-as-open'],
+                        'actions' => ['logout',  'current-plan', 'domains', 'compare-plan',  'downgrade-to-free-plan', 'confirm-plan', 'promote-to-open', 'connect-domain', 'promote-to-close', 'callback', 'vendor-dashboard', 'real-time-orders', 'mark-as-busy', 'mark-as-open'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -178,110 +180,138 @@ class SiteController extends Controller {
         }
     }
 
-    /**
-     * Comapre plan page
-     *
-     * @return mixed
-     */
-    public function actionPay($id) {
 
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
-
-            $plugn_store = Restaurant::findOne('rest_1d40a718-beac-11ea-808a-0673128d0c9c');
-
-            $subscription = new Subscription();
-            $subscription->restaurant_uuid = $managedRestaurant->restaurant_uuid;
-            $subscription->plan_id = 2;
-            $subscription->save(false);
-
-            $payment = new SubscriptionPayment;
-            $payment->restaurant_uuid = $managedRestaurant->restaurant_uuid;
-            // $payment->payment_mode = $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD; TODO
-            $payment->subscription_uuid = $subscription->subscription_uuid; //subscription_uuid
-            $payment->payment_amount_charged = $subscription->plan->price;
-            $payment->payment_current_status = "Redirected to payment gateway";
-
-            if ($payment->save()) {
-
-                //Update payment_uuid in order
-                $subscription->payment_uuid = $payment->payment_uuid;
-                $subscription->save(false);
+    public function actionConfirmPlan($id, $selectedPlanId) {
+      if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
 
 
-                // Redirect to payment gateway
-                Yii::$app->tapPayments->setApiKeys($plugn_store->test_api_key, $plugn_store->test_api_key);
 
-                // if ($order->payment_method_id == 1) {
-                //     $source_id = TapPayments::GATEWAY_KNET;
-                // } else {
-                //     if ($payment->payment_token)
-                //         $source_id = $payment->payment_token;
-                //     else
-                //         $source_id = TapPayments::GATEWAY_VISA_MASTERCARD;
-                // }
-                // $source_id
-                $response = Yii::$app->tapPayments->createCharge(
-                        "Order placed from: " . $managedRestaurant->name, // Description
-                        'Plugn', //Statement Desc.
-                        $payment->payment_uuid, // Reference
-                        $subscription->plan->price, $managedRestaurant->owner_first_name, $managedRestaurant->owner_email, $managedRestaurant->owner_number, 0, Url::to(['site/callback'], true), TapPayments::GATEWAY_KNET
-                        // $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET :  TapPayments::GATEWAY_VISA_MASTERCARD
-                        // $source_id
-                );
+        $selectedPlan = Plan::findOne($selectedPlanId);
 
-                $responseContent = json_decode($response->content);
+        $subscription_model = new Subscription();
+        $subscription_model->restaurant_uuid = $managedRestaurant->restaurant_uuid;
+        $subscription_model->plan_id = $selectedPlan->plan_id;
 
-                try {
+        $payment_methods = PaymentMethod::find()->all();
 
-                    // Validate that theres no error from TAP gateway
-                    if (isset($responseContent->errors)) {
-                        $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
-                        \Yii::error($errorMessage, __METHOD__); // Log error faced by user
+        if ($subscription_model->load(Yii::$app->request->post()) && $subscription_model->save()) {
 
-                        return [
-                            'operation' => 'error',
-                            'message' => $errorMessage
-                        ];
-                    }
+        if($selectedPlan->price > 0){
 
-                    if ($responseContent->id) {
+          $payment = new SubscriptionPayment;
+          $payment->restaurant_uuid = $managedRestaurant->restaurant_uuid;
+          $payment->payment_mode = $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
+          $payment->subscription_uuid = $subscription_model->subscription_uuid; //subscription_uuid
+          $payment->payment_amount_charged = $subscription_model->plan->price;
+          $payment->payment_current_status = "Redirected to payment gateway";
 
-                        $chargeId = $responseContent->id;
-                        $redirectUrl = $responseContent->transaction->url;
+          if ($payment->save()) {
+              //Update payment_uuid in order
+              $subscription_model->payment_uuid = $payment->payment_uuid;
+              $subscription_model->save(false);
 
-                        $payment->payment_gateway_transaction_id = $chargeId;
 
-                        if (!$payment->save(false)) {
+              // Redirect to payment gateway
+              Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
 
-                            \Yii::error($payment->errors, __METHOD__); // Log error faced by user
 
-                            return [
-                                'operation' => 'error',
-                                'message' => $payment->getErrors()
-                            ];
-                        }
-                    } else {
-                        \Yii::error('[Payment Issue > Charge id is missing ]' . $responseContent, __METHOD__); // Log error faced by user
-                    }
+              $response = Yii::$app->tapPayments->createCharge(
+                      "Upgrade store's plan", // Description
+                      'Plugn', //Statement Desc.
+                       $payment->payment_uuid, // Reference
+                       $subscription_model->plan->price,
+                       $managedRestaurant->name,
+                       $managedRestaurant->getAgents()->one()->agent_email,
+                       $managedRestaurant->owner_number ? $managedRestaurant->owner_number : null,
+                       0, //Comission
+                      Url::to(['site/callback'], true),
+                      $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET :  TapPayments::GATEWAY_VISA_MASTERCARD
+              );
 
-                    return $this->redirect($redirectUrl);
-                } catch (\Exception $e) {
+              $responseContent = json_decode($response->content);
 
-                    if ($payment)
-                        Yii::error('[TAP Payment Issue > ]' . json_encode($payment->getErrors()), __METHOD__);
+              try {
 
-                    Yii::error('[TAP Payment Issue > Charge id is missing]' . json_encode($responseContent), __METHOD__);
+                  // Validate that theres no error from TAP gateway
+                  if (isset($responseContent->errors)) {
+                      $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
+                      \Yii::error($errorMessage, __METHOD__); // Log error faced by user
 
-                    $response = [
-                        'operation' => 'error',
-                        'message' => $responseContent
-                    ];
-                }
-            }else {
-                die(json_encode($payment->errors));
-            }
+                      return [
+                          'operation' => 'error',
+                          'message' => $errorMessage
+                      ];
+                  }
+
+                  if ($responseContent->id) {
+
+                      $chargeId = $responseContent->id;
+                      $redirectUrl = $responseContent->transaction->url;
+
+                      $payment->payment_gateway_transaction_id = $chargeId;
+
+                      if (!$payment->save(false)) {
+
+                          \Yii::error($payment->errors, __METHOD__); // Log error faced by user
+
+                          return [
+                              'operation' => 'error',
+                              'message' => $payment->getErrors()
+                          ];
+                      }
+                  } else {
+                      \Yii::error('[Payment Issue > Charge id is missing ]' . $responseContent, __METHOD__); // Log error faced by user
+                  }
+
+                  return $this->redirect($redirectUrl);
+              } catch (\Exception $e) {
+
+                  if ($payment)
+                      Yii::error('[TAP Payment Issue > ]' . json_encode($payment->getErrors()), __METHOD__);
+
+                  Yii::error('[TAP Payment Issue > Charge id is missing]' . json_encode($responseContent), __METHOD__);
+
+                  $response = [
+                      'operation' => 'error',
+                      'message' => $responseContent
+                  ];
+              }
+          } else {
+              die(json_encode($payment->errors));
+          }
+
         }
+      }
+
+
+        return $this->render('confirm-plan', [
+              'restaurant_model' => $managedRestaurant,
+              'selectedPlan' => Plan::findOne($selectedPlanId),
+              'subscription_model' => $subscription_model,
+              'paymentMethods' => $payment_methods
+        ]);
+
+      }
+
     }
+
+    public function actionDowngradeToFreePlan($id, $selectedPlanId) {
+
+      if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
+
+        $subscription = new Subscription();
+        $subscription->restaurant_uuid = $managedRestaurant->restaurant_uuid;
+        $subscription->plan_id = $selectedPlanId;
+        $subscription->subscription_status = Subscription::STATUS_ACTIVE;
+        $subscription->save(false);
+
+        return $this->redirect(['current-plan',
+                    'id' => $id
+        ]);
+      }
+
+    }
+
 
     /**
      * Process callback from TAP payment gateway
@@ -296,13 +326,12 @@ class SiteController extends Controller {
             $paymentRecord->save(false);
 
             // Redirect back to app
-            if ($paymentRecord->payment_current_status != 'CAPTURED') {  //Failed Payment
-                return $this->redirect($paymentRecord->restaurant->restaurant_domain . '/payment-failed/' . $paymentRecord->order_uuid);
-            }
-
+            if ($paymentRecord->payment_current_status == 'CAPTURED')
+              Yii::$app->session->setFlash('success',$paymentRecord->plan->name .  print_r(' has been activated', true));
+            else if ($paymentRecord->payment_current_status != 'CAPTURED')  //Failed Payment
+            Yii::$app->session->setFlash('error', print_r('There seems to be an issue with your payment, please try again.', true));
 
             // Redirect back to current plan page
-
             return $this->redirect(['current-plan',
                         'id' => $paymentRecord->restaurant_uuid
             ]);
@@ -321,10 +350,12 @@ class SiteController extends Controller {
 
             $subscription = $managedRestaurant->getSubscriptions()->where(['subscription_status' => Subscription::STATUS_ACTIVE])->one();
 
+            $plans = Plan::find()->all();
 
             return $this->render('compare-plan', [
                         'restaurant_model' => $managedRestaurant,
-                        'plan_id' => $subscription->plan_id
+                        'selectedPlan' => $subscription,
+                        'availablePlans' =>  $plans
             ]);
         }
     }
