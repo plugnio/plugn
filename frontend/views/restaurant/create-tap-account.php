@@ -10,6 +10,7 @@ use common\models\Area;
 use common\models\RestaurantDelivery;
 use kartik\file\FileInput;
 use common\models\Restaurant;
+use kartik\daterange\DateRangePicker;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Restaurant */
@@ -19,10 +20,37 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 $this->title = 'Create Tap account';
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
+
+
+
+$js = "
+$(function () {
+
+  $('#restaurant-identification_issuing_date').attr('autocomplete','off');
+  $('#restaurant-identification_issuing_date').attr('style', '  padding-right: 2rem !important; padding-left: 3rem !important; ');
+
+
+  $('#restaurant-identification_expiry_date').attr('autocomplete','off');
+  $('#restaurant-identification_expiry_date').attr('style', '  padding-right: 2rem !important; padding-left: 3rem !important; ');
+
+
+  $('#restaurant-authorized_signature_issuing_date').attr('autocomplete','off');
+  $('#restaurant-authorized_signature_issuing_date').attr('style', '  padding-right: 2rem !important; padding-left: 3rem !important; ');
+
+  $('#restaurant-authorized_signature_expiry_date').attr('autocomplete','off');
+  $('#restaurant-authorized_signature_expiry_date').attr('style', '  padding-right: 2rem !important; padding-left: 3rem !important; ');
+
+
+});
+";
+$this->registerJs($js);
+
+
 ?>
 
 
-<div class="restaurant-view" style="width: 66.666667%;">
+<div class="row">
+<div class="col-12">
 
     <?php
     $form = ActiveForm::begin([
@@ -30,6 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'errorSummaryCssClass' => 'alert alert-danger'
     ]);
     ?>
+    <?= $form->errorSummary([$model], ['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
 
     <div class="card">
         <div class="card-header">
@@ -37,7 +66,6 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
         <div class="card-body">
 
-            <?= $form->errorSummary([$model], ['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
 
             <div class="row">
                 <div class="col-12 col-sm-6 col-lg-6">
@@ -56,16 +84,44 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
 
                 <div class="col-12 col-sm-6 col-lg-6">
-                    <?= $form->field($model, 'owner_number')->textInput(['maxlength' => true])->label('Phone Number') ?>
+                    <?= $form->field($model, 'owner_number')->input('number')->label('Phone Number') ?>
                 </div>
             </div>
+
             <div class="row">
 
                 <div class="col-12">
 
                     <?=
-                    $form->field($model, 'owner_identification_file')->fileinput(['name' => 'identification_file', 'class' => 'files'])->label('Upload National ID (front and back side)');
+                    $form->field($model, 'owner_identification_file')->fileinput(['name' => 'identification_file', 'class' => 'files', 'required' => true])->label('Upload National ID (front and back side)');
                     ?>
+
+                </div>
+
+            </div>
+            <div class="row">
+
+                <div class="col-12">
+
+                  <?=
+                  $form->field($model, 'vendor_sector')->radioList(['Shopping & Retail' => 'Shopping & Retail', 'F&B' => 'F&B', 'Other' => 'Other'], [
+                      'style' => 'display:grid',
+                      'item' => function($index, $label, $name, $checked, $value) {
+
+                          $return = '<label class="vs-radio-con">';
+                          /* -----> */ if ($checked)
+                              $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                          /* -----> */
+                          else
+                              $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                          $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
+                          $return .= '<span>' . ucwords($label) . '</span>';
+                          $return .= '</label>';
+
+                          return $return;
+                      }
+                  ]);
+                  ?>
 
                 </div>
 
@@ -82,8 +138,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <p>Enable it if your store operations is formally licensed.</p>
 
-            <?= $form->errorSummary([$model], ['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
-
             <div class="row">
                 <div class="col-12 col-sm-6 col-lg-6">
                     <?= $form->field($model, 'company_name')->textInput(['maxlength' => true]) ?>
@@ -94,8 +148,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
             </div>
 
-
             <div class="row">
+
+
 
                 <div class="col-12">
 
@@ -104,6 +159,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     ?>
 
                 </div>
+
+
                 <div class="col-12">
 
                     <?=
@@ -124,8 +181,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="card-body">
 
             <p>Enter the information of your company bank account if you have a commercial license, if not, enter the information of your personal bank account.</p>
-
-            <?= $form->errorSummary([$model], ['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
 
 
             <div class="row">
@@ -177,4 +232,5 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <?php ActiveForm::end(); ?>
 
+</div>
 </div>

@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
               'attribute' => 'restaurant_name',
               'value' => 'restaurant.name'
             ],
-            'restaurant.platform_fee:percent',  
+            'plan.platform_fee:percent',
             [
               'attribute' => 'plan_name',
               'value' =>     'plan.name'
@@ -39,7 +39,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'subscription_end_at',
 
             [
-              'class' => 'yii\grid\ActionColumn'
+              'class' => 'yii\grid\ActionColumn',
+              'template' => '{view} {update}'
            ],
         ],
     ]); ?>

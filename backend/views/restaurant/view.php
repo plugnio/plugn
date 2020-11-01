@@ -94,6 +94,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'format' => 'raw'
             ],
+            'company_name',
             'name',
             'name_ar',
             'tagline',
@@ -116,25 +117,38 @@ $this->params['breadcrumbs'][] = $this->title;
                     return Html::img($data->getRestaurantLogoUrl());
                 },
             ],
-            'support_delivery',
-            'support_pick_up',
-            'phone_number',
             [
-                'attribute' => 'Owner name',
-                'format' => 'html',
+                'label' => 'Support Delivery',
                 'value' => function ($data) {
-                    return $data->owner_first_name . ' ' . $data->owner_last_name;
+                    return $data->support_delivery ? 'Yes' : 'No';
                 },
+                'format' => 'raw'
             ],
-            'owner_number',
+            [
+                'label' => 'Support Pick up',
+                'value' => function ($data) {
+                    return $data->support_pick_up ? 'Yes' : 'No';
+                },
+                'format' => 'raw'
+            ],
+            'phone_number',
             'restaurant_email:email',
             'instagram_url:url',
             'iban',
             'restaurant_created_at',
             'restaurant_updated_at',
-            'platform_fee',
+            'platform_fee:percent',
             'facebook_pixil_id',
             'google_analytics_id',
+            [
+              'attribute' => 'Owner name',
+              'format' => 'html',
+              'value' => function ($data) {
+                  return  $data->owner_first_name && $data->owner_last_name ? $data->owner_first_name . ' ' . $data->owner_last_name : null;
+              },
+            ],
+            'owner_email',
+            'owner_number',
             'business_id',
             'developer_id',
             'business_entity_id',
@@ -142,6 +156,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'authorized_signature_file_id',
             'commercial_license_file_id',
             'identification_file_id',
+
+            //TODO
+            'identification_title',
+            'commercial_license_title',
+            'authorized_signature_title',
+
+
             'wallet_id',
             'operator_id',
             'live_api_key',

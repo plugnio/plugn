@@ -84,6 +84,29 @@ class NetlifyComponent extends Component {
     }
 
     /**
+     *returns the specified site.
+     * @param type $site_id
+     * @return type
+     */
+    public function getSiteData($site_id) {
+
+        $deploySiteEndpoint = $this->apiEndpoint . "/sites/" . $site_id ;
+
+
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setMethod('GET')
+                ->setUrl($deploySiteEndpoint)
+                ->addHeaders([
+                    'Authorization' => 'Bearer ' . $this->token,
+                    'User-Agent' => 'request',
+                ])
+                ->send();
+
+        return $response;
+    }
+
+    /**
      * deploys a new site.
      * @param type $site_id
      * @return type

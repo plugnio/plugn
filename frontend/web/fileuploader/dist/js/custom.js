@@ -39,7 +39,7 @@ $(document).ready(function() {
 
 		// enable fileuploader plugin
 		$('input[class="files"]').fileuploader({
-			limit: 10,
+			limit: 1,
 			extensions: ['image/*'],
 			addMore: true,
 	        thumbnails: {

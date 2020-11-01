@@ -24,6 +24,7 @@ $js = <<< JS
 
 // enable fileuploader plugin
 $('input[class="item-upload"]').fileuploader({
+	limit:10,
 	extensions: ['image/*'],
 	addMore: true,
 	thumbnails: {

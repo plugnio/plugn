@@ -90,7 +90,7 @@ class Queue extends \yii\db\ActiveRecord {
                         //Replace test with store domain name
                         $url = parse_url($store_model->restaurant_domain);
                         $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
-
+                  
                         if ($createNewSiteResponse->isOk) {
 
                             $site_id = $createNewSiteResponse->data['site_id'];
@@ -126,6 +126,8 @@ class Queue extends \yii\db\ActiveRecord {
 
 
     public function deleteBuildJsFolder(){
+
+
       $dirPath = $this->restaurant->store_branch_name;
       $file_pointer = $dirPath . '/build.js';
 

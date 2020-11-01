@@ -36,6 +36,7 @@ use common\models\WebLink;
  * @property int $store_branch_name
  * @property int $custom_css
  * @property int $store_layout
+ * @property int $has_deployed
  * @property int $site_id
  * @property int $platform_fee
  * @property int $facebook_pixil_id
@@ -112,12 +113,15 @@ class Restaurant extends \yii\db\ActiveRecord {
             [
                 [
                     'vendor_sector', 'iban',
-                    'identification_title', 'identification_issuing_country',
-                    'identification_issuing_date', 'identification_expiry_date',
-                    'owner_identification_file', 'identification_file_purpose',
+                    // 'owner_identification_file',
                 ],
                 'required', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT
             ],
+
+            // [['restaurant_commercial_license_file', 'restaurant_authorized_signature_file'], 'required', 'when' => function($model) {
+            //     return $model->business_type == 'corp';
+            // }],
+
             [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3, 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             [['identification_file_id', 'authorized_signature_file_id', 'commercial_license_file_id'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             [['not_for_profit'], 'number'],
@@ -153,7 +157,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             ['restaurant_status', 'in', 'range' => [self::RESTAURANT_STATUS_OPEN, self::RESTAURANT_STATUS_BUSY, self::RESTAURANT_STATUS_CLOSED]],
             ['store_layout', 'in', 'range' => [self::STORE_LAYOUT_LIST_FULLWIDTH, self::STORE_LAYOUT_GRID_FULLWIDTH, self::STORE_LAYOUT_CATEGORY_FULLWIDTH, self::STORE_LAYOUT_LIST_HALFWIDTH, self::STORE_LAYOUT_GRID_HALFWIDTH, self::STORE_LAYOUT_CATEGORY_HALFWIDTH]],
             ['phone_number_display', 'in', 'range' => [self::PHONE_NUMBER_DISPLAY_ICON, self::PHONE_NUMBER_DISPLAY_SHOW_PHONE_NUMBER, self::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER]],
-            [['restaurant_created_at', 'restaurant_updated_at'], 'safe'],
+            [['restaurant_created_at', 'restaurant_updated_at', 'has_deployed'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['custom_css'], 'string'],
             [['platform_fee'], 'number'],
@@ -163,6 +167,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['phone_number'], 'string', 'min' => 7, 'max' => 8],
             [['live_public_key', 'test_public_key'], 'default', 'value' => null],
             [['phone_number'], 'integer', 'min' => 0],
+            [['phone_number'], 'integer'],
             [['restaurant_email_notification', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable'], 'integer'],
             ['restaurant_email', 'email'],
             [['restaurant_uuid'], 'unique'],
@@ -213,11 +218,14 @@ class Restaurant extends \yii\db\ActiveRecord {
             'business_type' => 'Account Type',
             'vendor_sector' => 'Vendor Sector',
             'license_number' => 'License Number',
+            'owner_identification_file' => 'Civil ID',
+
+
             'authorized_signature_issuing_country' => 'Authorized Signature Issuing Country',
             'authorized_signature_issuing_date' => 'Authorized Signature Issuing Date',
             'authorized_signature_expiry_date' => 'Authorized Signature Expiry Date',
-            'authorized_signature_file' => 'Authorized Signature File',
-            'restaurant_authorized_signature_file' => 'Store Authorized Signature File',
+            'authorized_signature_file' => 'Authorized Signature',
+            'restaurant_authorized_signature_file' => 'Authorized Signature',
             'authorized_signature_title' => 'Authorized Signature Title',
             'authorized_signature_file_purpose' => 'Authorized Signature File Purpose',
             'commercial_license_issuing_country' => 'Commercial License Issuing Country',
@@ -323,7 +331,6 @@ class Restaurant extends \yii\db\ActiveRecord {
                     Yii::getAlias('@privateDocuments') . "/" . $this->authorized_signature_file, $this->authorized_signature_file_purpose, $this->authorized_signature_title);
             if ($response->isOk) {
                 $this->authorized_signature_file_id = $response->data['id'];
-                unlink(Yii::getAlias('@privateDocuments') . "/" . $this->authorized_signature_file, $this->authorized_signature_file_purpose, $this->authorized_signature_title);
             } else {
                 return Yii::$app->session->setFlash('error', print_r('Error when uploading authorized signature document: ' . json_encode($response->data), true));
             }
@@ -339,7 +346,6 @@ class Restaurant extends \yii\db\ActiveRecord {
             if ($response->isOk) {
 
                 $this->commercial_license_file_id = $response->data['id'];
-                unlink(Yii::getAlias('@privateDocuments') . "/" . $this->commercial_license_file);
             } else {
                 return Yii::$app->session->setFlash('error', print_r('Error when uploading commercial license document: ' . json_encode($response->data), true));
             }
@@ -353,7 +359,6 @@ class Restaurant extends \yii\db\ActiveRecord {
 
         if ($response->isOk) {
             $this->identification_file_id = $response->data['id'];
-            unlink(Yii::getAlias('@privateDocuments') . "/" . $this->identification_file);
         }
     }
 
@@ -377,7 +382,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         }
 
         //Create a merchant on Tap
-        $merchantApiResponse = Yii::$app->tapPayments->createMergentAccount($this->name, $this->business_id, $this->business_entity_id, $this->iban);
+        $merchantApiResponse = Yii::$app->tapPayments->createMergentAccount($this->company_name, $this->business_id, $this->business_entity_id, $this->iban);
 
         if ($merchantApiResponse->isOk) {
             $this->merchant_id = $merchantApiResponse->data['id'];
@@ -392,9 +397,12 @@ class Restaurant extends \yii\db\ActiveRecord {
         if ($operatorApiResponse->isOk) {
             $this->operator_id = $operatorApiResponse->data['id'];
             $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
+            $this->test_public_key = $operatorApiResponse->data['api_credentials']['test']['public'];
 
-            if (array_key_exists('live', $operatorApiResponse->data['api_credentials']))
-                $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
+            if (array_key_exists('live', $operatorApiResponse->data['api_credentials'])){
+              $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
+              $this->live_public_key = $operatorApiResponse->data['api_credentials']['live']['public'];
+            }
         } else {
             return Yii::$app->session->setFlash('error', print_r('Operator: ' . json_encode($operatorApiResponse->data), true));
         }
@@ -591,7 +599,6 @@ class Restaurant extends \yii\db\ActiveRecord {
      * Deletes the files associated with this project
      */
     public function deleteTempFiles() {
-
         if ($this->authorized_signature_file && file_exists(Yii::getAlias('@privateDocuments') . "/" . $this->authorized_signature_file)) {
             $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/" . $this->authorized_signature_file, $this->authorized_signature_file, 'authorized_signature_file');
         }
@@ -614,7 +621,6 @@ class Restaurant extends \yii\db\ActiveRecord {
         parent::afterSave($insert, $changedAttributes);
 
         if ($this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT) {
-            die('enter else');
             //delete tmp files
             $this->deleteTempFiles();
         }
@@ -628,7 +634,8 @@ class Restaurant extends \yii\db\ActiveRecord {
             $queue_model->queue_status = Queue::QUEUE_STATUS_PENDING;
 
             if (!$queue_model->save())
-                die(json_encode($queue_model->errors));
+                Yii::error('Queue Error:' . json_encode($queue_model->errors));
+
         }
 
 

@@ -46,11 +46,11 @@ class SiteController extends Controller {
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error',  'index', 'signup', 'check-for-new-orders', 'thank-you', 'request-password-reset', 'reset-password'],
+                        'actions' => ['login', 'error',  'index', 'signup', 'thank-you', 'request-password-reset', 'reset-password'],
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout',  'current-plan', 'domains', 'compare-plan',  'downgrade-to-free-plan', 'confirm-plan', 'promote-to-open', 'connect-domain', 'promote-to-close', 'callback', 'vendor-dashboard', 'real-time-orders', 'mark-as-busy', 'mark-as-open'],
+                        'actions' => ['logout', 'redirect-to-store-domain',  'check-for-new-orders', 'current-plan', 'domains', 'compare-plan',  'downgrade-to-free-plan', 'confirm-plan', 'promote-to-open', 'connect-domain', 'promote-to-close', 'callback', 'vendor-dashboard', 'real-time-orders', 'mark-as-busy', 'mark-as-open'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -121,6 +121,29 @@ class SiteController extends Controller {
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider
         ]);
+    }
+
+
+    /**
+     * View Stores domains
+     *
+     * @return mixed
+     */
+    public function actionRedirectToStoreDomain($restaurantUuid) {
+        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+
+            if($managedRestaurant->has_deployed)
+            return $this->redirect($managedRestaurant->restaurant_domain);
+            else{
+              $this->layout = 'login';
+              return $this->render('coming-soon', [
+                          'restaurant_model' => $managedRestaurant
+              ]);
+
+            }
+
+
+        }
     }
 
 
@@ -276,8 +299,6 @@ class SiteController extends Controller {
                       'message' => $responseContent
                   ];
               }
-          } else {
-              die(json_encode($payment->errors));
           }
 
         }

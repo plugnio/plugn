@@ -564,6 +564,7 @@ class RestaurantController extends Controller {
     public function actionCreateTapAccount($id) {
 
         $model = $this->findModel($id);
+        $model->setScenario(Restaurant::SCENARIO_CREATE_TAP_ACCOUNT);
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->save()) {
 
@@ -641,7 +642,8 @@ class RestaurantController extends Controller {
                 $model->authorized_signature_file = $restaurant_authorized_signature_file[0]['file']; //Authorized signature
 
             if (sizeof($owner_identification_file) > 0)
-                $model->identification_file = $owner_identification_file[0]['file']; //Owner's civil id
+              $model->identification_file =  $owner_identification_file[0]['file']; //Owner's civil id
+
 
 
 
@@ -713,9 +715,7 @@ class RestaurantController extends Controller {
             $payments_method = new RestaurantPaymentMethod();
             $payments_method->payment_method_id = 3; //Cash
             $payments_method->restaurant_uuid = $model->restaurant_uuid;
-            if (!$payments_method->save()) {
-                die(json_encode($payments_method->errors));
-            }
+            $payments_method->save();
         }
         return $this->redirect(['view-payment-methods', 'restaurantUuid' => $model->restaurant_uuid]);
     }

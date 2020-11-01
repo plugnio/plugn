@@ -38,7 +38,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 Online Payment
             </h3>
 
-            <?= Html::a($isOnlinePaymentEnabled ?  'Disable' : 'Enable' , [$isOnlinePaymentEnabled ? 'disable-online-payment'  :  'enable-online-payment' , 'restaurantUuid' => $model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+            <?php
+
+              if($model->is_tap_enable)
+                echo Html::a($isOnlinePaymentEnabled ?  'Disable' : 'Enable' , [$isOnlinePaymentEnabled ? 'disable-online-payment'  :  'enable-online-payment' , 'restaurantUuid' => $model->restaurant_uuid], ['class' => 'btn btn-success'])
+
+            ?>
 
         </div>
         <div class="card-body">

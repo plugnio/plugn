@@ -51,7 +51,7 @@ class DashboardAsset extends AssetBundle {
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
         'css/bootstrap-duallistbox.css',
-
+        'app-assets/css/pages/coming-soon.css',
 
 
         'https://fonts.googleapis.com/css?family=Roboto:400,700',
@@ -109,11 +109,12 @@ class DashboardAsset extends AssetBundle {
         'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js',
         'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js',
         'js/jquery.bootstrap-duallistbox.min.js',
-
+        'app-assets/js/scripts/pages/coming-soon.js',
+        'app-assets/vendors/js/coming-soon/jquery.countdown.min.js',
+        
         // 'https://code.jquery.com/jquery-3.2.1.min.js',
         'fileuploader/dist/jquery.fileuploader.min.js',
-        'fileuploader/dist/js/custom.js'
-
+        'fileuploader/dist/js/custom.js',
 
 
     ];

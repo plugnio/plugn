@@ -114,9 +114,15 @@ class Subscription extends \yii\db\ActiveRecord {
 
     public function beforeSave($insert) {
 
-        $vaid_for = $this->plan->valid_for;
-        if ($vaid_for && !$this->subscription_end_at)
-            $this->subscription_end_at = date('Y-m-d', strtotime(date('Y-m-d',  strtotime($this->subscription_start_at)) . " + $vaid_for MONTHS"));
+            $valid_for = $this->plan->valid_for;
+            if ($this->subscription_status ==  self::STATUS_ACTIVE){
+              if( $valid_for > 0 && !$this->subscription_end_at )
+                $this->subscription_end_at = date('Y-m-d', strtotime(date('Y-m-d',  strtotime($this->subscription_start_at)) . " + $valid_for MONTHS"));
+
+             else if( $valid_for == 0)
+                  $this->subscription_end_at = null;
+            }
+
 
           if($this->payment_uuid && $this->subscriptionPayment->payment_current_status == 'CAPTURED' || $this->plan->price == 0){
             Subscription::updateAll(['subscription_status' => self::STATUS_INACTIVE], ['and',  ['subscription_status' => self::STATUS_ACTIVE ] , ['restaurant_uuid' => $this->restaurant_uuid  ]]);
@@ -124,15 +130,13 @@ class Subscription extends \yii\db\ActiveRecord {
           }
 
 
-          if($this->plan->valid_for == 0)
-             $this->subscription_end_at = null;
 
         return parent::beforeSave($insert);
     }
 
     public function afterSave($insert, $changedAttributes) {
 
-        if($insert && $this->subscription_status ==  self::STATUS_ACTIVE){
+        if( $this->subscription_status ==  self::STATUS_ACTIVE){
           $restaurant_model = $this->restaurant;
           $restaurant_model->platform_fee = $this->plan->platform_fee;
 

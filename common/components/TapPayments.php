@@ -316,12 +316,12 @@ class TapPayments extends Component
      * @param type $iban
      * @return type
      */
-    public function createMergentAccount($restaurant_name, $business_id, $business_entity_id, $iban)
+    public function createMergentAccount($company_name, $business_id, $business_entity_id, $iban)
     {
         $merchantEndpoint = $this->apiEndpoint . "/merchant";
 
         $merchantParams = [
-            "display_name" => $restaurant_name,
+            "display_name" => $company_name,
             "business_id" => $business_id,
             "business_entity_id" => $business_entity_id,
             "bank_account" => [

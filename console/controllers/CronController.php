@@ -25,7 +25,6 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-
     public function actionIndex(){
         $restaurants = Restaurant::find()->all();
 
@@ -36,6 +35,7 @@ class CronController extends \yii\console\Controller {
         foreach ($restaurants as  $restaurant) {
           if($restaurant){
             $restaurant->company_name = $restaurant->name;
+            $restaurant->has_deployed = 1;
 
             if($restaurant->live_api_key && $restaurant->test_api_key)
               $restaurant->is_tap_enable = 1;
@@ -60,6 +60,33 @@ class CronController extends \yii\console\Controller {
         $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
         return self::EXIT_CODE_NORMAL;
     }
+
+
+
+        public function actionSiteStatus(){
+            $restaurants = Restaurant::find()
+                          ->where(['has_deployed' => 0])
+                          ->all();
+
+            foreach ($restaurants as $restaurant) {
+
+              if($restaurant->site_id){
+
+                $getSiteResponse = Yii::$app->netlifyComponent->getSiteData($restaurant->site_id);
+
+                if ($getSiteResponse->isOk) {
+                  if($getSiteResponse->data['state'] == 'current'){
+                    $restaurant->has_deployed = 1;
+                    $restaurant->save(false);
+                  }
+
+                }
+                
+              }
+
+            }
+        }
+
 
 
     // public function actionNotifyAgentsForSubscriptionThatWillExpireSoon(){
@@ -109,7 +136,6 @@ class CronController extends \yii\console\Controller {
     // }
 
     public function actionCreateBuildJsFile() {
-
         $now = new DateTime('now');
         $queue = Queue::find()
                 ->joinWith('restaurant')
@@ -122,10 +148,9 @@ class CronController extends \yii\console\Controller {
           $queue->save();
 
         $restaurant = $queue->restaurant;
-        $store_name =  strtolower( str_replace(' ', '_', $restaurant->name));
 
-        $myFolder = mkdir(strtolower($restaurant->name));
-        $myfile = fopen($store_name . "/build.js", "w") or die("Unable to open file!");
+        $myFolder = mkdir($queue->restaurant->store_branch_name);
+        $myfile = fopen($queue->restaurant->store_branch_name . "/build.js", "w") or die("Unable to open file!");
 
         $themeColor = RestaurantTheme::find()
                 ->select(['primary'])
@@ -569,7 +594,7 @@ class CronController extends \yii\console\Controller {
 
 
         $queue->queue_status = Queue::QUEUE_STATUS_COMPLETE;
-        $queue->save();
+        $queue->save(false);
 
         $this->stdout("File has been created! \n", Console::FG_RED, Console::BOLD);
       }

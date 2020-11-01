@@ -16,7 +16,7 @@ $js = "
 
 
         $('#bankdiscount-duration').attr('autocomplete','off');
-
+        $('#bankdiscount-duration').attr('style', '  padding-right: 2rem !important; padding-left: 3rem !important; ');
 
         let discountType = $('.discountType');
 

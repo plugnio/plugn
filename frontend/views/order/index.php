@@ -22,6 +22,7 @@ $(function () {
   $('table.data-list-view.dataTable tbody td').css('padding', '10px');
 
   $('#restaurant-date_range_picker_with_time').attr('autocomplete','off');
+  $('#restaurant-date_range_picker_with_time').attr('style', '  padding-right: 2rem !important; padding-left: 3rem !important; ');
 
   $('#restaurant-date_range_picker_with_time').change(function(e){
     if(e.target.value){
