@@ -133,6 +133,10 @@ class Category extends \yii\db\ActiveRecord {
                 $this->category_image = basename($result['url']);
                 $this->save();
             }
+
+            unlink($imageURL);
+
+
         } catch (\Cloudinary\Error $err) {
             Yii::error("Error when uploading category image to Cloudinry: " . json_encode($err));
             Yii::error("Error when uploading category image to Cloudinry: ImageUrl Value " . json_encode($imageURL));

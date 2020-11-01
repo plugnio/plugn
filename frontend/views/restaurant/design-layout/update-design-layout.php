@@ -12,6 +12,7 @@ use common\models\RestaurantPaymentMethod;
 use common\models\PaymentMethod;
 use kartik\file\FileInput;
 use common\models\Restaurant;
+use common\components\FileUploader;
 
 
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
@@ -20,6 +21,121 @@ $this->title = 'Update Store design and layout';
 $this->params['breadcrumbs'][] = ['label' => 'Design & layout', 'url' => ['view-design-layout','restaurantUuid' =>$model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = 'Update design & layout';
 
+
+$deleteLogoUrl = yii\helpers\Url::to(['delete-logo-image', 'restaurantUuid' => $model->restaurant_uuid]);
+$deleteThumbnailUrl = yii\helpers\Url::to(['delete-thumbnail-image', 'restaurantUuid' => $model->restaurant_uuid]);
+
+
+$js = <<< JS
+
+$('#primaryColorInput').change(function(e){
+  primaryColor = e.target.value;
+  $('#primary-wrapper').css('background-color',primaryColor);
+});
+
+
+// enable fileuploader plugin
+$('input[class="upload-logo"]').fileuploader({
+	limit: 1,
+	extensions: ['image/*'],
+	addMore: true,
+	thumbnails: {
+		onItemShow: function (item) {
+      // add sorter button to the item html
+      		if (item.choosed )
+			item.html.find('.fileuploader-action-remove').before('<button type="button" class="fileuploader-action fileuploader-action-sort" title="Sort"><i class="fileuploader-icon-sort"></i></button>');
+
+			if (item.choosed && !item.html.find('.fileuploader-action-edit').length)
+				item.html.find('.fileuploader-action-remove').before('<button type="button" class="fileuploader-action fileuploader-action-popup fileuploader-action-edit" title="Edit"><i class="fileuploader-icon-edit"></i></button>');
+		}
+	},
+	sorter: {
+		selectorExclude: null,
+		placeholder: null,
+		scrollContainer: window,
+		onSort: function (list, listEl, parentEl, newInputEl, inputEl) {
+			// onSort callback
+		}
+	},
+	editor: {
+		cropper: {
+			ratio: '1:1',
+			minWidth: 100,
+			minHeight: 100,
+			showGrid: true
+		}
+	},
+	onRemove: function (item) {
+
+   if('$model->logo'){
+
+   $.ajax({
+             url:'$deleteLogoUrl',
+             type:'POST',
+             dataType:'json',
+             data:{
+                file: item['name']
+            }
+
+    });
+  }
+
+	},
+
+});
+
+// enable fileuploader plugin
+$('input[class="upload-thumbnail"]').fileuploader({
+	limit: 1,
+	extensions: ['image/*'],
+	addMore: true,
+	thumbnails: {
+		onItemShow: function (item) {
+      // add sorter button to the item html
+      		if (item.choosed )
+			item.html.find('.fileuploader-action-remove').before('<button type="button" class="fileuploader-action fileuploader-action-sort" title="Sort"><i class="fileuploader-icon-sort"></i></button>');
+
+			if (item.choosed && !item.html.find('.fileuploader-action-edit').length)
+				item.html.find('.fileuploader-action-remove').before('<button type="button" class="fileuploader-action fileuploader-action-popup fileuploader-action-edit" title="Edit"><i class="fileuploader-icon-edit"></i></button>');
+		}
+	},
+	sorter: {
+		selectorExclude: null,
+		placeholder: null,
+		scrollContainer: window,
+		onSort: function (list, listEl, parentEl, newInputEl, inputEl) {
+			// onSort callback
+		}
+	},
+	editor: {
+		cropper: {
+			ratio: '1:1',
+			minWidth: 100,
+			minHeight: 100,
+			showGrid: true
+		}
+	},
+	onRemove: function (item) {
+
+   if('$model->thumbnail_image'){
+
+   $.ajax({
+             url:'$deleteThumbnailUrl',
+             type:'POST',
+             dataType:'json',
+             data:{
+                file: item['name']
+            }
+
+    });
+  }
+
+	},
+
+});
+
+JS;
+$this->registerJs($js);
 ?>
 
 <div class="restaurant-form card">
@@ -30,6 +146,55 @@ $this->params['breadcrumbs'][] = 'Update design & layout';
                 'id' => 'dynamic-form',
                 'errorSummaryCssClass' => 'alert alert-danger'
     ]);
+
+
+
+    $preloadedLogo = array();
+
+    if ($model->logo) {
+        $file_name = $model->logo;
+
+        $file_location = "https://res.cloudinary.com/plugn/image/upload/restaurants/" . $model->restaurant_uuid . "/logo/" . $model->logo;
+        $preloadedLogo[] = array(
+            "name" => $file_name,
+            "type" => FileUploader::mime_content_type($file_location),
+            "size" => null,
+            "file" => $file_location,
+            "local" => $file_location, // same as in form_upload.php
+            "data" => array(
+                "url" => $file_location, // (optional)
+                "readerForce" => true // (optional) prevent browser cache
+            ),
+        );
+    }
+
+
+    $preloadedLogo = json_encode($preloadedLogo);
+
+
+    $preloadedThumbnailImage = array();
+
+    if ($model->thumbnail_image) {
+        $file_name = $model->thumbnail_image;
+
+        $file_location = "https://res.cloudinary.com/plugn/image/upload/restaurants/" . $model->restaurant_uuid . "/thumbnail-image/" . $model->thumbnail_image;
+        $preloadedThumbnailImage[] = array(
+            "name" => $file_name,
+            "type" => FileUploader::mime_content_type($file_location),
+            "size" => null,
+            "file" => $file_location,
+            "local" => $file_location, // same as in form_upload.php
+            "data" => array(
+                "url" => $file_location, // (optional)
+                "readerForce" => true // (optional) prevent browser cache
+            ),
+        );
+    }
+
+
+    $preloadedThumbnailImage = json_encode($preloadedThumbnailImage);
+
+
     ?>
 
 
@@ -46,38 +211,14 @@ $this->params['breadcrumbs'][] = 'Update design & layout';
 
             <div class="col-12 col-sm-6 col-lg-6">
                 <?=
-                $form->field($model, 'restaurant_thumbnail_image', [
-                    'template' => "{label}"
-                    . "            <div class='input-group'>"
-                    . "             <div class='custom-file'>"
-                    . "                 {input}"
-                    . "                 <label class='custom-file-label' for='exampleInputFile'>Choose file</label>"
-                    . "             </div>"
-                    . "            </div>"
-                ])->fileInput([
-                    'multiple' => false,
-                    'accept' => 'image/*',
-                    'class' => 'custom-file-input',
-                ])
+                $form->field($model, 'restaurant_thumbnail_image')->fileinput(['name' => 'restaurant_thumbnail_image', 'class' => 'upload-thumbnail', 'data-fileuploader-files' => $preloadedThumbnailImage]);
                 ?>
             </div>
 
             <div class="col-12 col-sm-6 col-lg-6">
 
                 <?=
-                $form->field($model, 'restaurant_logo', [
-                    'template' => "{label}"
-                    . "            <div class='input-group'>"
-                    . "             <div class='custom-file'>"
-                    . "                 {input}"
-                    . "                 <label class='custom-file-label' for='exampleInputFile'>Choose file</label>"
-                    . "             </div>"
-                    . "            </div>"
-                ])->fileInput([
-                    'multiple' => false,
-                    'accept' => 'image/*',
-                    'class' => 'custom-file-input',
-                ])
+                $form->field($model, 'restaurant_logo')->fileinput(['name' => 'restaurant_logo', 'class' => 'upload-logo', 'data-fileuploader-files' => $preloadedLogo]);
                 ?>
             </div>
         </div>

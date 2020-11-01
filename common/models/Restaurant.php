@@ -476,6 +476,10 @@ class Restaurant extends \yii\db\ActiveRecord {
                 $this->logo = basename($result['url']);
                 $this->save();
             }
+
+            unlink($imageURL);
+
+
         } catch (\Cloudinary\Error $err) {
             Yii::error("Error when uploading logo photos to Cloudinry: " . json_encode($err));
         }
@@ -507,6 +511,10 @@ class Restaurant extends \yii\db\ActiveRecord {
                 $this->thumbnail_image = basename($result['url']);
                 $this->save();
             }
+
+            unlink($imageURL);
+
+
         } catch (\Cloudinary\Error $err) {
             Yii::error("Error when uploading thumbnail photos to Cloudinry: " . json_encode($err));
         }
@@ -620,6 +628,10 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
+
+
+
+
         if ($this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT) {
             //delete tmp files
             $this->deleteTempFiles();
@@ -639,17 +651,17 @@ class Restaurant extends \yii\db\ActiveRecord {
         }
 
 
-        if (!$insert && isset($changedAttributes['thumbnail_image']) && $this->restaurant_thumbnail_image) {
-            if ($changedAttributes['thumbnail_image']) {
-                $this->deleteRestaurantThumbnailImage($changedAttributes['thumbnail_image']);
-            }
+        if (!$insert &&  $this->restaurant_logo ) {
+
+          $deploySiteResponse = Yii::$app->netlifyComponent->deploySite( $this->site_id );
+
+          if (!$deploySiteResponse->isOk) {
+              Yii::error('[Netlify > While Creating new site]' . json_encode($deploySiteResponse->data), __METHOD__);
+          }
+
         }
 
-        if (!$insert && isset($changedAttributes['logo']) && $this->restaurant_logo) {
-            if ($changedAttributes['logo']) {
-                $this->deleteRestaurantLogo($changedAttributes['logo']);
-            }
-        }
+
 
         if ($insert) {
 

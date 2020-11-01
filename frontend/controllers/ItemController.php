@@ -20,14 +20,15 @@ use common\components\FileUploader;
 /**
  * ItemController implements the CRUD actions for Item model.
  */
-class ItemController extends Controller {
-
+class ItemController extends Controller
+{
     public $enableCsrfValidation = false;
 
     /**
      * {@inheritdoc}
      */
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -47,7 +48,8 @@ class ItemController extends Controller {
         ];
     }
 
-    public function actionExportToExcel($restaurantUuid) {
+    public function actionExportToExcel($restaurantUuid)
+    {
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
         $model = Item::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->all();
@@ -74,7 +76,8 @@ class ItemController extends Controller {
      * Lists all Item models.
      * @return mixed
      */
-    public function actionIndex($restaurantUuid) {
+    public function actionIndex($restaurantUuid)
+    {
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
         $searchModel = new ItemSearch();
@@ -92,7 +95,8 @@ class ItemController extends Controller {
      * Lists all Item models.
      * @return mixed
      */
-    public function actionInventory($restaurantUuid) {
+    public function actionInventory($restaurantUuid)
+    {
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
         $searchModel = new ItemSearch();
@@ -118,16 +122,14 @@ class ItemController extends Controller {
      * @param type $itemUuid
      * @return boolean
      */
-    public function actionDeleteItemImage($restaurantUuid, $itemUuid) {
-
-
+    public function actionDeleteItemImage($restaurantUuid, $itemUuid)
+    {
         $model = $this->findModel($itemUuid, $restaurantUuid);
 
 
         $file_name = Yii::$app->request->getBodyParam("file");
 
         if ($model && $file_name) {
-
             $item_image = \common\models\ItemImage::find()->where(['item_uuid' => $itemUuid, 'product_file_name' => $file_name])->one();
 
             $item_image->delete();
@@ -142,7 +144,8 @@ class ItemController extends Controller {
      * If creation is successful, the browser will be redirected to the 'index' page.
      * @return mixed
      */
-    public function actionCreate($restaurantUuid) {
+    public function actionCreate($restaurantUuid)
+    {
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
         $modelItem = new Item;
@@ -208,13 +211,13 @@ class ItemController extends Controller {
                 $transaction = Yii::$app->db->beginTransaction();
                 try {
                     if ($flag = $modelItem->save(false)) {
-
                         if ($modelItem->items_category) {
                             $modelItem->saveItemsCategory($modelItem->items_category);
                         }
 
-                        if (!empty($itemImages))
+                        if (!empty($itemImages)) {
                             $modelItem->uploadItemImage($itemImages);
+                        }
 
                         Yii::info("[" . $modelItem->restaurant->name . ": " . $modelItem->item_name . " has been added  " . '] ' . $modelItem->restaurant->restaurant_domain . '/product/' . $modelItem->item_uuid, __METHOD__);
 
@@ -266,7 +269,8 @@ class ItemController extends Controller {
      * @param type $restaurantUuid
      * @return type
      */
-    public function actionChangeItemStatus($id, $restaurantUuid) {
+    public function actionChangeItemStatus($id, $restaurantUuid)
+    {
         $model = $this->findModel($id, $restaurantUuid);
 
         $model->item_status = $model->item_status == Item::ITEM_STATUS_PUBLISH ? Item::ITEM_STATUS_UNPUBLISH : Item::ITEM_STATUS_PUBLISH;
@@ -281,7 +285,8 @@ class ItemController extends Controller {
      * @param integer $id
      * @return mixed
      */
-    public function actionUpdate($id, $restaurantUuid) {
+    public function actionUpdate($id, $restaurantUuid)
+    {
         $modelItem = $this->findModel($id, $restaurantUuid);
         $modelsOption = $modelItem->getOptions()->all();
         $modelsExtraOption = [];
@@ -367,15 +372,15 @@ class ItemController extends Controller {
                 $transaction = Yii::$app->db->beginTransaction();
                 try {
                     if ($flag = $modelItem->save(false)) {
-
                         if ($modelItem->items_category) {
                             $modelItem->saveItemsCategory($modelItem->items_category);
                         } else {
                             CategoryItem::deleteAll(['item_uuid' => $modelItem->item_uuid]);
                         }
 
-                        if (!empty($itemImages))
+                        if (!empty($itemImages)) {
                             $modelItem->uploadItemImage($itemImages);
+                        }
 
 
                         Yii::info("[" . $modelItem->restaurant->name . ": " . $modelItem->item_name . " has been updated  " . '] ' . $modelItem->restaurant->restaurant_domain . '/product/' . $modelItem->item_uuid, __METHOD__);
@@ -438,7 +443,8 @@ class ItemController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id, $restaurantUuid) {
+    public function actionDelete($id, $restaurantUuid)
+    {
         $this->findModel($id, $restaurantUuid)->delete();
 
         return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
@@ -451,12 +457,12 @@ class ItemController extends Controller {
      * @return Item the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $restaurantUuid) {
+    protected function findModel($id, $restaurantUuid)
+    {
         if (($model = Item::find()->where(['item_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
-
 }

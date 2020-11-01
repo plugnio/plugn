@@ -15,7 +15,7 @@ use Yii;
  * @property string|null $medium
  * @property string|null $dark
  *
- * @property Restaurant $restaurantUu
+ * @property Restaurant $restaurant
  */
 class RestaurantTheme extends \yii\db\ActiveRecord {
 
@@ -44,6 +44,19 @@ class RestaurantTheme extends \yii\db\ActiveRecord {
             $this->addError($attribute, 'Invalid color format');
     }
 
+
+    public function afterSave($insert, $changedAttributes) {
+
+        if(!$insert && isset($changedAttributes['primary']) && $this->primary == $changedAttributes['primary'] ){
+          $deploySiteResponse = Yii::$app->netlifyComponent->deploySite( $this->restaurant->site_id );
+
+          if (!$deploySiteResponse->isOk) {
+              Yii::error('[Netlify > While Creating new site]' . json_encode($deploySiteResponse->data), __METHOD__);
+          }
+        }
+
+        return parent::afterSave($insert, $changedAttributes);
+    }
     /**
      * {@inheritdoc}
      */
@@ -64,7 +77,7 @@ class RestaurantTheme extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantUu() {
+    public function getRestaurant() {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 

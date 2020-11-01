@@ -827,17 +827,63 @@ class RestaurantController extends Controller {
             if (!$model->phone_number)
                 $model->phone_number_display = Restaurant::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER;
 
-            if ($model->save() && $store_theme_model->save()) {
+                $FileUploader = new FileUploader('restaurant_logo', array(
+                    'limit' => 1,
+                    'maxSize' => null,
+                    'extensions' => null,
+                    'uploadDir' => 'uploads/',
+                    'title' => 'name'
+                ));
 
-                $thumbnail_image = \yii\web\UploadedFile::getInstances($model, 'restaurant_thumbnail_image');
-                $logo = \yii\web\UploadedFile::getInstances($model, 'restaurant_logo');
+                // call to upload the files
+                $data = $FileUploader->upload();
+
+                // if uploaded and success
+                if ($data['isSuccess'] && count($data['files']) > 0) {
+                    // get uploaded files
+                    $uploadedFiles = $data['files'];
+                }
+
+                // get the fileList
+                $logo = $FileUploader->getFileList();
+
+                if($logo)
+                  $model->restaurant_logo = $logo[0]['file'];
+
+
+
+                $FileUploader = new FileUploader('restaurant_thumbnail_image', array(
+                    'limit' => 1,
+                    'maxSize' => null,
+                    'extensions' => null,
+                    'uploadDir' => 'uploads/',
+                    'title' => 'name'
+                ));
+
+                // call to upload the files
+                $data = $FileUploader->upload();
+
+                // if uploaded and success
+                if ($data['isSuccess'] && count($data['files']) > 0) {
+                    // get uploaded files
+                    $uploadedFiles = $data['files'];
+                }
+
+                // get the fileList
+                $thumbnail_image = $FileUploader->getFileList();
+
+                if($thumbnail_image)
+                  $model->restaurant_thumbnail_image = $thumbnail_image[0]['file'];
+
+
+            if ($model->save() && $store_theme_model->save()) {
 
 
                 if ($thumbnail_image)
-                    $model->uploadThumbnailImage($thumbnail_image[0]->tempName);
+                    $model->uploadThumbnailImage($model->restaurant_thumbnail_image);
 
                 if ($logo)
-                    $model->uploadLogo($logo[0]->tempName);
+                    $model->uploadLogo($model->restaurant_logo);
 
                 return $this->redirect(['view-design-layout', 'restaurantUuid' => $id]);
             }
@@ -848,6 +894,55 @@ class RestaurantController extends Controller {
                     'store_theme_model' => $store_theme_model
         ]);
     }
+
+    /**
+     * Delete logo image
+     * @param type $restaurantUuid
+     * @return boolean
+     */
+    public function actionDeleteLogoImage($restaurantUuid) {
+
+
+        $model = $this->findModel($restaurantUuid);
+
+
+        $file_name = Yii::$app->request->getBodyParam("file");
+
+        if ($model && $model->logo == $file_name) {
+          $model->deleteRestaurantLogo();
+
+            $model->logo = null;
+            $model->save(false);
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Delete thumbnail image
+     * @param type $restaurantUuid
+     * @return boolean
+     */
+    public function actionDeleteThumbnailImage($restaurantUuid) {
+
+
+        $model = $this->findModel($restaurantUuid);
+
+
+        $file_name = Yii::$app->request->getBodyParam("file");
+
+        if ($model && $model->thumbnail_image == $file_name) {
+          $model->deleteRestaurantThumbnailImage();
+
+            $model->thumbnail_image = null;
+            $model->save(false);
+
+            return true;
+        }
+        return false;
+    }
+
 
     /**
      * Finds the Restaurant model based on its primary key value.
