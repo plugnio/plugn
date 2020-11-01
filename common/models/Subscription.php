@@ -72,7 +72,7 @@ class Subscription extends \yii\db\ActiveRecord {
                 'createdAtAttribute' => 'subscription_start_at',
                 'updatedAtAttribute' => false,
                 'value' => function() {
-                  //TODO
+      
                     if (!$this->subscription_start_at)
                         $this->subscription_start_at = new \yii\db\Expression('NOW()');
 
