@@ -47,12 +47,12 @@ class RestaurantTheme extends \yii\db\ActiveRecord {
 
     public function afterSave($insert, $changedAttributes) {
 
-        if(!$insert && isset($changedAttributes['primary']) && $this->primary == $changedAttributes['primary'] ){
+        if(!$insert && isset($changedAttributes['primary'])){
           $deploySiteResponse = Yii::$app->netlifyComponent->deploySite( $this->restaurant->site_id );
 
-          if (!$deploySiteResponse->isOk) {
+          if (!$deploySiteResponse->isOk)
               Yii::error('[Netlify > While Creating new site]' . json_encode($deploySiteResponse->data), __METHOD__);
-          }
+
         }
 
         return parent::afterSave($insert, $changedAttributes);
