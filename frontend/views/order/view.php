@@ -75,8 +75,9 @@ $this->registerJs($js);
         // }
         ?>
 
-        <?=
-        Html::a('Delete', ['delete', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
+        <?php
+        if($model->restaurant_uuid != 'rest_f6bc4e4a-e7c6-11ea-808a-0673128d0c9c'){
+        echo Html::a('Delete', ['delete', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
             'class' => 'btn btn-danger mr-1 mb-1',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this order?',
@@ -84,6 +85,7 @@ $this->registerJs($js);
             ],
             'style' => 'margin-right: 7px;'
         ]);
+        }
         ?>
 
     <div style="display: block">

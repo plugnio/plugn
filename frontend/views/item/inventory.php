@@ -34,7 +34,7 @@ $this->registerJs($js);
 <section id="data-list-view" class="data-list-view-header">
 
 
-    <?php echo $this->render('_search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
+    <?php echo $this->render('_inventory-search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
 
 
     <!-- DataTable starts -->

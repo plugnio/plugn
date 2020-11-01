@@ -14,6 +14,7 @@ use common\models\Plan;
 use common\models\Order;
 use common\models\Subscription;
 use common\models\OpeningHour;
+use common\models\ExtraOption;
 use common\models\ItemImage;
 use common\models\RestaurantTheme;
 use \DateTime;
@@ -81,7 +82,7 @@ class CronController extends \yii\console\Controller {
                   }
 
                 }
-                
+
               }
 
             }

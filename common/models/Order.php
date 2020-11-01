@@ -618,7 +618,7 @@ class Order extends \yii\db\ActiveRecord {
         parent::afterSave($insert, $changedAttributes);
 
       //Send SMS To customer
-      if (!$insert &&  $this->restaurant_uuid == 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290' && !$this->sms_sent && isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_PENDING && $this->order_status == self::STATUS_ACCEPTED) {
+      if (!$insert && $this->restaurant_uuid != 'rest_7351b2ff-c73d-11ea-808a-0673128d0c9c' && !$this->sms_sent &&  isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_PENDING && $this->order_status == self::STATUS_ACCEPTED) {
 
         try {
           $response = Yii::$app->smsComponent->sendSms($this->customer_phone_number, $this->order_uuid);
