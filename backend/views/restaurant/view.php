@@ -94,6 +94,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'format' => 'raw'
             ],
+            'site_id',
             'company_name',
             'name',
             'name_ar',
