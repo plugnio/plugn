@@ -55,10 +55,10 @@ return [
             ],
         ],
         'tapPayments' => [
-            'gatewayToUse' => \common\components\TapPayments::USE_TEST_GATEWAY,
+            'gatewayToUse' => \common\components\TapPayments::USE_LIVE_GATEWAY,
         ],
         'armadaDelivery' => [
-            'keyToUse' => \common\components\ArmadaDelivery::USE_TEST_KEY,
+            'keyToUse' => \common\components\ArmadaDelivery::USE_LIVE_KEY,
         ],
         'mashkorDelivery' => [
             'class' => 'common\components\MashkorDelivery',
