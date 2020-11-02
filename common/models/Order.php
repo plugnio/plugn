@@ -157,15 +157,15 @@ class Order extends \yii\db\ActiveRecord {
                         $this->addError($attribute, 'Unit type cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['block', function ($attribute, $params, $validator) {
-                    if (!$this->block && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                    if ($this->block == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                         $this->addError($attribute, 'Block cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['street', function ($attribute, $params, $validator) {
-                    if (!$this->street && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                    if ($this->street  == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                         $this->addError($attribute, 'Street cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['house_number', function ($attribute, $params, $validator) {
-                    if (!$this->house_number && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                    if ($this->house_number  == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                         $this->addError($attribute, 'House number cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['order_mode', 'validateOrderMode'],

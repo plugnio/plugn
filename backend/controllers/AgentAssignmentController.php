@@ -40,6 +40,7 @@ class AgentAssignmentController extends Controller {
       ];
   }
 
+
     /**
      * Lists all AgentAssignment models.
      * @return mixed

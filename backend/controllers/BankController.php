@@ -40,6 +40,7 @@ class BankController extends Controller
   }
 
 
+
     /**
      * Lists all Bank models.
      * @return mixed
