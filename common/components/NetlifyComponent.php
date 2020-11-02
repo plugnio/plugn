@@ -106,28 +106,6 @@ class NetlifyComponent extends Component {
         return $response;
     }
 
-    /**
-     * deploys a new site.
-     * @param type $site_id
-     * @return type
-     */
-    public function deploySite($site_id) {
-
-        $deploySiteEndpoint = $this->apiEndpoint . "/sites/" . $site_id . '/deploys';
-
-
-        $client = new Client();
-        $response = $client->createRequest()
-                ->setMethod('POST')
-                ->setUrl($deploySiteEndpoint)
-                ->addHeaders([
-                    'Authorization' => 'Bearer ' . $this->token,
-                    'User-Agent' => 'request',
-                ])
-                ->send();
-
-        return $response;
-    }
 
     /**
      *  Provision SSL for a site

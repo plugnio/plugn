@@ -140,7 +140,7 @@ class CronController extends \yii\console\Controller {
         $now = new DateTime('now');
         $queue = Queue::find()
                 ->joinWith('restaurant')
-                ->andWhere(['queue_status' => Queue::QUEUE_STATUS_PENDING])
+                // ->andWhere(['queue_status' => Queue::QUEUE_STATUS_PENDING])
                 ->orderBy(['queue_created_at' => SORT_ASC])
                 ->one();
 
@@ -150,8 +150,8 @@ class CronController extends \yii\console\Controller {
 
         $restaurant = $queue->restaurant;
 
-        $myFolder = mkdir($queue->restaurant->store_branch_name);
-        $myfile = fopen($queue->restaurant->store_branch_name . "/build.js", "w") or die("Unable to open file!");
+        $myFolder = mkdir("store/" . $queue->restaurant->store_branch_name);
+        $myfile = fopen("store/" .   $queue->restaurant->store_branch_name . "/build.js", "w") or die("Unable to open file!");
 
         $themeColor = RestaurantTheme::find()
                 ->select(['primary'])

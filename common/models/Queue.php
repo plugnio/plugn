@@ -77,7 +77,7 @@ class Queue extends \yii\db\ActiveRecord {
 
                 if ($createBranchResponse->isOk) {
 
-                    $fileToBeUploaded = file_get_contents($store_model->store_branch_name . "/build.js");
+                    $fileToBeUploaded = file_get_contents("store/" . $store_model->store_branch_name . "/build.js");
 
                     // Encode the image string data into base64
                     $data = base64_encode($fileToBeUploaded);
@@ -90,7 +90,7 @@ class Queue extends \yii\db\ActiveRecord {
                         //Replace test with store domain name
                         $url = parse_url($store_model->restaurant_domain);
                         $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
-                  
+
                         if ($createNewSiteResponse->isOk) {
 
                             $site_id = $createNewSiteResponse->data['site_id'];
@@ -128,8 +128,8 @@ class Queue extends \yii\db\ActiveRecord {
     public function deleteBuildJsFolder(){
 
 
-      $dirPath = $this->restaurant->store_branch_name;
-      $file_pointer = $dirPath . '/build.js';
+      $dirPath = "store/" .  $this->restaurant->store_branch_name;
+      $file_pointer =  $dirPath . '/build.js';
 
       // Use unlink() function to delete a file
       if (!unlink($file_pointer)) {

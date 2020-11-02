@@ -652,18 +652,6 @@ class Restaurant extends \yii\db\ActiveRecord {
         }
 
 
-        if (!$insert &&  $this->restaurant_logo ) {
-
-          $deploySiteResponse = Yii::$app->netlifyComponent->deploySite( $this->site_id );
-
-          if (!$deploySiteResponse->isOk) {
-              Yii::error('[Netlify > While Creating new site]' . json_encode($deploySiteResponse->data), __METHOD__);
-          }
-
-        }
-
-
-
         if ($insert) {
 
           $freePlan = Plan::find()->where(['valid_for' => 0])->one();
