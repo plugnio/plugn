@@ -15,7 +15,7 @@ use common\models\Agent;
  */
 class AgentAssignmentController extends Controller {
 
-     public $enableCsrfValidation = false;
+    public $enableCsrfValidation = false;
 
     /**
      * {@inheritdoc}
@@ -28,8 +28,18 @@ class AgentAssignmentController extends Controller {
                     'delete' => ['POST'],
                 ],
             ],
+            'access' => [
+                'class' => \yii\filters\AccessControl::className(),
+                'rules' => [
+                    [//allow authenticated users only
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
         ];
     }
+
 
     /**
      * Lists all AgentAssignment models.

@@ -14,11 +14,13 @@ use yii\filters\VerbFilter;
  */
 class BankController extends Controller
 {
+
+    public $enableCsrfValidation = false;
+
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -26,8 +28,18 @@ class BankController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
+            'access' => [
+                'class' => \yii\filters\AccessControl::className(),
+                'rules' => [
+                    [//allow authenticated users only
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
         ];
     }
+
 
     /**
      * Lists all Bank models.
