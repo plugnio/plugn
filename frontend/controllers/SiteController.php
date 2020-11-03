@@ -239,7 +239,7 @@ class SiteController extends Controller {
 
 
               $response = Yii::$app->tapPayments->createCharge(
-                      "Upgrade store's plan", // Description
+                      "Upgrade store's plan to " . $subscription_model->plan->name, // Description
                       'Plugn', //Statement Desc.
                        $payment->payment_uuid, // Reference
                        $subscription_model->plan->price,
