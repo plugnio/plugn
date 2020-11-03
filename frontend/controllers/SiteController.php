@@ -188,7 +188,7 @@ class SiteController extends Controller {
                              ])
                              ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
                              ->setTo(Yii::$app->params['supportEmail'])
-                             ->setSubject('[Plugn] CONTACT INFORMATION UPDATE REQUEST')
+                             ->setSubject('[Plugn] Agent updated DN')
                              ->send();
 
                      return $this->redirect(['domains',
@@ -240,7 +240,7 @@ class SiteController extends Controller {
 
 
               $response = Yii::$app->tapPayments->createCharge(
-                      "Upgrade store's plan to " . $subscription_model->plan->name, // Description
+                      "Upgrade $managedRestaurant->name's plan to " . $subscription_model->plan->name, // Description
                       'Plugn', //Statement Desc.
                        $payment->payment_uuid, // Reference
                        $subscription_model->plan->price,
