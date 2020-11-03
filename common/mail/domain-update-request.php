@@ -4,9 +4,10 @@
 /* @var $signupForm common\models\ContactForm */
 
 ?>
-Hello Big Boss,
+Hello Big Boss,  <br/><br/>
 
-Store's domain name has been chnaged <br/><br/>
+<?= $store_name ?> changed their domain name recently.  <br/><br/>
 
-Old domain: <?= $old_domain ?> <br/>
-New domain: <?= $new_domain ?>
+The previous name and the recent name are listed below:
+Previous: <?= $old_domain ?> <br/>
+New: <?= $new_domain ?>

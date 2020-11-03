@@ -182,6 +182,7 @@ class SiteController extends Controller {
                      \Yii::$app->mailer->compose([
                                  'html' => 'domain-update-request',
                                      ], [
+                                 'store_name' => $managedRestaurant->name,
                                  'new_domain' => $managedRestaurant->restaurant_domain,
                                  'old_domain' => $old_domain
                              ])
