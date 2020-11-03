@@ -404,7 +404,7 @@ class Restaurant extends \yii\db\ActiveRecord {
               $this->live_public_key = $operatorApiResponse->data['api_credentials']['live']['public'];
             }
 
-            \Yii::info("$store_model->name . " has just created TAP account", __METHOD__);
+            \Yii::info($store_model->name . " has just created TAP account", __METHOD__);
 
 
         } else {
