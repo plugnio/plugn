@@ -1274,6 +1274,8 @@ class SiteController extends Controller {
                     $model->password = $agent_model->tempPassword;
 
                     if ($managedRestaurant = $model->login()) {
+                      \Yii::info("[New Store Signup] " . $store_model->name . " has just joined Plugn", __METHOD__);
+
                         return $this->redirect(['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
                     } else {
                         $model->password = '';

@@ -22,6 +22,26 @@ $url = yii\helpers\Url::to(['delete-item-image', 'restaurantUuid' => $modelItem-
 
 $js = <<< JS
 
+$( '.ql-snow' ).css( 'border-radius', '0px' )
+$(document).on('wheel', 'input[type=number]', function (e) {
+		$(this).blur();
+});
+$( window ).on( 'load', function() {
+		if ('$modelItem->track_quantity' == 1)
+			$('#stock_qty').show();
+		else
+			$('#stock_qty').hide();
+});
+let trackQuantityInput = $('#trackQuantityInput');
+trackQuantityInput.change(function(e){
+	let selection = trackQuantityInput.is(':checked');
+	if (selection == true)
+		$('#stock_qty').show();
+	else
+		$('#stock_qty').hide();
+});
+
+
 // enable fileuploader plugin
 $('input[class="item-upload"]').fileuploader({
 	limit:10,

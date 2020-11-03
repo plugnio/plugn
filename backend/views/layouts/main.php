@@ -52,7 +52,8 @@ AppAsset::register($this);
             ['label' => 'Restaurants', 'url' => ['/restaurant/index']],
             ['label' => 'Plans', 'url' => ['/plan/index']],
             ['label' => 'Subscription', 'url' => ['/subscription/index']],
-            ['label' => 'Bank', 'url' => ['/bank/index']]
+            ['label' => 'Bank', 'url' => ['/bank/index']],
+            ['label' => 'Queue', 'url' => ['/queue/index']]
         ];
 
         $menuItems[] = '<li>'
