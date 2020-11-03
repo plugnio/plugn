@@ -140,7 +140,7 @@ class CronController extends \yii\console\Controller {
         $now = new DateTime('now');
         $queue = Queue::find()
                 ->joinWith('restaurant')
-                // ->andWhere(['queue_status' => Queue::QUEUE_STATUS_PENDING])
+                ->andWhere(['queue_status' => Queue::QUEUE_STATUS_PENDING])
                 ->orderBy(['queue_created_at' => SORT_ASC])
                 ->one();
 
