@@ -150,8 +150,12 @@ class CronController extends \yii\console\Controller {
 
         $restaurant = $queue->restaurant;
 
-        $myFolder = mkdir("store/" . $queue->restaurant->store_branch_name);
-        $myfile = fopen("store/" .   $queue->restaurant->store_branch_name . "/build.js", "w") or die("Unable to open file!");
+        $dirName = "store";
+        if(!$file_exists($dirName))
+          $createStoreFolder = mkdir($dirName);
+
+        $myFolder = mkdir( $dirName . "/" . $queue->restaurant->store_branch_name);
+        $myfile =  fopen($dirName . "/" .   $queue->restaurant->store_branch_name . "/build.js", "w") or die("Unable to open file!");
 
         $themeColor = RestaurantTheme::find()
                 ->select(['primary'])
