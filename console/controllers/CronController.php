@@ -151,7 +151,7 @@ class CronController extends \yii\console\Controller {
         $restaurant = $queue->restaurant;
 
         $dirName = "store";
-        if(!$file_exists($dirName))
+        if(!file_exists($dirName))
           $createStoreFolder = mkdir($dirName);
 
         $myFolder = mkdir( $dirName . "/" . $queue->restaurant->store_branch_name);
