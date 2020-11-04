@@ -20,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <span class="badge">
             <?= $model->status ?>
         </span>
-        <?= $model->business_id ? '' : Html::a('Create Tap account', ['create-tap-account', 'restaurant_uuid' => $model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+        <?= $model->is_tap_enable ? '' : Html::a('Create Tap account', ['create-tap-account', 'restaurant_uuid' => $model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
         <?=
         Html::a('Send store data to Tap', ['send-email-to-tap', 'id' => $model->restaurant_uuid], [
             'class' => 'btn btn-warning',
@@ -165,8 +165,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'wallet_id',
             'operator_id',
+
             'live_api_key',
             'test_api_key',
+
+            'live_public_key',
+            'test_public_key',
+
             'store_branch_name',
             'custom_css:text',
         ],

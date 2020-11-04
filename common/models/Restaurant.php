@@ -246,6 +246,10 @@ class Restaurant extends \yii\db\ActiveRecord {
             'identification_file' => 'Identification File',
             'identification_title' => 'Identification Title',
             'identification_file_purpose' => 'Identification File Purpose',
+
+            'live_api_key' => 'Live secret key',
+            'test_api_key' => 'Test secret key',
+
         ];
     }
 
@@ -324,9 +328,9 @@ class Restaurant extends \yii\db\ActiveRecord {
 
     public function uploadDocumentsToTap() {
 
-        if ($this->authorized_signature_expiry_date && $this->authorized_signature_issuing_date && $this->authorized_signature_issuing_country && $this->authorized_signature_file_purpose && $this->authorized_signature_title) {
+        //Upload Authorized Signature file
+        if ($this->authorized_signature_file && $this->authorized_signature_issuing_country && $this->authorized_signature_file_purpose && $this->authorized_signature_title) {
 
-            //Upload Authorized Signature file
             $response = Yii::$app->tapPayments->uploadFileToTap(
                     Yii::getAlias('@privateDocuments') . "/" . $this->authorized_signature_file, $this->authorized_signature_file_purpose, $this->authorized_signature_title);
             if ($response->isOk) {
@@ -336,10 +340,9 @@ class Restaurant extends \yii\db\ActiveRecord {
             }
         }
 
+        //Upload commercial_license file
+        if ($this->commercial_license_file && $this->commercial_license_issuing_country && $this->commercial_license_file_purpose && $this->commercial_license_title) {
 
-        if ($this->commercial_license_expiry_date && $this->commercial_license_issuing_date && $this->commercial_license_issuing_country && $this->commercial_license_file_purpose && $this->commercial_license_title) {
-
-            //Upload Authorized Signature file
             $response = Yii::$app->tapPayments->uploadFileToTap(
                     Yii::getAlias('@privateDocuments') . "/" . $this->commercial_license_file, $this->commercial_license_file_purpose, $this->commercial_license_title);
 
@@ -351,15 +354,21 @@ class Restaurant extends \yii\db\ActiveRecord {
             }
         }
 
-
         //Upload Owner civil id
-        $response = Yii::$app->tapPayments->uploadFileToTap(
-                Yii::getAlias('@privateDocuments') . "/" . $this->identification_file, $this->identification_file_purpose, $this->identification_title);
+        if ($this->identification_file  && $this->identification_file_purpose && $this->identification_title) {
 
+            $response = Yii::$app->tapPayments->uploadFileToTap(
+                    Yii::getAlias('@privateDocuments') . "/" . $this->identification_file, $this->identification_file_purpose, $this->identification_title);
 
-        if ($response->isOk) {
-            $this->identification_file_id = $response->data['id'];
-        }
+            if ($response->isOk) {
+              $this->identification_file_id = $response->data['id'];
+
+            } else {
+                return Yii::$app->session->setFlash('error', print_r('Error when uploading civil id: ' . json_encode($response->data), true));
+            }
+
+          }
+
     }
 
     /**
@@ -404,7 +413,7 @@ class Restaurant extends \yii\db\ActiveRecord {
               $this->live_public_key = $operatorApiResponse->data['api_credentials']['live']['public'];
             }
 
-            \Yii::info($store_model->name . " has just created TAP account", __METHOD__);
+            \Yii::info($this->name . " has just created TAP account", __METHOD__);
 
 
         } else {
