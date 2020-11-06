@@ -187,7 +187,36 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
         return $paymentRecord;
     }
+    
+    
+    public function beforeSave($insert) {
+            
+        //TODO
+        if(!$insert && $this->payment_current_status == 'CAPTURED'){
+            
+            //send to all store's owner
+            
+            foreach ($this->restaurant->getOwnerAgent()->all() as $agent) {
+                
+                \Yii::$app->mailer->compose([
+                       'html' => 'subscription-will-expire-soon-html',
+                           ], [
+                       'subscription' => $subscription,
+                       'agent_name' => $agent->agent_name,
+                   ])
+                   ->setFrom([\Yii::$app->params['supportEmail']])
+                   ->setTo($agent->agent_email)
+                   ->setSubject('Your Subscription is Expiring')
+                   ->send();
+                
+            }
 
+        
+        }
+        
+        return parent::beforeSave($insert);
+    }
+    
     /**
      * @return \yii\db\ActiveQuery
      */
