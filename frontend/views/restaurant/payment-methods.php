@@ -50,7 +50,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <?php if(!$model->is_tap_enable) { ?>
               <div style="text-align: center;">
-                <?= Html::a('Create Tap account' , ['create-tap-account' , 'id' => $model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+                <?php
+                if(!$model->tap_queue_id)
+                 echo Html::a('Create Tap account' , ['create-tap-account' , 'id' => $model->restaurant_uuid], ['class' => 'btn btn-success']);
+                else
+                  echo "<h5>Your TAP payments account will be ready within 24 hours. We'll email you once it's ready</h5>";
+                 ?>
               </div>
             <?php } else { ?>
             <div class="card-content">

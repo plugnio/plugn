@@ -6,6 +6,7 @@ use Yii;
 use common\models\Restaurant;
 use common\models\OrderItem;
 use common\models\Queue;
+use common\models\TapQueue;
 use common\models\Voucher;
 use common\models\BankDiscount;
 use common\models\Payment;
@@ -136,6 +137,21 @@ class CronController extends \yii\console\Controller {
 
     // }
 
+    public function actionCreateTapAccount() {
+
+      $queue = TapQueue::find()
+              ->where(['queue_status' => Queue::QUEUE_STATUS_PENDING])
+              ->orderBy(['queue_created_at' => SORT_ASC])
+              ->one();
+
+      if($queue && $queue->restaurant_uuid){
+        $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
+        $queue->save();
+      }
+
+    }
+
+
     public function actionCreateBuildJsFile() {
         $now = new DateTime('now');
         $queue = Queue::find()
@@ -167,6 +183,8 @@ class CronController extends \yii\console\Controller {
         $google_analytics_id = $restaurant->google_analytics_id ? "'$restaurant->google_analytics_id'" : 'null';
         $customCss = $restaurant->custom_css ? "'$restaurant->custom_css'" : 'null';
         $tagline = $restaurant->tagline ? $restaurant->tagline : $restaurant->name;
+
+        $apiEndpoint = Yii::$app->params['apiEndpoint'] . '/v1';
 
         $txt = "
 
@@ -392,7 +410,7 @@ class CronController extends \yii\console\Controller {
                 var environmentFile = `export const environment = {
                 production: true,
                 envName: 'prod',
-                apiEndpoint: 'https://api.dev.plugn.io/v1',
+                apiEndpoint: '$apiEndpoint',
                 restaurantUuid : '`+ storeUuid +`'
                 };`;
                 fs.writeFileSync('src/environments/environment.'+  storebranchName  + '.ts', environmentFile);

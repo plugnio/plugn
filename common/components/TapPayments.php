@@ -190,13 +190,13 @@ class TapPayments extends Component
 
         $bussinessParams = [
             "name" => [
-                "en" => $restaurant->name,
+                "en" => $restaurant->company_name,
                 "ar" => $restaurant->name_ar
             ],
             "type" => $restaurant->business_type,
             "entity" => [
                 "legal_name" => [
-                    "en" => $restaurant->name,
+                    "en" => $restaurant->company_name,
                     "ar" => $restaurant->name_ar
                 ],
                 "is_licensed" => 'true',
@@ -236,7 +236,7 @@ class TapPayments extends Component
             "brands" => [
                 [
                     "name" => [
-                        "en" => $restaurant->name,
+                        "en" => $restaurant->company_name,
                         "ar" => $restaurant->name_ar
                     ],
                     "website" => $restaurant->restaurant_domain,

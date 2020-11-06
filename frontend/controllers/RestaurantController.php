@@ -10,6 +10,7 @@ use common\models\Item;
 use yii\db\Expression;
 use common\models\Customer;
 use common\models\RestaurantTheme;
+use common\models\TapQueue;
 use common\models\AgentAssignment;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
@@ -636,20 +637,27 @@ class RestaurantController extends Controller {
 
 
             if (sizeof($restaurant_commercial_license_file) > 0)
-                $model->commercial_license_file = $restaurant_commercial_license_file[0]['file']; //Commercial License
+              $model->commercial_license_file = str_replace( 'uploads/', '',$restaurant_commercial_license_file[0]['file']); //Commercial License
+
 
             if (sizeof($restaurant_authorized_signature_file) > 0)
-                $model->authorized_signature_file = $restaurant_authorized_signature_file[0]['file']; //Authorized signature
+              $model->authorized_signature_file = str_replace( 'uploads/', '',$restaurant_authorized_signature_file[0]['file']);  //Authorized signature
 
             if (sizeof($owner_identification_file) > 0)
-              $model->identification_file =  $owner_identification_file[0]['file']; //Owner's civil id
+              $model->identification_file =  str_replace('uploads/',  '', $owner_identification_file[0]['file']); //Owner's civil id
 
+              if(!$model->is_tap_enable){
+                $tap_queue_model = new TapQueue;
+                $tap_queue_model->queue_status = TapQueue::QUEUE_STATUS_PENDING;
+                $tap_queue_model->restaurant_uuid = $model->restaurant_uuid;
+                if($tap_queue_model->save()){
+                  $model->tap_queue_id = $tap_queue_model->tap_queue_id;
+                }
+              }
 
-
-
-            $model->createAnAccountOnTap();
 
             if ($model->validate() && $model->save()) {
+
 
                 return $this->redirect(['view-payment-methods', 'restaurantUuid' => $model->restaurant_uuid]);
             } else {

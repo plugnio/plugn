@@ -209,7 +209,7 @@ class SiteController extends Controller {
       if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
 
 
-
+    
         $selectedPlan = Plan::findOne($selectedPlanId);
 
         $subscription_model = new Subscription();

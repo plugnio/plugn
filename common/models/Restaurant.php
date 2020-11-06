@@ -45,7 +45,7 @@ use common\models\WebLink;
  * @property int $schedule_interval
  * @property string $live_public_key
  * @property string $test_public_key
- *
+ * @property int|null $tap_queue_id
  *
  * @property AgentAssignment[] $agentAssignments
  * @property Agent[] $agents
@@ -157,7 +157,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             ['restaurant_status', 'in', 'range' => [self::RESTAURANT_STATUS_OPEN, self::RESTAURANT_STATUS_BUSY, self::RESTAURANT_STATUS_CLOSED]],
             ['store_layout', 'in', 'range' => [self::STORE_LAYOUT_LIST_FULLWIDTH, self::STORE_LAYOUT_GRID_FULLWIDTH, self::STORE_LAYOUT_CATEGORY_FULLWIDTH, self::STORE_LAYOUT_LIST_HALFWIDTH, self::STORE_LAYOUT_GRID_HALFWIDTH, self::STORE_LAYOUT_CATEGORY_HALFWIDTH]],
             ['phone_number_display', 'in', 'range' => [self::PHONE_NUMBER_DISPLAY_ICON, self::PHONE_NUMBER_DISPLAY_SHOW_PHONE_NUMBER, self::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER]],
-            [['restaurant_created_at', 'restaurant_updated_at', 'has_deployed'], 'safe'],
+            [['restaurant_created_at', 'restaurant_updated_at', 'has_deployed','tap_queue_id'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['custom_css'], 'string'],
             [['platform_fee'], 'number'],
@@ -171,6 +171,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_email_notification', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable'], 'integer'],
             ['restaurant_email', 'email'],
             [['restaurant_uuid'], 'unique'],
+            [['tap_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => TapQueue::className(), 'targetAttribute' => ['tap_queue_id' => 'tap_queue_id']]
         ];
     }
 
@@ -304,9 +305,10 @@ class Restaurant extends \yii\db\ActiveRecord {
      * Upload a File to cloudinary
      * @param type $imageURL
      */
-    public function uploadFileToCloudinary($file_path, $filename, $attribute) {
+    public function uploadFileToCloudinary($file_path, $attribute) {
 
-        if ($filename) {
+        $filename = Yii::$app->security->generateRandomString();
+
             try {
 
                 $result = Yii::$app->cloudinaryManager->upload(
@@ -323,7 +325,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             } catch (\Cloudinary\Error $err) {
                 Yii::error('Error when uploading restaurant document to Cloudinary: ' . json_encode($err));
             }
-        }
+
     }
 
     public function uploadDocumentsToTap() {
@@ -331,50 +333,128 @@ class Restaurant extends \yii\db\ActiveRecord {
         //Upload Authorized Signature file
         if ($this->authorized_signature_file && $this->authorized_signature_issuing_country && $this->authorized_signature_file_purpose && $this->authorized_signature_title) {
 
-            $response = Yii::$app->tapPayments->uploadFileToTap(
-                    Yii::getAlias('@privateDocuments') . "/" . $this->authorized_signature_file, $this->authorized_signature_file_purpose, $this->authorized_signature_title);
-            if ($response->isOk) {
-                $this->authorized_signature_file_id = $response->data['id'];
-            } else {
-                return Yii::$app->session->setFlash('error', print_r('Error when uploading authorized signature document: ' . json_encode($response->data), true));
+          $tmpFile = sys_get_temp_dir() . '/' . $this->authorized_signature_file;
+
+          if(!file_put_contents($tmpFile, file_get_contents($this->getAuthorizedSignaturePhoto())))
+              return Yii::error('Error reading authorized signature document: ');
+
+            $response = Yii::$app->tapPayments->uploadFileToTap($tmpFile, $this->authorized_signature_file_purpose ,$this->authorized_signature_title);
+
+            if ($response->isOk){
+              $this->authorized_signature_file_id = $response->data['id'];
+              @unlink($tmpFile);
             }
+
+            else
+                return Yii::error('Error when uploading authorized signature document: ' . json_encode($response->data));
         }
 
         //Upload commercial_license file
         if ($this->commercial_license_file && $this->commercial_license_issuing_country && $this->commercial_license_file_purpose && $this->commercial_license_title) {
 
+          $commercialLicenseTmpFile = sys_get_temp_dir() . '/' . $this->commercial_license_file;
+
+          if(!file_put_contents($commercialLicenseTmpFile, file_get_contents($this->getCommercialLicensePhoto())))
+              return Yii::error('Error reading commercial license document: ');
+
+
             $response = Yii::$app->tapPayments->uploadFileToTap(
-                    Yii::getAlias('@privateDocuments') . "/" . $this->commercial_license_file, $this->commercial_license_file_purpose, $this->commercial_license_title);
+                    $commercialLicenseTmpFile, $this->commercial_license_file_purpose, $this->commercial_license_title);
 
-            if ($response->isOk) {
-
+            if ($response->isOk){
                 $this->commercial_license_file_id = $response->data['id'];
-            } else {
-                return Yii::$app->session->setFlash('error', print_r('Error when uploading commercial license document: ' . json_encode($response->data), true));
+                @unlink($commercialLicenseTmpFile);
             }
+
+            else
+                return Yii::error('Error when uploading commercial license document: ' . json_encode($response->data));
         }
 
         //Upload Owner civil id
         if ($this->identification_file  && $this->identification_file_purpose && $this->identification_title) {
 
+          $civilIdTmpFile = sys_get_temp_dir() . '/' . $this->commercial_license_file;
+
+          if(!file_put_contents($civilIdTmpFile, file_get_contents($this->getCivilIdPhoto())))
+              return Yii::error('Error reading civil id : ');
+
+
             $response = Yii::$app->tapPayments->uploadFileToTap(
-                    Yii::getAlias('@privateDocuments') . "/" . $this->identification_file, $this->identification_file_purpose, $this->identification_title);
+                    $civilIdTmpFile, $this->identification_file_purpose, $this->identification_title);
 
-            if ($response->isOk) {
+            if ($response->isOk){
               $this->identification_file_id = $response->data['id'];
+              @unlink($civilIdTmpFile);
+           }
+            else
+              return Yii::error('Error when uploading civil id: ' . json_encode($response->data));
 
-            } else {
-                return Yii::$app->session->setFlash('error', print_r('Error when uploading civil id: ' . json_encode($response->data), true));
-            }
 
           }
+    }
 
+    /**
+     * Return Civil id url
+     * @return string
+     */
+    public function getCivilIdPhoto() {
+        $photo_url = [];
+
+
+        if ($this->identification_file) {
+
+            $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
+                    . $this->restaurant_uuid . '/private_documents/'
+                    . $this->identification_file;
+            $photo_url = $url;
+        }
+
+        return $photo_url;
+    }
+
+    /**
+     * Return commercial_license_file
+     * @return string
+     */
+    public function getCommercialLicensePhoto() {
+        $photo_url = [];
+
+        if ($this->commercial_license_file) {
+
+            $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
+                    .  $this->restaurant_uuid  . '/private_documents/'
+                    . $this->commercial_license_file;
+            $photo_url = $url;
+        }
+
+        return $photo_url;
+    }
+
+
+    /**
+     * Return authorized_signature_file
+     * @return string
+     */
+    public function getAuthorizedSignaturePhoto() {
+        $photo_url = [];
+
+        if ($this->authorized_signature_file) {
+
+            $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
+                    .  $this->restaurant_uuid  . '/private_documents/'
+                    . $this->authorized_signature_file;
+            $photo_url = $url;
+        }
+
+        return $photo_url;
     }
 
     /**
      * Create an account for vendor on tap
      */
     public function createAnAccountOnTap() {
+
+
         //Upload documents file on our server before we create an account on tap we gonaa delete them
         $this->uploadDocumentsToTap();
 
@@ -387,7 +467,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
             $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
         } else {
-            return Yii::$app->session->setFlash('error', print_r('Business: ' . json_encode($businessApiResponse->data), true));
+            return Yii::error('Error while create Business  ' . json_encode($businessApiResponse->data));
         }
 
         //Create a merchant on Tap
@@ -397,7 +477,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             $this->merchant_id = $merchantApiResponse->data['id'];
             $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
         } else {
-            return Yii::$app->session->setFlash('error', print_r('Merchant: ' . json_encode($merchantApiResponse->data), true));
+            return Yii::error('Error while create Merchant  ' . json_encode($merchantApiResponse->data));
         }
 
         //Create an Operator
@@ -414,10 +494,10 @@ class Restaurant extends \yii\db\ActiveRecord {
             }
 
             \Yii::info($this->name . " has just created TAP account", __METHOD__);
-
-
+            $this->save();
+            return true;
         } else {
-            return Yii::$app->session->setFlash('error', print_r('Operator: ' . json_encode($operatorApiResponse->data), true));
+          return Yii::error('Error while create Operator  ' . json_encode($operatorApiResponse->data));
         }
     }
 
@@ -614,6 +694,12 @@ class Restaurant extends \yii\db\ActiveRecord {
             $this->is_tap_enable = 0;
 
 
+        if ($this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT) {
+            //delete tmp files
+            $this->deleteTempFiles();
+        }
+
+
         return parent::beforeSave($insert);
     }
 
@@ -621,16 +707,16 @@ class Restaurant extends \yii\db\ActiveRecord {
      * Deletes the files associated with this project
      */
     public function deleteTempFiles() {
-        if ($this->authorized_signature_file && file_exists(Yii::getAlias('@privateDocuments') . "/" . $this->authorized_signature_file)) {
-            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/" . $this->authorized_signature_file, $this->authorized_signature_file, 'authorized_signature_file');
+        if ($this->authorized_signature_file && file_exists(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->authorized_signature_file)) {
+            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->authorized_signature_file, 'authorized_signature_file');
         }
 
-        if ($this->commercial_license_file && file_exists(Yii::getAlias('@privateDocuments') . "/" . $this->commercial_license_file)) {
-            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/" . $this->commercial_license_file, $this->commercial_license_file, 'commercial_license_file');
+        if ($this->commercial_license_file && file_exists(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->commercial_license_file)) {
+            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->commercial_license_file,  'commercial_license_file');
         }
 
-        if ($this->identification_file && file_exists(Yii::getAlias('@privateDocuments') . "/" . $this->identification_file)) {
-            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/" . $this->identification_file, $this->identification_file, 'identification_file');
+        if ($this->identification_file && file_exists(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->identification_file)) {
+            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->identification_file, 'identification_file');
         }
     }
 
@@ -641,15 +727,6 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
-
-
-
-
-
-        if ($this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT) {
-            //delete tmp files
-            $this->deleteTempFiles();
-        }
 
 
         if ($this->scenario == self::SCENARIO_CREATE_STORE_BY_AGENT && $insert) {
@@ -980,6 +1057,17 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getRestaurantTheme() {
         return $this->hasOne(RestaurantTheme::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+
+    /**
+     * Gets query for [[TapQueue]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTapQueue()
+    {
+        return $this->hasOne(TapQueue::className(), ['tap_queue_id' => 'tap_queue_id']);
     }
 
 

@@ -1,4 +1,4 @@
 <?php
 return [
-  'apiEndpoint' => 'http://localhost/~Saoud/plugn/plugn-yii2/api/web'
+  'apiEndpoint' => 'https://api.dev.plugn.io'
 ];

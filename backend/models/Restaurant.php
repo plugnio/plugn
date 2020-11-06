@@ -148,31 +148,7 @@ class Restaurant extends \common\models\Restaurant {
         $this->_uploadTempFile($this->owner_identification_file, 'identification_file');
     }
 
-    /**
-     * Upload a File to cloudinary
-     * @param type $imageURL
-     */
-    public function uploadFileToCloudinary($file_path, $filename, $attribute) {
 
-        if ($filename) {
-            try {
-
-                $result = Yii::$app->cloudinaryManager->upload(
-                        $file_path, [
-                    'public_id' => "restaurants/" . $this->restaurant_uuid . "/private_documents/" . $filename
-                        ]
-                );
-
-                if ($result || count($result) > 0) {
-                    //delete the file from temp folder
-                    unlink($file_path);
-                    $this[$attribute] = basename($result['url']);
-                }
-            } catch (\Cloudinary\Error $err) {
-                Yii::error('Error when uploading restaurant document to Cloudinary: ' . json_encode($err));
-            }
-        }
-    }
 
     /**
      * Processes a file upload
@@ -198,15 +174,6 @@ class Restaurant extends \common\models\Restaurant {
         }
     }
 
-    public function afterSave($insert, $changedAttributes) {
-        parent::afterSave($insert, $changedAttributes);
-
-        if ($this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT) {
-            //delete tmp files
-            $this->deleteTempFiles();
-        }
-
-    }
 
     /**
      * Send store's data to Tap via email
@@ -231,15 +198,15 @@ class Restaurant extends \common\models\Restaurant {
     public function deleteTempFiles() {
 
         if ($this->authorized_signature_file && file_exists(Yii::getAlias('@projectFiles') . "/" . $this->authorized_signature_file)) {
-            $this->uploadFileToCloudinary(Yii::getAlias('@projectFiles') . "/" . $this->authorized_signature_file, $this->authorized_signature_file, 'authorized_signature_file');
+            $this->uploadFileToCloudinary(Yii::getAlias('@projectFiles') . "/" . $this->authorized_signature_file,  'authorized_signature_file');
         }
 
         if ($this->commercial_license_file && file_exists(Yii::getAlias('@projectFiles') . "/" . $this->commercial_license_file)) {
-            $this->uploadFileToCloudinary(Yii::getAlias('@projectFiles') . "/" . $this->commercial_license_file, $this->commercial_license_file, 'commercial_license_file');
+            $this->uploadFileToCloudinary(Yii::getAlias('@projectFiles') . "/" . $this->commercial_license_file,  'commercial_license_file');
         }
 
         if ($this->identification_file && file_exists(Yii::getAlias('@projectFiles') . "/" . $this->identification_file)) {
-            $this->uploadFileToCloudinary(Yii::getAlias('@projectFiles') . "/" . $this->identification_file, $this->identification_file, 'identification_file');
+            $this->uploadFileToCloudinary(Yii::getAlias('@projectFiles') . "/" . $this->identification_file,  'identification_file');
         }
     }
 
