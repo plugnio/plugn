@@ -6,8 +6,7 @@ use common\models\Voucher;
 use common\models\BankDiscount;
 
 /* @var $this yii\web\View */
-/* @var $subscription common\models\Subscription */
-/* @var $store common\models\Restaurant */
+/* @var $order common\models\Order */
 ?>
 
 
@@ -115,7 +114,52 @@ use common\models\BankDiscount;
                                     <tbody>
                                         <tr>
                                             <td style="border:1px solid #d8e2e7;direction:ltr;font-size:0px;padding:5px;text-align:center;">
+                                                <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" width="600px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:588px;" width="588" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+                                                <div style="margin:0px auto;max-width:588px;">
+                                                    <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td style="direction:ltr;font-size:0px;padding:0px;text-align:center;">
+                                                                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:588px;" ><![endif]-->
+                                                                    <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                                                                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
 
+                                                                            <tr>
+                                                                                <td align="center" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-bottom:6px;word-break:break-word;">
+                                                                                    <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:21px;font-weight:bold;line-height:24px;text-align:center;color:#000000;">Your store was successfully upgraded</div>
+                                                                                </td>
+                                                                            </tr>
+
+                                                                            <tr>
+                                                                                <td style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                                                                    <p style="border-top:solid 1px #d8e2e7;font-size:1;margin:0px auto;width:100%;"></p>
+                                                                                    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 1px #d8e2e7;font-size:1;margin:0px auto;width:538px;" role="presentation" width="538px" ><tr><td style="height:0;line-height:0;"> &nbsp;
+                                        </td></tr></table><![endif]-->
+                                                                                </td>
+                                                                            </tr>
+
+                                                                            <tr>
+                                                                                <td align="center" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-bottom:6px;word-break:break-word;">
+                                                                                    <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:21px;font-weight:bold;line-height:24px;text-align:center;color:#000000;">This email is to confirm the recent upgrade of your store to  <?= $subscription->plan->name ?> </div>
+                                                                                </td>
+                                                                            </tr>
+
+
+                                                                            <tr>
+                                                                                <td style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                                                                    <p style="border-top:solid 1px #d8e2e7;font-size:1;margin:0px auto;width:100%;"></p>
+                                                                                    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 1px #d8e2e7;font-size:1;margin:0px auto;width:538px;" role="presentation" width="538px" ><tr><td style="height:0;line-height:0;"> &nbsp;
+                                        </td></tr></table><![endif]-->
+                                                                                </td>
+                                                                            </tr>
+                                                                        </table>
+                                                                    </div>
+                                                                    <!--[if mso | IE]></td></tr></table><![endif]-->
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                                 <!--[if mso | IE]></td></tr></table></td></tr><tr><td class="" width="600px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:588px;" width="588" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
                                                 <div style="margin:0px auto;max-width:588px;">
                                                     <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
@@ -125,28 +169,26 @@ use common\models\BankDiscount;
                                                                     <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:588px;" ><![endif]-->
                                                                     <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
                                                                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
-                                                                            <!-- <tr>
-                                                                                <td align="center" style="font-size:0px;padding:10px 25px;padding-top:15px;padding-bottom:6px;word-break:break-word;">
-                                                                                    <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:18px;line-height:24px;text-align:center;color:#000000;">Order #<?= $order->order_uuid ?>
-                                                                                    </div>
-                                                                                </td>
-                                                                            </tr> -->
+                                                                     
                                                                             <tr>
                                                                                 <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
                                                                                     <table cellpadding="0" cellspacing="0" width="100%" border="0" style="color:#000000;font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:22px;table-layout:auto;width:100%;border:none;">
                                                                                         <!-- #item -->
 
-                                                                                            ?>
+                    
                                                                                             <tr>
+                                                                                            
                                                                                                 <td style="width: 70%; padding: 0 15px; padding-top:10px; vertical-align:top;">
                                                                                                     <p style="margin:0;padding:0;">
-                                                                                                        <?= $subscription->plan->name ?>
+                                                                                                        <?= $subscription->plan->name   ?>
                                                                                                     </p>
+                                                                                                
                                                                                                 </td>
                                                                                                 <td style="color:#828585; padding-top:10px; text-align: right; vertical-align:top;width: 80px;">
                                                                                                     <?= \Yii::$app->formatter->asCurrency($subscription->plan->price); ?>
                                                                                                 </td>
                                                                                             </tr>
+                                                                                 
 
                                                                                         <!-- #item -->
                                                                                         <!-- End items -->
@@ -159,7 +201,6 @@ use common\models\BankDiscount;
                                                                                                 <?= \Yii::$app->formatter->asCurrency($subscription->plan->price) ?>
                                                                                             </td>
                                                                                         </tr>
-
 
 
                                                                                     </table>
@@ -195,49 +236,7 @@ use common\models\BankDiscount;
                                                         </tbody>
                                                     </table>
                                                 </div>
-                                                <!--[if mso | IE]></td></tr></table></td></tr><tr><td class="" width="600px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:588px;" width="588" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
-                                                <div style="margin:0px auto;max-width:588px;">
-                                                    <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td style="direction:ltr;font-size:0px;padding:0px;padding-bottom:30px;text-align:center;">
-                                                                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:294px;" ><![endif]-->
-                                                                    <div class="mj-column-per-50 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
-                                                                        <?php if ($order->order_mode == Order::ORDER_MODE_DELIVERY) { ?>
-
-                                                                            <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
-                                                                                <tr>
-                                                                                    <td align="center" style="font-size:0px;padding:10px 25px;padding-top:15px;padding-bottom:6px;word-break:break-word;">
-                                                                                        <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:18px;line-height:24px;text-align:center;color:#000000;">Delivering to</div>
-                                                                                    </td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
-                                                                                        <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;"><?= $order->area_name ?>, Block <?= $order->block ?>, Street <?= $order->street ?>, <?= $order->avenue != null ? 'Avenue' . $order->avenue : '' ?>, House <?= $order->house_number ?></div>
-                                                                                    </td>
-                                                                                </tr>
-                                                                            </table>
-                                                                        <?php } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) { ?>
-                                                                            <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
-                                                                                <tr>
-                                                                                    <td align="center" style="font-size:0px;padding:10px 25px;padding-top:15px;padding-bottom:6px;word-break:break-word;">
-                                                                                        <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:18px;line-height:24px;text-align:center;color:#000000;">Pickup from</div>
-                                                                                    </td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
-                                                                                        <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;"><?= $order->restaurantBranch->branch_name_en ?></div>
-                                                                                    </td>
-                                                                                </tr>
-                                                                            </table>
-                                                                        <?php } ?>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                <!--[if mso | IE]></td></tr></table></td></tr></table><![endif]-->
+                                            
                                             </td>
                                         </tr>
                                     </tbody>

@@ -37,6 +37,7 @@ $('#primaryColorInput').change(function(e){
 // enable fileuploader plugin
 $('input[class="upload-logo"]').fileuploader({
 	limit: 1,
+  fileMaxSize: 20,
 	extensions: ['image/*'],
 	addMore: true,
 	thumbnails: {
@@ -87,6 +88,7 @@ $('input[class="upload-logo"]').fileuploader({
 // enable fileuploader plugin
 $('input[class="upload-thumbnail"]').fileuploader({
 	limit: 1,
+  fileMaxSize: 20,
 	extensions: ['image/*'],
 	addMore: true,
 	thumbnails: {

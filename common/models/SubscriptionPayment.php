@@ -194,22 +194,17 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         //TODO
         if(!$insert && $this->payment_current_status == 'CAPTURED'){
 
-            //send to all store's owner
 
-            foreach ($this->restaurant->getOwnerAgent()->all() as $agent) {
-
-                \Yii::$app->mailer->compose([
-                       'html' => 'plan-upgraded-html',
-                           ], [
-                       'subscription' => $this->subscription,
-                       'store' => $this->restaurant,
-                   ])
-                   ->setFrom([\Yii::$app->params['supportEmail']])
-                   ->setTo($agent->agent_email)
-                   ->setSubject('Your store was successfully upgraded')
-                   ->send();
-
-            }
+            \Yii::$app->mailer->compose([
+                   'html' => 'plan-upgraded',
+                       ], [
+                   'subscription' => $this->subscription,
+                   'store' => $this->restaurant,
+               ])
+               ->setFrom([\Yii::$app->params['supportEmail']])
+               ->setTo([$this->restaurant->restaurant_email, \Yii::$app->params['supportEmail']])
+               ->setSubject('Your store was successfully upgraded')
+               ->send();
 
 
         }
