@@ -408,7 +408,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         <?=
                         Html::a(
                                 Html::tag('i', '', ['class' => 'feather icon-eye']) .
-                                Html::tag('span', 'Online Store'), ['site/redirect-to-store-domain', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                Html::tag('span', 'Visit Store'), ['site/redirect-to-store-domain', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title', 'style' => 'border: 2px solid #28c76f; border-radius: 5px;']
                         )
                         ?>
                     </li>

@@ -1259,8 +1259,13 @@ class SiteController extends Controller {
         if ($agent_model->load(Yii::$app->request->post()) && $store_model->load(Yii::$app->request->post())) {
 
             $store_model->restaurant_email = $agent_model->agent_email;
+            $store_model->owner_first_name = $agent_model->agent_name;
 
-            if ($agent_model->validate() && $store_model->validate() && $agent_model->save() && $store_model->save()) {
+
+
+
+            if ($agent_model->validate() && $store_model->validate() && $store_model->save() && $agent_model->save()) {
+
 
                 $assignment_agent_model = new AgentAssignment();
                 $assignment_agent_model->agent_id = $agent_model->agent_id;

@@ -69,22 +69,22 @@ $this->registerJs($js);
 
             <div class="row">
                 <div class="col-12 col-sm-6 col-lg-6">
-                    <?= $form->field($model, 'owner_first_name')->textInput(['maxlength' => true])->label('First Name') ?>
+                    <?= $form->field($model, 'owner_first_name')->textInput(['maxlength' => true])->label('First Name *') ?>
                 </div>
 
                 <div class="col-12 col-sm-6 col-lg-6">
-                    <?= $form->field($model, 'owner_last_name')->textInput(['maxlength' => true])->label('Last Name') ?>
+                    <?= $form->field($model, 'owner_last_name')->textInput(['maxlength' => true])->label('Last Name *') ?>
                 </div>
             </div>
 
             <div class="row">
 
                 <div class="col-12 col-sm-6 col-lg-6">
-                    <?= $form->field($model, 'owner_email')->textInput(['maxlength' => true, 'type' => 'email'])->label('Email Address') ?>
+                    <?= $form->field($model, 'owner_email')->textInput(['maxlength' => true, 'type' => 'email'])->label('Email Address *') ?>
                 </div>
 
                 <div class="col-12 col-sm-6 col-lg-6">
-                    <?= $form->field($model, 'owner_number')->input('number')->label('Phone Number') ?>
+                    <?= $form->field($model, 'owner_number')->input('number')->label('Phone Number *') ?>
                 </div>
             </div>
 
@@ -93,7 +93,7 @@ $this->registerJs($js);
                 <div class="col-12">
 
                     <?=
-                    $form->field($model, 'owner_identification_file')->fileinput(['name' => 'identification_file', 'class' => 'files', 'required' => true])->label('Upload National ID (front and back side)');
+                    $form->field($model, 'owner_identification_file')->fileinput(['name' => 'identification_file', 'class' => 'files', 'required' => true])->label('Upload National ID (front and back side) *');
                     ?>
 
                 </div>
@@ -120,7 +120,7 @@ $this->registerJs($js);
 
                           return $return;
                       }
-                  ]);
+                  ])->label('Vendor Sector *');
                   ?>
 
                 </div>
@@ -140,7 +140,7 @@ $this->registerJs($js);
 
             <div class="row">
                 <div class="col-12 col-sm-6 col-lg-6">
-                    <?= $form->field($model, 'company_name')->textInput(['maxlength' => true]) ?>
+                    <?= $form->field($model, 'company_name')->textInput(['maxlength' => true])->label('Company name *') ?>
                 </div>
 
                 <div class="col-12 col-sm-6 col-lg-6">
@@ -164,7 +164,7 @@ $this->registerJs($js);
                 <div class="col-12">
 
                     <?=
-                    $form->field($model, 'restaurant_authorized_signature_file')->fileinput(['name' => 'authorized_signature', 'class' => 'files'])->label('Authorized Signatory');
+                    $form->field($model, 'restaurant_authorized_signature_file')->fileinput(['name' => 'authorized_signature', 'class' => 'files'])->label('Authorized signatory');
                     ?>
 
                 </div>
@@ -188,7 +188,7 @@ $this->registerJs($js);
 
                 <div class="col-12">
 
-                    <?= $form->field($model, 'iban')->textInput(['maxlength' => true]) ?>
+                    <?= $form->field($model, 'iban')->textInput(['maxlength' => true])->label('IBAN *') ?>
 
                 </div>
 
@@ -211,7 +211,7 @@ $this->registerJs($js);
 
                             return $return;
                         }
-                    ]);
+                    ])->label('Account type *');
                     ?>
 
                 </div>

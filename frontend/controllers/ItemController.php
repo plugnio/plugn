@@ -9,6 +9,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use common\models\Option;
+use common\models\Category;
 use common\models\CategoryItem;
 use common\models\ExtraOption;
 use wbraganca\dynamicform\DynamicFormWidget;
@@ -150,6 +151,9 @@ class ItemController extends Controller
 
         $modelItem = new Item;
         $modelItem->restaurant_uuid = $restaurant_model->restaurant_uuid;
+        $categoryQuery = Category::find()->where(['restaurant_uuid' => $modelItem->restaurant_uuid])->asArray()->all();
+
+
         $modelsOption = [new Option];
         $modelsExtraOption = [[new ExtraOption]];
 
@@ -257,6 +261,7 @@ class ItemController extends Controller
 
         return $this->render('create', [
                     'modelItem' => $modelItem,
+                    'categoryQuery' => $categoryQuery,
                     'modelsOption' => (empty($modelsOption)) ? [new Option] : $modelsOption,
                     'modelsExtraOption' => (empty($modelsExtraOption)) ? [[new ExtraOption]] : $modelsExtraOption,
                     'restaurantUuid' => $restaurant_model->restaurant_uuid
@@ -288,6 +293,8 @@ class ItemController extends Controller
     public function actionUpdate($id, $restaurantUuid)
     {
         $modelItem = $this->findModel($id, $restaurantUuid);
+        $categoryQuery = Category::find()->where(['restaurant_uuid' => $modelItem->restaurant_uuid])->asArray()->all();
+
         $modelsOption = $modelItem->getOptions()->all();
         $modelsExtraOption = [];
         $oldExtraOptions = [];
@@ -430,6 +437,7 @@ class ItemController extends Controller
 
         return $this->render('update', [
                     'modelItem' => $modelItem,
+                    'categoryQuery' => $categoryQuery,
                     'modelsOption' => (empty($modelsOption)) ? [new Option] : $modelsOption,
                     'modelsExtraOption' => (empty($modelsExtraOption)) ? [[new ExtraOption]] : $modelsExtraOption,
                     'restaurantUuid' => $restaurantUuid

@@ -36,6 +36,9 @@ class CronController extends \yii\console\Controller {
 
         foreach ($restaurants as  $restaurant) {
           if($restaurant){
+
+            $restaurant->restaurant_domain = str_replace("http://", "https://", $restaurant->restaurant_domain);
+
             $restaurant->company_name = $restaurant->name;
             $restaurant->has_deployed = 1;
 

@@ -112,7 +112,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['owner_first_name', 'owner_last_name', 'owner_email', 'owner_number'], 'required', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             [
                 [
-                    'vendor_sector', 'iban',
+                    'vendor_sector', 'iban', 'company_name', 'business_type'
                     // 'owner_identification_file',
                 ],
                 'required', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT
@@ -170,7 +170,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['phone_number'], 'integer'],
             [['restaurant_email_notification', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable'], 'integer'],
             ['restaurant_email', 'email'],
-            [['restaurant_uuid'], 'unique'],
+            [['restaurant_uuid', 'restaurant_domain', 'name'], 'unique'],
             [['tap_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => TapQueue::className(), 'targetAttribute' => ['tap_queue_id' => 'tap_queue_id']]
         ];
     }
@@ -203,7 +203,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             'restaurant_updated_at' => 'Store Updated At',
             'armada_api_key' => 'Armada Api Key',
             'armada_branch_id' => 'Mashkor Branch ID',
-            'restaurant_email_notification' => 'Email Notification',
+            'restaurant_email_notification' => 'Email notification',
             'show_opening_hours' => 'Show Opening hours',
             'phone_number_display' => 'Phone number display',
             'store_branch_name' => 'Branch name',
@@ -213,19 +213,19 @@ class Restaurant extends \yii\db\ActiveRecord {
             'store_layout' => 'Store layout',
             'google_analytics_id' => 'Google Analytics ID',
             'facebook_pixil_id' => 'Facebook Pixil ID',
-            'instagram_url' => 'Instagram Url',
-            'schedule_order' => 'Schedule Order',
-            'schedule_interval' => 'Schedule Interval',
-            'business_type' => 'Account Type',
-            'vendor_sector' => 'Vendor Sector',
-            'license_number' => 'License Number',
+            'instagram_url' => 'Instagram url',
+            'schedule_order' => 'Schedule order',
+            'schedule_interval' => 'Schedule interval',
+            'business_type' => 'Account type',
+            'vendor_sector' => 'Vendor sector',
+            'license_number' => 'License number',
             'owner_identification_file' => 'Civil ID',
 
 
             'authorized_signature_issuing_country' => 'Authorized Signature Issuing Country',
             'authorized_signature_issuing_date' => 'Authorized Signature Issuing Date',
             'authorized_signature_expiry_date' => 'Authorized Signature Expiry Date',
-            'authorized_signature_file' => 'Authorized Signature',
+            'authorized_signature_file' => 'Authorized signature',
             'restaurant_authorized_signature_file' => 'Authorized Signature',
             'authorized_signature_title' => 'Authorized Signature Title',
             'authorized_signature_file_purpose' => 'Authorized Signature File Purpose',
@@ -684,7 +684,15 @@ class Restaurant extends \yii\db\ActiveRecord {
             $this->app_id = 'store.plugn.' . $store_domain;
             $this->restaurant_domain = 'https://' . $store_domain . '.plugn.store';
             $this->store_branch_name = $store_name;
+
+          $isDomainExist = self::find()->where(['restaurant_domain' => $this->restaurant_domain])->exists();
+
+          if($isDomainExist)
+            return  $this->addError('restaurant_domain', 'Another site is already using this domain');
+
+
         }
+
 
 
 

@@ -14,7 +14,7 @@ $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 
-<div class="restaurant-view" style="width: 66.666667%;">
+<div class="restaurant-view">
   <?php if (Yii::$app->session->getFlash('error') != null) { ?>
 
       <div class="alert alert-danger alert-dismissible">

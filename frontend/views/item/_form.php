@@ -103,7 +103,6 @@ $this->registerJs($js);
 
 
     <?php
-    $categoryQuery = Category::find()->where(['restaurant_uuid' => $modelItem->restaurant_uuid])->asArray()->all();
     $categoryArray = ArrayHelper::map($categoryQuery, 'category_id', 'title');
 
     $itemCategoryValues = [];

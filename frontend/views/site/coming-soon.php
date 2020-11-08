@@ -24,8 +24,16 @@ $this->title = $restaurant_model->name;
 
                     </div>
 
-                    <h2 style="padding: 10px 0px 50px;" class="mb-0">Your store will be ready within the next ten minutes. You can refresh this page or wait for our email notifying you of it's creation</h2>
+                    <h3 style="padding: 10px 0px 0px;" class="mb-0">Your store will be ready within the next ten minutes.</h3>
 
+
+                      <p style="padding: 10px 21px 50px;" class="mb-0">
+                        You can refresh this page or wait for our email notifying you of it's creation. In the meantime you can start adding products and customizing your store settings
+                      </p>
+
+                      <div  style="padding: 10px 21px 50px;" class="mb-0">
+                        <?= Html::a('Back to dashboard', ['index', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                     </div>
                 </div>
 
             </div>

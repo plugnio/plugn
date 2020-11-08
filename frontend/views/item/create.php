@@ -17,13 +17,27 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-create">
 
-    <?=
-    $this->render('_form', [
-                    'modelItem' => $modelItem,
-                    'modelsOption' => (empty($modelsOption)) ? [new Option] : $modelsOption,
-                    'modelsExtraOption' => (empty($modelsExtraOption)) ? [[new ExtraOption]] : $modelsExtraOption,
-                    'restaurantUuid' => $restaurantUuid
-    ])
+    <?php
+      if(count($categoryQuery) > 0){
+        echo $this->render('_form', [
+                        'modelItem' => $modelItem,
+                        'modelsOption' => (empty($modelsOption)) ? [new Option] : $modelsOption,
+                        'modelsExtraOption' => (empty($modelsExtraOption)) ? [[new ExtraOption]] : $modelsExtraOption,
+                        'restaurantUuid' => $restaurantUuid
+        ]);
+      } else {
+
+
+          echo'
+          <div class="card">
+            <div style="padding: 50px 0; text-align: center;">'
+          . '     <h4 style="margin-bottom: 30px">You need to first define a category before adding items</h4>'
+          . Html::a('Create category', ['category/create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success'])
+          . '</div>
+          </div>';
+
+        }
+
     ?>
 
 </div>
