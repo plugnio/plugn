@@ -148,7 +148,7 @@ class Subscription extends \yii\db\ActiveRecord {
             \Yii::$app->mailer->compose([
                    'html' => 'premium-upgrade',
                        ], [
-                   'subscription' => $this->subscription,
+                   'subscription' => $this,
                    'store' => $this->restaurant,
                ])
                ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
