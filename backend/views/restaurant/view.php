@@ -38,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
       <?php
 
       if($model->tap_queue_id){
-      echo Html::a('Delete tap queue', ['delete-tap-queue', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary'])
+      echo Html::a('Delete tap queue', ['delete-tap-queue', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']);
       }
 
        ?>
