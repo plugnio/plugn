@@ -65,7 +65,7 @@ class CronController extends \yii\console\Controller {
 
 
         public function actionSiteStatus(){
-          
+
             $restaurants = Restaurant::find()
                           ->where(['has_deployed' => 0])
                           ->all();
@@ -89,7 +89,7 @@ class CronController extends \yii\console\Controller {
                        ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                        ->setTo([$restaurant->restaurant_email])
                        ->setBcc(\Yii::$app->params['supportEmail'])
-                       ->setSubject('Your store' . $this->restaurant->name .' is now ready for use')
+                       ->setSubject('Your store' . $restaurant->name .' is now ready for use')
                        ->send();
 
                   }

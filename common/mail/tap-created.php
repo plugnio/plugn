@@ -240,7 +240,7 @@ $paymentSettingsUrl = Yii::$app->params['frontendUrl'] . '/restaurant/view-payme
       <div
          style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:center;color:#000000;"
       >
-        Hello <?= $store->owner_first_name ?>,
+        Hello <?= $store->owner_first_name ? $store->owner_first_name : $store->name ?>,
       </div>
 
               </td>

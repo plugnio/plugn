@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use common\models\Subscription;
 use common\models\Restaurant;
+use common\models\TapPayments;
 
 
 /* @var $this yii\web\View */
@@ -238,7 +239,7 @@ use common\models\Restaurant;
                                                                                     <div
                                                                                         style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:center;color:#000000;"
                                                                                         >
-                                                                                        Hello <?= $store->owner_first_name ?>,
+                                                                                        Hello <?= $store->owner_first_name ? $store->owner_first_name : $store->name ?>,
                                                                                     </div>
 
                                                                                 </td>
@@ -403,7 +404,7 @@ use common\models\Restaurant;
                                                                                     <div
                                                                                         style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;"
                                                                                         >
-                                                                                        Paid by:  <?= $subscription->subscriptionPayment->payment_mode ?>
+                                                                                        Paid by:  <?= $subscription->subscriptionPayment->payment_mode == TapPayments::GATEWAY_VISA_MASTERCARD ? 'Credit Card' : 'Knet' ?>
                                                                                     </div>
 
                                                                                 </td>

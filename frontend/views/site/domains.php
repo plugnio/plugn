@@ -18,7 +18,12 @@ $this->title = 'Domains';
 
         <div class="card-header">
             <h5>Primary domain</h5>
-            <?= Html::a('Update', ['connect-domain', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+            <?php
+
+              if($restaurant_model->has_deployed)
+                echo Html::a('Update', ['connect-domain', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary'])
+
+             ?>
 
         </div>
 
