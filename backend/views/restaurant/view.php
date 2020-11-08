@@ -35,14 +35,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
     <p>
-      <?php
-
-      if($model->tap_queue_id){
-      echo Html::a('Delete tap queue', ['delete-tap-queue', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']);
-      }
-
-       ?>
-
         <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
         <?=
         Html::a('Delete', ['delete', 'id' => $model->restaurant_uuid], [
@@ -84,11 +76,6 @@ $this->params['breadcrumbs'][] = $this->title;
     DetailView::widget([
         'model' => $model,
         'attributes' => [
-  
-            'authorized_signature_issuing_country',
-            'authorized_signature_file_id',
-            'commercial_license_issuing_country',
-            'commercial_license_file_id',
             'restaurant_uuid',
             [
                 'label' => 'Payment Methods',

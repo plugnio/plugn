@@ -89,7 +89,7 @@ class CronController extends \yii\console\Controller {
                        ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                        ->setTo([$restaurant->restaurant_email])
                        ->setBcc(\Yii::$app->params['supportEmail'])
-                       ->setSubject('Your store ' . $restaurant->name .' is now ready for use')
+                       ->setSubject('Your store ' . $restaurant->name .' is now ready')
                        ->send();
 
                   }
