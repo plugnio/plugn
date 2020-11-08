@@ -88,6 +88,7 @@ $this->registerJs($js);
     ]);
     ?>
 
+    <?= $form->field($model, 'tap_queue_id')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'name_ar')->textInput(['maxlength' => true]) ?>
@@ -188,7 +189,7 @@ $this->registerJs($js);
     <?= $form->field($model, 'custom_css')->textarea(['rows' => '12']) ?>
 
     <?= $form->field($model, 'identification_file_id')->textInput() ?>
-    
+
     <?= $form->field($model, 'business_id')->textInput() ?>
 
     <?= $form->field($model, 'business_entity_id')->textInput() ?>
