@@ -20,7 +20,7 @@ $customDomainUrl = Yii::$app->params['frontendUrl'] . '/site/domains?id=' . $sto
     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
       <head>
         <title>
-          Your store <?= $store->name ?> is now ready for use
+          Your store <?= $store->name ?> is now ready 
         </title>
         <!--[if !mso]><!-- -->
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -257,7 +257,7 @@ $customDomainUrl = Yii::$app->params['frontendUrl'] . '/site/domains?id=' . $sto
       <div
          style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:21px;font-weight:bold;line-height:24px;text-align:center;color:#000000;"
       >
-        Your store <?= $store->name ?> is now ready for use
+        Your store <?= $store->name ?> is now ready 
       </div>
 
               </td>
