@@ -82,7 +82,6 @@ class TapQueue extends \yii\db\ActiveRecord
           \Yii::$app->mailer->compose([
                  'html' => 'tap-created',
                      ], [
-                 'subscription' => $this->subscription,
                  'store' => $this->restaurant,
              ])
              ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
