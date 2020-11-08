@@ -88,7 +88,6 @@ $this->registerJs($js);
     ]);
     ?>
 
-    <?= $form->field($model, 'tap_queue_id')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'name_ar')->textInput(['maxlength' => true]) ?>

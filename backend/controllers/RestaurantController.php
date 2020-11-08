@@ -120,6 +120,18 @@ class RestaurantController extends Controller {
         ]);
     }
 
+
+    public function actionDeleteTapQueue($id){
+      
+      $model = $this->findModel($id);
+      $model->tap_queue_id = null;
+      $model->save(false);
+
+      TapQueue::deleteAll(['restaurant_uuid' =>$model->restaurant_uuid]);
+
+    }
+
+
     /**
      * Creates a new Restaurant model.
      * If creation is successful, the browser will be redirected to the 'view' page.

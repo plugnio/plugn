@@ -35,6 +35,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
     <p>
+      <?= Html::a('Delete tap queue', ['delete-tap-queue', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+
         <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
         <?=
         Html::a('Delete', ['delete', 'id' => $model->restaurant_uuid], [
