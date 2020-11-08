@@ -187,7 +187,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
                  ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                  ->setTo([$paymentRecord->restaurant->restaurant_email])
                  ->setBcc(\Yii::$app->params['supportEmail'])
-                 ->setSubject('Your store'. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription_model->plan->name)
+                 ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription_model->plan->name)
                  ->send();
 
 
