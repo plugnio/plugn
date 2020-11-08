@@ -84,6 +84,11 @@ $this->params['breadcrumbs'][] = $this->title;
     DetailView::widget([
         'model' => $model,
         'attributes' => [
+  
+            'authorized_signature_issuing_country',
+            'authorized_signature_file_id',
+            'commercial_license_issuing_country',
+            'commercial_license_file_id',
             'restaurant_uuid',
             [
                 'label' => 'Payment Methods',
