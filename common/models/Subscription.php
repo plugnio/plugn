@@ -143,7 +143,7 @@ class Subscription extends \yii\db\ActiveRecord {
           $restaurant_model->save(false);
 
 
-          if($this->plan->valid_for > 0){
+          if($this->plan->valid_for > 0 && $subscription->subscriptionPayment){
 
             \Yii::$app->mailer->compose([
                    'html' => 'premium-upgrade',
