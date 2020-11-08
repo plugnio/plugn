@@ -176,6 +176,22 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
             $subscription_model = $paymentRecord->subscription;
             $subscription_model->subscription_status = Subscription::STATUS_ACTIVE;
             $subscription_model->save(false);
+
+
+              \Yii::$app->mailer->compose([
+                     'html' => 'premium-upgrade',
+                         ], [
+                     'subscription' => $subscription_model,
+                     'store' => $paymentRecord->restaurant,
+                 ])
+                 ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                 ->setTo([$paymentRecord->restaurant->restaurant_email])
+                 ->setBcc(\Yii::$app->params['supportEmail'])
+                 ->setSubject('Your store'. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription_model->plan->name)
+                 ->send();
+
+
+
         }
 
         if ($isError) {
@@ -188,30 +204,6 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         return $paymentRecord;
     }
 
-
-    public function beforeSave($insert) {
-
-    
-        if(!$insert && $this->payment_current_status == 'CAPTURED'){
-
-
-            \Yii::$app->mailer->compose([
-                   'html' => 'premium-upgrade',
-                       ], [
-                   'subscription' => $this->subscription,
-                   'store' => $this->restaurant,
-               ])
-               ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-               ->setTo([$this->restaurant->restaurant_email])
-               ->setBcc(\Yii::$app->params['supportEmail'])
-               ->setSubject('Your store'. $this->restaurant->name . ' has been upgraded to our Premium Plan')
-               ->send();
-
-
-        }
-
-        return parent::beforeSave($insert);
-    }
 
     /**
      * @return \yii\db\ActiveQuery

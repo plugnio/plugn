@@ -225,8 +225,6 @@ class TapPayments extends Component
                     [
                         "type" => "Identity Card",
                         "issuing_country" => $restaurant->identification_issuing_country,
-                        "issuing_date" => $restaurant->identification_issuing_date,
-                        "expiry_date" => $restaurant->identification_expiry_date,
                         "images" => [
                             $restaurant->identification_file_id
                         ]
@@ -251,12 +249,8 @@ class TapPayments extends Component
 
         if (
                 $restaurant->authorized_signature_issuing_country &&
-                $restaurant->authorized_signature_issuing_date &&
-                $restaurant->authorized_signature_expiry_date &&
                 $restaurant->authorized_signature_file_id &&
                 $restaurant->commercial_license_issuing_country &&
-                $restaurant->commercial_license_issuing_date &&
-                $restaurant->commercial_license_expiry_date &&
                 $restaurant->commercial_license_file_id
         ) {
             $authorizedSignatureDocument = [

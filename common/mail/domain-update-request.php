@@ -108,8 +108,9 @@ Hello Big Boss,  <br/><br/>
           <tr>
             <td style="width:100px;">
 
-      <img height="auto" src="../img/logo-plugn.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;" width="100">
-
+            <img
+               height="auto" src="https://res.cloudinary.com/plugn/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max/restaurants/rest_1d40a718-beac-11ea-808a-0673128d0c9c/logo/R1wBpdQU4GBF_eT0FL89A0bNUFr_ZOJJ.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;" width="100"
+            />
             </td>
           </tr>
         </tbody>

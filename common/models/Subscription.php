@@ -142,23 +142,6 @@ class Subscription extends \yii\db\ActiveRecord {
 
           $restaurant_model->save(false);
 
-
-          if($this->plan->valid_for > 0 && $subscription->subscriptionPayment){
-
-            \Yii::$app->mailer->compose([
-                   'html' => 'premium-upgrade',
-                       ], [
-                   'subscription' => $this,
-                   'store' => $this->restaurant,
-               ])
-               ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-               ->setTo([$this->restaurant->restaurant_email])
-               ->setBcc(\Yii::$app->params['supportEmail'])
-               ->setSubject('Your store'. $this->restaurant->name . ' has been upgraded to our Premium Plan')
-               ->send();
-
-          }
-
         }
 
 
