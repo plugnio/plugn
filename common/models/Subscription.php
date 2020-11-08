@@ -72,7 +72,7 @@ class Subscription extends \yii\db\ActiveRecord {
                 'createdAtAttribute' => 'subscription_start_at',
                 'updatedAtAttribute' => false,
                 'value' => function() {
-      
+
                     if (!$this->subscription_start_at)
                         $this->subscription_start_at = new \yii\db\Expression('NOW()');
 
@@ -141,6 +141,24 @@ class Subscription extends \yii\db\ActiveRecord {
           $restaurant_model->platform_fee = $this->plan->platform_fee;
 
           $restaurant_model->save(false);
+
+
+          if($this->plan->valid_for > 0){
+
+            \Yii::$app->mailer->compose([
+                   'html' => 'premium-upgrade',
+                       ], [
+                   'subscription' => $this->subscription,
+                   'store' => $this->restaurant,
+               ])
+               ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+               ->setTo([$this->restaurant->restaurant_email])
+               ->setBcc(\Yii::$app->params['supportEmail'])
+               ->setSubject('Your store'. $this->restaurant->name . ' has been upgraded to our Premium Plan')
+               ->send();
+
+          }
+
         }
 
 

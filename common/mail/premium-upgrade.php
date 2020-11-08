@@ -423,21 +423,22 @@ use common\components\TapPayments;
 
                                                                                 </td>
                                                                             </tr>
+                                                                            <?php
+                                                                              if($subscription->subscriptionPayment->payment_gateway_order_id ){ ?>
+                                                                                  <tr>
+                                                                                      <td
+                                                                                          align="left" style="font-size:0px;padding:10px 25px;padding-top:0;padding-bottom:0;word-break:break-word;"
+                                                                                          >
 
-                                                                            <tr>
-                                                                                <td
-                                                                                    align="left" style="font-size:0px;padding:10px 25px;padding-top:0;padding-bottom:0;word-break:break-word;"
-                                                                                    >
+                                                                                          <div
+                                                                                              style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;"
+                                                                                              >
+                                                                                              Ref: <?= $subscription->subscriptionPayment->payment_gateway_order_id ?>
+                                                                                          </div>
 
-                                                                                    <div
-                                                                                        style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;"
-                                                                                        >
-                                                                                        Ref: <?= $subscription->subscriptionPayment->payment_gateway_order_id ?>
-                                                                                    </div>
-
-                                                                                </td>
-                                                                            </tr>
-
+                                                                                      </td>
+                                                                                  </tr>
+                                                                            <?php } ?>
                                                                             <tr>
                                                                                 <td
                                                                                     align="left" style="font-size:0px;padding:10px 25px;padding-top:0;padding-bottom:0;word-break:break-word;"
