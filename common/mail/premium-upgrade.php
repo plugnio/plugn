@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use common\models\Subscription;
 use common\models\Restaurant;
-use common\models\TapPayments;
+use common\components\TapPayments;
 
 
 /* @var $this yii\web\View */
