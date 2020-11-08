@@ -32,14 +32,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <?php $form = ActiveForm::begin(['id' => 'store-form', 'enableClientScript' => false]); ?>
 
 
-                                <?= $form->field($agent_model, 'agent_name')->textInput(['maxlength' => true])->label('Name') ?>
+                                <?= $form->field($agent_model, 'agent_name')->textInput(['maxlength' => true])->label('Your name *') ?>
 
-                                <?= $form->field($agent_model, 'agent_email')->textInput(['maxlength' => true,'type' => 'email'])->label('Email') ?>
+                                <?= $form->field($agent_model, 'agent_email')->textInput(['maxlength' => true,'type' => 'email'])->label('Email *') ?>
 
 
-                                <?= $form->field($store_model, 'name')->textInput(['maxlength' => true])->label('Your store name in English') ?>
+                                <?= $form->field($store_model, 'name')->textInput(['maxlength' => true])->label('Your store name in English *') ?>
 
-                                <?= $form->field($store_model, 'name_ar')->textInput(['maxlength' => true])->label('Your store name in Arabic') ?>
+                                <?= $form->field($store_model, 'name_ar')->textInput(['maxlength' => true])->label('Your store name in Arabic *') ?>
 
                                 <?=
                                 $form->field($store_model, 'restaurant_domain', [
@@ -50,15 +50,18 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 <span class='input-group-text' id='basic-addon2'>.plugn.store</span>
                                             </div>
                                        "
-                                    . "</div>"
+                                    . "</div>
+
+                                    <small>You can connect a domain once your account is created</small>
+                                    "
                                     . "{error}{hint}"
                                 ])->textInput([
                                     'class' => 'form-control'
-                                ])->label('Store URL')
+                                ])->label('Store URL *')
                                 ?>
 
 
-                                <?= $form->field($agent_model, 'tempPassword')->passwordInput(['maxlength' => true]) ?>
+                                <?= $form->field($agent_model, 'tempPassword')->passwordInput(['maxlength' => true])->label('Password *') ?>
 
 
                                 <?= Html::a('Login', ['site/login'], ['class' => 'btn btn-outline-primary float-left btn-inline mb-50']) ?>

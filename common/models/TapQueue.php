@@ -77,6 +77,21 @@ class TapQueue extends \yii\db\ActiveRecord
           }
         }
 
+        if ($this->queue_status == self::QUEUE_STATUS_COMPLETE) {
+
+          \Yii::$app->mailer->compose([
+                 'html' => 'tap-created',
+                     ], [
+                 'subscription' => $this->subscription,
+                 'store' => $this->restaurant,
+             ])
+             ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+             ->setTo([$this->restaurant->restaurant_email])
+             ->setBcc(\Yii::$app->params['supportEmail'])
+             ->setSubject('Your store'. $this->restaurant->name . ' has been upgraded to our Premium Plan')
+             ->send();
+        }
+
 
       return parent::afterSave($insert, $changedAttributes);
 

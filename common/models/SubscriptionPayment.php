@@ -191,19 +191,20 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
     public function beforeSave($insert) {
 
-        //TODO
+    
         if(!$insert && $this->payment_current_status == 'CAPTURED'){
 
 
             \Yii::$app->mailer->compose([
-                   'html' => 'plan-upgraded',
+                   'html' => 'premium-upgrade',
                        ], [
                    'subscription' => $this->subscription,
                    'store' => $this->restaurant,
                ])
-               ->setFrom([\Yii::$app->params['supportEmail']])
-               ->setTo([$this->restaurant->restaurant_email, \Yii::$app->params['supportEmail']])
-               ->setSubject('Your store was successfully upgraded')
+               ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+               ->setTo([$this->restaurant->restaurant_email])
+               ->setBcc(\Yii::$app->params['supportEmail'])
+               ->setSubject('Your store'. $this->restaurant->name . ' has been upgraded to our Premium Plan')
                ->send();
 
 

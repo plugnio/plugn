@@ -9,7 +9,7 @@ $config = [
         'urlManager' => [
             'class' => 'yii\web\UrlManager',
             'baseUrl' => 'https://dashboard.dev.plugn.io',
-            'enablePrettyUrl' => false,
+            'enablePrettyUrl' => true,
             'showScriptName' => false,
         ],
     ],

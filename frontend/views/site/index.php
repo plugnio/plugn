@@ -9,7 +9,7 @@ use yii\grid\GridView;
 /* @var $this yii\web\View */
 
 $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
-//$this->title = $restaurant_model->name;
+$this->title = 'Dashboard';
 
 
 $js = "
@@ -431,7 +431,7 @@ $this->registerJs($js);
                     <div>
                         <h3><span>Strengthen your brand with a custom domain</span></h3>
                     </div>
-                    <p>Your current domain is stoer-name.myshopify.com but you can add a custom domain to help customers find your online store.</p>
+                    <p>Your current domain is <?= $restaurant_model->restaurant_domain ?> but you can add a custom domain to help customers find your online store.</p>
                     <div>
                         <div>
                             <div>

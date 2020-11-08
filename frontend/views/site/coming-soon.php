@@ -10,6 +10,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 
 $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->title = $restaurant_model->name;
 ?>
 
 <section>
@@ -23,7 +24,7 @@ $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
 
                     </div>
 
-                    <h2 style="padding: 10px 0px 50px;" class="mb-0">Your store will be ready in 5 minutes</h2>
+                    <h2 style="padding: 10px 0px 50px;" class="mb-0">Your store will be ready within the next ten minutes. You can refresh this page or wait for our email notifying you of it's creation</h2>
 
                 </div>
 
