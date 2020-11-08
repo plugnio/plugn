@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use Yii;
 use backend\models\Restaurant;
+use common\models\TapQueue;
 use backend\models\RestaurantSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -122,7 +123,7 @@ class RestaurantController extends Controller {
 
 
     public function actionDeleteTapQueue($id){
-      
+
       $model = $this->findModel($id);
       $model->tap_queue_id = null;
       $model->save(false);
