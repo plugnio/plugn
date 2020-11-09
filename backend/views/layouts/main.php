@@ -48,12 +48,26 @@ AppAsset::register($this);
             ['label' => 'Cities', 'url' => ['/city/index']],
             ['label' => 'Areas', 'url' => ['/area/index']],
             ['label' => 'Agent Assignment', 'url' => ['/agent-assignment/index']],
-            ['label' => 'Payments Method', 'url' => ['/payment-method/index']],
             ['label' => 'Restaurants', 'url' => ['/restaurant/index']],
-            ['label' => 'Plans', 'url' => ['/plan/index']],
+
             ['label' => 'Subscription', 'url' => ['/subscription/index']],
-            ['label' => 'Bank', 'url' => ['/bank/index']],
-            ['label' => 'Queue', 'url' => ['/queue/index']]
+
+
+
+            [
+            'label' => 'Other',
+                'items' => [
+                  ['label' => 'Country', 'url' => ['/country/index']],
+                  ['label' => 'Currency', 'url' => ['/currency/index']],
+                  ['label' => 'Plans', 'url' => ['/plan/index']],
+                  ['label' => 'Bank', 'url' => ['/bank/index']],
+                  ['label' => 'Queue', 'url' => ['/queue/index']],
+                  ['label' => 'Payments Method', 'url' => ['/payment-method/index']],
+                  
+                ],
+            ],
+
+
         ];
 
         $menuItems[] = '<li>'

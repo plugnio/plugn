@@ -196,7 +196,7 @@ use common\models\BankDiscount;
                                                                                                     <?php } ?>
                                                                                                 </td>
                                                                                                 <td style="color:#828585; padding-top:10px; text-align: right; vertical-align:top;width: 80px;">
-                                                                                                    <?= \Yii::$app->formatter->asCurrency($orderItem->calculateOrderItemPrice()); ?>
+                                                                                                    <?= \Yii::$app->formatter->asCurrency($orderItem->calculateOrderItemPrice(), $orderItem->currency->code); ?>
                                                                                                 </td>
                                                                                             </tr>
                                                                                         <?php } ?>
@@ -209,7 +209,7 @@ use common\models\BankDiscount;
                                                                                                 <p style="margin:0;padding:0;">Subtotal</p>
                                                                                             </td>
                                                                                             <td style="color:#828585;padding-top:40px; text-align: right; vertical-align:top;">
-                                                                                                <?= \Yii::$app->formatter->asCurrency($order->subtotal) ?>
+                                                                                                <?= \Yii::$app->formatter->asCurrency($order->subtotal, $order->currency->code) ?>
                                                                                             </td>
                                                                                         </tr>
 
@@ -223,7 +223,7 @@ use common\models\BankDiscount;
                                                                                                     <p style="margin:0;padding:0;">Voucher Discount (<?= $order->voucher->code ?>)</p>
                                                                                                 </td>
                                                                                                 <td style="color:#828585; text-align: right; vertical-align:top;">
-                                                                                                    -<?= Yii::$app->formatter->asCurrency($voucherDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                                                                                                    -<?= Yii::$app->formatter->asCurrency($voucherDiscount, $order->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
                                                                                                 </td>
                                                                                             </tr>
 
@@ -234,7 +234,7 @@ use common\models\BankDiscount;
                                                                                                 </td>
 
                                                                                                 <td style="color:#828585; text-align: right; vertical-align:top;">
-                                                                                                    <?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                                                                                                    <?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, $order->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
                                                                                                 </td>
                                                                                             </tr>
 
@@ -249,7 +249,7 @@ use common\models\BankDiscount;
                                                                                                     <p style="margin:0;padding:0;">Bank Discount</p>
                                                                                                 </td>
                                                                                                 <td style="color:#828585; text-align: right; vertical-align:top;">
-                                                                                                    -<?= Yii::$app->formatter->asCurrency($bankDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                                                                                                    -<?= Yii::$app->formatter->asCurrency($bankDiscount, $order->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
                                                                                                 </td>
                                                                                             </tr>
 
@@ -261,7 +261,7 @@ use common\models\BankDiscount;
                                                                                                 </td>
 
                                                                                                 <td style="color:#828585; text-align: right; vertical-align:top;">
-                                                                                                    <?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                                                                                                    <?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, $order->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
                                                                                                 </td>
                                                                                             </tr>
                                                                                         <?php }
@@ -275,7 +275,7 @@ use common\models\BankDiscount;
                                                                                                     <p style="margin:0;padding:0;">Delivery fee</p>
                                                                                                 </td>
                                                                                                 <td style="color:#828585;padding-top:0px; text-align: right; vertical-align:top;">
-                                                                                                    <?= \Yii::$app->formatter->asCurrency($order->delivery_fee) ?>
+                                                                                                    <?= \Yii::$app->formatter->asCurrency($order->delivery_fee,$order->currency->code) ?>
                                                                                                 </td>
                                                                                             </tr>
 
@@ -286,7 +286,7 @@ use common\models\BankDiscount;
                                                                                                         <p style="margin:0;padding:0;">Voucher Discount (<?= $order->voucher->code ?>)</p>
                                                                                                     </td>
                                                                                                     <td style="color:#828585; text-align: right; vertical-align:top;">
-                                                                                                        -<?= Yii::$app->formatter->asCurrency($order->delivery_fee, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                                                                                                        -<?= Yii::$app->formatter->asCurrency($order->delivery_fee,$order->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
                                                                                                     </td>
                                                                                                 </tr>
 
@@ -296,7 +296,7 @@ use common\models\BankDiscount;
                                                                                                         <p style="margin:0;padding:0;">Delivery fee After Voucher</p>
                                                                                                     </td>
                                                                                                     <td style="color:#828585; text-align: right; vertical-align:top;">
-                                                                                                        <?= Yii::$app->formatter->asCurrency(0, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                                                                                                        <?= Yii::$app->formatter->asCurrency(0, $order->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
                                                                                                     </td>
                                                                                                 </tr>
 
@@ -314,7 +314,7 @@ use common\models\BankDiscount;
                                                                                                 <p style="margin:0;padding:0;">Total</p>
                                                                                             </td>
                                                                                             <td style="font-size:23px; padding: 0 15px 0 0; padding-top:30px; text-align: right; vertical-align:top;">
-                                                                                                <?= \Yii::$app->formatter->asCurrency($order->total_price) ?>
+                                                                                                <?= \Yii::$app->formatter->asCurrency($order->total_price,$order->currency->code) ?>
                                                                                             </td>
                                                                                         </tr>
                                                                                     </table>

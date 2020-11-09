@@ -175,6 +175,16 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Gets query for [[Currency]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+    }
+    
+    /**
      * Gets query for [[ExtraOption]].
      *
      * @return \yii\db\ActiveQuery

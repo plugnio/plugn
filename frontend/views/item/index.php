@@ -106,7 +106,12 @@ $this->registerJs($js);
                 ],
                 'unit_sold',
                 'sort_number',
-                'item_price:currency',
+                [
+                    'attribute' => 'item_price',
+                    "value" => function($data) {
+                            return Yii::$app->formatter->asCurrency($data->item_price, $data->currency->code);
+                    },
+                ],
                 [
                     'attribute' => 'item_status',
                     "format" => "raw",

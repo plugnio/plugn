@@ -20,6 +20,8 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'restaurant_name') ?>
 
     <?= $form->field($model, 'plan_name') ?>
+    
+    <?= $form->field($model, 'subscription_status') ?>
 
     <?= $form->field($model, 'subscription_start_at')->textInput(['type' => 'date']) ?>
 

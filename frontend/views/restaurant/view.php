@@ -31,6 +31,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         'name_ar',
                         'tagline',
                         'tagline_ar',
+                        'country.country_name',
+                        [
+                            'label' => 'Store currency',
+                            'value' => function ($data) {
+                              return $data->currency->title;
+                            }
+                        ],
                         [
                             'label' => 'Support Delivery',
                             'value' => function ($data) {

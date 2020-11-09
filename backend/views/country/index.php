@@ -4,18 +4,18 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel common\models\PlanSearch */
+/* @var $searchModel backend\models\CountrySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Plans';
+$this->title = 'Countries';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="plan-index">
+<div class="country-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Plan', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Country', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -25,15 +25,8 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-            'name',
-            [
-                'attribute' => 'price',
-                "value" => function($data) {
-                        return Yii::$app->formatter->asCurrency($data->price, 'KWD');
-                },
-            ],
-            'valid_for',
-            'platform_fee:percent',
+            'country_name',
+            'country_code',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

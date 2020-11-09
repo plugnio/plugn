@@ -11,13 +11,18 @@ use common\models\Restaurant;
  */
 class RestaurantSearch extends Restaurant
 {
+
+    public $country_name;
+    public $currency_title;
+
+
     /**
      * {@inheritdoc}
      */
      public function rules()
      {
          return [
-             [['restaurant_uuid', 'name', 'name_ar' ,'app_id',  'restaurant_email', 'restaurant_created_at', 'restaurant_updated_at','restaurant_domain'], 'safe'],
+             [['restaurant_uuid', 'name', 'name_ar' ,'app_id',  'restaurant_email', 'restaurant_created_at', 'restaurant_updated_at','restaurant_domain', 'country_name', 'currency_title'], 'safe'],
              [['restaurant_status'], 'integer'],
              [['platform_fee'], 'number'],
          ];
@@ -43,13 +48,27 @@ class RestaurantSearch extends Restaurant
      */
     public function search($params)
     {
-        $query = Restaurant::find();
+        $query = Restaurant::find()->joinWith(['country', 'currency']);
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
+
+
+        $dataProvider->sort->attributes['country_name'] = [
+            'asc' => ['country.country_name' => SORT_ASC],
+            'desc' => ['country.country_name' => SORT_DESC],
+        ];
+
+
+        $dataProvider->sort->attributes['currency_title'] = [
+            'asc' => ['currency.title' => SORT_ASC],
+            'desc' => ['currency.title' => SORT_DESC],
+        ];
+
+
 
         $this->load($params);
 
@@ -68,7 +87,11 @@ class RestaurantSearch extends Restaurant
         $query->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
             ->andFilterWhere(['like', 'restaurant_domain', $this->restaurant_domain])
             ->andFilterWhere(['like', 'name', $this->name])
+            ->andFilterWhere(['like', 'currency.title', $this->currency_title])
+            ->andFilterWhere(['like', 'country.country_name', $this->country_name])
             ->andFilterWhere(['like', 'name_ar', $this->name_ar]);
+
+
 
         return $dataProvider;
     }

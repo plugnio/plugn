@@ -81,7 +81,7 @@ class Customer extends \yii\db\ActiveRecord {
     public function getOrders() {
         return $this->hasMany(Order::className(), ['customer_id' => 'customer_id']);
     }
-    
+
     /**
      * Gets query for [[CustomerVouchers]].
      *
@@ -91,7 +91,7 @@ class Customer extends \yii\db\ActiveRecord {
     {
         return $this->hasMany(CustomerVoucher::className(), ['customer_id' => 'customer_id']);
     }
-    
+
     /**
      * Gets query for [[Orders]].
      *
@@ -101,4 +101,15 @@ class Customer extends \yii\db\ActiveRecord {
         return $this->hasMany(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    /**
+     * Gets query for [[Currency]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+    }
+
+    
 }

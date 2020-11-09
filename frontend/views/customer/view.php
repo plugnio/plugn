@@ -114,8 +114,18 @@ $this->params['breadcrumbs'][] = $this->title;
                                   return '<span class="badge bg-danger" >' . $model->orderStatusInEnglish . '</span>';
                           }
                       ],
-                      'delivery_fee:currency',
-                      'total_price:currency',
+                      [
+                          'attribute' => 'delivery_fee',
+                          "value" => function($data) {
+                                  return Yii::$app->formatter->asCurrency($data->delivery_fee, $data->currency->code);
+                          },
+                      ],
+                      [
+                          'attribute' => 'total_price',
+                          "value" => function($data) {
+                                  return Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code);
+                          },
+                      ],
                       [
                           'attribute' => 'order_created_at',
                           "format" => "raw",

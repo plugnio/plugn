@@ -49,30 +49,6 @@ class ItemController extends Controller
         ];
     }
 
-    public function actionExportToExcel($restaurantUuid)
-    {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
-
-        $model = Item::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->all();
-
-        header('Access-Control-Allow-Origin: *');
-        header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        header("Content-Disposition: attachment;filename=\"products.xlsx\"");
-        header("Cache-Control: max-age=0");
-
-
-        \moonland\phpexcel\Excel::export([
-            'isMultipleSheet' => false,
-            'models' => $model,
-            'columns' => [
-                'item_name',
-                'stock_qty',
-                'unit_sold',
-                'item_price:currency'
-            ],
-        ]);
-    }
-
     /**
      * Lists all Item models.
      * @return mixed

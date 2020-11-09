@@ -28,7 +28,14 @@ $this->params['breadcrumbs'][] = $this->title;
             'restaurant_uuid',
             'name',
             'restaurant_domain',
-            'app_id',
+            [
+              'attribute' => 'country_name',
+              'value' =>     'country.country_name'
+            ],
+            [
+              'attribute' => 'currency_title',
+              'value' =>     'currency.title'
+            ],
             'store_branch_name',
             'restaurant_created_at:datetime',
             'platform_fee:percent',
