@@ -228,9 +228,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 <p style="color: black;">
                     Payments that are processed outside your online store. When a customer makes a manual payment, you need to approve their order before fulfilling.
                 </p>
-                <?= Html::a($isCashOnDeliveryEnabled ? 'Disable' : 'Enable', [$isCashOnDeliveryEnabled ? 'disable-cod' : 'enable-cod', 'restaurantUuid' => $model->restaurant_uuid], ['class' => $isCashOnDeliveryEnabled ? 'btn btn-danger' : 'btn btn-success',
+                <?= Html::a($isCashOnDeliveryEnabled ? 'Disable cash on delivery' : 'Enable cash on delivery', [$isCashOnDeliveryEnabled ? 'disable-cod' : 'enable-cod', 'restaurantUuid' => $model->restaurant_uuid], ['class' => $isCashOnDeliveryEnabled ? 'btn btn-danger' : 'btn btn-success',
                 'data' => [
-                          'confirm' => $isCashOnDeliveryEnabled ? 'Are you sure you want to disable cash?' : 'Are you sure you want to enable cash?',
+                          'confirm' => $isCashOnDeliveryEnabled ? 'Are you sure you want to disable cash on delivery?' : 'Are you sure you want to enable cash on delivery?',
                           'method' => 'post',
                       ]
                 ]) ?>

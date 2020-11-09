@@ -48,13 +48,22 @@ $( window ).on( 'load', function() {
 });
 
 let businessTypeInput = $('#businessTypeInput');
+let companyName = $('#company_name')[0];
 businessTypeInput.change(function(e){
 	let selection = businessTypeInput.is(':checked');
 
-	if (e.target.defaultValue == 'corp')
-		$('#legal_info').show();
-	else
+
+	if (e.target.defaultValue == 'corp'){
+    companyName.value = '';
+    $('#legal_info').show();
+  }
+
+	else{
+    companyName.value = '$model->name';
+    companyName.placeholder = 'official business name if license available';
 		$('#legal_info').hide();
+  }
+
 });
 
 
@@ -107,7 +116,7 @@ $this->registerJs($js);
 
             <div class="row">
               <div class="col-12 col-sm-6 col-lg-6">
-                  <?= $form->field($model, 'company_name')->textInput(['maxlength' => true])->label('Business name *') ?>
+                  <?= $form->field($model, 'company_name')->textInput(['maxlength' => true, 'value' => $model->name, 'id' => 'company_name'])->label('Business name *') ?>
               </div>
                 <div class="col-12 col-sm-6 col-lg-6">
 
