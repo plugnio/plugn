@@ -107,7 +107,7 @@ $this->registerJs($js);
 
             <div class="row">
               <div class="col-12 col-sm-6 col-lg-6">
-                  <?= $form->field($model, 'company_name')->textInput(['maxlength' => true])->label('Company name *') ?>
+                  <?= $form->field($model, 'company_name')->textInput(['maxlength' => true])->label('Business name *') ?>
               </div>
                 <div class="col-12 col-sm-6 col-lg-6">
 
