@@ -12,16 +12,16 @@ use yii\helpers\ArrayHelper;
 /* @var $this yii\web\View */
 
 $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
-$this->title = "Confirm " . $selectedPlan->name . " plan";
+$this->title = "Confirm " . $selectedPlan->name;
 
 ?>
 
 
 <section>
 
-  <div class="card" style="  padding-bottom: 3.2rem;text-align: center;width: 80%;  margin: auto; padding-bottom:2.1rem;">
+  <div class="card" style=" padding-bottom:2.1rem;">
     <div class="card-header">
-      <h4>Payment method</h4>
+      <h4>Enjoy lower feed on your online payment collection by upgrading your store to our <?= $selectedPlan->name ?></h4>
     </div>
 
     <div class="card-content">
@@ -60,7 +60,7 @@ $this->title = "Confirm " . $selectedPlan->name . " plan";
 
 
         <div class="form-group">
-            <?= Html::submitButton('Start plan', ['class' => 'btn btn-success', 'style' => '    float: left;']) ?>
+            <?= Html::submitButton('Make Payment ('.  \Yii::$app->formatter->asCurrency($selectedPlan->price) .')', ['class' => 'btn btn-success', 'style' => '    float: left;']) ?>
         </div>
 
         <?php ActiveForm::end();  ?>

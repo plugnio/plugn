@@ -49,7 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
         padding: 24px;
         margin: 24px;
     }
-    
+
     .payment-method-icon{
       margin-right: 5px;
     }
@@ -97,7 +97,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <tr>
                             <th style="border-top: none !important;"></th>
                             <th style="border-top: none !important;"></th>
-                            <th class="<?= $model->plan->plan_id == 2 ? 'current-plan' : 'premium-plan' ?>"><?= $model->plan->plan_id == 2 ? 'Current plan' : Html::a('Upgrade to premium', ['site/compare-plan', 'id' => $model->restaurant_uuid], ['style' => 'color: #4CAF50;']) ?></th>
+                            <th class="<?= $model->plan->plan_id == 2 ? 'current-plan' : 'premium-plan' ?>"><?= $model->plan->plan_id == 2 ? 'Current plan' : Html::a('Upgrade to premium', ['site/confirm-plan', 'id' => $model->restaurant_uuid, 'selectedPlanId' => 2 ], ['style' => 'color: #4CAF50;']) ?></th>
                             <th class="<?= $model->plan->plan_id == 1 ? 'current-plan' : '' ?>"><?= $model->plan->plan_id == 1 ? 'Current plan' : '' ?></th>
                         </tr>
                     </thead>
