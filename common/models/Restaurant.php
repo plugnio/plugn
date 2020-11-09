@@ -960,6 +960,19 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Gets query for [[Subscriptions]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPlan() {
+
+      return $this->hasOne(Plan::className(), ['plan_id' => 'plan_id'])
+                      ->via('subscriptions', function($query) {
+                          return $query->andWhere(['subscription.subscription_status' => Subscription::STATUS_ACTIVE]);
+                      });
+    }
+
+    /**
      * Gets query for [[RestaurantDeliveryAreas]].
      *
      * @return \yii\db\ActiveQuery
