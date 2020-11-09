@@ -21,6 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
       if(count($categoryQuery) > 0){
         echo $this->render('_form', [
                         'modelItem' => $modelItem,
+                        'categoryQuery' => $categoryQuery,
                         'modelsOption' => (empty($modelsOption)) ? [new Option] : $modelsOption,
                         'modelsExtraOption' => (empty($modelsExtraOption)) ? [[new ExtraOption]] : $modelsExtraOption,
                         'restaurantUuid' => $restaurantUuid

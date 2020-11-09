@@ -42,6 +42,23 @@ $(function () {
 
 
 });
+
+$( window ).on( 'load', function() {
+  $('#legal_info').hide();
+});
+
+let businessTypeInput = $('#businessTypeInput');
+businessTypeInput.change(function(e){
+	let selection = businessTypeInput.is(':checked');
+
+	if (e.target.defaultValue == 'corp')
+		$('#legal_info').show();
+	else
+		$('#legal_info').hide();
+});
+
+
+
 ";
 $this->registerJs($js);
 
@@ -101,6 +118,32 @@ $this->registerJs($js);
             </div>
             <div class="row">
 
+
+                <div class="col-12">
+
+                                      <?=
+                                      $form->field($model, 'business_type')->radioList(['ind' => 'Individual', 'corp' => 'Company',], [
+                                          'style' => 'display:grid',
+                                          'id' => 'businessTypeInput',
+                                          'item' => function($index, $label, $name, $checked, $value) {
+
+                                              $return = '<label class="vs-radio-con">';
+                                              /* -----> */ if ($checked)
+                                                  $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                                              /* -----> */
+                                              else
+                                                  $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                                              $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
+                                              $return .= '<span>' . ucwords($label) . '</span>';
+                                              $return .= '</label>';
+
+                                              return $return;
+                                          }
+                                      ])->label('Account type *');
+                                      ?>
+
+</div>
+
                 <div class="col-12">
 
                   <?=
@@ -129,7 +172,7 @@ $this->registerJs($js);
         </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="legal_info">
         <div class="card-header">
             <h3>Licensed Business</h3>
         </div>
@@ -192,29 +235,6 @@ $this->registerJs($js);
 
                 </div>
 
-                <div class="col-12">
-
-                    <?=
-                    $form->field($model, 'business_type')->radioList(['ind' => 'Individual', 'corp' => 'Company',], [
-                        'style' => 'display:grid',
-                        'item' => function($index, $label, $name, $checked, $value) {
-
-                            $return = '<label class="vs-radio-con">';
-                            /* -----> */ if ($checked)
-                                $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                            /* -----> */
-                            else
-                                $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                            $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
-                            $return .= '<span>' . ucwords($label) . '</span>';
-                            $return .= '</label>';
-
-                            return $return;
-                        }
-                    ])->label('Account type *');
-                    ?>
-
-                </div>
 
 
             </div>
