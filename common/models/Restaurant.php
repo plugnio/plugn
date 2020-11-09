@@ -373,7 +373,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         //Upload Owner civil id
         if ($this->identification_file  && $this->identification_file_purpose && $this->identification_title) {
 
-          $civilIdTmpFile = sys_get_temp_dir() . '/' . $this->commercial_license_file;
+          $civilIdTmpFile = sys_get_temp_dir() . '/' . $this->identification_file;
 
           if(!file_put_contents($civilIdTmpFile, file_get_contents($this->getCivilIdPhoto())))
               return Yii::error('Error reading civil id : ');
