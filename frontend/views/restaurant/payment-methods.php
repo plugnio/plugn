@@ -172,7 +172,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <div class="row">
 
                                     <div class="col-6">
-                                        <p style="margin-bottom: 1px;">Company name</p>
+                                        <p style="margin-bottom: 1px;">Business name</p>
                                         <p style="color: black;"><?= $model->company_name ?></p>
                                     </div>
 
