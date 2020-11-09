@@ -365,6 +365,33 @@ $this->registerJs($js);
 </script>
 <section id="tutorial-card">
 
+
+  <?php if( !$restaurant_model->is_tap_enable ){ ?>
+
+  <div class="card">
+      <div class="card-body">
+          <div class="row">
+              <div class="col-9">
+                  <div>
+                      <h3><span>Looking to accept online payments?</span></h3>
+                  </div>
+                  <p>Set up payment profile to start collecting online payments</p>
+                  <div>
+                      <div>
+                          <div>
+                              <?= Html::a('Set up payments', ['restaurant/view-payment-methods', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+          </div>
+
+      </div>
+  </div>
+
+<?php } ?>
+
   <?php
   if($restaurant_model->getItems()->count() == 0){ ?>
 
@@ -397,6 +424,8 @@ $this->registerJs($js);
 
   <?php } ?>
 
+  <?php
+  if(!$restaurant_model->has_deployed){ ?>
     <div class="card">
         <div class="card-body">
             <div class="row">
@@ -422,7 +451,8 @@ $this->registerJs($js);
 
         </div>
     </div>
-    <?php
+
+      <?php }
     if(str_contains($restaurant_model->restaurant_domain, '.plugn.store') ){ ?>
     <div class="card">
         <div class="card-body">
@@ -478,31 +508,7 @@ $this->registerJs($js);
         </div>
     </div>
 
-    <?php if( !$restaurant_model->is_tap_enable ){ ?>
 
-    <div class="card">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-9">
-                    <div>
-                        <h3><span>Online payments</span></h3>
-                    </div>
-                    <p>Enable and manage your store's payment providers.</p>
-                    <div>
-                        <div>
-                            <div>
-                                <?= Html::a('View payment settings page', ['restaurant/view-payment-methods', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-    </div>
-
-  <?php } ?>
 
 
 
