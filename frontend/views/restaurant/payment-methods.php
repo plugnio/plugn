@@ -79,10 +79,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 Online Payments
             </h3>
 
-            <?php
-            if ($model->is_tap_enable)
-                echo Html::a($isOnlinePaymentEnabled ? 'Disable' : 'Enable', [$isOnlinePaymentEnabled ? 'disable-online-payment' : 'enable-online-payment', 'restaurantUuid' => $model->restaurant_uuid], ['class' => 'btn btn-success'])
-                ?>
 
         </div>
         <div class="card-body">
@@ -199,7 +195,20 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
                     </div>
                 </div>
-            <?php } ?>
+
+
+
+
+            <?php
+
+            echo Html::a($isOnlinePaymentEnabled ? 'Disable online payments' : 'Enable online payments', [$isOnlinePaymentEnabled ? 'disable-online-payment' : 'enable-online-payment', 'restaurantUuid' => $model->restaurant_uuid], ['class' => $isOnlinePaymentEnabled ? 'btn btn-danger' : 'btn btn-success',
+            'data' => [
+                      'confirm' => $isOnlinePaymentEnabled ? 'Are you sure you want to disable online payments?' : 'Are you sure you want to enable online payments?',
+                      'method' => 'post',
+                  ],
+          ]);
+
+          } ?>
         </div>
 
     </div>
@@ -219,7 +228,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 <p style="color: black;">
                     Payments that are processed outside your online store. When a customer makes a manual payment, you need to approve their order before fulfilling.
                 </p>
-                <?= Html::a($isCashOnDeliveryEnabled ? 'Disable' : 'Enable', [$isCashOnDeliveryEnabled ? 'disable-cod' : 'enable-cod', 'restaurantUuid' => $model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+                <?= Html::a($isCashOnDeliveryEnabled ? 'Disable' : 'Enable', [$isCashOnDeliveryEnabled ? 'disable-cod' : 'enable-cod', 'restaurantUuid' => $model->restaurant_uuid], ['class' => $isCashOnDeliveryEnabled ? 'btn btn-danger' : 'btn btn-success',
+                'data' => [
+                          'confirm' => $isCashOnDeliveryEnabled ? 'Are you sure you want to disable cash?' : 'Are you sure you want to enable cash?',
+                          'method' => 'post',
+                      ]
+                ]) ?>
 
             </div>
         </div>

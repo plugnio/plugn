@@ -106,14 +106,18 @@ $this->registerJs($js);
             </div>
 
             <div class="row">
-
-                <div class="col-12">
+              <div class="col-12 col-sm-6 col-lg-6">
+                  <?= $form->field($model, 'company_name')->textInput(['maxlength' => true])->label('Company name *') ?>
+              </div>
+                <div class="col-12 col-sm-6 col-lg-6">
 
                     <?=
                     $form->field($model, 'owner_identification_file')->fileinput(['name' => 'identification_file', 'class' => 'files', 'required' => true])->label('Upload National ID (front and back side) *');
                     ?>
 
                 </div>
+
+
 
             </div>
             <div class="row">
@@ -182,10 +186,6 @@ $this->registerJs($js);
             <p>Enable it if your store operations is formally licensed.</p>
 
             <div class="row">
-                <div class="col-12 col-sm-6 col-lg-6">
-                    <?= $form->field($model, 'company_name')->textInput(['maxlength' => true])->label('Company name *') ?>
-                </div>
-
                 <div class="col-12 col-sm-6 col-lg-6">
                     <?= $form->field($model, 'license_number')->textInput(['maxlength' => true]) ?>
                 </div>
