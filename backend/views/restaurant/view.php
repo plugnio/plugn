@@ -156,7 +156,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'merchant_id',
             'authorized_signature_file_id',
             'commercial_license_file_id',
-            'identification_file_id',
+            'identification_file_id_front_side',
+            'identification_file_id_back_side',
 
             'identification_title',
             'commercial_license_title',

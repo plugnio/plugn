@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use common\models\Agent;
-use backend\models\Restaurant;
+use common\models\Restaurant;
 use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
 use common\models\AgentAssignment;
@@ -65,7 +65,7 @@ $this->registerJs($js);
             ],
         ])->label('Agent');
     ?>
-    
+
     <?=
         $form->field($model, 'restaurant_uuid')->widget(Select2::classname(), [
             'data' => $restaurantArray,
@@ -75,7 +75,7 @@ $this->registerJs($js);
             ],
         ])->label('Restaurant');
     ?>
-    
+
     <?=
         $form->field($model, 'role')->widget(Select2::classname(), [
             'data' => [

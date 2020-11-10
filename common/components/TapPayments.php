@@ -226,7 +226,8 @@ class TapPayments extends Component
                         "type" => "Identity Card",
                         "issuing_country" => $restaurant->identification_issuing_country,
                         "images" => [
-                            $restaurant->identification_file_id
+                            $restaurant->identification_file_id_front_side,
+                            $restaurant->identification_file_id_back_side,
                         ]
                     ]
                 ],

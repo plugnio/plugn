@@ -187,7 +187,9 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'custom_css')->textarea(['rows' => '12']) ?>
 
-    <?= $form->field($model, 'identification_file_id')->textInput() ?>
+    <?= $form->field($model, 'identification_file_id_front_side')->textInput() ?>
+
+    <?= $form->field($model, 'identification_file_id_back_side')->textInput() ?>
 
     <?= $form->field($model, 'business_id')->textInput() ?>
 

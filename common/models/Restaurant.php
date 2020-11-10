@@ -87,13 +87,15 @@ class Restaurant extends \yii\db\ActiveRecord {
     const STORE_LAYOUT_CATEGORY_HALFWIDTH = 6;
     const SCENARIO_CREATE_STORE_BY_AGENT = 'create-by-agent';
     const SCENARIO_CREATE_TAP_ACCOUNT = 'tap_account';
+    const SCENARIO_UPLOAD_STORE_DOCUMENT = 'upload';
 
     public $restaurant_delivery_area;
     public $restaurant_payments_method;
     public $restaurant_logo;
     public $restaurant_thumbnail_image;
     public $date_range_picker_with_time;
-    public $owner_identification_file;
+    public $owner_identification_file_front_side;
+    public $owner_identification_file_back_side;
     public $restaurant_authorized_signature_file;
     public $restaurant_commercial_license_file;
 
@@ -113,17 +115,22 @@ class Restaurant extends \yii\db\ActiveRecord {
             [
                 [
                     'vendor_sector', 'iban', 'company_name', 'business_type'
-                    // 'owner_identification_file',
                 ],
                 'required', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT
             ],
+            [
+                [
+                   'identification_file_front_side', 'identification_file_back_side'
+                ],
+                'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT
+            ],
 
-            // [['restaurant_commercial_license_file', 'restaurant_authorized_signature_file'], 'required', 'when' => function($model) {
-            //     return $model->business_type == 'corp';
-            // }],
+            [['commercial_license_file', 'authorized_signature_file'], 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function($model) {
+                return $model->business_type == 'corp';
+            }],
 
             [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3, 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
-            [['identification_file_id', 'authorized_signature_file_id', 'commercial_license_file_id'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            [['identification_file_id_back_side','identification_file_id_front_side', 'authorized_signature_file_id', 'commercial_license_file_id'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             [['not_for_profit'], 'number'],
             [['authorized_signature_issuing_date', 'authorized_signature_expiry_date', 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             ['owner_email', 'email'],
@@ -137,14 +144,14 @@ class Restaurant extends \yii\db\ActiveRecord {
                     'iban', 'owner_first_name', 'owner_last_name',
                     'owner_email', 'owner_number',
                     'identification_issuing_country', 'identification_issuing_date', 'identification_title',
-                    'identification_expiry_date', 'identification_file', 'identification_file_purpose',
+                    'identification_expiry_date', 'identification_file_back_side', 'identification_file_front_side', 'identification_file_purpose',
                     'business_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
                     'live_api_key', 'test_api_key', 'developer_id', 'live_public_key', 'test_public_key'
                 ],
                 'string', 'max' => 255
             ],
-            [['restaurant_commercial_license_file', 'owner_identification_file'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
-            [['restaurant_authorized_signature_file', 'owner_identification_file'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            [['restaurant_commercial_license_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
+            [['restaurant_authorized_signature_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
             [['name', 'name_ar', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_domain', 'restaurant_email', 'store_branch_name', 'app_id'], 'required', 'on' => 'create'],
             [['name', 'name_ar', 'restaurant_domain'], 'required', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             ['name', 'match', 'pattern' => '/^[a-zA-Z0-9-\s]+$/', 'message' => 'Your store name can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
@@ -219,7 +226,8 @@ class Restaurant extends \yii\db\ActiveRecord {
             'business_type' => 'Account type',
             'vendor_sector' => 'Vendor sector',
             'license_number' => 'License number',
-            'owner_identification_file' => 'Civil ID',
+            'owner_identification_file_front_side' => 'Civil ID Front side',
+            'owner_identification_file_back_side' => 'Civil ID Back side',
 
 
             'authorized_signature_issuing_country' => 'Authorized Signature Issuing Country',
@@ -244,7 +252,8 @@ class Restaurant extends \yii\db\ActiveRecord {
             'identification_issuing_country' => 'Identification Issuing Country',
             'identification_issuing_date' => 'Identification Issuing Date',
             'identification_expiry_date' => 'Identification Expiry Date',
-            'identification_file' => 'Identification File',
+            'identification_file_front_side' => ' National ID File front side',
+            'identification_file_back_side' => ' National ID File back side',
             'identification_title' => 'Identification Title',
             'identification_file_purpose' => 'Identification File Purpose',
 
@@ -330,6 +339,7 @@ class Restaurant extends \yii\db\ActiveRecord {
 
     public function uploadDocumentsToTap() {
 
+
         //Upload Authorized Signature file
         if ($this->authorized_signature_file && $this->authorized_signature_issuing_country && $this->authorized_signature_file_purpose && $this->authorized_signature_title) {
 
@@ -340,10 +350,11 @@ class Restaurant extends \yii\db\ActiveRecord {
 
             $response = Yii::$app->tapPayments->uploadFileToTap($tmpFile, $this->authorized_signature_file_purpose ,$this->authorized_signature_title);
 
-            if ($response->isOk){
+            @unlink($tmpFile);
+
+
+            if ($response->isOk)
               $this->authorized_signature_file_id = $response->data['id'];
-              @unlink($tmpFile);
-            }
 
             else
                 return Yii::error('Error when uploading authorized signature document: ' . json_encode($response->data));
@@ -361,51 +372,92 @@ class Restaurant extends \yii\db\ActiveRecord {
             $response = Yii::$app->tapPayments->uploadFileToTap(
                     $commercialLicenseTmpFile, $this->commercial_license_file_purpose, $this->commercial_license_title);
 
-            if ($response->isOk){
+            @unlink($commercialLicenseTmpFile);
+
+            if ($response->isOk)
                 $this->commercial_license_file_id = $response->data['id'];
-                @unlink($commercialLicenseTmpFile);
-            }
 
             else
                 return Yii::error('Error when uploading commercial license document: ' . json_encode($response->data));
         }
 
-        //Upload Owner civil id
-        if ($this->identification_file  && $this->identification_file_purpose && $this->identification_title) {
+        //Upload Owner civil id front side
+        if ($this->identification_file_front_side  && $this->identification_file_purpose && $this->identification_title) {
 
-          $civilIdTmpFile = sys_get_temp_dir() . '/' . $this->identification_file;
+          $civilIdFrontSideTmpFile = sys_get_temp_dir() . '/' . $this->identification_file_front_side;
 
-          if(!file_put_contents($civilIdTmpFile, file_get_contents($this->getCivilIdPhoto())))
-              return Yii::error('Error reading civil id : ');
+          if(!file_put_contents($civilIdFrontSideTmpFile, file_get_contents($this->getCivilIdFrontSidePhoto())))
+              return Yii::error('Error reading civil id (front side): ');
 
 
             $response = Yii::$app->tapPayments->uploadFileToTap(
-                    $civilIdTmpFile, $this->identification_file_purpose, $this->identification_title);
+                    $civilIdFrontSideTmpFile, $this->identification_file_purpose, $this->identification_title);
 
-            if ($response->isOk){
-              $this->identification_file_id = $response->data['id'];
-              @unlink($civilIdTmpFile);
-           }
+            @unlink($civilIdFrontSideTmpFile);
+
+
+            if ($response->isOk)
+              $this->identification_file_id_front_side = $response->data['id'];
+
             else
-              return Yii::error('Error when uploading civil id: ' . json_encode($response->data));
+              return Yii::error('Error when uploading civil id (front side): ' . json_encode($response->data));
+
+        }
+
+        //Upload Owner civil id back side
+        if ($this->identification_file_back_side  && $this->identification_file_purpose && $this->identification_title) {
+
+          $civilIdBackSideTmpFile = sys_get_temp_dir() . '/' . $this->identification_file_back_side;
+
+          if(!file_put_contents($civilIdBackSideTmpFile, file_get_contents($this->getCivilIdBackSidePhoto())))
+              return Yii::error('Error reading civil id (back side): ');
 
 
-          }
+            $response = Yii::$app->tapPayments->uploadFileToTap(
+                    $civilIdBackSideTmpFile, $this->identification_file_purpose, $this->identification_title);
+
+            @unlink($civilIdBackSideTmpFile);
+
+            if ($response->isOk)
+              $this->identification_file_id_back_side = $response->data['id'];
+            else
+              return Yii::error('Error when uploading civil id (back side): ' . json_encode($response->data));
+
+        }
     }
 
     /**
-     * Return Civil id url
+     * Return Civil id front side url
      * @return string
      */
-    public function getCivilIdPhoto() {
+    public function getCivilIdFrontSidePhoto() {
         $photo_url = [];
 
 
-        if ($this->identification_file) {
+        if ($this->identification_file_front_side) {
 
             $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
                     . $this->restaurant_uuid . '/private_documents/'
-                    . $this->identification_file;
+                    . $this->identification_file_front_side;
+            $photo_url = $url;
+        }
+
+        return $photo_url;
+    }
+
+    /**
+     * Return Civil id back side url
+     * @return string
+     */
+    public function getCivilIdBackSidePhoto() {
+        $photo_url = [];
+
+
+        if ($this->identification_file_back_side) {
+
+            $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
+                    . $this->restaurant_uuid . '/private_documents/'
+                    . $this->identification_file_back_side;
             $photo_url = $url;
         }
 
@@ -453,7 +505,6 @@ class Restaurant extends \yii\db\ActiveRecord {
      * Create an account for vendor on tap
      */
     public function createAnAccountOnTap() {
-
 
         //Upload documents file on our server before we create an account on tap we gonaa delete them
         $this->uploadDocumentsToTap();
@@ -665,8 +716,10 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset($fields['identification_issuing_country']);
         unset($fields['identification_issuing_date']);
         unset($fields['identification_expiry_date']);
-        unset($fields['identification_file']);
-        unset($fields['identification_file_id']);
+        unset($fields['identification_file_front_side']);
+        unset($fields['identification_file_back_side']);
+        unset($fields['identification_file_id_front_side']);
+        unset($fields['identification_file_id_back_side']);
         unset($fields['identification_title']);
         unset($fields['identification_file_purpose']);
         unset($fields['restaurant_created_at']);
@@ -695,14 +748,13 @@ class Restaurant extends \yii\db\ActiveRecord {
 
 
 
-
         if ($this->live_api_key && $this->test_api_key)
             $this->is_tap_enable = 1;
         else
             $this->is_tap_enable = 0;
 
 
-        if ($this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT) {
+        if ($this->scenario == self::SCENARIO_UPLOAD_STORE_DOCUMENT) {
             //delete tmp files
             $this->deleteTempFiles();
         }
@@ -723,8 +775,12 @@ class Restaurant extends \yii\db\ActiveRecord {
             $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->commercial_license_file,  'commercial_license_file');
         }
 
-        if ($this->identification_file && file_exists(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->identification_file)) {
-            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->identification_file, 'identification_file');
+        if ($this->identification_file_front_side && file_exists(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->identification_file_front_side)) {
+            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->identification_file_front_side, 'identification_file_front_side');
+        }
+
+        if ($this->identification_file_back_side && file_exists(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->identification_file_back_side)) {
+            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->identification_file_back_side, 'identification_file_back_side');
         }
     }
 

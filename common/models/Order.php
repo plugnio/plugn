@@ -624,7 +624,7 @@ class Order extends \yii\db\ActiveRecord {
           $response = Yii::$app->smsComponent->sendSms($this->customer_phone_number, $this->order_uuid);
 
           if(!$response->isOk)
-            Yii::error('Error while Sending SMS' . json_encode($response));
+            Yii::error('Error while Sending SMS' . json_encode($respons->data));
           else {
             $this->sms_sent = 1;
             $this->save(false);

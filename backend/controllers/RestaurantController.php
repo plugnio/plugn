@@ -3,7 +3,7 @@
 namespace backend\controllers;
 
 use Yii;
-use backend\models\Restaurant;
+use common\models\Restaurant;
 use common\models\TapQueue;
 use backend\models\RestaurantSearch;
 use yii\web\Controller;
@@ -93,7 +93,8 @@ class RestaurantController extends Controller {
             $restaurant_authorized_signature_file = UploadedFile::getInstances($model, 'restaurant_authorized_signature_file');
             $restaurant_commercial_license_file = UploadedFile::getInstances($model, 'restaurant_commercial_license_file');
 
-            $owner_identification_file = UploadedFile::getInstances($model, 'owner_identification_file');
+            $owner_identification_file_front_side = UploadedFile::getInstances($model, 'owner_identification_file_front_side');
+            $owner_identification_file_back_side = UploadedFile::getInstances($model, 'owner_identification_file_back_side');
 
             if (sizeof($restaurant_commercial_license_file) > 0)
                 $model->restaurant_commercial_license_file = $restaurant_commercial_license_file[0]; //Commercial License
@@ -101,8 +102,11 @@ class RestaurantController extends Controller {
             if (sizeof($restaurant_authorized_signature_file) > 0)
                 $model->restaurant_authorized_signature_file = $restaurant_authorized_signature_file[0]; //Authorized signature
 
-            if (sizeof($owner_identification_file) > 0)
-                $model->owner_identification_file = $owner_identification_file[0]; //Owner's civil id
+            if (sizeof($owner_identification_file_front_side) > 0)
+                $model->owner_identification_file_front_side = $owner_identification_file_front_side[0]; //Owner's civil id front side
+
+            if (sizeof($owner_identification_file_back_side) > 0)
+                $model->owner_identification_file_back_side = $owner_identification_file_back_side[0]; //Owner's civil id back side
 
 
 

@@ -34,7 +34,7 @@ $this->title = 'Plan';
 
   <div class="row">
       <!-- account start -->
-      <div class="col-4">
+      <div class="col-sm-12 col-md-4 col-lg-4">
 
         <h5>Plan details</h5>
 
@@ -43,7 +43,7 @@ $this->title = 'Plan';
           with different features and rates.
         </p>
       </div>
-      <div class="col-8">
+      <div class="col-sm-12 col-md-8 col-lg-8">
         <div class="card">
             <div class="card-body">
               <div class="row card-content">
