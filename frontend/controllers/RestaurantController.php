@@ -569,9 +569,11 @@ class RestaurantController extends Controller {
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->save()) {
 
+            $model->setScenario(Restaurant::SCENARIO_UPLOAD_STORE_DOCUMENT);
+
 
             // initialize FileUploader
-            $FileUploader = new FileUploader('identification_file', array(
+            $FileUploader = new FileUploader('identification_file_front_side', array(
                 'limit' => null,
                 'maxSize' => null,
                 'extensions' => null,
@@ -589,7 +591,28 @@ class RestaurantController extends Controller {
             }
 
             // get the fileList
-            $owner_identification_file = $FileUploader->getFileList();
+            $owner_identification_file_front_side = $FileUploader->getFileList();
+
+            // initialize FileUploader
+            $FileUploader = new FileUploader('identification_file_back_side', array(
+                'limit' => null,
+                'maxSize' => null,
+                'extensions' => null,
+                'uploadDir' => 'uploads/',
+                'title' => 'name'
+            ));
+
+            // call to upload the files
+            $data = $FileUploader->upload();
+
+            // if uploaded and success
+            if ($data['isSuccess'] && count($data['files']) > 0) {
+                // get uploaded files
+                $uploadedFiles = $data['files'];
+            }
+
+            // get the fileList
+            $owner_identification_file_back_side = $FileUploader->getFileList();
 
 
             // initialize FileUploader
@@ -635,7 +658,6 @@ class RestaurantController extends Controller {
             $restaurant_authorized_signature_file = $FileUploader->getFileList();
 
 
-
             if (sizeof($restaurant_commercial_license_file) > 0)
               $model->commercial_license_file = str_replace( 'uploads/', '',$restaurant_commercial_license_file[0]['file']); //Commercial License
 
@@ -643,8 +665,11 @@ class RestaurantController extends Controller {
             if (sizeof($restaurant_authorized_signature_file) > 0)
               $model->authorized_signature_file = str_replace( 'uploads/', '',$restaurant_authorized_signature_file[0]['file']);  //Authorized signature
 
-            if (sizeof($owner_identification_file) > 0)
-              $model->identification_file =  str_replace('uploads/',  '', $owner_identification_file[0]['file']); //Owner's civil id
+            if (sizeof($owner_identification_file_front_side) > 0)
+              $model->identification_file_front_side =  str_replace('uploads/',  '', $owner_identification_file_front_side[0]['file']); //Owner's civil id front side
+
+            if (sizeof($owner_identification_file_back_side) > 0)
+              $model->identification_file_back_side =  str_replace('uploads/',  '', $owner_identification_file_back_side[0]['file']); //Owner's civil id back side
 
               if(!$model->is_tap_enable){
                 $tap_queue_model = new TapQueue;

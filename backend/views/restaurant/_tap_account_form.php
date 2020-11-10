@@ -149,7 +149,16 @@ $this->registerJs($js);
     ?>
 
     <?=
-    $form->field($model, 'owner_identification_file')->widget(FileInput::classname(), [
+    $form->field($model, 'owner_identification_file_front_side')->widget(FileInput::classname(), [
+        'options' => [
+            'accept' => 'image/*',
+            'multiple' => false
+        ]
+    ]);
+    ?>
+
+    <?=
+    $form->field($model, 'owner_identification_file_back_side')->widget(FileInput::classname(), [
         'options' => [
             'accept' => 'image/*',
             'multiple' => false

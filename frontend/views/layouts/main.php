@@ -33,6 +33,17 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
         </title>
         <link rel="shortcut icon" href="<?php echo Yii::$app->request->baseUrl; ?>/favicon.ico" type="image/x-icon" />
 
+
+        <!-- Global site tag (gtag.js) - Google Ads: 946322720 -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-946322720"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+        gtag('config', 'G-JN88PPG4C6');
+          gtag('config', 'AW-946322720');
+        </script>
+
         <?php $this->head() ?>
     </head>
 

@@ -45,7 +45,18 @@ $(function () {
 
 $( window ).on( 'load', function() {
   $('#legal_info').hide();
+
+  if ('$model->business_type' == 'corp'){
+    companyName.placeholder = 'official business name if license available';
+    companyName.value = '';
+    $('#legal_info').show();
+  }
+  else{
+    companyName.value = '$model->name';
+		$('#legal_info').hide();
+  }
 });
+
 
 let businessTypeInput = $('#businessTypeInput');
 let companyName = $('#company_name')[0];
@@ -54,13 +65,13 @@ businessTypeInput.change(function(e){
 
 
 	if (e.target.defaultValue == 'corp'){
+    companyName.placeholder = 'official business name if license available';
     companyName.value = '';
     $('#legal_info').show();
   }
 
 	else{
     companyName.value = '$model->name';
-    companyName.placeholder = 'official business name if license available';
 		$('#legal_info').hide();
   }
 
@@ -115,13 +126,23 @@ $this->registerJs($js);
             </div>
 
             <div class="row">
-              <div class="col-12 col-sm-6 col-lg-6">
+              <div class="col-12">
                   <?= $form->field($model, 'company_name')->textInput(['maxlength' => true, 'value' => $model->name, 'id' => 'company_name'])->label('Business name *') ?>
               </div>
-                <div class="col-12 col-sm-6 col-lg-6">
+            </div>
+            <div class="row">
+                <div class="col-12  col-lg-6">
 
                     <?=
-                    $form->field($model, 'owner_identification_file')->fileinput(['name' => 'identification_file', 'class' => 'files', 'required' => true])->label('Upload National ID (front and back side) *');
+                    $form->field($model, 'owner_identification_file_front_side')->fileinput(['name' => 'identification_file_front_side', 'class' => 'files'])->label('Upload National ID front side  *');
+                    ?>
+
+                </div>
+
+                <div class="col-12  col-lg-6 ">
+
+                    <?=
+                    $form->field($model, 'owner_identification_file_back_side')->fileinput(['name' => 'identification_file_back_side', 'class' => 'files'])->label('Upload National ID back side  *');
                     ?>
 
                 </div>
@@ -132,7 +153,7 @@ $this->registerJs($js);
             <div class="row">
 
 
-                <div class="col-12">
+                <div class="col-12 col-sm-6 col-lg-6">
 
                                       <?=
                                       $form->field($model, 'business_type')->radioList(['ind' => 'Individual', 'corp' => 'Company',], [
@@ -155,9 +176,9 @@ $this->registerJs($js);
                                       ])->label('Account type *');
                                       ?>
 
-</div>
+                </div>
 
-                <div class="col-12">
+                <div class="col-12 col-sm-6 col-lg-6">
 
                   <?=
                   $form->field($model, 'vendor_sector')->radioList(['Shopping & Retail' => 'Shopping & Retail', 'F&B' => 'F&B', 'Other' => 'Other'], [
@@ -207,7 +228,7 @@ $this->registerJs($js);
                 <div class="col-12">
 
                     <?=
-                    $form->field($model, 'restaurant_commercial_license_file')->fileinput(['name' => 'commercial_license', 'class' => 'files'])->label('License copy');
+                    $form->field($model, 'restaurant_commercial_license_file')->fileinput(['name' => 'commercial_license', 'class' => 'files'])->label('License copy *');
                     ?>
 
                 </div>
@@ -216,7 +237,7 @@ $this->registerJs($js);
                 <div class="col-12">
 
                     <?=
-                    $form->field($model, 'restaurant_authorized_signature_file')->fileinput(['name' => 'authorized_signature', 'class' => 'files'])->label('Authorized signatory');
+                    $form->field($model, 'restaurant_authorized_signature_file')->fileinput(['name' => 'authorized_signature', 'class' => 'files'])->label('Authorized signatory *');
                     ?>
 
                 </div>

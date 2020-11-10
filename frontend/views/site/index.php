@@ -406,7 +406,7 @@ $this->registerJs($js);
     <div class="card">
         <div class="card-body">
             <div class="row">
-                <div class="col-9">
+                <div class="col-sm-12 col-md-9 col-lg-9">
                     <div>
                         <h3><span>Add your first item</span></h3>
                     </div>
@@ -419,7 +419,7 @@ $this->registerJs($js);
                         </div>
                     </div>
                 </div>
-                <div class="col-3">
+                <div class="col-sm-12 col-md-3 col-lg-3">
                     <div  style="float: right">
                         <img src="https://res.cloudinary.com/plugn/image/upload/v1603284452/home-onboard.svg" alt="" />
                     </div>
@@ -437,7 +437,7 @@ $this->registerJs($js);
     <div class="card">
         <div class="card-body">
             <div class="row">
-                <div class="col-9">
+                <div class="col-sm-12 col-md-9 col-lg-9">
                     <div>
                         <h3><span>Edit the look and feel of your online store</span></h3>
                     </div>
@@ -450,7 +450,7 @@ $this->registerJs($js);
                         </div>
                     </div>
                 </div>
-                <div class="col-3">
+                <div class="col-sm-12 col-md-3 col-lg-3">
                     <div  style="float: right">
                         <img src="https://res.cloudinary.com/plugn/image/upload/v1603284769/home-onboard-theme-incomplete.svg" alt="" />
                     </div>
@@ -465,7 +465,7 @@ $this->registerJs($js);
     <div class="card">
         <div class="card-body">
             <div class="row">
-                <div class="col-9">
+                <div class="col-sm-12 col-md-9 col-lg-9">
                     <div>
                         <h3><span>Strengthen your brand with a custom domain</span></h3>
                     </div>
@@ -478,7 +478,7 @@ $this->registerJs($js);
                         </div>
                     </div>
                 </div>
-                <div class="col-3">
+                <div class="col-sm-12 col-md-3 col-lg-3">
                     <div  style="float: right">
                         <img src="https://res.cloudinary.com/plugn/image/upload/v1603284844/home-onboard-domain-incomplete.svg" alt="" />
                     </div>
@@ -493,7 +493,7 @@ $this->registerJs($js);
     <div class="card">
         <div class="card-body">
             <div class="row">
-                <div class="col-9">
+                <div class="col-sm-12 col-md-9 col-lg-9">
                     <div>
                         <h3><span>Keep track of your real time orders</span></h3>
                     </div>
@@ -506,7 +506,7 @@ $this->registerJs($js);
                         </div>
                     </div>
                 </div>
-                <div class="col-3">
+                <div class="col-sm-12 col-md-3 col-lg-3">
                     <div  style="float: right">
                         <img src="https://res.cloudinary.com/plugn/image/upload/c_scale,h_120,w_100/v1603286062/a64ef20cde1af82ef69556c7ab33c727_pa1xe7.svg" width="120" alt="" />
                     </div>

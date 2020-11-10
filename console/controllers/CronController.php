@@ -160,7 +160,7 @@ class CronController extends \yii\console\Controller {
               ->one();
 
       if($queue && $queue->restaurant_uuid){
-        $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
+        $queue->queue_status = TapQueue::QUEUE_STATUS_CREATING;
         $queue->save();
       }
 
