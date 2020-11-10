@@ -76,6 +76,13 @@ $this->params['breadcrumbs'][] = $this->title;
     DetailView::widget([
         'model' => $model,
         'attributes' => [
+            'country.country_name',
+            [
+                'label' => 'Store currency',
+                'value' => function ($data) {
+                  return $data->currency->title;
+                }
+            ],
             'restaurant_uuid',
             [
                 'label' => 'Payment Methods',
@@ -100,6 +107,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'name_ar',
             'tagline',
             'tagline_ar',
+            'app_id',
             'status',
             'restaurant_domain',
             'thumbnail_image',

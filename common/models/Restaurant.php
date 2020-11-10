@@ -12,12 +12,14 @@ use common\models\WebLink;
  * This is the model class for table "restaurant".
  *
  * @property string $restaurant_uuid
+ * @property int $country_id
+ * @property int $currency_id
  * @property string $name
  * @property string|null $name_ar
  * @property string|null $tagline
  * @property string|null $tagline_ar
  * @property string|null $restaurant_domain
- *  @property int $app_id
+ * @property int $app_id
  * @property int $restaurant_status
  * @property string $thumbnail_image
  * @property string $logo
@@ -167,11 +169,13 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['phone_number'], 'string', 'min' => 7, 'max' => 8],
             [['live_public_key', 'test_public_key'], 'default', 'value' => null],
             [['phone_number'], 'integer', 'min' => 0],
-            [['phone_number'], 'integer'],
+            [['phone_number', 'country_id', 'currency_id'], 'integer'],
             [['restaurant_email_notification', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable'], 'integer'],
             ['restaurant_email', 'email'],
             [['restaurant_uuid', 'restaurant_domain', 'name'], 'unique'],
-            [['tap_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => TapQueue::className(), 'targetAttribute' => ['tap_queue_id' => 'tap_queue_id']]
+            [['tap_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => TapQueue::className(), 'targetAttribute' => ['tap_queue_id' => 'tap_queue_id']],
+            [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country_id' => 'country_id']],
+            [['currency_id'], 'exist', 'skipOnError' => true, 'targetClass' => Currency::className(), 'targetAttribute' => ['currency_id' => 'currency_id']],
         ];
     }
 
@@ -181,8 +185,10 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function attributeLabels() {
         return [
             'restaurant_uuid' => 'Restaurant Uuid',
-            'name' => 'Name in English',
-            'name_ar' => 'Name in Arabic',
+            'country_id' => 'Country',
+            'currency_id' => 'Store currency',
+            'name' => 'Store name in English',
+            'name_ar' => 'Store name in Arabic',
             'tagline' => 'Tagline in English',
             'tagline_ar' => 'Tagline in Arabic',
             'restaurant_domain' => 'Store Url',
@@ -1109,5 +1115,27 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function getStoreWebLinks() {
         return $this->hasMany(StoreWebLink::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
+
+    /**
+   * Gets query for [[Country]].
+   *
+   * @return \yii\db\ActiveQuery
+   */
+  public function getCountry()
+  {
+      return $this->hasOne(Country::className(), ['country_id' => 'country_id']);
+  }
+
+  /**
+   * Gets query for [[Currency]].
+   *
+   * @return \yii\db\ActiveQuery
+   */
+  public function getCurrency()
+  {
+      return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id']);
+  }
+
 
 }

@@ -191,8 +191,8 @@ class Item extends \yii\db\ActiveRecord
 //        }
 
         foreach ($imagesPath as $key => $path) {
-            
-          
+
+
             $filename = Yii::$app->security->generateRandomString();
 
             $itemName = str_replace(' ', '', $this->item_name);
@@ -211,9 +211,9 @@ class Item extends \yii\db\ActiveRecord
                     $item_image_model->product_file_name = basename($result['url']);
                     $item_image_model->save(false);
                 }
-                
+
                 unlink($path['file']);
-                
+
             } catch (\Cloudinary\Error $err) {
                 Yii::error("Error when uploading item's image to Cloudinry: " . json_encode($err));
                 Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($imagesPath));
@@ -279,6 +279,16 @@ class Item extends \yii\db\ActiveRecord
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    /**
+     * Gets query for [[Currency]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+    }
+    
     /**
      * Gets query for [[Options]].
      *

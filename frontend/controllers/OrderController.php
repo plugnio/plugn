@@ -120,7 +120,12 @@ class OrderController extends Controller {
                                 return $data->paymentMethod->payment_method_name;
                         },
                     ],
-                    'total_price_before_refund:currency',
+                    [
+                        'attribute' => 'total_price',
+                        "value" => function($data) {
+                                return Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code);
+                        },
+                    ],
                     'order_created_at'
                 ]
             ]);

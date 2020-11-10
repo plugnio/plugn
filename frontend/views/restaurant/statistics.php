@@ -12,6 +12,10 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 $this->title = 'Overview dashboard';
 $this->params['breadcrumbs'][] = $this->title;
 // \yii\web\YiiAsset::register($this);
+
+
+$currencyCode = $model->currency->code;
+
 ?>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -19,6 +23,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <!-- <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script> -->
 <script type="text/javascript">
+
+  var currency_code = "<?= $currencyCode ?>";
+
 
     $(document).ready(function () {
 
@@ -69,7 +76,14 @@ $this->params['breadcrumbs'][] = $this->title;
             yaxis: {
                 tickAmount: 5,
                 opposite: yaxis_opposite
-            }
+            },
+            tooltip: {
+                y: {
+                  formatter: function (val) {
+                    return val + ' ' + currency_code ;
+                  }
+                }
+          }
         }
 
         var revenueChart = new ApexCharts(

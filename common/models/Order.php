@@ -386,7 +386,7 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function validateMinCharge($attribute) {
         if ($this->restaurantDelivery->min_charge > $this->$attribute)
-            $this->addError($attribute, "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency($this->restaurantDelivery->min_charge));
+            $this->addError($attribute, "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency($this->restaurantDelivery->min_charge, $this->currency->code));
     }
 
 
@@ -798,6 +798,19 @@ class Order extends \yii\db\ActiveRecord {
     public function getRestaurant() {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
+
+
+      /**
+       * Gets query for [[Currency]].
+       *
+       * @return \yii\db\ActiveQuery
+       */
+      public function getCurrency()
+      {
+          return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+      }
+
 
     /**
      * Gets query for [[RestaurantDelivery]].

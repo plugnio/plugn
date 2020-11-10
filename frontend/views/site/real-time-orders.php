@@ -148,7 +148,12 @@ var soundForNewOrders = new Audio("data:audio/wav;base64,//uQRAAAAWMSLwUIYAAsYkX
                             return $data->paymentMethod->payment_method_name;
                     },
                 ],
-                'total_price:currency',
+                [
+                    'attribute' => 'total_price',
+                    "value" => function($data) {
+                            return Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code);
+                    },
+                ],
             ],
             'layout' => '{items}{pager}',
             'tableOptions' => ['class' => 'table data-list-view', 'id' => 'new-order-table'],

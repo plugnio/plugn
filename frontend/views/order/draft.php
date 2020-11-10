@@ -79,7 +79,12 @@ $this->registerJs($js);
                             return $data->paymentMethod->payment_method_name;
                     },
                 ],
-                'total_price:currency',
+                [
+                    'attribute' => 'total_price',
+                    "value" => function($data) {
+                            return Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code);
+                    },
+                ],
                 'order_created_at:datetime',
             ],
             'layout' => '{summary}{items}{pager}',

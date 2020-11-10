@@ -13,9 +13,9 @@ class SubscriptionSearch extends Subscription
 {
 
 
-      // public restaurant_name;
       public $restaurant_name;
       public $plan_name;
+      public $platform_fee;
 
     /**
      * {@inheritdoc}
@@ -23,7 +23,7 @@ class SubscriptionSearch extends Subscription
     public function rules()
     {
         return [
-            [['subscription_uuid', 'plan_id'], 'integer'],
+            [['subscription_uuid', 'plan_id','subscription_status','platform_fee'], 'integer'],
             [['restaurant_uuid', 'subscription_start_at', 'subscription_end_at', 'restaurant_name', 'plan_name'], 'safe'],
         ];
     }
@@ -67,6 +67,12 @@ class SubscriptionSearch extends Subscription
           ];
 
 
+          $dataProvider->sort->attributes['platform_fee'] = [
+              'asc' => ['plan.platform_fee' => SORT_ASC],
+              'desc' => ['plan.platform_fee' => SORT_DESC],
+          ];
+
+
 
         $this->load($params);
 
@@ -78,12 +84,14 @@ class SubscriptionSearch extends Subscription
 
         // grid filtering conditions
         $query->andFilterWhere([
+            'subscription_status' => $this->subscription_status,
             'subscription_start_at' => $this->subscription_start_at,
             'subscription_end_at' => $this->subscription_end_at,
         ]);
 
         $query->andFilterWhere(['like', 'restaurant.name', $this->restaurant_name]);
         $query->andFilterWhere(['like', 'plan.name', $this->plan_name]);
+        $query->andFilterWhere(['like', 'plan.platform_fee', $this->platform_fee]);
 
         return $dataProvider;
     }

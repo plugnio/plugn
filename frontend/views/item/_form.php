@@ -213,7 +213,7 @@ $this->registerJs($js);
             <?=
             $form->field($modelItem, 'item_price', [
                 'template' => "{label}"
-                . "<div class='input-group'> <div class='input-group-prepend'> <span class='input-group-text'>KWD</span> </div>{input}"
+                . "<div class='input-group'> <div class='input-group-prepend'> <span class='input-group-text'>" . $modelItem->currency->code . " </span> </div>{input}"
                 . "</div>"
                 . "{error}{hint}"
             ])->textInput([

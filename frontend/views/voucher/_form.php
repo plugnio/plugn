@@ -10,6 +10,7 @@ use yii\helpers\ArrayHelper;
 /* @var $model common\models\Voucher */
 /* @var $form yii\widgets\ActiveForm */
 
+$currencyCode = $model->currency->code;
 
 $js = "
 
@@ -25,7 +26,7 @@ $js = "
               $('#discount_amount_section').show();
             }
             else   if ('$model->discount_type' == 2){
-              $('#discountAmount').text('KWD');
+              $('#discountAmount').text('$currencyCode');
               $('#discount_amount_section').show();
             }
             else   if ('$model->discount_type' == 3)
@@ -42,7 +43,7 @@ $js = "
             $('#discount_amount_section').show();
           }
           else   if (selection == 2){
-            $('#discountAmount').text('KWD');
+            $('#discountAmount').text('$currencyCode');
             $('#discount_amount_section').show();
           }
           else   if (selection == 3)

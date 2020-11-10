@@ -139,7 +139,7 @@ class Voucher extends \yii\db\ActiveRecord {
         }
     }
 
-    
+
     public function isValid($phone_number) {
         $isValid = true;
 
@@ -210,4 +210,13 @@ class Voucher extends \yii\db\ActiveRecord {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    /**
+     * Gets query for [[Currency]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+    }
 }

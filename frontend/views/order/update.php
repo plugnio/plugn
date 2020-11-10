@@ -68,7 +68,12 @@ $this->registerJs($js);
                 'columns' => [
                   ['class' => 'yii\grid\SerialColumn'],
                   'item_name',
-                  'item_price:currency',
+                  [
+                      'attribute' => 'item_price',
+                      "value" => function($data) {
+                              return Yii::$app->formatter->asCurrency($data->item_price, $data->currency->code);
+                      },
+                  ],
                   'qty',
                   [
                       'label' => 'Extra Options',

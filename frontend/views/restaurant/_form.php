@@ -10,6 +10,10 @@ use common\models\Area;
 use common\models\RestaurantDelivery;
 use kartik\file\FileInput;
 use common\models\Restaurant;
+use common\models\Currency;
+use common\models\Country;
+use common\models\Order;
+
 
 $js = "
 $('#primaryColorInput').change(function(e){
@@ -56,6 +60,16 @@ $this->registerJs($js);
                 'id' => 'dynamic-form',
                 'errorSummaryCssClass' => 'alert alert-danger'
     ]);
+
+    $countryQuery = Country::find()->asArray()->all();
+    $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
+
+    $currencyQuery = Currency::find()->asArray()->all();
+    $currencyArray = ArrayHelper::map($currencyQuery, 'currency_id', 'title');
+
+
+    $madeAnySales = Order::find()->where(['restaurant_uuid' => $model->restaurant_uuid ])->exists();
+
     ?>
 
 
@@ -88,6 +102,26 @@ $this->registerJs($js);
 
                 <?= $form->field($model, 'tagline_ar')->textInput(['maxlength' => true]) ?>
             </div>
+        </div>
+
+        <div class="row">
+
+            <div class="col-12 col-sm-6 col-lg-6">
+              <?= $form->field($model, 'country_id')->dropDownList($countryArray); ?>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-6">
+              <?= $form->field($model, 'currency_id', ['template' =>
+
+                       $madeAnySales ? '
+                       <p>Youve made your first sale, so you need to contact support if you want to change your currency.</p>' : "
+                       {label}
+                          {input}
+                          {hint}
+                          {error}";
+              '])->dropDownList($currencyArray); ?>
+          </div>
+
         </div>
 
 

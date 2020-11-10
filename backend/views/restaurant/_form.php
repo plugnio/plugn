@@ -6,7 +6,8 @@ use kartik\time\TimePicker;
 use common\models\Agent;
 use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
-use common\models\Area;
+use common\models\Currency;
+use common\models\Country;
 use common\models\RestaurantDelivery;
 use common\models\RestaurantPaymentMethod;
 use common\models\PaymentMethod;
@@ -55,6 +56,12 @@ $this->registerJs($js);
     $paymentMethodQuery = PaymentMethod::find()->asArray()->all();
     $paymentMethodArray = ArrayHelper::map($paymentMethodQuery, 'payment_method_id', 'payment_method_name');
 
+    $countryQuery = Country::find()->asArray()->all();
+    $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
+
+    $currencyQuery = Currency::find()->asArray()->all();
+    $currencyArray = ArrayHelper::map($currencyQuery, 'currency_id', 'title');
+
     $sotredRestaurantPaymentMethod = [];
 
     if ($model->restaurant_uuid != null) {
@@ -71,6 +78,28 @@ $this->registerJs($js);
 
 
     $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]);
+    ?>
+
+    <?=
+    $form->field($model, 'country_id')->widget(Select2::classname(), [
+        'data' => $countryArray,
+        'options' => [
+            'placeholder' => 'Select country ...',
+            'multiple' => false,
+            'value' => $model->country_id
+        ],
+    ]);
+    ?>
+
+    <?=
+    $form->field($model, 'currency_id')->widget(Select2::classname(), [
+        'data' => $currencyArray,
+        'options' => [
+            'placeholder' => 'Select currency ...',
+            'multiple' => false,
+            'value' => $model->currency_id
+        ],
+    ]);
     ?>
 
     <?=
