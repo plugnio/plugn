@@ -63,12 +63,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                 <?= $form->field($agent_model, 'tempPassword')->passwordInput(['maxlength' => true])->label('Password *') ?>
 
+                                <div class="form-group">
+                                    <?= Html::submitButton('Create', ['class' => 'btn btn-primary  btn-inline', 'style' => 'width: 100%;',  'name' => 'register-button']) ?>
+                                </div>
 
+
+                                <p>Already have a store?</p>
                                 <?= Html::a('Login', ['site/login'], ['class' => 'btn btn-outline-primary float-left btn-inline mb-50']) ?>
 
-                                <div class="form-group">
-                                    <?= Html::submitButton('Create', ['class' => 'btn btn-primary float-right btn-inline mb-50', 'name' => 'register-button']) ?>
-                                </div>
+
 
 
                                 <?php ActiveForm::end(); ?>

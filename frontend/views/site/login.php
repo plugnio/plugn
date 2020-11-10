@@ -51,17 +51,19 @@ $this->title = 'Plugn Dashboard';
                                     'template' => '{input}<div class="form-control-position"> <i class="feather icon-lock"></i> </div>{error}{hint}'
                                 ])->passwordInput(['placeholder' => 'Password', 'required' => true])
                                 ?>
+                                <div class="form-group" style="margin-bottom: 10px;">
+                                    <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'style' => 'width: 100%;','name' => 'login-button']) ?>
+                                </div>
 
                                 <?=
                                 Html::a('Forgot Password?', ['request-password-reset'], ['class' => ''])
                                 ?>
 
                             </div>
+
+                            <p>Don't have a store?</p>
                             <?= Html::a('Create Your Store', ['site/signup'], ['class' => 'btn btn-outline-primary float-left btn-inline mb-50']) ?>
 
-                            <div class="form-group">
-                                <?= Html::submitButton('Login', ['class' => 'btn btn-primary float-right btn-inline mb-50', 'name' => 'login-button']) ?>
-                            </div>
 
 
                             <?php ActiveForm::end(); ?>

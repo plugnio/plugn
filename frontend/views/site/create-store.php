@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
                               <?php $form = ActiveForm::begin(['id' => 'signup-form', 'enableClientScript' => false]); ?>
 
 
-                          
+
                                     <?=
                                     $form->field($model, 'restaurant_logo', [
                                         'template' => "{label}"
