@@ -60,7 +60,8 @@ class LoginForm extends Model {
             $loggedInAgent = $this->getAgent();
 
             if ($loggedInAgent != NULL) {
-                Yii::$app->user->login($loggedInAgent, $this->rememberMe ? 3600 * 24 * 30 : 0);
+                $duration = 3600 * 24 * 30;
+                Yii::$app->user->login($loggedInAgent, $duration);
 
                 if ($managedRestaurants = Yii::$app->accountManager->getManagedAccounts()) {
                     foreach ($managedRestaurants as $managedRestaurant) {
