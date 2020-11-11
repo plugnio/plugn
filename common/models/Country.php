@@ -8,20 +8,15 @@ use Yii;
  * This is the model class for table "country".
  *
  * @property int $country_id
- * @property string $country_name
- * @property string $country_code
- * @property int $country_status
+ * @property string|null $country_name
+ * @property string|null $iso
+ * @property string|null $iso3
+ * @property int|null $country_code
  *
  * @property Restaurant[] $restaurants
  */
 class Country extends \yii\db\ActiveRecord
 {
-
-
-    const STATUS_ACTIVE = 10;
-    const STATUS_INACTIVE = 0;
-
-
     /**
      * {@inheritdoc}
      */
@@ -36,9 +31,10 @@ class Country extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['country_name', 'country_code'], 'required'],
-            [['country_status'], 'integer'],
-            [['country_name', 'country_code'], 'string', 'max' => 255],
+            [['country_code'], 'integer'],
+            [['country_name'], 'string', 'max' => 80],
+            [['iso'], 'string', 'max' => 2],
+            [['iso3'], 'string', 'max' => 3],
         ];
     }
 
@@ -50,8 +46,9 @@ class Country extends \yii\db\ActiveRecord
         return [
             'country_id' => 'Country ID',
             'country_name' => 'Country Name',
+            'iso' => 'Iso',
+            'iso3' => 'Iso3',
             'country_code' => 'Country Code',
-            'country_status' => 'Country Status',
         ];
     }
 

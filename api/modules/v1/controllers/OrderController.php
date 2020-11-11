@@ -79,6 +79,7 @@ class OrderController extends Controller {
             //Save Customer Info
             $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
             $order->customer_phone_number = strval(Yii::$app->request->getBodyParam("phone_number"));
+            $order->customer_phone_country_code = Yii::$app->request->getBodyParam("country_code") ? Yii::$app->request->getBodyParam("country_code") : 965;
             $order->customer_email = Yii::$app->request->getBodyParam("email"); //optional
             //payment method
             $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
@@ -312,11 +313,17 @@ class OrderController extends Controller {
 
                         // $source_id
                         $response = Yii::$app->tapPayments->createCharge(
+                                $order->currency->code,
                                 "Order placed from: " . $order->customer_name, // Description
                                 $order->restaurant->name, //Statement Desc.
                                 $payment->payment_uuid, // Reference
-                                $order->total_price, $order->customer_name, $order->customer_email, $order->customer_phone_number, $order->restaurant->platform_fee, Url::to(['order/callback'], true),
-                                // $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET :  TapPayments::GATEWAY_VISA_MASTERCARD
+                                $order->total_price,
+                                 $order->customer_name,
+                                 $order->customer_email,
+                                 $order->customer_phone_country_code,
+                                 $order->customer_phone_number,
+                                 $order->restaurant->platform_fee,
+                                 Url::to(['order/callback'], true),
                                 $source_id
                         );
 

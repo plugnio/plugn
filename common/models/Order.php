@@ -27,6 +27,7 @@ use yii\behaviors\AttributeBehavior;
  * @property string $special_directions
  * @property string $customer_name
  * @property string $customer_phone_number
+ * @property string $customer_phone_country_code
  * @property string $customer_email
  * @property int $payment_method_id
  * @property string $payment_method_name
@@ -117,13 +118,13 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['customer_name', 'customer_phone_number', 'order_mode'], 'required'],
+            [['customer_name', 'customer_phone_country_code','customer_phone_number', 'order_mode'], 'required'],
             [['is_order_scheduled'], 'required' , 'on' => 'create'],
             [['payment_method_id'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status','mashkor_order_status', 'customer_id'], 'integer', 'min' => 0],
-            [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id', 'reminder_sent', 'sms_sent'], 'integer'],
+            [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id', 'reminder_sent', 'sms_sent', 'customer_phone_country_code'], 'integer'],
             ['mashkor_order_status', 'in', 'range' => [
               self::MASHKOR_ORDER_STATUS_NEW,
               self::MASHKOR_ORDER_STATUS_CONFIRMED,
@@ -170,7 +171,7 @@ class Order extends \yii\db\ActiveRecord {
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['order_mode', 'validateOrderMode'],
             [['restaurant_uuid'], 'string', 'max' => 60],
-            [['customer_phone_number'], 'string', 'min' => 8, 'max' => 8],
+            [['customer_phone_number'], 'string', 'min' => 6, 'max' => 15],
             [['customer_phone_number'], 'number'],
             [['total_price', 'total_price_before_refund', 'delivery_fee', 'subtotal', 'subtotal_before_refund'], 'number', 'min' => 0],
             ['subtotal', 'validateMinCharge', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN, 'when' => function($model) {
@@ -219,6 +220,11 @@ class Order extends \yii\db\ActiveRecord {
 
                     return $this->order_uuid;
                 }
+            ],
+            [
+             'class' => \borales\extensions\phoneInput\PhoneInputBehavior::className(),
+             'countryCodeAttribute' => 'customer_phone_country_code',
+             'phoneAttribute' => 'customer_phone_number',
             ],
             [
                 'class' => TimestampBehavior::className(),
@@ -409,6 +415,7 @@ class Order extends \yii\db\ActiveRecord {
             'house_number' => 'House number',
             'special_directions' => 'Special directions',
             'customer_name' => 'Customer name',
+            'customer_phone_country_code' => 'Country Code',
             'customer_phone_number' => 'Phone number',
             'customer_email' => 'Customer email',
             'payment_method_id' => 'Payment method ID',
@@ -618,10 +625,10 @@ class Order extends \yii\db\ActiveRecord {
         parent::afterSave($insert, $changedAttributes);
 
       //Send SMS To customer
-      if (!$insert && $this->restaurant_uuid != 'rest_7351b2ff-c73d-11ea-808a-0673128d0c9c' && !$this->sms_sent &&  isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_PENDING && $this->order_status == self::STATUS_ACCEPTED) {
+      if ($this->customer_phone_country_code == 965 && !$insert && $this->restaurant_uuid != 'rest_7351b2ff-c73d-11ea-808a-0673128d0c9c' && !$this->sms_sent &&  isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_PENDING && $this->order_status == self::STATUS_ACCEPTED) {
 
         try {
-          $response = Yii::$app->smsComponent->sendSms($this->customer_phone_number, $this->order_uuid);
+          $response = Yii::$app->smsComponent->sendSms($this->customer_phone_country_code, str_replace('+' . $this->customer_phone_country_code, '', $this->customer_phone_number), $this->order_uuid);
 
           if(!$response->isOk)
             Yii::error('Error while Sending SMS' . json_encode($respons->data));
@@ -734,18 +741,19 @@ class Order extends \yii\db\ActiveRecord {
                 $customer_model = new Customer();
                 $customer_model->restaurant_uuid = $this->restaurant_uuid;
                 $customer_model->customer_name = $this->customer_name;
+                $customer_model->country_code = $this->customer_phone_country_code;
                 $customer_model->customer_phone_number = $this->customer_phone_number;
-                if ($this->customer_email != null)
-                    $customer_model->customer_email = $this->customer_email;
 
-                $customer_model->save(false);
-            } else {
-                //Make sure customer name & email are correct
-                $this->customer_name = $customer_model->customer_name;
-                $this->customer_phone_number = $customer_model->customer_phone_number;
-                if ($customer_model->customer_email != null)
-                    $this->customer_email = $customer_model->customer_email;
-            }
+            } else
+                $customer_model->customer_name = $this->customer_name;
+
+
+
+            if ($this->customer_email != null)
+                $customer_model->customer_email = $this->customer_email;
+
+            $customer_model->save(false);
+
 
             $this->customer_id = $customer_model->customer_id;
 

@@ -13,7 +13,7 @@ use common\models\Restaurant;
 use common\models\Currency;
 use common\models\Country;
 use common\models\Order;
-
+use borales\extensions\phoneInput\PhoneInput;
 
 $js = "
 $('#primaryColorInput').change(function(e){
@@ -110,16 +110,16 @@ $this->registerJs($js);
               <?= $form->field($model, 'country_id')->dropDownList($countryArray); ?>
             </div>
 
+
             <div class="col-12 col-sm-6 col-lg-6">
               <?= $form->field($model, 'currency_id', ['template' =>
-
-                       $madeAnySales ? '
-                       <p>Youve made your first sale, so you need to contact support if you want to change your currency.</p>' : "
-                       {label}
-                          {input}
-                          {hint}
-                          {error}";
-              '])->dropDownList($currencyArray); ?>
+                               $madeAnySales  ? "
+                               {label} {input} {hint}  {error}
+                                    <p>
+                                        You've made your first sale, so you need to <a href='mailto:contact@plugn.io'>contact support</a> if you want to change your currency.
+                                    </p>"
+                              : '{label} {input} {hint}  {error}'
+            ])->dropDownList($currencyArray, ['disabled' => $madeAnySales ]); ?>
           </div>
 
         </div>
@@ -175,7 +175,13 @@ $this->registerJs($js);
 
         <div class="row">
             <div class="col-12 col-sm-6 col-lg-6">
-                <?= $form->field($model, 'phone_number')->input('number', ['id' => 'phoneNumberInput']) ?>
+                <?=
+                   $form->field($model, 'phone_number')->widget(PhoneInput::className(), [
+                      'jsOptions' => [
+                          'preferredCountries' => ['kw', 'sa', 'aed','qa','bh','om'],
+                      ]
+                  ]);
+                ?>
             </div>
             <div class="col-12 col-sm-6 col-lg-6">
 

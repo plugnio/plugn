@@ -11,43 +11,89 @@ use common\models\WebLink;
 /**
  * This is the model class for table "restaurant".
  *
- * @property string $restaurant_uuid
- * @property int $country_id
- * @property int $currency_id
- * @property string $name
- * @property string|null $name_ar
- * @property string|null $tagline
- * @property string|null $tagline_ar
- * @property string|null $restaurant_domain
- * @property int $app_id
- * @property int $restaurant_status
- * @property string $thumbnail_image
- * @property string $logo
- * @property int $support_delivery
- * @property int $support_pick_up
- * @property string|null $phone_number
- * @property string $restaurant_email
- * @property string|null $restaurant_created_at
- * @property string|null $restaurant_updated_at
- * @property boolean $restaurant_email_notification
- * @property boolean $show_opening_hours
- * @property boolean $armada_api_key
- * @property boolean $mashkor_branch_id
- * @property boolean $is_tap_enable
- * @property int $phone_number_display
- * @property int $store_branch_name
- * @property int $custom_css
- * @property int $store_layout
- * @property int $has_deployed
- * @property int $site_id
- * @property int $platform_fee
- * @property int $facebook_pixil_id
- * @property int $google_analytics_id
- * @property int $schedule_order
- * @property int $schedule_interval
- * @property string $live_public_key
- * @property string $test_public_key
- * @property int|null $tap_queue_id
+ /**
+  * This is the model class for table "restaurant".
+  *
+  * @property string $restaurant_uuid
+  * @property int $country_id
+  * @property int $currency_id
+  * @property string $name
+  * @property string|null $name_ar
+  * @property string|null $tagline
+  * @property string|null $tagline_ar
+  * @property string|null $restaurant_domain
+  * @property string|null $app_id
+  * @property int $restaurant_status
+  * @property string|null $thumbnail_image
+  * @property string|null $logo
+  * @property int|null $support_delivery
+  * @property int|null $support_pick_up
+  * @property string|null $phone_number
+  * @property string $restaurant_email
+  * @property string|null $restaurant_created_at
+  * @property string|null $restaurant_updated_at
+  * @property string|null $business_id
+  * @property string|null $business_entity_id
+  * @property string|null $wallet_id
+  * @property string|null $merchant_id
+  * @property string|null $operator_id
+  * @property string|null $live_api_key
+  * @property string|null $test_api_key
+  * @property string|null $business_type
+  * @property string|null $vendor_sector
+  * @property string|null $license_number
+  * @property int $not_for_profit
+  * @property string $authorized_signature_issuing_country
+  * @property string|null $authorized_signature_issuing_date
+  * @property string|null $authorized_signature_expiry_date
+  * @property string|null $authorized_signature_title
+  * @property string|null $authorized_signature_file
+  * @property string|null $authorized_signature_file_id
+  * @property string|null $authorized_signature_file_purpose
+  * @property string|null $iban
+  * @property string|null $owner_first_name
+  * @property string|null $owner_last_name
+  * @property string|null $owner_email
+  * @property string|null $owner_number
+  * @property string|null $owner_phone_country_code
+  * @property string $identification_issuing_country
+  * @property string|null $identification_issuing_date
+  * @property string|null $identification_expiry_date
+  * @property string|null $identification_file_front_side
+  * @property string|null $identification_file_id_front_side
+  * @property string|null $identification_title
+  * @property string|null $identification_file_purpose
+  * @property int|null $restaurant_email_notification
+  * @property string|null $developer_id
+  * @property string|null $armada_api_key
+  * @property int|null $phone_number_display
+  * @property string|null $store_branch_name
+  * @property string|null $custom_css
+  * @property int|null $store_layout
+  * @property string $commercial_license_issuing_country
+  * @property string|null $commercial_license_issuing_date
+  * @property string|null $commercial_license_expiry_date
+  * @property string|null $commercial_license_title
+  * @property string|null $commercial_license_file
+  * @property string|null $commercial_license_file_id
+  * @property string|null $commercial_license_file_purpose
+  * @property float|null $platform_fee
+  * @property string|null $google_analytics_id
+  * @property string|null $facebook_pixil_id
+  * @property int|null $show_opening_hours
+  * @property string|null $instagram_url
+  * @property int|null $schedule_order
+  * @property int|null $schedule_interval
+  * @property string|null $mashkor_branch_id
+  * @property string|null $live_public_key
+  * @property string|null $test_public_key
+  * @property string|null $site_id
+  * @property string|null $company_name
+  * @property int|null $is_tap_enable
+  * @property int|null $has_deployed
+  * @property int|null $tap_queue_id
+  * @property string|null $identification_file_back_side
+  * @property string|null $identification_file_id_back_side
  *
  * @property AgentAssignment[] $agentAssignments
  * @property Agent[] $agents
@@ -173,10 +219,18 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['instagram_url'], 'url'],
             [['date_range_picker_with_time', 'google_analytics_id', 'facebook_pixil_id', 'site_id'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'app_id', 'armada_api_key', 'mashkor_branch_id', 'store_branch_name', 'live_public_key', 'test_public_key', 'company_name'], 'string', 'max' => 255],
-            [['phone_number'], 'string', 'min' => 7, 'max' => 8],
+            [['phone_number'], 'string', 'min' => 5, 'max' => 15],
+
             [['live_public_key', 'test_public_key'], 'default', 'value' => null],
             [['phone_number'], 'integer', 'min' => 0],
-            [['phone_number', 'country_id', 'currency_id'], 'integer'],
+            [['phone_number', 'country_id', 'currency_id', 'owner_phone_country_code'], 'integer'],
+
+           //  ['currency_id', function ($attribute, $params, $validator) {
+           //     if ($this->getOrders()->exists())
+           //         $this->addError($attribute, "You've made your first sale, so you need to contact support if you want to change your currency.");
+           // }],
+
+
             [['restaurant_email_notification', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable'], 'integer'],
             ['restaurant_email', 'email'],
             [['restaurant_uuid', 'restaurant_domain', 'name'], 'unique'],
@@ -254,7 +308,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             'owner_first_name' => 'First Name',
             'owner_last_name' => 'Last Name',
             'owner_email' => 'Email Address',
-            'owner_number' => 'Phone Number',
+            'owner_number' => 'Owner Phone Number',
             'identification_issuing_country' => 'Identification Issuing Country',
             'identification_issuing_date' => 'Identification Issuing Date',
             'identification_expiry_date' => 'Identification Expiry Date',
@@ -292,6 +346,11 @@ class Restaurant extends \yii\db\ActiveRecord {
                 'createdAtAttribute' => 'restaurant_created_at',
                 'updatedAtAttribute' => 'restaurant_updated_at',
                 'value' => new Expression('NOW()'),
+            ],
+            [
+             'class' => \borales\extensions\phoneInput\PhoneInputBehavior::className(),
+             'countryCodeAttribute' => 'owner_phone_country_code',
+             'phoneAttribute' => 'owner_number',
             ],
         ];
     }
@@ -528,7 +587,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         }
 
         //Create a merchant on Tap
-        $merchantApiResponse = Yii::$app->tapPayments->createMergentAccount($this->company_name, $this->business_id, $this->business_entity_id, $this->iban);
+        $merchantApiResponse = Yii::$app->tapPayments->createMergentAccount($this->company_name, $this->currency->code ,$this->business_id, $this->business_entity_id, $this->iban);
 
         if ($merchantApiResponse->isOk) {
             $this->merchant_id = $merchantApiResponse->data['id'];

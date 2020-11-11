@@ -7,6 +7,7 @@ use yii\helpers\ArrayHelper;
 use common\models\Order;
 use common\models\City;
 use common\models\RestaurantDelivery;
+use borales\extensions\phoneInput\PhoneInput;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Order */
@@ -112,7 +113,13 @@ $this->registerJs($js);
 
         <?= $form->field($model, 'customer_name')->textInput(['maxlength' => true]) ?>
 
-        <?= $form->field($model, 'customer_phone_number')->textInput(['maxlength' => true]) ?>
+        <?=
+           $form->field($model, 'customer_phone_number')->widget(PhoneInput::className(), [
+              'jsOptions' => [
+                  'preferredCountries' => ['kw', 'sa', 'aed','qa','bh','om'],
+              ]
+          ]);
+        ?>
 
         <?= $form->field($model, 'special_directions')->textInput(['maxlength' => true]) ?>
 

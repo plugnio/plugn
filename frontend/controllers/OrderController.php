@@ -96,13 +96,7 @@ class OrderController extends Controller {
                             return $data->customer_name;
                         },
                     ],
-                    [
-                        'attribute' => 'customer_phone_number',
-                        'format' => 'raw',
-                        'value' => function ($data) {
-                            return $data->customer_phone_number;
-                        },
-                    ],
+                    'customer_phone_number',
                     [
                         'attribute' => 'order_status',
                         "format" => "raw",

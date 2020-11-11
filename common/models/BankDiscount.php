@@ -184,5 +184,5 @@ class BankDiscount extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
     }
-    
+
 }

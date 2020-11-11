@@ -216,7 +216,7 @@ class TapPayments extends Component
                     "primary" => [
                         "email" => $restaurant->owner_email,
                         "phone" => [
-                            "country_code" => "965",
+                            "country_code" => $restaurant->owner_phone_country_code,
                             "number" => $restaurant->owner_number
                         ]
                     ]
@@ -310,7 +310,7 @@ class TapPayments extends Component
      * @param type $iban
      * @return type
      */
-    public function createMergentAccount($company_name, $business_id, $business_entity_id, $iban)
+    public function createMergentAccount($company_name,$currency,  $business_id, $business_entity_id, $iban)
     {
         $merchantEndpoint = $this->apiEndpoint . "/merchant";
 
@@ -322,7 +322,7 @@ class TapPayments extends Component
                 "iban" => $iban
             ],
             "charge_currenices" => [
-                "KWD"
+                $currency
             ]
         ];
 
@@ -372,7 +372,7 @@ class TapPayments extends Component
     /**
      * Create a refund for a customer
      */
-    public function createRefund($chargeId, $amount, $currency = "KWD", $reason="requested_by_customer")  {
+    public function createRefund($chargeId, $amount, $currency , $reason="requested_by_customer")  {
 
         $refundEndpoint = $this->apiEndpoint . "/refunds";
 
@@ -401,22 +401,18 @@ class TapPayments extends Component
     /**
      * Create a charge for redirect
      */
-    public function createCharge($desc = "Pay", $statementDesc = "", $ref, $amount, $firstName, $email, $phone,$platform_fee, $redirectUrl, $gateway)
+    public function createCharge($currency, $desc = "Pay", $statementDesc = "", $ref, $amount ,$firstName, $email, $country_code ,$phone,$platform_fee, $redirectUrl, $gateway)
     {
 
         $chargeEndpoint = $this->apiEndpoint . "/charges";
 
         $chargeParams = [
             "amount" => $amount,
-            "currency" => "KWD",
+            "currency" => $currency,
             "threeDSecure" => true,
             "save_card" => false,
             "description" => $desc,
             "statement_descriptor" => $statementDesc,
-            "metadata" => [
-            // "udf1" => "test 1",
-            // "udf2" => "test 2"
-            ],
             "reference" => [
                 "transaction" => $ref,
                 "order" => $ref
@@ -429,7 +425,7 @@ class TapPayments extends Component
                 "first_name" => $firstName,
                 "email" => $email,
                 "phone" => [
-                    "country_code" => "965",
+                    "country_code" => $country_code,
                     "number" => $phone
                 ]
             ],

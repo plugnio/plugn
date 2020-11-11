@@ -14,9 +14,11 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'country_name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'country_code')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'iso')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'country_status')->textInput() ?>
+    <?= $form->field($model, 'iso3')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'country_code')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

@@ -19,9 +19,11 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'country_name') ?>
 
-    <?= $form->field($model, 'country_code') ?>
+    <?= $form->field($model, 'iso') ?>
 
-    <?= $form->field($model, 'country_status') ?>
+    <?= $form->field($model, 'iso3') ?>
+
+    <?= $form->field($model, 'country_code') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>

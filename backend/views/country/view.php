@@ -31,8 +31,9 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'country_id',
             'country_name',
+            'iso',
+            'iso3',
             'country_code',
-            'country_status',
         ],
     ]) ?>
 

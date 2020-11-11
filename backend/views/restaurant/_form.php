@@ -43,6 +43,7 @@ supportPickupInput.change(function(){
 
 
 $this->registerJs($js);
+use borales\extensions\phoneInput\PhoneInput;
 
 
 /* @var $this yii\web\View */
@@ -81,14 +82,9 @@ $this->registerJs($js);
     ?>
 
     <?=
-    $form->field($model, 'country_id')->widget(Select2::classname(), [
-        'data' => $countryArray,
-        'options' => [
-            'placeholder' => 'Select country ...',
-            'multiple' => false,
-            'value' => $model->country_id
-        ],
-    ]);
+     $form->field($model, 'phone_number')->widget(PhoneInput::className())->label(false);
+
+
     ?>
 
     <?=

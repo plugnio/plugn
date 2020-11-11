@@ -53,8 +53,15 @@ $this->registerJs($js);
               'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
                   'customer_name',
-                  'customer_phone_number',
+                  [
+                      'attribute' => 'customer_phone_number',
+                      "format" => "raw",
+                      "value" => function($model) {
+                          return '<a href="tel:+'. $model->customer_phone_number .'"> '. $model->customer_phone_number.' </a>';
+                      }
+                  ],
                   'customer_email:email',
+
                   [
                       'label' => 'Number of orders',
                       "format" => "raw",

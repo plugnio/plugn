@@ -32,7 +32,7 @@ class SmsComponent extends Component
     /**
      * Send SMS
      */
-    public function sendSms($phone_number,$orderUuid)
+    public function sendSms($country_code, $phone_number,$orderUuid)
     {
 
         $urlShortner = 'https://i.plugn.io/' . $orderUuid;
@@ -44,7 +44,7 @@ class SmsComponent extends Component
             "UID" => "usrbawes",
             "p" => "bawes1452",
             "S" => "Plugn",
-            "G" => "965" . $phone_number,
+            "G" => $country_code . $phone_number,
             "M" => 'Order #'.  $orderUuid .' has been accepted. Get order status updates at '. $urlShortner,
             "L" => "L",
         ];

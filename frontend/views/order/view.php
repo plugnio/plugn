@@ -626,7 +626,13 @@ $this->registerJs($js);
                     'model' => $model,
                     'attributes' => [
                         'customer_name',
-                        'customer_phone_number',
+                        [
+                            'attribute' => 'customer_phone_number',
+                            "format" => "raw",
+                            "value" => function($model) {
+                                return '<a href="tel:+'. $model->customer_phone_number .'"> '. $model->customer_phone_number.' </a>';
+                            }
+                        ],
                         'customer_email:email',
                         [
                             'attribute' => 'order_mode',

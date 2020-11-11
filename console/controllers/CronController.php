@@ -30,34 +30,27 @@ class CronController extends \yii\console\Controller {
     public function actionIndex(){
         $restaurants = Restaurant::find()->all();
 
-        $freePlan = Plan::find()->where(['valid_for' => 0])->one();
-        $premPlan = Plan::find()->where(['platform_fee' => 0])->one();
-
 
         foreach ($restaurants as  $restaurant) {
           if($restaurant){
 
-            $restaurant->restaurant_domain = str_replace("http://", "https://", $restaurant->restaurant_domain);
+            $restaurant->phone_number = "+965" . $restaurant->phone_number;
+            $restaurant->owner_number = "+965" . $restaurant->owner_number;
 
-            $restaurant->company_name = $restaurant->name;
-            $restaurant->has_deployed = 1;
+            $restaurant->save(false);
+          }
 
-            if($restaurant->live_api_key && $restaurant->test_api_key)
-              $restaurant->is_tap_enable = 1;
+        }
 
-              $subscription = new Subscription();
-              $subscription->restaurant_uuid = $restaurant->restaurant_uuid;
-              $subscription->subscription_start_at = $restaurant->restaurant_created_at;
-              $subscription->subscription_status = Subscription::STATUS_ACTIVE;
+        $customers = \common\models\Customer::find()->all();
 
-          if($restaurant->platform_fee == 0)
-            $subscription->plan_id = $premPlan->plan_id; //Prem
-          else
-            $subscription->plan_id = $freePlan->plan_id; //Free
 
-            $subscription->save(false);
+        foreach ($customers as  $customer) {
+          if($customer){
 
-            $restaurant->save();
+            $customer->customer_phone_number = "+965" . $customer->customer_phone_number;
+
+            $customer->save(false);
           }
 
         }

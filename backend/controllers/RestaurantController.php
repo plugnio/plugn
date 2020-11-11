@@ -132,7 +132,6 @@ class RestaurantController extends Controller {
      */
     public function actionCreate() {
         $model = new Restaurant();
-        $model->setScenario(Restaurant::SCENARIO_CREATE);
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->save()) {
 

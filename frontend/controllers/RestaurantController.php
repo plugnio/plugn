@@ -793,12 +793,14 @@ class RestaurantController extends Controller {
 
         $model = $this->findModel($id);
 
+
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index', 'restaurantUuid' => $id]);
         }
 
         return $this->render('update', [
-                    'model' => $model
+                    'model' => $model,
+                    'madeAnySales' => $model->getOrders()->exists()
         ]);
     }
 

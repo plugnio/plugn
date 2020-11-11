@@ -145,7 +145,13 @@ $this->registerJs($js);
                         return $data->customer_id ? true : false;
                     },
                 ],
-                'customer_phone_number',
+                [
+                    'attribute' => 'customer_phone_number',
+                    "format" => "raw",
+                    "value" => function($model) {
+                        return '<a href="tel:+'. $model->customer_phone_number .'"> '. $model->customer_phone_number.' </a>';
+                    }
+                ],
                 [
                     'label' => 'When',
                     'format' => 'raw',

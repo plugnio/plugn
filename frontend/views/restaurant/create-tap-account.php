@@ -7,10 +7,13 @@ use common\models\Agent;
 use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
 use common\models\Area;
+use common\models\Country;
+use common\models\Currency;
 use common\models\RestaurantDelivery;
 use kartik\file\FileInput;
 use common\models\Restaurant;
 use kartik\daterange\DateRangePicker;
+use borales\extensions\phoneInput\PhoneInput;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Restaurant */
@@ -90,10 +93,22 @@ $this->registerJs($js);
 <div class="col-12">
 
     <?php
-    $form = ActiveForm::begin([
-                'id' => 'dynamic-form',
-                'errorSummaryCssClass' => 'alert alert-danger'
-    ]);
+
+
+        $countryQuery = Country::find()->asArray()->all();
+        $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
+
+
+
+        $currencyQuery = Currency::find()->asArray()->all();
+        $currencyArray = ArrayHelper::map($currencyQuery, 'currency_id', 'title');
+
+
+
+        $form = ActiveForm::begin([
+                    'id' => 'dynamic-form',
+                    'errorSummaryCssClass' => 'alert alert-danger'
+        ]);
     ?>
     <?= $form->errorSummary([$model], ['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
 
@@ -121,13 +136,29 @@ $this->registerJs($js);
                 </div>
 
                 <div class="col-12 col-sm-6 col-lg-6">
-                    <?= $form->field($model, 'owner_number')->input('number')->label('Phone Number *') ?>
+                    <?=
+                        $form->field($model, 'phone_number')->widget(PhoneInput::className(), [
+                             'jsOptions' => [
+                                 'preferredCountries' => ['kw', 'sa', 'aed','qa','bh','om'],
+                             ]
+                         ])->label('Phone Number *');
+                   ?>
+
                 </div>
             </div>
 
             <div class="row">
               <div class="col-12">
                   <?= $form->field($model, 'company_name')->textInput(['maxlength' => true, 'value' => $model->name, 'id' => 'company_name'])->label('Business name *') ?>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12 col-lg-6">
+                  <?= $form->field($model, 'country_id')->dropDownList($countryArray)->label('Business location'); ?>
+              </div>
+              <div class="col-12 col-lg-6">
+                <?= $form->field($model, 'currency_id')->dropDownList($currencyArray); ?>
               </div>
             </div>
             <div class="row">

@@ -240,6 +240,7 @@ class SiteController extends Controller {
 
 
               $response = Yii::$app->tapPayments->createCharge(
+                      "KWD",
                       "Upgrade $managedRestaurant->name's plan to " . $subscription_model->plan->name, // Description
                       'Plugn', //Statement Desc.
                        $payment->payment_uuid, // Reference
@@ -1281,7 +1282,7 @@ class SiteController extends Controller {
                       \Yii::info("[New Store Signup] " . $store_model->name . " has just joined Plugn", __METHOD__);
 
 
-                    $this->getView()->registerJs("                  
+                    $this->getView()->registerJs("
                                     <script>
                                         gtag('event', 'conversion', {
                                             'send_to': 'AW-946322720/CmDDCN_6tugBEKD6nsMD',
@@ -1289,9 +1290,9 @@ class SiteController extends Controller {
                                         });
                                     </script>
                                 ");
-                    
-        
-                    
+
+
+
                         return $this->redirect(['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
                     } else {
                         $model->password = '';
