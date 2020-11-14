@@ -10,6 +10,7 @@ use Yii;
  * @property int $payment_method_id
  * @property string|null $payment_method_name
  * @property string|null $payment_method_name_ar
+ * @property string|null $source_id
  *
  * @property RestaurantPaymentMethod[] $restaurantPaymentMethods
  * @property Restaurant[] $restaurantUus
@@ -30,7 +31,7 @@ class PaymentMethod extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['payment_method_name' , 'payment_method_name_ar'], 'string', 'max' => 255],
+            [['payment_method_name' , 'payment_method_name_ar', 'source_id'], 'string', 'max' => 255],
         ];
     }
 

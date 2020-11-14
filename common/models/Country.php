@@ -12,7 +12,8 @@ use Yii;
  * @property string|null $iso
  * @property string|null $iso3
  * @property int|null $country_code
- *
+
+ * @property CountryPaymentMethod[] $countryPaymentMethods
  * @property Restaurant[] $restaurants
  */
 class Country extends \yii\db\ActiveRecord
@@ -51,6 +52,29 @@ class Country extends \yii\db\ActiveRecord
             'country_code' => 'Country Code',
         ];
     }
+
+
+
+    /**
+     * Gets query for [[CountryPaymentMethods]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCountryPaymentMethods()
+    {
+        return $this->hasMany(CountryPaymentMethod::className(), ['country_id' => 'country_id']);
+    }
+
+    /**
+     * Gets query for [[PaymentMethods]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPaymentMethods()
+    {
+        return $this->hasMany(PaymentMethod::className(), ['payment_method_id' => 'payment_method_id'])->viaTable('country_payment_method', ['country_id' => 'country_id']);
+    }
+
 
     /**
      * Gets query for [[Restaurants]].

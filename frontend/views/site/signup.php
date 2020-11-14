@@ -4,8 +4,12 @@
 /* @var $agent_model \frontend\models\ContactForm */
 
 use yii\helpers\Html;
+use yii\helpers\ArrayHelper;
 use yii\bootstrap\ActiveForm;
 use yii\captcha\Captcha;
+use common\models\Country;
+use common\models\Currency;
+
 
 $this->title = 'Create an Online Store';
 $this->params['breadcrumbs'][] = $this->title;
@@ -29,7 +33,18 @@ $this->params['breadcrumbs'][] = $this->title;
                         <p class="px-2">Fill the below form to create an online store.</p>
                         <div class="card-content">
                             <div class="card-body pt-0">
-                                <?php $form = ActiveForm::begin(['id' => 'store-form', 'enableClientScript' => false]); ?>
+                                <?php
+
+                                      $form = ActiveForm::begin(['id' => 'store-form', 'enableClientScript' => false]);
+
+                                      $countryQuery = Country::find()->asArray()->all();
+                                      $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
+
+
+                                        $currencyQuery = Currency::find()->asArray()->all();
+                                        $currencyArray = ArrayHelper::map($currencyQuery, 'currency_id', 'title');
+
+                                ?>
 
 
                                 <?= $form->field($agent_model, 'agent_name')->textInput(['maxlength' => true])->label('Your name *') ?>
@@ -60,6 +75,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ])->label('Store URL *')
                                 ?>
 
+                                <?= $form->field($store_model, 'country_id')->dropDownList($countryArray)->label('Business location *'); ?>
+
+
+                                <?= $form->field($store_model, 'currency_id')->dropDownList($currencyArray)->label('Store Currency *'); ?>
 
                                 <?= $form->field($agent_model, 'tempPassword')->passwordInput(['maxlength' => true])->label('Password *') ?>
 

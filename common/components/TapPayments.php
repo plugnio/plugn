@@ -185,7 +185,6 @@ class TapPayments extends Component
     public function createBussiness($restaurant)
     {
 
-
         $bussinessEndpoint = $this->apiEndpoint . "/business";
 
         $bussinessParams = [
@@ -201,7 +200,7 @@ class TapPayments extends Component
                 ],
                 "is_licensed" => 'true',
                 "license_number" => $restaurant->license_number,
-                "country" => "KW",
+                "country" => $restaurant->country->iso,
                 "documents" => [],
                 "bank_account" => [
                     "iban" => $restaurant->iban
@@ -217,14 +216,14 @@ class TapPayments extends Component
                         "email" => $restaurant->owner_email,
                         "phone" => [
                             "country_code" => $restaurant->owner_phone_country_code,
-                            "number" => $restaurant->owner_number
+                            "number" => str_replace('+'.$restaurant->owner_phone_country_code, '',$restaurant->owner_number)
                         ]
                     ]
                 ],
                 "identification" => [
                     [
                         "type" => "Identity Card",
-                        "issuing_country" => $restaurant->identification_issuing_country,
+                        "issuing_country" => $restaurant->country->iso,
                         "images" => [
                             $restaurant->identification_file_id_front_side,
                             $restaurant->identification_file_id_back_side,
@@ -249,15 +248,15 @@ class TapPayments extends Component
 
 
         if (
-                $restaurant->authorized_signature_issuing_country &&
+
                 $restaurant->authorized_signature_file_id &&
-                $restaurant->commercial_license_issuing_country &&
+
                 $restaurant->commercial_license_file_id
         ) {
             $authorizedSignatureDocument = [
                 "type" => "Authorized Signature",
                 "number" => 1,
-                "issuing_country" => $restaurant->authorized_signature_issuing_country,
+                "issuing_country" => $restaurant->country->iso,
                 "issuing_date" => $restaurant->authorized_signature_issuing_date,
                 "expiry_date" => $restaurant->authorized_signature_expiry_date,
                 "images" => [
@@ -271,7 +270,7 @@ class TapPayments extends Component
             $commercialLicenseDocument = [
                 "type" => "Commercial License",
                 "number" => 1,
-                "issuing_country" => $restaurant->commercial_license_issuing_country,
+                "issuing_country" => $restaurant->country->iso,
                 "issuing_date" => $restaurant->commercial_license_issuing_date,
                 "expiry_date" => $restaurant->commercial_license_expiry_date,
                 "images" => [

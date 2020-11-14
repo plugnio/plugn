@@ -81,11 +81,6 @@ use borales\extensions\phoneInput\PhoneInput;
     $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]);
     ?>
 
-    <?=
-     $form->field($model, 'phone_number')->widget(PhoneInput::className())->label(false);
-
-
-    ?>
 
     <?=
     $form->field($model, 'currency_id')->widget(Select2::classname(), [

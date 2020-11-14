@@ -541,6 +541,35 @@ class RestaurantController extends Controller {
     }
 
     /**
+     * Disable payment method
+     * @return mixed
+     */
+    public function actionDisablePaymentMethod($restaurantUuid, $paymentMethodId) {
+
+      $model = $this->findModel($restaurantUuid);
+      RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => $paymentMethodId]);
+      return $this->redirect(['view-payment-methods', 'restaurantUuid' => $model->restaurant_uuid]);
+
+    }
+
+    /**
+     * Enable payment method
+     * @return mixed
+     */
+    public function actionEnablePaymentMethod($restaurantUuid, $paymentMethodId) {
+
+      $model = $this->findModel($restaurantUuid);
+
+      $restaurant_payment_method_model = new RestaurantPaymentMethod();
+      $restaurant_payment_method_model->payment_method_id = $paymentMethodId;
+      $restaurant_payment_method_model->restaurant_uuid = $model->restaurant_uuid;
+      $restaurant_payment_method_model->save(false);
+
+      return $this->redirect(['view-payment-methods', 'restaurantUuid' => $model->restaurant_uuid]);
+
+    }
+
+    /**
      * View payment settings page
      * @return mixed
      */
@@ -550,6 +579,9 @@ class RestaurantController extends Controller {
         $isCashOnDeliveryEnabled = $model->getPaymentMethods()->where(['payment_method_id' => 3])->exists();
         $isOnlinePaymentEnabled = $model->getPaymentMethods()->where(['payment_method_id' => 1])->exists();
 
+        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
+          die('FUCL');
+        }
         return $this->render('payment-methods', [
                   'model' => $model,
                   'isCashOnDeliveryEnabled' => $isCashOnDeliveryEnabled,

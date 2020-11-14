@@ -5,9 +5,11 @@ namespace common\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
+use yii\db\ActiveRecord;
 use common\models\Customer;
 use common\models\Agent;
 use yii\behaviors\AttributeBehavior;
+use borales\extensions\phoneInput\PhoneInputValidator;
 
 /**
  * This is the model class for table "order".
@@ -64,6 +66,7 @@ use yii\behaviors\AttributeBehavior;
  * @property Customer $customer
  * @property PaymentMethod $paymentMethod
  * @property Restaurant $restaurant
+ * @property Country $country
  * @property RestaurantDelivery $restaurantDelivery
  * @property Payment $payment
  * @property Voucher $voucher
@@ -118,7 +121,7 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['customer_name', 'customer_phone_country_code','customer_phone_number', 'order_mode'], 'required'],
+            [['customer_name', 'order_mode'], 'required'],
             [['is_order_scheduled'], 'required' , 'on' => 'create'],
             [['payment_method_id'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['order_uuid'], 'string', 'max' => 40],
@@ -137,6 +140,8 @@ class Order extends \yii\db\ActiveRecord {
               self::MASHKOR_ORDER_STATUS_CANCELED,
             ]],
 
+            [['customer_phone_number'], 'required', 'on' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
+            [['customer_phone_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number'],
             ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_PARTIALLY_REFUNDED, self::STATUS_CANCELED, self::STATUS_DRAFT, self::STATUS_ABANDONED_CHECKOUT, self::STATUS_ACCEPTED]],
 
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
@@ -186,6 +191,7 @@ class Order extends \yii\db\ActiveRecord {
             ],
             [['customer_email'], 'email'],
             [['payment_method_id'], 'validatePaymentMethodId', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
+            [['payment_method_id'], 'default', 'value' => 3, 'on' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['voucher_id'], 'validateVoucherId', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['payment_uuid'], 'string', 'max' => 36],
             [['estimated_time_of_arrival', 'scheduled_time_start_from', 'scheduled_time_to', 'latitude', 'longitude'], 'safe'],
@@ -222,7 +228,11 @@ class Order extends \yii\db\ActiveRecord {
                 }
             ],
             [
+
              'class' => \borales\extensions\phoneInput\PhoneInputBehavior::className(),
+             'attributes' => [
+                       ActiveRecord::EVENT_BEFORE_INSERT => ['customer_phone_number', 'customer_phone_country_code'],
+                   ],
              'countryCodeAttribute' => 'customer_phone_country_code',
              'phoneAttribute' => 'customer_phone_number',
             ],
@@ -709,6 +719,7 @@ class Order extends \yii\db\ActiveRecord {
             $this->save(false);
         }
 
+
         if ($insert) {
 
             if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
@@ -785,6 +796,21 @@ class Order extends \yii\db\ActiveRecord {
 
             $this->save(false);
         }
+
+        if(!$insert && $this->customer_id){
+
+                    //Save Customer data
+                    $customer_model = Customer::findOne($this->customer_id);
+
+                    $customer_model->customer_name = $this->customer_name;
+                    $customer_model->country_code = $this->customer_phone_country_code;
+                    $customer_model->customer_phone_number = $this->customer_phone_number;
+
+                    if ($this->customer_email != null)
+                        $customer_model->customer_email = $this->customer_email;
+
+                    $customer_model->save(false);
+        }
     }
 
 
@@ -807,6 +833,16 @@ class Order extends \yii\db\ActiveRecord {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+
+    /**
+   * Gets query for [[Country]].
+   *
+   * @return \yii\db\ActiveQuery
+   */
+  public function getCountry()
+  {
+      return $this->hasOne(Country::className(), ['country_id' => 'country_id'])->via('restaurant');
+  }
 
 
       /**

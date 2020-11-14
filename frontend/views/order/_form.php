@@ -117,6 +117,7 @@ $this->registerJs($js);
            $form->field($model, 'customer_phone_number')->widget(PhoneInput::className(), [
               'jsOptions' => [
                   'preferredCountries' => ['kw', 'sa', 'aed','qa','bh','om'],
+                  'initialCountry' => $model->country->iso
               ]
           ]);
         ?>

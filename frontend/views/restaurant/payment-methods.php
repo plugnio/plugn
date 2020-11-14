@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use common\models\Restaurant;
+use common\models\RestaurantPaymentMethod;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Restaurant */
@@ -50,9 +51,6 @@ $this->params['breadcrumbs'][] = $this->title;
         margin: 24px;
     }
 
-    .payment-method-icon{
-      margin-right: 5px;
-    }
 </style>
 <div class="restaurant-view">
     <?php if (Yii::$app->session->getFlash('error') != null) { ?>
@@ -103,13 +101,20 @@ $this->params['breadcrumbs'][] = $this->title;
                             <th>Settlement Window</th>
                             <th class="<?= $model->plan->plan_id == 2 ? 'current-plan-header-row' : '' ?>">Premium Plan Fees</th>
                             <th class="<?= $model->plan->plan_id == 1 ? 'current-plan-header-row' : '' ?>">Free Plan Fees</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
+
+                        <!-- Credit card -->
                         <tr>
                             <th scope="row">
-                                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiPgogICAgICAgIDxwYXRoIGZpbGw9IiMzRjUxQjUiIGQ9Ik0yNCAxMy44NjdDMjQgMTUuMDQ1IDIyLjk3NyAxNiAyMS43MTQgMTZIMi4yODZDMS4wMjMgMTYgMCAxNS4wNDUgMCAxMy44NjdWMi4xMzNDMCAuOTU1IDEuMDIzIDAgMi4yODYgMGgxOS40MjhDMjIuOTc3IDAgMjQgLjk1NSAyNCAyLjEzM3YxMS43MzR6Ii8+CiAgICAgICAgPGVsbGlwc2UgY3g9IjE1LjE0MyIgY3k9IjgiIGZpbGw9IiNGRkMxMDciIHJ4PSI1LjIzOCIgcnk9IjUuMzMzIi8+CiAgICAgICAgPHBhdGggZmlsbD0iI0ZGM0QwMCIgZD0iTTEwLjk2IDExLjJjLS4yNDMtLjMzLS40NTItLjY4NS0uNjE2LTEuMDY3aDIuNzg5Yy4xNDYtLjMzOS4yNi0uNjk1LjMzNC0xLjA2NkgxMC4wMWMtLjA3LS4zNDUtLjEwNi0uNzAxLS4xMDYtMS4wNjdoMy42NjZjMC0uMzY2LS4wMzYtLjcyMi0uMTA1LTEuMDY3SDEwLjAxYy4wNzQtLjM3LjE4OC0uNzI3LjMzNC0xLjA2NmgyLjc4OWMtLjE2NC0uMzgyLS4zNzItLjczOC0uNjE2LTEuMDY3SDEwLjk2Yy4yMjktLjMxLjQ4Ny0uNTk4Ljc3NS0uODUtLjkxNS0uNzk5LTIuMTAyLTEuMjgzLTMuNDAyLTEuMjgzQzUuNDQgMi42NjcgMy4wOTUgNS4wNTQgMy4wOTUgOHMyLjM0NSA1LjMzMyA1LjIzOCA1LjMzM2MxLjcxMyAwIDMuMjI4LS44NCA0LjE4My0yLjEzM0gxMC45NnoiLz4KICAgIDwvZz4KPC9zdmc+Cg==" width="24px" height="16px" class="payment-method-icon">
-                                Mastercard
+                                <div style="text-align: center; display:block">
+                                  <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/master-card.svg' ?>">
+                                  <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/visa.svg' ?>">
+                                </div>
+
+                                <span style="margin-top:5px;text-align: center; display:block">Credit Card</span>
                             </th>
                             <td>
                                 5 working days
@@ -120,26 +125,32 @@ $this->params['breadcrumbs'][] = $this->title;
                             <td class="<?= $model->plan->plan_id == 1 ? 'current-plan-body-row' : '' ?>">
                                 5% per transaction, no minimum.
                             </td>
+                            <td>
+                              <?php
 
-                        </tr>
-                        <tr>
-                            <th scope="row">
-                                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiPgogICAgICAgIDxwYXRoIGZpbGw9IiMxNTY1QzAiIGQ9Ik0yNCAxMy44NjdDMjQgMTUuMDQ1IDIyLjk3NyAxNiAyMS43MTQgMTZIMi4yODZDMS4wMjMgMTYgMCAxNS4wNDUgMCAxMy44NjdWMi4xMzNDMCAuOTU1IDEuMDIzIDAgMi4yODYgMGgxOS40MjhDMjIuOTc3IDAgMjQgLjk1NSAyNCAyLjEzM3YxMS43MzR6Ii8+CiAgICAgICAgPGcgZmlsbD0iI0ZGRiI+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0zLjgzMy41MTlsLTEuNDAxIDQuMDZzLS4zNTYtMS43MTctLjM5LTEuOTMzQzEuMjQzLjg3Ny4wNjYuOTc2LjA2Ni45NzZsMS4zODcgNS4yNDZIMy4xNEw1LjQ3LjUxOEgzLjgzNHpNNS4xNjcgNi4yMjJMNi42OTkgNi4yMjIgNy42MjUuNTE5IDYuMDc0LjUxOXpNMTYuMDA0LjUxOWgtMS42MUwxMS44OCA2LjIyMmgxLjUyMWwuMzE0LS44MTRoMS45MThsLjE2My44MTRoMS4zOTNMMTYuMDA0LjUyem0tMS44NjQgMy44bC44MzQtMi4xNTYuNDM2IDIuMTU1aC0xLjI3ek05Ljc5NyAyLjE4YzAtLjMxMy4yNjUtLjU0NyAxLjAyNy0uNTQ3LjQ5NSAwIDEuMDYyLjM1IDEuMDYyLjM1bC4yNDgtMS4xOThTMTEuNDEuNTE4IDEwLjcuNTE4Yy0xLjYxIDAtMi40NC43NDktMi40NCAxLjY5NyAwIDEuNzE0IDIuMTIyIDEuNDc5IDIuMTIyIDIuMzYgMCAuMTUtLjEyMy41LTEuMDA3LjUtLjg4NyAwLTEuNDcyLS4zMTctMS40NzItLjMxN2wtLjI2NCAxLjE1cy41NjcuMzE0IDEuNjYzLjMxNGMxLjA5OCAwIDIuNjIxLS43OTkgMi42MjEtMS45NDYgMC0xLjM4LTIuMTI1LTEuNDgtMi4xMjUtMi4wOTV6IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzLjY0IDQuNDQ0KSIvPgogICAgICAgIDwvZz4KICAgICAgICA8cGF0aCBmaWxsPSIjRkZDMTA3IiBkPSJNNS40IDhsLS40ODctMi4xOTJzLS4yMi0uNDc1LS43OTQtLjQ3NUgxLjg4UzQuNzM1IDYuMTA1IDUuNCA4eiIvPgogICAgPC9nPgo8L3N2Zz4K" width="24px" height="16px" class="payment-method-icon">
-                                Visa
-                            </th>
-                            <td>  5 working days </td>
-                            <td class="<?= $model->plan->plan_id == 2 ? 'current-plan-body-row' : '' ?>">
-                                2.5% per transaction, no minimum.
-                            </td>
-                            <td class="<?= $model->plan->plan_id == 1 ? 'current-plan-body-row' : '' ?>">
-                                5% per transaction, no minimum.
+                                  if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 2])->exists())
+                                    echo Html::a('Disable', ['disable-payment-method', 'restaurantUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 2], ['class' => 'btn btn-danger']);
+                                  else
+                                    echo Html::a('Enable', ['enable-payment-method', 'restaurantUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 2], ['class' => 'btn btn-success']);
+
+                              ?>
                             </td>
 
                         </tr>
+
+                        <!-- KNET -->
+                        <?php if ($model->country->iso == 'KW') { ?>
+
                         <tr>
                             <th scope="row">
-                                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjE2IiBmaWxsPSIjMDc3MkI4IiByeD0iMyIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNGQ0VEMjAiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTE4IDkuODkyTDE0Ljg4NSA3LjczIDE3LjY1NCA2IDEyLjU3NyA2IDkuODA4IDcuNzMgOS44MDggNiA2IDYgNiAxMCA5LjgwOCAxMCA5LjgwOCA3LjgzOCAxMi41NzcgOS44OTJ6Ii8+CiAgICAgICAgPHBhdGggZmlsbD0iI0Y1RjVGOSIgZD0iTTAgNUwyNCA1IDI0IDUuMiAwIDUuMnpNMCAxMS40TDI0IDExLjQgMjQgMTEuNiAwIDExLjZ6Ii8+CiAgICAgICAgPHBhdGggZmlsbD0iI0ZGRiIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNNy42MTYgMTMuOTI3aC0uNDY5di0uNzQyYzAtLjE1Ny0uMDEtLjI1OC0uMDMtLjMwNC0uMDItLjA0Ni0uMDUyLS4wODItLjA5OC0uMTA4LS4wNDUtLjAyNS0uMDk5LS4wMzgtLjE2Mi0uMDM4LS4wODIgMC0uMTU1LjAxOC0uMjIuMDU1LS4wNjQuMDM2LS4xMDguMDg0LS4xMzIuMTQ1LS4wMjQuMDYtLjAzNi4xNzEtLjAzNi4zMzR2LjY1OEg2di0xLjQ1NGguNDM2di4yMTRjLjE1NS0uMTY0LjM1LS4yNDYuNTg0LS4yNDYuMTA0IDAgLjE5OC4wMTUuMjg0LjA0NS4wODYuMDMxLjE1LjA3LjE5NS4xMTcuMDQ0LjA0OC4wNzQuMTAyLjA5Mi4xNjIuMDE3LjA2LjAyNS4xNDYuMDI1LjI1OXYuOTAzem00LjU4Ny0uNDYzbC40NjguMDY1Yy0uMDYuMTQtLjE1NS4yNDctLjI4NS4zMi0uMTMuMDc0LS4yOTIuMTExLS40ODcuMTExLS4zMDggMC0uNTM2LS4wODMtLjY4NS0uMjQ4LS4xMTYtLjEzMi0uMTc1LS4zLS4xNzUtLjUgMC0uMjQyLjA3Ny0uNDMuMjMtLjU2Ny4xNTQtLjEzNi4zNDgtLjIwNC41ODMtLjIwNC4yNjQgMCAuNDcyLjA3LjYyNS4yMTQuMTUyLjE0My4yMjUuMzYxLjIxOS42NTZIMTEuNTJjLjAwMy4xMTQuMDQxLjIwMy4xMTQuMjY2LjA3Mi4wNjQuMTYyLjA5Ni4yNy4wOTYuMDc0IDAgLjEzNS0uMDE3LjE4Ni0uMDUuMDUtLjAzMy4wODctLjA4Ni4xMTMtLjE1OXptLjAyNy0uMzg4Yy0uMDA0LS4xMTItLjAzOS0uMTk2LS4xMDUtLjI1NC0uMDY3LS4wNTgtLjE0OC0uMDg3LS4yNDQtLjA4Ny0uMTAzIDAtLjE4Ny4wMy0uMjU0LjA5Mi0uMDY3LjA2LS4xLjE0NC0uMDk5LjI0OWguNzAyem01LjczMi0uNTYzdi4zMDdoLS4zMjF2LjU4NmMwIC4xMTkuMDAzLjE4OC4wMS4yMDcuMDA1LjAyLjAyLjAzNi4wNC4wNDkuMDIzLjAxMy4wNDkuMDE5LjA4LjAxOS4wNDQgMCAuMTA3LS4wMTIuMTg5LS4wMzdsLjA0LjI5OWMtLjExLjAzOC0uMjMzLjA1Ny0uMzcuMDU3LS4wODUgMC0uMTYyLS4wMTItLjIzLS4wMzUtLjA2Ny0uMDIzLS4xMTctLjA1My0uMTQ5LS4wOS0uMDMyLS4wMzctLjA1NC0uMDg3LS4wNjYtLjE1LS4wMS0uMDQ1LS4wMTUtLjEzNS0uMDE1LS4yNzF2LS42MzRoLS4yMTV2LS4zMDdoLjIxNXYtLjI4OGwuNDcxLS4yMjV2LjUxM2guMzJ6Ii8+CiAgICAgICAgPHBhdGggZmlsbD0iI0ZGRiIgZD0iTTIwLjA1NCAybC4yNS4zNzVoLTEuNjE5bC4yMTIuMjVoMS42NTVMMjEgM2wtLjU3Mi41aC0yLjg2M2wtLjI0OS0uMjVWNGgtMy40ODRWMi41aDIuNDg5di42MjVoLTEuMzdWMy41aDEuNzQzdi0xaC44NzFsLjU3My42MjVoMS43OTJ2LS4yNWgtMS42MThMMTcuNTY1IDJoMi40OXptLTEuODY3IDEuNjI1VjRoLS4zNzN2LS4zNzVoLjM3M3ptLjg3MiAwVjRoLS4zNzR2LS4zNzVoLjM3NHpNNS42MTggMmwtLjYyMiAxLjEyNUg5LjM1VjIuNzVoLjYyM3YuMzc1aC4zNzNWMi43NWguODcxdjFoLTYuNzJMNCAzLjEyNSA0Ljg3MSAyaC43NDd6bTcuNDY3Ljg3NXYuNUgxMS44NHYtLjVoMS4yNDV6bS0xLjk5MS0uNzV2LjVoLS40OTh2LS41aC40OTh6bS00LjczIDB2LjVoLS40OTd2LS41aC40OTh6bS42MjMgMHYuNWgtLjQ5OHYtLjVoLjQ5OHoiLz4KICAgIDwvZz4KPC9zdmc+Cg==" width="24px" height="16px" class="payment-method-icon">
-                                KNET
+                              <div style="text-align: center; display:block">
+
+                                <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/knet.svg' ?>">
+
+                              </div>
+                              <span style="margin-top:5px;text-align: center; display:block">KNET</span>
+
+
                             </th>
                             <td>  3 working days</td>
                             <td class="<?= $model->plan->plan_id == 2 ? 'current-plan-body-row current-plan-bottom-row' : '' ?>">
@@ -148,7 +159,88 @@ $this->params['breadcrumbs'][] = $this->title;
                             <td class="<?= $model->plan->plan_id == 1 ? 'current-plan-body-row current-plan-bottom-row' : '' ?>">
                                 5% per transaction, a minimum of 200 fills.
                             </td>
+                            <td >
+                              <?php
+
+                                  if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 1])->exists())
+                                    echo Html::a('Disable', ['disable-payment-method', 'restaurantUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 1], ['class' => 'btn btn-danger']);
+                                  else
+                                    echo Html::a('Enable', ['enable-payment-method', 'restaurantUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 1], ['class' => 'btn btn-success']);
+
+                              ?>
+                            </td>
                         </tr>
+                      <?php  }  ?>
+
+                      <!-- SA -->
+                        <?php if ($model->country->iso == 'SA') { ?>
+
+                        <tr>
+                            <th scope="row">
+                              <div style="text-align: center; display:block">
+
+                                <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/mada.svg' ?>" style=" width: 30px; ">
+
+                              </div>
+                              <span style="margin-top:5px;text-align: center; display:block">Mada</span>
+
+
+                            </th>
+                            <td>  3 working days</td>
+                            <td class="<?= $model->plan->plan_id == 2 ? 'current-plan-body-row current-plan-bottom-row' : '' ?>">
+                                1% per transaction, a minimum of 100 fills.
+                            </td>
+                            <td class="<?= $model->plan->plan_id == 1 ? 'current-plan-body-row current-plan-bottom-row' : '' ?>">
+                                5% per transaction, a minimum of 200 fills.
+                            </td>
+                            <td >
+                              <?php
+
+                                  if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 4])->exists())
+                                    echo Html::a('Disable', ['disable-payment-method', 'restaurantUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 4], ['class' => 'btn btn-danger']);
+                                  else
+                                    echo Html::a('Enable', ['enable-payment-method', 'restaurantUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 4], ['class' => 'btn btn-success']);
+
+                              ?>
+                            </td>
+                        </tr>
+                      <?php  }  ?>
+
+                      <!-- BH -->
+                        <?php if ($model->country->iso == 'BH') { ?>
+
+                        <tr>
+                            <th scope="row">
+                              <div style="text-align: center; display:block">
+
+                                <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/benefit.png' ?>" style="max-width:50px">
+
+                              </div>
+                              <span style="text-align: center; display:block">Benefit</span>
+
+
+                            </th>
+                            <td>  3 working days</td>
+                            <td class="<?= $model->plan->plan_id == 2 ? 'current-plan-body-row current-plan-bottom-row' : '' ?>">
+                                1% per transaction, a minimum of 100 fills.
+                            </td>
+                            <td class="<?= $model->plan->plan_id == 1 ? 'current-plan-body-row current-plan-bottom-row' : '' ?>">
+                                5% per transaction, a minimum of 200 fills.
+                            </td>
+                            <td >
+                              <?php
+
+                                  if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 5])->exists())
+                                    echo Html::a('Disable', ['disable-payment-method', 'restaurantUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-danger']);
+                                  else
+                                    echo Html::a('Enable', ['enable-payment-method', 'restaurantUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-success']);
+
+                              ?>
+                            </td>
+                        </tr>
+                      <?php  }  ?>
+
+
                     </tbody>
                 </table>
 

@@ -91,11 +91,9 @@ return [
                     'controller' => 'v1/payment',
                     'pluralize' => false,
                     'patterns' => [
-                        'GET payment-detail/<id>' => 'payment-detail',
                         'GET <id>' => 'list-all-restaurants-payment-method',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS payment-detail/<id>' => 'options',
                         'OPTIONS <id>' => 'options',
                     ]
                 ],

@@ -112,6 +112,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'restaurant_domain',
             'thumbnail_image',
             'logo',
+            'identification_file_front_side',
+            'identification_file_back_side',
             [
                 'attribute' => 'thumbnail_image',
                 'format' => 'html',

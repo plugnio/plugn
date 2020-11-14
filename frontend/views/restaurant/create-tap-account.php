@@ -94,17 +94,6 @@ $this->registerJs($js);
 
     <?php
 
-
-        $countryQuery = Country::find()->asArray()->all();
-        $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
-
-
-
-        $currencyQuery = Currency::find()->asArray()->all();
-        $currencyArray = ArrayHelper::map($currencyQuery, 'currency_id', 'title');
-
-
-
         $form = ActiveForm::begin([
                     'id' => 'dynamic-form',
                     'errorSummaryCssClass' => 'alert alert-danger'
@@ -137,7 +126,7 @@ $this->registerJs($js);
 
                 <div class="col-12 col-sm-6 col-lg-6">
                     <?=
-                        $form->field($model, 'phone_number')->widget(PhoneInput::className(), [
+                        $form->field($model, 'owner_number')->widget(PhoneInput::className(), [
                              'jsOptions' => [
                                  'preferredCountries' => ['kw', 'sa', 'aed','qa','bh','om'],
                              ]
@@ -153,14 +142,6 @@ $this->registerJs($js);
               </div>
             </div>
 
-            <div class="row">
-              <div class="col-12 col-lg-6">
-                  <?= $form->field($model, 'country_id')->dropDownList($countryArray)->label('Business location'); ?>
-              </div>
-              <div class="col-12 col-lg-6">
-                <?= $form->field($model, 'currency_id')->dropDownList($currencyArray); ?>
-              </div>
-            </div>
             <div class="row">
                 <div class="col-12  col-lg-6">
 

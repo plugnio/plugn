@@ -28,10 +28,7 @@ class m201109_180428_create_currency_table extends Migration
           INSERT INTO `currency` (`currency_id`, `title`, `code`) VALUES
           (1, 'Saudi Riyal', 'SAR'),
           (2, 'Kuwaiti Dinar', 'KWD'),
-          (3, 'Qatari Riyal', 'QAR'),
-          (4, 'United Arab Emirates Dirham', 'AED'),
-          (5, 'Bahraini Dinar', 'BHD'),
-          (6, 'Omani Rial', 'OMR')
+          (3, 'Bahraini Dinar', 'BHD')
         ";
 
         Yii::$app->db->createCommand($sql)->execute();

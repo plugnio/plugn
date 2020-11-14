@@ -224,7 +224,7 @@ class OrderController extends Controller {
                     // Create new payment record
                     $payment = new Payment;
                     $payment->restaurant_uuid = $restaurant_model->restaurant_uuid;
-                    $payment->payment_mode = $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
+                    $payment->payment_mode = $order->paymentMethod->source_id;
 
                     if ($payment->payment_mode == TapPayments::GATEWAY_VISA_MASTERCARD && Yii::$app->request->getBodyParam("payment_token") && Yii::$app->request->getBodyParam("bank_name")) {
 
@@ -302,14 +302,6 @@ class OrderController extends Controller {
                         // Redirect to payment gateway
                         Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
 
-                        if ($order->payment_method_id == 1) {
-                            $source_id = TapPayments::GATEWAY_KNET;
-                        } else {
-                            if ($payment->payment_token)
-                                $source_id = $payment->payment_token;
-                            else
-                                $source_id = TapPayments::GATEWAY_VISA_MASTERCARD;
-                        }
 
                         // $source_id
                         $response = Yii::$app->tapPayments->createCharge(
@@ -324,7 +316,7 @@ class OrderController extends Controller {
                                  $order->customer_phone_number,
                                  $order->restaurant->platform_fee,
                                  Url::to(['order/callback'], true),
-                                $source_id
+                                $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id
                         );
 
                         $responseContent = json_decode($response->content);

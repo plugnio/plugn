@@ -5,8 +5,10 @@ namespace common\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
+use yii\db\ActiveRecord;
 use yii\behaviors\AttributeBehavior;
 use common\models\WebLink;
+use borales\extensions\phoneInput\PhoneInputValidator;
 
 /**
  * This is the model class for table "restaurant".
@@ -160,6 +162,8 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['owner_first_name', 'owner_last_name', 'owner_email', 'owner_number'], 'required', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+
+
             [
                 [
                     'vendor_sector', 'iban', 'company_name', 'business_type'
@@ -172,6 +176,8 @@ class Restaurant extends \yii\db\ActiveRecord {
                 ],
                 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT
             ],
+
+            [['owner_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
 
             [['commercial_license_file', 'authorized_signature_file'], 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function($model) {
                 return $model->business_type == 'corp';
@@ -201,7 +207,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_commercial_license_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
             [['restaurant_authorized_signature_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
             [['name', 'name_ar', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_domain', 'restaurant_email', 'store_branch_name', 'app_id'], 'required', 'on' => 'create'],
-            [['name', 'name_ar', 'restaurant_domain'], 'required', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
+            [['name', 'name_ar', 'restaurant_domain', 'currency_id', 'country_id'], 'required', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             ['name', 'match', 'pattern' => '/^[a-zA-Z0-9-\s]+$/', 'message' => 'Your store name can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             ['restaurant_domain', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/', 'message' => 'Your store url can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             [['restaurant_domain'], 'url', 'except' => self::SCENARIO_CREATE_STORE_BY_AGENT],
@@ -349,6 +355,9 @@ class Restaurant extends \yii\db\ActiveRecord {
             ],
             [
              'class' => \borales\extensions\phoneInput\PhoneInputBehavior::className(),
+             'attributes' => [
+                       ActiveRecord::EVENT_BEFORE_INSERT => ['owner_phone_country_code', 'owner_number'],
+                   ],
              'countryCodeAttribute' => 'owner_phone_country_code',
              'phoneAttribute' => 'owner_number',
             ],
@@ -463,7 +472,6 @@ class Restaurant extends \yii\db\ActiveRecord {
 
             if ($response->isOk)
               $this->identification_file_id_front_side = $response->data['id'];
-
             else
               return Yii::error('Error when uploading civil id (front side): ' . json_encode($response->data));
 
@@ -487,7 +495,6 @@ class Restaurant extends \yii\db\ActiveRecord {
               $this->identification_file_id_back_side = $response->data['id'];
             else
               return Yii::error('Error when uploading civil id (back side): ' . json_encode($response->data));
-
         }
     }
 
@@ -589,11 +596,25 @@ class Restaurant extends \yii\db\ActiveRecord {
         //Create a merchant on Tap
         $merchantApiResponse = Yii::$app->tapPayments->createMergentAccount($this->company_name, $this->currency->code ,$this->business_id, $this->business_entity_id, $this->iban);
 
+
         if ($merchantApiResponse->isOk) {
             $this->merchant_id = $merchantApiResponse->data['id'];
             $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
-        } else {
-            return Yii::error('Error while create Merchant  ' . json_encode($merchantApiResponse->data));
+        }
+
+        else {
+             Yii::error('Error while create Merchant #1 ' . json_encode($merchantApiResponse->data));
+             if($merchantApiResponse->data['message'] == 'Profile Name already exists') {
+               $merchantApiResponse = Yii::$app->tapPayments->createMergentAccount($this->company_name . '-' . $this->country->iso, $this->currency->code ,$this->business_id, $this->business_entity_id, $this->iban);
+
+               if ($merchantApiResponse->isOk) {
+                   $this->merchant_id = $merchantApiResponse->data['id'];
+                   $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
+               } else
+                return Yii::error('Error while create Merchant #2 ' . json_encode($merchantApiResponse->data));
+
+             }
+
         }
 
         //Create an Operator
@@ -958,6 +979,9 @@ class Restaurant extends \yii\db\ActiveRecord {
             },
             'webLinks' => function($restaurant) {
                 return $restaurant->getWebLinks()->all();
+            },
+            'country' => function($restaurant) {
+                return $restaurant->getCountry()->one();
             }
         ];
     }
@@ -1128,6 +1152,7 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function getRestaurantPaymentMethods() {
         return $this->hasMany(RestaurantPaymentMethod::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
 
     /**
      * Gets query for [[PaymentMethods]].

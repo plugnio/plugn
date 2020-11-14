@@ -342,11 +342,10 @@ class OrderController extends Controller {
         $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
 
         $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
-    $model->is_order_scheduled = 0;
+        $model->is_order_scheduled = 0;
 
         if ($model->load(Yii::$app->request->post())) {
-            $model->payment_method_id = 3;
-
+            // $model->payment_method_id = 3;
 
 
         // order's Item
@@ -356,13 +355,8 @@ class OrderController extends Controller {
 
 
 
-            if ($model->validate() && $model->save()) {
-                return $this->render('update', [
-                            'model' => $model,
-                            'ordersItemDataProvider' => $ordersItemDataProvider,
-                            'restaurant_model' => $restaurant_model
-                ]);
-            }
+            if ($model->validate() && $model->save())
+                return $this->redirect(['update', 'id' => $model->order_uuid, 'restaurantUuid' => $restaurantUuid]);
         }
 
         return $this->render('create', [

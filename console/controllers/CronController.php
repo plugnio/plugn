@@ -15,6 +15,8 @@ use common\models\Plan;
 use common\models\Order;
 use common\models\Subscription;
 use common\models\OpeningHour;
+use common\models\CountryPaymentMethod;
+use common\models\Country;
 use common\models\ExtraOption;
 use common\models\ItemImage;
 use common\models\RestaurantTheme;
@@ -54,6 +56,32 @@ class CronController extends \yii\console\Controller {
           }
 
         }
+
+
+        $countries = Country::find()->all();
+
+        foreach ($countries as $country) {
+          $country_payment_method = new CountryPaymentMethod();
+          $country_payment_method->country_id = $country->country_id;
+          $country_payment_method->payment_method_id = 2; //Credit card
+          $country_payment_method->save(false);
+        }
+
+        $country_payment_method = new CountryPaymentMethod();
+        $country_payment_method->country_id = 114; //kuwait
+        $country_payment_method->payment_method_id = 1; //knet
+        $country_payment_method->save(false);
+
+        $country_payment_method = new CountryPaymentMethod();
+        $country_payment_method->country_id = 187; //KSA
+        $country_payment_method->payment_method_id = 4; //Mada
+        $country_payment_method->save(false);
+
+        $country_payment_method = new CountryPaymentMethod();
+        $country_payment_method->country_id = 17; //Bahrain
+        $country_payment_method->payment_method_id = 5; //Benefit
+        $country_payment_method->save(false);
+
 
         $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
         return self::EXIT_CODE_NORMAL;
@@ -148,7 +176,7 @@ class CronController extends \yii\console\Controller {
     public function actionCreateTapAccount() {
 
       $queue = TapQueue::find()
-              ->where(['queue_status' => Queue::QUEUE_STATUS_PENDING])
+              // ->where(['queue_status' => Queue::QUEUE_STATUS_PENDING])
               ->orderBy(['queue_created_at' => SORT_ASC])
               ->one();
 
