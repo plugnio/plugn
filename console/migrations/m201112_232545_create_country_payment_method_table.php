@@ -69,6 +69,16 @@ class m201112_232545_create_country_payment_method_table extends Migration
      */
     public function safeDown()
     {
+        $this->dropForeignKey('fk-payment-method-payment_method_id', 'country_payment_method');
+        $this->dropIndex('idx-payment-method-payment_method_id', 'country_payment_method');
+
+        $this->dropForeignKey('fk-country_payment_method-country_id', 'country_payment_method');
+        $this->dropIndex('idx-country_payment_method-country_id', 'country_payment_method');
+
+
+        $this->dropPrimaryKey('PK', 'country_payment_method');
+
+
         $this->dropTable('{{%country_payment_method}}');
     }
 }
