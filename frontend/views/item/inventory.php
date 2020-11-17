@@ -37,86 +37,72 @@ $this->registerJs($js);
     <?php echo $this->render('_inventory-search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
 
 
-    <!-- DataTable starts -->
+        <!-- Data list view starts -->
+        <div class="action-btns d-none">
+            <div class="btn-dropdown mr-1 mb-1">
+                <div class="btn-group dropdown actions-dropodown">
+                    <?= Html::a('<i class="fa fa-file-excel-o"></i> Export to Excel', ['export-to-excel', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+                </div>
+            </div>
+        </div>
+
+
+
     <div class="table-responsive">
 
+        <?=
+        GridView::widget([
+            'dataProvider' => $dataProvider,
+            'columns' => [
+                [
+                    'label' => 'Image',
+                    'format' => 'raw',
+                    'value' => function ($item) {
 
-
-        <table class="table data-list-view">
-            <thead>
-                <tr>
-                    <th>Image</th>
-                    <th>Item name</th>
-                    <th>SKU</th>
-                    <th>Available</th>
-                    <th>Edit quantity available</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                foreach ($dataProvider->query->all() as $item) {
-                    $form = ActiveForm::begin([
-                                'enableClientScript' => false,
-                    ]);
-                    ?>
-                    <tr>
-                        <td style="vertical-align: inherit;">
-                            <?php
                             $itemItmage = $item->getItemImages()->one();
+
                             if ($itemItmage)
-                                echo Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_60,w_60/restaurants/" . $item->restaurant->restaurant_uuid . "/items/" . $itemItmage->product_file_name, ['style' => 'border-radius: 3px;margin-right: 20px;']);
-                           else
-                                echo Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_60,w_60/no-image.jpg", ['style' => 'border-radius: 3px;margin-right: 20px;']);
-                            ?>
-                        </td>
-                        <td style="vertical-align: inherit;">
+                              return  Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_60,w_60/restaurants/" . $item->restaurant->restaurant_uuid . "/items/" . $itemItmage->product_file_name, ['style' => 'border-radius: 3px;margin-right: 20px;']);
+                            else
+                                return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_60,w_60/no-image.jpg", ['style' => 'border-radius: 3px;margin-right: 20px;']);
 
-                            <?= Html::a($item->item_name, ['item/update', 'id' => $item->item_uuid, 'restaurantUuid' => $item->restaurant_uuid]) ?>
 
-                        </td>
-                        <td style="vertical-align: inherit;">
-                            <?= $item->sku ? '<span style="color:black;">' . $item->sku . '</span>' : '<span style="color:#637381;"> No SKU </span>'; ?>
-                        </td>
-                        <td style="vertical-align: inherit;">
-                            <?= $item->stock_qty ?>
-                        </td>
-                        <td width="220px">
-
-                            <div style=" position: relative;   display: flex;">
-                                <?=
-                                $form->field($item, 'stock_qty', [
-                                    'options' => ['style' => 'margin: 0px'],
-                                    'template' => '
-                                   {input}
-                                   '
-                                ])->textInput(['type' => 'number', 'value' => 0, 'min' => 0, 'style' => ' border-top-right-radius: unset !important;border-bottom-right-radius: unset !important;'])->label(false)
-                                ?>
-                                <div style="position: relative; z-index: 10; flex: 0 0 auto;">
-
-                                    <?=
-                                    Html::submitButton('Save', ['style' => 'margin-right: 20px; border-top-left-radius: unset;   border-bottom-left-radius: unset;height: calc(1.25em + 1.4rem + 0px);', 'class' => 'btn btn-success', 'name' => $item->item_uuid])
-                                    ?>
-
-                                </div>
-                            </div>
-
-                        </td>
-
-                        <td></td>
-
-                    </tr>
-
-                    <?php
-                    ActiveForm::end();
-                }
-                ?>
-
-            </tbody>
-        </table>
-
+                    },
+                ],
+                [
+                    'attribute' => 'sku',
+                    'format' => 'raw',
+                    'value' => function ($item) {
+                        return $item->sku ? $item->sku : '(not set)';
+                    },
+                ],
+                [
+                    'label' => '	Available',
+                    'format' => 'raw',
+                    'value' => function ($item) {
+                        return $item->stock_qty;
+                    },
+                ],
+                [
+                    'header' => 'Edit quantity available',
+                    'class' => 'yii\grid\ActionColumn',
+                    'template' => ' {update}',
+                    'buttons' => [
+                        'update' => function ($url, $model) {
+                          return $this->render('_update-inventory', ['model' => $model]);
+                        },
+                    ],
+                ],
+            ],
+            'layout' => '{summary}{items}{pager}',
+            'tableOptions' => ['class' => 'table data-list-view'],
+        ]);
+        ?>
 
     </div>
     <!-- DataTable ends -->
+
+
 
 </section>
 <!-- Data list view end -->

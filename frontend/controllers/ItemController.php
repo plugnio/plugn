@@ -57,7 +57,7 @@ class ItemController extends Controller
 
         header('Access-Control-Allow-Origin: *');
         header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        header("Content-Disposition: attachment;filename=\"products.xlsx\"");
+        header("Content-Disposition: attachment;filename=\"inventory.xlsx\"");
         header("Cache-Control: max-age=0");
 
 
