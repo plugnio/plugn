@@ -15,6 +15,7 @@ use Yii;
 
  * @property CountryPaymentMethod[] $countryPaymentMethods
  * @property Restaurant[] $restaurants
+ * @property City[] $cities
  */
 class Country extends \yii\db\ActiveRecord
 {
@@ -53,6 +54,15 @@ class Country extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * Gets query for [[Cities]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCities()
+    {
+        return $this->hasMany(City::className(), ['country_id' => 'country_id']);
+    }
 
 
     /**

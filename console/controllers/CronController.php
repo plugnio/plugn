@@ -11,7 +11,9 @@ use common\models\Voucher;
 use common\models\BankDiscount;
 use common\models\Payment;
 use common\models\Item;
+use common\models\City;
 use common\models\Plan;
+use common\models\Area;
 use common\models\Order;
 use common\models\Subscription;
 use common\models\OpeningHour;
@@ -22,12 +24,207 @@ use common\models\ItemImage;
 use common\models\RestaurantTheme;
 use \DateTime;
 use yii\helpers\Console;
+use yii\helpers\ArrayHelper;
 use yii\db\Expression;
 
 /**
  * All Cron actions related to this project
  */
 class CronController extends \yii\console\Controller {
+
+    public function actionQatar(){
+      $jsonString = file_get_contents('qatar.json');
+      $data = json_decode($jsonString, true);
+
+      foreach ($data as $key => $area) {
+
+          $area_name = str_replace(' (' . $area['cityTitleEn'] . ')', '', $area['titleEn']);
+
+          if( !$city_model = City::find()->where(['city_name' => $area['cityTitleEn']])->one() ) {
+
+            $city_model = new City();
+
+            $city_model->country_id = 174;//Qatar
+            $city_model->city_name = $area['cityTitleEn'];
+            $city_model->city_name_ar = $area['cityTitleAr'];
+            $city_model->save(false);
+          }
+
+          if( !Area::find()->where(['area_name' => $area['titleEn']])->exists() ){
+            $area_model = new Area();
+            $area_model->city_id = $city_model->city_id;
+            $area_model->area_name = $area_name;
+            $area_model->area_name_ar = $area['titleAr'];
+            $area_model->latitude = $area['lat'];
+            $area_model->longitude = $area['lng'];
+            $area_model->save(false);
+          }
+
+
+      }
+    }
+
+    public function actionKsa(){
+      $jsonString = file_get_contents('ksa.json');
+      $data = json_decode($jsonString, true);
+
+      foreach ($data as $key => $area) {
+
+          $area_name = str_replace(' (' . $area['cityTitleEn'] . ')', '', $area['titleEn']);
+
+          if( !$city_model = City::find()->where(['city_name' => $area['cityTitleEn']])->one() ) {
+
+            $city_model = new City();
+
+            $city_model->country_id = 187;//KSA
+            $city_model->city_name = $area['cityTitleEn'];
+            $city_model->city_name_ar = $area['cityTitleAr'];
+            $city_model->save(false);
+          }
+
+          if( !Area::find()->where(['area_name' => $area['titleEn']])->exists() ){
+            $area_model = new Area();
+            $area_model->city_id = $city_model->city_id;
+            $area_model->area_name = $area_name;
+            $area_model->area_name_ar = $area['titleAr'];
+            $area_model->latitude = $area['lat'];
+            $area_model->longitude = $area['lng'];
+            $area_model->save(false);
+          }
+
+
+      }
+    }
+
+    public function actionEgypt(){
+      $jsonString = file_get_contents('egypt.json');
+      $data = json_decode($jsonString, true);
+
+      foreach ($data as $key => $area) {
+
+          $area_name = str_replace(' (' . $area['cityTitleEn'] . ')', '', $area['titleEn']);
+          $area_name_ar = str_replace(' (' . $area['cityTitleAr'] . ')', '', $area['titleAr']);
+
+          if( !$city_model = City::find()->where(['city_name' => $area['cityTitleEn']])->one() ) {
+
+            $city_model = new City();
+
+            $city_model->country_id = 63;//Egypt
+            $city_model->city_name = $area['cityTitleEn'];
+            $city_model->city_name_ar = $area['cityTitleAr'];
+            $city_model->save(false);
+          }
+
+          if( !Area::find()->where(['area_name' => $area['titleEn']])->exists() ){
+            $area_model = new Area();
+            $area_model->city_id = $city_model->city_id;
+            $area_model->area_name = $area_name;
+            $area_model->area_name_ar = $area_name_ar;
+            $area_model->latitude = $area['lat'];
+            $area_model->longitude = $area['lng'];
+            $area_model->save(false);
+          }
+
+
+      }
+    }
+
+    public function actionBahrain(){
+      $jsonString = file_get_contents('bahrain.json');
+      $data = json_decode($jsonString, true);
+
+      foreach ($data as $key => $area) {
+
+          $area_name = str_replace(' (' . $area['cityTitleEn'] . ')', '', $area['titleEn']);
+
+          if( !$city_model = City::find()->where(['city_name' => $area['cityTitleEn']])->one() ) {
+
+            $city_model = new City();
+
+            $city_model->country_id = 17;//BH
+            $city_model->city_name = $area['cityTitleEn'];
+            $city_model->city_name_ar = $area['cityTitleAr'];
+            $city_model->save(false);
+          }
+
+          if( !Area::find()->where(['area_name' => $area['titleEn']])->exists() ){
+            $area_model = new Area();
+            $area_model->city_id = $city_model->city_id;
+            $area_model->area_name = $area_name;
+            $area_model->area_name_ar = $area['titleAr'];
+            $area_model->latitude = $area['lat'];
+            $area_model->longitude = $area['lng'];
+            $area_model->save(false);
+          }
+
+
+      }
+    }
+
+    public function actionUae(){
+      $jsonString = file_get_contents('uae.json');
+      $data = json_decode($jsonString, true);
+
+      foreach ($data as $key => $area) {
+
+          $area_name = str_replace(' (' . $area['cityTitleEn'] . ')', '', $area['titleEn']);
+
+          if( !$city_model = City::find()->where(['city_name' => $area['cityTitleEn']])->one() ) {
+
+            $city_model = new City();
+
+            $city_model->country_id = 224;//UAE
+            $city_model->city_name = $area['cityTitleEn'];
+            $city_model->city_name_ar = $area['cityTitleAr'];
+            $city_model->save(false);
+          }
+
+          if( !Area::find()->where(['area_name' => $area['titleEn']])->exists() ){
+            $area_model = new Area();
+            $area_model->city_id = $city_model->city_id;
+            $area_model->area_name = $area_name;
+            $area_model->area_name_ar = $area['titleAr'];
+            $area_model->latitude = $area['lat'];
+            $area_model->longitude = $area['lng'];
+            $area_model->save(false);
+          }
+
+
+      }
+    }
+
+    public function actionOman(){
+      $jsonString = file_get_contents('oman.json');
+      $data = json_decode($jsonString, true);
+
+      foreach ($data as $key => $area) {
+
+          $area_name = str_replace(' (' . $area['cityTitleEn'] . ')', '', $area['titleEn']);
+
+          if( !$city_model = City::find()->where(['city_name' => $area['cityTitleEn']])->one() ) {
+
+            $city_model = new City();
+
+            $city_model->country_id = 161;//Oman
+            $city_model->city_name = $area['cityTitleEn'];
+            $city_model->city_name_ar = $area['cityTitleAr'];
+            $city_model->save(false);
+          }
+
+          if( !Area::find()->where(['area_name' => $area['titleEn']])->exists() ){
+            $area_model = new Area();
+            $area_model->city_id = $city_model->city_id;
+            $area_model->area_name = $area_name;
+            $area_model->area_name_ar = $area['titleAr'];
+            $area_model->latitude = $area['lat'];
+            $area_model->longitude = $area['lng'];
+            $area_model->save(false);
+          }
+
+
+      }
+    }
+
 
     public function actionIndex(){
         $restaurants = Restaurant::find()->all();

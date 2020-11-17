@@ -1,26 +1,81 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
+use common\models\Country;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\BusinessLocation */
 /* @var $form yii\widgets\ActiveForm */
 ?>
+  <div class="card">
+<div class="business-location-form card-body">
 
-<div class="business-location-form">
+    <?php
 
-    <?php $form = ActiveForm::begin(); ?>
+          $countryQuery = Country::find()->asArray()->all();
+          $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
 
-    <?= $form->field($model, 'restaurant_uuid')->textInput(['maxlength' => true]) ?>
+
+          $form = ActiveForm::begin();
+      ?>
+
+
 
     <?= $form->field($model, 'business_location_name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'business_location_name_ar')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'support_delivery')->textInput() ?>
 
-    <?= $form->field($model, 'support_pick_up')->textInput() ?>
+    <?=
+      $form->field($model, 'country_id')->dropDownList($countryArray, [
+          'class' => 'form-control select2 select2',
+          'multiple' => false,
+          'value' => $model->restaurant->country_id
+      ]);
+    ?>
+
+    <?=
+      $form->field($model, 'support_delivery', [
+          'template' => '
+          <div class="vs-checkbox-con vs-checkbox-primary">
+              {input}
+              <span class="vs-checkbox">
+                  <span class="vs-checkbox--check">
+                      <i class="vs-icon feather icon-check"></i>
+                  </span>
+              </span>
+              <span class="">{label}</span>
+          </div>
+          <div class=\"col-lg-8\">{error}</div>
+          ',
+      ])->checkbox([
+          'checked' => $model->support_delivery ? true : false,
+          'id' => 'trackQuantityInput',
+              ], false)
+    ?>
+
+    <?=
+      $form->field($model, 'support_pick_up', [
+          'template' => '
+          <div class="vs-checkbox-con vs-checkbox-primary">
+              {input}
+              <span class="vs-checkbox">
+                  <span class="vs-checkbox--check">
+                      <i class="vs-icon feather icon-check"></i>
+                  </span>
+              </span>
+              <span class="">{label}</span>
+          </div>
+          <div class=\"col-lg-8\">{error}</div>
+          ',
+      ])->checkbox([
+          'checked' => $model->support_pick_up ? true : false,
+          'id' => 'trackQuantityInput',
+              ], false)
+    ?>
+
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
@@ -28,4 +83,5 @@ use yii\widgets\ActiveForm;
 
     <?php ActiveForm::end(); ?>
 
+</div>
 </div>

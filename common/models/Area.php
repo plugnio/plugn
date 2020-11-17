@@ -15,6 +15,7 @@ use Yii;
  * @property float|null $longitude
  *
  * @property City $city
+ * @property Country $country
  * @property RestaurantDelivery[] $restaurantDeliveryAreas
  * @property Restaurant[] $restaurant
  */
@@ -66,6 +67,20 @@ class Area extends \yii\db\ActiveRecord
     {
         return $this->hasOne(City::className(), ['city_id' => 'city_id']);
     }
+
+
+    /**
+     * Gets query for [[Country]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCountry()
+    {
+        return $this->hasOne(Country::className(), ['country_id' => 'country_id'])->via('city');
+    }
+
+
+
 
     /**
      * Gets query for [[RestaurantDeliveryAreas]].

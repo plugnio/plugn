@@ -17,8 +17,7 @@ class DeliveryZoneSearch extends DeliveryZone
     public function rules()
     {
         return [
-            [['delivery_zone_id', 'business_location_id', 'support_delivery', 'support_pick_up', 'delivery_time'], 'integer'],
-            [['business_location_name', 'business_location_name_ar'], 'safe'],
+            [['delivery_zone_id', 'business_location_id', 'delivery_time'], 'integer'],
             [['delivery_fee', 'min_charge'], 'number'],
         ];
     }
@@ -39,14 +38,17 @@ class DeliveryZoneSearch extends DeliveryZone
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $restaurantUuid)
     {
-        $query = DeliveryZone::find();
+        $query = \Yii::$app->accountManager
+              ->getManagedAccount($restaurantUuid)
+              ->getDeliveryZones();
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => false
         ]);
 
         $this->load($params);
@@ -61,15 +63,10 @@ class DeliveryZoneSearch extends DeliveryZone
         $query->andFilterWhere([
             'delivery_zone_id' => $this->delivery_zone_id,
             'business_location_id' => $this->business_location_id,
-            'support_delivery' => $this->support_delivery,
-            'support_pick_up' => $this->support_pick_up,
             'delivery_time' => $this->delivery_time,
             'delivery_fee' => $this->delivery_fee,
             'min_charge' => $this->min_charge,
         ]);
-
-        $query->andFilterWhere(['like', 'business_location_name', $this->business_location_name])
-            ->andFilterWhere(['like', 'business_location_name_ar', $this->business_location_name_ar]);
 
         return $dataProvider;
     }

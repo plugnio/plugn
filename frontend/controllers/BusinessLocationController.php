@@ -57,19 +57,7 @@ class BusinessLocationController extends Controller
         ]);
     }
 
-    /**
-     * Displays a single BusinessLocation model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id, $restaurantUuid)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id, $restaurantUuid),
-            'restaurantUuid' => $restaurantUuid
-        ]);
-    }
+
 
     /**
      * Creates a new BusinessLocation model.
@@ -82,7 +70,7 @@ class BusinessLocationController extends Controller
         $model->restaurant_uuid = $restaurantUuid;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->business_location_id]);
+            return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
         }
 
         return $this->render('create', [
@@ -103,7 +91,7 @@ class BusinessLocationController extends Controller
         $model = $this->findModel($id, $restaurantUuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->business_location_id, 'restaurantUuid' => $restaurantUuid]);
+            return $this->redirect(['index',  'restaurantUuid' => $restaurantUuid]);
         }
 
         return $this->render('update', [
@@ -133,7 +121,7 @@ class BusinessLocationController extends Controller
      * @return BusinessLocation the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel($id, $restaurantUuid)
     {
 
         if (($model = BusinessLocation::find()->where(['business_location_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {

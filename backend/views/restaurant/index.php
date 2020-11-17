@@ -26,8 +26,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             // ['class' => 'yii\grid\SerialColumn'],
             'restaurant_uuid',
-            'name',
-            'restaurant_domain',
             [
               'attribute' => 'country_name',
               'value' =>     'country.country_name'
@@ -36,6 +34,9 @@ $this->params['breadcrumbs'][] = $this->title;
               'attribute' => 'currency_title',
               'value' =>     'currency.title'
             ],
+            'name',
+            'restaurant_domain',
+
             'store_branch_name',
             'restaurant_created_at:datetime',
             'platform_fee:percent',

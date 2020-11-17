@@ -9,10 +9,6 @@ use Yii;
  *
  * @property int $delivery_zone_id
  * @property int $business_location_id
- * @property string $business_location_name
- * @property string $business_location_name_ar
- * @property int $support_delivery
- * @property int $support_pick_up
  * @property int|null $delivery_time
  * @property float|null $delivery_fee
  * @property float|null $min_charge
@@ -23,6 +19,9 @@ use Yii;
  */
 class DeliveryZone extends \yii\db\ActiveRecord
 {
+
+    public $selectedAreas;
+
     /**
      * {@inheritdoc}
      */
@@ -37,10 +36,10 @@ class DeliveryZone extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['business_location_id', 'business_location_name', 'business_location_name_ar', 'support_delivery', 'support_pick_up'], 'required'],
-            [['business_location_id', 'support_delivery', 'support_pick_up', 'delivery_time'], 'integer'],
+            [['business_location_id'], 'required'],
+            [['business_location_id', 'delivery_time'], 'integer'],
             [['delivery_fee', 'min_charge'], 'number'],
-            [['business_location_name', 'business_location_name_ar'], 'string', 'max' => 255],
+            [['selectedAreas'], 'safe'],
             [['business_location_id'], 'exist', 'skipOnError' => true, 'targetClass' => BusinessLocation::className(), 'targetAttribute' => ['business_location_id' => 'business_location_id']],
         ];
     }
@@ -52,11 +51,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
     {
         return [
             'delivery_zone_id' => 'Delivery Zone ID',
-            'business_location_id' => 'Business Location ID',
-            'business_location_name' => 'Business Location Name',
-            'business_location_name_ar' => 'Business Location Name Ar',
-            'support_delivery' => 'Support Delivery',
-            'support_pick_up' => 'Support Pick Up',
+            'business_location_id' => 'Business Location',
             'delivery_time' => 'Delivery Time',
             'delivery_fee' => 'Delivery Fee',
             'min_charge' => 'Min Charge',
@@ -83,6 +78,27 @@ class DeliveryZone extends \yii\db\ActiveRecord
         return $this->hasMany(Area::className(), ['area_id' => 'area_id'])->viaTable('area_delivery_zone', ['delivery_zone_id' => 'delivery_zone_id']);
     }
 
+
+      /**
+       * Gets query for [[Country]].
+       *
+       * @return \yii\db\ActiveQuery
+       */
+      public function getCountry()
+      {
+          return $this->hasOne(Country::className(), ['country_id' => 'country_id'])->via('businessLocation');
+      }
+
+      /**
+       * Gets query for [[Cities]].
+       *
+       * @return \yii\db\ActiveQuery
+       */
+      public function getCities()
+      {
+          return $this->hasMany(City::className(), ['country_id' => 'country_id'])->via('country');
+      }
+
     /**
      * Gets query for [[BusinessLocation]].
      *
@@ -92,4 +108,16 @@ class DeliveryZone extends \yii\db\ActiveRecord
     {
         return $this->hasOne(BusinessLocation::className(), ['business_location_id' => 'business_location_id']);
     }
+
+
+    /**
+     * Gets query for [[RestaurantUu]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurant()
+    {
+        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('businessLocation');
+    }
+
 }

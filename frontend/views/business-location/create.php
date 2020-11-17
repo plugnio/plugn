@@ -7,12 +7,10 @@ use yii\helpers\Html;
 
 $this->params['restaurant_uuid'] = $restaurantUuid;
 $this->title = 'Create Business Location';
-$this->params['breadcrumbs'][] = ['label' => 'Business Locations', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Business Locations', 'url' => ['index',  'restaurantUuid' => $restaurantUuid]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="business-location-create">
-
-    <h1><?= Html::encode($this->title) ?></h1>
 
     <?= $this->render('_form', [
         'model' => $model,

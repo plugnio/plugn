@@ -14,7 +14,8 @@ use Yii;
  * @property int $support_delivery
  * @property int $support_pick_up
  *
- * @property Restaurant $restaurantUu
+ * @property Restaurant $restaurant
+  * @property Country $country
  * @property DeliveryZone[] $deliveryZones
  */
 class BusinessLocation extends \yii\db\ActiveRecord
@@ -33,10 +34,11 @@ class BusinessLocation extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['restaurant_uuid', 'business_location_name', 'business_location_name_ar', 'support_delivery', 'support_pick_up'], 'required'],
-            [['support_delivery', 'support_pick_up'], 'integer'],
+            [['restaurant_uuid', 'country_id', 'business_location_name', 'business_location_name_ar', 'support_delivery', 'support_pick_up'], 'required'],
+            [['support_delivery', 'country_id' , 'support_pick_up'], 'integer'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['business_location_name', 'business_location_name_ar'], 'string', 'max' => 255],
+            [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country_id' => 'country_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
@@ -49,6 +51,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
         return [
             'business_location_id' => 'Business Location ID',
             'restaurant_uuid' => 'Restaurant Uuid',
+            'country_id' => 'Country',
             'business_location_name' => 'Business Location Name',
             'business_location_name_ar' => 'Business Location Name Ar',
             'support_delivery' => 'Support Delivery',
@@ -56,12 +59,24 @@ class BusinessLocation extends \yii\db\ActiveRecord
         ];
     }
 
+
+    /**
+     * Gets query for [[Country]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCountry()
+    {
+        return $this->hasOne(Country::className(), ['country_id' => 'country_id']);
+    }
+
+
     /**
      * Gets query for [[RestaurantUu]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantUu()
+    public function getRestaurant()
     {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
@@ -73,6 +88,22 @@ class BusinessLocation extends \yii\db\ActiveRecord
      */
     public function getDeliveryZones()
     {
-        return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id']);
+        return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])->joinWith(['areas']);
     }
+
+
+      /**
+       * Gets query for [[AreaDeliveryZones]].
+       *
+       * @return \yii\db\ActiveQuery
+       */
+      public function getAreaDeliveryZones()
+      {
+          return $this->hasMany(AreaDeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id'])->via('deliveryZones');
+      }
+
+    public function getPreferedCitiesWithCountry() {
+        return $this->getDeliveryZones()->joinWith('cities')->asArray();
+    }
+
 }

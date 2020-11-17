@@ -22,6 +22,7 @@ class m201114_105311_create_business_location_table extends Migration
 
         $this->createTable('{{%business_location}}', [
             'business_location_id' => $this->bigPrimaryKey(),
+            'country_id' => $this->integer()->notNull(),
             'restaurant_uuid' => $this->char(60)->notNull(),
             'business_location_name' => $this->string()->notNull(),
             'business_location_name_ar' => $this->string()->notNull(),
@@ -49,6 +50,23 @@ class m201114_105311_create_business_location_table extends Migration
         );
 
 
+        // creates index for column `country_id`
+        $this->createIndex(
+                'idx-business_location-country_id',
+                'business_location',
+                'country_id'
+        );
+
+        // add foreign key for table `business_location`
+        $this->addForeignKey(
+                'fk-business_location-country_id',
+                'business_location',
+                'country_id',
+                'country',
+                'country_id',
+                'CASCADE'
+        );
+
     }
 
     /**
@@ -58,6 +76,9 @@ class m201114_105311_create_business_location_table extends Migration
     {
         $this->dropForeignKey('fk-business_location-restaurant_uuid', 'business_location');
         $this->dropIndex('idx-business_location-restaurant_uuid', 'business_location');
+
+        $this->dropForeignKey('fk-business_location-country_id', 'business_location');
+        $this->dropIndex('idx-business_location-country_id', 'business_location');
 
         $this->dropTable('{{%business_location}}');
     }

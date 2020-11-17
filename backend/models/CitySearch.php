@@ -11,6 +11,10 @@ use common\models\City;
  */
 class CitySearch extends City
 {
+
+  public $country_name;
+
+
     /**
      * {@inheritdoc}
      */
@@ -18,7 +22,7 @@ class CitySearch extends City
     {
         return [
             [['city_id'], 'integer'],
-            [['city_name', 'city_name_ar'], 'safe'],
+            [['city_name', 'city_name_ar', 'country_name'], 'safe'],
         ];
     }
 
@@ -41,13 +45,20 @@ class CitySearch extends City
     public function search($params)
     {
 
-        $query = City::find();
+        $query = City::find()->joinWith(['country']);
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
+
+
+        $dataProvider->sort->attributes['country_name'] = [
+            'asc' => ['country.country_name' => SORT_ASC],
+            'desc' => ['country.country_name' => SORT_DESC],
+        ];
+
 
         $this->load($params);
 
@@ -63,6 +74,7 @@ class CitySearch extends City
         ]);
 
         $query->andFilterWhere(['like', 'city_name', $this->city_name])
+            ->andFilterWhere(['like', 'country.country_name', $this->country_name])
             ->andFilterWhere(['like', 'city_name_ar', $this->city_name_ar]);
 
         return $dataProvider;

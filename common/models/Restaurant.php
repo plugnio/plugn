@@ -116,6 +116,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property Voucher[] $vouchers
  * @property Queue[] $queues
  * @property Subscription[] $subscriptions
+ * @property BusinessLocation[] $businessLocations
 
  */
 class Restaurant extends \yii\db\ActiveRecord {
@@ -799,6 +800,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset($fields['owner_last_name']);
         unset($fields['owner_email']);
         unset($fields['owner_number']);
+        unset($fields['owner_phone_country_code']);
         unset($fields['identification_issuing_country']);
         unset($fields['identification_issuing_date']);
         unset($fields['identification_expiry_date']);
@@ -982,6 +984,9 @@ class Restaurant extends \yii\db\ActiveRecord {
             },
             'country' => function($restaurant) {
                 return $restaurant->getCountry()->one();
+            },
+            'currency' => function($restaurant) {
+                return $restaurant->getCurrency()->one();
             }
         ];
     }
@@ -1254,6 +1259,69 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getStoreWebLinks() {
         return $this->hasMany(StoreWebLink::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+
+    /**
+     * Gets query for [[BusinessLocations]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStoreDeliveryZones($countryId)
+    {
+        return $this->hasMany(BusinessLocation::className(), ['restaurant_uuid' => 'restaurant_uuid'])->joinWith(['deliveryZones','country'])->where(['country.country_id' => $countryId]);
+    }
+
+
+
+    /**
+     * Gets query for [[BusinessLocations]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBusinessLocations()
+    {
+        return $this->hasMany(BusinessLocation::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * Gets query for [[AreaDeliveryZones]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAreaDeliveryZones()
+    {
+        return $this->hasMany(AreaDeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id'])
+          ->with('area.city')
+          ->via('deliveryZones');
+    }
+
+
+    /**
+     * Gets query for [[BusinessLocations]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBusinessLocationsForSpecificCountry($countryId)
+    {
+        return $this->hasMany(BusinessLocation::className(), ['restaurant_uuid' => 'restaurant_uuid'])->where(['country_id' => $countryId]);
+    }
+
+    /**
+     * Gets query for [[Country]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCountries()
+    {
+        return $this->hasMany(Country::className(), ['country_id' => 'country_id'])->via('businessLocations');
+    }
+
+
+    public function getDeliveryZones()
+    {
+        return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])
+            ->viaTable('business_location', ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
 

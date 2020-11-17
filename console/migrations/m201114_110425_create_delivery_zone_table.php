@@ -23,10 +23,6 @@ class m201114_110425_create_delivery_zone_table extends Migration
       $this->createTable('{{%delivery_zone}}', [
           'delivery_zone_id' => $this->bigPrimaryKey(),
           'business_location_id' => $this->bigInteger()->notNull(),
-          'business_location_name' => $this->string()->notNull(),
-          'business_location_name_ar' => $this->string()->notNull(),
-          'support_delivery' => $this->tinyInteger(1)->notNull(),
-          'support_pick_up' => $this->tinyInteger(1)->notNull(),
           'delivery_time' => $this->integer()->unsigned()->defaultValue(60),
           'delivery_fee' => $this->float()->unsigned()->defaultValue(0),
           'min_charge' => $this->float()->unsigned()->defaultValue(0)

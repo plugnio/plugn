@@ -9,6 +9,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use common\models\Agent;
+use backend\models\AgentAssignmentSearch;
 
 /**
  * AgentAssignmentController implements the CRUD actions for AgentAssignment model.
@@ -46,14 +47,16 @@ class AgentAssignmentController extends Controller {
      * @return mixed
      */
     public function actionIndex() {
-        $dataProvider = new ActiveDataProvider([
-            'query' => AgentAssignment::find(),
-            'pagination' => false
-        ]);
 
-        return $this->render('index', [
-                    'dataProvider' => $dataProvider,
-        ]);
+         $searchModel = new AgentAssignmentSearch();
+         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+         return $this->render('index', [
+             'searchModel' => $searchModel,
+             'dataProvider' => $dataProvider,
+         ]);
+
+
     }
 
     /**

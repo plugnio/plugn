@@ -11,6 +11,9 @@ use common\models\Area;
  */
 class AreaSearch extends Area
 {
+    public $city_name;
+    public $country_name;
+
     /**
      * {@inheritdoc}
      */
@@ -18,7 +21,7 @@ class AreaSearch extends Area
     {
         return [
             [['area_id', 'city_id'], 'integer'],
-            [['area_name', 'area_name_ar'], 'safe'],
+            [['area_name', 'area_name_ar', 'city_name', 'country_name'], 'safe'],
             [['latitude', 'longitude'], 'number'],
         ];
     }
@@ -41,13 +44,26 @@ class AreaSearch extends Area
      */
     public function search($params)
     {
-        $query = Area::find();
+        $query = Area::find()->joinWith(['city','country']);
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
+
+
+        $dataProvider->sort->attributes['city_name'] = [
+            'asc' => ['city.city_name' => SORT_ASC],
+            'desc' => ['city.city_name' => SORT_DESC],
+        ];
+
+        $dataProvider->sort->attributes['country_name'] = [
+            'asc' => ['country.country_name' => SORT_ASC],
+            'desc' => ['country.country_name' => SORT_DESC],
+        ];
+
+
 
         $this->load($params);
 
@@ -66,6 +82,8 @@ class AreaSearch extends Area
         ]);
 
         $query->andFilterWhere(['like', 'area_name', $this->area_name])
+          ->andFilterWhere(['like', 'city.city_name', $this->city_name])
+          ->andFilterWhere(['like', 'country.country_name', $this->country_name])
             ->andFilterWhere(['like', 'area_name_ar', $this->area_name_ar]);
 
         return $dataProvider;

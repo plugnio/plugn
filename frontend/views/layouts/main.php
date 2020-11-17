@@ -315,6 +315,24 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                     ?>
                                 </li>
 
+                                <li class=" nav-item <?= $this->context->route == 'business-location/index'  ? 'active' : '' ?> ">
+                                    <?=
+                                    Html::a(
+                                            Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                            Html::tag('span', 'Business Locations'), ['business-location/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                    )
+                                    ?>
+                                </li>
+
+                                <li class=" nav-item <?= $this->context->route == 'delivery-zone/index'  ? 'active' : '' ?> ">
+                                    <?=
+                                    Html::a(
+                                            Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                            Html::tag('span', 'Delivery Zones'), ['delivery-zone/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                    )
+                                    ?>
+                                </li>
+
                                 <li class=" nav-item <?= $this->context->route == 'site/current-plan' || $this->context->route == 'restaurant/update-payment-settings' ? 'active' : '' ?> ">
                                     <?=
                                     Html::a(
