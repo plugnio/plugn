@@ -1281,17 +1281,6 @@ class SiteController extends Controller {
                       \Yii::info("[New Store Signup] " . $store_model->name . " has just joined Plugn", __METHOD__);
 
 
-                    $this->getView()->registerJs("                  
-                                    <script>
-                                        gtag('event', 'conversion', {
-                                            'send_to': 'AW-946322720/CmDDCN_6tugBEKD6nsMD',
-                                            'transaction_id': ''
-                                        });
-                                    </script>
-                                ");
-                    
-        
-                    
                         return $this->redirect(['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
                     } else {
                         $model->password = '';
