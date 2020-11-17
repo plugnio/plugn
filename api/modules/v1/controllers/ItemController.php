@@ -75,7 +75,7 @@ class ItemController extends Controller {
       } else {
           return [
               'operation' => 'error',
-              'message' => 'Restaurant Uuid is invalid'
+              'message' => 'Store Uuid is invalid'
           ];
       }
     }
@@ -136,11 +136,19 @@ class ItemController extends Controller {
         } else {
             return [
                 'operation' => 'error',
-                'message' => 'Restaurant Uuid is invalid'
+                'message' => 'Store Uuid is invalid'
             ];
         }
     }
 
+
+
+        /**
+         * Return Delivery zones
+         */
+        public function actionGetDeliveryZones($restaurant_uuid) {
+        return Yii::$app->request->get("restaurant_uuid");
+      }
     /**
      * Return item's data
      */

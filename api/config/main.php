@@ -59,6 +59,17 @@ return [
                         'OPTIONS <category_id>' => 'options',
                     ]
                 ],
+                [// ZoneController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/delivery-zone',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET <restaurant_uuid>' => 'delivery-zone',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <restaurant_uuid>' => 'options'
+                    ]
+                ],
                 [// RestaurantController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/restaurant',

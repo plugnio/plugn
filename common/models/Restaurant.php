@@ -800,6 +800,10 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset($fields['owner_last_name']);
         unset($fields['owner_email']);
         unset($fields['owner_number']);
+        unset($fields['has_deployed']);
+        unset($fields['tap_queue_id']);
+        unset($fields['is_tap_enable']);
+        unset($fields['company_name']);
         unset($fields['owner_phone_country_code']);
         unset($fields['identification_issuing_country']);
         unset($fields['identification_issuing_date']);
@@ -1267,9 +1271,19 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getStoreDeliveryZones($countryId)
+    public function getCountryDeliveryZones($countryId)
     {
         return $this->hasMany(BusinessLocation::className(), ['restaurant_uuid' => 'restaurant_uuid'])->joinWith(['deliveryZones','country'])->where(['country.country_id' => $countryId]);
+    }
+
+    /**
+     * Gets query for [[BusinessLocations]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStoreDeliveryZones()
+    {
+        return $this->hasMany(BusinessLocation::className(), ['restaurant_uuid' => 'restaurant_uuid'])->joinWith(['deliveryZones','country']);
     }
 
 
@@ -1308,11 +1322,11 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
-     * Gets query for [[Country]].
+     * list of all the countries around the world that store can ship orders to
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCountries()
+    public function getShippingCountries()
     {
         return $this->hasMany(Country::className(), ['country_id' => 'country_id'])->via('businessLocations');
     }

@@ -5,10 +5,12 @@ namespace api\modules\v1\controllers;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
-use common\models\City;
-use common\models\RestaurantDelivery;
+use common\models\Item;
+use common\models\Category;
+use common\models\Restaurant;
+use common\models\ItemImage;
 
-class RestaurantDeliveryController extends Controller {
+class DeliveryZoneController extends Controller {
 
     public function behaviors() {
         $behaviors = parent::behaviors();
@@ -52,49 +54,28 @@ class RestaurantDeliveryController extends Controller {
     }
 
     /**
-     * Return City list
+     * Return Delivery zones
      */
-    public function actionDeliveredAreaData($id,$restaurant_uuid) {
+    public function actionDeliveryZone($restaurant_uuid) {
 
+        if ($store_model = Restaurant::findOne($restaurant_uuid)) {
 
-        $restaurantDeliveryArea = RestaurantDelivery::find()
-                ->where(['area_id' => $id, 'restaurant_uuid' => $restaurant_uuid])
-                ->one();
+            $shipping_countries = $store_model->getShippingCountries()->asArray()->all();
 
-
-        $restaurantDeliveryArea->delivery_time = Yii::$app->formatter->asDuration($restaurantDeliveryArea->delivery_time * 60);
-
-        Yii::$app->formatter->language = 'ar-KW';
-        $restaurantDeliveryArea->delivery_time_ar = Yii::$app->formatter->asDuration($restaurantDeliveryArea->delivery_time_ar * 60);
-
-        return $restaurantDeliveryArea;
-    }
-
-    /**
-     * Return City list
-     */
-    public function actionListAllCities($restaurant_uuid) {
-
-
-        $allCitiesData = City::find()
-                ->asArray()
-                ->all();
-
-        $restaurantDeliveryAreas = RestaurantDelivery::find()
-                ->where(['restaurant_uuid' => $restaurant_uuid])
-                ->asArray()
-                ->with('area')
-                ->all();
-
-        foreach ($restaurantDeliveryAreas as $key => $delivery_area) {
-            foreach ($allCitiesData as $key => $city) {
-                if ($city['city_id'] == $delivery_area['area']['city_id']) {
-                    $allCitiesData[$key]['areas'][] = $delivery_area['area'];
-                }
+            foreach ($shipping_countries as $key => $country) {
+              $deliveryZones = $store_model->getCountryDeliveryZones($country['country_id'])->asArray()->all();
+              $shipping_countries[$key]['deliveryZones'] = $deliveryZones;
             }
-        }
 
-        return $allCitiesData;
+            return $shipping_countries;
+
+
+        } else {
+            return [
+                'operation' => 'error',
+                'message' => 'Store Uuid is invalid'
+            ];
+        }
     }
 
 }
