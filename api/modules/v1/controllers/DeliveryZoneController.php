@@ -51,7 +51,7 @@ class DeliveryZoneController extends Controller {
             'resourceOptions' => ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
         ];
         return $actions;
-    }
+    } 
 
     /**
      * Return Delivery zones
