@@ -100,11 +100,11 @@ class VoucherController extends Controller
                 \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
                 \Segment::track([
                     'event' => 'Order Completed',
-                    'order_id' => $this->order_uuid,
-                    'total' => $this->total_price,
-                    'subtotal' => $this->subtotal,
+                    'order_id' => $order->order_uuid,
+                    'total' => $order->total_price,
+                    'subtotal' => $order->subtotal,
                     'currency' => 'KWD',
-                    'coupon' => $this->voucher && $this->voucher->code  ? $this->voucher->code : null,
+                    'coupon' => $order->voucher && $order->voucher->code  ? $order->voucher->code : null,
                     'products' => $productsList
                 ]);
                 
