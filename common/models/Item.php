@@ -149,7 +149,6 @@ class Item extends \yii\db\ActiveRecord
             unset($fields['item_created_at']);
             unset($fields['item_updated_at']);
             unset($fields['barcode']);
-            unset($fields['sku']);
 
             return $fields;
         }
