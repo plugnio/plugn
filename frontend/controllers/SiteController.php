@@ -1281,6 +1281,24 @@ class SiteController extends Controller {
                       \Yii::info("[New Store Signup] " . $store_model->name . " has just joined Plugn", __METHOD__);
 
 
+                      $full_name = explode(' ', $agent_model->agent_name);
+
+                      \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+                      \Segment::track([
+                          'userId' => $store_model->restaurant_uuid,
+                          'event' => 'Store Created',
+                          'type' => 'track',
+                          'properties' => [
+                               'first_name' => trim($firstname),
+                               'last_name' => trim($lastname),
+                               'store_name' => $store_model->name,
+                               'email' => $agent_model->agent_email,
+                               'store_url' => $store_model->restaurant_name
+                          ]
+                      ]);
+
+
+
                         return $this->redirect(['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
                     } else {
                         $model->password = '';
