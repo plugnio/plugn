@@ -97,15 +97,17 @@ class VoucherController extends Controller
                   ];
                 }
                 
-//                \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-//                \Segment::track([
-//                    'order_id' => $this->order_uuid,
-//                    'total' => $this->total_price,
-//                    'subtotal' => $this->subtotal,
-//                    'currency' => 'KWD',
-//                    'coupon' => $this->voucher && $this->voucher->code  ? $this->voucher->code : null,
-//                    'products' => $productsList
-//                ]);
+                \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+                \Segment::track([
+                    'event' => 'Order Completed',
+                    'order_id' => $this->order_uuid,
+                    'total' => $this->total_price,
+                    'subtotal' => $this->subtotal,
+                    'currency' => 'KWD',
+                    'coupon' => $this->voucher && $this->voucher->code  ? $this->voucher->code : null,
+                    'products' => $productsList
+                ]);
+                
 
                 return $this->redirect(['index',  'restaurantUuid' => $restaurantUuid]);
 

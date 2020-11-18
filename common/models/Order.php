@@ -618,32 +618,32 @@ class Order extends \yii\db\ActiveRecord {
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-      if (!$insert && $this->order_status == self::STATUS_PENDING) {
-
-                $productsList;
-
-                foreach ($this->orderItems as $orderedItem) {
-                  $productsList[] = [
-                    'product_id' => $orderedItem->item_uuid,
-                    'sku' => $orderedItem->item->sku ? $orderedItem->item->sku : null ,
-                    'name' => $orderedItem->item_name,
-                    'price' => $orderedItem->item_price,
-                    'quantity' => $orderedItem->qty,
-                    'url' => $this->restaurant->restaurant_domain . '/product/' . $orderedItem->item_uuid,
-                  ];
-                }
-                
-                \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-                \Segment::track([
-                    'order_id' => $this->order_uuid,
-                    'total' => $this->total_price,
-                    'subtotal' => $this->subtotal,
-                    'currency' => 'KWD',
-                    'coupon' => $this->voucher && $this->voucher->code  ? $this->voucher->code : null,
-                    'products' => $productsList
-                ]);
-
-      }
+//      if (!$insert && $this->order_status == self::STATUS_PENDING) {
+//
+//                $productsList;
+//
+//                foreach ($this->orderItems as $orderedItem) {
+//                  $productsList[] = [
+//                    'product_id' => $orderedItem->item_uuid,
+//                    'sku' => $orderedItem->item->sku ? $orderedItem->item->sku : null ,
+//                    'name' => $orderedItem->item_name,
+//                    'price' => $orderedItem->item_price,
+//                    'quantity' => $orderedItem->qty,
+//                    'url' => $this->restaurant->restaurant_domain . '/product/' . $orderedItem->item_uuid,
+//                  ];
+//                }
+//                
+//                \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+//                \Segment::track([
+//                    'order_id' => $this->order_uuid,
+//                    'total' => $this->total_price,
+//                    'subtotal' => $this->subtotal,
+//                    'currency' => 'KWD',
+//                    'coupon' => $this->voucher && $this->voucher->code  ? $this->voucher->code : null,
+//                    'products' => $productsList
+//                ]);
+//
+//      }
 
 
       //Send SMS To customer
