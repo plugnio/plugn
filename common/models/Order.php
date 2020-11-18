@@ -8,6 +8,7 @@ use yii\db\Expression;
 use common\models\Customer;
 use common\models\Agent;
 use yii\behaviors\AttributeBehavior;
+use Segment;
 
 /**
  * This is the model class for table "order".
