@@ -82,8 +82,10 @@ class VoucherController extends Controller
 
 
               if($model->save()){
-
-                 $order  = \common\models\Order::findOne('5BAB3I');
+                  
+                  
+                $order  = \common\models\Order::findOne('5BAB3I');
+                
                 $productsList;
 
                 foreach ($order->orderItems as $orderedItem) {
@@ -99,6 +101,7 @@ class VoucherController extends Controller
                 
                 \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
                 \Segment::track([
+                    'userId' => $order->restaurant_uuid,
                     'event' => 'Order Completed',
                     'order_id' => $order->order_uuid,
                     'total' => $order->total_price,
@@ -108,6 +111,16 @@ class VoucherController extends Controller
                     'products' => $productsList
                 ]);
                 
+                
+//                  \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+//                  \Segment::track([
+//                      'userId' => $restaurantUuid,
+//                      'event' => 'Voucher Created',
+//                      'properties' => [
+//                          'type' => $model->discountType,
+//                           'discountAmount' => $model->discount_amount
+//                      ]
+//                  ]);
 
                 return $this->redirect(['index',  'restaurantUuid' => $restaurantUuid]);
 
