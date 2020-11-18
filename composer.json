@@ -47,7 +47,8 @@
         "janisto/yii2-timepicker": "*",
         "softark/yii2-dual-listbox": "dev-master",
         "maksyutin/yii2-dual-list-box": "dev-master",
-        "ssimpson/yii2-dual-list-box": "dev-master"
+        "ssimpson/yii2-dual-list-box": "dev-master",
+        "segmentio/analytics-php": "^1.5"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

@@ -125,6 +125,23 @@ class Voucher extends \yii\db\ActiveRecord {
         return "Couldnt find a status";
     }
 
+    public function getDiscountType() {
+       
+        switch ($this->discount_type) {
+            case self::DISCOUNT_TYPE_PERCENTAGE:
+                return "Percentage";
+                break;
+            case self::DISCOUNT_TYPE_AMOUNT:
+                return "Amount";
+                break;
+            case self::DISCOUNT_TYPE_FREE_DELIVERY:
+                return "Free delivery";
+                break;
+        }
+
+        return "Couldnt find discount type";
+    }
+
 
     /**
      * {@inheritdoc}

@@ -40,20 +40,14 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
 
             $planName = $restaurant_model->plan->name;
 
-            $segmentScript = "analytics.identify('". Yii::$app->user->identity->agent_id ."', {
-                name: '". Yii::$app->user->identity->agent_name ."',
-                email: '".Yii::$app->user->identity->agent_email  ."',
-                store: '". $restaurant_model->name ."',
-                plan: '". $planName ."'
-              });
-
-
-              analytics.group('". $restaurant_model->restaurant_uuid  ."', {
-                storeName: '". $restaurant_model->name  ."',
+            $segmentScript = "analytics.identify('". $restaurant_model->restaurant_uuid."', {
+                name: '". $restaurant_model->name ."',
                 domain:'". $restaurant_model->restaurant_domain  ."',
+                email: '".Yii::$app->user->identity->agent_email  ."',
                 plan: '". $planName ."'
               });
-              ";
+
+           ";
 
             } ?>
 

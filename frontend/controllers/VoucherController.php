@@ -8,6 +8,7 @@ use frontend\models\VoucherSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use Segment;
 
 /**
  * VoucherController implements the CRUD actions for Voucher model.
@@ -75,13 +76,27 @@ class VoucherController extends Controller
 
 
           if ($model->load(Yii::$app->request->post())) {
-
+              
             if( $model->duration && $model->duration != null )
               list($model->valid_from, $model->valid_until) = explode(' - ', $model->duration);
 
 
-              if($model->save())
+              if($model->save()){
+                  
+                  \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+                  \Segment::track([
+                      'userId' => $restaurantUuid,
+                      'event' => 'Voucher Created',
+                      'properties' => [
+                          'type' => $model->discountType,
+                           'discountAmount' => $model->discount_amount
+                      ]
+                      
+                  ]);
+                  
                 return $this->redirect(['index',  'restaurantUuid' => $restaurantUuid]);
+
+              }
           }
 
           return $this->render('create', [
