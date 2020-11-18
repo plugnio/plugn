@@ -48,7 +48,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
               });
 
 
-              analytics.group(''". $restaurant_model->restaurant_uuid  ."', {
+              analytics.group('". $restaurant_model->restaurant_uuid  ."', {
                 storeName: '". $restaurant_model->name  ."',
                 domain:'". $restaurant_model->restaurant_domain  ."',
                 plan: '". $planName ."'
