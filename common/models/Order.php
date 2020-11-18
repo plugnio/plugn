@@ -629,7 +629,7 @@ class Order extends \yii\db\ActiveRecord {
                     'price' => $orderedItem->item_price,
                     'quantity' => $orderedItem->qty,
                     'url' => $this->restaurant->restaurant_domain . '/product/' . $orderedItem->item_uuid,
-                  ]
+                  ];
                 }
 
                 \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
