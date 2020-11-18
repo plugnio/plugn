@@ -83,15 +83,29 @@ class VoucherController extends Controller
 
               if($model->save()){
 
-                  \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-                  \Segment::track([
-                      'userId' => $restaurantUuid,
-                      'event' => 'Voucher Created',
-                      'properties' => [
-                          'type' => $model->discountType,
-                           'discountAmount' => $model->discount_amount
-                      ]
-                  ]);
+                 $order  = \common\models\Order::findOne('5BAB3I');
+                $productsList;
+
+                foreach ($order->orderItems as $orderedItem) {
+                  $productsList[] = [
+                    'product_id' => $orderedItem->item_uuid,
+                    'sku' => $orderedItem->item->sku ? $orderedItem->item->sku : null ,
+                    'name' => $orderedItem->item_name,
+                    'price' => $orderedItem->item_price,
+                    'quantity' => $orderedItem->qty,
+                    'url' => $order->restaurant->restaurant_domain . '/product/' . $orderedItem->item_uuid,
+                  ];
+                }
+                
+//                \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+//                \Segment::track([
+//                    'order_id' => $this->order_uuid,
+//                    'total' => $this->total_price,
+//                    'subtotal' => $this->subtotal,
+//                    'currency' => 'KWD',
+//                    'coupon' => $this->voucher && $this->voucher->code  ? $this->voucher->code : null,
+//                    'products' => $productsList
+//                ]);
 
                 return $this->redirect(['index',  'restaurantUuid' => $restaurantUuid]);
 
