@@ -66,6 +66,8 @@ class ItemController extends Controller
             'models' => $model,
             'columns' => [
                 'item_name',
+                'sku',
+                'barcode',
                 'stock_qty',
                 'unit_sold',
                 'item_price:currency'

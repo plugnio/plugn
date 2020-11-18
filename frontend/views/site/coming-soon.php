@@ -18,17 +18,18 @@ $this->title = $restaurant_model->name;
         <div class="col-xl-5 col-md-8 col-sm-10 col-12 px-md-0 px-2">
             <div class="card text-center w-100 mb-0">
 
-                <div class="card-content" style="    margin-top: 100px;">
+                <div class="card-content" style="margin-top: 100px;">
                     <div class="card-body pt-0">
                         <img  src="<?= Yii::$app->urlManager->getBaseUrl() . '/app-assets/images/pages/rocket.png' ?>" class="img-responsive block width-150 mx-auto" width="150" alt="bg-img">
 
                     </div>
 
-                    <h3 style="padding: 10px 0px 0px;" class="mb-0">Your store will be ready within the next ten minutes.</h3>
+                    <h3 style="padding: 10px 0px 0px;" class="mb-0">Your store will be ready in a few minutes</h3>
 
 
                       <p style="padding: 10px 21px 50px;" class="mb-0">
-                        You can refresh this page or wait for our email notifying you of it's creation. In the meantime you can start adding products and customizing your store settings
+                        We'll be sending you an email as soon as it's ready. You can also refresh this page in a few minutes to view your store.
+                        In the meantime you can start adding products and customizing your store settings.
                       </p>
 
                       <div  style="padding: 10px 21px 50px;" class="mb-0">

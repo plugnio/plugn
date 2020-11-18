@@ -85,6 +85,13 @@ $this->registerJs($js);
                            },
                 ],
                 [
+                    'label' => 'SKU',
+                    'format' => 'raw',
+                    'value' => function ($data) {
+                        return $data->sku;
+                    },
+                ],
+                [
                     'label' => 'Category name',
                     'value' => function ($data) {
                         $categoryName = '';
@@ -104,6 +111,7 @@ $this->registerJs($js);
                     },
                     'format' => 'raw'
                 ],
+
                 'unit_sold',
                 'sort_number',
                 'item_price:currency',
