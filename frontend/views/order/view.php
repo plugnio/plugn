@@ -342,6 +342,11 @@ $this->registerJs($js);
                                     'contentOptions' => ['style' => 'width: 100px;'],
                                 ],
                                 'item_name',
+                                [
+                                    'label' => 'SKU',
+                                    'format' => 'raw',
+                                    'value' => 'sku',
+                                ],
                                 'customer_instruction',
                                 'qty',
                                 [
