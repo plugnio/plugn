@@ -85,44 +85,48 @@ class VoucherController extends Controller
                   
                   
                              
-//                $order  = \common\models\Order::findOne('5BAB3I');
-//                
-//                $productsList;
-//
-//                foreach ($order->orderItems as $orderedItem) {
-//                  $productsList[] = [
-//                    'product_id' => $orderedItem->item_uuid,
-//                    'sku' => $orderedItem->item->sku ? $orderedItem->item->sku : null ,
-//                    'name' => $orderedItem->item_name,
-//                    'price' => $orderedItem->item_price,
-//                    'quantity' => $orderedItem->qty,
-//                    'url' => $order->restaurant->restaurant_domain . '/product/' . $orderedItem->item_uuid,
-//                  ];
-//                }
-//                
-//                \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-//                \Segment::track([
-//                    'checkout_id' => $order->restaurant_uuid,
-//                    'event' => 'Order Completed',
-//                    'order_id' => $order->order_uuid,
-//                    'total' => $order->total_price,
-//                    'subtotal' => $order->subtotal,
-//                    'currency' => 'KWD',
-//                    'coupon' => $order->voucher && $order->voucher->code  ? $order->voucher->code : null,
-//                    'products' => $productsList
-//                ]);
-//                
+                $order  = \common\models\Order::findOne('5B8CVE');
+                
+                $productsList;
+
+                foreach ($order->orderItems as $orderedItem) {
+                  $productsList[] = [
+                    'product_id' => $orderedItem->item_uuid,
+                    'sku' => $orderedItem->item->sku ? $orderedItem->item->sku : null ,
+                    'name' => $orderedItem->item_name,
+                    'price' => $orderedItem->item_price,
+                    'quantity' => $orderedItem->qty,
+                    'url' => $order->restaurant->restaurant_domain . '/product/' . $orderedItem->item_uuid,
+                  ];
+                }
+                
+                \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+                \Segment::track([
+                    'userId' => $order->restaurant_uuid,
+                    
+                    'event' => 'Order Completed',
+                    'properties' => [
+                        'checkout_id' => $order->order_uuid,
+                        'order_id' => $order->order_uuid,
+                        'total' => $order->total_price,
+                        'subtotal' => $order->subtotal,
+                        'currency' => 'KWD',
+                        'coupon' => $order->voucher && $order->voucher->code  ? $order->voucher->code : null,
+                        'products' => $productsList
+                    ]
+                ]);
                 
                 
-                  \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-                  \Segment::track([
-                      'userId' => $restaurantUuid,
-                      'event' => 'Voucher Created',
-                      'properties' => [
-                          'type' => $model->discountType,
-                           'discountAmount' => $model->discount_amount
-                      ]
-                  ]);
+                
+//                  \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+//                  \Segment::track([
+//                      'userId' => $restaurantUuid,
+//                      'event' => 'Voucher Created',
+//                      'properties' => [
+//                          'type' => $model->discountType,
+//                           'discountAmount' => $model->discount_amount
+//                      ]
+//                  ]);
 
                 return $this->redirect(['index',  'restaurantUuid' => $restaurantUuid]);
 
