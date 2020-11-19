@@ -1282,6 +1282,8 @@ class SiteController extends Controller {
 
 
                       $full_name = explode(' ', $agent_model->agent_name);
+                      $firstname = $full_name[0];
+                      $lastname = $full_name[1];
 
                       \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
                       \Segment::track([
@@ -1293,7 +1295,7 @@ class SiteController extends Controller {
                                'last_name' => trim($lastname),
                                'store_name' => $store_model->name,
                                'email' => $agent_model->agent_email,
-                               'store_url' => $store_model->restaurant_name
+                               'store_url' => $store_model->name
                           ]
                       ]);
 
