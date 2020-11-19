@@ -13,7 +13,7 @@ class m201116_164637_add_country_id_field_to_city_table extends Migration
     public function safeUp()
     {
 
-          $this->addColumn('city', 'country_id', $this->integer()->notNull()->defaultValue(114)->after('city_id'));
+          $this->addColumn('city', 'country_id', $this->integer()->notNull()->defaultValue(84)->after('city_id'));
 
 
           // creates index for column `country_id`

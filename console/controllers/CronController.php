@@ -32,6 +32,7 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
+
     public function actionQatar(){
       $jsonString = file_get_contents('qatar.json');
       $data = json_decode($jsonString, true);
@@ -44,7 +45,7 @@ class CronController extends \yii\console\Controller {
 
             $city_model = new City();
 
-            $city_model->country_id = 174;//Qatar
+            $city_model->country_id = 125;//Qatar
             $city_model->city_name = $area['cityTitleEn'];
             $city_model->city_name_ar = $area['cityTitleAr'];
             $city_model->save(false);
@@ -76,7 +77,7 @@ class CronController extends \yii\console\Controller {
 
             $city_model = new City();
 
-            $city_model->country_id = 187;//KSA
+            $city_model->country_id = 129;//KSA
             $city_model->city_name = $area['cityTitleEn'];
             $city_model->city_name_ar = $area['cityTitleAr'];
             $city_model->save(false);
@@ -109,7 +110,7 @@ class CronController extends \yii\console\Controller {
 
             $city_model = new City();
 
-            $city_model->country_id = 63;//Egypt
+            $city_model->country_id = 49;//Egypt
             $city_model->city_name = $area['cityTitleEn'];
             $city_model->city_name_ar = $area['cityTitleAr'];
             $city_model->save(false);
@@ -141,7 +142,7 @@ class CronController extends \yii\console\Controller {
 
             $city_model = new City();
 
-            $city_model->country_id = 17;//BH
+            $city_model->country_id = 12;//BH
             $city_model->city_name = $area['cityTitleEn'];
             $city_model->city_name_ar = $area['cityTitleAr'];
             $city_model->save(false);
@@ -173,7 +174,7 @@ class CronController extends \yii\console\Controller {
 
             $city_model = new City();
 
-            $city_model->country_id = 224;//UAE
+            $city_model->country_id = 162;//UAE
             $city_model->city_name = $area['cityTitleEn'];
             $city_model->city_name_ar = $area['cityTitleAr'];
             $city_model->save(false);
@@ -205,7 +206,7 @@ class CronController extends \yii\console\Controller {
 
             $city_model = new City();
 
-            $city_model->country_id = 161;//Oman
+            $city_model->country_id = 116;//Oman
             $city_model->city_name = $area['cityTitleEn'];
             $city_model->city_name_ar = $area['cityTitleAr'];
             $city_model->save(false);
@@ -265,17 +266,17 @@ class CronController extends \yii\console\Controller {
         }
 
         $country_payment_method = new CountryPaymentMethod();
-        $country_payment_method->country_id = 114; //kuwait
+        $country_payment_method->country_id = 84; //kuwait
         $country_payment_method->payment_method_id = 1; //knet
         $country_payment_method->save(false);
 
         $country_payment_method = new CountryPaymentMethod();
-        $country_payment_method->country_id = 187; //KSA
+        $country_payment_method->country_id = 129; //KSA
         $country_payment_method->payment_method_id = 4; //Mada
         $country_payment_method->save(false);
 
         $country_payment_method = new CountryPaymentMethod();
-        $country_payment_method->country_id = 17; //Bahrain
+        $country_payment_method->country_id = 12; //Bahrain
         $country_payment_method->payment_method_id = 5; //Benefit
         $country_payment_method->save(false);
 

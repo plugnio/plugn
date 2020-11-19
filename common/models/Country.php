@@ -9,8 +9,9 @@ use Yii;
  *
  * @property int $country_id
  * @property string|null $country_name
+ * @property string|null $country_name_ar
  * @property string|null $iso
- * @property string|null $iso3
+ * @property string|null $emoji
  * @property int|null $country_code
 
  * @property CountryPaymentMethod[] $countryPaymentMethods
@@ -34,9 +35,9 @@ class Country extends \yii\db\ActiveRecord
     {
         return [
             [['country_code'], 'integer'],
-            [['country_name'], 'string', 'max' => 80],
+            [['country_name','country_name_ar'], 'string', 'max' => 80],
             [['iso'], 'string', 'max' => 2],
-            [['iso3'], 'string', 'max' => 3],
+            [['emoji'], 'safe'],
         ];
     }
 
@@ -49,7 +50,7 @@ class Country extends \yii\db\ActiveRecord
             'country_id' => 'Country ID',
             'country_name' => 'Country Name',
             'iso' => 'Iso',
-            'iso3' => 'Iso3',
+            'emoji' => 'Emoji',
             'country_code' => 'Country Code',
         ];
     }

@@ -7,7 +7,7 @@ return [
             'dsn' => 'mysql:host=localhost;dbname=plugn',
             'username' => 'root',
             'password' => 'saoud',
-            'charset' => 'utf8',
+            'charset' => 'utf8mb4',
         ],
         'log' => [
             'targets' => [
