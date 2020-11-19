@@ -12,6 +12,14 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 $this->title = 'Payment Settings';
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
+
+
+$today = new DateTime();
+
+$expiry = new DateTime($model->activeSubscription->subscription_end_at);
+
+$interval = $today->diff($expiry);
+
 ?>
 
 
@@ -93,7 +101,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <tr>
                             <th style="border-top: none !important;"></th>
                             <th style="border-top: none !important;"></th>
-                            <th class="<?= $model->plan->plan_id == 2 ? 'current-plan' : 'premium-plan' ?>"><?= $model->plan->plan_id == 2 ? 'Current plan' : Html::a('Upgrade to premium', ['site/confirm-plan', 'id' => $model->restaurant_uuid, 'selectedPlanId' => 2 ], ['style' => 'color: #4CAF50;']) ?></th>
+                            <th class="<?= $model->plan->plan_id == 2 ? 'current-plan' : 'premium-plan' ?>"><?= $model->plan->plan_id == 2 ? 'Active, expires in ' . $interval->days . ' days'  : Html::a('Upgrade to premium', ['site/confirm-plan', 'id' => $model->restaurant_uuid, 'selectedPlanId' => 2 ], ['style' => 'color: #4CAF50;']) ?></th>
                             <th class="<?= $model->plan->plan_id == 1 ? 'current-plan' : '' ?>"><?= $model->plan->plan_id == 1 ? 'Current plan' : '' ?></th>
                         </tr>
                     </thead>

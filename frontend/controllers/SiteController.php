@@ -50,7 +50,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'redirect-to-store-domain',  'check-for-new-orders', 'current-plan', 'domains', 'compare-plan',  'downgrade-to-free-plan', 'confirm-plan', 'promote-to-open', 'connect-domain', 'promote-to-close', 'callback', 'vendor-dashboard', 'real-time-orders', 'mark-as-busy', 'mark-as-open'],
+                        'actions' => ['logout', 'redirect-to-store-domain',  'check-for-new-orders',  'domains',  'downgrade-to-free-plan', 'confirm-plan', 'promote-to-open', 'connect-domain', 'promote-to-close', 'callback', 'vendor-dashboard', 'real-time-orders', 'mark-as-busy', 'mark-as-open'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -317,23 +317,6 @@ class SiteController extends Controller {
 
     }
 
-    public function actionDowngradeToFreePlan($id, $selectedPlanId) {
-
-      if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
-
-        $subscription = new Subscription();
-        $subscription->restaurant_uuid = $managedRestaurant->restaurant_uuid;
-        $subscription->plan_id = $selectedPlanId;
-        $subscription->subscription_status = Subscription::STATUS_ACTIVE;
-        $subscription->save(false);
-
-        return $this->redirect(['current-plan',
-                    'id' => $id
-        ]);
-      }
-
-    }
-
 
     /**
      * Process callback from TAP payment gateway
@@ -354,50 +337,15 @@ class SiteController extends Controller {
             Yii::$app->session->setFlash('error', print_r('There seems to be an issue with your payment, please try again.', true));
 
             // Redirect back to current plan page
-            return $this->redirect(['current-plan',
+            return $this->redirect(['vendor-dashboard',
                         'id' => $paymentRecord->restaurant_uuid
             ]);
+
         } catch (\Exception $e) {
             throw new NotFoundHttpException($e->getMessage());
         }
     }
 
-    /**
-     * Comapre plan page
-     *
-     * @return mixed
-     */
-    public function actionComparePlan($id) {
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
-
-            $subscription = $managedRestaurant->getSubscriptions()->where(['subscription_status' => Subscription::STATUS_ACTIVE])->one();
-
-            $plans = Plan::find()->all();
-
-            return $this->render('compare-plan', [
-                        'restaurant_model' => $managedRestaurant,
-                        'selectedPlan' => $subscription,
-                        'availablePlans' =>  $plans
-            ]);
-        }
-    }
-
-    /**
-     * Current plan
-     *
-     * @return mixed
-     */
-    public function actionCurrentPlan($id) {
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
-
-            $subscription = $managedRestaurant->getSubscriptions()->where(['subscription_status' => Subscription::STATUS_ACTIVE])->with('plan')->one();
-
-            return $this->render('current-plan', [
-                        'restaurant_model' => $managedRestaurant,
-                        'subscription' => $subscription
-            ]);
-        }
-    }
 
     /**
      * Displays  Real time orders
@@ -1284,7 +1232,7 @@ class SiteController extends Controller {
                       $full_name = explode(' ', $agent_model->agent_name);
                       $firstname = $full_name[0];
                       $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
-                      
+
                       \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
                       \Segment::track([
                           'userId' => $store_model->restaurant_uuid,
