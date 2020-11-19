@@ -618,7 +618,7 @@ class Order extends \yii\db\ActiveRecord {
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-      if (!$insert && $this->order_status == self::STATUS_PENDING) {
+      if ($this->order_status == self::STATUS_PENDING) {
 
                 $productsList;
 
