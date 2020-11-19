@@ -642,6 +642,13 @@ class Order extends \yii\db\ActiveRecord {
                         'checkout_id' => $this->order_uuid,
                         'order_id' => $this->order_uuid,
                         'total' => $this->total_price,
+                        
+                        'revenue' => $this->payment_uuid ? $this->payment->plugn_fee : 0,
+                        'gateway_fee' => $this->payment_uuid ? $this->payment->payment_gateway_fee : 0,
+                        'payment_method' => $this->payment_method_name,
+                        'gateway' => $this->payment_uuid ? 'Tap' : null,
+                        'shipping' => $this->delivery_fee,
+                        
                         'subtotal' => $this->subtotal,
                         'currency' => 'KWD',
                         'coupon' => $this->voucher && $this->voucher->code  ? $this->voucher->code : null,
