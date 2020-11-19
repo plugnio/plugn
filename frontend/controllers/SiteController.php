@@ -1283,8 +1283,8 @@ class SiteController extends Controller {
 
                       $full_name = explode(' ', $agent_model->agent_name);
                       $firstname = $full_name[0];
-                      $lastname = $full_name[1];
-
+                      $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
+                      
                       \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
                       \Segment::track([
                           'userId' => $store_model->restaurant_uuid,
