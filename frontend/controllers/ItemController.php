@@ -17,6 +17,7 @@ use frontend\base\Model;
 use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 use common\components\FileUploader;
+use common\models\Order;
 
 /**
  * ItemController implements the CRUD actions for Item model.
@@ -86,6 +87,45 @@ class ItemController extends Controller
         $searchModel = new ItemSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
 
+
+        if ($restaurant_model->load(Yii::$app->request->post())) {
+
+          list($start_date, $end_date) = explode(' - ', $restaurant_model->export_sold_items_data_in_specific_date_range);
+
+
+            $searchResult = Item::find()
+                    ->joinWith(['orderItems', 'orderItems.order'])
+                    ->where(['order.order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['order.restaurant_uuid' => $restaurant_model->restaurant_uuid])
+                    ->andWhere(['between', 'order.order_created_at', $start_date, $end_date])
+                    ->all();
+
+            header('Access-Control-Allow-Origin: *');
+            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
+            header("Cache-Control: max-age=0");
+
+
+            \moonland\phpexcel\Excel::export([
+                'isMultipleSheet' => false,
+                'models' => $searchResult,
+                'columns' => [
+                    'item_name',
+                    [
+                        'label' => 'Sold items',
+                        'format' => 'html',
+                        'value' => function ($data)  use ($start_date,$end_date) {
+                            return $data->getSoldUnitsInSpecifcDate($start_date,$end_date);
+                        },
+                    ],
+                ],
+            ]);
+
+        }
 
         return $this->render('index', [
                     'searchModel' => $searchModel,

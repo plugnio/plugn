@@ -191,8 +191,8 @@ class Item extends \yii\db\ActiveRecord
 //        }
 
         foreach ($imagesPath as $key => $path) {
-            
-          
+
+
             $filename = Yii::$app->security->generateRandomString();
 
             $itemName = str_replace(' ', '', $this->item_name);
@@ -211,9 +211,9 @@ class Item extends \yii\db\ActiveRecord
                     $item_image_model->product_file_name = basename($result['url']);
                     $item_image_model->save(false);
                 }
-                
+
                 unlink($path['file']);
-                
+
             } catch (\Cloudinary\Error $err) {
                 Yii::error("Error when uploading item's image to Cloudinry: " . json_encode($err));
                 Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($imagesPath));
@@ -322,6 +322,22 @@ class Item extends \yii\db\ActiveRecord
             ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
             ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
             ->orWhere(['order_status' => Order::STATUS_CANCELED])
+            ->sum('qty');
+    }
+
+    /**
+     * Gets query for [[Options]].
+     *
+     */
+    public function getSoldUnitsInSpecifcDate($start_date, $end_date){
+      return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid'])
+            ->joinWith('order')
+            ->where(['order.order_status' => Order::STATUS_PENDING])
+            ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
+            ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+            ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+            ->orWhere(['order_status' => Order::STATUS_CANCELED])
+            ->andWhere(['between', 'order.order_created_at', $start_date, $end_date])
             ->sum('qty');
     }
 

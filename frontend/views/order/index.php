@@ -21,10 +21,10 @@ $(function () {
 
   $('table.data-list-view.dataTable tbody td').css('padding', '10px');
 
-  $('#restaurant-date_range_picker_with_time').attr('autocomplete','off');
-  $('#restaurant-date_range_picker_with_time').attr('style', '  padding-right: 2rem !important; padding-left: 3rem !important; ');
+  $('#restaurant-export_orders_data_in_specific_date_range').attr('autocomplete','off');
+  $('#restaurant-export_orders_data_in_specific_date_range').attr('style', '  padding-right: 2rem !important; padding-left: 3rem !important; ');
 
-  $('#restaurant-date_range_picker_with_time').change(function(e){
+  $('#restaurant-export_orders_data_in_specific_date_range').change(function(e){
     if(e.target.value){
       $('#export-to-excel-btn').attr('disabled',false);
     }else {
@@ -64,7 +64,7 @@ $this->registerJs($js);
 
 
             <?=
-            $form->field($restaurant_model, 'date_range_picker_with_time', [
+            $form->field($restaurant_model, 'export_orders_data_in_specific_date_range', [
                 'labelOptions' => ['style' => ' margin-bottom: 10px;   font-size: 1.32rem;'],
                 'template' => '
               {label}

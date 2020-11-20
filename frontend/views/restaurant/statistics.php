@@ -258,20 +258,30 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="card-header">
                         <h4 class="card-title">Sold Items</h4>
 
-                        <div class="btn-group mb-1">
+                        <!-- <div class="btn-group mb-1">
                                             <div class="dropdown">
                                                 <button class="btn btn-success dropdown-toggle mr-1 waves-effect waves-light" type="button" id="dropdownMenuButton2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                   <i class="fa fa-file-excel-o"></i>  Export to excel
                                                 </button>
                                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 38px, 0px);">
-                                                    <?= Html::a('Today', ['export-today-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item']) ?>
-                                                    <?= Html::a('Last 7 days', ['export-last-seven-days-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item']) ?>
-                                                    <?= Html::a('Current month', ['export-current-month-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item']) ?>
-                                                    <?= Html::a('Last month', ['export-last-month-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item']) ?>
-                                                    <?= Html::a('Last 3 months', ['export-last-three-months-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item']) ?>
+                                                    <?php
+                                                     // echo Html::a('Today', ['export-today-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
+                                                     ?>
+                                                    <?php
+                                                    // echo Html::a('Last 7 days', ['export-last-seven-days-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
+                                                    ?>
+                                                    <?php
+                                                    // echo Html::a('Current month', ['export-current-month-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
+                                                    ?>
+                                                    <?php
+                                                    // echo Html::a('Last month', ['export-last-month-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
+                                                    ?>
+                                                    <?php
+                                                     // echo Html::a('Last 3 months', ['export-last-three-months-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
+                                                     ?>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
                     </div>
                     <div class="card-content">
                         <div class="card-body">

@@ -93,7 +93,8 @@ class Restaurant extends \yii\db\ActiveRecord {
     public $restaurant_payments_method;
     public $restaurant_logo;
     public $restaurant_thumbnail_image;
-    public $date_range_picker_with_time;
+    public $export_orders_data_in_specific_date_range;
+    public $export_sold_items_data_in_specific_date_range;
     public $owner_identification_file_front_side;
     public $owner_identification_file_back_side;
     public $restaurant_authorized_signature_file;
@@ -169,7 +170,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['custom_css'], 'string'],
             [['platform_fee'], 'number'],
             [['instagram_url'], 'url'],
-            [['date_range_picker_with_time', 'google_analytics_id', 'facebook_pixil_id', 'site_id'], 'safe'],
+            [['export_orders_data_in_specific_date_range','export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'site_id'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'app_id', 'armada_api_key', 'mashkor_branch_id', 'store_branch_name', 'live_public_key', 'test_public_key', 'company_name'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 7, 'max' => 8],
             [['live_public_key', 'test_public_key'], 'default', 'value' => null],
@@ -203,7 +204,8 @@ class Restaurant extends \yii\db\ActiveRecord {
             'support_delivery' => 'Support Delivery',
             'support_pick_up' => 'Support Pick Up',
             'restaurant_delivery_area' => 'Delivery Areas',
-            'date_range_picker_with_time' => 'Export orders data in a specific date range',
+            'export_orders_data_in_specific_date_range' => 'Export orders data in a specific date range',
+            'export_sold_items_data_in_specific_date_range' => 'Export sold items data in a specific date range',
             'phone_number' => "Store's phone number",
             'restaurant_email' => "Store's Email",
             'restaurant_created_at' => 'Store Created At',
