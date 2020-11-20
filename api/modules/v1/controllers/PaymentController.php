@@ -8,6 +8,7 @@ use yii\data\ActiveDataProvider;
 use common\models\RestaurantPaymentMethod;
 use common\models\PaymentMethod;
 use common\models\Payment;
+use common\models\Restaurant;
 
 class PaymentController extends Controller {
 
@@ -58,21 +59,21 @@ class PaymentController extends Controller {
     public function actionPaymentDetail($id) {
 
         $model = Payment::find()->where(['payment_uuid' => $id])->with('order')->asArray()->one();
-        
+
         return $model;
     }
-    
+
+
+
     /**
      * return a list of payments method that restaurant's owner added on agent dashboard
      */
     public function actionListAllRestaurantsPaymentMethod($id) {
 
-        $query = PaymentMethod::find()
-                    ->joinWith('restaurantPaymentMethods as restaurantPaymentMethods')
-                    ->where(['restaurantPaymentMethods.restaurant_uuid' => $id]);
-        
+        $model = Restaurant::findOne($id);
+
         return new ActiveDataProvider([
-            'query' => $query->asArray(),
+            'query' => $model->getPaymentMethods()->asArray(),
             'pagination' => false
         ]);
     }
