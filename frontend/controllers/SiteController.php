@@ -337,8 +337,8 @@ class SiteController extends Controller {
             Yii::$app->session->setFlash('error', print_r('There seems to be an issue with your payment, please try again.', true));
 
             // Redirect back to current plan page
-            return $this->redirect(['vendor-dashboard',
-                        'id' => $paymentRecord->restaurant_uuid
+            return $this->redirect(['restaurant/view-payment-methods',
+                        'restaurantUuid' => $paymentRecord->restaurant_uuid
             ]);
 
         } catch (\Exception $e) {

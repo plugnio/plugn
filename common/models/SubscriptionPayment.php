@@ -153,6 +153,26 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         // On Successful Payments
         if ($responseContent->status == 'CAPTURED') {
 
+
+          // KNET Gateway Fee Calculation
+          if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
+
+              if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->knetGatewayFee) > Yii::$app->tapPayments->minKnetGatewayFee)
+                  $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->knetGatewayFee;
+              else
+                  $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minKnetGatewayFee;
+          }
+
+          // Creditcard Gateway Fee Calculation
+          if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_VISA_MASTERCARD) {
+
+              if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage) > Yii::$app->tapPayments->minCreditcardGatewayFee)
+                  $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage;
+              else
+                  $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minCreditcardGatewayFee;
+          }
+
+
             // Update payment method used and the order id assigned to it
             if (isset($responseContent->source->payment_method) && $responseContent->source->payment_method)
                 $paymentRecord->payment_mode = $responseContent->source->payment_method;
@@ -161,6 +181,23 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
             // Net amount after deducting gateway fee
             $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee;
+
+
+            //Send event to Segment
+                \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+                \Segment::track([
+                      'userId' => $paymentRecord->restaurant_uuid,
+                      'event' => 'Premium Plan Purchase',
+                      'properties' => [
+                          'order_id' => $paymentRecord->payment_uuid,
+                          'value' => $paymentRecord->payment_amount_charged,
+                          'paymentMethod' => $paymentRecord->payment_mode,
+                          'currency' => 'KWD'
+                      ]
+                  ]);
+
+
+
         } else {
             Yii::info('[TAP Payment Issue > ' . $paymentRecord->restaurant->name . ']'
                     . $paymentRecord->restaurant->name .
