@@ -652,7 +652,7 @@ class Order extends \yii\db\ActiveRecord {
                         'subtotal' => $this->subtotal,
                         'currency' => 'KWD',
                         'coupon' => $this->voucher && $this->voucher->code  ? $this->voucher->code : null,
-                        'products' => $productsList
+                        'products' => $productsList ? $productsList : null
                     ]
                 ]);
       }
