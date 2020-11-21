@@ -81,6 +81,15 @@ class Area extends \yii\db\ActiveRecord
 
 
 
+    /**
+     * Gets query for [[RestaurantDeliveryAreas]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAreaDeliveryZones()
+    {
+        return $this->hasMany(AreaDeliveryZone::className(), ['area_id' => 'area_id']);
+    }
 
     /**
      * Gets query for [[RestaurantDeliveryAreas]].

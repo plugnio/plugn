@@ -15,6 +15,15 @@ use common\models\Area;
 
 <script>
 
+  $('.collapseBtn').on('click', function(e){
+    currentId = $(this).attr('id');
+
+    console.log(currentId);
+    $('#collapse-'+ currentId).collapse('toggle');
+
+  });
+
+
   $('.selectAll').on('click', function(e){
 
 
@@ -81,15 +90,14 @@ foreach ($cities as $cityIndex => $city) {
 
             </p>
 
-            <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
-            <div class="heading-elements" style="top: initial;">
+            <div style="top: initial; display: block !important; background-color: inherit; position: absolute; right: 21px; cursor: pointer;">
                 <ul class="list-inline mb-0">
                     <li id="<?= $city->city_id ?>">
 
                     <?=  Html::button(' Select all', ['class' => 'btn selectAll', 'id' => 'selectAll-' . $city->city_id, 'style' => 'color :#7367F0;' ]); ?>
                     <?=  Html::button(' Clear all', ['class' => 'btn clearAll', 'id' => 'clearAll-' . $city->city_id, 'style' => 'display :none; color :#7367F0;']); ?>
 
-                        <a style="font-size: 15px;" data-action="collapse"><i class="feather icon-chevron-down"></i></a>
+                        <a style="font-size: 15px;" id="<?= $city->city_id ?>" class="collapseBtn" data-action="collapse"><i class="feather icon-chevron-down"></i></a>
                     </li>
                 </ul>
             </div>
@@ -97,7 +105,7 @@ foreach ($cities as $cityIndex => $city) {
 
 
 
-        <div class="card-content collapse" style="border-radius: 0.25rem; border: 1px solid #ecedf1; border-top:none; padding-top:10px">
+        <div class="card-content collapse" id="collapse-<?= $city->city_id ?>"   style="border-radius: 0.25rem; border: 1px solid #ecedf1; border-top:none; padding-top:10px">
 
 
             <?php foreach ($areaQuery as $key => $area) { ?>

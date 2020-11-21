@@ -14,9 +14,9 @@ use Yii;
  *
  * @property Area[] $areas
  */
-class City extends \common\models\City 
+class City extends \common\models\City
 {
-    
+
     /**
      * Gets query for [[RestaurantDeliveryAreas]].
      *
@@ -26,4 +26,5 @@ class City extends \common\models\City
     {
         return $this->hasMany(RestaurantDelivery::className(), ['area_id' => 'area_id'])->via('areas');
     }
+
 }

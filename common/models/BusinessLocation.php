@@ -91,19 +91,15 @@ class BusinessLocation extends \yii\db\ActiveRecord
         return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])->joinWith(['areas']);
     }
 
-
-      /**
-       * Gets query for [[AreaDeliveryZones]].
-       *
-       * @return \yii\db\ActiveQuery
-       */
-      public function getAreaDeliveryZones()
-      {
-          return $this->hasMany(AreaDeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id'])->via('deliveryZones');
-      }
-
-    public function getPreferedCitiesWithCountry() {
-        return $this->getDeliveryZones()->joinWith('cities')->asArray();
+     /**
+     * Gets query for [[AreaDeliveryZones]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAreaDeliveryZones()
+    {
+        return $this->hasMany(AreaDeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id'])->via('deliveryZones');
     }
+
 
 }

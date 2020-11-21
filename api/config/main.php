@@ -64,9 +64,13 @@ return [
                     'controller' => 'v1/delivery-zone',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET list-of-countries/<restaurant_uuid>' => 'list-of-countries',
+                        'GET <restaurant_uuid>/<country_id>' => 'list-of-areas',
                         'GET <restaurant_uuid>' => 'delivery-zone',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS list-of-countries/<restaurant_uuid>' => 'options',
+                        'OPTIONS <restaurant_uuid>/<country_id>' => 'options',
                         'OPTIONS <restaurant_uuid>' => 'options'
                     ]
                 ],

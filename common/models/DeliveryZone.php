@@ -1,5 +1,6 @@
 <?php
 
+
 namespace common\models;
 
 use Yii;
@@ -75,7 +76,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
      */
     public function getAreas()
     {
-        return $this->hasMany(Area::className(), ['area_id' => 'area_id'])->viaTable('area_delivery_zone', ['delivery_zone_id' => 'delivery_zone_id']);
+        return $this->hasMany(Area::className(), ['area_id' => 'area_id'])->viaTable('area_delivery_zone', ['delivery_zone_id' => 'delivery_zone_id'])->joinWith('city');
     }
 
 
@@ -89,15 +90,19 @@ class DeliveryZone extends \yii\db\ActiveRecord
           return $this->hasOne(Country::className(), ['country_id' => 'country_id'])->via('businessLocation');
       }
 
+
       /**
-       * Gets query for [[Cities]].
+       * Gets query for [[City]].
        *
        * @return \yii\db\ActiveQuery
        */
       public function getCities()
       {
-          return $this->hasMany(City::className(), ['country_id' => 'country_id'])->via('country');
+          return $this->hasMany(City::className(), ['city_id' => 'city_id'])->via('areas');
       }
+
+
+
 
     /**
      * Gets query for [[BusinessLocation]].

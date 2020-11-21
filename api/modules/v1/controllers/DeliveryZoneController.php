@@ -5,8 +5,10 @@ namespace api\modules\v1\controllers;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
 use common\models\Item;
 use common\models\Category;
+use common\models\City;
 use common\models\Restaurant;
 use common\models\ItemImage;
 
@@ -51,7 +53,7 @@ class DeliveryZoneController extends Controller {
             'resourceOptions' => ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
         ];
         return $actions;
-    } 
+    }
 
     /**
      * Return Delivery zones
@@ -64,10 +66,89 @@ class DeliveryZoneController extends Controller {
 
             foreach ($shipping_countries as $key => $country) {
               $deliveryZones = $store_model->getCountryDeliveryZones($country['country_id'])->asArray()->all();
-              $shipping_countries[$key]['deliveryZones'] = $deliveryZones;
+              $shipping_countries[$key]['businessLocations'] = $deliveryZones;
             }
 
             return $shipping_countries;
+
+
+        } else {
+            return [
+                'operation' => 'error',
+                'message' => 'Store Uuid is invalid'
+            ];
+        }
+    }
+
+    /**
+     * Return List of countries available for delivery
+     */
+    public function actionListOfCountries($restaurant_uuid) {
+
+        if ($store_model = Restaurant::findOne($restaurant_uuid)) {
+
+            $shipping_countries = $store_model->getShippingCountries()->asArray()->all();
+
+
+            return $shipping_countries;
+
+
+        } else {
+            return [
+                'operation' => 'error',
+                'message' => 'Store Uuid is invalid'
+            ];
+        }
+    }
+
+    /**
+     * Return list of areas available for delivery
+     */
+    public function actionListOfAreas($restaurant_uuid, $country_id) {
+
+        if ($store_model = Restaurant::findOne($restaurant_uuid)) {
+
+
+          $countryCities = City::find()
+                  ->where(['country_id' => $country_id])
+                  ->asArray()
+                  ->all();
+
+          // $countryCities = ArrayHelper::index($countryCities, 'city_id');
+
+
+          $businessLocations = $store_model->getBusinessLocationsForSpecificCountry($country_id)->asArray()->all();
+
+
+          foreach ($countryCities as $cityKey => $city) {
+            foreach ($businessLocations as $businessLocationKey => $businessLocation) {
+                foreach ($businessLocation['deliveryZones'] as $deliveryZoneKey => $deliveryZone) {
+
+                  $businessLocationData = $businessLocation;
+                  $deliveryZoneData = $deliveryZone;
+                  unset($businessLocationData['deliveryZones']);
+                  unset($deliveryZoneData['areas']);
+
+                  foreach ($deliveryZone['areas'] as $key => $area) {
+                      if($area['city_id'] == $city['city_id']){
+                        unset($area['city']);
+                        $area['businessLocation'] = $businessLocationData;
+                        $area['deliveryZone'] = $deliveryZoneData;
+                        $countryCities[$cityKey]['areas'][] = $area;
+                      }
+                  }
+                }
+            }
+
+
+          }
+
+          foreach ($countryCities as $key => $city) {
+            if(isset($city['areas']))
+              $citiesData []= $city;
+          }
+
+            return $citiesData ;
 
 
         } else {
