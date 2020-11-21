@@ -135,15 +135,14 @@ $this->registerJs($js);
                     }
                 ],
                 [
-                    'attribute' => 'customer_name',
-                    'format' => 'raw',
-                    'value' => function ($data) {
-                        if ($data->customer_id)
-                            return Html::a($data->customer->customer_name, ['customer/view', 'id' => $data->customer_id, 'restaurantUuid' => $data->restaurant_uuid]);
-                    },
-                    'visible' => function ($data) {
-                        return $data->customer_id ? true : false;
-                    },
+                  'attribute' => 'customer_name',
+                  'format' => 'raw',
+                  'value' => function ($data) {
+                      if ($data->customer_id)
+                          return Html::a($data->customer_name, ['customer/view', 'id' => $data->customer_id, 'restaurantUuid' => $data->restaurant_uuid]);
+                      else
+                        return $data->customer_name;
+                  },
                 ],
                 'customer_phone_number',
                 [
