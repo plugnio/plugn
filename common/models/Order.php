@@ -620,7 +620,7 @@ class Order extends \yii\db\ActiveRecord {
 
       if ($this->order_status == self::STATUS_PENDING) {
 
-                $productsList;
+                $productsList = null  ;
 
                 foreach ($this->orderItems as $orderedItem) {
                   $productsList[] = [
@@ -632,23 +632,23 @@ class Order extends \yii\db\ActiveRecord {
                     'url' => $this->restaurant->restaurant_domain . '/product/' . $orderedItem->item_uuid,
                   ];
                 }
-                
+
                 \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
                 \Segment::track([
                     'userId' => $this->restaurant_uuid,
-                    
+
                     'event' => 'Order Completed',
                     'properties' => [
                         'checkout_id' => $this->order_uuid,
                         'order_id' => $this->order_uuid,
                         'total' => $this->total_price,
-                        
+
                         'revenue' => $this->payment_uuid ? $this->payment->plugn_fee : 0,
                         'gateway_fee' => $this->payment_uuid ? $this->payment->payment_gateway_fee : 0,
                         'payment_method' => $this->payment_method_name,
                         'gateway' => $this->payment_uuid ? 'Tap' : null,
                         'shipping' => $this->delivery_fee,
-                        
+
                         'subtotal' => $this->subtotal,
                         'currency' => 'KWD',
                         'coupon' => $this->voucher && $this->voucher->code  ? $this->voucher->code : null,
