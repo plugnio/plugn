@@ -171,6 +171,11 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                         'sorter' => false,
                         'columns' => [
                             'item_name',
+                            [
+                                'label' => 'SKU',
+                                'format' => 'raw',
+                                'value' => 'item.sku',
+                            ],
                             'customer_instruction',
                             'qty',
                             [
@@ -243,7 +248,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                         <td><?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                                     </tr>
                                 </tbody>
-                            <?php } ?> 
+                            <?php } ?>
 
                             <?php if ($model->order_mode == Order::ORDER_MODE_DELIVERY) { ?>
 

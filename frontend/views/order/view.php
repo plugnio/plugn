@@ -345,7 +345,7 @@ $this->registerJs($js);
                                 [
                                     'label' => 'SKU',
                                     'format' => 'raw',
-                                    'value' => 'sku',
+                                    'value' => 'item.sku',
                                 ],
                                 'customer_instruction',
                                 'qty',
