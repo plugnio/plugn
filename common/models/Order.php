@@ -771,17 +771,17 @@ class Order extends \yii\db\ActiveRecord {
                 $customer_model->restaurant_uuid = $this->restaurant_uuid;
                 $customer_model->customer_name = $this->customer_name;
                 $customer_model->customer_phone_number = $this->customer_phone_number;
-                if ($this->customer_email != null)
-                    $customer_model->customer_email = $this->customer_email;
 
-                $customer_model->save(false);
-            } else {
-                //Make sure customer name & email are correct
-                $this->customer_name = $customer_model->customer_name;
-                $this->customer_phone_number = $customer_model->customer_phone_number;
-                if ($customer_model->customer_email != null)
-                    $this->customer_email = $customer_model->customer_email;
-            }
+            } else
+                $customer_model->customer_name = $this->customer_name;
+
+
+
+            if ($this->customer_email != null)
+                $customer_model->customer_email = $this->customer_email;
+
+            $customer_model->save(false);
+
 
             $this->customer_id = $customer_model->customer_id;
 
