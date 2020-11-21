@@ -526,6 +526,41 @@ class Order extends \yii\db\ActiveRecord {
     public function changeOrderStatusToPending() {
         $this->order_status = self::STATUS_PENDING;
         $this->save(false);
+
+
+        $productsList = null  ;
+
+        foreach ($this->orderItems as $orderedItem) {
+          $productsList[] = [
+            'product_id' => $orderedItem->item_uuid,
+            'sku' => $orderedItem->item->sku ? $orderedItem->item->sku : null ,
+            'name' => $orderedItem->item_name,
+            'price' => $orderedItem->item_price,
+            'quantity' => $orderedItem->qty,
+            'url' => $this->restaurant->restaurant_domain . '/product/' . $orderedItem->item_uuid,
+          ];
+        }
+
+        \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+        \Segment::track([
+            'userId' => $this->restaurant_uuid,
+
+            'event' => 'Order Completed',
+            'properties' => [
+                'checkout_id' => $this->order_uuid,
+                'order_id' => $this->order_uuid,
+                'total' => $this->total_price,
+                'revenue' => $this->payment_uuid ? $this->payment->plugn_fee : 0,
+                'gateway_fee' => $this->payment_uuid ? $this->payment->payment_gateway_fee : 0,
+                'payment_method' => $this->payment_method_name,
+                'gateway' => $this->payment_uuid ? 'Tap' : null,
+                'shipping' => $this->delivery_fee,
+                'subtotal' => $this->subtotal,
+                'currency' => 'KWD',
+                'coupon' => $this->voucher && $this->voucher->code  ? $this->voucher->code : null,
+                'products' => $productsList ? $productsList : null
+            ]
+        ]);
     }
 
     /**
@@ -617,46 +652,6 @@ class Order extends \yii\db\ActiveRecord {
 
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
-
-      if ($this->order_status == self::STATUS_PENDING) {
-
-                $productsList = null  ;
-
-                foreach ($this->orderItems as $orderedItem) {
-                  $productsList[] = [
-                    'product_id' => $orderedItem->item_uuid,
-                    'sku' => $orderedItem->item->sku ? $orderedItem->item->sku : null ,
-                    'name' => $orderedItem->item_name,
-                    'price' => $orderedItem->item_price,
-                    'quantity' => $orderedItem->qty,
-                    'url' => $this->restaurant->restaurant_domain . '/product/' . $orderedItem->item_uuid,
-                  ];
-                }
-
-                \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-                \Segment::track([
-                    'userId' => $this->restaurant_uuid,
-
-                    'event' => 'Order Completed',
-                    'properties' => [
-                        'checkout_id' => $this->order_uuid,
-                        'order_id' => $this->order_uuid,
-                        'total' => $this->total_price,
-
-                        'revenue' => $this->payment_uuid ? $this->payment->plugn_fee : 0,
-                        'gateway_fee' => $this->payment_uuid ? $this->payment->payment_gateway_fee : 0,
-                        'payment_method' => $this->payment_method_name,
-                        'gateway' => $this->payment_uuid ? 'Tap' : null,
-                        'shipping' => $this->delivery_fee,
-
-                        'subtotal' => $this->subtotal,
-                        'currency' => 'KWD',
-                        'coupon' => $this->voucher && $this->voucher->code  ? $this->voucher->code : null,
-                        'products' => $productsList ? $productsList : null
-                    ]
-                ]);
-      }
-
 
       //Send SMS To customer
       if (!$insert && $this->restaurant_uuid != 'rest_7351b2ff-c73d-11ea-808a-0673128d0c9c' && !$this->sms_sent &&  isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_PENDING && $this->order_status == self::STATUS_ACCEPTED) {
