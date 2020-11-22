@@ -240,6 +240,7 @@ class CronController extends \yii\console\Controller {
                   var storeUuid = store.restaurant_uuid;
                   var storeTagline = store.tagline;
                   var storeLogo = store.logo;
+                  var storeDomain = store.restaurant_domain;
 
 
                   var buildFileJs = `
