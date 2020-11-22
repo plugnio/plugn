@@ -241,6 +241,7 @@ class CronController extends \yii\console\Controller {
                   var storeTagline = store.tagline;
                   var storeLogo = store.logo;
                   var storeDomain = store.restaurant_domain;
+                  var storeThemeColor = store.theme_color;
 
 
                   var buildFileJs = `
