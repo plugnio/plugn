@@ -1,5 +1,5 @@
 <?php
 return [
-  'apiEndpoint' => 'http://localhost/~Saoud/plugn/plugn-yii2/api/web',
+  'apiEndpoint' => 'https://api.plugn.io',
   'frontendUrl' => 'http://localhost/~Saoud/plugn/plugn-yii2/frontend/web',
 ];
