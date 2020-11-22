@@ -82,14 +82,14 @@ class VoucherController extends Controller
 
 
               if($model->save()){
-                  
+
                   \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
                   \Segment::track([
                       'userId' => $restaurantUuid,
                       'event' => 'Voucher Created',
                       'properties' => [
                           'type' => $model->discountType,
-                           'discountAmount' => $model->discount_amount
+                           'discountAmount' => ($model->discount_amount * 3.28)
                       ]
                   ]);
 

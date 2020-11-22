@@ -184,17 +184,17 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
 
             //Send event to Segment
-                \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-                \Segment::track([
-                      'userId' => $paymentRecord->restaurant_uuid,
-                      'event' => 'Premium Plan Purchase',
-                      'properties' => [
-                          'order_id' => $paymentRecord->payment_uuid,
-                          'value' => $paymentRecord->payment_amount_charged,
-                          'paymentMethod' => $paymentRecord->payment_mode,
-                          'currency' => 'KWD'
-                      ]
-                  ]);
+            \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+            \Segment::track([
+                  'userId' => $paymentRecord->restaurant_uuid,
+                  'event' => 'Premium Plan Purchase',
+                  'properties' => [
+                      'order_id' => $paymentRecord->payment_uuid,
+                      'value' => ( $paymentRecord->payment_amount_charged * 3.28 ),
+                      'paymentMethod' => $paymentRecord->payment_mode,
+                      'currency' => 'USD'
+                  ]
+              ]);
 
 
 

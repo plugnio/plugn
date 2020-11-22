@@ -549,14 +549,14 @@ class Order extends \yii\db\ActiveRecord {
             'properties' => [
                 'checkout_id' => $this->order_uuid,
                 'order_id' => $this->order_uuid,
-                'total' => $this->total_price,
-                'revenue' => $this->payment_uuid ? $this->payment->plugn_fee : 0,
-                'gateway_fee' => $this->payment_uuid ? $this->payment->payment_gateway_fee : 0,
+                'total' => ($this->total_price * 3.28),
+                'revenue' => $this->payment_uuid ? ($this->payment->plugn_fee * 3.28) : 0,
+                'gateway_fee' => $this->payment_uuid ? ($this->payment->payment_gateway_fe * 3.28 ) : 0,
                 'payment_method' => $this->payment_method_name,
                 'gateway' => $this->payment_uuid ? 'Tap' : null,
-                'shipping' => $this->delivery_fee,
-                'subtotal' => $this->subtotal,
-                'currency' => 'KWD',
+                'shipping' => ($this->delivery_fee * 3.28),
+                'subtotal' => ($this->subtotal * 3.28),
+                'currency' => 'USD',
                 'coupon' => $this->voucher && $this->voucher->code  ? $this->voucher->code : null,
                 'products' => $productsList ? $productsList : null
             ]
