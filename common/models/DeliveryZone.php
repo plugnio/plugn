@@ -93,6 +93,20 @@ class DeliveryZone extends \yii\db\ActiveRecord
         return $this->hasOne(BusinessLocation::className(), ['business_location_id' => 'business_location_id']);
     }
 
+
+
+    /**
+     * Gets query for [[RestaurantUu]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurant()
+    {
+        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('businessLocation');
+    }
+
+
+
     /**
      * Gets query for [[Country]].
      *

@@ -40,9 +40,8 @@ class DeliveryZoneSearch extends DeliveryZone
      */
     public function search($params, $restaurantUuid)
     {
-        $query = \Yii::$app->accountManager
-              ->getManagedAccount($restaurantUuid)
-              ->getDeliveryZones();
+        $query = \Yii::$app->accountManager->getManagedAccount($restaurantUuid) ->getDeliveryZones();
+
 
         // add conditions that should always apply here
 

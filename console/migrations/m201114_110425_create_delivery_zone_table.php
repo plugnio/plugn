@@ -55,6 +55,7 @@ class m201114_110425_create_delivery_zone_table extends Migration
               'business_location_id'
       );
 
+
       // add foreign key for table `delivery_zone`
       $this->addForeignKey(
               'fk-delivery_zone-business_location_id',
@@ -67,13 +68,11 @@ class m201114_110425_create_delivery_zone_table extends Migration
 
 
       $this->createTable('{{%area_delivery_zone}}', [
+          'area_delivery_zone' => $this->bigPrimaryKey(),
           'delivery_zone_id' => $this->bigInteger()->notNull(),
           'country_id' => $this->integer()->notNull(),
-          'city_id' => $this->integer()->notNull(),
-          'area_id' => $this->integer()->notNull()
+          'area_id' => $this->integer()
       ],$tableOptions);
-
-      $this->addPrimaryKey('PK', 'area_delivery_zone', ['delivery_zone_id','area_id']);
 
 
 
@@ -91,24 +90,6 @@ class m201114_110425_create_delivery_zone_table extends Migration
           'country_id',
           'country',
           'country_id',
-          'CASCADE'
-      );
-
-
-      // creates index for column `city_id`
-      $this->createIndex(
-          'idx-area_delivery_zone-city_id',
-          'area_delivery_zone',
-          'city_id'
-      );
-
-      // add foreign key for table `area_delivery_zone`
-      $this->addForeignKey(
-          'fk-area_delivery_zone-city_id',
-          'area_delivery_zone',
-          'city_id',
-          'city',
-          'city_id',
           'CASCADE'
       );
 

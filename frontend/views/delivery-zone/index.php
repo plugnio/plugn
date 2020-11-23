@@ -40,7 +40,7 @@ $this->params['restaurant_uuid'] = $restaurantUuid;
         GridView::widget([
             'dataProvider' => $dataProvider,
             'rowOptions' => function($model) {
-                $url = Url::to(['update', 'id' => $model->business_location_id, 'restaurantUuid' => $model->restaurant->restaurant_uuid]);
+                $url = Url::to(['update', 'id' => $model->delivery_zone_id, 'restaurantUuid' => $model->restaurant->restaurant_uuid]);
 
                 return [
                     'onclick' => "window.location.href='{$url}'"

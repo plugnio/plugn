@@ -91,27 +91,35 @@ class DeliveryZoneController extends Controller {
 
         if ($model->load(Yii::$app->request->post()) && $model->save() ) {
 
-            foreach ($model['selectedAreas'] as $cities) {
 
-                if (is_array($cities)) {
-                    foreach ($cities as $areas) {
+            if(isset($model['selectedAreas'])){
+              foreach ($model['selectedAreas'] as $cities) {
 
-                            if (is_array($areas)) {
+                  if (is_array($cities)) {
+                      foreach ($cities as $areas) {
 
-                      foreach ($areas as $area_id) {
+                              if (is_array($areas)) {
 
-                            $delivery_zone_area_model = new AreaDeliveryZone();
-                            $delivery_zone_area_model->country_id = $model->country_id;
-                            $delivery_zone_area_model->city_id = $model->city_id;
-                            $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
-                            $delivery_zone_area_model->area_id = $area_id;
-                            $delivery_zone_area_model->save(false);
+                        foreach ($areas as $area_id) {
 
-                          }
-                    }
-                    }
-                }
+                              $delivery_zone_area_model = new AreaDeliveryZone();
+                              $delivery_zone_area_model->country_id = $model->country_id;
+                              $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
+                              $delivery_zone_area_model->area_id = $area_id;
+                              $delivery_zone_area_model->save(false);
+
+                            }
+                      }
+                      }
+                  }
+              }
+            } else {
+              $delivery_zone_area_model = new AreaDeliveryZone();
+              $delivery_zone_area_model->country_id = $model->country_id;
+              $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
+              $delivery_zone_area_model->save(false);
             }
+
 
             $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
         }
