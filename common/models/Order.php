@@ -487,6 +487,13 @@ class Order extends \yii\db\ActiveRecord {
                     ->setReplyTo([$this->restaurant->restaurant_email => $this->restaurant->name])
                     ->send();
         }
+
+
+        if($this->payment_uuid)
+            Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $this->payment_method_name, __METHOD__);
+
+
+
     }
 
     /**

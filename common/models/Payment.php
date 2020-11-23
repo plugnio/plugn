@@ -143,6 +143,7 @@ class Payment extends \yii\db\ActiveRecord {
 
         // If there's an error from TAP, exit and display error
         if (isset($responseContent->errors)) {
+
             $errorMessage = "Error from TAP: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
             \Yii::error($errorMessage, __METHOD__); // Log error faced by user
             \Yii::$app->getSession()->setFlash('error', $errorMessage);
@@ -180,9 +181,9 @@ class Payment extends \yii\db\ActiveRecord {
 
             if(isset($responseContent->destinations))
                 $paymentRecord->plugn_fee = $responseContent->destinations->amount;
-            else    
+            else
                 $paymentRecord->plugn_fee = 0;
-            
+
 
             // Update payment method used and the order id assigned to it
             if( isset($responseContent->source->payment_method) && $responseContent->source->payment_method )
@@ -218,12 +219,10 @@ class Payment extends \yii\db\ActiveRecord {
         parent::afterSave($insert, $changedAttributes);
 
         if ($this->payment_current_status == 'CAPTURED' && $this->received_callback){
-            
-          Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $this->order->payment_method_name, __METHOD__);
 
           $this->order->changeOrderStatusToPending();
           $this->order->sendPaymentConfirmationEmail();
-          
+
         }
     }
 
