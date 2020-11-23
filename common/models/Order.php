@@ -558,7 +558,7 @@ class Order extends \yii\db\ActiveRecord {
                 'order_id' => $this->order_uuid,
                 'total' => ($this->total_price * 3.28),
                 'revenue' => $this->payment_uuid ? ($this->payment->plugn_fee * 3.28) : 0,
-                'gateway_fee' => $this->payment_uuid ? ($this->payment->payment_gateway_fe * 3.28 ) : 0,
+                'gateway_fee' => $this->payment_uuid ? ($this->payment->payment_gateway_fee * 3.28 ) : 0,
                 'payment_method' => $this->payment_method_name,
                 'gateway' => $this->payment_uuid ? 'Tap' : null,
                 'shipping' => ($this->delivery_fee * 3.28),
