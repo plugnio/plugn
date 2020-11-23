@@ -186,7 +186,17 @@ $this->registerJs($js);
 
                 'unit_sold',
                 'sort_number',
-                'item_price:currency',
+
+                [
+                    'attribute' => 'item_price',
+                    "format" => "raw",
+                    "value" => function($model) {
+                        if ($model->getExtraOptions()->where(['>','extra_option_price', '0'])->exists())
+                          return 'Price on selection';
+                        else
+                          return Yii::$app->formatter->asCurrency($model->item_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]);
+                    }
+                ],
                 [
                     'attribute' => 'item_status',
                     "format" => "raw",
