@@ -9,6 +9,7 @@ use Yii;
  * This is the model class for table "delivery_zone".
  *
  * @property int $delivery_zone_id
+ * @property int $country_id
  * @property int $business_location_id
  * @property int|null $delivery_time
  * @property float|null $delivery_fee
@@ -17,6 +18,7 @@ use Yii;
  * @property AreaDeliveryZone[] $areaDeliveryZones
  * @property Area[] $areas
  * @property BusinessLocation $businessLocation
+ * @property Country $country
  */
 class DeliveryZone extends \yii\db\ActiveRecord
 {
@@ -37,11 +39,12 @@ class DeliveryZone extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['business_location_id'], 'required'],
-            [['business_location_id', 'delivery_time'], 'integer'],
+            [['country_id','business_location_id'], 'required'],
+            [['business_location_id', 'delivery_time','country_id'], 'integer'],
             [['delivery_fee', 'min_charge'], 'number'],
             [['selectedAreas'], 'safe'],
             [['business_location_id'], 'exist', 'skipOnError' => true, 'targetClass' => BusinessLocation::className(), 'targetAttribute' => ['business_location_id' => 'business_location_id']],
+            [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country_id' => 'country_id']]
         ];
     }
 
@@ -52,6 +55,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
     {
         return [
             'delivery_zone_id' => 'Delivery Zone ID',
+            'country_id' => 'Country ID',
             'business_location_id' => 'Business Location',
             'delivery_time' => 'Delivery Time',
             'delivery_fee' => 'Delivery Fee',
@@ -76,33 +80,8 @@ class DeliveryZone extends \yii\db\ActiveRecord
      */
     public function getAreas()
     {
-        return $this->hasMany(Area::className(), ['area_id' => 'area_id'])->viaTable('area_delivery_zone', ['delivery_zone_id' => 'delivery_zone_id'])->joinWith('city');
+        return $this->hasMany(Area::className(), ['area_id' => 'area_id'])->viaTable('area_delivery_zone', ['delivery_zone_id' => 'delivery_zone_id']);
     }
-
-
-      /**
-       * Gets query for [[Country]].
-       *
-       * @return \yii\db\ActiveQuery
-       */
-      public function getCountry()
-      {
-          return $this->hasOne(Country::className(), ['country_id' => 'country_id'])->via('businessLocation');
-      }
-
-
-      /**
-       * Gets query for [[City]].
-       *
-       * @return \yii\db\ActiveQuery
-       */
-      public function getCities()
-      {
-          return $this->hasMany(City::className(), ['city_id' => 'city_id'])->via('areas');
-      }
-
-
-
 
     /**
      * Gets query for [[BusinessLocation]].
@@ -114,15 +93,14 @@ class DeliveryZone extends \yii\db\ActiveRecord
         return $this->hasOne(BusinessLocation::className(), ['business_location_id' => 'business_location_id']);
     }
 
-
     /**
-     * Gets query for [[RestaurantUu]].
+     * Gets query for [[Country]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
+    public function getCountry()
     {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('businessLocation');
+        return $this->hasOne(Country::className(), ['country_id' => 'country_id']);
     }
 
 }

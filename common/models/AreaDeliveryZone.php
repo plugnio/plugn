@@ -8,9 +8,13 @@ use Yii;
  * This is the model class for table "area_delivery_zone".
  *
  * @property int $delivery_zone_id
+ * @property int $country_id
+ * @property int $city_id
  * @property int $area_id
  *
  * @property Area $area
+ * @property City $city
+ * @property Country $country
  * @property DeliveryZone $deliveryZone
  */
 class AreaDeliveryZone extends \yii\db\ActiveRecord
@@ -29,8 +33,8 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['delivery_zone_id', 'area_id'], 'required'],
-            [['delivery_zone_id', 'area_id'], 'integer'],
+            [['delivery_zone_id', 'country_id', 'city_id', 'area_id'], 'required'],
+            [['delivery_zone_id', 'country_id', 'city_id', 'area_id'], 'integer'],
             [['delivery_zone_id', 'area_id'], 'unique', 'targetAttribute' => ['delivery_zone_id', 'area_id']],
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
             [['delivery_zone_id'], 'exist', 'skipOnError' => true, 'targetClass' => DeliveryZone::className(), 'targetAttribute' => ['delivery_zone_id' => 'delivery_zone_id']],
@@ -44,6 +48,8 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
     {
         return [
             'delivery_zone_id' => 'Delivery Zone ID',
+            'country_id' => 'Country ID',
+            'city_id' => 'City ID',
             'area_id' => 'Area ID',
         ];
     }
@@ -58,18 +64,25 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
         return $this->hasOne(Area::className(), ['area_id' => 'area_id']);
     }
 
+    /**
+     * Gets query for [[City]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCity()
+    {
+        return $this->hasOne(City::className(), ['city_id' => 'city_id']);
+    }
 
-      /**
-       * Gets query for [[City]].
-       *
-       * @return \yii\db\ActiveQuery
-       */
-      public function getCity()
-      {
-          return $this->hasOne(City::className(), ['city_id' => 'city_id'])->via('area');
-      }
-
-
+    /**
+     * Gets query for [[Country]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCountry()
+    {
+        return $this->hasOne(Country::className(), ['country_id' => 'country_id']);
+    }
 
     /**
      * Gets query for [[DeliveryZone]].

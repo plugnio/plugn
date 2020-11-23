@@ -50,21 +50,18 @@ class DeliveryZoneController extends Controller {
      * Lists all DeliveryZone models.
      * @return mixed
      */
-    public function actionRenderCitiesChecboxList($restaurantUuid, $businessLocaitonId) {
+    public function actionRenderCitiesChecboxList($restaurantUuid, $countryId) {
 
+        if (Yii::$app->request->isPost){
+              $selectedAreas = Yii::$app->request->post('selectedAreas');
+         }
 
-      if (Yii::$app->request->isPost){
-          $selectedAreas = Yii::$app->request->post('selectedAreas');
-     }
-                $business_location_model = BusinessLocation::findOne($businessLocaitonId);
-                $cities = City::find()->where(['country_id' => $business_location_model->country_id])->all();
+        $cities = City::find()->where(['country_id' => $countryId])->all();
 
-
-               return $this->renderPartial('_cities', [
-                 'cities' => $cities,
-                 'selectedAreas' => $selectedAreas
-               ]);
-
+         return $this->renderPartial('_cities', [
+           'cities' => $cities,
+           'selectedAreas' => $selectedAreas
+         ]);
    }
 
     /**
@@ -104,6 +101,8 @@ class DeliveryZoneController extends Controller {
                       foreach ($areas as $area_id) {
 
                             $delivery_zone_area_model = new AreaDeliveryZone();
+                            $delivery_zone_area_model->country_id = $model->country_id;
+                            $delivery_zone_area_model->city_id = $model->city_id;
                             $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
                             $delivery_zone_area_model->area_id = $area_id;
                             $delivery_zone_area_model->save(false);

@@ -7,12 +7,13 @@ use yii\web\View;
 use common\models\BusinessLocation;
 use common\models\City;
 use common\models\Area;
+use common\models\Country;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\DeliveryZone */
 /* @var $form yii\widgets\ActiveForm */
 
-$url = Yii::$app->request->baseUrl . '/delivery-zone/render-cities-checbox-list?restaurantUuid=rest_c5afa51c-2840-11eb-b923-812122480232&businessLocaitonId=';
+$url = Yii::$app->request->baseUrl . '/delivery-zone/render-cities-checbox-list?restaurantUuid='. $restaurantUuid .'&countryId=';
 $selectedAreas = $model->getAreaDeliveryZones()->all();
 $selectedAreas = ArrayHelper::map($selectedAreas, 'area_id', 'area_id');
 $data = json_encode($selectedAreas);
@@ -22,7 +23,7 @@ $(document).ready(function() {
 
       $.ajax({
          // Controller method to call
-         url: '$url' + $('#business-location-id').val(),
+         url: '$url' + $('#country-id').val(),
          // Parameter data to pass in
          data: {
              selectedAreas : $data
@@ -30,13 +31,14 @@ $(document).ready(function() {
          type: 'POST',
          cache: false,
          success: function(data) {
+           console.log(data);
            $('#cities').html(data);
            $(document).trigger('rebindButtons');
          }
       })
 
 
-      $('#business-location-id').on('change', function(e){
+      $('#country-id').on('change', function(e){
 
               $.ajax({
                  // Controller method to call
@@ -74,15 +76,28 @@ $this->registerJs($js);
             $businessLocationArray = ArrayHelper::map($businessLocationQuery, 'business_location_id', 'business_location_name');
 
 
+            $countryQuery = Country::find()->asArray()->all();
+            $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
+
+
             $form = ActiveForm::begin();
         ?>
 
         <?=
         $form->field($model, 'business_location_id')->dropDownList($businessLocationArray, [
-            'class' => 'form-control select2 select2',
+            'class' => 'form-control select2',
             'multiple' => false,
             'id' => 'business-location-id',
         ]);
+        ?>
+
+
+        <?=
+          $form->field($model, 'country_id')->dropDownList($countryArray, [
+              'class' => 'form-control select2',
+              'multiple' => false,
+              'id' => 'country-id',
+          ]);
         ?>
 
 
