@@ -90,6 +90,10 @@ class DeliveryZoneController extends Controller {
             $shipping_countries = $store_model->getShippingCountries()->asArray()->all();
 
 
+            foreach ($shipping_countries as $key => $country) {
+              $shipping_countries[$key]['areas'] = $store_model->getAreaDeliveryZonesForSpecificCountry($country['country_id']) ? $store_model->getAreaDeliveryZonesForSpecificCountry($country['country_id'])->count() : null;
+            }
+
             return $shipping_countries;
 
 
@@ -114,34 +118,41 @@ class DeliveryZoneController extends Controller {
                   ->asArray()
                   ->all();
 
-          // $countryCities = ArrayHelper::index($countryCities, 'city_id');
+
+                  if($countryCities){
+                    $areaDeliveryZones = $store_model->getAreaDeliveryZonesForSpecificCountry($country_id)->asArray()->all();
 
 
-          $businessLocations = $store_model->getBusinessLocationsForSpecificCountry($country_id)->asArray()->all();
+                    foreach ($countryCities as $cityKey => $city) {
+                      foreach ($areaDeliveryZones as $areaDeliveryZoneKey => $areaDeliveryZone) {
 
+                            // $areaDeliveryZoneData = $areaDeliveryZone;
+                            // unset($businessLocationData['deliveryZones']);
+                            // unset($deliveryZoneData['areas']);
+                            // foreach ($deliveryZone['areas'] as $key => $area) {
 
-          foreach ($countryCities as $cityKey => $city) {
-            foreach ($businessLocations as $businessLocationKey => $businessLocation) {
-                foreach ($businessLocation['deliveryZones'] as $deliveryZoneKey => $deliveryZone) {
+                            if(isset($areaDeliveryZone['area'])){
+                              if($areaDeliveryZone['area']['city_id'] == $city['city_id']){
 
-                  $businessLocationData = $businessLocation;
-                  $deliveryZoneData = $deliveryZone;
-                  unset($businessLocationData['deliveryZones']);
-                  unset($deliveryZoneData['areas']);
-
-                  foreach ($deliveryZone['areas'] as $key => $area) {
-                      if($area['city_id'] == $city['city_id']){
-                        unset($area['city']);
-                        $area['businessLocation'] = $businessLocationData;
-                        $area['deliveryZone'] = $deliveryZoneData;
-                        $countryCities[$cityKey]['areas'][] = $area;
+                                    // unset($areaDeliveryZone['city']);
+                                    // $areaDeliveryZone['businessLocation'] = $businessLocationData;
+                                    // $areaDeliveryZone['deliveryZone'] = $deliveryZoneData;
+                                    $countryCities[$cityKey]['areas'][] = $areaDeliveryZone;
+                                  }
+                            }
+                            else {
+                              $countryCities[$cityKey]['areas'][] = $areaDeliveryZone;
+                            }
+                            // }
                       }
                   }
-                }
-            }
+              } else
+                    return $store_model->getDeliveryZonesForSpecificCountry($country_id)->asArray()->all();
 
 
-          }
+
+
+
 
           foreach ($countryCities as $key => $city) {
             if(isset($city['areas']))

@@ -1135,13 +1135,22 @@ class Restaurant extends \yii\db\ActiveRecord {
         return $this->hasMany(RestaurantDelivery::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    // /**
+    //  * Gets query for [[Areas]].
+    //  *
+    //  * @return \yii\db\ActiveQuery
+    //  */
+    // public function getAreas() {
+    //     return $this->hasMany(Area::className(), ['area_id' => 'area_id'])->viaTable('restaurant_delivery', ['restaurant_uuid' => 'restaurant_uuid']);
+    // }
+
     /**
      * Gets query for [[Areas]].
      *
      * @return \yii\db\ActiveQuery
      */
     public function getAreas() {
-        return $this->hasMany(Area::className(), ['area_id' => 'area_id'])->viaTable('restaurant_delivery', ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany(Area::className(), ['area_id' => 'area_id'])->via('areaDeliveryZone']);
     }
 
     /**
@@ -1277,11 +1286,6 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
 
-    public function getDeliveryZones()
-    {
-        return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])
-            ->viaTable('business_location', ['restaurant_uuid' => 'restaurant_uuid']);
-    }
 
     //
     //
@@ -1295,7 +1299,6 @@ class Restaurant extends \yii\db\ActiveRecord {
     //         return $this->hasMany(AreaDeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id'])
     //           ->via('deliveryZones');
     //     }
-
 
 
 
@@ -1322,15 +1325,53 @@ class Restaurant extends \yii\db\ActiveRecord {
         return $this->hasMany(BusinessLocation::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    public function getDeliveryZones()
+    {
+        return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])
+            ->viaTable('business_location', ['restaurant_uuid' => 'restaurant_uuid']);
+
+
+    }
+
+
+
+        /**
+         * Gets query for [[AreaDeliveryZones]].
+         *
+         * @return \yii\db\ActiveQuery
+         */
+        public function getAreaDeliveryZones()
+        {
+            return $this->hasMany(AreaDeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id'])->joinWith('area');
+        }
+
+
+
     /**
      * Gets query for [[BusinessLocations]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getBusinessLocationsForSpecificCountry($countryId)
+    public function getDeliveryZonesForSpecificCountry($countryId)
     {
-        return $this->hasMany(BusinessLocation::className(), ['restaurant_uuid' => 'restaurant_uuid'])->where(['business_location.country_id' => $countryId])->joinWith(['deliveryZones']);
+
+      return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])
+          ->viaTable('business_location', ['restaurant_uuid' => 'restaurant_uuid'])  ->where(['delivery_zone.country_id' => $countryId]);
+
     }
+
+
+    /**
+     * Gets query for [[BusinessLocations]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAreaDeliveryZonesForSpecificCountry($countryId)
+    {
+        return $this->hasMany(AreaDeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id'])->via('deliveryZones')
+              ->where(['delivery_zone.country_id' => $countryId])->joinWith('deliveryZone');
+    }
+
 
     /**
      * list of all the countries around the world that store can ship orders to
@@ -1339,7 +1380,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getShippingCountries()
     {
-        return $this->hasMany(Country::className(), ['country_id' => 'country_id'])->via('businessLocations');
+        return $this->hasMany(Country::className(), ['country_id' => 'country_id'])->via('deliveryZones');
     }
 
 

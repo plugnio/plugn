@@ -18,6 +18,20 @@ $this->params['restaurant_uuid'] = $restaurantUuid;
     <section id="data-list-view" class="data-list-view-header">
 
 
+
+      <?php if (Yii::$app->session->getFlash('errorResponse') != null) { ?>
+
+          <div class="alert alert-danger alert-dismissible">
+              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+              <h5><i class="icon fa fa-ban"></i> Warning!</h5>
+              <?= (Yii::$app->session->getFlash('errorResponse')) ?>
+          </div>
+      <?php }  ?>
+
+
+
+
+
       <!-- Data list view starts -->
       <div class="action-btns d-none">
           <div class="btn-dropdown mr-1 mb-1">

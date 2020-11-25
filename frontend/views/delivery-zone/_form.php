@@ -62,7 +62,14 @@ $this->registerJs($js);
 
 ?>
 
-
+<?= Html::a('Delete', ['delete', 'id' => $model->delivery_zone_id, 'restaurantUuid' => $restaurantUuid], [
+    'class' => 'btn btn-danger',
+    'style' => 'margin-bottom:15px',
+    'data' => [
+        'confirm' => 'Are you sure you want to delete this zone?',
+        'method' => 'post',
+    ],
+]) ?>
 
 <div class="card">
     <div class="card-body delivery-zone-form">

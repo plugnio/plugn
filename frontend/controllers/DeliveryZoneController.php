@@ -52,17 +52,17 @@ class DeliveryZoneController extends Controller {
      */
     public function actionRenderCitiesChecboxList($restaurantUuid, $countryId) {
 
-        if (Yii::$app->request->isPost){
-              $selectedAreas = Yii::$app->request->post('selectedAreas');
-         }
+        if (Yii::$app->request->isPost) {
+            $selectedAreas = Yii::$app->request->post('selectedAreas');
+        }
 
         $cities = City::find()->where(['country_id' => $countryId])->all();
 
-         return $this->renderPartial('_cities', [
-           'cities' => $cities,
-           'selectedAreas' => $selectedAreas
-         ]);
-   }
+        return $this->renderPartial('_cities', [
+                    'cities' => $cities,
+                    'selectedAreas' => $selectedAreas
+        ]);
+    }
 
     /**
      * Lists all DeliveryZone models.
@@ -87,37 +87,55 @@ class DeliveryZoneController extends Controller {
      * @return mixed
      */
     public function actionCreate($restaurantUuid) {
+        $store_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+
         $model = new DeliveryZone();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save() ) {
+        if ($model->load(Yii::$app->request->post())) {
+
+          $storeDeliveryZones = $store_model->getDeliveryZonesForSpecificCountry($model->country_id);
 
 
-            if(isset($model['selectedAreas'])){
-              foreach ($model['selectedAreas'] as $cities) {
+          if($storeDeliveryZones->exists() && $store_model->getAreaDeliveryZonesForSpecificCountry($model->country_id)->count() == 0){
+            Yii::$app->session->setFlash('errorResponse', "Cant add another zone1");
+            return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+          }
 
-                  if (is_array($cities)) {
-                      foreach ($cities as $areas) {
+          if( $model->save()){
+            if ($model['selectedAreas']) {
+                foreach ($model['selectedAreas'] as $cities) {
 
-                              if (is_array($areas)) {
 
-                        foreach ($areas as $area_id) {
+                    if (is_array($cities)) {
+                        foreach ($cities as $areas) {
 
-                              $delivery_zone_area_model = new AreaDeliveryZone();
-                              $delivery_zone_area_model->country_id = $model->country_id;
-                              $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
-                              $delivery_zone_area_model->area_id = $area_id;
-                              $delivery_zone_area_model->save(false);
+                            if (is_array($areas)) {
 
+                                foreach ($areas as $area_id) {
+
+                                    if ($area_id) {
+                                        $delivery_zone_area_model = new AreaDeliveryZone();
+                                        $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
+                                        $delivery_zone_area_model->area_id = $area_id;
+                                        $delivery_zone_area_model->restaurant_uuid = $restaurantUuid;
+                                        $delivery_zone_area_model->save(false);
+                                    }
+                                }
                             }
-                      }
-                      }
-                  }
-              }
-            } else {
-              $delivery_zone_area_model = new AreaDeliveryZone();
-              $delivery_zone_area_model->country_id = $model->country_id;
-              $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
-              $delivery_zone_area_model->save(false);
+                        }
+                    }
+                }
+            }
+
+
+
+                        if($store_model->getDeliveryZonesForSpecificCountry($model->country_id)->count() > 1 &&  !AreaDeliveryZone::find()->where(['delivery_zone_id' => $model->delivery_zone_id])->exists()   ){
+                          DeliveryZone::deleteAll(['delivery_zone_id' => $model->delivery_zone_id]);
+                          Yii::$app->session->setFlash('errorResponse', "Cant add another zone2");
+                          return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+                        }
+
+
             }
 
 
@@ -139,42 +157,57 @@ class DeliveryZoneController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($id, $restaurantUuid) {
+
+        $store_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+
         $model = $this->findModel($id, $restaurantUuid);
 
 
-          $areaQuery = $model->getAreas()->all();
-          $areaArray[] = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
+        if ($model->load(Yii::$app->request->post())) {
+
+          $storeDeliveryZones = $store_model->getDeliveryZonesForSpecificCountry($model->country_id);
 
 
-                  if ($model->load(Yii::$app->request->post())) {
+          if($model->save()){
+            AreaDeliveryZone::deleteAll(['delivery_zone_id' => $model->delivery_zone_id]);
+            if (($model['selectedAreas'])) {
 
-                    AreaDeliveryZone::deleteAll(['delivery_zone_id' => $model->delivery_zone_id]);
+                foreach ($model['selectedAreas'] as $cities) {
 
-                      if ($model->save()){
-                        foreach ($model['selectedAreas'] as $cities) {
+                    if (is_array($cities)) {
 
-                            if (is_array($cities)) {
-                                foreach ($cities as $areas) {
+                        foreach ($cities as $areas) {
+                            if (is_array($areas)) {
 
-                                        if (is_array($areas)) {
 
-                                  foreach ($areas as $area_id) {
+                                foreach ($areas as $area_id) {
 
-                                        $delivery_zone_area_model = new AreaDeliveryZone();
-                                        $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
-                                        $delivery_zone_area_model->area_id = $area_id;
-                                        $delivery_zone_area_model->save(false);
-
-                                      }
-                                }
+                                    $delivery_zone_area_model = new AreaDeliveryZone();
+                                    $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
+                                    $delivery_zone_area_model->area_id = $area_id;
+                                    $delivery_zone_area_model->restaurant_uuid = $restaurantUuid;
+                                    $delivery_zone_area_model->save(false);
                                 }
                             }
                         }
+                    }
+                }
+            }
 
-                      }
 
-                      $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
-                  }
+            if( !AreaDeliveryZone::find()->where(['delivery_zone_id' => $model->delivery_zone_id])->exists()   ){
+              DeliveryZone::deleteAll(['delivery_zone_id' => $model->delivery_zone_id]);
+              Yii::$app->session->setFlash('errorResponse', "Cant add another zone");
+              return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+            }
+
+
+
+          }
+
+            $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+        }
+
 
         return $this->render('update', [
                     'model' => $model,
@@ -189,7 +222,7 @@ class DeliveryZoneController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id) {
+    public function actionDelete($id, $restaurantUuid) {
         $this->findModel($id, $restaurantUuid)->delete();
 
         return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
@@ -203,7 +236,7 @@ class DeliveryZoneController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id, $restaurantUuid) {
-        $model = Yii::$app->accountManager->getManagedAccount($restaurantUuid)->getDeliveryZones()->one();
+        $model = Yii::$app->accountManager->getManagedAccount($restaurantUuid)->getDeliveryZones()->where(['delivery_zone_id' => $id])->one();
 
         if ($model != null)
             return $model;
