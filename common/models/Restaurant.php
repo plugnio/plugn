@@ -1135,22 +1135,15 @@ class Restaurant extends \yii\db\ActiveRecord {
         return $this->hasMany(RestaurantDelivery::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
-    // /**
-    //  * Gets query for [[Areas]].
-    //  *
-    //  * @return \yii\db\ActiveQuery
-    //  */
-    // public function getAreas() {
-    //     return $this->hasMany(Area::className(), ['area_id' => 'area_id'])->viaTable('restaurant_delivery', ['restaurant_uuid' => 'restaurant_uuid']);
-    // }
-
     /**
      * Gets query for [[Areas]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getAreas() {
-        return $this->hasMany(Area::className(), ['area_id' => 'area_id'])->via('areaDeliveryZone']);
+    public function getAvailableAreas() {
+
+      return $this->hasMany(AreaDeliveryZone::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+         ->where(['is', 'area_delivery_zone.area_id', null]);
     }
 
     /**
@@ -1286,35 +1279,6 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
 
-
-    //
-    //
-    //     /**
-    //      * Gets query for [[AreaDeliveryZones]].
-    //      *
-    //      * @return \yii\db\ActiveQuery
-    //      */
-    //     public function getAreaDeliveryZones()
-    //     {
-    //         return $this->hasMany(AreaDeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id'])
-    //           ->via('deliveryZones');
-    //     }
-
-
-
-
-    /**
-     * Gets query for [[BusinessLocations]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStoreDeliveryZones()
-    {
-        return $this->hasMany(BusinessLocation::className(), ['restaurant_uuid' => 'restaurant_uuid'])->joinWith(['deliveryZones','country']);
-    }
-
-
-
     /**
      * Gets query for [[BusinessLocations]].
      *
@@ -1325,26 +1289,16 @@ class Restaurant extends \yii\db\ActiveRecord {
         return $this->hasMany(BusinessLocation::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    /**
+     * Gets query for [[DeliveryZones]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
     public function getDeliveryZones()
     {
         return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])
             ->viaTable('business_location', ['restaurant_uuid' => 'restaurant_uuid']);
-
-
     }
-
-
-
-        /**
-         * Gets query for [[AreaDeliveryZones]].
-         *
-         * @return \yii\db\ActiveQuery
-         */
-        public function getAreaDeliveryZones()
-        {
-            return $this->hasMany(AreaDeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id'])->joinWith('area');
-        }
-
 
 
     /**
@@ -1369,7 +1323,28 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function getAreaDeliveryZonesForSpecificCountry($countryId)
     {
         return $this->hasMany(AreaDeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id'])->via('deliveryZones')
-              ->where(['delivery_zone.country_id' => $countryId])->joinWith('deliveryZone');
+              ->where(['delivery_zone.country_id' => $countryId])->joinWith(['deliveryZone','area','city']);
+    }
+
+    /**
+     * Gets query for [[Areas]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAreas() {
+        return $this->hasMany(Area::className(), ['area_id' => 'area_id'])->via('areaDeliveryZones');
+    }
+
+
+
+    /**
+     * Gets query for [[AreaDeliveryZones]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAreaDeliveryZones()
+    {
+        return $this->hasMany(AreaDeliveryZone::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
 
@@ -1380,7 +1355,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getShippingCountries()
     {
-        return $this->hasMany(Country::className(), ['country_id' => 'country_id'])->via('deliveryZones');
+        return $this->hasMany(Country::className(), ['country_id' => 'country_id'])->via('deliveryZones')->joinWith('deliveryZones');
     }
 
 

@@ -11,6 +11,7 @@ use common\models\Restaurant;
 use common\models\RestaurantTheme;
 use common\models\OpeningHour;
 use common\models\RestaurantDelivery;
+use common\models\BusinessLocation;
 
 class RestaurantController extends Controller {
 
@@ -64,15 +65,15 @@ class RestaurantController extends Controller {
 
 
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
-        $area_id = Yii::$app->request->get("area_id");
+        $delivery_zone_id = Yii::$app->request->get("delivery_zone_id");
 
-        if ($restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->one()) {
-          $deliveryArea = RestaurantDelivery::find()->where(['restaurant_uuid' => $restaurant_uuid , 'area_id' =>$area_id ])->one();
+        if ($store_model = Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->one()) {
+          $deliveryZone =  $store_model->getDeliveryZones()->where(['delivery_zone_id' => $delivery_zone_id ])->one();
 
           $schedule_time = [];
 
 
-            if($deliveryArea){
+            if($deliveryZone){
 
               for ($i = 0; $i <= OpeningHour::DAY_OF_WEEK_SATURDAY; $i++) {
 
@@ -90,9 +91,9 @@ class RestaurantController extends Controller {
 
                   $startTime =   date('c',strtotime( date('Y-m-d', strtotime($i == 0 ? "now" : $selectedDay)) . ' ' . $opening_hrs->open_at));
 
-                  if($restaurant_model->schedule_order){
+                  if($store_model->schedule_order){
 
-                    $scheduleOrder = $opening_hrs->getDeliveryTimes($deliveryArea->delivery_time, date("Y-m-d", strtotime($startTime)) , $startTime);
+                    $scheduleOrder = $opening_hrs->getDeliveryTimes($deliveryZone->delivery_time, date("Y-m-d", strtotime($startTime)) , $startTime);
 
                     if(count($scheduleOrder) > 0) {
                       array_push($schedule_time, [
@@ -106,11 +107,11 @@ class RestaurantController extends Controller {
               }
 
               $todayOpeningHours = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => date('w' , strtotime("now"))])->one();
-              $asap = date("c", strtotime('+' . $deliveryArea->delivery_time . ' minutes',  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
+              $asap = date("c", strtotime('+' . $deliveryZone->delivery_time . ' minutes',  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
 
              return [
-                    'ASAP' => $restaurant_model->isOpen() ? $asap : null,
-                    'scheduleOrder' => $restaurant_model->schedule_order ?  ($schedule_time  ? $schedule_time  : null): null
+                    'ASAP' => $store_model->isOpen() ? $asap : null,
+                    'scheduleOrder' => $store_model->schedule_order ?  ($schedule_time  ? $schedule_time  : null): null
                 ];
 
 
@@ -129,15 +130,15 @@ class RestaurantController extends Controller {
     }
 
     /**
-     * Return Restaurant's branches
+     * Return Store's Locations
      */
-    public function actionListAllRestaurantsBranches($id) {
+    public function actionListAllStoresLocations($id) {
 
-        $restaurantBranches = RestaurantBranch::find()
+        $storesLocations = BusinessLocation::find()
                         ->where(['restaurant_uuid' => $id])->all();
 
-        if ($restaurantBranches) {
-            return $restaurantBranches;
+        if ($storesLocations) {
+            return $storesLocations;
         } else {
             return [
                 'operation' => 'error',

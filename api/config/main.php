@@ -65,12 +65,14 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET list-of-countries/<restaurant_uuid>' => 'list-of-countries',
-                        'GET <restaurant_uuid>/<country_id>' => 'list-of-areas',
+                        'GET list-of-areas/<restaurant_uuid>/<country_id>' => 'list-of-areas',
+                        'GET <restaurant_uuid>/<delivery_zone_id>' => 'get-delivery-zone',
                         'GET <restaurant_uuid>' => 'delivery-zone',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS list-of-countries/<restaurant_uuid>' => 'options',
-                        'OPTIONS <restaurant_uuid>/<country_id>' => 'options',
+                        'OPTIONS list-of-areas/<restaurant_uuid>/<country_id>' => 'options',
+                        'OPTIONS <restaurant_uuid>/<delivery_zone_id>' => 'options',
                         'OPTIONS <restaurant_uuid>' => 'options'
                     ]
                 ],
@@ -80,7 +82,7 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET get-opening-hours' => 'get-opening-hours',
-                        'GET branches/<id>' => 'list-all-restaurants-branches',
+                        'GET locations/<id>' => 'list-all-stores-locations',
                         'GET get-restaurant-data/<branch_name>' => 'get-restaurant-data',
                         // OPTIONS VERBS
                         'OPTIONS get-opening-hours' => 'options',

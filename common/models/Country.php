@@ -14,9 +14,12 @@ use Yii;
  * @property string|null $emoji
  * @property int|null $country_code
 
- * @property CountryPaymentMethod[] $countryPaymentMethods
- * @property Restaurant[] $restaurants
+ * @property BusinessLocation[] $businessLocations
  * @property City[] $cities
+ * @property CountryPaymentMethod[] $countryPaymentMethods
+ * @property PaymentMethod[] $paymentMethods
+ * @property DeliveryZone[] $deliveryZones
+ * @property Restaurant[] $restaurants
  */
 class Country extends \yii\db\ActiveRecord
 {
@@ -67,6 +70,17 @@ class Country extends \yii\db\ActiveRecord
 
 
     /**
+     * Gets query for [[DeliveryZones]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeliveryZones()
+    {
+        return $this->hasMany(DeliveryZone::className(), ['country_id' => 'country_id']);
+    }
+
+
+    /**
      * Gets query for [[CountryPaymentMethods]].
      *
      * @return \yii\db\ActiveQuery
@@ -96,4 +110,5 @@ class Country extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Restaurant::className(), ['country_id' => 'country_id']);
     }
+
 }

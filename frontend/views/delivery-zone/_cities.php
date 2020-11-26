@@ -18,7 +18,6 @@ use common\models\Area;
   $('.collapseBtn').on('click', function(e){
     currentId = $(this).attr('id');
 
-    console.log(currentId);
     $('#collapse-'+ currentId).collapse('toggle');
 
   });

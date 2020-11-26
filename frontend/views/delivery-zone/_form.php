@@ -31,7 +31,6 @@ $(document).ready(function() {
          type: 'POST',
          cache: false,
          success: function(data) {
-           console.log(data);
            $('#cities').html(data);
            $(document).trigger('rebindButtons');
          }

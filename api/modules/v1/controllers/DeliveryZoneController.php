@@ -11,6 +11,7 @@ use common\models\Category;
 use common\models\City;
 use common\models\Restaurant;
 use common\models\ItemImage;
+use common\models\AreaDeliveryZone;
 
 class DeliveryZoneController extends Controller {
 
@@ -91,11 +92,68 @@ class DeliveryZoneController extends Controller {
 
 
             foreach ($shipping_countries as $key => $country) {
-              $shipping_countries[$key]['areas'] = $store_model->getAreaDeliveryZonesForSpecificCountry($country['country_id']) ? $store_model->getAreaDeliveryZonesForSpecificCountry($country['country_id'])->count() : null;
+              $shipping_countries[$key]['areas'] =
+                $store_model->getAreaDeliveryZonesForSpecificCountry($country['country_id']) ? $store_model->getAreaDeliveryZonesForSpecificCountry($country['country_id'])->count() : null;
+
+                if($shipping_countries[$key]['areas'] == 0 )
+                  $shipping_countries[$key]['deliveryZone'] = $shipping_countries[$key]['deliveryZones'][0];
+
+
+                unset($shipping_countries[$key]['deliveryZones']);
+
             }
+
+
 
             return $shipping_countries;
 
+
+        } else {
+            return [
+                'operation' => 'error',
+                'message' => 'Store Uuid is invalid'
+            ];
+        }
+    }
+
+    /**
+     * Return Delivery zone
+     */
+    public function actionGetDeliveryZone($restaurant_uuid, $delivery_zone_id) {
+
+
+        $area_id = Yii::$app->request->get("area_id");
+
+
+
+        if ($store_model = Restaurant::findOne($restaurant_uuid)) {
+
+
+            if( $deliveryZone = $store_model->getDeliveryZones()->where(['delivery_zone_id' => $delivery_zone_id])->asArray()->one() ){
+
+
+              if($area_id && !AreaDeliveryZone::find()->where(['area_id' => $area_id , 'delivery_zone_id' => $delivery_zone_id])->exists()){
+                return [
+                    'operation' => 'error',
+                    'message' => 'delivery zone id is invalid'
+                ];
+              }
+
+              $deliveryZone['delivery_time'] = Yii::$app->formatter->asDuration($deliveryZone['delivery_time'] * 60);
+
+              Yii::$app->formatter->language = 'ar-KW';
+              $deliveryZone['delivery_time_ar'] = Yii::$app->formatter->asDuration(intval($deliveryZone['delivery_time']) * 60);
+
+              return $deliveryZone;
+
+
+            }
+            else {
+              return [
+                  'operation' => 'error',
+                  'message' => 'delivery zone id is invalid'
+              ];
+            }
 
         } else {
             return [
@@ -122,44 +180,35 @@ class DeliveryZoneController extends Controller {
                   if($countryCities){
                     $areaDeliveryZones = $store_model->getAreaDeliveryZonesForSpecificCountry($country_id)->asArray()->all();
 
-
                     foreach ($countryCities as $cityKey => $city) {
                       foreach ($areaDeliveryZones as $areaDeliveryZoneKey => $areaDeliveryZone) {
 
-                            // $areaDeliveryZoneData = $areaDeliveryZone;
-                            // unset($businessLocationData['deliveryZones']);
-                            // unset($deliveryZoneData['areas']);
-                            // foreach ($deliveryZone['areas'] as $key => $area) {
-
                             if(isset($areaDeliveryZone['area'])){
                               if($areaDeliveryZone['area']['city_id'] == $city['city_id']){
-
-                                    // unset($areaDeliveryZone['city']);
-                                    // $areaDeliveryZone['businessLocation'] = $businessLocationData;
-                                    // $areaDeliveryZone['deliveryZone'] = $deliveryZoneData;
                                     $countryCities[$cityKey]['areas'][] = $areaDeliveryZone;
                                   }
                             }
                             else {
                               $countryCities[$cityKey]['areas'][] = $areaDeliveryZone;
                             }
-                            // }
                       }
                   }
               } else
                     return $store_model->getDeliveryZonesForSpecificCountry($country_id)->asArray()->all();
 
 
-
-
-
-
+          $citiesData = [];
           foreach ($countryCities as $key => $city) {
             if(isset($city['areas']))
               $citiesData []= $city;
           }
 
+
+          if(!empty($citiesData))
             return $citiesData ;
+          else
+          return $store_model->getDeliveryZonesForSpecificCountry($country_id)->asArray()->all();
+
 
 
         } else {
@@ -169,5 +218,8 @@ class DeliveryZoneController extends Controller {
             ];
         }
     }
+
+
+
 
 }
