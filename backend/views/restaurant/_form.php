@@ -165,6 +165,7 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'restaurant_email')->input('email') ?>
 
+    <?= $form->field($model, 'iban')->textInput() ?>
     <?= $form->field($model, 'owner_first_name')->textInput() ?>
 
     <?= $form->field($model, 'owner_last_name')->textInput() ?>
