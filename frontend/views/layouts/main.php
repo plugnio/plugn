@@ -62,16 +62,6 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
         </script>
 
 
-        <script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="39816dc5-cf48-452e-a9ce-4f236b2104ec";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
-
-
-        <script>
-          $crisp.push(["set", "user:email", "<?php echo Yii::$app->user->identity->agent_email; ?>"]);
-          $crisp.push(["set", "user:nickname", "<?= Yii::$app->user->identity->agent_name . ' [' . $restaurant_model->name . ']' ?> "])
-        </script>
-
-
-
         <?php $this->head() ?>
     </head>
 
