@@ -280,7 +280,7 @@ class CronController extends \yii\console\Controller {
                                                       <meta property='og:image' itemprop='image primaryImageOfPage' content='https://res.cloudinary.com/plugn/image/upload/w_300,h_300/restaurants/` + storeUuid + `/logo/` + storeLogo + `'/>
                                                       <meta name='twitter:card' content='summary'/>
                                                       <meta name='twitter:domain' content='` + storeDomain + ` '/>
-                                                      <meta name='twitter:title' property='og:title' itemprop='name' content='` + storeName + `  | ` + storeTagline + ` '/>
+                                                      <meta name='twitter:title' property='og:title' itemprop='name' content='` + storeContent + ` '/>
                                                       <meta name='twitter:description' property='og:description' itemprop='description | description' content='` + storeName + `'/>
                                                       <link rel='manifest' href='manifest.webmanifest'>
                                                               <meta name='theme-color' content='` + storeThemeColor + `'>
