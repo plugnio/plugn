@@ -19,6 +19,17 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property int $customer_id
  * @property string|null $restaurant_uuid
  * @property int $area_id
+ * @property int|null $delivery_zone_id
+ * @property int|null $country_id
+ * @property string|null $country_name
+ * @property string|null $country_name_ar
+ * @property int|null $floor
+ * @property int|null $apartment
+ * @property int|null $building
+ * @property int|null $office
+ * @property string|null $postcode
+ * @property string|null $address_1
+ * @property string|null $address_2
  * @property string $area_name
  * @property string $area_name_ar
  * @property string $unit_type
@@ -62,6 +73,8 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  *
  * @property Area
  * @property BankDiscount $bankDiscount
+ * @property Country $country
+ * @property DeliveryZone $deliveryZone
  * @property RestaurantBranch $restaurantBranch
  * @property Customer $customer
  * @property PaymentMethod $paymentMethod
@@ -121,13 +134,13 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['customer_name', 'order_mode'], 'required'],
+            [['customer_name', 'order_mode','delivery_zone_id'], 'required'],
             [['is_order_scheduled'], 'required' , 'on' => 'create'],
             [['payment_method_id'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status','mashkor_order_status', 'customer_id'], 'integer', 'min' => 0],
-            [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id', 'reminder_sent', 'sms_sent', 'customer_phone_country_code'], 'integer'],
+            [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id', 'reminder_sent', 'sms_sent', 'customer_phone_country_code', 'delivery_zone_id', 'country_id', 'floor'], 'integer'],
             ['mashkor_order_status', 'in', 'range' => [
               self::MASHKOR_ORDER_STATUS_NEW,
               self::MASHKOR_ORDER_STATUS_CONFIRMED,
@@ -154,9 +167,14 @@ class Order extends \yii\db\ActiveRecord {
                         $this->addError($attribute, $attribute . ' cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['area_id', function ($attribute, $params, $validator) {
-                    if (!$this->area_id && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                    if (!$this->area_id && $this->order_mode == Order::ORDER_MODE_DELIVERY && !$this->country_id)
                         $this->addError($attribute, 'Area name cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
+            ['country_id', function ($attribute, $params, $validator) {
+                    if ($this->order_mode == Order::ORDER_MODE_DELIVERY && !$this->country_id)
+                        $this->addError($attribute, 'Area name cannot be blank.');
+                }, 'skipOnError' => false, 'skipOnEmpty' => false],
+            [['country_id'], 'validateCountry'],
             [['area_id'], 'validateArea'],
             ['unit_type', function ($attribute, $params, $validator) {
                     if (!$this->unit_type && $this->order_mode == Order::ORDER_MODE_DELIVERY)
@@ -183,6 +201,14 @@ class Order extends \yii\db\ActiveRecord {
                     return $model->order_mode == static::ORDER_MODE_DELIVERY;
                 }
             ],
+            [['building', 'floor', 'appartment', 'office'], 'required', 'when' => function($model) {
+                    return $model->unit_type == 'Office' ||  $model->unit_type == 'Apartment';
+                }
+            ],
+            [['postal_code', 'city', 'address_1' , 'address_2'], 'required', 'when' => function($model) {
+                    return $model->country_id;
+                }
+            ],
             [
               'subtotal', function ($attribute, $params, $validator) {
               if($this->voucher  && $this->voucher->minimum_order_amount !== 0 && $this->calculateOrderItemsTotalPrice() >= $this->voucher->minimum_order_amount)
@@ -196,7 +222,19 @@ class Order extends \yii\db\ActiveRecord {
             [['payment_uuid'], 'string', 'max' => 36],
             [['estimated_time_of_arrival', 'scheduled_time_start_from', 'scheduled_time_to', 'latitude', 'longitude'], 'safe'],
             [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
-            [['area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_email', 'payment_method_name', 'payment_method_name_ar', 'armada_tracking_link', 'armada_qr_code_link', 'armada_delivery_code'], 'string', 'max' => 255],
+
+            [
+              [
+                 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions',
+                 'customer_name', 'customer_email',
+                 'payment_method_name', 'payment_method_name_ar',
+                 'armada_tracking_link', 'armada_qr_code_link', 'armada_delivery_code',
+                 'country_name','country_name_ar',
+                 'building', 'apartment', 'city',  'address_1' , 'address_2'
+             ],
+             'string', 'max' => 255],
+             [['postal_code'], 'string', 'max' => 10],
+
             [['mashkor_order_number' , 'mashkor_tracking_link' ,'mashkor_driver_name','mashkor_driver_phone'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
             [['bank_discount_id'], 'exist', 'skipOnError' => true, 'targetClass' => BankDiscount::className(), 'targetAttribute' => ['bank_discount_id' => 'bank_discount_id']],
@@ -378,8 +416,17 @@ class Order extends \yii\db\ActiveRecord {
      * @param type $attribute
      */
     public function validateArea($attribute) {
-        if (!RestaurantDelivery::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'area_id' => $this->area_id])->one())
-            $this->addError($attribute, "Store does not deliver to this Area.");
+        if (!AreaDeliveryZone::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'area_id' => $this->area_id, 'delivery_zone_id' => $this->delivery_zone_id])->one())
+            $this->addError($attribute, "Store does not deliver to this delivery zone.");
+    }
+
+    /**
+     * Check if  store deliver to the selected country
+     * @param type $attribute
+     */
+    public function validateCountry($attribute) {
+        if (!$deliveryZone = DeliveryZone::find()->where(['country_id' => $this->country_id, 'delivery_zone_id' => $this->delivery_zone_id])->one() || $deliveryZone->businessLocation->restaurant_uuid != $this->restaurant_uuid)
+            $this->addError($attribute, "Store does not deliver to this country.");
     }
 
     /**
@@ -415,6 +462,17 @@ class Order extends \yii\db\ActiveRecord {
             'payment_uuid' => 'Payment Uuid',
             'restaurant_uuid' => 'Restaurant Uuid',
             'area_id' => 'Area ID',
+            'delivery_zone_id' => 'Delivery Zone ID',
+            'country_id' => 'Country ID',
+            'country_name' => 'Country Name',
+            'country_name_ar' => 'Country Name Ar',
+            'floor' => 'Floor',
+            'apartment' => 'Apartment',
+            'office' => 'Office',
+            'building' => 'Building',
+            'postcode' => 'Postcode',
+            'address_1' => 'Address 1',
+            'address_2' => 'Address 2',
             'area_name' => 'Area name',
             'area_name_ar' => 'Area name in Arabic',
             'unit_type' => 'Unit type',
@@ -663,6 +721,13 @@ class Order extends \yii\db\ActiveRecord {
       }
 
 
+      if (!$insert &&  $this->order_mode == static::ORDER_MODE_DELIVERY && isset($changedAttributes['country_id']) && $changedAttributes['country_id'] != $this->getOldAttribute('country_id')  && $this->country_id) {
+            $this->country_name = $this->deliveryZone->country->country_name;
+            $this->country_name_ar = $this->deliveryZone->country->country_name_ar;
+            $this->save(false);
+      }
+
+
         if (!$insert && $this->payment && $this->items_has_been_restocked && isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_ABANDONED_CHECKOUT) {
 
             $orderItems = $this->getOrderItems();
@@ -815,6 +880,28 @@ class Order extends \yii\db\ActiveRecord {
 
 
     /**
+     * Gets query for [[Country]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCountry()
+    {
+        return $this->hasOne(Country::className(), ['country_id' => 'country_id']);
+    }
+
+    /**
+     * Gets query for [[DeliveryZone]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeliveryZone()
+    {
+        return $this->hasOne(DeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id']);
+    }
+
+
+
+    /**
      * Gets query for [[BankDiscount]].
      *
      * @return \yii\db\ActiveQuery
@@ -832,17 +919,6 @@ class Order extends \yii\db\ActiveRecord {
     public function getRestaurant() {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-
-
-    /**
-   * Gets query for [[Country]].
-   *
-   * @return \yii\db\ActiveQuery
-   */
-  public function getCountry()
-  {
-      return $this->hasOne(Country::className(), ['country_id' => 'country_id'])->via('restaurant');
-  }
 
 
       /**
