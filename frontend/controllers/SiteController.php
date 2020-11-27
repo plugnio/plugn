@@ -1209,7 +1209,7 @@ class SiteController extends Controller {
             $store_model->restaurant_email = $agent_model->agent_email;
             $store_model->owner_first_name = $agent_model->agent_name;
 
-
+            $store_model->name_ar = $store_model->name;
 
             if ($agent_model->validate() && $store_model->validate() && $store_model->save() && $agent_model->save()) {
 

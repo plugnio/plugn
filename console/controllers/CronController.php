@@ -27,46 +27,6 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-    public function actionIndex(){
-        $restaurants = Restaurant::find()->all();
-
-        $freePlan = Plan::find()->where(['valid_for' => 0])->one();
-        $premPlan = Plan::find()->where(['platform_fee' => 0])->one();
-
-
-        foreach ($restaurants as  $restaurant) {
-          if($restaurant){
-
-            $restaurant->restaurant_domain = str_replace("http://", "https://", $restaurant->restaurant_domain);
-
-            $restaurant->company_name = $restaurant->name;
-            $restaurant->has_deployed = 1;
-
-            if($restaurant->live_api_key && $restaurant->test_api_key)
-              $restaurant->is_tap_enable = 1;
-
-              $subscription = new Subscription();
-              $subscription->restaurant_uuid = $restaurant->restaurant_uuid;
-              $subscription->subscription_start_at = $restaurant->restaurant_created_at;
-              $subscription->subscription_status = Subscription::STATUS_ACTIVE;
-
-          if($restaurant->platform_fee == 0)
-            $subscription->plan_id = $premPlan->plan_id; //Prem
-          else
-            $subscription->plan_id = $freePlan->plan_id; //Free
-
-            $subscription->save(false);
-
-            $restaurant->save();
-          }
-
-        }
-
-        $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-        return self::EXIT_CODE_NORMAL;
-    }
-
-
         public function actionSiteStatus(){
 
             $restaurants = Restaurant::find()
@@ -189,11 +149,6 @@ class CronController extends \yii\console\Controller {
         $myFolder = mkdir( $dirName . "/" . $queue->restaurant->store_branch_name);
         $myfile =  fopen($dirName . "/" .   $queue->restaurant->store_branch_name . "/build.js", "w") or die("Unable to open file!");
 
-        // $themeColor = RestaurantTheme::find()
-        //         ->select(['primary'])
-        //         ->where(['restaurant_uuid' => $queue->restaurant_uuid])
-        //         ->one();
-
 
         $apiEndpoint = Yii::$app->params['apiEndpoint'] . '/v1';
 
@@ -242,6 +197,11 @@ class CronController extends \yii\console\Controller {
                   var storeLogo = store.logo;
                   var storeDomain = store.restaurant_domain;
                   var storeThemeColor = store.theme_color;
+
+                  var storeContent = store.name;
+
+                  if (store.tagline)
+                    storeContent = storeContent + ' | ' + store.tagline;
 
 
                   var buildFileJs = `
@@ -300,7 +260,7 @@ class CronController extends \yii\console\Controller {
                                               <meta charset='utf-8'/>
                                               <title>` + storeName + `</title>
                                               <base href='/'/>
-                                              <meta name='description' content='` + storeName + ` | ` + storeTagline + ` '>
+                                              <meta name='description' content='` + storeContent + ` '>
                                                       <meta name='viewport' content='viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no'/>
                                                       <meta name='format-detection' content='telephone=no'/>
                                                       <meta name='msapplication-tap-highlight' content='no'/>
@@ -316,7 +276,7 @@ class CronController extends \yii\console\Controller {
                                                       <!-- Meta tags for social media -->
                                                       <meta property='og:type' content='website'/>
                                                       <meta property='og:url' content='` + storeDomain + `'/>
-                                                      <meta property='og:site_name' content='` + storeName + ` | ` + storeTagline + `'/>
+                                                      <meta property='og:site_name' content='` + storeContent + `'/>
                                                       <meta property='og:image' itemprop='image primaryImageOfPage' content='https://res.cloudinary.com/plugn/image/upload/w_300,h_300/restaurants/` + storeUuid + `/logo/` + storeLogo + `'/>
                                                       <meta name='twitter:card' content='summary'/>
                                                       <meta name='twitter:domain' content='` + storeDomain + ` '/>
@@ -678,7 +638,6 @@ class CronController extends \yii\console\Controller {
         fwrite($myfile, $txt);
 
         fclose($myfile);
-
 
         $queue->queue_status = Queue::QUEUE_STATUS_COMPLETE;
         $queue->save(false);
