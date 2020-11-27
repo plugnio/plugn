@@ -290,7 +290,7 @@ class CronController extends \yii\console\Controller {
                                                                       <script src='https://secure.gosell.io/js/sdk/tap.min.js'></script>
                                                               </head>
                                                               <body>
-                                                                      <app-root></app-root>
+                                                                      <app-root></app-root> 
                                     ` + googleAnalyticsCode + `
 
                                                                       <noscript>Please enable JavaScript to continue using this application.</noscript>
