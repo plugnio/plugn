@@ -31,6 +31,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
   * @property int|null $support_delivery
   * @property int|null $support_pick_up
   * @property string|null $phone_number
+  * @property string|null $phone_number_country_code
   * @property string $restaurant_email
   * @property string|null $restaurant_created_at
   * @property string|null $restaurant_updated_at
@@ -96,6 +97,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
   * @property int|null $tap_queue_id
   * @property string|null $identification_file_back_side
   * @property string|null $identification_file_id_back_side
+  * @property string|null $default_language
  *
  * @property AgentAssignment[] $agentAssignments
  * @property Agent[] $agents
@@ -221,6 +223,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             ['phone_number_display', 'in', 'range' => [self::PHONE_NUMBER_DISPLAY_ICON, self::PHONE_NUMBER_DISPLAY_SHOW_PHONE_NUMBER, self::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER]],
             [['restaurant_created_at', 'restaurant_updated_at', 'has_deployed','tap_queue_id'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
+            [['default_language'], 'string', 'max' => 2],
             [['custom_css'], 'string'],
             [['platform_fee'], 'number'],
             [['instagram_url'], 'url'],
@@ -230,7 +233,7 @@ class Restaurant extends \yii\db\ActiveRecord {
 
             [['live_public_key', 'test_public_key'], 'default', 'value' => null],
             [['phone_number'], 'integer', 'min' => 0],
-            [['phone_number', 'country_id', 'currency_id', 'owner_phone_country_code'], 'integer'],
+            [['phone_number', 'country_id', 'currency_id', 'owner_phone_country_code', 'phone_number_country_code'], 'integer'],
 
            //  ['currency_id', function ($attribute, $params, $validator) {
            //     if ($this->getOrders()->exists())
@@ -326,6 +329,7 @@ class Restaurant extends \yii\db\ActiveRecord {
 
             'live_api_key' => 'Live secret key',
             'test_api_key' => 'Test secret key',
+            'default_language' => 'Default Language',
 
         ];
     }
@@ -361,6 +365,14 @@ class Restaurant extends \yii\db\ActiveRecord {
                    ],
              'countryCodeAttribute' => 'owner_phone_country_code',
              'phoneAttribute' => 'owner_number',
+            ],
+            [
+             'class' => \borales\extensions\phoneInput\PhoneInputBehavior::className(),
+             'attributes' => [
+                       ActiveRecord::EVENT_BEFORE_INSERT => ['phone_number_country_code', 'phone_number'],
+                   ],
+             'countryCodeAttribute' => 'phone_number_country_code',
+             'phoneAttribute' => 'phone_number',
             ],
         ];
     }

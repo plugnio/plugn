@@ -68,7 +68,6 @@ class OrderController extends Controller {
 
         $restaurant_model = Restaurant::findOne($id);
 
-
         if ($restaurant_model) {
 
 
@@ -103,12 +102,28 @@ class OrderController extends Controller {
 
             //if the order mode = 1 => Delivery
             if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
+
+              if(Yii::$app->request->getBodyParam("area_id")){
+                $order->delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
                 $order->area_id = Yii::$app->request->getBodyParam("area_id");
                 $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
                 $order->block = Yii::$app->request->getBodyParam("block");
                 $order->street = Yii::$app->request->getBodyParam("street");
                 $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
                 $order->house_number = Yii::$app->request->getBodyParam("house_number");
+                $order->delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
+              }
+
+              else if (Yii::$app->request->getBodyParam("country_id")){
+                $order->delivery_zone_id = Yii::$app->request->getBodyParam("deliveryZone")['delivery_zone_id'];
+                $order->shipping_country_id = Yii::$app->request->getBodyParam("country_id");
+                $order->address_1 = Yii::$app->request->getBodyParam('address_1');
+                $order->address_2 = Yii::$app->request->getBodyParam('address_2');
+                $order->postalcode = Yii::$app->request->getBodyParam('postal_code');
+                $order->city = Yii::$app->request->getBodyParam("city");
+              }
+
+
                 $order->special_directions = Yii::$app->request->getBodyParam("special_directions"); //optional
 
                 if (Yii::$app->request->getBodyParam("deliver_location_latitude"))
@@ -130,7 +145,6 @@ class OrderController extends Controller {
             $response = [];
 
             if ($order->save()) {
-
                 $items = Yii::$app->request->getBodyParam("items");
 
 
@@ -210,10 +224,10 @@ class OrderController extends Controller {
             if ($response == null) {
 
                 $order->updateOrderTotalPrice();
-                if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->restaurantDelivery->min_charge) {
+                if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
                     $response = [
                         'operation' => 'error',
-                        'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->restaurantDelivery->min_charge, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
+                        'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->deliveryZone->min_charge, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
                     ];
                 }
 

@@ -62,6 +62,13 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         [
+                            'attribute' => 'default_language',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                  return $data->default_language == 'en' ? 'English' : 'عربي';
+                            },
+                        ],
+                        [
                             'label' => 'Theme Color',
                             'format' => 'html',
                             'value' => function ($data) {

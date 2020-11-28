@@ -13,21 +13,21 @@ class m201126_164544_add_delivery_zone_id_field_to_order_table extends Migration
     public function safeUp()
     {
       $this->addColumn('order', 'delivery_zone_id', $this->bigInteger()->after('house_number'));
-      $this->addColumn('order', 'country_id', $this->integer()->after('delivery_zone_id'));
+      $this->addColumn('order', 'shipping_country_id', $this->integer()->after('delivery_zone_id'));
 
 
         // creates index for column `country_id`
         $this->createIndex(
                 'idx-order-country_id',
                 'order',
-                'country_id'
+                'shipping_country_id'
         );
 
         // add foreign key for table `order`
         $this->addForeignKey(
                 'fk-order-country_id',
                 'order',
-                'country_id',
+                'shipping_country_id',
                 'country',
                 'country_id',
                 'CASCADE'
@@ -57,9 +57,9 @@ class m201126_164544_add_delivery_zone_id_field_to_order_table extends Migration
       $this->addColumn('order', 'apartment', $this->string()->after('floor'));
       $this->addColumn('order', 'building', $this->string()->after('apartment'));
       $this->addColumn('order', 'office', $this->integer()->after('building'));
-      $this->addColumn('order', 'city', $this->integer()->after('office'));
-      $this->addColumn('order', 'postcode', $this->string(10)->after('city'));
-      $this->addColumn('order', 'address_1', $this->string()->after('postcode'));
+      $this->addColumn('order', 'city', $this->string()->after('office'));
+      $this->addColumn('order', 'postalcode', $this->string()->after('city'));
+      $this->addColumn('order', 'address_1', $this->string()->after('postalcode'));
       $this->addColumn('order', 'address_2', $this->string()->after('address_1'));
     }
 
@@ -86,7 +86,7 @@ class m201126_164544_add_delivery_zone_id_field_to_order_table extends Migration
       $this->dropColumn('order', 'building');
       $this->dropColumn('order', 'office');
       $this->dropColumn('order', 'city');
-      $this->dropColumn('order', 'postcode');
+      $this->dropColumn('order', 'postalcode');
       $this->dropColumn('order', 'address_1');
       $this->dropColumn('order', 'address_2');
     }

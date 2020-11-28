@@ -20,14 +20,14 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property string|null $restaurant_uuid
  * @property int $area_id
  * @property int|null $delivery_zone_id
- * @property int|null $country_id
+ * @property int|null $shipping_country_id
  * @property string|null $country_name
  * @property string|null $country_name_ar
  * @property int|null $floor
  * @property int|null $apartment
  * @property int|null $building
  * @property int|null $office
- * @property string|null $postcode
+ * @property string|null $postalcode
  * @property string|null $address_1
  * @property string|null $address_2
  * @property string $area_name
@@ -140,7 +140,7 @@ class Order extends \yii\db\ActiveRecord {
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status','mashkor_order_status', 'customer_id'], 'integer', 'min' => 0],
-            [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id', 'reminder_sent', 'sms_sent', 'customer_phone_country_code', 'delivery_zone_id', 'country_id', 'floor'], 'integer'],
+            [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id', 'reminder_sent', 'sms_sent', 'customer_phone_country_code', 'delivery_zone_id', 'shipping_country_id', 'floor'], 'integer'],
             ['mashkor_order_status', 'in', 'range' => [
               self::MASHKOR_ORDER_STATUS_NEW,
               self::MASHKOR_ORDER_STATUS_CONFIRMED,
@@ -166,30 +166,30 @@ class Order extends \yii\db\ActiveRecord {
                     if ($this->is_order_scheduled && (!$this->scheduled_time_start_from || !$this->scheduled_time_to))
                         $this->addError($attribute, $attribute . ' cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
-            ['area_id', function ($attribute, $params, $validator) {
-                    if (!$this->area_id && $this->order_mode == Order::ORDER_MODE_DELIVERY && !$this->country_id)
-                        $this->addError($attribute, 'Area name cannot be blank.');
-                }, 'skipOnError' => false, 'skipOnEmpty' => false],
-            ['country_id', function ($attribute, $params, $validator) {
-                    if ($this->order_mode == Order::ORDER_MODE_DELIVERY && !$this->country_id)
-                        $this->addError($attribute, 'Area name cannot be blank.');
-                }, 'skipOnError' => false, 'skipOnEmpty' => false],
-            [['country_id'], 'validateCountry'],
+            // ['area_id', function ($attribute, $params, $validator) {
+            //         if (!$this->area_id && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+            //             $this->addError($attribute, 'Area name cannot be blank.');
+            //     }, 'skipOnError' => false, 'skipOnEmpty' => false],
+            // ['shipping_country_id', function ($attribute, $params, $validator) {
+            //         if ($this->order_mode == Order::ORDER_MODE_DELIVERY && !$this->shipping_country_id)
+            //             $this->addError($attribute, 'Invalid country id');
+            //     }, 'skipOnError' => false, 'skipOnEmpty' => false],
+            [['shipping_country_id'], 'validateCountry'],
             [['area_id'], 'validateArea'],
             ['unit_type', function ($attribute, $params, $validator) {
-                    if (!$this->unit_type && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                    if ($this->area_id && !$this->unit_type && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                         $this->addError($attribute, 'Unit type cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['block', function ($attribute, $params, $validator) {
-                    if ($this->block == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                    if ($this->area_id && $this->block == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                         $this->addError($attribute, 'Block cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['street', function ($attribute, $params, $validator) {
-                    if ($this->street  == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                    if ($this->area_id && $this->street  == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                         $this->addError($attribute, 'Street cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['house_number', function ($attribute, $params, $validator) {
-                    if ($this->house_number  == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                    if ($this->area_id && $this->house_number  == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                         $this->addError($attribute, 'House number cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['order_mode', 'validateOrderMode'],
@@ -205,8 +205,8 @@ class Order extends \yii\db\ActiveRecord {
                     return $model->unit_type == 'Office' ||  $model->unit_type == 'Apartment';
                 }
             ],
-            [['postal_code', 'city', 'address_1' , 'address_2'], 'required', 'when' => function($model) {
-                    return $model->country_id;
+            [['postalcode', 'city', 'address_1' , 'address_2'], 'required', 'when' => function($model) {
+                    return $model->shipping_country_id;
                 }
             ],
             [
@@ -230,10 +230,10 @@ class Order extends \yii\db\ActiveRecord {
                  'payment_method_name', 'payment_method_name_ar',
                  'armada_tracking_link', 'armada_qr_code_link', 'armada_delivery_code',
                  'country_name','country_name_ar',
-                 'building', 'apartment', 'city',  'address_1' , 'address_2'
+                 'building', 'apartment', 'city',  'address_1' , 'address_2','postalcode'
              ],
              'string', 'max' => 255],
-             [['postal_code'], 'string', 'max' => 10],
+             [['postalcode'], 'string', 'max' => 10],
 
             [['mashkor_order_number' , 'mashkor_tracking_link' ,'mashkor_driver_name','mashkor_driver_phone'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
@@ -425,7 +425,7 @@ class Order extends \yii\db\ActiveRecord {
      * @param type $attribute
      */
     public function validateCountry($attribute) {
-        if (!$deliveryZone = DeliveryZone::find()->where(['country_id' => $this->country_id, 'delivery_zone_id' => $this->delivery_zone_id])->one() || $deliveryZone->businessLocation->restaurant_uuid != $this->restaurant_uuid)
+        if (!$deliveryZone = DeliveryZone::find()->where(['shipping_country_id' => $this->shipping_country_id, 'delivery_zone_id' => $this->delivery_zone_id])->one() || $deliveryZone->businessLocation->restaurant_uuid != $this->restaurant_uuid)
             $this->addError($attribute, "Store does not deliver to this country.");
     }
 
@@ -448,8 +448,8 @@ class Order extends \yii\db\ActiveRecord {
      * @param string $attribute the attribute currently being validated
      */
     public function validateMinCharge($attribute) {
-        if ($this->restaurantDelivery->min_charge > $this->$attribute)
-            $this->addError($attribute, "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency($this->restaurantDelivery->min_charge, $this->currency->code));
+        if ($this->deliveryZone->min_charge > $this->$attribute)
+            $this->addError($attribute, "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency($this->deliveryZone->min_charge, $this->currency->code));
     }
 
 
@@ -463,16 +463,16 @@ class Order extends \yii\db\ActiveRecord {
             'restaurant_uuid' => 'Restaurant Uuid',
             'area_id' => 'Area ID',
             'delivery_zone_id' => 'Delivery Zone ID',
-            'country_id' => 'Country ID',
+            'shipping_country_id' => 'Country ID',
             'country_name' => 'Country Name',
             'country_name_ar' => 'Country Name Ar',
             'floor' => 'Floor',
             'apartment' => 'Apartment',
             'office' => 'Office',
             'building' => 'Building',
-            'postcode' => 'Postcode',
-            'address_1' => 'Address 1',
-            'address_2' => 'Address 2',
+            'postalcode' => 'Postal code',
+            'address_1' => 'Address line 1',
+            'address_2' => 'Address line 2',
             'area_name' => 'Area name',
             'area_name_ar' => 'Area name in Arabic',
             'unit_type' => 'Unit type',
@@ -607,7 +607,7 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function updateOrderTotalPrice() {
         if ($this->order_mode == static::ORDER_MODE_DELIVERY)
-            $this->delivery_fee = $this->restaurantDelivery->delivery_fee;
+            $this->delivery_fee = $this->deliveryZone->delivery_fee;
 
 
         if ($this->order_status != Order::STATUS_REFUNDED && $this->order_status != Order::STATUS_PARTIALLY_REFUNDED) {
@@ -656,7 +656,7 @@ class Order extends \yii\db\ActiveRecord {
 
 
         if ($this->order_mode == static::ORDER_MODE_DELIVERY && !$this->voucher  || ($this->voucher && $this->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY)){
-            $totalPrice += $this->restaurantDelivery->delivery_fee;
+            $totalPrice += $this->deliveryZone->delivery_fee;
         }
 
 
@@ -717,14 +717,12 @@ class Order extends \yii\db\ActiveRecord {
             $area_model = Area::findOne($this->area_id);
             $this->area_name = $area_model->area_name;
             $this->area_name_ar = $area_model->area_name_ar;
-            $this->save(false);
       }
 
 
-      if (!$insert &&  $this->order_mode == static::ORDER_MODE_DELIVERY && isset($changedAttributes['country_id']) && $changedAttributes['country_id'] != $this->getOldAttribute('country_id')  && $this->country_id) {
-            $this->country_name = $this->deliveryZone->country->country_name;
-            $this->country_name_ar = $this->deliveryZone->country->country_name_ar;
-            $this->save(false);
+      if (!$insert &&  $this->order_mode == static::ORDER_MODE_DELIVERY) {
+              $this->country_name = $this->deliveryZone->country->country_name;
+              $this->country_name_ar = $this->deliveryZone->country->country_name_ar;
       }
 
 
@@ -794,12 +792,12 @@ class Order extends \yii\db\ActiveRecord {
                 if ($this->is_order_scheduled)
                     $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($this->scheduled_time_start_from));
                 else
-                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $this->restaurantDelivery->delivery_time . ' minutes', Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
+                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $this->deliveryZone->delivery_time . ' minutes', Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
 
 
 
 
-                $this->delivery_time = $this->restaurantDelivery->delivery_time;
+                $this->delivery_time = $this->deliveryZone->delivery_time;
                 $this->save(false);
             } else {
                 //set ETA value
@@ -847,9 +845,15 @@ class Order extends \yii\db\ActiveRecord {
 
 
             if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
+
+              if($this->area_id){
                 $area_model = Area::findOne($this->area_id);
                 $this->area_name = $area_model->area_name;
                 $this->area_name_ar = $area_model->area_name_ar;
+              }
+
+
+
             }
 
             $payment_method_model = PaymentMethod::findOne($this->payment_method_id);
@@ -886,7 +890,7 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function getCountry()
     {
-        return $this->hasOne(Country::className(), ['country_id' => 'country_id']);
+        return $this->hasOne(Country::className(), ['country_id' => 'shipping_country_id']);
     }
 
     /**

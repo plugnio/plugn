@@ -641,13 +641,83 @@ $this->registerJs($js);
                                 return $data->order_mode == Order::ORDER_MODE_DELIVERY ? 'Delivery' : 'Pickup';
                             },
                         ],
+
                         [
-                            'label' => 'Address',
+                            'attribute' => 'address_1',
                             'format' => 'html',
                             'value' => function ($data) {
-                                return $data->area_name . ', Block ' . $data->block . ', St ' . $data->street . ', ' . ($data->avenue ? 'Avenue ' . $data->avenue . ', ' : '') . $data->house_number;
+                              return $data->address_1;
                             },
-                            'visible' => $model->order_mode == Order::ORDER_MODE_DELIVERY,
+                            'visible' => $model->address_1 ? true : false,
+                        ],
+                        [
+                            'attribute' => 'address_2',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return $data->address_2;
+                            },
+                            'visible' => $model->address_2 ? true : false,
+                        ],
+                        [
+                            'attribute' => 'postalcode',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return $data->postalcode;
+                            },
+                            'visible' => $model->postalcode ? true : false,
+                        ],
+                        [
+                            'label' => 'Area',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return $data->area_name;
+                            },
+                            'visible' => $model->area_id ? true : false,
+                        ],
+                        [
+                            'label' => 'Block',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return $data->block;
+                            },
+                            'visible' => $model->area_id ? true : false,
+                        ],
+                        [
+                            'label' => 'Street',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return $data->street;
+                            },
+                            'visible' => $model->area_id ? true : false,
+                        ],
+                        [
+                            'label' => 'Avenue',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return $data->avenue;
+                            },
+                            'visible' => $model->area_id && $model->avenue ? true : false,
+                        ],
+                        [
+                            'label' => 'House number',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return $data->house_number;
+                            },
+                            'visible' => $model->area_id ? true : false,
+                        ],
+                        [
+                            'label' => 'City',
+                            'value' => function ($data) {
+                                return  $data->area_id ? $data->area->city->city_name : $data->city;
+                            }
+                        ],
+                        [
+                            'label' => 'Country',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return  $data->country_name;
+                            }
                         ],
                         [
                             'label' => 'Pickup from',
