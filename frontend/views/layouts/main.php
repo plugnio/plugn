@@ -40,11 +40,29 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
 
             $planName = $restaurant_model->plan->name;
 
+            $tapAccountCreated = $restaurant_model->is_tap_enable ? 'yes' : 'no';
+            $paymentCash = $restaurant_model->getPaymentMethods()->where(['payment_method_id' => 3])->exists() ? 'yes' : 'no';
+            $paymentKNET = $restaurant_model->getPaymentMethods()->where(['payment_method_id' => 1])->exists() ? 'yes' : 'no';
+            $paymentCreditcard = $restaurant_model->getPaymentMethods()->where(['payment_method_id' => 2])->exists() ? 'yes' : 'no';
+            $deliveryMashkor = $restaurant_model->mashkor_branch_id ? 'yes' : 'no' ;
+            $deliveryArmada = $restaurant_model->armada_api_key ? 'yes' : 'no' ;
+            $storeLogo = $restaurant_model->logo ? $restaurant_model->getRestaurantLogoUrl() : 'false';
+
             $segmentScript = "analytics.identify('". $restaurant_model->restaurant_uuid."', {
                 name: '". $restaurant_model->name ."',
                 domain:'". $restaurant_model->restaurant_domain  ."',
                 email: '".Yii::$app->user->identity->agent_email  ."',
-                plan: '". $planName ."'
+                plan: '". $planName ."',
+                logo: '". $storeLogo ."',
+                totalProducts: '". $restaurant_model->getItems()->count() ."',
+                totalOrders: '". $restaurant_model->getOrders()->count() ."',
+                tapAccountCreated: '". $tapAccountCreated ."',
+                paymentCash: '". $paymentCash ."',
+                paymentKNET: '". $paymentKNET ."',
+                paymentCreditcard: '". $paymentCreditcard ."',
+                paymentMada: 'no',
+                deliveryMashkor: '".  $deliveryMashkor ."',
+                deliveryArmada: '".  $deliveryArmada ."',
               });
 
            ";
@@ -137,18 +155,11 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
             <div class="navbar-header">
                 <ul class="nav navbar-nav flex-row">
                     <li class="nav-item mr-auto">
-                        <?php
-                        if ($restaurant_model->logo) {
-                            echo Html::a('<img src="' . $restaurant_model->getRestaurantLogoUrl() . '" class="round"  height="40" width="40" ">'
+                        <?=
+                           Html::a('<img src="' . $restaurant_model->getRestaurantLogoUrl() . '" class="round"  height="40" width="40" ">'
                                     . '<h2 class="brand-text mb-0"  style="font-size: 20px; width: 190px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">' . $restaurant_model->name . '</h2>'
                                     , ['site/index', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'navbar-brand']);
-                        } else {
-                            echo Html::a('<img src="https://res.cloudinary.com/plugn/image/upload/plugn-icon.png" class="round"  height="40" width="40" ">'
-                                    . '<h2 class="brand-text mb-0"  style="font-size: 20px; width: 190px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">' . $restaurant_model->name . '</h2>'
-                                    , ['site/index', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'navbar-brand']);
-                        }
                         ?>
-
                     </li>
                     </a>
                     </li>
