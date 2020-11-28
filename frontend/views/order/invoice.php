@@ -57,33 +57,36 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                     <h6 class="mt-2">When</h6>
                     <p>  <?= $model->is_order_scheduled ? 'Scheduled' : 'As soon as possible'; ?> </p>
 
-
-
+                    <h6 class="mt-2">Shipping address</h6>
+                      <span style="display: block; margin-bottom:3px" >
+                        <?=  $model->customer_name ?>
+                      </span>
+                      <span style="display: block" >
+                        <?= $model->area_id ? $model->area_name : $model->address_1  . ', ' ?>
+                      </span>
+                      <span style="display: block" >
+                        <?= $model->area_id ? 'Block: ' . $model->block : $model->address_2  . ', ' ?>
+                      </span>
+                      <span style="display: block" >
+                        <?= $model->area_id ? 'St: ' . $model->street : $model->postalcode . ' ' . $model->city  . ', ' ?>
+                      </span>
+                      <span style="display: block" >
+                        <?= $model->area_id && $model->avenue ? 'Avenue: ' . $model->avenue : ''; ?>
+                      </span>
+                      <span style="display: block" >
+                        <?= $model->area_id ? 'House: ' . $model->house_number :  $model->country_name  . ', ' ?>
+                      </span>
+                      <span style="display: block" >
+                        <?= $model->area_id ?  $model->area->city->city_name . ', ' :  $model->customer_phone_number  ?>
+                      </span>
+                      <span style="display: block" >
+                        <?= $model->area_id ?  $model->country_name . ', ' :  '' ?>
+                      </span>
+                      <span style="display: block" >
+                        <?= $model->area_id ?  $model->customer_phone_number :  '' ?>
+                      </span>
                 </div>
 
-                <div class="recipient-contact pb-2">
-                    <div class="table-responsive">
-
-                        <table class="table table-bordered table-hover" style="margin-top:1.5rem !important;">
-                            <tbody>
-                                <tr>
-                                    <th>Customer name</th>
-                                    <td><?= $model->customer_name ?></td>
-                                </tr>
-                                <tr>
-                                    <th>Customer phone number</th>
-                                    <td><?= $model->customer_phone_number ?></td>
-                                </tr>
-                                <?php if ($model->customer_email) { ?>
-                                    <tr>
-                                        <th>Customer email address</th>
-                                        <td><?= $model->customer_email ?></td>
-                                    </tr>
-                                <?php } ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
 
             <div class="col-sm-6 col-12 text-left">
@@ -116,48 +119,12 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 
                 </div>
-                <div class="recipient-info my-2">
 
-                    <?php if ($model->order_mode == Order::ORDER_MODE_DELIVERY) { ?>
-
-
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover" style="margin-top: 1.5rem !important;">
-                                <thead>
-                                    <tr>
-                                        <th>Area</th>
-                                        <th>Block</th>
-                                        <th>Street</th>
-                                        <?= $model->avenue != null ? '<th>Avenue</th>' : '' ?>
-                                        <th>House</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                <td><?= $model->area_name ?></td>
-                                <td><?= $model->block ?></td>
-                                <td><?= $model->street ?></td>
-                                <?= $model->avenue != null ? '<td>' . $model->avenue . '</td>' : '' ?></td>
-                                <td> <?= $model->house_number ?></td>
-                                </tbody>
-                            </table>
-                            <?php if ($model->special_directions) { ?>
-
-                                <table class="table table-bordered table-hover" style="margin-top: 1.5rem !important;">
-                                    <tbody>
-                                    <th>Special Directions</th>
-                                    <td> <?= $model->special_directions ?></td>
-                                    </tbody>
-                                </table>
-                            <?php } ?>
-
-                        <?php } ?>
-                    </div>
-                </div>
 
             </div>
 
         </div>
+
         <!--/ Invoice Recipient Details -->
 
         <!-- Invoice Items Details -->

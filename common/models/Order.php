@@ -425,7 +425,7 @@ class Order extends \yii\db\ActiveRecord {
      * @param type $attribute
      */
     public function validateCountry($attribute) {
-        if (!$deliveryZone = DeliveryZone::find()->where(['shipping_country_id' => $this->shipping_country_id, 'delivery_zone_id' => $this->delivery_zone_id])->one() || $deliveryZone->businessLocation->restaurant_uuid != $this->restaurant_uuid)
+        if (!$deliveryZone = DeliveryZone::find()->where(['country_id' => $this->shipping_country_id, 'delivery_zone_id' => $this->delivery_zone_id])->one() || $deliveryZone->businessLocation->restaurant_uuid != $this->restaurant_uuid)
             $this->addError($attribute, "Store does not deliver to this country.");
     }
 
@@ -683,7 +683,6 @@ class Order extends \yii\db\ActiveRecord {
 
         if ($insert && $this->scenario == self::SCENARIO_CREATE_ORDER_BY_ADMIN)
             $this->order_status = self::STATUS_DRAFT;
-
 
 
         return true;

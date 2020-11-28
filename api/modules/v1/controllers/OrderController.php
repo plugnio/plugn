@@ -114,6 +114,8 @@ class OrderController extends Controller {
                 $order->delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
               }
 
+
+
               else if (Yii::$app->request->getBodyParam("country_id")){
                 $order->delivery_zone_id = Yii::$app->request->getBodyParam("deliveryZone")['delivery_zone_id'];
                 $order->shipping_country_id = Yii::$app->request->getBodyParam("country_id");
