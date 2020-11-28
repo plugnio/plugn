@@ -91,7 +91,49 @@ class ZapierController extends Controller {
 
             foreach ($orders as $key => $order) {
                 $orders[$key]['id'] = $order['order_uuid'];
+                $orders[$key]['estimated_time_of_arrival'] = date('c', strtotime($order['estimated_time_of_arrival']));
+                $orders[$key]['order_created_at'] = date('c', strtotime($order['order_created_at']));
+                $orders[$key]['order_updated_at'] = date('c', strtotime($order['order_updated_at']));
+
+
+                foreach ($order['orderItems'] as $orderItemKey => $orderItem) {
+
+                  unset($orders[$key]['orderItems'][$orderItemKey]['item']);
+                  unset($orders[$key]['orderItems'][$orderItemKey]['order_item_id']);
+                  unset($orders[$key]['orderItems'][$orderItemKey]['item_uuid']);
+                }
+
+                unset($orders[$key]['restaurant_uuid']);
+                unset($orders[$key]['restaurant_branch_id']);
+                unset($orders[$key]['armada_tracking_link']);
+                unset($orders[$key]['items_has_been_restocked']);
+                unset($orders[$key]['scheduled_time_start_from']);
+                unset($orders[$key]['scheduled_time_start_to']);
+                unset($orders[$key]['armada_qr_code_link']);
+                unset($orders[$key]['voucher_id']);
+                unset($orders[$key]['armada_delivery_code']);
+
+
+                unset($orders[$key]['mashkor_order_number']);
+                unset($orders[$key]['mashkor_tracking_link']);
+                unset($orders[$key]['mashkor_driver_name']);
+                unset($orders[$key]['mashkor_driver_name']);
+                unset($orders[$key]['mashkor_driver_phone']);
+                unset($orders[$key]['mashkor_order_status']);
+                unset($orders[$key]['bank_discount_id']);
+                unset($orders[$key]['bank_discount_id']);
+                unset($orders[$key]['reminder_sent']);
+                unset($orders[$key]['sms_sent']);
+
+
+
+                unset($orders[$key]['payment_uuid']);
                 unset($orders[$key]['order_uuid']);
+                unset($orders[$key]['customer_id']);
+                unset($orders[$key]['area_id']);
+                unset($orders[$key]['payment_method_id']);
+                unset($orders[$key]['subtotal_before_refund']);
+                unset($orders[$key]['total_price_before_refund']);
             }
 
             return $orders;
