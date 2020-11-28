@@ -903,6 +903,16 @@ class Order extends \yii\db\ActiveRecord {
         return $this->hasOne(DeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id']);
     }
 
+    /**
+     * Gets query for [[BusinessLocation]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBusinessLocation()
+    {
+        return $this->hasOne(BusinessLocation::className(), ['business_location_id' => 'business_location_id'])->via('deliveryZone');
+    }
+
 
 
     /**

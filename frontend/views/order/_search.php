@@ -1,9 +1,11 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\ArrayHelper;
 use yii\bootstrap\ActiveForm;
 use kartik\daterange\DateRangePicker;
 use common\models\Order;
+use common\models\Restaurant;
 
 /* @var $this yii\web\View */
 /* @var $model frontend\models\OrderSearch */
@@ -50,15 +52,15 @@ $this->registerJs($js);
                         ]);
                         ?>
 
-                        <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="col-6">
                             <?= $form->field($model, 'order_uuid') ?>
                         </div>
 
 
-                        <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="col-6">
                             <?= $form->field($model, 'customer_phone_number') ?>
                         </div>
-                        <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="col-6">
                           <?=
                              $form->field($model, 'date_range', [
                              ])->widget(DateRangePicker::classname(), [
@@ -69,7 +71,7 @@ $this->registerJs($js);
                          ?>
                         </div>
 
-                        <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="col-6">
                             <?=
                             $form->field($model, 'order_status')->dropDownList([
                                 Order::STATUS_PENDING => 'Pending',
@@ -81,15 +83,29 @@ $this->registerJs($js);
                                     ], ['class' => 'form-control', 'prompt' => 'Select order status']);
                             ?>
                         </div>
+                      </div>
 
 
-                        <div class="form-group" style="margin: 0px 15px">
+                        <div class="row">
+                          <div class="col-6">
+                            <?php
+
+                            $store_model = Restaurant::findOne($restaurant_uuid);
+                            $businessLocationQuery = $store_model->getBusinessLocations()->asArray()->all();
+                            $businessLocationArray = ArrayHelper::map($businessLocationQuery, 'business_location_id', 'business_location_name');
+
+                            echo $form->field($model, 'business_location_id')->dropDownList($businessLocationArray, ['class' => 'form-control', 'prompt' => 'Select order status'])->label('Branch');
+                            ?>
+                          </div>
+                        </div>
+
+
+                        <div class="form-group">
                             <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
                             <?= Html::a('Reset', ['order/index', 'restaurantUuid' => $restaurant_uuid], ['class' => 'btn btn-outline-secondary', 'style' => 'margin-left: 10px;']) ?>
                         </div>
                         <?php ActiveForm::end(); ?>
 
-                    </div>
                 </form>
             </div>
         </div>

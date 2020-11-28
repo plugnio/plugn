@@ -153,6 +153,13 @@ $this->registerJs($js);
                     }
                 ],
                 [
+                    'label' => 'Branch',
+                    "format" => "raw",
+                    "value" => function($model) {
+                        return $model->businessLocation->business_location_name;
+                    }
+                ],
+                [
                     'label' => 'When',
                     'format' => 'raw',
                     'value' => function ($data) {
