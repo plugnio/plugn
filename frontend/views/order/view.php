@@ -648,7 +648,7 @@ $this->registerJs($js);
                             'value' => function ($data) {
                               return $data->address_1;
                             },
-                            'visible' => $model->address_1 ? true : false,
+                            'visible' => $model->shipping_country_id ? true : false,
                         ],
                         [
                             'attribute' => 'address_2',
@@ -656,7 +656,7 @@ $this->registerJs($js);
                             'value' => function ($data) {
                                 return $data->address_2;
                             },
-                            'visible' => $model->address_2 ? true : false,
+                            'visible' => $model->shipping_country_id ? true : false,
                         ],
                         [
                             'attribute' => 'postalcode',
@@ -664,7 +664,7 @@ $this->registerJs($js);
                             'value' => function ($data) {
                                 return $data->postalcode;
                             },
-                            'visible' => $model->postalcode ? true : false,
+                            'visible' => $model->shipping_country_id ? true : false,
                         ],
                         [
                             'label' => 'Area',
