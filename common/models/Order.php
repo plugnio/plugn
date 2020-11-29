@@ -548,26 +548,32 @@ class Order extends \yii\db\ActiveRecord {
           ];
         }
 
-        \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-        \Segment::track([
-            'userId' => $this->restaurant_uuid,
+        if(YII_ENV == 'prod') {
 
-            'event' => 'Order Completed',
-            'properties' => [
-                'checkout_id' => $this->order_uuid,
-                'order_id' => $this->order_uuid,
-                'total' => ($this->total_price * 3.28),
-                'revenue' => $this->payment_uuid ? ($this->payment->plugn_fee * 3.28) : 0,
-                'gateway_fee' => $this->payment_uuid ? ($this->payment->payment_gateway_fee * 3.28 ) : 0,
-                'payment_method' => $this->payment_method_name,
-                'gateway' => $this->payment_uuid ? 'Tap' : null,
-                'shipping' => ($this->delivery_fee * 3.28),
-                'subtotal' => ($this->subtotal * 3.28),
-                'currency' => 'USD',
-                'coupon' => $this->voucher && $this->voucher->code  ? $this->voucher->code : null,
-                'products' => $productsList ? $productsList : null
-            ]
-        ]);
+          \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+          \Segment::track([
+              'userId' => $this->restaurant_uuid,
+
+              'event' => 'Order Completed',
+              'properties' => [
+                  'checkout_id' => $this->order_uuid,
+                  'order_id' => $this->order_uuid,
+                  'total' => ($this->total_price * 3.28),
+                  'revenue' => $this->payment_uuid ? ($this->payment->plugn_fee * 3.28) : 0,
+                  'gateway_fee' => $this->payment_uuid ? ($this->payment->payment_gateway_fee * 3.28 ) : 0,
+                  'payment_method' => $this->payment_method_name,
+                  'gateway' => $this->payment_uuid ? 'Tap' : null,
+                  'shipping' => ($this->delivery_fee * 3.28),
+                  'subtotal' => ($this->subtotal * 3.28),
+                  'currency' => 'USD',
+                  'coupon' => $this->voucher && $this->voucher->code  ? $this->voucher->code : null,
+                  'products' => $productsList ? $productsList : null
+              ]
+          ]);
+
+        }
+
+
     }
 
     /**

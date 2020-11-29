@@ -35,8 +35,10 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
 
         <?php
 
-        $segmentScript = '';
-          if(Yii::$app->user->identity){
+          $segmentScript = '';
+
+          if(Yii::$app->user->identity && YII_ENV == 'prod'){
+
 
             $planName = $restaurant_model->plan->name;
 
@@ -51,6 +53,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
             $segmentScript = "analytics.identify('". $restaurant_model->restaurant_uuid."', {
                 name: '". $restaurant_model->name ."',
                 domain:'". $restaurant_model->restaurant_domain  ."',
+                phone:'". $restaurant_model->owner_number  ."',
                 email: '".Yii::$app->user->identity->agent_email  ."',
                 plan: '". $planName ."',
                 logo: '". $storeLogo ."',

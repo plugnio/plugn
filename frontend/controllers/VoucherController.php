@@ -83,6 +83,7 @@ class VoucherController extends Controller
 
               if($model->save()){
 
+              if(YII_ENV == 'prod') {
                   \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
                   \Segment::track([
                       'userId' => $restaurantUuid,
@@ -92,7 +93,8 @@ class VoucherController extends Controller
                            'discountAmount' => ($model->discount_amount * 3.28)
                       ]
                   ]);
-
+                }
+                
                 return $this->redirect(['index',  'restaurantUuid' => $restaurantUuid]);
 
               }

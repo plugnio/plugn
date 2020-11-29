@@ -1240,7 +1240,7 @@ class SiteController extends Controller {
                     if ($managedRestaurant = $model->login()) {
                       \Yii::info("[New Store Signup] " . $store_model->name . " has just joined Plugn", __METHOD__);
 
-
+                  if(YII_ENV == 'prod') {
                       $full_name = explode(' ', $agent_model->agent_name);
                       $firstname = $full_name[0];
                       $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
@@ -1258,7 +1258,7 @@ class SiteController extends Controller {
                                'store_url' => $store_model->name
                           ]
                       ]);
-
+                    }
 
 
                         return $this->redirect(['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
