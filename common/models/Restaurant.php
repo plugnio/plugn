@@ -431,9 +431,6 @@ class Restaurant extends \yii\db\ActiveRecord {
 
         }
 
-
-        $this->save();
-        
     }
 
     /**
