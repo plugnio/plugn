@@ -531,8 +531,8 @@ class Restaurant extends \yii\db\ActiveRecord {
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
             $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
         } else {
-            Yii::error('enter else');
-            Yii::error(json_encode($businessApiResponse->data));
+            Yii::error('Error while create Business11  ');
+            Yii::error('Error while create Business22  ' . json_encode($businessApiResponse->data));
             return Yii::error('Error while create Business  ' . json_encode($businessApiResponse->data));
         }
 
