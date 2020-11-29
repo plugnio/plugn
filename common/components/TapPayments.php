@@ -288,9 +288,6 @@ class TapPayments extends Component
         }
 
 
-        Yii::error( json_encode($bussinessParams), __METHOD__);
-
-
         $client = new Client();
         $response = $client->createRequest()
                 ->setMethod('POST')
