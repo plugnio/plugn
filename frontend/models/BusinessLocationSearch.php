@@ -17,7 +17,7 @@ class BusinessLocationSearch extends BusinessLocation
     public function rules()
     {
         return [
-            [['business_location_id', 'support_delivery', 'support_pick_up'], 'integer'],
+            [['business_location_id', 'support_pick_up'], 'integer'],
             [['restaurant_uuid', 'business_location_name', 'business_location_name_ar'], 'safe'],
         ];
     }
@@ -60,7 +60,6 @@ class BusinessLocationSearch extends BusinessLocation
         // grid filtering conditions
         $query->andFilterWhere([
             'business_location_id' => $this->business_location_id,
-            'support_delivery' => $this->support_delivery,
             'support_pick_up' => $this->support_pick_up,
         ]);
 

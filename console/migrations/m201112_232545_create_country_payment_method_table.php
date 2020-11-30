@@ -47,14 +47,14 @@ class m201112_232545_create_country_payment_method_table extends Migration
 
         // creates index for column `payment_method_id`
         $this->createIndex(
-                'idx-payment-method-payment_method_id',
-                'payment_method',
+                'idx-country_payment_method-payment_method_id',
+                'country_payment_method',
                 'payment_method_id'
         );
 
         // add foreign key for table `payment_method`
         $this->addForeignKey(
-                'fk-payment-method-payment_method_id',
+                'fk-country_payment_method-payment_method_id',
                 'country_payment_method',
                 'payment_method_id',
                 'payment_method',
@@ -69,8 +69,8 @@ class m201112_232545_create_country_payment_method_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropForeignKey('fk-payment-method-payment_method_id', 'country_payment_method');
-        $this->dropIndex('idx-payment-method-payment_method_id', 'country_payment_method');
+        $this->dropForeignKey('fk-country_payment_method-payment_method_id', 'country_payment_method');
+        $this->dropIndex('idx-country_payment_method-payment_method_id', 'country_payment_method');
 
         $this->dropForeignKey('fk-country_payment_method-country_id', 'country_payment_method');
         $this->dropIndex('idx-country_payment_method-country_id', 'country_payment_method');

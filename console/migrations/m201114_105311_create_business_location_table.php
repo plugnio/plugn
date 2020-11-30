@@ -26,7 +26,6 @@ class m201114_105311_create_business_location_table extends Migration
             'restaurant_uuid' => $this->char(60)->notNull(),
             'business_location_name' => $this->string()->notNull(),
             'business_location_name_ar' => $this->string()->notNull(),
-            'support_delivery' => $this->tinyInteger(1)->notNull(),
             'support_pick_up' => $this->tinyInteger(1)->notNull(),
         ],$tableOptions);
 

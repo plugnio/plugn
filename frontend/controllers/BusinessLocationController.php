@@ -47,12 +47,10 @@ class BusinessLocationController extends Controller
     {
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
-        $searchModel = new BusinessLocationSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
+        $businessLocations = BusinessLocation::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->all();
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+            'businessLocations' => $businessLocations,
             'restaurantUuid' => $restaurantUuid
         ]);
     }

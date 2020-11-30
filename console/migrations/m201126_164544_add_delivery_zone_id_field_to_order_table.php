@@ -33,7 +33,6 @@ class m201126_164544_add_delivery_zone_id_field_to_order_table extends Migration
                 'CASCADE'
         );
 
-
         // creates index for column `delivery_zone_id`
         $this->createIndex(
                 'idx-order-delivery_zone_id',
@@ -51,7 +50,7 @@ class m201126_164544_add_delivery_zone_id_field_to_order_table extends Migration
                 'CASCADE'
         );
 
-      $this->addColumn('order', 'country_name', $this->string()->after('country_id'));
+      $this->addColumn('order', 'country_name', $this->string()->after('shipping_country_id'));
       $this->addColumn('order', 'country_name_ar', $this->string()->after('country_name'));
       $this->addColumn('order', 'floor', $this->integer()->after('country_name_ar'));
       $this->addColumn('order', 'apartment', $this->string()->after('floor'));
@@ -72,12 +71,7 @@ class m201126_164544_add_delivery_zone_id_field_to_order_table extends Migration
       $this->dropForeignKey('fk-order-delivery_zone_id', 'order');
       $this->dropIndex('idx-order-delivery_zone_id', 'order');
 
-      $this->dropForeignKey('fk-order-country_id', 'order');
-      $this->dropIndex('idx-order-country_id', 'order');
-
-
       $this->dropColumn('order', 'delivery_zone_id');
-      $this->dropColumn('order', 'country_id');
 
       $this->dropColumn('order', 'country_name');
       $this->dropColumn('order', 'country_name_ar');

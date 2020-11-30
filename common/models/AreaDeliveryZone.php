@@ -31,7 +31,7 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['delivery_zone_id','area_id', 'restaurant_uuid'], 'required'],
+            [['delivery_zone_id', 'restaurant_uuid'], 'required'],
             [['delivery_zone_id', 'area_id'], 'integer'],
             [['delivery_zone_id', 'area_id'], 'unique', 'targetAttribute' => ['delivery_zone_id', 'area_id']],
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
@@ -52,6 +52,31 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
             'restaurant_uuid' => 'Restaurant Uuid',
         ];
     }
+
+    /**
+     *
+     * @param type $insert
+     * @param type $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes) {
+        parent::afterSave($insert, $changedAttributes);
+
+        if ($insert) {
+
+          if( $this->area_id){
+            $this->country_id = $this->area->country->country_id;
+            $this->city_id = $this->area->city_id;
+          } else {
+            $this->country_id = $this->deliveryZone->country_id;
+          }
+
+          return $this->save();
+
+        }
+
+        return true;
+    }
+
 
     /**
      * Gets query for [[Area]].
@@ -97,4 +122,18 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
     {
         return $this->hasOne(DeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id']);
     }
+
+
+
+    /**
+     * Gets query for [[BusinessLocation]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBusinessLocation()
+    {
+        return $this->hasOne(BusinessLocation::className(), ['business_location_id' => 'business_location_id'])->via('deliveryZone');
+    }
+
+
 }

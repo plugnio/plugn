@@ -92,8 +92,12 @@ class DeliveryZoneController extends Controller {
 
 
             foreach ($shipping_countries as $key => $country) {
+
+
+
+
               $shipping_countries[$key]['areas'] =
-                $store_model->getAreaDeliveryZonesForSpecificCountry($country['country_id']) ? $store_model->getAreaDeliveryZonesForSpecificCountry($country['country_id'])->count() : null;
+                $store_model->getAreaDeliveryZonesForSpecificCountry($country['country_id'])->one()->area_id  == null  && $store_model->getAreaDeliveryZonesForSpecificCountry($country['country_id'])->count() == 1 ? 0 : $store_model->getAreaDeliveryZonesForSpecificCountry($country['country_id'])->count() ;
 
                 if($shipping_countries[$key]['areas'] == 0 )
                   $shipping_countries[$key]['deliveryZone'] = $shipping_countries[$key]['deliveryZones'][0];

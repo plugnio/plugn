@@ -11,7 +11,6 @@ use Yii;
  * @property string $restaurant_uuid
  * @property string $business_location_name
  * @property string $business_location_name_ar
- * @property int $support_delivery
  * @property int $support_pick_up
  *
  * @property Restaurant $restaurant
@@ -34,8 +33,8 @@ class BusinessLocation extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['restaurant_uuid', 'country_id', 'business_location_name', 'business_location_name_ar', 'support_delivery', 'support_pick_up'], 'required'],
-            [['support_delivery', 'country_id' , 'support_pick_up'], 'integer'],
+            [['restaurant_uuid', 'country_id', 'business_location_name', 'business_location_name_ar', 'support_pick_up'], 'required'],
+            [['country_id' , 'support_pick_up'], 'integer'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['business_location_name', 'business_location_name_ar'], 'string', 'max' => 255],
             [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country_id' => 'country_id']],
@@ -54,7 +53,6 @@ class BusinessLocation extends \yii\db\ActiveRecord
             'country_id' => 'Country',
             'business_location_name' => 'Business Location Name',
             'business_location_name_ar' => 'Business Location Name Ar',
-            'support_delivery' => 'Support Delivery',
             'support_pick_up' => 'Support Pick Up',
         ];
     }

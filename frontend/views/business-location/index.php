@@ -26,61 +26,52 @@ $this->registerJs($js);
   <section id="data-list-view" class="data-list-view-header">
 
 
-    <!-- Data list view starts -->
-    <div class="action-btns d-none">
-        <div class="btn-dropdown mr-1 mb-1">
-            <div class="btn-group dropdown actions-dropodown">
-              <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-outline-primary']) ?>
-            </div>
-        </div>
-    </div>
+
+    <?= Html::a('Add Business location', ['create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']); ?>
 
 
+      <?php
 
-
-       <?php if($dataProvider->getCount() == 0 ){  ?>
-         <div style="padding-left:14px">
-         <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-outline-primary','style'=>'    padding: 0.85rem 1.7rem;']) ?>
-       </div>
-       <?php } ?>
-
-      <?=
-      GridView::widget([
-          'dataProvider' => $dataProvider,
-          'rowOptions' => function($model) {
-              $url = Url::to(['business-location/update', 'id' => $model->business_location_id, 'restaurantUuid' => $model->restaurant_uuid]);
-
-              return [
-                  'onclick' => "window.location.href='{$url}'"
-              ];
-          },
-          'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-              'business_location_name',
-              'business_location_name_ar',
-              [
-                  'label' => 'Support Delivery',
-                  'value' => function ($data) {
-                      return $data->support_delivery ? 'Yes' : 'No';
-                  },
-                  'format' => 'raw'
-              ],
-
-              [
-                  'label' => 'Support Pick up',
-                  'value' => function ($data) {
-                      return $data->support_pick_up ? 'Yes' : 'No';
-                  },
-                  'format' => 'raw'
-              ]
-
-          ],
-
-          'layout' => '{summary}<div class="card-body"><div class="box-body table-responsive no-padding">{items}{pager}</div></div>',
-          'tableOptions' => ['class' => 'table data-list-view'],
-      ]);
+        foreach ($businessLocations as $key => $businessLocation) {
       ?>
+      <div class="card mt-2">
+
+
+        <div class="card-content">
+        <div class="card-body">
+          <h1><?= $businessLocation->business_location_name_ar ?></h1>
+
+
+              <small>Support pickup</small>
+              <span style="display: block">
+                <?= $businessLocation->support_pick_up ? 'Yes' : 'No' ?>
+              </span>
+
+
+            <?php
+
+
+              if($businessLocation->getDeliveryZones()->count()  == 0 ){
+                echo'<div class="card"><div style="padding: 70px 0; text-align: center;">'
+                . '     <h4>You currently do not have any places you deliver to</h4>'
+                . Html::a('Setup Delivery Zones', ['delivery-zone/create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success'])
+                . '</div></div>';
+              } else {
+                echo'<div class="card"><div style="padding: 70px 0; text-align: center;">'
+                .  Html::a('Manage Delivery Zones', ['delivery-zone/index', 'restaurantUuid' => $restaurantUuid, 'businessLocationId' => $businessLocation->business_location_id], ['class' => 'btn btn-success'])
+                . '</div></div>';
+              }
+
+            ?>
+
+
+
+        </div>
+
+      </div>
+      </div>
+
+    <?php } ?>
 
 
   </section>

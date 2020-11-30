@@ -166,13 +166,15 @@ class Order extends \yii\db\ActiveRecord {
                     if ($this->is_order_scheduled && (!$this->scheduled_time_start_from || !$this->scheduled_time_to))
                         $this->addError($attribute, $attribute . ' cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
+
+            //TODO
             // ['area_id', function ($attribute, $params, $validator) {
-            //         if (!$this->area_id && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+            //         if ($this->order_mode == Order::ORDER_MODE_DELIVERY && $this->shipping_country_id && !$this->area_id)
             //             $this->addError($attribute, 'Area name cannot be blank.');
             //     }, 'skipOnError' => false, 'skipOnEmpty' => false],
             // ['shipping_country_id', function ($attribute, $params, $validator) {
-            //         if ($this->order_mode == Order::ORDER_MODE_DELIVERY && !$this->shipping_country_id)
-            //             $this->addError($attribute, 'Invalid country id');
+            //         if ($this->order_mode == Order::ORDER_MODE_DELIVERY && $this->shipping_country_id && !$this->area_id)
+            //             $this->addError($attribute, 'Area name cannot be blank.');
             //     }, 'skipOnError' => false, 'skipOnEmpty' => false],
             [['shipping_country_id'], 'validateCountry'],
             [['area_id'], 'validateArea'],
@@ -420,14 +422,19 @@ class Order extends \yii\db\ActiveRecord {
             $this->addError($attribute, "Store does not deliver to this delivery zone.");
     }
 
+
     /**
      * Check if  store deliver to the selected country
      * @param type $attribute
      */
     public function validateCountry($attribute) {
-        if (!$deliveryZone = DeliveryZone::find()->where(['country_id' => $this->shipping_country_id, 'delivery_zone_id' => $this->delivery_zone_id])->one() || $deliveryZone->businessLocation->restaurant_uuid != $this->restaurant_uuid)
-            $this->addError($attribute, "Store does not deliver to this country.");
+
+        $areaDeliveryZone = AreaDeliveryZone::find()->where(['country_id' => $this->shipping_country_id, 'delivery_zone_id' => $this->delivery_zone_id])->one();
+
+        if (!$areaDeliveryZone || $areaDeliveryZone->area_id != null || ($areaDeliveryZone && $areaDeliveryZone->businessLocation->restaurant_uuid != $this->restaurant_uuid))
+            $this->addError($attribute, "Store does not deliver to this country. " . $areaDeliveryZone->area_id);
     }
+
 
     /**
      * Validate order mode attribute
@@ -462,8 +469,8 @@ class Order extends \yii\db\ActiveRecord {
             'payment_uuid' => 'Payment Uuid',
             'restaurant_uuid' => 'Restaurant Uuid',
             'area_id' => 'Area ID',
-            'delivery_zone_id' => 'Delivery Zone ID',
             'shipping_country_id' => 'Country ID',
+            'delivery_zone_id' => 'Delivery Zone ID',
             'country_name' => 'Country Name',
             'country_name_ar' => 'Country Name Ar',
             'floor' => 'Floor',
@@ -891,6 +898,8 @@ class Order extends \yii\db\ActiveRecord {
     {
         return $this->hasOne(Country::className(), ['country_id' => 'shipping_country_id']);
     }
+
+
 
     /**
      * Gets query for [[DeliveryZone]].

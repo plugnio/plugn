@@ -68,11 +68,11 @@ class DeliveryZoneController extends Controller {
      * Lists all DeliveryZone models.
      * @return mixed
      */
-    public function actionIndex($restaurantUuid) {
+    public function actionIndex($restaurantUuid, $businessLocationId) {
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
         $searchModel = new DeliveryZoneSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid, $businessLocationId);
 
         return $this->render('index', [
                     'searchModel' => $searchModel,
@@ -125,6 +125,12 @@ class DeliveryZoneController extends Controller {
                         }
                     }
                 }
+            } else {
+              $delivery_zone_area_model = new AreaDeliveryZone();
+              $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
+              $delivery_zone_area_model->country_id = $model->country_id;
+              $delivery_zone_area_model->restaurant_uuid = $restaurantUuid;
+              $delivery_zone_area_model->save(false);
             }
 
 
@@ -192,6 +198,12 @@ class DeliveryZoneController extends Controller {
                         }
                     }
                 }
+            } else {
+              $delivery_zone_area_model = new AreaDeliveryZone();
+              $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
+              $delivery_zone_area_model->country_id = $model->country_id;
+              $delivery_zone_area_model->restaurant_uuid = $restaurantUuid;
+              $delivery_zone_area_model->save(false);
             }
 
 
