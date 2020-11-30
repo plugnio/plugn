@@ -41,8 +41,7 @@ return [
             'frontend/web/uploads/',
             'api/runtime',
             'api/web/assets',
-            'shortner/runtime',
-            'shortner/web/assets',
+            'shortner/runtime'
         ],
         'setExecutable' => [
             'yii',
@@ -69,8 +68,7 @@ return [
             'frontend/web/uploads/',
             'api/runtime',
             'api/web/assets',
-            'shortner/runtime',
-            'shortner/web/assets',
+            'shortner/runtime'
         ],
         'setExecutable' => [
             'yii',
@@ -96,8 +94,7 @@ return [
             'frontend/web/uploads/',
             'api/runtime',
             'api/web/assets',
-            'shortner/runtime',
-            'shortner/web/assets',
+            'shortner/runtime'
         ],
         'setExecutable' => [
             'yii',
@@ -124,8 +121,7 @@ return [
             'frontend/web/uploads/',
             'api/runtime',
             'api/web/assets',
-            'shortner/runtime',
-            'shortner/web/assets',
+            'shortner/runtime'
         ],
         'setExecutable' => [
             'yii',
