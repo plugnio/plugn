@@ -548,6 +548,7 @@ class Order extends \yii\db\ActiveRecord {
           ];
         }
 
+        if(YII_ENV == 'prod') {
 
           \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
           \Segment::track([
@@ -569,7 +570,7 @@ class Order extends \yii\db\ActiveRecord {
                   'products' => $productsList ? $productsList : null
               ]
           ]);
-
+        }
 
 
     }
