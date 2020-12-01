@@ -61,7 +61,7 @@ class OrderController extends Controller {
 
         if ($restaurant_model->load(Yii::$app->request->post())) {
 
-            list($start_date, $end_date) = explode(' - ', $restaurant_model->date_range_picker_with_time);
+            list($start_date, $end_date) = explode(' - ', $restaurant_model->export_orders_data_in_specific_date_range);
 
 
             $searchResult = Order::find()

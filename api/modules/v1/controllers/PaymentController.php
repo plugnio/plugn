@@ -7,6 +7,7 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use common\models\RestaurantPaymentMethod;
 use common\models\PaymentMethod;
+use common\models\Payment;
 use common\models\Restaurant;
 
 class PaymentController extends Controller {
@@ -51,6 +52,17 @@ class PaymentController extends Controller {
         ];
         return $actions;
     }
+
+
+    /**
+     *  Return Payment details
+     */
+    // public function actionPaymentDetail($id) {
+    //
+    //     $model = Payment::find()->where(['payment_uuid' => $id])->with('order')->asArray()->one();
+    //
+    //     return $model;
+    // }
 
 
     /**

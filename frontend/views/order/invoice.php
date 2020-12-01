@@ -138,6 +138,11 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                         'sorter' => false,
                         'columns' => [
                             'item_name',
+                            [
+                                'label' => 'SKU',
+                                'format' => 'raw',
+                                'value' => 'item.sku',
+                            ],
                             'customer_instruction',
                             'qty',
                             [

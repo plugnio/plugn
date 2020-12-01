@@ -17,6 +17,7 @@ use frontend\models\ResetPasswordForm;
 use common\models\Agent;
 use common\models\Restaurant;
 use common\models\OrderItem;
+use common\models\Category;
 use common\models\Order;
 use common\models\Plan;
 use common\models\PaymentMethod;
@@ -50,7 +51,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'redirect-to-store-domain',  'check-for-new-orders', 'current-plan', 'domains', 'compare-plan',  'downgrade-to-free-plan', 'confirm-plan', 'promote-to-open', 'connect-domain', 'promote-to-close', 'callback', 'vendor-dashboard', 'real-time-orders', 'mark-as-busy', 'mark-as-open'],
+                        'actions' => ['logout', 'redirect-to-store-domain',  'check-for-new-orders',  'domains',  'downgrade-to-free-plan', 'confirm-plan', 'promote-to-open', 'connect-domain', 'promote-to-close', 'callback', 'vendor-dashboard', 'real-time-orders', 'mark-as-busy', 'mark-as-open'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -318,23 +319,6 @@ class SiteController extends Controller {
 
     }
 
-    public function actionDowngradeToFreePlan($id, $selectedPlanId) {
-
-      if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
-
-        $subscription = new Subscription();
-        $subscription->restaurant_uuid = $managedRestaurant->restaurant_uuid;
-        $subscription->plan_id = $selectedPlanId;
-        $subscription->subscription_status = Subscription::STATUS_ACTIVE;
-        $subscription->save(false);
-
-        return $this->redirect(['current-plan',
-                    'id' => $id
-        ]);
-      }
-
-    }
-
 
     /**
      * Process callback from TAP payment gateway
@@ -355,50 +339,15 @@ class SiteController extends Controller {
             Yii::$app->session->setFlash('error', print_r('There seems to be an issue with your payment, please try again.', true));
 
             // Redirect back to current plan page
-            return $this->redirect(['current-plan',
-                        'id' => $paymentRecord->restaurant_uuid
+            return $this->redirect(['restaurant/view-payment-methods',
+                        'restaurantUuid' => $paymentRecord->restaurant_uuid
             ]);
+
         } catch (\Exception $e) {
             throw new NotFoundHttpException($e->getMessage());
         }
     }
 
-    /**
-     * Comapre plan page
-     *
-     * @return mixed
-     */
-    public function actionComparePlan($id) {
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
-
-            $subscription = $managedRestaurant->getSubscriptions()->where(['subscription_status' => Subscription::STATUS_ACTIVE])->one();
-
-            $plans = Plan::find()->all();
-
-            return $this->render('compare-plan', [
-                        'restaurant_model' => $managedRestaurant,
-                        'selectedPlan' => $subscription,
-                        'availablePlans' =>  $plans
-            ]);
-        }
-    }
-
-    /**
-     * Current plan
-     *
-     * @return mixed
-     */
-    public function actionCurrentPlan($id) {
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
-
-            $subscription = $managedRestaurant->getSubscriptions()->where(['subscription_status' => Subscription::STATUS_ACTIVE])->with('plan')->one();
-
-            return $this->render('current-plan', [
-                        'restaurant_model' => $managedRestaurant,
-                        'subscription' => $subscription
-            ]);
-        }
-    }
 
     /**
      * Displays  Real time orders
@@ -1262,10 +1211,21 @@ class SiteController extends Controller {
             $store_model->restaurant_email = $agent_model->agent_email;
             $store_model->owner_first_name = $agent_model->agent_name;
 
+            $store_model->name_ar = $store_model->name;
+
+
+
 
 
             if ($agent_model->validate() && $store_model->validate() && $store_model->save() && $agent_model->save()) {
 
+
+                //Create a catrgory for a store by default named "Products". so they can get started adding products without having to add category first
+                $category_model = new Category();
+                $category_model->restaurant_uuid = $store_model->restaurant_uuid;
+                $category_model->title = 'Products';
+                $category_model->title_ar = 'منتجات';
+                $category_model->save();
 
                 $assignment_agent_model = new AgentAssignment();
                 $assignment_agent_model->agent_id = $agent_model->agent_id;
@@ -1281,17 +1241,25 @@ class SiteController extends Controller {
                     if ($managedRestaurant = $model->login()) {
                       \Yii::info("[New Store Signup] " . $store_model->name . " has just joined Plugn", __METHOD__);
 
+                  if(YII_ENV == 'prod') {
+                      $full_name = explode(' ', $agent_model->agent_name);
+                      $firstname = $full_name[0];
+                      $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
 
-                    $this->getView()->registerJs("
-                                    <script>
-                                        gtag('event', 'conversion', {
-                                            'send_to': 'AW-946322720/CmDDCN_6tugBEKD6nsMD',
-                                            'transaction_id': ''
-                                        });
-                                    </script>
-                                ");
-
-
+                      \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+                      \Segment::track([
+                          'userId' => $store_model->restaurant_uuid,
+                          'event' => 'Store Created',
+                          'type' => 'track',
+                          'properties' => [
+                               'first_name' => trim($firstname),
+                               'last_name' => trim($lastname),
+                               'store_name' => $store_model->name,
+                               'email' => $agent_model->agent_email,
+                               'store_url' => $store_model->name
+                          ]
+                      ]);
+                    }
 
                         return $this->redirect(['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
                     } else {

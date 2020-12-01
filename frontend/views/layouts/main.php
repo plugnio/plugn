@@ -33,16 +33,55 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
         </title>
         <link rel="shortcut icon" href="<?php echo Yii::$app->request->baseUrl; ?>/favicon.ico" type="image/x-icon" />
 
+        <?php
 
-        <!-- Global site tag (gtag.js) - Google Ads: 946322720 -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-946322720"></script>
+          $segmentScript = '';
+
+          if(Yii::$app->user->identity && YII_ENV == 'prod'){
+
+
+            $planName = $restaurant_model->plan->name;
+
+            $tapAccountCreated = $restaurant_model->is_tap_enable ? 'yes' : 'no';
+            $paymentCash = $restaurant_model->getPaymentMethods()->where(['payment_method_id' => 3])->exists() ? 'yes' : 'no';
+            $paymentKNET = $restaurant_model->getPaymentMethods()->where(['payment_method_id' => 1])->exists() ? 'yes' : 'no';
+            $paymentCreditcard = $restaurant_model->getPaymentMethods()->where(['payment_method_id' => 2])->exists() ? 'yes' : 'no';
+            $deliveryMashkor = $restaurant_model->mashkor_branch_id ? 'yes' : 'no' ;
+            $deliveryArmada = $restaurant_model->armada_api_key ? 'yes' : 'no' ;
+            $storeLogo = $restaurant_model->logo ? $restaurant_model->getRestaurantLogoUrl() : 'false';
+
+            $segmentScript = "analytics.identify('". $restaurant_model->restaurant_uuid."', {
+                name: '". $restaurant_model->name ."',
+                domain:'". $restaurant_model->restaurant_domain  ."',
+                phone:'". $restaurant_model->owner_number  ."',
+                email: '".Yii::$app->user->identity->agent_email  ."',
+                plan: '". $planName ."',
+                logo: '". $storeLogo ."',
+                totalProducts: '". $restaurant_model->getItems()->count() ."',
+                totalOrders: '". $restaurant_model->getOrders()->count() ."',
+                tapAccountCreated: '". $tapAccountCreated ."',
+                paymentCash: '". $paymentCash ."',
+                paymentKNET: '". $paymentKNET ."',
+                paymentCreditcard: '". $paymentCreditcard ."',
+                paymentMada: 'no',
+                deliveryMashkor: '".  $deliveryMashkor ."',
+                deliveryArmada: '".  $deliveryArmada ."',
+              });
+
+           ";
+
+            } ?>
+
+
+
         <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-        gtag('config', 'G-JN88PPG4C6');
-          gtag('config', 'AW-946322720');
+          !function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId","addDestinationMiddleware"];analytics.factory=function(e){return function(){var t=Array.prototype.slice.call(arguments);t.unshift(e);analytics.push(t);return analytics}};for(var e=0;e<analytics.methods.length;e++){var key=analytics.methods[e];analytics[key]=analytics.factory(key)}analytics.load=function(key,e){var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.src="https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);analytics._loadOptions=e};analytics.SNIPPET_VERSION="4.13.1";
+          analytics.load("2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5");
+          <?= $segmentScript ?>
+          analytics.page();
+          }}();
         </script>
+
 
         <?php $this->head() ?>
     </head>
@@ -119,18 +158,11 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
             <div class="navbar-header">
                 <ul class="nav navbar-nav flex-row">
                     <li class="nav-item mr-auto">
-                        <?php
-                        if ($restaurant_model->logo) {
-                            echo Html::a('<img src="' . $restaurant_model->getRestaurantLogoUrl() . '" class="round"  height="40" width="40" ">'
+                        <?=
+                           Html::a('<img src="' . $restaurant_model->getRestaurantLogoUrl() . '" class="round"  height="40" width="40" ">'
                                     . '<h2 class="brand-text mb-0"  style="font-size: 20px; width: 190px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">' . $restaurant_model->name . '</h2>'
                                     , ['site/index', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'navbar-brand']);
-                        } else {
-                            echo Html::a('<img src="https://res.cloudinary.com/plugn/image/upload/plugn-icon.png" class="round"  height="40" width="40" ">'
-                                    . '<h2 class="brand-text mb-0"  style="font-size: 20px; width: 190px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">' . $restaurant_model->name . '</h2>'
-                                    , ['site/index', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'navbar-brand']);
-                        }
                         ?>
-
                     </li>
                     </a>
                     </li>

@@ -49,12 +49,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                 <?= $form->field($agent_model, 'agent_name')->textInput(['maxlength' => true])->label('Your name *') ?>
 
-                                <?= $form->field($agent_model, 'agent_email')->textInput(['maxlength' => true,'type' => 'email'])->label('Email *') ?>
+                                <?= $form->field($agent_model, 'agent_email')->textInput(['maxlength' => true,'type' => 'email'])->label('Your email *') ?>
 
+                                <?= $form->field($store_model, 'owner_number')->textInput(['maxlength' => true])->label('Your phone number *') ?>
 
-                                <?= $form->field($store_model, 'name')->textInput(['maxlength' => true])->label('Your store name in English *') ?>
+                                <?= $form->field($store_model, 'name')->textInput(['maxlength' => true])->label('Your store name *') ?>
 
-                                <?= $form->field($store_model, 'name_ar')->textInput(['maxlength' => true])->label('Your store name in Arabic *') ?>
 
                                 <?=
                                 $form->field($store_model, 'restaurant_domain', [

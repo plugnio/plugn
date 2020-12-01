@@ -25,6 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'tap_queue_id',
             'restaurant_uuid',
+            'restaurant.name',
             'queue_status',
             'queue_created_at',
             'queue_updated_at',

@@ -138,6 +138,10 @@ class Restaurant extends \yii\db\ActiveRecord {
     const STORE_LAYOUT_LIST_HALFWIDTH = 4;
     const STORE_LAYOUT_GRID_HALFWIDTH = 5;
     const STORE_LAYOUT_CATEGORY_HALFWIDTH = 6;
+
+
+
+
     const SCENARIO_CREATE_STORE_BY_AGENT = 'create-by-agent';
     const SCENARIO_CREATE_TAP_ACCOUNT = 'tap_account';
     const SCENARIO_UPLOAD_STORE_DOCUMENT = 'upload';
@@ -146,7 +150,8 @@ class Restaurant extends \yii\db\ActiveRecord {
     public $restaurant_payments_method;
     public $restaurant_logo;
     public $restaurant_thumbnail_image;
-    public $date_range_picker_with_time;
+    public $export_orders_data_in_specific_date_range;
+    public $export_sold_items_data_in_specific_date_range;
     public $owner_identification_file_front_side;
     public $owner_identification_file_back_side;
     public $restaurant_authorized_signature_file;
@@ -199,7 +204,7 @@ class Restaurant extends \yii\db\ActiveRecord {
                     'commercial_license_issuing_country', 'commercial_license_issuing_date', 'commercial_license_expiry_date',
                     'commercial_license_file', 'commercial_license_file_purpose', 'commercial_license_title',
                     'iban', 'owner_first_name', 'owner_last_name',
-                    'owner_email', 'owner_number',
+                    'owner_email',
                     'identification_issuing_country', 'identification_issuing_date', 'identification_title',
                     'identification_expiry_date', 'identification_file_back_side', 'identification_file_front_side', 'identification_file_purpose',
                     'business_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
@@ -210,10 +215,11 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_commercial_license_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
             [['restaurant_authorized_signature_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
             [['name', 'name_ar', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_domain', 'restaurant_email', 'store_branch_name', 'app_id'], 'required', 'on' => 'create'],
-            [['name', 'name_ar', 'restaurant_domain', 'currency_id', 'country_id'], 'required', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
+            [['name', 'owner_number', 'restaurant_domain', 'currency_id', 'country_id'], 'required', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             ['name', 'match', 'pattern' => '/^[a-zA-Z0-9-\s]+$/', 'message' => 'Your store name can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             ['restaurant_domain', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/', 'message' => 'Your store url can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             [['restaurant_domain'], 'url', 'except' => self::SCENARIO_CREATE_STORE_BY_AGENT],
+            [['restaurant_domain'], 'string',  'min' => 3, 'max' => 20, 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png, pdf', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['restaurant_status', 'support_delivery', 'support_pick_up'], 'integer', 'min' => 0],
@@ -227,13 +233,13 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['custom_css'], 'string'],
             [['platform_fee'], 'number'],
             [['instagram_url'], 'url'],
-            [['date_range_picker_with_time', 'google_analytics_id', 'facebook_pixil_id', 'site_id'], 'safe'],
+            [['export_orders_data_in_specific_date_range','export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'site_id'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'app_id', 'armada_api_key', 'mashkor_branch_id', 'store_branch_name', 'live_public_key', 'test_public_key', 'company_name'], 'string', 'max' => 255],
             [['phone_number'], 'string', 'min' => 5, 'max' => 15],
 
             [['live_public_key', 'test_public_key'], 'default', 'value' => null],
-            [['phone_number'], 'integer', 'min' => 0],
-            [['phone_number', 'country_id', 'currency_id', 'owner_phone_country_code', 'phone_number_country_code'], 'integer'],
+            [['phone_number', 'owner_number'], 'integer', 'min' => 0],
+            [['phone_number', 'country_id', 'currency_id', 'owner_phone_country_code', 'phone_number_country_code', 'owner_number'], 'integer'],
 
            //  ['currency_id', function ($attribute, $params, $validator) {
            //     if ($this->getOrders()->exists())
@@ -273,7 +279,8 @@ class Restaurant extends \yii\db\ActiveRecord {
             'support_delivery' => 'Support Delivery',
             'support_pick_up' => 'Support Pick Up',
             'restaurant_delivery_area' => 'Delivery Areas',
-            'date_range_picker_with_time' => 'Export orders data in a specific date range',
+            'export_orders_data_in_specific_date_range' => 'Export orders data in a specific date range',
+            'export_sold_items_data_in_specific_date_range' => 'Export sold items data in a specific date range',
             'phone_number' => "Store's phone number",
             'restaurant_email' => "Store's Email",
             'restaurant_created_at' => 'Store Created At',
@@ -509,6 +516,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             else
               return Yii::error('Error when uploading civil id (back side): ' . json_encode($response->data));
         }
+
     }
 
     /**
@@ -591,8 +599,10 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function createAnAccountOnTap() {
 
+
         //Upload documents file on our server before we create an account on tap we gonaa delete them
         $this->uploadDocumentsToTap();
+
 
         //Create a business for a vendor on Tap
         $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
@@ -603,7 +613,8 @@ class Restaurant extends \yii\db\ActiveRecord {
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
             $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
         } else {
-            return Yii::error('Error while create Business  ' . json_encode($businessApiResponse->data));
+            Yii::error('Error while create Business [ ' . $this->name . '] ' . json_encode($businessApiResponse->data));
+            return false;
         }
 
         //Create a merchant on Tap
@@ -624,10 +635,8 @@ class Restaurant extends \yii\db\ActiveRecord {
                    $this->merchant_id = $merchantApiResponse->data['id'];
                    $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
                } else
-                return Yii::error('Error while create Merchant #2 ' . json_encode($merchantApiResponse->data));
-
+                return  Yii::error('Error while create Merchant [ ' . $this->name . '] ' . json_encode($merchantApiResponse->data));
              }
-
         }
 
         //Create an Operator
@@ -647,7 +656,8 @@ class Restaurant extends \yii\db\ActiveRecord {
             $this->save();
             return true;
         } else {
-          return Yii::error('Error while create Operator  ' . json_encode($operatorApiResponse->data));
+          Yii::error('Error while create Operator  [ ' . $this->name . '] ' . json_encode($operatorApiResponse->data));
+          return false;
         }
     }
 
@@ -684,7 +694,10 @@ class Restaurant extends \yii\db\ActiveRecord {
      * Return Restaurant's logo url
      */
     public function getRestaurantLogoUrl() {
-        return 'https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/' . $this->restaurant_uuid . "/logo/" . $this->logo;
+        if($this->logo)
+          return 'https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/' . $this->restaurant_uuid . "/logo/" . $this->logo;
+        else
+          return 'https://res.cloudinary.com/plugn/image/upload/plugn-icon.png';
     }
 
     /**
@@ -1123,6 +1136,15 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getSubscriptions() {
         return $this->hasMany(Subscription::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * Gets query for [[Subscriptions]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getActiveSubscription() {
+        return $this->hasOne(Subscription::className(), ['restaurant_uuid' => 'restaurant_uuid'])->where(['subscription_status' => Subscription::STATUS_ACTIVE]);
     }
 
     /**

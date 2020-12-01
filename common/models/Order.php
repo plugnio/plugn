@@ -9,6 +9,7 @@ use yii\db\ActiveRecord;
 use common\models\Customer;
 use common\models\Agent;
 use yii\behaviors\AttributeBehavior;
+use Segment;
 use borales\extensions\phoneInput\PhoneInputValidator;
 
 /**
@@ -568,6 +569,13 @@ class Order extends \yii\db\ActiveRecord {
                     ->setReplyTo([$this->restaurant->restaurant_email => $this->restaurant->name])
                     ->send();
         }
+
+
+        if($this->payment_uuid)
+            Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $this->payment_method_name, __METHOD__);
+
+
+
     }
 
     /**
@@ -607,6 +615,46 @@ class Order extends \yii\db\ActiveRecord {
     public function changeOrderStatusToPending() {
         $this->order_status = self::STATUS_PENDING;
         $this->save(false);
+
+
+        $productsList = null  ;
+
+        foreach ($this->orderItems as $orderedItem) {
+          $productsList[] = [
+            'product_id' => $orderedItem->item_uuid,
+            'sku' => $orderedItem->item->sku ? $orderedItem->item->sku : null ,
+            'name' => $orderedItem->item_name,
+            'price' => $orderedItem->item_price,
+            'quantity' => $orderedItem->qty,
+            'url' => $this->restaurant->restaurant_domain . '/product/' . $orderedItem->item_uuid,
+          ];
+        }
+
+        if(YII_ENV == 'prod') {
+
+          \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+          \Segment::track([
+              'userId' => $this->restaurant_uuid,
+
+              'event' => 'Order Completed',
+              'properties' => [
+                  'checkout_id' => $this->order_uuid,
+                  'order_id' => $this->order_uuid,
+                  'total' => ($this->total_price * 3.28),
+                  'revenue' => $this->payment_uuid ? ($this->payment->plugn_fee * 3.28) : 0,
+                  'gateway_fee' => $this->payment_uuid ? ($this->payment->payment_gateway_fee * 3.28 ) : 0,
+                  'payment_method' => $this->payment_method_name,
+                  'gateway' => $this->payment_uuid ? 'Tap' : null,
+                  'shipping' => ($this->delivery_fee * 3.28),
+                  'subtotal' => ($this->subtotal * 3.28),
+                  'currency' => 'USD',
+                  'coupon' => $this->voucher && $this->voucher->code  ? $this->voucher->code : null,
+                  'products' => $productsList ? $productsList : null
+              ]
+          ]);
+        }
+
+
     }
 
     /**
@@ -699,7 +747,7 @@ class Order extends \yii\db\ActiveRecord {
         parent::afterSave($insert, $changedAttributes);
 
       //Send SMS To customer
-      if ($this->customer_phone_country_code == 965 && !$insert && $this->restaurant_uuid != 'rest_7351b2ff-c73d-11ea-808a-0673128d0c9c' && !$this->sms_sent &&  isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_PENDING && $this->order_status == self::STATUS_ACCEPTED) {
+      if ($this->customer_phone_country_code == 965 && !$insert && $this->restaurant_uuid != 'rest_7351b2ff-c73d-11ea-808a-0673128d0c9c'  && $this->restaurant_uuid != 'rest_085f7a5f-19db-11eb-b97d-0673128d0c9c' && !$this->sms_sent &&  isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_PENDING && $this->order_status == self::STATUS_ACCEPTED) {
 
         try {
           $response = Yii::$app->smsComponent->sendSms($this->customer_phone_country_code, str_replace('+' . $this->customer_phone_country_code, '', $this->customer_phone_number), $this->order_uuid);

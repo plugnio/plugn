@@ -22,6 +22,7 @@ use yii\web\NotFoundHttpException;
  * @property double $payment_amount_charged amount charged to customer
  * @property double $payment_net_amount net amount deposited into our account
  * @property double $payment_gateway_fee gateway fee charged
+ * @property double $plugn_fee our commision
  * @property double $payment_token
  * @property string $payment_udf1
  * @property string $payment_udf2
@@ -54,7 +55,7 @@ class Payment extends \yii\db\ActiveRecord {
             [['customer_id', 'received_callback'], 'integer'],
             [['order_uuid'], 'string', 'max' => 40],
             [['payment_gateway_order_id', 'payment_current_status'], 'string'],
-            [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee'], 'number'],
+            [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee', 'plugn_fee'], 'number'],
             [['payment_uuid'], 'string', 'max' => 36],
             [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'response_message','payment_token'], 'string', 'max' => 255],
             [['payment_uuid'], 'unique'],
@@ -105,6 +106,7 @@ class Payment extends \yii\db\ActiveRecord {
             'payment_amount_charged' => Yii::t('app', 'Amount Charged'),
             'payment_net_amount' => Yii::t('app', 'Net Amount'),
             'payment_gateway_fee' => Yii::t('app', 'Gateway Fee'),
+            'plugn_fee' => Yii::t('app', 'Plugn Fee'),
             'payment_token' => Yii::t('app', 'Payment Token'),
             'payment_udf1' => Yii::t('app', 'Udf1'),
             'payment_udf2' => Yii::t('app', 'Udf2'),
@@ -141,6 +143,7 @@ class Payment extends \yii\db\ActiveRecord {
 
         // If there's an error from TAP, exit and display error
         if (isset($responseContent->errors)) {
+
             $errorMessage = "Error from TAP: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
             \Yii::error($errorMessage, __METHOD__); // Log error faced by user
             \Yii::$app->getSession()->setFlash('error', $errorMessage);
@@ -178,6 +181,12 @@ class Payment extends \yii\db\ActiveRecord {
             }
 
 
+            if(isset($responseContent->destinations))
+                $paymentRecord->plugn_fee = $responseContent->destinations->amount;
+            else
+                $paymentRecord->plugn_fee = 0;
+
+
             // Update payment method used and the order id assigned to it
             if( isset($responseContent->source->payment_method) && $responseContent->source->payment_method )
               $paymentRecord->payment_mode = $responseContent->source->payment_method;
@@ -212,8 +221,10 @@ class Payment extends \yii\db\ActiveRecord {
         parent::afterSave($insert, $changedAttributes);
 
         if ($this->payment_current_status == 'CAPTURED' && $this->received_callback){
+
           $this->order->changeOrderStatusToPending();
           $this->order->sendPaymentConfirmationEmail();
+
         }
     }
 

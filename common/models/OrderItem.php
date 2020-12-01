@@ -79,7 +79,11 @@ class OrderItem extends \yii\db\ActiveRecord {
      */
     public function calculateOrderItemPrice() {
 
-        $totalPrice = $this->item->item_price; //5
+        if($this->item)
+          $totalPrice = $this->item->item_price; //5
+        else
+          $totalPrice = $this->item_price; //5
+
 
 
         foreach ($this->getOrderItemExtraOptions()->asArray()->all() as $extraOption)

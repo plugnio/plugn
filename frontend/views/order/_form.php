@@ -16,6 +16,14 @@ use borales\extensions\phoneInput\PhoneInput;
 
 $js = "
 
+
+
+
+    $('#order-estimated_time_of_arrival').attr('autocomplete','off');
+    $('#order-estimated_time_of_arrival').attr('style', '  padding-right: 2rem !important; padding-left: 3rem !important; ');
+
+
+
     let orderModeInput = $('#orderModeInput');
     // On Change of project type input
 
@@ -123,6 +131,32 @@ $this->registerJs($js);
         ?>
 
         <?= $form->field($model, 'special_directions')->textInput(['maxlength' => true]) ?>
+
+
+        <?=
+          $form->field($model, 'estimated_time_of_arrival', [
+              'labelOptions' => ['class' => 'control-label'],
+              'template' => '
+              {label}
+           <div class="position-relative has-icon-left">
+
+                {input}
+
+             <div class="form-control-position">
+              <i class="feather icon-calendar"></i>
+            </div>
+          </div>'
+          ])->widget(DateRangePicker::classname(), [
+              'presetDropdown' => false,
+              'convertFormat' => true,
+              'pluginOptions' => [
+                'locale'=>['format' => 'Y-m-d H:i'],
+                'timePicker'=>true,
+                'singleDatePicker'=>true,
+              ],
+          ]);
+        ?>
+
 
 
         <div class="form-group" style="background: #f4f6f9;  margin-bottom: 0px; padding-bottom: 0px; background:#f4f6f9 ">
