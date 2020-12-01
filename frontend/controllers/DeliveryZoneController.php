@@ -81,7 +81,7 @@ class DeliveryZoneController extends Controller {
                       'searchModel' => $searchModel,
                       'dataProvider' => $dataProvider,
                       'business_location_model' => $business_location_model,
-                      'restaurantUuid' => $restaurantUuid
+                      'store_model' => $store_model
           ]);
       }
     }

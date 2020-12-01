@@ -10,7 +10,7 @@ use yii\grid\GridView;
 
 $this->title = 'Delivery Zones for ' . $business_location_model->business_location_name . ' | ' . $business_location_model->country->country_name;
 $this->params['breadcrumbs'][] = $this->title;
-$this->params['restaurant_uuid'] = $restaurantUuid;
+$this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
 
 ?>
 
@@ -18,60 +18,94 @@ $this->params['restaurant_uuid'] = $restaurantUuid;
     <section id="data-list-view" class="data-list-view-header">
 
 
+            <?php if (Yii::$app->session->getFlash('errorResponse') != null) { ?>
 
-      <?php if (Yii::$app->session->getFlash('errorResponse') != null) { ?>
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h5><i class="icon fa fa-ban"></i> Warning!</h5>
+                    <?= (Yii::$app->session->getFlash('errorResponse')) ?>
+                </div>
+            <?php }  ?>
 
-          <div class="alert alert-danger alert-dismissible">
-              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-              <h5><i class="icon fa fa-ban"></i> Warning!</h5>
-              <?= (Yii::$app->session->getFlash('errorResponse')) ?>
+
+
+
+
+      <?php
+
+        foreach ($store_model->getShippingCountries()->all()  as $country) {
+
+          $deliveryZones = new \yii\data\ActiveDataProvider([
+              'query' => $store_model->getDeliveryZonesForSpecificCountry($country->country_id),
+              'pagination' => false
+          ]);
+
+
+
+
+      ?>
+
+
+
+
+
+      <div class="card">
+
+        <div class="card-header">
+
+            <h1>
+              <?= $country->country_name ?>
+            </h1>
+
+              <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $store_model->restaurant_uuid, 'businessLocationId' => $business_location_model->business_location_id], ['class' => 'btn btn-outline-primary']) ?>
+
+
+
+        </div>
+
+
+        <div class="card-body">
+
+          <div class="card-content">
+
+
+                  <?=
+                  GridView::widget([
+                      'dataProvider' =>  $deliveryZones,
+                      // 'rowOptions' => function($model) {
+                      //     $url = Url::to(['update', 'id' => $model->delivery_zone_id, 'restaurantUuid' => $model->restaurant->restaurant_uuid]);
+                      //
+                      //     return [
+                      //         'onclick' => "window.location.href='{$url}'"
+                      //     ];
+                      // },
+                      'columns' => [
+                        ['class' => 'yii\grid\SerialColumn'],
+
+                        'delivery_time',
+                        'delivery_fee',
+                        'min_charge'
+                      ],
+
+                      'layout' => '{summary}<div class="card-body"><div class="box-body table-responsive no-padding">{items}{pager}</div></div>',
+                      'tableOptions' => ['class' => 'table'],
+                  ]);
+                  ?>
+
           </div>
-      <?php }  ?>
+
+
+        </div>
 
 
 
-
-
-      <!-- Data list view starts -->
-      <div class="action-btns d-none">
-          <div class="btn-dropdown mr-1 mb-1">
-              <div class="btn-group dropdown actions-dropodown">
-                <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurantUuid, 'businessLocationId' => $business_location_model->business_location_id], ['class' => 'btn btn-outline-primary']) ?>
-              </div>
-          </div>
       </div>
 
+      <?php
 
+          }
 
-
-         <?php if($dataProvider->getCount() == 0 ){  ?>
-           <div style="padding-left:14px">
-           <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-outline-primary','style'=>'    padding: 0.85rem 1.7rem;']) ?>
-         </div>
-         <?php } ?>
-
-        <?=
-        GridView::widget([
-            'dataProvider' => $dataProvider,
-            'rowOptions' => function($model) {
-                $url = Url::to(['update', 'id' => $model->delivery_zone_id, 'restaurantUuid' => $model->restaurant->restaurant_uuid]);
-
-                return [
-                    'onclick' => "window.location.href='{$url}'"
-                ];
-            },
-            'columns' => [
-              ['class' => 'yii\grid\SerialColumn'],
-
-              'delivery_time',
-              'delivery_fee',
-              'min_charge'
-            ],
-
-            'layout' => '{summary}<div class="card-body"><div class="box-body table-responsive no-padding">{items}{pager}</div></div>',
-            'tableOptions' => ['class' => 'table data-list-view'],
-        ]);
-        ?>
+      ?>
 
 
     </section>
