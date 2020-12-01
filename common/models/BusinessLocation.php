@@ -78,17 +78,20 @@ class BusinessLocation extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-
-    /**
-     * Gets query for [[DeliveryZones]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
+    //
+    // /**
+    //  * Gets query for [[DeliveryZones]].
+    //  *
+    //  * @return \yii\db\ActiveQuery
+    //  */
+    // public function getDeliveryZones()
+    // {
+    //     return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])->joinWith(['areas']);
+    // }
     public function getDeliveryZones()
     {
-        return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])->joinWith(['areas']);
+        return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id']);
     }
-
      /**
      * Gets query for [[AreaDeliveryZones]].
      *

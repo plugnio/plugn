@@ -8,7 +8,7 @@ use yii\grid\GridView;
 /* @var $searchModel frontend\models\DeliveryZoneSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Delivery Zones';
+$this->title = 'Delivery Zones for ' . $business_location_model->business_location_name . ' | ' . $business_location_model->country->country_name;
 $this->params['breadcrumbs'][] = $this->title;
 $this->params['restaurant_uuid'] = $restaurantUuid;
 
@@ -36,7 +36,7 @@ $this->params['restaurant_uuid'] = $restaurantUuid;
       <div class="action-btns d-none">
           <div class="btn-dropdown mr-1 mb-1">
               <div class="btn-group dropdown actions-dropodown">
-                <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-outline-primary']) ?>
+                <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurantUuid, 'businessLocationId' => $business_location_model->business_location_id], ['class' => 'btn btn-outline-primary']) ?>
               </div>
           </div>
       </div>
@@ -63,7 +63,6 @@ $this->params['restaurant_uuid'] = $restaurantUuid;
             'columns' => [
               ['class' => 'yii\grid\SerialColumn'],
 
-              'businessLocation.business_location_name',
               'delivery_time',
               'delivery_fee',
               'min_charge'

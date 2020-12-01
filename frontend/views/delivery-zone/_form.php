@@ -61,14 +61,19 @@ $this->registerJs($js);
 
 ?>
 
-<?= Html::a('Delete', ['delete', 'id' => $model->delivery_zone_id, 'restaurantUuid' => $restaurantUuid], [
-    'class' => 'btn btn-danger',
-    'style' => 'margin-bottom:15px',
-    'data' => [
-        'confirm' => 'Are you sure you want to delete this zone?',
-        'method' => 'post',
-    ],
-]) ?>
+    <?php
+      if($model->delivery_zone_id){
+          echo         Html::a('Delete', ['delete', 'id' => $model->delivery_zone_id, 'restaurantUuid' => $restaurantUuid], [
+                      'class' => 'btn btn-danger',
+                      'style' => 'margin-bottom:15px',
+                      'data' => [
+                          'confirm' => 'Are you sure you want to delete this zone?',
+                          'method' => 'post',
+                      ],
+                  ]);
+      }
+
+    ?>
 
 <div class="card">
     <div class="card-body delivery-zone-form">
@@ -78,25 +83,12 @@ $this->registerJs($js);
             $areaArray[] = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
 
 
-            $businessLocationQuery = BusinessLocation::find()->where(['restaurant_uuid' => $restaurantUuid])->asArray()->all();
-            $businessLocationArray = ArrayHelper::map($businessLocationQuery, 'business_location_id', 'business_location_name');
-
-
             $countryQuery = Country::find()->asArray()->all();
             $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
 
 
             $form = ActiveForm::begin();
         ?>
-
-        <?=
-        $form->field($model, 'business_location_id')->dropDownList($businessLocationArray, [
-            'class' => 'form-control select2',
-            'multiple' => false,
-            'id' => 'business-location-id',
-        ]);
-        ?>
-
 
         <?=
           $form->field($model, 'country_id')->dropDownList($countryArray, [

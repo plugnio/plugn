@@ -69,16 +69,21 @@ class DeliveryZoneController extends Controller {
      * @return mixed
      */
     public function actionIndex($restaurantUuid, $businessLocationId) {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
-        $searchModel = new DeliveryZoneSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid, $businessLocationId);
+        $store_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
-        return $this->render('index', [
-                    'searchModel' => $searchModel,
-                    'dataProvider' => $dataProvider,
-                    'restaurantUuid' => $restaurantUuid
-        ]);
+        if($business_location_model = BusinessLocation::find()->where(['restaurant_uuid' => $store_model->restaurant_uuid, 'business_location_id' => $businessLocationId])->one()) {
+
+          $searchModel = new DeliveryZoneSearch();
+          $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $store_model->restaurant_uuid, $businessLocationId);
+
+          return $this->render('index', [
+                      'searchModel' => $searchModel,
+                      'dataProvider' => $dataProvider,
+                      'business_location_model' => $business_location_model,
+                      'restaurantUuid' => $restaurantUuid
+          ]);
+      }
     }
 
     /**
@@ -86,15 +91,17 @@ class DeliveryZoneController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($restaurantUuid) {
+    public function actionCreate($restaurantUuid, $businessLocationId) {
         $store_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
 
+        if(BusinessLocation::find()->where(['restaurant_uuid' => $store_model->restaurant_uuid, 'business_location_id' => $businessLocationId])->exists()) {
+
         $model = new DeliveryZone();
+        $model->business_location_id = $businessLocationId;
 
         if ($model->load(Yii::$app->request->post())) {
 
           $storeDeliveryZones = $store_model->getDeliveryZonesForSpecificCountry($model->country_id);
-
 
           if($storeDeliveryZones->exists() && $store_model->getAreaDeliveryZonesForSpecificCountry($model->country_id)->count() == 0){
             Yii::$app->session->setFlash('errorResponse', "Cant add another zone1");
@@ -153,6 +160,9 @@ class DeliveryZoneController extends Controller {
                     'model' => $model,
                     'restaurantUuid' => $restaurantUuid
         ]);
+
+      }
+
     }
 
     /**

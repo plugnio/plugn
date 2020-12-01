@@ -33,6 +33,11 @@ $this->registerJs($js);
       <?php
 
         foreach ($businessLocations as $key => $businessLocation) {
+
+          $numberOfAreasStoreDeliveringTo = $businessLocation->getAreaDeliveryZones()->where(['not', ['area_id' => null]])->count();
+          $numberOfCoutnriesStoreDeliveringTo = $businessLocation->getAreaDeliveryZones()->where(['area_id' => null])->count();
+
+
       ?>
       <div class="card mt-2">
 
@@ -57,7 +62,22 @@ $this->registerJs($js);
                 . Html::a('Setup Delivery Zones', ['delivery-zone/create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success'])
                 . '</div></div>';
               } else {
+
+                $numberOfAreasDeliveringToText = '';
+                $numberOfCoutnriesDeliveringToText = '';
+
+                // if($numberOfAreasStoreDeliveringTo)
+
+                // if($numberOfCoutnriesDeliveringToText)
+                  $numberOfCoutnriesDeliveringToText =  $numberOfCoutnriesStoreDeliveringTo . $numberOfCoutnriesStoreDeliveringTo == 1 ? 'Delivering to '. $numberOfCoutnriesStoreDeliveringTo .' country' : 'Delivering to '. $numberOfCoutnriesStoreDeliveringTo .' countries';
+
+
+                  $numberOfAreasDeliveringToText = 'and '. $numberOfAreasStoreDeliveringTo . ' areas';
+
+
+
                 echo'<div class="card"><div style="padding: 70px 0; text-align: center;">'
+                . '     <h4>'. $numberOfCoutnriesDeliveringToText  . ' ' . $numberOfAreasDeliveringToText .'</h4>'
                 .  Html::a('Manage Delivery Zones', ['delivery-zone/index', 'restaurantUuid' => $restaurantUuid, 'businessLocationId' => $businessLocation->business_location_id], ['class' => 'btn btn-success'])
                 . '</div></div>';
               }

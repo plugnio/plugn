@@ -49,6 +49,7 @@ class BusinessLocationController extends Controller
 
         $businessLocations = BusinessLocation::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->all();
 
+        
         return $this->render('index', [
             'businessLocations' => $businessLocations,
             'restaurantUuid' => $restaurantUuid
