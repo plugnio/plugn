@@ -529,7 +529,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
             $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
         } else {
-            Yii::error('Error while create Business  ' . json_encode($businessApiResponse->data));
+            Yii::error('Error while create Business [ ' . $this->name . '] ' . json_encode($businessApiResponse->data));
             return false;
         }
 
@@ -540,7 +540,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             $this->merchant_id = $merchantApiResponse->data['id'];
             $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
         } else {
-            Yii::error('Error while create Merchant  ' . json_encode($merchantApiResponse->data));
+            Yii::error('Error while create Merchant [ ' . $this->name . '] ' . json_encode($merchantApiResponse->data));
             return false;
         }
 
@@ -561,7 +561,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             $this->save();
             return true;
         } else {
-          Yii::error('Error while create Operator  ' . json_encode($operatorApiResponse->data));
+          Yii::error('Error while create Operator  [ ' . $this->name . '] ' . json_encode($operatorApiResponse->data));
           return false;
         }
     }
