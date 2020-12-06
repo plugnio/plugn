@@ -47,7 +47,7 @@ class TapQueueController extends Controller
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => TapQueue::find(),
+            'query' => TapQueue::find()->orderBy(['queue_status' => SORT_ASC]),
         ]);
 
         return $this->render('index', [

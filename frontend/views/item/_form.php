@@ -127,20 +127,20 @@ $this->registerJs($js);
                 'class' => 'select2',
                 'multiple' => 'multiple',
                 'value' => $itemCategoryValues
-            ]);
+            ])->label('Category *');
             ?>
             <div class="row">
                 <div class="col-12 col-sm-6 col-lg-6">
-                    <?= $form->field($modelItem, 'item_name')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger, Short sleeve t-shirt', 'autocomplete' => 'off']) ?>
+                    <?= $form->field($modelItem, 'item_name')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger, Short sleeve t-shirt', 'autocomplete' => 'off'])->label('Item name in English *') ?>
                 </div>
                 <div class="col-12 col-sm-6 col-lg-6">
-                    <?= $form->field($modelItem, 'item_name_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger', 'autocomplete' => 'off']) ?>
+                    <?= $form->field($modelItem, 'item_name_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger', 'autocomplete' => 'off'])->label('Item name in Arabic *') ?>
                 </div>
             </div>
 
-            <?= $form->field($modelItem, 'item_description')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL']) ?>
+            <?= $form->field($modelItem, 'item_description')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL'])->label('Item description in English *') ?>
 
-            <?= $form->field($modelItem, 'item_description_ar')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL']) ?>
+            <?= $form->field($modelItem, 'item_description_ar')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL'])->label('Item description in Arabic *')  ?>
 
 
 
