@@ -146,7 +146,7 @@ class Restaurant extends \yii\db\ActiveRecord {
                     'authorized_signature_file', 'authorized_signature_file_purpose', 'authorized_signature_title',
                     'commercial_license_issuing_country', 'commercial_license_issuing_date', 'commercial_license_expiry_date',
                     'commercial_license_file', 'commercial_license_file_purpose', 'commercial_license_title',
-                    'iban', 'owner_first_name', 'owner_last_name',
+                     'owner_first_name', 'owner_last_name',
                     'owner_email',
                     'identification_issuing_country', 'identification_issuing_date', 'identification_title',
                     'identification_expiry_date', 'identification_file_back_side', 'identification_file_front_side', 'identification_file_purpose',
@@ -155,6 +155,9 @@ class Restaurant extends \yii\db\ActiveRecord {
                 ],
                 'string', 'max' => 255
             ],
+            ['iban', 'string', 'min'=>10, 'max'=>10 , 'message' => 'The IBAN must be at least 10 characters long.'],
+
+            ['iban', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/', 'message' => 'Please check the IBAN, we might not support transfering to this bank.'],
             [['restaurant_commercial_license_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
             [['restaurant_authorized_signature_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
             [['name', 'name_ar', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_domain', 'restaurant_email', 'store_branch_name', 'app_id'], 'required', 'on' => 'create'],
