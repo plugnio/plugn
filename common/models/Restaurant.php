@@ -46,7 +46,6 @@ use borales\extensions\phoneInput\PhoneInputValidator;
   * @property string|null $vendor_sector
   * @property string|null $license_number
   * @property int $not_for_profit
-  * @property string $authorized_signature_issuing_country
   * @property string|null $authorized_signature_issuing_date
   * @property string|null $authorized_signature_expiry_date
   * @property string|null $authorized_signature_title
@@ -59,7 +58,6 @@ use borales\extensions\phoneInput\PhoneInputValidator;
   * @property string|null $owner_email
   * @property string|null $owner_number
   * @property string|null $owner_phone_country_code
-  * @property string $identification_issuing_country
   * @property string|null $identification_issuing_date
   * @property string|null $identification_expiry_date
   * @property string|null $identification_file_front_side
@@ -73,7 +71,6 @@ use borales\extensions\phoneInput\PhoneInputValidator;
   * @property string|null $store_branch_name
   * @property string|null $custom_css
   * @property int|null $store_layout
-  * @property string $commercial_license_issuing_country
   * @property string|null $commercial_license_issuing_date
   * @property string|null $commercial_license_expiry_date
   * @property string|null $commercial_license_title
@@ -199,13 +196,13 @@ class Restaurant extends \yii\db\ActiveRecord {
             [
                 [
                     'business_type', 'vendor_sector', 'license_number',
-                    'authorized_signature_issuing_country', 'authorized_signature_issuing_date', 'authorized_signature_expiry_date',
+                    'authorized_signature_issuing_date', 'authorized_signature_expiry_date',
                     'authorized_signature_file', 'authorized_signature_file_purpose', 'authorized_signature_title',
-                    'commercial_license_issuing_country', 'commercial_license_issuing_date', 'commercial_license_expiry_date',
+                    'commercial_license_issuing_date', 'commercial_license_expiry_date',
                     'commercial_license_file', 'commercial_license_file_purpose', 'commercial_license_title',
                     'iban', 'owner_first_name', 'owner_last_name',
                     'owner_email',
-                    'identification_issuing_country', 'identification_issuing_date', 'identification_title',
+                    'identification_issuing_date', 'identification_title',
                     'identification_expiry_date', 'identification_file_back_side', 'identification_file_front_side', 'identification_file_purpose',
                     'business_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
                     'live_api_key', 'test_api_key', 'developer_id', 'live_public_key', 'test_public_key'
@@ -307,14 +304,12 @@ class Restaurant extends \yii\db\ActiveRecord {
             'owner_identification_file_back_side' => 'Civil ID Back side',
 
 
-            'authorized_signature_issuing_country' => 'Authorized Signature Issuing Country',
             'authorized_signature_issuing_date' => 'Authorized Signature Issuing Date',
             'authorized_signature_expiry_date' => 'Authorized Signature Expiry Date',
             'authorized_signature_file' => 'Authorized signature',
             'restaurant_authorized_signature_file' => 'Authorized Signature',
             'authorized_signature_title' => 'Authorized Signature Title',
             'authorized_signature_file_purpose' => 'Authorized Signature File Purpose',
-            'commercial_license_issuing_country' => 'Commercial License Issuing Country',
             'commercial_license_issuing_date' => 'Commercial License Issuing Date',
             'commercial_license_expiry_date' => 'Commercial License Expiry Date',
             'commercial_license_file' => 'Commercial License File',
@@ -326,7 +321,6 @@ class Restaurant extends \yii\db\ActiveRecord {
             'owner_last_name' => 'Last Name',
             'owner_email' => 'Email Address',
             'owner_number' => 'Owner Phone Number',
-            'identification_issuing_country' => 'Identification Issuing Country',
             'identification_issuing_date' => 'Identification Issuing Date',
             'identification_expiry_date' => 'Identification Expiry Date',
             'identification_file_front_side' => ' National ID File front side',
@@ -367,17 +361,17 @@ class Restaurant extends \yii\db\ActiveRecord {
             ],
             [
              'class' => \borales\extensions\phoneInput\PhoneInputBehavior::className(),
-             'attributes' => [
-                       ActiveRecord::EVENT_BEFORE_INSERT => ['owner_phone_country_code', 'owner_number'],
-                   ],
+             // 'attributes' => [
+             //           ActiveRecord::EVENT_BEFORE_INSERT => ['owner_phone_country_code', 'owner_number'],
+             //       ],
              'countryCodeAttribute' => 'owner_phone_country_code',
              'phoneAttribute' => 'owner_number',
             ],
             [
              'class' => \borales\extensions\phoneInput\PhoneInputBehavior::className(),
-             'attributes' => [
-                       ActiveRecord::EVENT_BEFORE_INSERT => ['phone_number_country_code', 'phone_number'],
-                   ],
+             // 'attributes' => [
+             //           ActiveRecord::EVENT_BEFORE_INSERT => ['phone_number_country_code', 'phone_number'],
+             //       ],
              'countryCodeAttribute' => 'phone_number_country_code',
              'phoneAttribute' => 'phone_number',
             ],
@@ -435,7 +429,7 @@ class Restaurant extends \yii\db\ActiveRecord {
 
 
         //Upload Authorized Signature file
-        if ($this->authorized_signature_file && $this->authorized_signature_issuing_country && $this->authorized_signature_file_purpose && $this->authorized_signature_title) {
+        if ($this->authorized_signature_file  && $this->authorized_signature_file_purpose && $this->authorized_signature_title) {
 
           $tmpFile = sys_get_temp_dir() . '/' . $this->authorized_signature_file;
 
@@ -455,7 +449,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         }
 
         //Upload commercial_license file
-        if ($this->commercial_license_file && $this->commercial_license_issuing_country && $this->commercial_license_file_purpose && $this->commercial_license_title) {
+        if ($this->commercial_license_file  && $this->commercial_license_file_purpose && $this->commercial_license_title) {
 
           $commercialLicenseTmpFile = sys_get_temp_dir() . '/' . $this->commercial_license_file;
 
@@ -804,7 +798,6 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset($fields['restaurant_email']);
         unset($fields['license_number']);
         unset($fields['not_for_profit']);
-        unset($fields['authorized_signature_issuing_country']);
         unset($fields['authorized_signature_issuing_date']);
         unset($fields['authorized_signature_issuing_date']);
         unset($fields['authorized_signature_expiry_date']);
@@ -812,7 +805,6 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset($fields['authorized_signature_file']);
         unset($fields['authorized_signature_file_id']);
         unset($fields['authorized_signature_file_purpose']);
-        unset($fields['commercial_license_issuing_country']);
         unset($fields['commercial_license_issuing_date']);
         unset($fields['commercial_license_issuing_date']);
         unset($fields['commercial_license_expiry_date']);
@@ -830,7 +822,6 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset($fields['is_tap_enable']);
         unset($fields['company_name']);
         unset($fields['owner_phone_country_code']);
-        unset($fields['identification_issuing_country']);
         unset($fields['identification_issuing_date']);
         unset($fields['identification_expiry_date']);
         unset($fields['identification_file_front_side']);

@@ -41,8 +41,6 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
           ]);
 
 
-
-
       ?>
 
 
@@ -57,9 +55,7 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
               <?= $country->country_name ?>
             </h1>
 
-              <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $store_model->restaurant_uuid, 'businessLocationId' => $business_location_model->business_location_id], ['class' => 'btn btn-outline-primary']) ?>
-
-
+              <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $store_model->restaurant_uuid, 'businessLocationId' => $business_location_model->business_location_id, 'countryId' => $country->country_id], ['class' => 'btn btn-outline-primary']) ?>
 
         </div>
 

@@ -35,6 +35,26 @@ class TapPayments extends Component
     const GATEWAY_VISA_MASTERCARD = "src_card";
 
     /**
+     * @var string Generated link sends user directly to VISA/MASTER portal
+     */
+    const GATEWAY_MADA = "src_sa.mada";
+
+    /**
+     * @var string Generated link sends user directly to VISA/MASTER portal
+     */
+    const GATEWAY_BENEFIT = "src_bh.benefit";
+
+    /**
+     * @var float gateway fee charged by portal
+     */
+    public $madaGatewayFee = 0.015; // How much is charged per Mada transaction
+
+    /**
+     * @var float gateway fee charged by portal
+     */
+    public $benefitGatewayFee = 0.015; // How much is charged per BENEFIT transaction
+
+    /**
      * @var float gateway fee charged by portal
      */
     public $knetGatewayFee = 0.01; // How much is charged per KNET transaction
@@ -58,6 +78,16 @@ class TapPayments extends Component
      * @var float gateway fee charged by portal
      */
     public $minCreditcardGatewayFee = 0; // How much is charged per Creditcard transaction
+
+    /**
+     * @var float gateway fee charged by portal
+     */
+    public $minMadaGatewayFee = 0; // How much is charged per Creditcard transaction
+
+    /**
+     * @var float gateway fee charged by portal
+     */
+    public $minBenefitGatewayFee = 0; // How much is charged per Creditcard transaction
 
     /**
      * @var string destination id
@@ -443,7 +473,6 @@ class TapPayments extends Component
         if($platform_fee > 0){
           if($gateway == static::GATEWAY_KNET){
 
-
             //if greater than 10KD
           if (($amount * $this->knetGatewayFee) >= $this->minKnetGatewayFee) {
               $platform_fee = $amount *  ( $platform_fee  - $this->knetGatewayFee );
@@ -456,7 +485,17 @@ class TapPayments extends Component
               $platform_fee = 0.100;
             }
 
-          } else {
+          }
+
+          else if($gateway == static::GATEWAY_MADA){
+              $platform_fee = $amount *  ( $platform_fee  - $this->madaGatewayFee );
+          }
+
+          else if($gateway == static::GATEWAY_BENEFIT){
+              $platform_fee = $amount *  ( $platform_fee  - $this->benefitGatewayFee );
+          }
+
+          else { //Credit card
             $platform_fee = $amount *  ($platform_fee  - $this->creditcardGatewayFeePercentage);
           }
 
@@ -464,7 +503,7 @@ class TapPayments extends Component
           $destination = [
               "id" => $this->destinationId,
               "amount" => $platform_fee,
-              "currency" => "KWD",
+              "currency" => $currency,
           ];
 
 

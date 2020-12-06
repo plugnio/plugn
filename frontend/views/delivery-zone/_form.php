@@ -82,22 +82,8 @@ $this->registerJs($js);
             $areaQuery = $model->getAreas()->all();
             $areaArray[] = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
 
-
-            $countryQuery = Country::find()->asArray()->all();
-            $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
-
-
             $form = ActiveForm::begin();
         ?>
-
-        <?=
-          $form->field($model, 'country_id')->dropDownList($countryArray, [
-              'class' => 'form-control select2',
-              'multiple' => false,
-              'id' => 'country-id',
-          ]);
-        ?>
-
 
         <?= $form->field($model, 'delivery_time')->textInput() ?>
 

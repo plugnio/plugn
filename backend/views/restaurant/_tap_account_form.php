@@ -61,8 +61,6 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'license_number')->textInput() ?>
 
-    <!-- Authorized Signature  -->
-    <?= $form->field($model, 'authorized_signature_issuing_country')->textInput(['value' => "KW"]) ?>
 
     <?=
     $form->field($model, 'authorized_signature_issuing_date')->widget(DatePicker::classname(), [
@@ -94,8 +92,6 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'authorized_signature_file_purpose')->textInput(['value' => 'customer_signature']) ?>
 
-    <!-- Commercial License  -->
-    <?= $form->field($model, 'commercial_license_issuing_country')->textInput(['value' => "KW"]) ?>
 
     <?=
     $form->field($model, 'commercial_license_issuing_date')->widget(DatePicker::classname(), [
@@ -128,8 +124,6 @@ $this->registerJs($js);
     <?= $form->field($model, 'commercial_license_file_purpose')->textInput(['value' => 'customer_signature']) ?>
 
     <?= $form->field($model, 'iban')->textInput() ?>
-
-    <?= $form->field($model, 'identification_issuing_country')->textInput(['value' => "KW"]) ?>
 
     <?=
     $form->field($model, 'identification_issuing_date')->widget(DatePicker::classname(), [

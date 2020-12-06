@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use Yii;
 use common\models\DeliveryZone;
 use common\models\Restaurant;
+use common\models\Country;
 use common\models\BusinessLocation;
 use common\models\Area;
 use common\models\City;
@@ -91,13 +92,16 @@ class DeliveryZoneController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($restaurantUuid, $businessLocationId) {
+    public function actionCreate($restaurantUuid, $businessLocationId, $countryId) {
         $store_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $country_model = Country::findOne($countryId);
 
-        if(BusinessLocation::find()->where(['restaurant_uuid' => $store_model->restaurant_uuid, 'business_location_id' => $businessLocationId])->exists()) {
+        if($country_model && $business_location_model = BusinessLocation::find()->where(['restaurant_uuid' => $store_model->restaurant_uuid, 'business_location_id' => $businessLocationId])->one()) {
+
 
         $model = new DeliveryZone();
-        $model->business_location_id = $businessLocationId;
+        $model->business_location_id = $business_location_model->business_location_id;
+        $model->country_id = $country_model->country_id;
 
         if ($model->load(Yii::$app->request->post())) {
 

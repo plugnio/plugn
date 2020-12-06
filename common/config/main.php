@@ -12,7 +12,6 @@ return [
             'class' => 'yii\caching\FileCache',
         ],
         'formatter' => [
-            // 'currencyCode' => 'KWD',
         'thousandSeparator' => ',',
         'decimalSeparator' => '.',
             'defaultTimeZone' => 'Asia/Kuwait',

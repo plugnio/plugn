@@ -172,12 +172,30 @@ class Payment extends \yii\db\ActiveRecord {
             }
 
             // Creditcard Gateway Fee Calculation
-            if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_VISA_MASTERCARD) {
+            else if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_VISA_MASTERCARD) {
 
                 if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage) > Yii::$app->tapPayments->minCreditcardGatewayFee)
                     $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage;
                 else
                     $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minCreditcardGatewayFee;
+            }
+
+            // Mada Gateway Fee Calculation
+            else if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_MADA) {
+
+                if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->madaGatewayFee) > Yii::$app->tapPayments->minMadaGatewayFee)
+                    $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->madaGatewayFee;
+                else
+                    $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->madaGatewayFee;
+            }
+
+            // BENEFIT Gateway Fee Calculation
+            else if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_BENEFIT) {
+
+                if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->benefitGatewayFe) > Yii::$app->tapPayments->minBenefitGatewayFee)
+                    $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->benefitGatewayFe;
+                else
+                    $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->benefitGatewayFe;
             }
 
 

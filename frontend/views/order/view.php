@@ -96,7 +96,7 @@ $this->registerJs($js);
         $difference = round(abs($deliveryTime - $currentTime) / 3600, 2);
 
 
-        if ($model->order_mode == Order::ORDER_MODE_DELIVERY) {
+        if ($model->order_mode == Order::ORDER_MODE_DELIVERY && ( ($model->area_id && $model->area->country->country_name == 'Kuwait') || ($model->shipping_country_id && $model->country->country_name == 'Kuwait'))) {
 
 
 

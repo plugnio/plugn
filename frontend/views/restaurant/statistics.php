@@ -80,7 +80,7 @@ $currencyCode = $model->currency->code;
             tooltip: {
                 y: {
                   formatter: function (val) {
-                    return val + ' ' + currency_code ;
+                    return  currency_code +  ' ' + val  ;
                   }
                 }
           }

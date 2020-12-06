@@ -273,6 +273,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                     </li>
 
 
+                    <?php if($restaurant_model->country->country_name == 'Kuwait') { ?>
 
                     <li class=" nav-item">
                         <a>
@@ -288,6 +289,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 )
                                 ?>
                             </li>
+
                             <li  <?= $this->context->route == 'bank-discount/index' ? 'class="active"' : '' ?>>
                                 <?=
                                 Html::a(
@@ -296,8 +298,20 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 )
                                 ?>
                             </li>
+
                         </ul>
                     </li>
+                  <?php } else { ?>
+                    <li  <?= $this->context->route == 'voucher/index' ? 'class="active"' : '' ?>>
+                        <?=
+                        Html::a(
+                                Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                Html::tag('span', 'Voucher'), ['voucher/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                        )
+                        ?>
+                    </li>
+                  <?php } ?>
+
 
                     <li class=" nav-item <?= $this->context->route == 'customer/index' ? 'active' : '' ?> ">
 
@@ -414,6 +428,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                             )
                                             ?>
                                         </li>
+                                        <?php if($restaurant_model->country->country_name == 'Kuwait') { ?>
                                         <li  <?= $this->context->route == 'restaurant/update-delivery-integration' ? 'class="active"' : '' ?>>
                                             <?=
                                             Html::a(
@@ -422,6 +437,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                             )
                                             ?>
                                         </li>
+                                      <?php } ?>
                                     </ul>
                                 </li>
 
@@ -432,14 +448,6 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
                                         Html::tag('span', 'Opening Hours'), ['opening-hour/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
-                                )
-                                ?>
-                            </li>
-                            <li class=" nav-item <?= $this->context->route == 'restaurant-delivery/index' ? 'active' : '' ?> ">
-                                <?=
-                                Html::a(
-                                        Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'Delivery Zone'), ['restaurant-delivery/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                                 )
                                 ?>
                             </li>

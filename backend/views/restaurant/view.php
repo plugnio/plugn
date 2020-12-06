@@ -170,7 +170,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'commercial_license_file_id',
             'identification_file_id_front_side',
             'identification_file_id_back_side',
-            'identification_issuing_country',
             'identification_title',
             'commercial_license_title',
             'authorized_signature_title',

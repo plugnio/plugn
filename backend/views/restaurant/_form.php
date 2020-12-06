@@ -181,7 +181,13 @@ use borales\extensions\phoneInput\PhoneInput;
         );
         ?>
 
-    <?= $form->field($model, 'phone_number')->textInput(['maxlength' => true]) ?>
+    <?=
+       $form->field($model, 'phone_number')->widget(PhoneInput::className(), [
+          'jsOptions' => [
+              'preferredCountries' => ['kw', 'sa', 'aed','qa','bh','om'],
+          ]
+      ]);
+    ?>
 
     <?= $form->field($model, 'restaurant_email')->input('email') ?>
 
@@ -192,7 +198,14 @@ use borales\extensions\phoneInput\PhoneInput;
 
     <?= $form->field($model, 'owner_email')->input('email') ?>
 
-    <?= $form->field($model, 'owner_number')->textInput() ?>
+
+    <?=
+       $form->field($model, 'owner_number')->widget(PhoneInput::className(), [
+          'jsOptions' => [
+              'preferredCountries' => ['kw', 'sa', 'aed','qa','bh','om'],
+          ]
+      ]);
+    ?>
 
     <?= $form->field($model, 'store_branch_name')->textInput() ?>
 

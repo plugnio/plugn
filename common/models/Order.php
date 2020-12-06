@@ -271,9 +271,9 @@ class Order extends \yii\db\ActiveRecord {
             [
 
              'class' => \borales\extensions\phoneInput\PhoneInputBehavior::className(),
-             'attributes' => [
-                       ActiveRecord::EVENT_BEFORE_INSERT => ['customer_phone_number', 'customer_phone_country_code'],
-                   ],
+             // 'attributes' => [
+             //           ActiveRecord::EVENT_BEFORE_INSERT => ['customer_phone_number', 'customer_phone_country_code'],
+             //       ],
              'countryCodeAttribute' => 'customer_phone_country_code',
              'phoneAttribute' => 'customer_phone_number',
             ],
