@@ -91,6 +91,8 @@ $this->registerJs($js);
 
         <?= $form->field($model, 'min_charge')->textInput() ?>
 
+        <?= $form->field($model, 'delivery_zone_tax')->textInput(['type' => 'number', 'value' => 0]) ?>
+
 
         <div id="cities"></div>
 

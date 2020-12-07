@@ -14,6 +14,7 @@ use Yii;
  * @property int|null $delivery_time
  * @property float|null $delivery_fee
  * @property float|null $min_charge
+ * @property float|null $delivery_zone_tax
  *
  * @property AreaDeliveryZone[] $areaDeliveryZones
  * @property Area[] $areas
@@ -24,6 +25,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
 {
 
     public $selectedAreas;
+    public $time_unit;
 
     /**
      * {@inheritdoc}
@@ -39,8 +41,9 @@ class DeliveryZone extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['country_id','business_location_id'], 'required'],
+              [['country_id','business_location_id', 'time_unit', 'delivery_fee', 'min_charge'], 'required'],
             [['business_location_id', 'delivery_time','country_id'], 'integer'],
+            [['delivery_zone_tax'], 'number', 'min' => 0, 'max' => 100],
             [['delivery_fee', 'min_charge'], 'number'],
             [['selectedAreas'], 'safe'],
             [['business_location_id'], 'exist', 'skipOnError' => true, 'targetClass' => BusinessLocation::className(), 'targetAttribute' => ['business_location_id' => 'business_location_id']],
@@ -60,6 +63,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
             'delivery_time' => 'Delivery Time',
             'delivery_fee' => 'Delivery Fee',
             'min_charge' => 'Min Charge',
+            'delivery_zone_tax' => 'Tax Override',
         ];
     }
 

@@ -12,6 +12,7 @@ use Yii;
  * @property string $business_location_name
  * @property string $business_location_name_ar
  * @property int $support_pick_up
+ * @property float $business_location_tax
  *
  * @property Restaurant $restaurant
   * @property Country $country
@@ -35,6 +36,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
         return [
             [['restaurant_uuid', 'country_id', 'business_location_name', 'business_location_name_ar', 'support_pick_up'], 'required'],
             [['country_id' , 'support_pick_up'], 'integer'],
+            [['business_location_tax'], 'number', 'min' => 0, 'max' => 100],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['business_location_name', 'business_location_name_ar'], 'string', 'max' => 255],
             [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country_id' => 'country_id']],
@@ -54,6 +56,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
             'business_location_name' => 'Business Location Name',
             'business_location_name_ar' => 'Business Location Name Ar',
             'support_pick_up' => 'Support Pick Up',
+            'business_location_tax' => 'Tax / VAT',
         ];
     }
 

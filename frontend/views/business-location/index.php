@@ -59,7 +59,7 @@ $this->registerJs($js);
               if($businessLocation->getDeliveryZones()->count()  == 0 ){
                 echo'<div class="card"><div style="padding: 70px 0; text-align: center;">'
                 . '     <h4>You currently do not have any places you deliver to</h4>'
-                . Html::a('Setup Delivery Zones', ['delivery-zone/create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success'])
+                . Html::a('Setup Delivery Zones', ['delivery-zone/create', 'restaurantUuid' => $restaurantUuid, 'businessLocationId' => $businessLocation->business_location_id], ['class' => 'btn btn-success'])
                 . '</div></div>';
               } else {
 

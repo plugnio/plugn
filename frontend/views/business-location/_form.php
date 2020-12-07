@@ -27,6 +27,8 @@ use common\models\Country;
 
     <?= $form->field($model, 'business_location_name_ar')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'business_location_tax')->textInput(['type' => 'number', 'value' => 0]) ?>
+
 
     <?=
       $form->field($model, 'country_id')->dropDownList($countryArray, [
