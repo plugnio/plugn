@@ -1256,7 +1256,7 @@ class SiteController extends Controller {
                                'store_name' => $store_model->name,
                                'phone_number' => $store_model->owner_number,
                                'email' => $agent_model->agent_email,
-                               'store_url' => $store_model->name
+                               'store_url' => $store_model->restaurant_domain
                           ]
                       ]);
                     }
