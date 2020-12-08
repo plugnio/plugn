@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $model common\models\DeliveryZone */
 
 $this->title = 'Update Delivery Zone: ' . $model->delivery_zone_id;
-$this->params['breadcrumbs'][] = ['label' => 'Delivery Zones', 'url' => ['index',  'restaurantUuid' => $restaurantUuid]];
+$this->params['breadcrumbs'][] = ['label' => 'Delivery Zones', 'url' => ['index',  'restaurantUuid' => $restaurantUuid , 'businessLocationId' => $model->business_location_id]];
 $this->params['breadcrumbs'][] = 'Update';
 $this->params['restaurant_uuid'] = $restaurantUuid;
 

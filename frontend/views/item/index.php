@@ -194,7 +194,7 @@ $this->registerJs($js);
                         if ($model->getExtraOptions()->where(['>','extra_option_price', '0'])->exists())
                           return 'Price on selection';
                         else
-                        return Yii::$app->formatter->asCurrency($data->item_price, $data->currency->code);
+                        return Yii::$app->formatter->asCurrency($model->item_price, $model->currency->code);
                     }
                 ],
                 [

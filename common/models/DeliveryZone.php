@@ -25,7 +25,6 @@ class DeliveryZone extends \yii\db\ActiveRecord
 {
 
     public $selectedAreas;
-    public $time_unit;
 
     /**
      * {@inheritdoc}
@@ -41,9 +40,11 @@ class DeliveryZone extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-              [['country_id','business_location_id', 'time_unit', 'delivery_fee', 'min_charge'], 'required'],
+            [['country_id','business_location_id', 'time_unit', 'delivery_fee', 'min_charge'], 'required'],
+            ['time_unit', 'in', 'range' => ['min','hrs','day']],
+            ['time_unit', 'string','min' => 3  , 'max' => 3],
             [['business_location_id', 'delivery_time','country_id'], 'integer'],
-            [['delivery_zone_tax'], 'number', 'min' => 0, 'max' => 100],
+            [['delivery_zone_tax'], 'number', 'max' => 100],
             [['delivery_fee', 'min_charge'], 'number'],
             [['selectedAreas'], 'safe'],
             [['business_location_id'], 'exist', 'skipOnError' => true, 'targetClass' => BusinessLocation::className(), 'targetAttribute' => ['business_location_id' => 'business_location_id']],
@@ -108,6 +109,18 @@ class DeliveryZone extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('businessLocation');
     }
+
+    /**
+     * Gets query for [[Currency]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+    }
+
+
 
 
 

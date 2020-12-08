@@ -77,11 +77,70 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
                       // },
                       'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
-
-                        'delivery_time',
-                        'delivery_fee',
-                        'min_charge'
+                        [
+                            'attribute' => 'delivery_time',
+                            "format" => "raw",
+                            "value" => function($model) {
+                                if($model->time_unit == 'hrs'){
+                                  return $model->delivery_time > 1 ? $model->delivery_time . ' Hours' : $model->delivery_time . ' Hour';
+                                }
+                                else if($model->time_unit == 'day'){
+                                  return $model->delivery_time > 1 ? $model->delivery_time . ' Days' : $model->delivery_time . ' Day';
+                                }
+                                else if($model->time_unit == 'min'){
+                                  return $model->delivery_time > 1 ? $model->delivery_time . ' Minutes' : $model->delivery_time . ' Minute';
+                                }
+                            }
+                        ],
+                        [
+                            'attribute' => 'delivery_fee',
+                            "format" => "raw",
+                            "value" => function($model) {
+                                  return Yii::$app->formatter->asCurrency($model->delivery_fee, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]);
+                            }
+                        ],
+                        [
+                            'attribute' => 'min_charge',
+                            "format" => "raw",
+                            "value" => function($model) {
+                                  return Yii::$app->formatter->asCurrency($model->min_charge, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]);
+                            }
+                        ],
+                        [
+                            'attribute' => 'delivery_zone_tax',
+                            "format" => "raw",
+                            "value" => function($model) {
+                                return   $model->delivery_zone_tax ? $model->delivery_zone_tax . '%': $model->businessLocation->business_location_tax . '%';
+                            }
+                        ],
+                        [
+                            'header' => 'Action',
+                            'class' => 'yii\grid\ActionColumn',
+                            'template' => ' {view} {update} {delete}',
+                            'buttons' => [
+                                'update' => function ($url, $model) {
+                                    return Html::a(
+                                                    '<span style="margin-right: 20px;" class="nav-icon feather icon-edit"></span>', ['delivery-zone/update', 'id' => $model->delivery_zone_id, 'restaurantUuid' => $model->restaurant->restaurant_uuid], [
+                                                'title' => 'Update',
+                                                'data-pjax' => '0',
+                                                    ]
+                                    );
+                                },
+                                'delete' => function ($url, $model) {
+                                    return Html::a(
+                                                    '<span style="margin-right: 20px;color: red;" class="nav-icon feather icon-trash"></span>', ['delivery-zone/delete', 'id' => $model->delivery_zone_id, 'restaurantUuid' => $model->restaurant->restaurant_uuid], [
+                                                'title' => 'Delete',
+                                                'data' => [
+                                                    'confirm' => 'Are you absolutely sure ? You will lose all the information about this delivery-zone with this action.',
+                                                    'method' => 'post',
+                                                ],
+                                    ]);
+                                },
+                            ],
+                        ],
                       ],
+
+
 
                       'layout' => '{summary}<div class="card-body"><div class="box-body table-responsive no-padding">{items}{pager}</div></div>',
                       'tableOptions' => ['class' => 'table'],

@@ -8,7 +8,20 @@ use common\models\Country;
 /* @var $this yii\web\View */
 /* @var $model common\models\BusinessLocation */
 /* @var $form yii\widgets\ActiveForm */
+
+
+$js = "
+
+$(document).on('wheel', 'input[type=number]', function (e) {
+    $(this).blur();
+});
+
+";
+
+$this->registerJs($js);
 ?>
+
+
   <div class="card">
 <div class="business-location-form card-body">
 
@@ -27,7 +40,7 @@ use common\models\Country;
 
     <?= $form->field($model, 'business_location_name_ar')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'business_location_tax')->textInput(['type' => 'number', 'value' => 0]) ?>
+
 
 
     <?=
@@ -37,6 +50,24 @@ use common\models\Country;
           'value' => $model->restaurant->country_id
       ]);
     ?>
+
+    <?= $form->field($model, 'business_location_tax', [
+        'template' => "{label}"
+
+        . "<div  class='input-group'>
+            <div class='input-group-prepend'>
+              <span class='input-group-text'> % </span>
+            </div>
+              {input}
+          </div>
+        "
+        . "{error}{hint}"
+    ])->textInput([
+      'type' => 'number',
+      'step' => '.01',
+      'value' => 0,'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;']) ?>
+
+
 
     <?=
       $form->field($model, 'support_pick_up', [

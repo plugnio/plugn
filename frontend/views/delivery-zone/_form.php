@@ -19,7 +19,14 @@ $selectedAreas = ArrayHelper::map($selectedAreas, 'area_id', 'area_id');
 $data = json_encode($selectedAreas);
 
 $js = "
+
+$(document).on('wheel', 'input[type=number]', function (e) {
+    $(this).blur();
+});
+
+
 $(document).ready(function() {
+
 
       $.ajax({
          // Controller method to call
@@ -82,16 +89,86 @@ $this->registerJs($js);
             $areaQuery = $model->getAreas()->all();
             $areaArray[] = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
 
+
+            $countryQuery = Country::find()->asArray()->all();
+            $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
+
+
             $form = ActiveForm::begin();
         ?>
 
-        <?= $form->field($model, 'delivery_time')->textInput() ?>
 
-        <?= $form->field($model, 'delivery_fee')->textInput() ?>
+        <div class="row">
+              <div class="col-12">
+                <?=
+                    $form->field($model, 'country_id')->dropDownList($countryArray, [
+                        'class' => 'form-control select2',
+                        'multiple' => false,
+                        'id' => 'country-id',
+                    ]);
+                ?>
+              </div>
+        </div>
 
-        <?= $form->field($model, 'min_charge')->textInput() ?>
+        <div class="row">
+              <div class="col-12 col-sm-6 col-lg-6">
+                <?= $form->field($model, 'delivery_time')->textInput() ?>
+              </div>
 
-        <?= $form->field($model, 'delivery_zone_tax')->textInput(['type' => 'number', 'value' => 0]) ?>
+              <div class="col-12 col-sm-6 col-lg-6">
+                <?= $form->field($model, 'time_unit')->dropDownList(
+                        [
+                            'min' => 'Minutes',
+                            'hrs' => 'Hours',
+                            'day'=> 'Days',
+                        ]
+                ); ?>
+              </div>
+        </div>
+
+        <?= $form->field($model, 'delivery_fee', [
+            'template' => "{label}"
+
+            . "<div  class='input-group'>
+                <div class='input-group-prepend'>
+                  <span class='input-group-text'>". $model->currency->code ."</span>
+                </div>
+                  {input}
+              </div>
+            "
+
+            . "{error}{hint}"
+        ])->textInput(['maxlength' => true,'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;']) ?>
+
+        <?= $form->field($model, 'min_charge', [
+            'template' => "{label}"
+
+            . "<div  class='input-group'>
+                <div class='input-group-prepend'>
+                  <span class='input-group-text'>". $model->currency->code ."</span>
+                </div>
+                  {input}
+              </div>
+            "
+
+            . "{error}{hint}"
+        ])->textInput(['maxlength' => true,'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;']) ?>
+
+        <?= $form->field($model, 'delivery_zone_tax', [
+            'template' => "{label}"
+
+            . "<div  class='input-group'>
+                <div class='input-group-prepend'>
+                  <span class='input-group-text'> % </span>
+                </div>
+                  {input}
+              </div>
+            "
+            . "{error}{hint}"
+        ])->textInput([
+        'type' => 'number',
+        'step' => '.01',
+         'value' => $model->delivery_zone_tax ? $model->delivery_zone_tax : $model->businessLocation->business_location_tax , 'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;']) ?>
 
 
         <div id="cities"></div>

@@ -159,7 +159,7 @@ if (!$model->isNewRecord) {
               "
 
               . "{error}{hint}"
-          ])->textInput(['maxlength' => true]) ?>
+          ])->textInput(['maxlength' => true,'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;'])?>
 
 
 
