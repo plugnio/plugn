@@ -83,13 +83,13 @@ class ZapierController extends Controller {
       $storeList = [];
 
         foreach (Yii::$app->accountManager->getManagedAccounts() as $key => $store) {
-          $storeList[$key]['store_uuid'] = $store['restaurant_uuid'];
+          $storeList[$key]['id'] = $store['restaurant_uuid'];
           $storeList[$key]['store_name'] = $store['name'];
 
       }
 
       return $storeList;
-      
+
 
     }
 
