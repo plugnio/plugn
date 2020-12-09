@@ -93,7 +93,6 @@ $this->registerJs($js);
             $countryQuery = Country::find()->asArray()->all();
             $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
 
-
             $form = ActiveForm::begin();
         ?>
 
@@ -102,27 +101,29 @@ $this->registerJs($js);
               <div class="col-12">
                 <?=
                     $form->field($model, 'country_id')->dropDownList($countryArray, [
+                        'prompt' => 'Choose area name...',
                         'class' => 'form-control select2',
                         'multiple' => false,
-                        'id' => 'country-id',
-                    ]);
+                        'id' => 'country-id'
+                    ])->label('Select country you want deliver to');
                 ?>
               </div>
         </div>
 
+        <div>
         <div class="row">
-              <div class="col-12 col-sm-6 col-lg-6">
+              <div class="col-6">
                 <?= $form->field($model, 'delivery_time')->textInput() ?>
               </div>
 
-              <div class="col-12 col-sm-6 col-lg-6">
+              <div class="col-6">
                 <?= $form->field($model, 'time_unit')->dropDownList(
                         [
                             'min' => 'Minutes',
                             'hrs' => 'Hours',
                             'day'=> 'Days',
                         ]
-                ); ?>
+                )->label(''); ?>
               </div>
         </div>
 
@@ -168,15 +169,17 @@ $this->registerJs($js);
         ])->textInput([
         'type' => 'number',
         'step' => '.01',
-         'value' => $model->delivery_zone_tax ? $model->delivery_zone_tax : $model->businessLocation->business_location_tax , 'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;']) ?>
+        'placeholder' => $model->businessLocation->business_location_tax ,
+         'value' => $model->delivery_zone_tax ? $model->delivery_zone_tax : '' , 'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;']) ?>
 
 
         <div id="cities"></div>
 
-
         <div class="form-group">
             <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
         </div>
+
+      </div>
 
         <?php ActiveForm::end(); ?>
 

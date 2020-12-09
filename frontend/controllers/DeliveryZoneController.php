@@ -104,7 +104,7 @@ class DeliveryZoneController extends Controller {
 
         $model = new DeliveryZone();
         $model->business_location_id = $business_location_model->business_location_id;
-        $model->country_id = $business_location_model->country_id;
+        // $model->country_id = $business_location_model->country_id;
 
         if ($model->load(Yii::$app->request->post())) {
 

@@ -35,7 +35,7 @@ $this->registerJs($js);
         foreach ($businessLocations as $key => $businessLocation) {
 
           $numberOfAreasStoreDeliveringTo = $businessLocation->getAreaDeliveryZones()->where(['not', ['area_id' => null]])->count();
-          $numberOfCoutnriesStoreDeliveringTo = $businessLocation->getAreaDeliveryZones()->where(['area_id' => null])->count();
+          $numberOfCoutnriesStoreDeliveringTo = $businessLocation->getAreaDeliveryZones()->select(['country_id'])->distinct()->count();
 
 
       ?>
