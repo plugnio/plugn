@@ -8,14 +8,14 @@ use yii\helpers\Html;
 $this->title = 'Update Business Location: ' . $model->business_location_name;
 $this->params['restaurant_uuid'] = $restaurantUuid;
 
-$this->params['breadcrumbs'][] = ['label' => 'Business Locations', 'url' => ['index',  'restaurantUuid' => $restaurantUuid]];
+$this->params['breadcrumbs'][] = ['label' => 'Business Locations', 'url' => ['index',  'storeUuid' => $restaurantUuid]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
 <div class="business-location-update">
 
     <?= $this->render('_form', [
         'model' => $model,
-        'restaurantUuid' => $restaurantUuid
+        'storeUuid' => $storeUuid
     ]) ?>
 
 </div>

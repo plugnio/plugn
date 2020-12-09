@@ -10,7 +10,7 @@ use common\models\BusinessLocation;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Business Locations';
-$this->params['restaurant_uuid'] = $restaurantUuid;
+$this->params['restaurant_uuid'] = $storeUuid;
 
 
 $js = "
@@ -27,7 +27,7 @@ $this->registerJs($js);
 
 
 
-    <?= Html::a('Add Business location', ['create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']); ?>
+    <?= Html::a('Add Business location', ['create', 'storeUuid' => $storeUuid], ['class' => 'btn btn-success']); ?>
 
 
       <?php
@@ -39,17 +39,36 @@ $this->registerJs($js);
 
 
       ?>
+
+
+
+
       <div class="card mt-2">
 
 
         <div class="card-content">
         <div class="card-body">
           <h1><?= $businessLocation->business_location_name_ar ?></h1>
+          <div>
+
+              <?=
+                Html::a('<i class="feather icon-edit"></i> Update',
+                ['update',  'id' => $businessLocation->business_location_id, 'storeUuid' => $storeUuid],
+                ['class' => 'btn btn-outline-primary', 'style' => 'margin-bottom : 15px;     margin-right: 20px;'])
+              ?>
 
 
-              <small>Support pickup</small>
+              <?=
+                Html::a('<i class="feather icon-trash"></i> Delete',
+                ['delete' ,'id' => $businessLocation->business_location_id, 'storeUuid' => $storeUuid],
+                ['class' => 'btn btn-danger', 'style' => 'margin-bottom : 15px'])
+              ?>
+
+        </div>
+
+
               <span style="display: block">
-                <?= $businessLocation->support_pick_up ? 'Yes' : 'No' ?>
+                <?= $businessLocation->support_pick_up ? 'Support pickup' : "Doesn't support pickup" ?>
               </span>
 
 
@@ -59,7 +78,7 @@ $this->registerJs($js);
               if($businessLocation->getDeliveryZones()->count()  == 0 ){
                 echo'<div class="card"><div style="padding: 70px 0; text-align: center;">'
                 . '     <h4>You currently do not have any places you deliver to</h4>'
-                . Html::a('Setup Delivery Zones', ['delivery-zone/create', 'restaurantUuid' => $restaurantUuid, 'businessLocationId' => $businessLocation->business_location_id], ['class' => 'btn btn-success'])
+                . Html::a('Setup Delivery Zones', ['delivery-zone/create', 'storeUuid' => $storeUuid, 'businessLocationId' => $businessLocation->business_location_id], ['class' => 'btn btn-success'])
                 . '</div></div>';
               } else {
 
@@ -78,7 +97,7 @@ $this->registerJs($js);
 
                 echo'<div class="card"><div style="padding: 70px 0; text-align: center;">'
                 . '     <h4>'. $numberOfCoutnriesDeliveringToText  . ' ' . $numberOfAreasDeliveringToText .'</h4>'
-                .  Html::a('Manage Delivery Zones', ['delivery-zone/index', 'restaurantUuid' => $restaurantUuid, 'businessLocationId' => $businessLocation->business_location_id], ['class' => 'btn btn-success'])
+                .  Html::a('Manage Delivery Zones', ['delivery-zone/index', 'storeUuid' => $storeUuid, 'businessLocationId' => $businessLocation->business_location_id], ['class' => 'btn btn-success'])
                 . '</div></div>';
               }
 

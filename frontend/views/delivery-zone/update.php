@@ -6,16 +6,16 @@ use yii\helpers\Html;
 /* @var $model common\models\DeliveryZone */
 
 $this->title = 'Update Delivery Zone: ' . $model->delivery_zone_id;
-$this->params['breadcrumbs'][] = ['label' => 'Delivery Zones', 'url' => ['index',  'restaurantUuid' => $restaurantUuid , 'businessLocationId' => $model->business_location_id]];
+$this->params['breadcrumbs'][] = ['label' => 'Delivery Zones', 'url' => ['index',  'storeUuid' => $storeUuid , 'id' => $model->delivery_zone_id]];
 $this->params['breadcrumbs'][] = 'Update';
-$this->params['restaurant_uuid'] = $restaurantUuid;
+$this->params['restaurant_uuid'] = $storeUuid;
 
 ?>
 <div class="delivery-zone-update">
 
     <?= $this->render('_form', [
         'model' => $model,
-        'restaurantUuid' => $restaurantUuid
+        'storeUuid' => $storeUuid
     ]) ?>
 
 </div>

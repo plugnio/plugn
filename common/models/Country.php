@@ -68,6 +68,17 @@ class Country extends \yii\db\ActiveRecord
         return $this->hasMany(City::className(), ['country_id' => 'country_id']);
     }
 
+    /**
+     * Gets query for [[Areas]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAreas()
+    {
+        return $this->hasMany(Area::className(), ['city_id' => 'city_id'])->via('cities');
+    }
+
+
 
     /**
      * Gets query for [[DeliveryZones]].

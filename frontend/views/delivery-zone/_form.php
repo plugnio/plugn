@@ -13,7 +13,7 @@ use common\models\Country;
 /* @var $model common\models\DeliveryZone */
 /* @var $form yii\widgets\ActiveForm */
 
-$url = Yii::$app->request->baseUrl . '/delivery-zone/render-cities-checbox-list?restaurantUuid='. $restaurantUuid .'&countryId=';
+$url = Yii::$app->request->baseUrl . '/delivery-zone/render-cities-checbox-list?storeUuid='. $storeUuid .'&countryId=';
 $selectedAreas = $model->getAreaDeliveryZones()->all();
 $selectedAreas = ArrayHelper::map($selectedAreas, 'area_id', 'area_id');
 $data = json_encode($selectedAreas);
@@ -68,19 +68,6 @@ $this->registerJs($js);
 
 ?>
 
-    <?php
-      if($model->delivery_zone_id){
-          echo         Html::a('Delete', ['delete', 'id' => $model->delivery_zone_id, 'restaurantUuid' => $restaurantUuid], [
-                      'class' => 'btn btn-danger',
-                      'style' => 'margin-bottom:15px',
-                      'data' => [
-                          'confirm' => 'Are you sure you want to delete this zone?',
-                          'method' => 'post',
-                      ],
-                  ]);
-      }
-
-    ?>
 
 <div class="card">
     <div class="card-body delivery-zone-form">
@@ -105,7 +92,7 @@ $this->registerJs($js);
                         'class' => 'form-control select2',
                         'multiple' => false,
                         'id' => 'country-id'
-                    ])->label('Select country you want deliver to');
+                    ])->label('Select country you want deliver to *');
                 ?>
               </div>
         </div>
@@ -113,7 +100,7 @@ $this->registerJs($js);
         <div>
         <div class="row">
               <div class="col-6">
-                <?= $form->field($model, 'delivery_time')->textInput() ?>
+                <?= $form->field($model, 'delivery_time')->textInput()->label('Delivery Time *') ?>
               </div>
 
               <div class="col-6">
@@ -139,7 +126,7 @@ $this->registerJs($js);
             "
 
             . "{error}{hint}"
-        ])->textInput(['maxlength' => true,'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;']) ?>
+        ])->textInput(['maxlength' => true,'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;'])->label('Delivery Fee *') ?>
 
         <?= $form->field($model, 'min_charge', [
             'template' => "{label}"
@@ -153,7 +140,7 @@ $this->registerJs($js);
             "
 
             . "{error}{hint}"
-        ])->textInput(['maxlength' => true,'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;']) ?>
+        ])->textInput(['maxlength' => true,'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;'])->label('Min Charge *') ?>
 
         <?= $form->field($model, 'delivery_zone_tax', [
             'template' => "{label}"
@@ -173,7 +160,7 @@ $this->registerJs($js);
          'value' => $model->delivery_zone_tax ? $model->delivery_zone_tax : '' , 'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;']) ?>
 
 
-        <div id="cities"></div>
+        <!-- <div id="cities"></div> -->
 
         <div class="form-group">
             <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

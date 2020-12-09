@@ -36,19 +36,19 @@ $this->registerJs($js);
 
 
 
-    <?= $form->field($model, 'business_location_name')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'business_location_name')->textInput(['maxlength' => true, 'placeholder' => "Main branch"])->label('Business location name *') ?>
 
-    <?= $form->field($model, 'business_location_name_ar')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'business_location_name_ar')->textInput(['maxlength' => true, 'placeholder' => "الفرع الرئيسي"])->label('Business location name in Arabic *') ?>
 
 
 
 
     <?=
       $form->field($model, 'country_id')->dropDownList($countryArray, [
-          'class' => 'form-control select2 select2',
-          'multiple' => false,
-          'value' => $model->restaurant->country_id
-      ]);
+          'prompt' => 'Choose country name...',
+          'class' => 'form-control select2',
+          'multiple' => false
+      ])->label('Located in *');
     ?>
 
     <?= $form->field($model, 'business_location_tax', [
@@ -86,7 +86,7 @@ $this->registerJs($js);
       ])->checkbox([
           'checked' => $model->support_pick_up ? true : false,
           'id' => 'trackQuantityInput',
-              ], false)
+        ], false)->label('Customer can pick up from this location')
     ?>
 
 

@@ -43,16 +43,16 @@ class BusinessLocationController extends Controller
      * Lists all BusinessLocation models.
      * @return mixed
      */
-    public function actionIndex($restaurantUuid)
+    public function actionIndex($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $businessLocations = BusinessLocation::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->all();
 
-        
+
         return $this->render('index', [
             'businessLocations' => $businessLocations,
-            'restaurantUuid' => $restaurantUuid
+            'storeUuid' => $storeUuid
         ]);
     }
 
@@ -63,18 +63,18 @@ class BusinessLocationController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($restaurantUuid)
+    public function actionCreate($storeUuid)
     {
         $model = new BusinessLocation();
-        $model->restaurant_uuid = $restaurantUuid;
+        $model->restaurant_uuid = $storeUuid;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+            return $this->redirect(['index', 'storeUuid' => $storeUuid]);
         }
 
         return $this->render('create', [
             'model' => $model,
-            'restaurantUuid' => $restaurantUuid
+            'storeUuid' => $storeUuid
         ]);
     }
 
@@ -85,17 +85,17 @@ class BusinessLocationController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id, $restaurantUuid)
+    public function actionUpdate($id, $storeUuid)
     {
-        $model = $this->findModel($id, $restaurantUuid);
+        $model = $this->findModel($id, $storeUuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index',  'restaurantUuid' => $restaurantUuid]);
+            return $this->redirect(['index',  'storeUuid' => $storeUuid]);
         }
 
         return $this->render('update', [
             'model' => $model,
-            'restaurantUuid' => $restaurantUuid
+            'storeUuid' => $storeUuid
         ]);
     }
 
@@ -106,11 +106,11 @@ class BusinessLocationController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id, $restaurantUuid)
+    public function actionDelete($id, $storeUuid)
     {
-        $this->findModel($id, $restaurantUuid)->delete();
+        $this->findModel($id, $storeUuid)->delete();
 
-        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+        return $this->redirect(['index', 'storeUuid' => $storeUuid]);
     }
 
     /**
@@ -120,10 +120,10 @@ class BusinessLocationController extends Controller
      * @return BusinessLocation the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $restaurantUuid)
+    protected function findModel($id, $storeUuid)
     {
 
-        if (($model = BusinessLocation::find()->where(['business_location_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
+        if (($model = BusinessLocation::find()->where(['business_location_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
             return $model;
         }
 

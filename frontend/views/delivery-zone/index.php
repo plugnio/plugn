@@ -18,7 +18,7 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
     <section id="data-list-view" class="data-list-view-header">
 
       <?= Html::a('<i class="feather icon-plus"></i> Add New',
-        ['create', 'restaurantUuid' => $store_model->restaurant_uuid, 'businessLocationId' => $business_location_model->business_location_id],
+        ['create', 'storeUuid' => $store_model->restaurant_uuid, 'businessLocationId' => $business_location_model->business_location_id],
         ['class' => 'btn btn-outline-primary', 'style' => 'margin-bottom : 15px'])
       ?>
 
@@ -56,19 +56,23 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
             </h1>
 
                     <div>
+                        <?=
+                          Html::a('<i class="feather icon-edit"></i> Update',
+                          ['update', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
+                          ['class' => 'btn btn-outline-primary', 'style' => 'margin-bottom : 15px;     margin-right: 20px;'])
+                        ?>
 
-                                          <?=
-                                            Html::a('<i class="feather icon-edit"></i> Update',
-                                            ['create', 'restaurantUuid' => $store_model->restaurant_uuid, 'businessLocationId' => $business_location_model->business_location_id],
-                                            ['class' => 'btn btn-outline-primary', 'style' => 'margin-bottom : 15px;     margin-right: 20px;'])
-                                          ?>
 
-
-                                          <?=
-                                            Html::a('<i class="feather icon-trash"></i> Delete',
-                                            ['create', 'restaurantUuid' => $store_model->restaurant_uuid, 'businessLocationId' => $business_location_model->business_location_id],
-                                            ['class' => 'btn btn-danger', 'style' => 'margin-bottom : 15px'])
-                                          ?>
+                        <?=
+                          Html::a('<i class="feather icon-trash"></i> Delete', ['delete', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid], [
+                               'class' => 'btn btn-danger',
+                               'style' => 'margin-bottom:15px',
+                               'data' => [
+                                   'confirm' => 'Are you sure you want to delete this zone?',
+                                   'method' => 'post',
+                               ],
+                           ]);
+                        ?>
                   </div>
 
         </div>
@@ -77,6 +81,9 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
 
           <div class="card-content">
 
+              <h4>
+                Delivering to  <?= $deliveryZone->getAreaDeliveryZones()->count() . '/' . $deliveryZone->country->getAreas()->count() ?>
+              </h4>
               <p>
                 Delivery Time:
                 <?= $deliveryZone->delivery_time ?>

@@ -365,7 +365,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                     <?=
                                     Html::a(
                                             Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                            Html::tag('span', 'Business Locations'), ['business-location/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                            Html::tag('span', 'Business Locations'), ['business-location/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                                     )
                                     ?>
                                 </li>

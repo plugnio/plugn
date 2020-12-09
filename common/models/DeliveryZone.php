@@ -40,7 +40,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['country_id','business_location_id', 'time_unit', 'delivery_fee', 'min_charge'], 'required'],
+            [['country_id','business_location_id', 'time_unit', 'delivery_fee', 'min_charge', 'delivery_time'], 'required'],
             ['time_unit', 'in', 'range' => ['min','hrs','day']],
             ['time_unit', 'string','min' => 3  , 'max' => 3],
             [['business_location_id', 'delivery_time','country_id'], 'integer'],

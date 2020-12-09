@@ -52,9 +52,9 @@ class BusinessLocation extends \yii\db\ActiveRecord
         return [
             'business_location_id' => 'Business Location ID',
             'restaurant_uuid' => 'Restaurant Uuid',
-            'country_id' => 'Country',
+            'country_id' => 'Located in',
             'business_location_name' => 'Business Location Name',
-            'business_location_name_ar' => 'Business Location Name Ar',
+            'business_location_name_ar' => 'Business Location Name in Arabic',
             'support_pick_up' => 'Support Pick Up',
             'business_location_tax' => 'Tax / VAT',
         ];
