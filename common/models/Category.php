@@ -168,7 +168,7 @@ class Category extends \yii\db\ActiveRecord {
         return $this->hasMany(Item::className(), ['item_uuid' => 'item_uuid'])
                         ->where(['item_status' => Item::ITEM_STATUS_PUBLISH])
                         ->viaTable('category_item', ['category_id' => 'category_id'])
-                        ->orderBy(['sort_number' => SORT_ASC]);
+                        ->orderBy([new \yii\db\Expression('item.sort_number IS NULL, item.sort_number ASC')]);
     }
 
 }
