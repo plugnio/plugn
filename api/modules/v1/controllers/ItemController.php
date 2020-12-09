@@ -115,7 +115,7 @@ class ItemController extends Controller {
             $restaurantMenu = Category::find()
                     ->where(['restaurant_uuid' => $restaurant_uuid])
                     ->with('items', 'items.options', 'items.options.extraOptions','items.itemImages')
-                    ->orderBy(['sort_number' => SORT_ASC])
+                    ->orderBy([new \yii\db\Expression('sort_number IS NULL, sort_number ASC')])
                     ->asArray()
                     ->all();
 
