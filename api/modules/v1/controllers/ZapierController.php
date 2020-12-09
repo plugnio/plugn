@@ -75,6 +75,25 @@ class ZapierController extends Controller {
   }
 
   /**
+   * Get store list
+   * @return boolean
+   */
+    public function actionGetStoreList() {
+
+      $storeList = [];
+
+        foreach (Yii::$app->accountManager->getManagedAccounts() as $key => $store) {
+          $storeList[$key]['store_uuid'] = $store['restaurant_uuid'];
+          $storeList[$key]['store_name'] = $store['name'];
+
+      }
+
+      return $storeList;
+      
+
+    }
+
+  /**
    * CheckPendingOrders of type boolean and we want to return
    * True if there are pending  orders , false if these isn't any
    * @param type $restaurantUuid
