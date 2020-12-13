@@ -48,27 +48,22 @@ $this->registerJs($js);
 
         <div class="card-content">
         <div class="card-body">
-          <h1><?= $businessLocation->business_location_name_ar ?></h1>
-          <div>
-
-              <?=
-                Html::a('<i class="feather icon-edit"></i> Update',
+          <h3>
+            <?=
+                Html::a($businessLocation->business_location_name . ', ' . $businessLocation->country->country_name. ' <i class="feather icon-edit"></i>',
                 ['update',  'id' => $businessLocation->business_location_id, 'storeUuid' => $storeUuid],
-                ['class' => 'btn btn-outline-primary', 'style' => 'margin-bottom : 15px;     margin-right: 20px;'])
-              ?>
-
-
-              <?=
-                Html::a('<i class="feather icon-trash"></i> Delete',
-                ['delete' ,'id' => $businessLocation->business_location_id, 'storeUuid' => $storeUuid],
-                ['class' => 'btn btn-danger', 'style' => 'margin-bottom : 15px'])
-              ?>
-
-        </div>
+                ['class' => '', 'style' => 'margin-bottom : 15px;     margin-right: 20px;']);
+            ?>
+          </h3>
 
 
               <span style="display: block">
-                <?= $businessLocation->support_pick_up ? 'Support pickup' : "Doesn't support pickup" ?>
+                <?=
+                  Html::a($businessLocation->support_pick_up ? 'Disable pick up' : 'Enable pick up',
+                  [$businessLocation->support_pick_up ? 'disable-pickup' : 'enable-pickup',  'id' => $businessLocation->business_location_id, 'storeUuid' => $storeUuid],
+                  ['class' => $businessLocation->support_pick_up ?  'btn btn-danger' : 'btn btn-primary', 'style' => 'margin-bottom : 15px;     margin-right: 20px;'])
+                ?>
+
               </span>
 
 

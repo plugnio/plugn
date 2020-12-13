@@ -36,10 +36,9 @@ $this->registerJs($js);
 
 
 
-    <?= $form->field($model, 'business_location_name')->textInput(['maxlength' => true, 'placeholder' => "Main branch"])->label('Business location name *') ?>
+    <?= $form->field($model, 'business_location_name')->textInput(['maxlength' => true, 'placeholder' => "Main branch"])->label('Location name *') ?>
 
-    <?= $form->field($model, 'business_location_name_ar')->textInput(['maxlength' => true, 'placeholder' => "الفرع الرئيسي"])->label('Business location name in Arabic *') ?>
-
+    <?= $form->field($model, 'business_location_name_ar')->textInput(['maxlength' => true, 'placeholder' => "الفرع الرئيسي"])->label('Location name in Arabic *') ?>
 
 
 
@@ -92,6 +91,20 @@ $this->registerJs($js);
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+
+        <?php
+          if(!$model->isNewRecord){
+            echo Html::a('<i class="feather icon-trash"></i> Delete', ['delete' ,'id' => $model->business_location_id, 'storeUuid' => $storeUuid], [
+               'class' => 'btn btn-danger mr-1',
+               'data' => [
+                   'confirm' => 'Are you sure you want to delete this location?',
+                   'method' => 'post',
+               ],
+               'style' => 'margin-left: 7px;'
+           ]);
+          }
+        ?>
+
     </div>
 
     <?php ActiveForm::end(); ?>

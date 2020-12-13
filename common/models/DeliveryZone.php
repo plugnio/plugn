@@ -26,6 +26,13 @@ class DeliveryZone extends \yii\db\ActiveRecord
 
     public $selectedAreas;
 
+    //Values for `time_unit`
+    const TIME_UNIT_MIN = 'min';
+    const TIME_UNIT_HRS = 'hrs';
+    const TIME_UNIT_DAY = 'day';
+
+
+
     /**
      * {@inheritdoc}
      */
@@ -41,7 +48,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
     {
         return [
             [['country_id','business_location_id', 'time_unit', 'delivery_fee', 'min_charge', 'delivery_time'], 'required'],
-            ['time_unit', 'in', 'range' => ['min','hrs','day']],
+            ['time_unit', 'in', 'range' => [self::TIME_UNIT_MIN,self::TIME_UNIT_HRS, self::TIME_UNIT_DAY]],
             ['time_unit', 'string','min' => 3  , 'max' => 3],
             [['business_location_id', 'delivery_time','country_id'], 'integer'],
             [['delivery_zone_tax'], 'number', 'max' => 100],
@@ -66,6 +73,24 @@ class DeliveryZone extends \yii\db\ActiveRecord
             'min_charge' => 'Min Charge',
             'delivery_zone_tax' => 'Tax Override',
         ];
+    }
+
+    /**
+     * Returns String value of current status
+     * @return string
+     */
+    public function getTimeUnit() {
+        switch ($this->time_unit) {
+          case self::TIME_UNIT_MIN:
+              return "Minutes";
+              break;
+          case self::TIME_UNIT_HRS:
+            return  $this->delivery_time == 1 ?  "Hour" : "Hours";
+              break;
+          case self::TIME_UNIT_DAY:
+              return  $this->delivery_time == 1 ?  "Day" : "Days";
+              break;
+        }
     }
 
     /**

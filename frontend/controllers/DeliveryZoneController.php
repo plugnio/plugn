@@ -89,12 +89,39 @@ class DeliveryZoneController extends Controller {
       }
     }
 
+
+
+
+    public function actionDeliverAllAreas($storeUuid, $deliveryZoneId) {
+      $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+      $model = $this->findModel($deliveryZoneId, $storeUuid);
+
+      if($model){
+        foreach ($model->country->getAreas()->all() as $key => $area) {
+
+          if(!AreaDeliveryZone::find()->where(['area_id' => $area->area_id , 'restaurant_uuid' => $storeUuid])->exists()){
+            $delivery_zone_area_model = new AreaDeliveryZone();
+            $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
+            $delivery_zone_area_model->area_id = $area->area_id;
+            $delivery_zone_area_model->restaurant_uuid = $storeUuid;
+            $delivery_zone_area_model->save(false);
+          }
+
+        }
+
+        $this->redirect(['index', 'storeUuid' => $storeUuid, 'businessLocationId' => $model->business_location_id]);
+
+
+      }
+
+    }
+
     /**
      * Creates a new DeliveryZone model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($storeUuid, $businessLocationId) {
+    public function actionCreate($storeUuid, $businessLocationId, $countryId = null) {
 
         $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
         $business_location_model = BusinessLocation::find()->where(['restaurant_uuid' => $store_model->restaurant_uuid, 'business_location_id' => $businessLocationId])->one();
@@ -104,7 +131,11 @@ class DeliveryZoneController extends Controller {
 
         $model = new DeliveryZone();
         $model->business_location_id = $business_location_model->business_location_id;
-        // $model->country_id = $business_location_model->country_id;
+
+
+        if($countryId)
+            $model->country_id = $countryId;
+
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -120,65 +151,28 @@ class DeliveryZoneController extends Controller {
 
             if($model->country->getAreas()){
 
-              foreach ($model->country->getAreas()->all() as $key => $area) {
-                $delivery_zone_area_model = new AreaDeliveryZone();
-                $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
-                $delivery_zone_area_model->area_id = $area->area_id;
-                $delivery_zone_area_model->restaurant_uuid = $storeUuid;
-                $delivery_zone_area_model->save(false);
-              }
+              return $this->render('select-area', [
+                          'deliveryZoneId' => $model->delivery_zone_id,
+                          'selectedCountry' => $model->country->country_name,
+                          'storeUuid' => $storeUuid
+              ]);
+              // foreach ($model->country->getAreas()->all() as $key => $area) {
+              //
+              //   if(!AreaDeliveryZone::find()->where(['area_id' => $area->area_id , 'restaurant_uuid' => $storeUuid])->exists()){
+              //     $delivery_zone_area_model = new AreaDeliveryZone();
+              //     $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
+              //     $delivery_zone_area_model->area_id = $area->area_id;
+              //     $delivery_zone_area_model->restaurant_uuid = $storeUuid;
+              //     $delivery_zone_area_model->save(false);
+              //   }
+              //
+              // }
 
+            } else {
+              $this->redirect(['index', 'storeUuid' => $storeUuid, 'businessLocationId' => $businessLocationId]);
             }
 
-              if($store_model->getDeliveryZonesForSpecificCountry($model->country_id)->count() > 1 &&  !AreaDeliveryZone::find()->where(['delivery_zone_id' => $model->delivery_zone_id])->exists()   ){
-                DeliveryZone::deleteAll(['delivery_zone_id' => $model->delivery_zone_id]);
-                Yii::$app->session->setFlash('errorResponse', "Cant add another zone2");
-                return $this->redirect(['index', 'storeUuid' => $storeUuid, 'businessLocationId' => $businessLocationId]);
-              }
 
-            $this->redirect(['index', 'storeUuid' => $storeUuid, 'businessLocationId' => $businessLocationId]);
-
-
-            // if ($model['selectedAreas']) {
-            //
-            //     foreach ($model['selectedAreas'] as $cities) {
-            //
-            //         if (is_array($cities)) {
-            //             foreach ($cities as $areas) {
-            //
-            //                 if (is_array($areas)) {
-            //
-            //                     foreach ($areas as $area_id) {
-            //
-            //                         if ($area_id) {
-            //                             $delivery_zone_area_model = new AreaDeliveryZone();
-            //                             $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
-            //                             $delivery_zone_area_model->area_id = $area_id;
-            //                             $delivery_zone_area_model->restaurant_uuid = $storeUuid;
-            //                             $delivery_zone_area_model->save(false);
-            //                         }
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //     }
-            //
-            // } else {
-            //
-            //   $delivery_zone_area_model = new AreaDeliveryZone();
-            //   $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
-            //   $delivery_zone_area_model->country_id = $model->country_id;
-            //   $delivery_zone_area_model->restaurant_uuid = $storeUuid;
-            //   $delivery_zone_area_model->save(false);
-            //
-            // }
-            //
-            //
-            //     if($store_model->getDeliveryZonesForSpecificCountry($model->country_id)->count() > 1 &&  !AreaDeliveryZone::find()->where(['delivery_zone_id' => $model->delivery_zone_id])->exists()   ){
-            //       DeliveryZone::deleteAll(['delivery_zone_id' => $model->delivery_zone_id]);
-            //       Yii::$app->session->setFlash('errorResponse', "Cant add another zone2");
-            //       return $this->redirect(['index', 'storeUuid' => $storeUuid, 'businessLocationId' => $businessLocationId]);
-            //     }
 
           }
         }
@@ -261,6 +255,137 @@ class DeliveryZoneController extends Controller {
         return $this->render('update', [
                     'model' => $model,
                     'storeUuid' => $storeUuid
+        ]);
+    }
+
+
+
+    public function actionUpdateDeliveryZoneVat($id, $storeUuid) {
+
+      $model = $this->findModel($id, $storeUuid);
+
+      if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+        return  $this->redirect(['index', 'storeUuid' => $storeUuid, 'businessLocationId' => $model->business_location_id]);
+
+      }
+
+      return $this->render('update-vat', [
+                  'storeUuid' => $storeUuid,
+                  'model' => $model
+      ]);
+
+
+    }
+
+
+    public function actionUpdateAreas($id, $storeUuid) {
+
+        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $model = $this->findModel($id, $storeUuid);
+
+        $selectedAreas = $model->getAreaDeliveryZones()->all();
+        $selectedAreas = ArrayHelper::map($selectedAreas, 'area_id', 'area_id');
+
+
+        $cities = City::find()->where(['country_id' => $model->country_id])->all();
+
+
+        //handling if the saveSelectedAreas button has been pressed
+        if ($model->load(Yii::$app->request->post())) {
+          if ($model['selectedAreas']) {
+            AreaDeliveryZone::deleteAll(['delivery_zone_id' => $model->delivery_zone_id, 'restaurant_uuid'  => $storeUuid]);
+
+              foreach ($model['selectedAreas'] as $cities) {
+
+                  if (is_array($cities)) {
+                      foreach ($cities as $areas) {
+
+                          if (is_array($areas)) {
+
+                              foreach ($areas as $area_id) {
+
+                                  if ($area_id) {
+                                      $delivery_zone_area_model = new AreaDeliveryZone();
+                                      $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
+                                      $delivery_zone_area_model->area_id = $area_id;
+                                      $delivery_zone_area_model->restaurant_uuid = $storeUuid;
+                                      $delivery_zone_area_model->save(false);
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+
+          } else {
+            AreaDeliveryZone::deleteAll(['delivery_zone_id' => $model->delivery_zone_id, 'restaurant_uuid'  => $storeUuid]);
+          }
+
+          return  $this->redirect(['index', 'storeUuid' => $storeUuid, 'businessLocationId' => $model->business_location_id]);
+
+        }
+
+
+        //
+        // if ($model->load(Yii::$app->request->post())) {
+        //
+        //   $storeDeliveryZones = $store_model->getDeliveryZonesForSpecificCountry($model->country_id);
+        //
+        //
+        //   if($model->save()){
+        //     AreaDeliveryZone::deleteAll(['delivery_zone_id' => $model->delivery_zone_id]);
+        //     if (($model['selectedAreas'])) {
+        //
+        //         foreach ($model['selectedAreas'] as $cities) {
+        //
+        //             if (is_array($cities)) {
+        //
+        //                 foreach ($cities as $areas) {
+        //                     if (is_array($areas)) {
+        //
+        //
+        //                         foreach ($areas as $area_id) {
+        //
+        //                             $delivery_zone_area_model = new AreaDeliveryZone();
+        //                             $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
+        //                             $delivery_zone_area_model->area_id = $area_id;
+        //                             $delivery_zone_area_model->restaurant_uuid = $storeUuid;
+        //                             $delivery_zone_area_model->save(false);
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     } else {
+        //       $delivery_zone_area_model = new AreaDeliveryZone();
+        //       $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
+        //       $delivery_zone_area_model->country_id = $model->country_id;
+        //       $delivery_zone_area_model->restaurant_uuid = $storeUuid;
+        //       $delivery_zone_area_model->save(false);
+        //     }
+        //
+        //
+        //     if( !AreaDeliveryZone::find()->where(['delivery_zone_id' => $model->delivery_zone_id])->exists()   ){
+        //       DeliveryZone::deleteAll(['delivery_zone_id' => $model->delivery_zone_id]);
+        //       Yii::$app->session->setFlash('errorResponse', "Cant add another zone");
+        //       $this->redirect(['index', 'storeUuid' => $storeUuid, 'businessLocationId' => $model->business_location_id]);
+        //     }
+        //
+        //
+        //
+        //   }
+        //
+        //   $this->redirect(['index', 'storeUuid' => $storeUuid, 'businessLocationId' => $model->business_location_id]);
+        // }
+
+
+        return $this->render('update-areas', [
+                    'cities' => $cities,
+                    'storeUuid' => $storeUuid,
+                    'model' => $model,
+                    'selectedAreas' => $selectedAreas
         ]);
     }
 

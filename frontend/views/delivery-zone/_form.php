@@ -8,6 +8,7 @@ use common\models\BusinessLocation;
 use common\models\City;
 use common\models\Area;
 use common\models\Country;
+use common\models\DeliveryZone;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\DeliveryZone */
@@ -20,47 +21,56 @@ $data = json_encode($selectedAreas);
 
 $js = "
 
-$(document).on('wheel', 'input[type=number]', function (e) {
-    $(this).blur();
-});
+
+  $('.collapseBtn').on('click', function(e){
+    currentId = $(this).attr('id');
+
+    $('#collapse-'+ currentId).collapse('toggle');
+
+  });
 
 
-$(document).ready(function() {
+  $('.selectAll').on('click', function(e){
 
 
-      $.ajax({
-         // Controller method to call
-         url: '$url' + $('#country-id').val(),
-         // Parameter data to pass in
-         data: {
-             selectedAreas : $data
-         },
-         type: 'POST',
-         cache: false,
-         success: function(data) {
-           $('#cities').html(data);
-           $(document).trigger('rebindButtons');
+    currentId = $(this).attr('id');
+
+    var cityId = currentId.replace('selectAll-','');
+
+    $('#clearAll-' + cityId).show();
+    $(this).hide();
+
+    var cardId = '#city-' + $(this).parent().attr('id');
+
+    $(cardId).find('input').each(function () {
+         if($(this).prop('checked') == false){
+             $(this).attr('checked', 'checked');
          }
-      })
+    });
+
+  });
+
+  $('.clearAll').on('click', function(e){
 
 
-      $('#country-id').on('change', function(e){
+    currentId = $(this).attr('id');
 
-              $.ajax({
-                 // Controller method to call
-                 url: '$url' + e.target.value,
-                 // Parameter data to pass in
-                 data: {
-                     selectedAreas : $data
-                 },
-                 type: 'POST',
-                 cache: false,
-                 success: function(data) {
-                   $('#cities').html(data);
-                   $(document).trigger('rebindButtons');
-                 }
-         })
-      });
+    var cityId = currentId.replace('clearAll-','');
+
+    $('#selectAll-' + cityId).show();
+    $(this).hide();
+
+
+
+
+    var cardId = '#city-' + $(this).parent().attr('id');
+
+    $(cardId).find('input').each(function () {
+         if($(this).prop('checked') == true){
+             $(this).removeAttr('checked');
+         }
+    });
+
   });
 ";
 
@@ -106,10 +116,10 @@ $this->registerJs($js);
               <div class="col-6">
                 <?= $form->field($model, 'time_unit')->dropDownList(
                         [
-                            'min' => 'Minutes',
-                            'hrs' => 'Hours',
-                            'day'=> 'Days',
-                        ]
+                            DeliveryZone::TIME_UNIT_MIN => 'Minutes',
+                            DeliveryZone::TIME_UNIT_HRS => 'Hours',
+                            DeliveryZone::TIME_UNIT_DAY => 'Days'
+                        ],['value' => $model->time_unit ? $model->time_unit : DeliveryZone::TIME_UNIT_DAY ]
                 )->label(''); ?>
               </div>
         </div>
@@ -126,7 +136,12 @@ $this->registerJs($js);
             "
 
             . "{error}{hint}"
-        ])->textInput(['maxlength' => true,'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;'])->label('Delivery Fee *') ?>
+        ])->textInput(
+          [
+            'maxlength' => true,
+            'style' => ' border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;',
+            'placeholder' => '3'
+            ])->label('Delivery Fee *') ?>
 
         <?= $form->field($model, 'min_charge', [
             'template' => "{label}"
@@ -140,24 +155,13 @@ $this->registerJs($js);
             "
 
             . "{error}{hint}"
-        ])->textInput(['maxlength' => true,'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;'])->label('Min Charge *') ?>
+        ])->textInput(
+          [
+            'maxlength' => true,
+            'placeholder' => '3',
+            'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;'
+          ])->label('Min Charge on each order not including delivery fee *') ?>
 
-        <?= $form->field($model, 'delivery_zone_tax', [
-            'template' => "{label}"
-
-            . "<div  class='input-group'>
-                <div class='input-group-prepend'>
-                  <span class='input-group-text'> % </span>
-                </div>
-                  {input}
-              </div>
-            "
-            . "{error}{hint}"
-        ])->textInput([
-        'type' => 'number',
-        'step' => '.01',
-        'placeholder' => $model->businessLocation->business_location_tax ,
-         'value' => $model->delivery_zone_tax ? $model->delivery_zone_tax : '' , 'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;']) ?>
 
 
         <!-- <div id="cities"></div> -->

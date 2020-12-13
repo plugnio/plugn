@@ -22,6 +22,11 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
         ['class' => 'btn btn-outline-primary', 'style' => 'margin-bottom : 15px'])
       ?>
 
+      <?= Html::a('<i class="feather icon-plus"></i> Add New to ' . $business_location_model->country->country_name ,
+        ['create', 'storeUuid' => $store_model->restaurant_uuid, 'businessLocationId' => $business_location_model->business_location_id, 'countryId' => $business_location_model->country_id],
+        ['class' => 'btn btn-outline-primary', 'style' => 'margin-bottom : 15px']);
+      ?>
+
 
             <?php if (Yii::$app->session->getFlash('errorResponse') != null) { ?>
 
@@ -33,19 +38,12 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
             <?php }  ?>
 
 
-
-
-
       <?php
 
         foreach ($dataProvider->query->all()  as $deliveryZone) {
 
 
       ?>
-
-
-
-
 
       <div class="card">
 
@@ -82,21 +80,32 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
           <div class="card-content">
 
               <h4>
-                Delivering to  <?= $deliveryZone->getAreaDeliveryZones()->count() . '/' . $deliveryZone->country->getAreas()->count() ?>
+              currently Delivering to  <?= $deliveryZone->getAreaDeliveryZones()->count() . '/' . $deliveryZone->country->getAreas()->count() ?>
               </h4>
+              <?=
+                Html::a('Edit',
+                ['update-areas', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
+                ['class' => 'btn btn-outline-primary', 'style' => 'margin-bottom : 15px;     margin-right: 20px;'])
+              ?>
+              <?=
+                Html::a($deliveryZone->businessLocation->business_location_tax. '% VAT override',
+                ['update-delivery-zone-vat', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
+                ['class' => 'btn btn-outline-primary', 'style' => 'margin-bottom : 15px;     margin-right: 20px;'])
+              ?>
+
               <p>
                 Delivery Time:
-                <?= $deliveryZone->delivery_time ?>
+                <?= $deliveryZone->delivery_time . ' ' . $deliveryZone->timeUnit ?>
               </p>
 
               <p>
                 Delivery Fee:
-                <?= $deliveryZone->delivery_fee ?>
+                <?= Yii::$app->formatter->asCurrency($deliveryZone->delivery_fee, $deliveryZone->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
               </p>
 
               <p>
                 Min Charge:
-                <?= $deliveryZone->delivery_fee ?>
+                <?= Yii::$app->formatter->asCurrency($deliveryZone->min_charge, $deliveryZone->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
               </p>
 
           </div>

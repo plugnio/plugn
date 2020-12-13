@@ -68,6 +68,7 @@ class BusinessLocationController extends Controller
         $model = new BusinessLocation();
         $model->restaurant_uuid = $storeUuid;
 
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index', 'storeUuid' => $storeUuid]);
         }
@@ -76,6 +77,29 @@ class BusinessLocationController extends Controller
             'model' => $model,
             'storeUuid' => $storeUuid
         ]);
+    }
+
+
+    public function actionEnablePickup($id, $storeUuid)
+    {
+        $model = $this->findModel($id, $storeUuid);
+        $model->support_pick_up = 1;
+        $model->save();
+
+
+        return $this->redirect(['index',  'storeUuid' => $storeUuid]);
+
+    }
+
+    public function actionDisablePickup($id, $storeUuid)
+    {
+        $model = $this->findModel($id, $storeUuid);
+        $model->support_pick_up = 0;
+        $model->save();
+
+
+        return $this->redirect(['index',  'storeUuid' => $storeUuid]);
+
     }
 
     /**
