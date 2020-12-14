@@ -40,13 +40,13 @@ class ItemSearch extends Item
      * Creates data provider instance with search query applied
      *
      * @param array $params
-     * @param sting $restaurantUuid
+     * @param sting $storeUuid
      *
      * @return ActiveDataProvider
      */
-    public function search($params, $restaurantUuid)
+    public function search($params, $storeUuid)
     {
-        $query = Item::find()->where(['item.restaurant_uuid' => $restaurantUuid])->joinWith('category', true);
+        $query = Item::find()->where(['item.restaurant_uuid' => $storeUuid])->joinWith('category', true);
 
         // add conditions that should always apply here
 
@@ -99,14 +99,14 @@ class ItemSearch extends Item
      * Creates data provider instance with search query applied
      *
      * @param array $params
-     * @param sting $restaurantUuid
+     * @param sting $storeUuid
      *
      * @return ActiveDataProvider
      */
-    public function searchTrackQuantity($params, $restaurantUuid)
+    public function searchTrackQuantity($params, $storeUuid)
     {
 
-        $query = Item::find()->where(['item.restaurant_uuid' => $restaurantUuid , 'track_quantity' => 1])->joinWith('category', true);
+        $query = Item::find()->where(['item.restaurant_uuid' => $storeUuid , 'track_quantity' => 1])->joinWith('category', true);
 
         // add conditions that should always apply here
 

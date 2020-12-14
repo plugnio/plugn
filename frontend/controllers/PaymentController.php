@@ -43,17 +43,17 @@ class PaymentController extends Controller
      * Lists all Payment models.
      * @return mixed
      */
-    public function actionIndex($restaurantUuid)
+    public function actionIndex($storeUuid)
     {
         
-        $restaurant_model = Yii::$app->getManagedAccount->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->getManagedAccount->getManagedAccount($storeUuid);
 
         $searchModel = new PaymentSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
-            'restaurantUuid' => $restaurantUuid,
+            'storeUuid' => $storeUuid,
             'dataProvider' => $dataProvider,
         ]);
     }
@@ -61,14 +61,14 @@ class PaymentController extends Controller
     /**
      * Displays a single Payment model.
      * @param string $id
-     * @param string $restaurantUuid
+     * @param string $storeUuid
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id,$restaurantUuid)
+    public function actionView($id,$storeUuid)
     {
         return $this->render('view', [
-            'model' => $this->findModel($id, $restaurantUuid),
+            'model' => $this->findModel($id, $storeUuid),
         ]);
     }
 
@@ -80,9 +80,9 @@ class PaymentController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id, $restaurantUuid)
+    public function actionDelete($id, $storeUuid)
     {
-        $this->findModel($id,$restaurantUuid)->delete();
+        $this->findModel($id,$storeUuid)->delete();
 
         return $this->redirect(['index']);
     }
@@ -94,9 +94,9 @@ class PaymentController extends Controller
      * @return Payment the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $restaurantUuid)
+    protected function findModel($id, $storeUuid)
     {
-        if (($model = Payment::find()->where(['payment_uuid' => $id, 'restaurant_uuid' => Yii::$app->getManagedAccount->getManagedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
+        if (($model = Payment::find()->where(['payment_uuid' => $id, 'restaurant_uuid' => Yii::$app->getManagedAccount->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
             return $model;
         }
 

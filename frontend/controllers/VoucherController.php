@@ -47,9 +47,9 @@ class VoucherController extends Controller
      * Lists all Voucher models.
      * @return mixed
      */
-    public function actionIndex($restaurantUuid)
+    public function actionIndex($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new VoucherSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
@@ -66,13 +66,13 @@ class VoucherController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($restaurantUuid)
+    public function actionCreate($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         if($restaurant_model){
           $model = new Voucher();
-          $model->restaurant_uuid = $restaurantUuid;
+          $model->restaurant_uuid = $storeUuid;
 
 
           if ($model->load(Yii::$app->request->post())) {
@@ -86,7 +86,7 @@ class VoucherController extends Controller
               if(YII_ENV == 'prod') {
                   \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
                   \Segment::track([
-                      'userId' => $restaurantUuid,
+                      'userId' => $storeUuid,
                       'event' => 'Voucher Created',
                       'properties' => [
                           'type' => $model->discountType,
@@ -95,14 +95,14 @@ class VoucherController extends Controller
                   ]);
                 }
                 
-                return $this->redirect(['index',  'restaurantUuid' => $restaurantUuid]);
+                return $this->redirect(['index',  'storeUuid' => $storeUuid]);
 
               }
           }
 
           return $this->render('create', [
               'model' => $model,
-              'restaurantUuid' => $restaurantUuid
+              'storeUuid' => $storeUuid
           ]);
         }
 
@@ -115,9 +115,9 @@ class VoucherController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id, $restaurantUuid)
+    public function actionUpdate($id, $storeUuid)
     {
-        $model = $this->findModel($id, $restaurantUuid);
+        $model = $this->findModel($id, $storeUuid);
 
         if($model->valid_from && $model->valid_until)
           $model->duration =  date('Y-m-d', strtotime( $model->valid_from ))  . ' - '. date('Y-m-d', strtotime( $model->valid_until ));
@@ -128,7 +128,7 @@ class VoucherController extends Controller
               list($model->valid_from, $model->valid_until) = explode(' - ', $model->duration);
 
           if($model->save())
-            return $this->redirect(['index','restaurantUuid' => $restaurantUuid]);
+            return $this->redirect(['index','storeUuid' => $storeUuid]);
         }
 
         return $this->render('update', [
@@ -143,14 +143,14 @@ class VoucherController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionChangeVoucherStatus($id, $restaurantUuid)
+    public function actionChangeVoucherStatus($id, $storeUuid)
     {
-        $model = $this->findModel($id, $restaurantUuid);
+        $model = $this->findModel($id, $storeUuid);
 
         $model->voucher_status = $model->voucher_status == Voucher::VOUCHER_STATUS_ACTIVE ? Voucher::VOUCHER_STATUS_EXPIRED  : Voucher::VOUCHER_STATUS_ACTIVE;
         $model->save();
 
-        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+        return $this->redirect(['index', 'storeUuid' => $storeUuid]);
 
     }
 
@@ -161,11 +161,11 @@ class VoucherController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id, $restaurantUuid)
+    public function actionDelete($id, $storeUuid)
     {
-        $this->findModel($id, $restaurantUuid)->delete();
+        $this->findModel($id, $storeUuid)->delete();
 
-        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+        return $this->redirect(['index', 'storeUuid' => $storeUuid]);
 
     }
 
@@ -176,9 +176,9 @@ class VoucherController extends Controller
      * @return Voucher the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $restaurantUuid)
+    protected function findModel($id, $storeUuid)
     {
-        if (($model = Voucher::find()->where(['voucher_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
+        if (($model = Voucher::find()->where(['voucher_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
             return $model;
         }
 

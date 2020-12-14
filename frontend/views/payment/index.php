@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel frontend\models\PaymentSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['restaurant_uuid'] = $restaurantUuid;
+$this->params['restaurant_uuid'] = $storeUuid;
 
 $this->title = 'Payments';
 $this->params['breadcrumbs'][] = $this->title;
@@ -50,7 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'buttons' => [
                         'view' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['view', 'id' => $model->payment_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['view', 'id' => $model->payment_uuid, 'storeUuid' => $model->restaurant_uuid], [
                                         'title' => 'View',
                                         'data-pjax' => '0',
                                             ]
@@ -58,7 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         },
                         'delete' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete', 'id' => $model->payment_uuid, 'restaurantUuid' => $model->restaurant_uuid], [
+                                            '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['delete', 'id' => $model->payment_uuid, 'storeUuid' => $model->restaurant_uuid], [
                                         'title' => 'Delete',
                                         'data' => [
                                             'confirm' => 'Are you absolutely sure ? You will lose all the information about this category with this action.',

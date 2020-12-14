@@ -40,11 +40,11 @@ class OrderSearch extends Order {
      *
      * @return ActiveDataProvider
      */
-    public function searchAbandonedCheckoutOrders($params, $restaurantUuid) {
+    public function searchAbandonedCheckoutOrders($params, $storeUuid) {
 
 
         $query = Order::find()
-            ->where(['order.restaurant_uuid' => $restaurantUuid])
+            ->where(['order.restaurant_uuid' => $storeUuid])
             ->andWhere(['order_status' => Order::STATUS_ABANDONED_CHECKOUT])
             ->orderBy(['order_created_at' => SORT_DESC]);
 
@@ -98,10 +98,10 @@ class OrderSearch extends Order {
      *
      * @return ActiveDataProvider
      */
-    public function searchDraftOrders($params, $restaurantUuid) {
+    public function searchDraftOrders($params, $storeUuid) {
 
         $query = Order::find()
-            ->where(['order.restaurant_uuid' => $restaurantUuid])
+            ->where(['order.restaurant_uuid' => $storeUuid])
             ->andWhere(['order_status' => Order::STATUS_DRAFT])
             ->orderBy(['order_created_at' => SORT_DESC]);
 
@@ -155,10 +155,10 @@ class OrderSearch extends Order {
      *
      * @return ActiveDataProvider
      */
-    public function searchPendingOrders($params, $restaurantUuid) {
+    public function searchPendingOrders($params, $storeUuid) {
 
         $query = Order::find()
-            ->where(['order.restaurant_uuid' => $restaurantUuid])
+            ->where(['order.restaurant_uuid' => $storeUuid])
             ->andWhere(['order_status' => Order::STATUS_PENDING])
             ->orderBy(['order_created_at' => SORT_DESC]);
 
@@ -214,10 +214,10 @@ class OrderSearch extends Order {
      *
      * @return ActiveDataProvider
      */
-    public function search($params, $restaurantUuid) {
+    public function search($params, $storeUuid) {
 
         $query = Order::find()
-            ->where(['order.restaurant_uuid' => $restaurantUuid])
+            ->where(['order.restaurant_uuid' => $storeUuid])
             ->andWhere(['!=' , 'order_status' , Order::STATUS_DRAFT])
             ->andWhere(['!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
             ->orderBy(['order_created_at' => SORT_DESC]);

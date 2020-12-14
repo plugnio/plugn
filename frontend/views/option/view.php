@@ -6,11 +6,11 @@ use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Option */
-$this->params['restaurant_uuid'] = $restaurantUuid;
+$this->params['restaurant_uuid'] = $storeUuid;
 
 $this->title = $model->option_name;
-$this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['item/index', 'restaurantUuid' => $restaurantUuid]];
-$this->params['breadcrumbs'][] = ['label' => $model->item->item_name, 'url' => ['item/view', 'id' => $model->item->item_uuid, 'restaurantUuid' => $restaurantUuid]];
+$this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['item/index', 'storeUuid' => $storeUuid]];
+$this->params['breadcrumbs'][] = ['label' => $model->item->item_name, 'url' => ['item/view', 'id' => $model->item->item_uuid, 'storeUuid' => $storeUuid]];
 
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -18,9 +18,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="option-view">
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->option_id, 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Update', ['update', 'id' => $model->option_id, 'storeUuid' => $storeUuid], ['class' => 'btn btn-primary']) ?>
         <?=
-        Html::a('Delete', ['delete', 'id' => $model->option_id, 'restaurantUuid' => $restaurantUuid], [
+        Html::a('Delete', ['delete', 'id' => $model->option_id, 'storeUuid' => $storeUuid], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
@@ -50,7 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h2>Extra Options</h2>
 
     <p>
-        <?= Html::a('Create Extra option', ['extra-option/create', 'option_id' => $model->option_id, 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Extra option', ['extra-option/create', 'option_id' => $model->option_id, 'storeUuid' => $storeUuid], ['class' => 'btn btn-success']) ?>
     </p>
 
     <div class="card">
@@ -67,7 +67,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'buttons' => [
                         'view' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['extra-option/view','id' => $model->extra_option_id, 'restaurantUuid'=> $model->option->item->restaurant_uuid ], [
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['extra-option/view','id' => $model->extra_option_id, 'storeUuid'=> $model->option->item->restaurant_uuid ], [
                                         'title' => 'View',
                                         'data-pjax' => '0',
                                             ]
@@ -75,7 +75,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         },
                         'update' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['extra-option/update','id' => $model->extra_option_id, 'restaurantUuid'=> $model->option->item->restaurant_uuid ], [
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['extra-option/update','id' => $model->extra_option_id, 'storeUuid'=> $model->option->item->restaurant_uuid ], [
                                         'title' => 'Update',
                                         'data-pjax' => '0',
                                             ]
@@ -83,7 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         },
                         'delete' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['extra-option/delete','id' => $model->extra_option_id, 'restaurantUuid'=> $model->option->item->restaurant_uuid ], [
+                                            '<span style="margin-right: 20px;color: red;" class="nav-icon fas fa-trash"></span>', ['extra-option/delete','id' => $model->extra_option_id, 'storeUuid'=> $model->option->item->restaurant_uuid ], [
                                         'title' => 'Delete',
                                         'data' => [
                                             'confirm' => 'Are you absolutely sure ? You will lose all the information about this item with this action.',

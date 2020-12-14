@@ -19,9 +19,9 @@ use yii\filters\VerbFilter;
 use common\components\FileUploader;
 
 /**
- * RestaurantController implements the CRUD actions for Restaurant model.
+ * StoreController implements the CRUD actions for Restaurant model.
  */
-class RestaurantController extends Controller {
+class StoreController extends Controller {
 
     public $enableCsrfValidation = false;
 
@@ -48,8 +48,8 @@ class RestaurantController extends Controller {
         ];
     }
 
-    public function actionExportTodaySoldItems($restaurantUuid) {
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+    public function actionExportTodaySoldItems($storeUuid) {
+        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($storeUuid)) {
 
 
             $today_sold_item = Item::find()
@@ -87,8 +87,8 @@ class RestaurantController extends Controller {
         }
     }
 
-    public function actionExportLastSevenDaysSoldItems($restaurantUuid) {
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+    public function actionExportLastSevenDaysSoldItems($storeUuid) {
+        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($storeUuid)) {
 
 
             $this_week_sold_item = Item::find()
@@ -125,9 +125,9 @@ class RestaurantController extends Controller {
         }
     }
 
-    public function actionExportCurrentMonthSoldItems($restaurantUuid) {
+    public function actionExportCurrentMonthSoldItems($storeUuid) {
 
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($storeUuid)) {
 
 
             $current_month_sold_item = Item::find()
@@ -165,9 +165,9 @@ class RestaurantController extends Controller {
         }
     }
 
-    public function actionExportLastMonthSoldItems($restaurantUuid) {
+    public function actionExportLastMonthSoldItems($storeUuid) {
 
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($storeUuid)) {
 
 
             $last_month_sold_item = Item::find()
@@ -207,9 +207,9 @@ class RestaurantController extends Controller {
         }
     }
 
-    public function actionExportLastThreeMonthsSoldItems($restaurantUuid) {
+    public function actionExportLastThreeMonthsSoldItems($storeUuid) {
 
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($storeUuid)) {
 
             $last_three_month_sold_item = Item::find()
                     ->joinWith(['orderItems', 'orderItems.order'])
@@ -250,9 +250,21 @@ class RestaurantController extends Controller {
     /**
      * @return mixed
      */
-    public function actionStatistics($restaurantUuid) {
+    public function actionReports($storeUuid) {
 
-        $model = $this->findModel($restaurantUuid);
+        $model = $this->findModel($storeUuid);
+
+        return $this->render('reports', [
+          'model' => $model
+        ]);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function actionStatistics($storeUuid) {
+
+        $model = $this->findModel($storeUuid);
 
 
         $revenue_generated_chart_data = [];
@@ -530,9 +542,9 @@ class RestaurantController extends Controller {
      * Lists all Restaurant models.
      * @return mixed
      */
-    public function actionIndex($restaurantUuid) {
+    public function actionIndex($storeUuid) {
 
-        $model = $this->findModel($restaurantUuid);
+        $model = $this->findModel($storeUuid);
 
 
         return $this->render('view', [
@@ -544,9 +556,9 @@ class RestaurantController extends Controller {
      * View payment settings page
      * @return mixed
      */
-    public function actionViewPaymentMethods($restaurantUuid) {
+    public function actionViewPaymentMethods($storeUuid) {
 
-        $model = $this->findModel($restaurantUuid);
+        $model = $this->findModel($storeUuid);
         $isCashOnDeliveryEnabled = $model->getPaymentMethods()->where(['payment_method_id' => 3])->exists();
         $isOnlinePaymentEnabled = $model->getPaymentMethods()->where(['payment_method_id' => 1])->exists();
 
@@ -684,7 +696,7 @@ class RestaurantController extends Controller {
             if ($model->validate() && $model->save()) {
 
 
-                return $this->redirect(['view-payment-methods', 'restaurantUuid' => $model->restaurant_uuid]);
+                return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
             } else {
                 Yii::$app->session->setFlash('error', print_r($model->errors, true));
             }
@@ -698,8 +710,8 @@ class RestaurantController extends Controller {
     /**
      *  Enable OnlinePayment on delivery
      */
-    public function actionEnableOnlinePayment($restaurantUuid) {
-        $model = $this->findModel($restaurantUuid);
+    public function actionEnableOnlinePayment($storeUuid) {
+        $model = $this->findModel($storeUuid);
 
         if (!$model->getRestaurantPaymentMethods()->where(['payment_method_id' => 1])->exists()) {
 
@@ -718,14 +730,14 @@ class RestaurantController extends Controller {
         }
 
 
-        return $this->redirect(['view-payment-methods', 'restaurantUuid' => $model->restaurant_uuid]);
+        return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
     }
 
     /**
      *  Disable OnlinePayment on delivery
      */
-    public function actionDisableOnlinePayment($restaurantUuid) {
-        $model = $this->findModel($restaurantUuid);
+    public function actionDisableOnlinePayment($storeUuid) {
+        $model = $this->findModel($storeUuid);
 
         $online_payments = $model->getRestaurantPaymentMethods()->where(['<>','payment_method_id' , 3])->all();
 
@@ -733,15 +745,15 @@ class RestaurantController extends Controller {
           $online_payment->delete();
         }
 
-        return $this->redirect(['view-payment-methods', 'restaurantUuid' => $model->restaurant_uuid]);
+        return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
     }
 
 
     /**
      *  Enable Cash on delivery
      */
-    public function actionEnableCod($restaurantUuid) {
-        $model = $this->findModel($restaurantUuid);
+    public function actionEnableCod($storeUuid) {
+        $model = $this->findModel($storeUuid);
 
         if (!$model->getRestaurantPaymentMethods()->where(['payment_method_id' => 3])->exists()) {
 
@@ -750,28 +762,28 @@ class RestaurantController extends Controller {
             $payments_method->restaurant_uuid = $model->restaurant_uuid;
             $payments_method->save();
         }
-        return $this->redirect(['view-payment-methods', 'restaurantUuid' => $model->restaurant_uuid]);
+        return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
     }
 
     /**
      *  Disable Cash on delivery
      */
-    public function actionDisableCod($restaurantUuid) {
-        $model = $this->findModel($restaurantUuid);
+    public function actionDisableCod($storeUuid) {
+        $model = $this->findModel($storeUuid);
 
         if ($cashOnDelivery = $model->getRestaurantPaymentMethods()->where(['payment_method_id' => 3])->one())
             $cashOnDelivery->delete();
 
-        return $this->redirect(['view-payment-methods', 'restaurantUuid' => $model->restaurant_uuid]);
+        return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
     }
 
     /**
      * View Design & layout page
      * @return mixed
      */
-    public function actionViewDesignLayout($restaurantUuid) {
+    public function actionViewDesignLayout($storeUuid) {
 
-        $model = $this->findModel($restaurantUuid);
+        $model = $this->findModel($storeUuid);
 
         $store_theme_model = RestaurantTheme::findOne($model->restaurant_uuid);
 
@@ -794,7 +806,7 @@ class RestaurantController extends Controller {
         $model = $this->findModel($id);
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index', 'restaurantUuid' => $id]);
+            return $this->redirect(['index', 'storeUuid' => $id]);
         }
 
         return $this->render('update', [
@@ -918,7 +930,7 @@ class RestaurantController extends Controller {
                 if ($logo)
                     $model->uploadLogo($model->restaurant_logo);
 
-                return $this->redirect(['view-design-layout', 'restaurantUuid' => $id]);
+                return $this->redirect(['view-design-layout', 'storeUuid' => $id]);
             }
         }
 
@@ -930,13 +942,13 @@ class RestaurantController extends Controller {
 
     /**
      * Delete logo image
-     * @param type $restaurantUuid
+     * @param type $storeUuid
      * @return boolean
      */
-    public function actionDeleteLogoImage($restaurantUuid) {
+    public function actionDeleteLogoImage($storeUuid) {
 
 
-        $model = $this->findModel($restaurantUuid);
+        $model = $this->findModel($storeUuid);
 
 
         $file_name = Yii::$app->request->getBodyParam("file");
@@ -954,13 +966,13 @@ class RestaurantController extends Controller {
 
     /**
      * Delete thumbnail image
-     * @param type $restaurantUuid
+     * @param type $storeUuid
      * @return boolean
      */
-    public function actionDeleteThumbnailImage($restaurantUuid) {
+    public function actionDeleteThumbnailImage($storeUuid) {
 
 
-        $model = $this->findModel($restaurantUuid);
+        $model = $this->findModel($storeUuid);
 
 
         $file_name = Yii::$app->request->getBodyParam("file");

@@ -38,9 +38,9 @@ class WebLinkSearch extends WebLink
      *
      * @return ActiveDataProvider
      */
-    public function search($params, $restaurantUuid)
+    public function search($params, $storeUuid)
     {
-        $query = WebLink::find()->where(['restaurant_uuid' => $restaurantUuid]);
+        $query = WebLink::find()->where(['restaurant_uuid' => $storeUuid]);
 
         // add conditions that should always apply here
 

@@ -45,9 +45,9 @@ class OptionController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id, $restaurantUuid) {
+    public function actionView($id, $storeUuid) {
         
-        $option_model = $this->findModel($id, $restaurantUuid);
+        $option_model = $this->findModel($id, $storeUuid);
 
         // extra options
         $itemExtraOptionsDataProvider = new \yii\data\ActiveDataProvider([
@@ -57,7 +57,7 @@ class OptionController extends Controller {
         return $this->render('view', [
                     'model' => $option_model,
                     'itemExtraOptionsDataProvider' => $itemExtraOptionsDataProvider,
-                    'restaurantUuid' => $restaurantUuid
+                    'storeUuid' => $storeUuid
         ]);
     }
 
@@ -66,17 +66,17 @@ class OptionController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($item_uuid, $restaurantUuid) {
+    public function actionCreate($item_uuid, $storeUuid) {
         $model = new Option();
         $model->item_uuid = $item_uuid;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->option_id,'restaurantUuid' => $restaurantUuid]);
+            return $this->redirect(['view', 'id' => $model->option_id,'storeUuid' => $storeUuid]);
         }
 
         return $this->render('create', [
                     'model' => $model,
-                    'restaurantUuid' => $restaurantUuid
+                    'storeUuid' => $storeUuid
         ]);
     }
 
@@ -87,16 +87,16 @@ class OptionController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id, $restaurantUuid) {
-        $model = $this->findModel($id, $restaurantUuid);
+    public function actionUpdate($id, $storeUuid) {
+        $model = $this->findModel($id, $storeUuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->option_id,'restaurantUuid' => $restaurantUuid]);
+            return $this->redirect(['view', 'id' => $model->option_id,'storeUuid' => $storeUuid]);
         }
 
         return $this->render('update', [
                     'model' => $model,
-                    'restaurantUuid' => $restaurantUuid
+                    'storeUuid' => $storeUuid
         ]);
     }
 
@@ -107,14 +107,14 @@ class OptionController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id, $restaurantUuid) {
+    public function actionDelete($id, $storeUuid) {
 
-        $model = $this->findModel($id, $restaurantUuid);
+        $model = $this->findModel($id, $storeUuid);
         $item_uuid = $model->item_uuid;
 
         $model->delete();
 
-        return $this->redirect(['item/view', 'id' => $item_uuid,'restaurantUuid' => $restaurantUuid]);
+        return $this->redirect(['item/view', 'id' => $item_uuid,'storeUuid' => $storeUuid]);
         
     }
 
@@ -125,9 +125,9 @@ class OptionController extends Controller {
      * @return Option the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id,$restaurantUuid) {
+    protected function findModel($id,$storeUuid) {
         if (($model = Option::findOne($id)) !== null) {
-            if($model->item->restaurant_uuid == Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid)
+            if($model->item->restaurant_uuid == Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid)
             return $model;
         }
 

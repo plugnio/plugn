@@ -33,19 +33,7 @@ $this->registerJs($js);
 
 <section id="data-list-view" class="data-list-view-header">
 
-
-    <?php echo $this->render('_inventory-search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
-
-
-        <!-- Data list view starts -->
-        <div class="action-btns d-none">
-            <div class="btn-dropdown mr-1 mb-1">
-                <div class="btn-group dropdown actions-dropodown">
-                    <?= Html::a('<i class="fa fa-file-excel-o"></i> Export to Excel', ['export-to-excel', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
-                </div>
-            </div>
-        </div>
-
+  <?php if ($dataProvider->getCount() > 0) { ?>
 
 
     <div class="table-responsive">
@@ -102,7 +90,29 @@ $this->registerJs($js);
     </div>
     <!-- DataTable ends -->
 
+  <?php } else {?>
 
+
+    <div class="card">
+      <div style="padding: 70px 0; text-align: center;">
+
+        <div>
+          <img src="https://res.cloudinary.com/plugn/image/upload/v1607881378/emptystate-inventory.svg" width="226" alt="" />
+        </div>
+
+        <h3>
+          Add and manage your products
+        </h3>
+
+        <p>
+          When you enable inventory tracking on your products, you can view and adjust their inventory counts here.
+        </p>
+        <?= Html::a('Go to items', ['item/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+      </div>
+    </div>
+
+
+  <?php } ?>
 
 </section>
 <!-- Data list view end -->

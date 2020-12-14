@@ -45,9 +45,9 @@ class AgentAssignmentController extends Controller {
      * Lists all AgentAssignment models.
      * @return mixed
      */
-    public function actionIndex($restaurantUuid) {
+    public function actionIndex($storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
 
         if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) {
@@ -70,9 +70,9 @@ class AgentAssignmentController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($assignment_id, $agent_id, $restaurantUuid) {
+    public function actionView($assignment_id, $agent_id, $storeUuid) {
         return $this->render('view', [
-                    'model' => $this->findModel($assignment_id, $agent_id, $restaurantUuid),
+                    'model' => $this->findModel($assignment_id, $agent_id, $storeUuid),
         ]);
     }
 
@@ -82,17 +82,17 @@ class AgentAssignmentController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($restaurantUuid) {
+    public function actionCreate($storeUuid) {
 
         $model = new AgentAssignment();
-        $model->restaurant_uuid = Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid;
+        $model->restaurant_uuid = Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid;
 
         if (AgentAssignment::isOwner($model->restaurant_uuid)) {
 
             if ($model->load(Yii::$app->request->post())) {
 
                 if ($model->validate() && $model->save()) {
-                    return $this->redirect(['view', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'restaurantUuid' => $restaurantUuid]);
+                    return $this->redirect(['view', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'storeUuid' => $storeUuid]);
                 }
             }
 
@@ -111,11 +111,11 @@ class AgentAssignmentController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($assignment_id, $agent_id, $restaurantUuid) {
-        $model = $this->findModel($assignment_id, $agent_id, $restaurantUuid);
+    public function actionUpdate($assignment_id, $agent_id, $storeUuid) {
+        $model = $this->findModel($assignment_id, $agent_id, $storeUuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'restaurantUuid' => $restaurantUuid]);
+            return $this->redirect(['view', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'storeUuid' => $storeUuid]);
         }
 
         return $this->render('update', [
@@ -130,10 +130,10 @@ class AgentAssignmentController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($assignment_id, $agent_id, $restaurantUuid) {
-        $this->findModel($assignment_id, $agent_id, $restaurantUuid)->delete();
+    public function actionDelete($assignment_id, $agent_id, $storeUuid) {
+        $this->findModel($assignment_id, $agent_id, $storeUuid)->delete();
 
-        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+        return $this->redirect(['index', 'storeUuid' => $storeUuid]);
     }
 
     /**
@@ -143,12 +143,12 @@ class AgentAssignmentController extends Controller {
      * @return AgentAssignment the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($assignment_id, $agent_id, $restaurantUuid) {
-        if (Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+    protected function findModel($assignment_id, $agent_id, $storeUuid) {
+        if (Yii::$app->accountManager->getManagedAccount($storeUuid)) {
 
-            if (AgentAssignment::isOwner($restaurantUuid)) {
+            if (AgentAssignment::isOwner($storeUuid)) {
 
-                if (($model = AgentAssignment::find()->where(['assignment_id' => $assignment_id, 'agent_id' => $agent_id, 'restaurant_uuid' => $restaurantUuid])->one()) !== null) {
+                if (($model = AgentAssignment::find()->where(['assignment_id' => $assignment_id, 'agent_id' => $agent_id, 'restaurant_uuid' => $storeUuid])->one()) !== null) {
                     return $model;
                 }
             } else {

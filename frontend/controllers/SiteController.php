@@ -130,8 +130,8 @@ class SiteController extends Controller {
      *
      * @return mixed
      */
-    public function actionRedirectToStoreDomain($restaurantUuid) {
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+    public function actionRedirectToStoreDomain($storeUuid) {
+        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($storeUuid)) {
 
             if($managedRestaurant->has_deployed)
             return $this->redirect($managedRestaurant->restaurant_domain);
@@ -338,8 +338,8 @@ class SiteController extends Controller {
             Yii::$app->session->setFlash('error', print_r('There seems to be an issue with your payment, please try again.', true));
 
             // Redirect back to current plan page
-            return $this->redirect(['restaurant/view-payment-methods',
-                        'restaurantUuid' => $paymentRecord->restaurant_uuid
+            return $this->redirect(['store/view-payment-methods',
+                        'storeUuid' => $paymentRecord->restaurant_uuid
             ]);
 
         } catch (\Exception $e) {
@@ -353,15 +353,15 @@ class SiteController extends Controller {
      *
      * @return mixed
      */
-    public function actionRealTimeOrders($restaurant_uuid) {
+    public function actionRealTimeOrders($storeUuid) {
 
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $restaurant_uuid);
+        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid);
 
         return $this->render('real-time-orders', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
-                    'restaurant_uuid' => $restaurant_uuid
+                    'restaurant_uuid' => $storeUuid
         ]);
     }
 

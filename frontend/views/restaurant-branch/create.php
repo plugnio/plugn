@@ -7,7 +7,7 @@ use yii\helpers\Html;
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 $this->title = 'Create Store Branch';
-$this->params['breadcrumbs'][] = ['label' => 'Store Branches', 'url' => ['index', 'restaurantUuid' =>$model->restaurant_uuid ]];
+$this->params['breadcrumbs'][] = ['label' => 'Store Branches', 'url' => ['index', 'storeUuid' =>$model->restaurant_uuid ]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="restaurant-branch-create">

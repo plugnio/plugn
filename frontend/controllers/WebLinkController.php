@@ -43,14 +43,14 @@ class WebLinkController extends Controller {
      * Lists all WebLink models.
      * @return mixed
      */
-    public function actionIndex($restaurantUuid) {
+    public function actionIndex($storeUuid) {
         $searchModel = new WebLinkSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurantUuid);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $storeUuid);
 
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
-                    'restaurantUuid' => $restaurantUuid
+                    'storeUuid' => $storeUuid
         ]);
     }
 
@@ -60,21 +60,21 @@ class WebLinkController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($restaurantUuid) {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+    public function actionCreate($storeUuid) {
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         if ($restaurant_model) {
 
             $model = new WebLink();
-            $model->restaurant_uuid = $restaurantUuid;
+            $model->restaurant_uuid = $storeUuid;
 
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+                return $this->redirect(['index', 'storeUuid' => $storeUuid]);
             }
 
             return $this->render('create', [
                         'model' => $model,
-                        'restaurantUuid' => $restaurantUuid
+                        'storeUuid' => $storeUuid
             ]);
         }
     }
@@ -86,16 +86,16 @@ class WebLinkController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id, $restaurantUuid) {
-        $model = $this->findModel($id, $restaurantUuid);
+    public function actionUpdate($id, $storeUuid) {
+        $model = $this->findModel($id, $storeUuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+            return $this->redirect(['index', 'storeUuid' => $storeUuid]);
         }
 
         return $this->render('update', [
                     'model' => $model,
-                    'restaurantUuid' => $restaurantUuid
+                    'storeUuid' => $storeUuid
         ]);
     }
 
@@ -106,10 +106,10 @@ class WebLinkController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id, $restaurantUuid) {
-        $this->findModel($id, $restaurantUuid)->delete();
+    public function actionDelete($id, $storeUuid) {
+        $this->findModel($id, $storeUuid)->delete();
 
-        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+        return $this->redirect(['index', 'storeUuid' => $storeUuid]);
     }
 
     /**
@@ -119,8 +119,8 @@ class WebLinkController extends Controller {
      * @return WebLink the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $restaurantUuid) {
-        if (($model = WebLink::find()->where(['web_link_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
+    protected function findModel($id, $storeUuid) {
+        if (($model = WebLink::find()->where(['web_link_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
             return $model;
         }
 

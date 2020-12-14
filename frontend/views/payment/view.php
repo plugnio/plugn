@@ -9,7 +9,7 @@ use yii\widgets\DetailView;
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 $this->title = $model->payment_uuid;
-$this->params['breadcrumbs'][] = ['label' => 'Payments', 'url' => ['index', 'restaurantUuid' => $model->restaurant_uuid]];
+$this->params['breadcrumbs'][] = ['label' => 'Payments', 'url' => ['index', 'storeUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
 
-        <?= Html::a('Create Refund', ['refund/create', 'restaurantUuid' => $model->restaurant_uuid, 'orderUuid' => $model->order_uuid], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Refund', ['refund/create', 'storeUuid' => $model->restaurant_uuid, 'orderUuid' => $model->order_uuid], ['class' => 'btn btn-success']) ?>
 
     </p>
     <div class="card">

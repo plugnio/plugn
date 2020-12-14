@@ -10,7 +10,7 @@ use common\models\AgentAssignment;
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 $this->title = $model->agent->agent_name;
-$this->params['breadcrumbs'][] = ['label' => 'Assigned Agents', 'url' => ['index', 'restaurantUuid' => $model->restaurant_uuid]];
+$this->params['breadcrumbs'][] = ['label' => 'Assigned Agents', 'url' => ['index', 'storeUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -20,10 +20,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?php
         if ($model->agent_id != Yii::$app->user->identity->agent_id) {
-            echo Html::a('Update', ['update', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'restaurantUuid' => $model->restaurant_uuid], ['class' => 'btn btn-primary', 'style' => 'margin-right: 5px;']);
+            echo Html::a('Update', ['update', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'storeUuid' => $model->restaurant_uuid], ['class' => 'btn btn-primary', 'style' => 'margin-right: 5px;']);
 
 
-            echo Html::a('Delete', ['delete', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'restaurantUuid' => $model->restaurant_uuid], [
+            echo Html::a('Delete', ['delete', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'storeUuid' => $model->restaurant_uuid], [
                 'class' => 'btn btn-danger',
                 'data' => [
                     'confirm' => 'Are you sure you want to delete this item?',

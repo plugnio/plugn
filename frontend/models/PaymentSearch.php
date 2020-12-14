@@ -39,9 +39,9 @@ class PaymentSearch extends Payment
      *
      * @return ActiveDataProvider
      */
-    public function search($params,$restaurantUuid)
+    public function search($params,$storeUuid)
     {
-        $query = Payment::find()->where(['restaurant_uuid' => $restaurantUuid]);
+        $query = Payment::find()->where(['restaurant_uuid' => $storeUuid]);
 
         // add conditions that should always apply here
 

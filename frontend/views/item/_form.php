@@ -17,7 +17,7 @@ use common\components\FileUploader;
 /* @var $model common\models\Item */
 /* @var $form yii\widgets\ActiveForm */
 
-$url = yii\helpers\Url::to(['delete-item-image', 'restaurantUuid' => $modelItem->restaurant_uuid, 'itemUuid' => $modelItem->item_uuid]);
+$url = yii\helpers\Url::to(['delete-item-image', 'storeUuid' => $modelItem->restaurant_uuid, 'itemUuid' => $modelItem->item_uuid]);
 
 
 $js = <<< JS
@@ -138,9 +138,9 @@ $this->registerJs($js);
                 </div>
             </div>
 
-            <?= $form->field($modelItem, 'item_description')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL'])->label('Item description in English *') ?>
+            <?= $form->field($modelItem, 'item_description')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL']) ?>
 
-            <?= $form->field($modelItem, 'item_description_ar')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL'])->label('Item description in Arabic *')  ?>
+            <?= $form->field($modelItem, 'item_description_ar')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL'])  ?>
 
 
 

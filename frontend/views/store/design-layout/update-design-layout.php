@@ -18,12 +18,12 @@ use common\components\FileUploader;
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 $this->title = 'Update Store design and layout';
-$this->params['breadcrumbs'][] = ['label' => 'Design & layout', 'url' => ['view-design-layout','restaurantUuid' =>$model->restaurant_uuid]];
+$this->params['breadcrumbs'][] = ['label' => 'Design & layout', 'url' => ['view-design-layout','storeUuid' =>$model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = 'Update design & layout';
 
 
-$deleteLogoUrl = yii\helpers\Url::to(['delete-logo-image', 'restaurantUuid' => $model->restaurant_uuid]);
-$deleteThumbnailUrl = yii\helpers\Url::to(['delete-thumbnail-image', 'restaurantUuid' => $model->restaurant_uuid]);
+$deleteLogoUrl = yii\helpers\Url::to(['delete-logo-image', 'storeUuid' => $model->restaurant_uuid]);
+$deleteThumbnailUrl = yii\helpers\Url::to(['delete-thumbnail-image', 'storeUuid' => $model->restaurant_uuid]);
 
 
 $js = <<< JS

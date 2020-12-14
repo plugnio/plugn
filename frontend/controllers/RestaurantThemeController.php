@@ -42,16 +42,16 @@ class RestaurantThemeController extends Controller {
 
     /**
      * Displays a single RestaurantTheme model.
-     * @param string $restaurantUuid
+     * @param string $storeUuid
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionIndex($restaurantUuid) {
+    public function actionIndex($storeUuid) {
 
-      $model = $this->findModel($restaurantUuid);
+      $model = $this->findModel($storeUuid);
 
       if ($model->load(Yii::$app->request->post()) && $model->save()) {
-          return $this->redirect(['index', 'restaurantUuid' => $model->restaurant_uuid]);
+          return $this->redirect(['index', 'storeUuid' => $model->restaurant_uuid]);
       }
 
       return $this->render('index', [
@@ -67,11 +67,11 @@ class RestaurantThemeController extends Controller {
      * @return RestaurantTheme the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($restaurantUuid) {
-        if (Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+    protected function findModel($storeUuid) {
+        if (Yii::$app->accountManager->getManagedAccount($storeUuid)) {
 
-            if (AgentAssignment::isOwner($restaurantUuid)) {
-                if (($model = RestaurantTheme::findOne(Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid)) !== null) {
+            if (AgentAssignment::isOwner($storeUuid)) {
+                if (($model = RestaurantTheme::findOne(Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid)) !== null) {
                     return $model;
                 }
             } else {

@@ -35,7 +35,7 @@ use yii\widgets\ActiveForm;
 
                         <?php
                         $form = ActiveForm::begin([
-                            'action' => ['category/index', 'restaurantUuid' => $restaurant_uuid],
+                            'action' => ['category/index', 'storeUuid' => $restaurant_uuid],
                             'method' => 'get',
                         ]);
                         ?>
@@ -60,7 +60,7 @@ use yii\widgets\ActiveForm;
 
                         <div class="form-group" style="margin: 0px 15px">
                             <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-                            <?= Html::a('Reset', ['category/index', 'restaurantUuid' => $restaurant_uuid], ['class' => 'btn btn-outline-secondary', 'style' => 'margin-left: 10px;']) ?>
+                            <?= Html::a('Reset', ['category/index', 'storeUuid' => $restaurant_uuid], ['class' => 'btn btn-outline-secondary', 'style' => 'margin-left: 10px;']) ?>
                         </div>
                         <?php ActiveForm::end(); ?>
 

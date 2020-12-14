@@ -36,9 +36,9 @@ class OpeningHourController extends Controller {
      * Lists all OpeningHour models.
      * @return mixed
      */
-    public function actionIndex($restaurantUuid) {
+    public function actionIndex($storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $daily_hours = new OpeningHour();
 
@@ -58,7 +58,7 @@ class OpeningHourController extends Controller {
             return $this->render('index', [
                         'models' => $models,
                         'daily_hours' => $daily_hours,
-                        'restaurantUuid' => $restaurantUuid,
+                        'storeUuid' => $storeUuid,
             ]);
 
 

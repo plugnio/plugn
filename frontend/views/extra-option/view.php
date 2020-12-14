@@ -5,21 +5,21 @@ use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\ExtraOption */
-$this->params['restaurant_uuid'] = $restaurantUuid;
+$this->params['restaurant_uuid'] = $storeUuid;
 
 $this->title = $model->extra_option_name;
-$this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['item/index', 'restaurantUuid' => $restaurantUuid]];
-$this->params['breadcrumbs'][] = ['label' => $model->option->item->item_name, 'url' => ['item/view', 'id' => $model->option->item->item_uuid, 'restaurantUuid' => $restaurantUuid]];
-$this->params['breadcrumbs'][] = ['label' => $model->option->option_name, 'url' => ['option/view', 'id' => $model->option->option_id, 'restaurantUuid' => $restaurantUuid]];
+$this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['item/index', 'storeUuid' => $storeUuid]];
+$this->params['breadcrumbs'][] = ['label' => $model->option->item->item_name, 'url' => ['item/view', 'id' => $model->option->item->item_uuid, 'storeUuid' => $storeUuid]];
+$this->params['breadcrumbs'][] = ['label' => $model->option->option_name, 'url' => ['option/view', 'id' => $model->option->option_id, 'storeUuid' => $storeUuid]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="extra-option-view">
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->extra_option_id, 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Update', ['update', 'id' => $model->extra_option_id, 'storeUuid' => $storeUuid], ['class' => 'btn btn-primary']) ?>
         <?=
-        Html::a('Delete', ['delete', 'id' => $model->extra_option_id, 'restaurantUuid' => $restaurantUuid], [
+        Html::a('Delete', ['delete', 'id' => $model->extra_option_id, 'storeUuid' => $storeUuid], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',

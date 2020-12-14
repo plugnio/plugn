@@ -116,7 +116,7 @@ $this->registerJs($js);
 
     <?php
 
-      if(AgentAssignment::isOwner($restaurantUuid)){
+      if(AgentAssignment::isOwner($storeUuid)){
         echo $form->field($model, 'reminder_email', [
             'template' => '
             <div class="vs-checkbox-con vs-checkbox-primary">

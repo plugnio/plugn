@@ -43,9 +43,9 @@ class RestaurantBranchController extends Controller {
      * Lists all RestaurantBranch models.
      * @return mixed
      */
-    public function actionIndex($restaurantUuid) {
+    public function actionIndex($storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $dataProvider = new ActiveDataProvider([
             'query' => RestaurantBranch::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid]),
@@ -53,7 +53,7 @@ class RestaurantBranchController extends Controller {
 
         return $this->render('index', [
                     'dataProvider' => $dataProvider,
-                    'restaurantUuid' => $restaurant_model->restaurant_uuid
+                    'storeUuid' => $restaurant_model->restaurant_uuid
         ]);
     }
 
@@ -63,9 +63,9 @@ class RestaurantBranchController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id, $restaurantUuid) {
+    public function actionView($id, $storeUuid) {
         return $this->render('view', [
-                    'model' => $this->findModel($id, $restaurantUuid),
+                    'model' => $this->findModel($id, $storeUuid),
         ]);
     }
 
@@ -74,14 +74,14 @@ class RestaurantBranchController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($restaurantUuid) {
+    public function actionCreate($storeUuid) {
         $model = new RestaurantBranch();
-        $model->restaurant_uuid = Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid;
+        $model->restaurant_uuid = Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid;
 
         if ($model->load(Yii::$app->request->post())) {
 
             if ($model->save())
-                return $this->redirect(['view', 'id' => $model->restaurant_branch_id, 'restaurantUuid' => $model->restaurant_uuid]);
+                return $this->redirect(['view', 'id' => $model->restaurant_branch_id, 'storeUuid' => $model->restaurant_uuid]);
         }
 
         return $this->render('create', [
@@ -96,15 +96,15 @@ class RestaurantBranchController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id, $restaurantUuid) {
-        $model = $this->findModel($id, $restaurantUuid);
+    public function actionUpdate($id, $storeUuid) {
+        $model = $this->findModel($id, $storeUuid);
 
         if ($model->load(Yii::$app->request->post())) {
 
-            $model->restaurant_uuid = Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid;
+            $model->restaurant_uuid = Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid;
 
             if ($model->save())
-                return $this->redirect(['view', 'id' => $model->restaurant_branch_id, 'restaurantUuid' => $model->restaurant_uuid]);
+                return $this->redirect(['view', 'id' => $model->restaurant_branch_id, 'storeUuid' => $model->restaurant_uuid]);
         }
 
         return $this->render('update', [
@@ -119,10 +119,10 @@ class RestaurantBranchController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id, $restaurantUuid) {
-        $this->findModel($id, $restaurantUuid)->delete();
+    public function actionDelete($id, $storeUuid) {
+        $this->findModel($id, $storeUuid)->delete();
 
-        return $this->redirect(['index','restaurantUuid' => $restaurantUuid]);
+        return $this->redirect(['index','storeUuid' => $storeUuid]);
     }
 
     /**
@@ -132,8 +132,8 @@ class RestaurantBranchController extends Controller {
      * @return RestaurantBranch the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $restaurantUuid) {
-        if (($model = RestaurantBranch::findOne(['restaurant_branch_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid ])) !== null) {
+    protected function findModel($id, $storeUuid) {
+        if (($model = RestaurantBranch::findOne(['restaurant_branch_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])) !== null) {
             return $model;
         }
 

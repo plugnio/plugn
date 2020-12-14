@@ -38,9 +38,9 @@ class BankDiscountSearch extends BankDiscount
      *
      * @return ActiveDataProvider
      */
-    public function search($params, $restaurantUuid)
+    public function search($params, $storeUuid)
     {
-        $query = BankDiscount::find()->where(['restaurant_uuid' => $restaurantUuid]);;
+        $query = BankDiscount::find()->where(['restaurant_uuid' => $storeUuid]);;
 
         // add conditions that should always apply here
 

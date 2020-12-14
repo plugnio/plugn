@@ -26,7 +26,7 @@ $this->registerJs($js);
     <div class="action-btns d-none">
         <div class="btn-dropdown mr-1 mb-1">
             <div class="btn-group dropdown actions-dropodown">
-                <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary']) ?>
+                <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary']) ?>
             </div>
         </div>
     </div>
@@ -35,7 +35,7 @@ $this->registerJs($js);
 
     <?php if ($dataProvider->getCount() == 0) { ?>
         <div style="padding-left:14px">
-            <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary', 'style' => '    padding: 0.85rem 1.7rem;']) ?>
+            <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary', 'style' => '    padding: 0.85rem 1.7rem;']) ?>
         </div>
     <?php } ?>
 
@@ -46,7 +46,7 @@ $this->registerJs($js);
         GridView::widget([
             'dataProvider' => $dataProvider,
             'rowOptions' => function($model) {
-                $url = Url::to(['voucher/update', 'id' => $model->voucher_id, 'restaurantUuid' => $model->restaurant_uuid]);
+                $url = Url::to(['voucher/update', 'id' => $model->voucher_id, 'storeUuid' => $model->restaurant_uuid]);
 
                 return [
                     'onclick' => "window.location.href='{$url}'"
@@ -110,7 +110,7 @@ $this->registerJs($js);
                     'buttons' => [
                         'update' => function ($url, $model) {
                             return Html::a(
-                                           $model->voucher_status == Voucher::VOUCHER_STATUS_ACTIVE ? 'Deactivate' : 'Activate' , ['change-voucher-status', 'id' => $model->voucher_id, 'restaurantUuid' => $model->restaurant_uuid], [
+                                           $model->voucher_status == Voucher::VOUCHER_STATUS_ACTIVE ? 'Deactivate' : 'Activate' , ['change-voucher-status', 'id' => $model->voucher_id, 'storeUuid' => $model->restaurant_uuid], [
                                         'title' => $model->voucher_status == Voucher::VOUCHER_STATUS_ACTIVE ? 'Deactivate' : 'Activate',
                                         'data-pjax' => '0',
                                             ]

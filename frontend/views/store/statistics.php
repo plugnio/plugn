@@ -265,19 +265,19 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 </button>
                                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 38px, 0px);">
                                                     <?php
-                                                     // echo Html::a('Today', ['export-today-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
+                                                     // echo Html::a('Today', ['export-today-sold-items','storeUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
                                                      ?>
                                                     <?php
-                                                    // echo Html::a('Last 7 days', ['export-last-seven-days-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
+                                                    // echo Html::a('Last 7 days', ['export-last-seven-days-sold-items','storeUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
                                                     ?>
                                                     <?php
-                                                    // echo Html::a('Current month', ['export-current-month-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
+                                                    // echo Html::a('Current month', ['export-current-month-sold-items','storeUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
                                                     ?>
                                                     <?php
-                                                    // echo Html::a('Last month', ['export-last-month-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
+                                                    // echo Html::a('Last month', ['export-last-month-sold-items','storeUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
                                                     ?>
                                                     <?php
-                                                     // echo Html::a('Last 3 months', ['export-last-three-months-sold-items','restaurantUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
+                                                     // echo Html::a('Last 3 months', ['export-last-three-months-sold-items','storeUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
                                                      ?>
                                                 </div>
                                             </div>

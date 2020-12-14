@@ -51,21 +51,38 @@ class OrderController extends Controller {
      * Lists all Order models.
      * @return mixed
      */
-    public function actionIndex($restaurantUuid) {
+    public function actionIndex($storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new OrderSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
 
+        return $this->render('index', [
+                    'searchModel' => $searchModel,
+                    'dataProvider' => $dataProvider,
+                    'restaurant_model' => $restaurant_model
+        ]);
+    }
 
-        if ($restaurant_model->load(Yii::$app->request->post())) {
+    /**
+     * Lists all Order models.
+     * @return mixed
+     */
+    public function actionOrdersReport($storeUuid) {
 
-            list($start_date, $end_date) = explode(' - ', $restaurant_model->export_orders_data_in_specific_date_range);
+        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $searchModel = new OrderSearch();
+
+
+        if ($store_model->load(Yii::$app->request->post())) {
+
+            list($start_date, $end_date) = explode(' - ', $store_model->export_orders_data_in_specific_date_range);
 
 
             $searchResult = Order::find()
-                    ->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
+                    ->where(['restaurant_uuid' => $store_model->restaurant_uuid])
                     ->andWhere(['between', 'order_created_at', $start_date, $end_date])
                     ->andWhere([ '!=' , 'order_status' , Order::STATUS_DRAFT])
                     ->andWhere([ '!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
@@ -126,22 +143,17 @@ class OrderController extends Controller {
             ]);
         }
 
-        return $this->render('index', [
-                    'searchModel' => $searchModel,
-                    'dataProvider' => $dataProvider,
-                    'restaurant_model' => $restaurant_model
+        return $this->render('orders-report', [
+                    'model' => $store_model
         ]);
-    }
-
-
-
+      }
     /**
      * Lists all draft Orders.
      * @return mixed
      */
-    public function actionDraft($restaurantUuid) {
+    public function actionDraft($storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new OrderSearch();
         $dataProvider = $searchModel->searchDraftOrders(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
@@ -157,9 +169,9 @@ class OrderController extends Controller {
      * Lists all Order models.
      * @return mixed
      */
-    public function actionAbandonedCheckout($restaurantUuid) {
+    public function actionAbandonedCheckout($storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new OrderSearch();
         $dataProvider = $searchModel->searchAbandonedCheckoutOrders(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
@@ -176,11 +188,11 @@ class OrderController extends Controller {
     /**
      * Request a driver from Mashkor
      * @param type $order_uuid
-     * @param type $restaurantUuid
+     * @param type $storeUuid
      */
-    public function actionRequestDriverFromMashkor($order_uuid, $restaurantUuid) {
+    public function actionRequestDriverFromMashkor($order_uuid, $storeUuid) {
 
-        $order_model = $this->findModel($order_uuid, $restaurantUuid);
+        $order_model = $this->findModel($order_uuid, $storeUuid);
 
         $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($order_model);
 
@@ -205,10 +217,10 @@ class OrderController extends Controller {
                Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse));
 
 
-            return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid]);
+            return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
         }
 
-        return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid]);
+        return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
     }
 
 
@@ -216,11 +228,11 @@ class OrderController extends Controller {
      /**
      * Request a driver from Armada
      * @param type $order_uuid
-     * @param type $restaurantUuid
+     * @param type $storeUuid
      */
-    public function actionRequestDriverFromArmada($order_uuid, $restaurantUuid) {
+    public function actionRequestDriverFromArmada($order_uuid, $storeUuid) {
 
-        $order_model = $this->findModel($order_uuid, $restaurantUuid);
+        $order_model = $this->findModel($order_uuid, $storeUuid);
 
         $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($order_model);
 
@@ -245,39 +257,39 @@ class OrderController extends Controller {
                Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse));
 
 
-            return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid]);
+            return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
         }
 
-        return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid]);
+        return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
     }
 
     /**
      * Change order status
      *
      * @param type $order_uuid
-     * @param type $restaurantUuid
+     * @param type $storeUuid
      * @param type $status
      * @return type
      */
-    public function actionChangeOrderStatus($order_uuid, $restaurantUuid, $status) {
-        $order_model = $this->findModel($order_uuid, $restaurantUuid);
+    public function actionChangeOrderStatus($order_uuid, $storeUuid, $status) {
+        $order_model = $this->findModel($order_uuid, $storeUuid);
 
         $order_model->order_status = $status;
         $order_model->save(false);
 
-        return $this->redirect(['view', 'id' => $order_model->order_uuid, 'restaurantUuid' => $restaurantUuid]);
+        return $this->redirect(['view', 'id' => $order_model->order_uuid, 'storeUuid' => $storeUuid]);
     }
 
     /**
      * Change order status
      *
      * @param type $order_uuid
-     * @param type $restaurantUuid
+     * @param type $storeUuid
      * @param type $status
      * @return type
      */
-    public function actionViewInvoice($order_uuid, $restaurantUuid) {
-        $order_model = $this->findModel($order_uuid, $restaurantUuid);
+    public function actionViewInvoice($order_uuid, $storeUuid) {
+        $order_model = $this->findModel($order_uuid, $storeUuid);
 
         // Item
         $orderItems = new \yii\data\ActiveDataProvider([
@@ -304,9 +316,9 @@ class OrderController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id, $restaurantUuid) {
+    public function actionView($id, $storeUuid) {
 
-        $order_model = $this->findModel($id, $restaurantUuid);
+        $order_model = $this->findModel($id, $storeUuid);
 
 
 
@@ -335,9 +347,9 @@ class OrderController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($restaurantUuid) {
+    public function actionCreate($storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $model = new Order();
         $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
@@ -379,11 +391,11 @@ class OrderController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id, $restaurantUuid) {
+    public function actionUpdate($id, $storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        $model = $this->findModel($id, $restaurantUuid);
+        $model = $this->findModel($id, $storeUuid);
         $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
 
         // order's Item
@@ -395,7 +407,7 @@ class OrderController extends Controller {
 
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->order_uuid, 'restaurantUuid' => $restaurantUuid]);
+            return $this->redirect(['view', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid]);
         }
 
         return $this->render('update', [
@@ -413,9 +425,9 @@ class OrderController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionRefundOrder($order_uuid, $restaurantUuid) {
+    public function actionRefundOrder($order_uuid, $storeUuid) {
 
-      $order_model = $this->findModel($order_uuid, $restaurantUuid);
+      $order_model = $this->findModel($order_uuid, $storeUuid);
 
       // foreach ($order_model->getOrderItems()->all() as $orderItem) {
       //    $refunded_items_model = new RefundedItem();
@@ -446,7 +458,7 @@ class OrderController extends Controller {
 
 
           if($model->save())
-            return $this->redirect(['view', 'id' => $order_uuid, 'restaurantUuid' => $restaurantUuid]);
+            return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
         }
      }
 
@@ -464,10 +476,10 @@ class OrderController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id, $restaurantUuid) {
-        $this->findModel($id, $restaurantUuid)->delete();
+    public function actionDelete($id, $storeUuid) {
+        $this->findModel($id, $storeUuid)->delete();
 
-        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+        return $this->redirect(['index', 'storeUuid' => $storeUuid]);
     }
 
     /**
@@ -477,8 +489,8 @@ class OrderController extends Controller {
      * @return Order the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $restaurantUuid) {
-        if (($model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
+    protected function findModel($id, $storeUuid) {
+        if (($model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->one()) !== null) {
             return $model;
         }
 
