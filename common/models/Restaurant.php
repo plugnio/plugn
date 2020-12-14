@@ -155,7 +155,7 @@ class Restaurant extends \yii\db\ActiveRecord {
                 ],
                 'string', 'max' => 255
             ],
-            ['iban', 'string', 'min'=>10, 'max'=>10 , 'message' => 'The IBAN must be at least 10 characters long.', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            ['iban', 'string', 'min'=>10, 'max'=>34 , 'message' => 'The IBAN must be at least 10 characters long.', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
 
             ['iban', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/', 'message' => 'Please check the IBAN, we might not support transfering to this bank.', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             [['restaurant_commercial_license_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
