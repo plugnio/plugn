@@ -52,7 +52,7 @@ $this->registerJs($js);
     <div class="action-btns d-none">
         <div class="btn-dropdown mr-1 mb-1">
             <div class="btn-group dropdown actions-dropodown">
-                <?= Html::a('Add item', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary']) ?>
+                <?= Html::a('Add item', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
             </div>
         </div>
     </div>

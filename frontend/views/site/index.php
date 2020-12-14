@@ -379,7 +379,7 @@ $this->registerJs($js);
                   <div>
                       <div>
                           <div>
-                              <?= Html::a('Set up payments', ['store/view-payment-methods', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+                              <?= Html::a('Set up payments', ['store/view-payment-methods', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
                           </div>
                       </div>
                   </div>
@@ -406,7 +406,7 @@ $this->registerJs($js);
                     <div>
                         <div>
                             <div>
-                                <?= Html::a('Add Product', ['item/create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+                                <?= Html::a('Add Product', ['item/create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
                             </div>
                         </div>
                     </div>
@@ -437,7 +437,7 @@ $this->registerJs($js);
                     <div>
                         <div>
                             <div>
-                                <?= Html::a('Customize theme', ['store/update-design-layout', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+                                <?= Html::a('Customize theme', ['store/update-design-layout', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
                             </div>
                         </div>
                     </div>
@@ -465,7 +465,7 @@ $this->registerJs($js);
                     <div>
                         <div>
                             <div>
-                                <?= Html::a('Add domain', ['site/connect-domain', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+                                <?= Html::a('Add domain', ['site/connect-domain', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
                             </div>
                         </div>
                     </div>
@@ -493,7 +493,7 @@ $this->registerJs($js);
                     <div>
                         <div>
                             <div>
-                                <?= Html::a('View orders', ['site/real-time-orders', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+                                <?= Html::a('View orders', ['site/real-time-orders', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
                             </div>
                         </div>
                     </div>

@@ -352,9 +352,20 @@ use common\models\BankDiscount;
                                                                                     </td>
                                                                                 </tr>
                                                                                 <tr>
-                                                                                    <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
-                                                                                        <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;"><?= $order->area_name ?>, Block <?= $order->block ?>, Street <?= $order->street ?>, <?= $order->avenue != null ? 'Avenue' . $order->avenue : '' ?>, House <?= $order->house_number ?></div>
-                                                                                    </td>
+                                                                                  <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                                                                      <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">
+                                                                                        <div style="display:block">
+                                                                                          <?= $order->customer_name ?>
+                                                                                        </div>
+                                                                                        <div style="display:block">
+                                                                                          <?= $order->customer_phone_number ?>
+                                                                                        </div>
+                                                                                        <?= $order->area_name ?>,
+                                                                                        Block <?= $order->block ?>,
+                                                                                        Street <?= $order->street ?>,
+                                                                                        <?= $order->avenue != null ? 'Avenue' . $order->avenue . ' ,' : '' ?>
+                                                                                        House <?= $order->house_number ?></div>
+                                                                                  </td>
                                                                                 </tr>
                                                                             </table>
                                                                         <?php } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) { ?>

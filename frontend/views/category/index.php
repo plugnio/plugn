@@ -93,7 +93,7 @@ $this->registerJs($js);
         </h3>
 
         <p>
-          Use collections to organize your products into categories and galleries for your online store.
+          Use categories to organize your products for your online store.
         </p>
         <?= Html::a('Create category', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
       </div>

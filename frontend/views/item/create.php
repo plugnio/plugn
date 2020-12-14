@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
           <div class="card">
             <div style="padding: 50px 0; text-align: center;">'
           . '     <h4 style="margin-bottom: 30px">You need to first define a category before adding items</h4>'
-          . Html::a('Create category', ['category/create', 'storeUuid' => $storeUuid], ['class' => 'btn btn-success'])
+          . Html::a('Create category', ['category/create', 'storeUuid' => $storeUuid], ['class' => 'btn btn-primary'])
           . '</div>
           </div>';
 

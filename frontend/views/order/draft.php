@@ -36,7 +36,7 @@ $this->registerJs($js);
 
 
     <?php
-    // echo $this->render('_search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]); 
+    // echo $this->render('_search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]);
     ?>
 
 
@@ -112,7 +112,7 @@ $this->registerJs($js);
         <p>
           Use draft orders to take orders over the phone, email invoices to customers, and collect payments.
         </p>
-        <?= Html::a('Create draft', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Create draft order', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
       </div>
     </div>
 

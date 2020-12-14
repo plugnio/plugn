@@ -149,20 +149,6 @@ class SiteController extends Controller {
 
 
     /**
-     * View Stores domains
-     *
-     * @return mixed
-     */
-    public function actionDomains($id) {
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
-
-            return $this->render('domains', [
-                        'restaurant_model' => $managedRestaurant
-            ]);
-        }
-    }
-
-    /**
      * Displays  Real time orders
      *
      * @return mixed
@@ -192,9 +178,6 @@ class SiteController extends Controller {
                              ->setSubject('[Plugn] Agent updated DN')
                              ->send();
 
-                     return $this->redirect(['domains',
-                                 'id' => $managedRestaurant->restaurant_uuid
-                     ]);
                    }
 
                 }

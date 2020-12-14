@@ -683,18 +683,20 @@ class StoreController extends Controller {
             if (sizeof($owner_identification_file_back_side) > 0)
               $model->identification_file_back_side =  str_replace('uploads/',  '', $owner_identification_file_back_side[0]['file']); //Owner's civil id back side
 
-              if(!$model->is_tap_enable){
-                $tap_queue_model = new TapQueue;
-                $tap_queue_model->queue_status = TapQueue::QUEUE_STATUS_PENDING;
-                $tap_queue_model->restaurant_uuid = $model->restaurant_uuid;
-                if($tap_queue_model->save()){
-                  $model->tap_queue_id = $tap_queue_model->tap_queue_id;
-                }
-              }
 
 
             if ($model->validate() && $model->save()) {
 
+
+                if(!$model->is_tap_enable){
+                  $tap_queue_model = new TapQueue;
+                  $tap_queue_model->queue_status = TapQueue::QUEUE_STATUS_PENDING;
+                  $tap_queue_model->restaurant_uuid = $model->restaurant_uuid;
+                  if($tap_queue_model->save()){
+                    $model->tap_queue_id = $tap_queue_model->tap_queue_id;
+                    $model->save(false);
+                  }
+                }
 
                 return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
             } else {
@@ -806,7 +808,9 @@ class StoreController extends Controller {
         $model = $this->findModel($id);
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index', 'storeUuid' => $id]);
+          return $this->render('update', [
+                      'model' => $model
+          ]);
         }
 
         return $this->render('update', [
@@ -930,7 +934,6 @@ class StoreController extends Controller {
                 if ($logo)
                     $model->uploadLogo($model->restaurant_logo);
 
-                return $this->redirect(['view-design-layout', 'storeUuid' => $id]);
             }
         }
 

@@ -198,6 +198,10 @@ $interval = $today->diff($expiry);
                                         <p style="margin-bottom: 1px;">IBAN</p>
                                         <p style="color: black;"><?= $model->iban ?></p>
                                     </div>
+                                    <div class="col-6">
+                                        <p style="margin-bottom: 1px;">	Email Address </p>
+                                        <p style="color: black;"><?= $model->owner_email ?></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
