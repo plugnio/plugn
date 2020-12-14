@@ -100,7 +100,7 @@ class SiteController extends Controller {
                     ]);
                 } else {
                     return $this->redirect(['real-time-orders',
-                                'restaurant_uuid' => $managedRestaurant->restaurant_uuid
+                                'storeUuid' => $managedRestaurant->restaurant_uuid
                     ]);
                 }
             }
@@ -110,13 +110,13 @@ class SiteController extends Controller {
     /**
      * Check for new orders
      */
-    public function actionCheckForNewOrders($restaurant_uuid) {
+    public function actionCheckForNewOrders($storeUuid) {
 
         $this->layout = false;
-        $managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurant_uuid);
+        $managedRestaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $restaurant_uuid);
+        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid);
 
         return $this->render('incoming-orders-table', [
                     'searchModel' => $searchModel,
@@ -344,7 +344,7 @@ class SiteController extends Controller {
         return $this->render('real-time-orders', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
-                    'restaurant_uuid' => $storeUuid
+                    'storeUuid' => $storeUuid
         ]);
     }
 
@@ -1093,7 +1093,7 @@ class SiteController extends Controller {
             } else {
 
                 return $this->redirect(['real-time-orders',
-                            'restaurant_uuid' => $managedRestaurant->restaurant_uuid
+                            'storeUuid' => $managedRestaurant->restaurant_uuid
                 ]);
             }
         }
