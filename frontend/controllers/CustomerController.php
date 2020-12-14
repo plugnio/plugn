@@ -170,7 +170,7 @@ class CustomerController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id, $storeUuid) {
-        if (($model = Customer::find()->where(['customer_id'=>$id, 'restaurant_uuid' => $storeUuid])->one()) !== null) {
+        if (($model = Customer::find()->where(['customer_id'=>$id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->one()) !== null) {
             return $model;
         }
 
