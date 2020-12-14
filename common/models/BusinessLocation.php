@@ -34,8 +34,9 @@ class BusinessLocation extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['restaurant_uuid', 'country_id', 'business_location_name', 'business_location_name_ar', 'support_pick_up'], 'required'],
+            [['restaurant_uuid', 'country_id', 'business_location_name', 'business_location_name_ar'], 'required'],
             [['country_id' , 'support_pick_up'], 'integer'],
+            [['support_pick_up'], 'default', 'value' => 0],
             [['business_location_tax'], 'number', 'min' => 0, 'max' => 100],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['business_location_name', 'business_location_name_ar'], 'string', 'max' => 255],

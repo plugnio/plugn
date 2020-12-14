@@ -116,6 +116,20 @@ class DeliveryZoneController extends Controller {
 
     }
 
+
+    public function actionRemoveTaxOverride($storeUuid, $deliveryZoneId)
+    {
+        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $model = $this->findModel($deliveryZoneId, $storeUuid);
+
+        $model->delivery_zone_tax = null;
+        $model->save();
+
+        $this->redirect(['index', 'storeUuid' => $storeUuid, 'businessLocationId' => $model->business_location_id]);
+
+    }
+
+
     /**
      * Creates a new DeliveryZone model.
      * If creation is successful, the browser will be redirected to the 'view' page.
@@ -149,8 +163,7 @@ class DeliveryZoneController extends Controller {
           if( $model->save()){
 
 
-            if($model->country->getAreas()){
-
+            if($model->country->getAreas()->count() > 0){
               return $this->render('select-area', [
                           'deliveryZoneId' => $model->delivery_zone_id,
                           'selectedCountry' => $model->country->country_name,

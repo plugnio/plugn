@@ -15,6 +15,7 @@ class m201207_115315_drop_vat_field extends Migration
       $this->dropColumn('restaurant', 'vat');
       $this->addColumn('business_location', 'business_location_tax', $this->float()->unsigned()->defaultValue(0)->notNull());
       $this->addColumn('delivery_zone', 'delivery_zone_tax', $this->float()->unsigned()->defaultValue(0));
+
       $this->addColumn('delivery_zone', 'time_unit', $this->char(3)->defaultValue('min')->notNull());
     }
 

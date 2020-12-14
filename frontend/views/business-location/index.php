@@ -27,7 +27,7 @@ $this->registerJs($js);
 
 
 
-    <?= Html::a('Add Business location', ['create', 'storeUuid' => $storeUuid], ['class' => 'btn btn-success']); ?>
+    <?= Html::a($businessLocations ? 'Add another business location' : 'Add Business location', ['create', 'storeUuid' => $storeUuid], ['class' => 'btn btn-success']); ?>
 
 
       <?php
@@ -48,23 +48,29 @@ $this->registerJs($js);
 
         <div class="card-content">
         <div class="card-body">
-          <h3>
+        <div class="row">
+          <div class="col-12col-sm-12 col-lg-6">
+            <h3 style="display: contents;">
+              <?=
+                  Html::a($businessLocation->business_location_name . ', ' . $businessLocation->country->country_name. ' <i class="feather icon-edit"></i>',
+                  ['update',  'id' => $businessLocation->business_location_id, 'storeUuid' => $storeUuid],
+                  ['class' => '', 'style' => 'margin-bottom : 15px;     margin-right: 20px;']);
+              ?>
+
+            </h3>
+          </div>
+          <div class="col-12col-sm-12 col-lg-6">
             <?=
-                Html::a($businessLocation->business_location_name . ', ' . $businessLocation->country->country_name. ' <i class="feather icon-edit"></i>',
-                ['update',  'id' => $businessLocation->business_location_id, 'storeUuid' => $storeUuid],
-                ['class' => '', 'style' => 'margin-bottom : 15px;     margin-right: 20px;']);
+              Html::a($businessLocation->support_pick_up ? 'Disable pick up for this location' : 'Enable pick up for this location',
+              [$businessLocation->support_pick_up ? 'disable-pickup' : 'enable-pickup',  'id' => $businessLocation->business_location_id, 'storeUuid' => $storeUuid],
+              ['class' => $businessLocation->support_pick_up ?  'btn btn-danger' : 'btn btn-outline-primary', 'style' => 'float:right'])
             ?>
-          </h3>
+          </div>
 
 
-              <span style="display: block">
-                <?=
-                  Html::a($businessLocation->support_pick_up ? 'Disable pick up' : 'Enable pick up',
-                  [$businessLocation->support_pick_up ? 'disable-pickup' : 'enable-pickup',  'id' => $businessLocation->business_location_id, 'storeUuid' => $storeUuid],
-                  ['class' => $businessLocation->support_pick_up ?  'btn btn-danger' : 'btn btn-primary', 'style' => 'margin-bottom : 15px;     margin-right: 20px;'])
-                ?>
 
-              </span>
+
+              </div>
 
 
             <?php
@@ -73,7 +79,7 @@ $this->registerJs($js);
               if($businessLocation->getDeliveryZones()->count()  == 0 ){
                 echo'<div class="card"><div style="padding: 70px 0; text-align: center;">'
                 . '     <h4>You currently do not have any places you deliver to</h4>'
-                . Html::a('Setup Delivery Zones', ['delivery-zone/create', 'storeUuid' => $storeUuid, 'businessLocationId' => $businessLocation->business_location_id], ['class' => 'btn btn-success'])
+                . Html::a('Setup Delivery Zones', ['delivery-zone/create', 'storeUuid' => $storeUuid, 'businessLocationId' => $businessLocation->business_location_id], ['class' => 'btn btn-primary'])
                 . '</div></div>';
               } else {
 

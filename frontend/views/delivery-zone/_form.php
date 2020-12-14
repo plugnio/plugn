@@ -101,7 +101,8 @@ $this->registerJs($js);
                         'prompt' => 'Choose area name...',
                         'class' => 'form-control select2',
                         'multiple' => false,
-                        'id' => 'country-id'
+                        'id' => 'country-id',
+                        'disabled' => !$model->delivery_zone_id && $model->country_id ? true : false
                     ])->label('Select country you want deliver to *');
                 ?>
               </div>

@@ -15,7 +15,7 @@ $this->params['restaurant_uuid'] = $storeUuid;
     <div class="card">
 
       <div class="card-header">
-        <h4>Would you like to select specific areas or you want to delivery all over <?= $selectedCountry ?> </h4>
+        <h4>Would you like to select specific areas or you want to deliver all over <?= $selectedCountry ?> </h4>
       </div>
 
       <div class="card-content">
@@ -26,7 +26,7 @@ $this->params['restaurant_uuid'] = $storeUuid;
           ['class' => 'btn btn-outline-primary', 'style' => 'margin-bottom : 15px']);
         ?>
 
-        <?= Html::a('Select specific area ',
+        <?= Html::a('Select specific areas to deliver to ',
           ['update-areas', 'storeUuid' => $storeUuid, 'id' => $deliveryZoneId],
           ['class' => 'btn btn-outline-primary', 'style' => 'margin-bottom : 15px']);
         ?>

@@ -64,29 +64,7 @@ $this->registerJs($js);
     ])->textInput([
       'type' => 'number',
       'step' => '.01',
-      'value' => 0,'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;']) ?>
-
-
-
-    <?=
-      $form->field($model, 'support_pick_up', [
-          'template' => '
-          <div class="vs-checkbox-con vs-checkbox-primary">
-              {input}
-              <span class="vs-checkbox">
-                  <span class="vs-checkbox--check">
-                      <i class="vs-icon feather icon-check"></i>
-                  </span>
-              </span>
-              <span class="">{label}</span>
-          </div>
-          <div class=\"col-lg-8\">{error}</div>
-          ',
-      ])->checkbox([
-          'checked' => $model->support_pick_up ? true : false,
-          'id' => 'trackQuantityInput',
-        ], false)->label('Customer can pick up from this location')
-    ?>
+      'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;']) ?>
 
 
     <div class="form-group">
