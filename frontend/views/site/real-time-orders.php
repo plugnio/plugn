@@ -9,7 +9,7 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\OrderSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-$this->params['restaurant_uuid'] = $restaurant_uuid;
+$this->params['restaurant_uuid'] = $storeUuid;
 
 $this->title = 'Real Time Orders';
 $this->params['breadcrumbs'][] = $this->title;
@@ -45,13 +45,13 @@ var soundForNewOrders = new Audio("data:audio/wav;base64,//uQRAAAAWMSLwUIYAAsYkX
 
 
    async function CheckPendingOrders() {
-       const url = <?= "'" . Yii::$app->params['apiEndpoint'] . '/v1/order/check-for-pending-orders/' . $restaurant_uuid . "'" ?>;
+       const url = <?= "'" . Yii::$app->params['apiEndpoint'] . '/v1/order/check-for-pending-orders/' . $storeUuid . "'" ?>;
 
        fetch(url)
                .then(res => res.json())
                .then(data => {
 
-                   $("#new-order-table").load(<?= "'" . yii\helpers\Url::to(['site/check-for-new-orders', 'restaurant_uuid' => $restaurant_uuid]) . "'" ?>);
+                   $("#new-order-table").load(<?= "'" . yii\helpers\Url::to(['site/check-for-new-orders', 'storeUuids' => $storeUuid]) . "'" ?>);
 
                    if (data && document.getElementById("play-btn").value == 'true' && document.getElementById("stop-btn").value == 'false') {
                      // console.log('play');
