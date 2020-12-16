@@ -51,7 +51,7 @@ var soundForNewOrders = new Audio("data:audio/wav;base64,//uQRAAAAWMSLwUIYAAsYkX
                .then(res => res.json())
                .then(data => {
 
-                   $("#new-order-table").load(<?= "'" . yii\helpers\Url::to(['site/check-for-new-orders', 'storeUuids' => $storeUuid]) . "'" ?>);
+                   $("#new-order-table").load(<?= "'" . yii\helpers\Url::to(['site/check-for-new-orders', 'storeUuid' => $storeUuid]) . "'" ?>);
 
                    if (data && document.getElementById("play-btn").value == 'true' && document.getElementById("stop-btn").value == 'false') {
                      // console.log('play');
