@@ -45,14 +45,14 @@ class BusinessLocationController extends Controller
      */
     public function actionIndex($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        $businessLocations = BusinessLocation::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->all();
+        $businessLocations = BusinessLocation::find()->where(['restaurant_uuid' => $store_model->restaurant_uuid])->all();
 
 
         return $this->render('index', [
             'businessLocations' => $businessLocations,
-            'storeUuid' => $storeUuid
+            'store' => $store_model
         ]);
     }
 
@@ -71,7 +71,7 @@ class BusinessLocationController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index', 'storeUuid' => $storeUuid]);
-        } 
+        }
 
         return $this->render('create', [
             'model' => $model,
@@ -100,6 +100,31 @@ class BusinessLocationController extends Controller
 
         return $this->redirect(['index',  'storeUuid' => $storeUuid]);
 
+    }
+
+
+
+        public function actionRemoveTax($id, $storeUuid)
+        {
+            $model = $this->findModel($id, $storeUuid);
+            $model->business_location_tax = 0;
+            $model->save();
+
+            return $this->redirect(['index',  'storeUuid' => $storeUuid]);
+        }
+
+    public function actionConfigureTax($id, $storeUuid)
+    {
+        $model = $this->findModel($id, $storeUuid);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['index',  'storeUuid' => $storeUuid]);
+        }
+
+        return $this->render('_set-tax', [
+            'model' => $model,
+            'storeUuid' => $storeUuid
+        ]);
     }
 
     /**

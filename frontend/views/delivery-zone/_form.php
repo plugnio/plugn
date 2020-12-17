@@ -102,7 +102,7 @@ $this->registerJs($js);
                         'class' => 'form-control select2',
                         'multiple' => false,
                         'id' => 'country-id',
-                        'disabled' => !$model->delivery_zone_id && $model->country_id ? true : false
+                        'disabled' => !$model->isNewRecord || $model->country_id  ? true : false
                     ])->label('Select country you want deliver to *');
                 ?>
               </div>
@@ -169,6 +169,23 @@ $this->registerJs($js);
 
         <div class="form-group">
             <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+
+            <?php
+
+            if(!$model->isNewRecord){
+
+              Html::a('<i class="feather icon-trash"></i> Delete', ['delete', 'id' => $model->delivery_zone_id, 'storeUuid' => $storeUuid], [
+                   'class' => 'btn btn-danger',
+                   'style' => 'margin-bottom:15px',
+                   'data' => [
+                       'confirm' => 'Are you sure you want to delete this zone?',
+                       'method' => 'post',
+                   ],
+               ]);
+             }
+            ?>
+
+
         </div>
 
       </div>

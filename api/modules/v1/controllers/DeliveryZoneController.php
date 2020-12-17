@@ -93,9 +93,6 @@ class DeliveryZoneController extends Controller {
 
             foreach ($shipping_countries as $key => $country) {
 
-
-
-
               $shipping_countries[$key]['areas'] =
                 $store_model->getAreaDeliveryZonesForSpecificCountry($country['country_id'])->one()->area_id  == null  && $store_model->getAreaDeliveryZonesForSpecificCountry($country['country_id'])->count() == 1 ? 0 : $store_model->getAreaDeliveryZonesForSpecificCountry($country['country_id'])->count() ;
 
@@ -133,7 +130,7 @@ class DeliveryZoneController extends Controller {
         if ($store_model = Restaurant::findOne($restaurant_uuid)) {
 
 
-            if( $deliveryZone = $store_model->getDeliveryZones()->where(['delivery_zone_id' => $delivery_zone_id])->asArray()->one() ){
+            if( $deliveryZone = $store_model->getDeliveryZones()->where(['delivery_zone_id' => $delivery_zone_id])->asArray()->joinWith(['businessLocation'])->one() ){
 
 
               if($area_id && !AreaDeliveryZone::find()->where(['area_id' => $area_id , 'delivery_zone_id' => $delivery_zone_id])->exists()){
@@ -147,6 +144,7 @@ class DeliveryZoneController extends Controller {
 
               Yii::$app->formatter->language = 'ar-KW';
               $deliveryZone['delivery_time_ar'] = Yii::$app->formatter->asDuration(intval($deliveryZone['delivery_time']) * 60);
+              $deliveryZone['tax'] = $deliveryZone['delivery_zone_tax'] ? $deliveryZone['delivery_zone_tax']  : $deliveryZone['businessLocation']['business_location_tax'] ;
 
               return $deliveryZone;
 
