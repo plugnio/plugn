@@ -91,7 +91,6 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'agent_email')->input('email') ?>
 
-    <?= $form->field($model, 'tempPassword')->passwordInput(['maxlength' => true])?>
 
     <?=
       $form->field($model, 'email_notification', [

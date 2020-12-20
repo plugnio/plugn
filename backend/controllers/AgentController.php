@@ -77,6 +77,7 @@ class AgentController extends Controller
     public function actionCreate()
     {
         $model = new Agent();
+        $model->setScenario(Agent::SCENARIO_CREATE_NEW_AGENT);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 

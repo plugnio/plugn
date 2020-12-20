@@ -131,6 +131,13 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                     <div class="dropdown-divider"> </div>
 
                                     <?=
+                                    Html::a(
+                                            '<i class="feather icon-lock"></i> Change Password', ['agent/change-password', 'storeUuid' => $this->params['restaurant_uuid']], ['class' => 'dropdown-item'])
+                                    ?>
+
+                                    <div class="dropdown-divider"> </div>
+
+                                    <?=
                                     Html::a('<i class="feather icon-power"></i> Logout', ['site/logout'], ['class' => 'dropdown-item',
                                         'data' => [
                                             'method' => 'post',

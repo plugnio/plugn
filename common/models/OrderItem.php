@@ -158,7 +158,6 @@ class OrderItem extends \yii\db\ActiveRecord {
           if ($item_model) {
               $this->item_name = $item_model->item_name;
               $this->item_name_ar = $item_model->item_name_ar;
-              $this->item_price = $this->calculateOrderItemPrice();
           } else
               return false;
 
@@ -166,6 +165,8 @@ class OrderItem extends \yii\db\ActiveRecord {
           $this->item->decreaseStockQty($this->qty);
 
         }
+
+        $this->item_price = $this->calculateOrderItemPrice();
 
 
         return true;

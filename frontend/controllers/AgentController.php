@@ -71,6 +71,26 @@ class AgentController extends Controller {
     }
 
     /**
+     * Change an existing Agent's password model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionChangePassword($storeUuid) {
+        $model = $this->findModel($storeUuid);
+        $model->setScenario(Agent::SCENARIO_CHANGE_PASSWORD);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['site/index', 'storeUuid' => $storeUuid]);
+        }
+
+        return $this->render('change-password', [
+                    'model' => $model,
+                    'storeUuid' => $storeUuid
+        ]);
+    }
+
+    /**
      * Finds the Agent model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @return Agent the loaded model

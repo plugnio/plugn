@@ -1188,6 +1188,8 @@ class SiteController extends Controller {
         $store_model->setScenario(Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
 
         $agent_model = new Agent();
+        $agent_model->setScenario(Agent::SCENARIO_CREATE_NEW_AGENT);
+
         if ($agent_model->load(Yii::$app->request->post()) && $store_model->load(Yii::$app->request->post())) {
 
             $store_model->restaurant_email = $agent_model->agent_email;
@@ -1279,9 +1281,10 @@ class SiteController extends Controller {
 
 
         $model = new PasswordResetRequestForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail()) {
+        if ($model->load(Yii::$app->request->post()) ) {
 
+
+            if ($model->sendEmail()) {
                 Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
 
                 return $this->goHome();
