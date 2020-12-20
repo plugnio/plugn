@@ -271,9 +271,9 @@ class DeliveryZoneController extends Controller {
 
 
 
-    public function actionUpdateDeliveryZoneVat($id, $storeUuid) {
+    public function actionUpdateDeliveryZoneVat($deliveryZoneId, $storeUuid) {
 
-      $model = $this->findModel($id, $storeUuid);
+      $model = $this->findModel($deliveryZoneId, $storeUuid);
 
       if ($model->load(Yii::$app->request->post()) && $model->save()) {
 

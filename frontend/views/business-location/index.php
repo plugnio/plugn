@@ -52,7 +52,7 @@ $this->registerJs($js);
             <h3>
 
             <?=
-                Html::a($businessLocation->business_location_name . ', ' . ' <i class="feather icon-edit"></i>',
+                Html::a($businessLocation->business_location_name  . ' <i class="feather icon-edit"></i>',
                 ['update',  'id' => $businessLocation->business_location_id, 'storeUuid' => $store->restaurant_uuid],
                 ['class' => '', 'style' => 'margin-bottom : 15px;     margin-right: 20px;']);
             ?>
@@ -94,8 +94,9 @@ $this->registerJs($js);
               <h5> Pickup </h5>
 
               <p>
-                <?= $businessLocation->support_pick_up ? 'You do not currently allow pickup from this location' : 'Your customer can pick up from this location' ?>
+                <?= !$businessLocation->support_pick_up ? 'You do not currently allow pickup from this location' : 'Your customer can pick up from this location' ?>
               </p>
+              
               <?=
                 Html::a($businessLocation->support_pick_up ? 'Disable pickup' : 'Enable pickup',
                 [$businessLocation->support_pick_up ? 'disable-pickup' : 'enable-pickup',  'id' => $businessLocation->business_location_id, 'storeUuid' => $store->restaurant_uuid],

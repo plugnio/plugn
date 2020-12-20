@@ -6,6 +6,7 @@ use common\models\Category;
 use kartik\select2\Select2;
 use yii\helpers\ArrayHelper;
 use common\models\CategoryItem;
+use common\models\Item;
 use kartik\file\FileInput;
 use wbraganca\dynamicform\DynamicFormWidget;
 use common\models\ExtraOption;
@@ -146,7 +147,6 @@ $this->registerJs($js);
 
 
             <?= $form->field($modelItem, 'sort_number')->textInput(['type' => 'number']) ?>
-
 
         </div>
 

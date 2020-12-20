@@ -14,6 +14,26 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
 
 ?>
 
+<style>
+
+
+      @media only screen and (max-width:992px) {
+        .second-column {
+          padding: 0px !important;
+          margin-top: 10px !important;
+        }
+      }
+
+      @media only screen and (min-width:992px) {
+        .second-column {
+          padding: 0px 10px !important;
+          margin-top: 0px !important;
+        }
+      }
+
+
+
+</style>
   <!-- Data list view starts -->
     <section id="data-list-view" class="data-list-view-header">
 
@@ -34,10 +54,6 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
       }
 
       ?>
-
-
-
-
 
 
             <?php if (Yii::$app->session->getFlash('errorResponse') != null) { ?>
@@ -63,7 +79,7 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
 
           <div>
             <h5>
-              Delivery from <?= $deliveryZone->businessLocation->country->country_name ?>
+              Delivery from <?= $deliveryZone->businessLocation->country->country_name ?> to
             </h5>
             <h3>
               <?= $deliveryZone->country->country_name ?>
@@ -74,9 +90,15 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
 
         <div class="card-content">
           <div class="card-body">
-            <div class="row">
+            <div class="row" style="padding-left: 10px">
 
-              <div class="col-12 col-sm-12 col-lg-4" style="border-width: 1px; border-style: solid; border-color: #e2e8f0; padding: 10px; border-radius: 7px;">
+              <div class="col-12 col-sm-12 col-lg-6" style="border-width: 0.5px; border-style: solid; border-color: #e2e8f0; padding: 10px; border-radius: 7px;     position: relative;">
+
+                <?=
+                  Html::a('Edit <i class="feather icon-edit"></i>',
+                  ['update', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
+                  [ 'style' => ' position: absolute; top: 10px; right: 10px;'])
+                ?>
 
                 <h5>
                   Delivers in
@@ -102,30 +124,56 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
 
               </div>
 
+            <div class="col-12 col-sm-12 col-lg-6" >
 
-    
+              <div class="row second-column">
 
-            <div class="col-12 col-sm-12 col-lg-6">
+                <div class="col-12" style=" margin-bottom:12px; border-width: 0.5px; border-style: solid; border-color: #e2e8f0; padding: 10px; border-radius: 7px;     position: relative;">
 
-              <div class="row">
+                  <?php
+                    if($deliveryZone->country->getAreas()->count() > 0){
+                        echo  Html::a('Edit <i class="feather icon-edit"></i>',
+                                      ['update-areas', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
+                                      [ 'style' => ' position: absolute; top: 10px; right: 10px;']);
+                    }
+                  ?>
 
-                <div class="col-12" style="border-width: 1px; border-style: solid; border-color: #e2e8f0; padding: 10px; border-radius: 7px;">
+
                   <h5>
                     Delivery allowed to
                   </h5>
 
                   <p>
-                    <?= Yii::$app->formatter->asCurrency($deliveryZone->delivery_fee, $deliveryZone->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                    <?=
+                        $deliveryZone->country->getAreas()->count() > 0 ?
+                        $deliveryZone->getAreaDeliveryZones()->count() . ' out of ' . $deliveryZone->country->getAreas()->count() .' areas in ' . $deliveryZone->country->country_name :
+                        'All over ' . $deliveryZone->country->country_name
+                    ?>
                   </p>
                 </div>
 
-                <div class="col-12" style="border-width: 1px; border-style: solid; border-color: #e2e8f0; padding: 10px; border-radius: 7px;">
+                <div class="col-12" style="margin-top:12px; border-width: 1px; border-style: solid; border-color: #e2e8f0; padding: 10px; border-radius: 7px;  position: relative;">
+
+
+                  <?php
+                    if(!$deliveryZone->delivery_zone_tax){
+                        echo  Html::a('Override <i class="feather icon-edit"></i>',
+                                       ['update-delivery-zone-vat', 'deliveryZoneId' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
+                                      [ 'style' => ' position: absolute; top: 10px; right: 10px;']);
+                    } else {
+                      echo  Html::a('Cancel override',
+                          ['remove-tax-override', 'deliveryZoneId' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
+                                    [ 'style' => ' position: absolute; top: 10px; right: 10px; color: #EA5455']);
+                    }
+                  ?>
+
+
                   <h5>
-                    Delivery allowed to
+                    VAT Charged
                   </h5>
 
                   <p>
-                    <?= Yii::$app->formatter->asCurrency($deliveryZone->delivery_fee, $deliveryZone->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                    <?= $deliveryZone->delivery_zone_tax ? $deliveryZone->delivery_zone_tax . '% for this delivery zone' : $deliveryZone->businessLocation->business_location_tax . '% as per business location' ?>
                   </p>
                 </div>
 
@@ -133,62 +181,6 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
 
             </div>
           </div>
-
-
-            <?php if($deliveryZone->delivery_zone_tax){ ?>
-
-              <p>
-                Tax override:
-                <?= $deliveryZone->delivery_zone_tax . '%' ?>
-
-                <?php
-                echo Html::a('remove',
-                          ['remove-tax-override', 'deliveryZoneId' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
-                          ['class' => 'btn btn-danger', 'style' => 'margin-bottom : 15px;     margin-right: 20px;']);
-
-                  ?>
-
-              </p>
-
-            <?php } ?>
-
-            <?=
-              Html::a('<i class="feather icon-edit"></i> Update',
-              ['update', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
-              ['class' => 'btn btn-outline-primary', 'style' => 'margin-bottom : 15px;     margin-right: 20px;'])
-            ?>
-
-
-              <h4>
-              currently delivering to
-
-              <?=
-
-                ( $deliveryZone->getAreaDeliveryZones()->count() == $deliveryZone->country->getAreas()->count() ) || $deliveryZone->country->getAreas()->count() == 0 ?
-                 ' all over ' . $deliveryZone->country->country_name  :
-                 $deliveryZone->getAreaDeliveryZones()->count() . '/' . $deliveryZone->country->getAreas()->count()
-
-               ?>
-
-              </h4>
-
-              <?php
-
-                if($deliveryZone->country->getAreas()->count()){
-                  echo Html::a('Edit',
-                                  ['update-areas', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
-                                  ['class' => 'btn btn-outline-primary', 'style' => 'margin-bottom : 15px;     margin-right: 20px;']);
-                }
-
-                if($deliveryZone->delivery_zone_tax == null){
-                    echo Html::a($deliveryZone->businessLocation->business_location_tax. '% VAT override',
-                              ['update-delivery-zone-vat', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
-                              ['class' => 'btn btn-outline-primary', 'style' => 'margin-bottom : 15px;     margin-right: 20px;']);
-                }
-
-              ?>
-
-
 
           </div>
 

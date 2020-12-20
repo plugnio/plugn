@@ -42,6 +42,7 @@ class Item extends \yii\db\ActiveRecord
     public $item_images;
 
 
+
     //Values for `item_status`
     const ITEM_STATUS_PUBLISH = 1;
     const ITEM_STATUS_UNPUBLISH =  2;
@@ -66,7 +67,7 @@ class Item extends \yii\db\ActiveRecord
             [['sort_number', 'stock_qty'], 'integer', 'min' => 0],
             [['unit_sold'], 'integer', 'min' => 0],
             [['item_price'], 'number', 'min' => 0],
-            [['track_quantity'], 'integer'],
+            [['track_quantity', 'delivery_time'], 'integer'],
             ['item_status', 'in', 'range' => [self::ITEM_STATUS_PUBLISH, self::ITEM_STATUS_UNPUBLISH]],
             ['stock_qty', 'required', 'when' => function($model) {
                 return $model->track_quantity;
@@ -81,6 +82,7 @@ class Item extends \yii\db\ActiveRecord
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
+
 
     /**
      * {@inheritdoc}
@@ -102,11 +104,31 @@ class Item extends \yii\db\ActiveRecord
             'sku' => 'SKU (Stock Keeping Unit)',
             'item_image' => 'Item image',
             'item_price' => 'Price',
+            'prep_time' => 'Preparation time',
+            'prep_time_unit' => 'Preparation time unit',
             'item_status' => 'Item status',
             'items_category' => 'Category',
             'item_created_at' => 'Item created at',
             'item_updated_at' => 'Item updated qt',
         ];
+    }
+
+    /**
+     * Returns String value of current status
+     * @return string
+     */
+    public function getTimeUnit() {
+        switch ($this->prep_time_unit) {
+          case self::TIME_UNIT_MIN:
+              return "Minutes";
+              break;
+          case self::TIME_UNIT_HRS:
+            return  $this->prep_time == 1 ?  "Hour" : "Hours";
+              break;
+          case self::TIME_UNIT_DAY:
+              return  $this->prep_time == 1 ?  "Day" : "Days";
+              break;
+        }
     }
 
     /**

@@ -12,6 +12,7 @@ use common\models\City;
 use common\models\Restaurant;
 use common\models\ItemImage;
 use common\models\AreaDeliveryZone;
+use common\models\DeliveryZone;
 
 class DeliveryZoneController extends Controller {
 
@@ -140,10 +141,18 @@ class DeliveryZoneController extends Controller {
                 ];
               }
 
-              $deliveryZone['delivery_time'] = Yii::$app->formatter->asDuration($deliveryZone['delivery_time'] * 60);
+              $deliveryTime = intval($deliveryZone['delivery_time']);
+
+              if(DeliveryZone::TIME_UNIT_DAY == $deliveryZone['time_unit'])
+                $deliveryTime = $deliveryTime * 24 * 60 * 60;
+              else if (DeliveryZone::TIME_UNIT_HRS == $deliveryZone['time_unit'])
+                $deliveryTime = $deliveryTime *  60 * 60;
+
+
+              $deliveryZone['delivery_time'] = Yii::$app->formatter->asDuration($deliveryTime);
 
               Yii::$app->formatter->language = 'ar-KW';
-              $deliveryZone['delivery_time_ar'] = Yii::$app->formatter->asDuration(intval($deliveryZone['delivery_time']) * 60);
+              $deliveryZone['delivery_time_ar'] = Yii::$app->formatter->asDuration(intval($deliveryTime));
               $deliveryZone['tax'] = $deliveryZone['delivery_zone_tax'] ? $deliveryZone['delivery_zone_tax']  : $deliveryZone['businessLocation']['business_location_tax'] ;
 
               return $deliveryZone;

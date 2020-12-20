@@ -846,7 +846,7 @@ class Order extends \yii\db\ActiveRecord {
                 if ($this->is_order_scheduled)
                     $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($this->scheduled_time_start_from));
                 else
-                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $this->deliveryZone->delivery_time . ' minutes', Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
+                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $this->deliveryZone->delivery_time . ' ' . $this->deliveryZone->timeUnit, Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
 
 
 
