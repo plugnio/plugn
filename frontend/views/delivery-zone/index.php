@@ -61,34 +61,78 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
 
         <div class="card-header">
 
-            <h1>
+          <div>
+            <h5>
+              Delivery from <?= $deliveryZone->businessLocation->country->country_name ?>
+            </h5>
+            <h3>
               <?= $deliveryZone->country->country_name ?>
-            </h1>
-
-                    <div>
-
-
-                  </div>
+            </h3>
+          </div>
 
         </div>
 
-        <div class="card-body">
+        <div class="card-content">
+          <div class="card-body">
+            <div class="row">
 
-          <div class="card-content">
-            <p>
-              Delivery Time:
-              <?= $deliveryZone->delivery_time . ' ' . $deliveryZone->timeUnit ?>
-            </p>
+              <div class="col-12 col-sm-12 col-lg-4" style="border-width: 1px; border-style: solid; border-color: #e2e8f0; padding: 10px; border-radius: 7px;">
 
-            <p>
-              Delivery Fee:
-              <?= Yii::$app->formatter->asCurrency($deliveryZone->delivery_fee, $deliveryZone->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
-            </p>
+                <h5>
+                  Delivers in
+                </h5>
+                <p>
+                  <?= $deliveryZone->delivery_time . ' ' . $deliveryZone->timeUnit ?>
+                </p>
 
-            <p>
-              Min Charge:
-              <?= Yii::$app->formatter->asCurrency($deliveryZone->min_charge, $deliveryZone->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
-            </p>
+                <h5>
+                  Delivery fee
+                </h5>
+                <p>
+                  <?= Yii::$app->formatter->asCurrency($deliveryZone->delivery_fee, $deliveryZone->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                </p>
+
+
+                <h5>
+                  Minimum charge on each orde:
+                </h5>
+                <p style=" margin: 0px;">
+                  <?= Yii::$app->formatter->asCurrency($deliveryZone->min_charge, $deliveryZone->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                </p>
+
+              </div>
+
+
+    
+
+            <div class="col-12 col-sm-12 col-lg-6">
+
+              <div class="row">
+
+                <div class="col-12" style="border-width: 1px; border-style: solid; border-color: #e2e8f0; padding: 10px; border-radius: 7px;">
+                  <h5>
+                    Delivery allowed to
+                  </h5>
+
+                  <p>
+                    <?= Yii::$app->formatter->asCurrency($deliveryZone->delivery_fee, $deliveryZone->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                  </p>
+                </div>
+
+                <div class="col-12" style="border-width: 1px; border-style: solid; border-color: #e2e8f0; padding: 10px; border-radius: 7px;">
+                  <h5>
+                    Delivery allowed to
+                  </h5>
+
+                  <p>
+                    <?= Yii::$app->formatter->asCurrency($deliveryZone->delivery_fee, $deliveryZone->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                  </p>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
 
 
             <?php if($deliveryZone->delivery_zone_tax){ ?>

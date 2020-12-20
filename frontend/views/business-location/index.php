@@ -45,69 +45,91 @@ $this->registerJs($js);
 
       <div class="card mt-2">
 
+        <div class="card-header">
 
+          <div>
+            <h5><?= $businessLocation->country->country_name ?></h5>
+            <h3>
+
+            <?=
+                Html::a($businessLocation->business_location_name . ', ' . ' <i class="feather icon-edit"></i>',
+                ['update',  'id' => $businessLocation->business_location_id, 'storeUuid' => $store->restaurant_uuid],
+                ['class' => '', 'style' => 'margin-bottom : 15px;     margin-right: 20px;']);
+            ?>
+          </h3>
+        </div>
+        </div>
         <div class="card-content">
-        <div class="card-body">
-        <div class="row">
-          <div class="col-12col-sm-12 col-lg-6">
-            <h3 style="display: contents;">
+
+          <div class="card-body">
+          <div class="row">
+
+            <div class="col-12 col-sm-12 col-lg-4" style="margin-bottom: 20px;">
+              <h5> Delivery </h5>
+
+              <?php   if($businessLocation->getDeliveryZones()->count()  == 0 ){ ?>
+
+
+                <p>You do not currently deliver from this location</p>
+                <?=  Html::a('Set up Delivery Zones', ['delivery-zone/create', 'storeUuid' => $store->restaurant_uuid, 'businessLocationId' => $businessLocation->business_location_id], ['class' => 'btn btn-outline-primary']); ?>
+
+
+              <?php  } else {
+
+                  $numberOfCoutnriesDeliveringToText = '';
+
+                  $numberOfCoutnriesDeliveringToText =
+                  $numberOfCoutnriesStoreDeliveringTo . $numberOfCoutnriesStoreDeliveringTo == 1 ?
+                   'Delivering to '. $numberOfCoutnriesStoreDeliveringTo .' country' : 'Delivering to '. $numberOfCoutnriesStoreDeliveringTo .' countries';
+
+                  ?>
+
+                    <p> <?= $numberOfCoutnriesDeliveringToText ?> </p>
+                  <?=  Html::a('Make changes', ['delivery-zone/index', 'storeUuid' => $store->restaurant_uuid, 'businessLocationId' => $businessLocation->business_location_id], ['class' => 'btn btn-outline-primary']) ?>
+
+              <?php  }      ?>
+
+            </div>
+            <div class="col-12 col-sm-12 col-lg-4" style="margin-bottom: 20px;">
+              <h5> Pickup </h5>
+
+              <p>
+                <?= $businessLocation->support_pick_up ? 'You do not currently allow pickup from this location' : 'Your customer can pick up from this location' ?>
+              </p>
               <?=
-                  Html::a($businessLocation->business_location_name . ', ' . $businessLocation->country->country_name. ' <i class="feather icon-edit"></i>',
-                  ['update',  'id' => $businessLocation->business_location_id, 'storeUuid' => $store->restaurant_uuid],
-                  ['class' => '', 'style' => 'margin-bottom : 15px;     margin-right: 20px;']);
+                Html::a($businessLocation->support_pick_up ? 'Disable pickup' : 'Enable pickup',
+                [$businessLocation->support_pick_up ? 'disable-pickup' : 'enable-pickup',  'id' => $businessLocation->business_location_id, 'storeUuid' => $store->restaurant_uuid],
+                ['class' => $businessLocation->support_pick_up ?  'btn btn-outline-danger' : 'btn btn-outline-primary'])
               ?>
 
-            </h3>
-          </div>
-          <div class="col-12 col-sm-12 col-lg-6">
-            <?=
-              Html::a($businessLocation->support_pick_up ? 'Disable pick up for this location' : 'Enable pick up for this location',
-              [$businessLocation->support_pick_up ? 'disable-pickup' : 'enable-pickup',  'id' => $businessLocation->business_location_id, 'storeUuid' => $store->restaurant_uuid],
-              ['class' => $businessLocation->support_pick_up ?  'btn btn-danger' : 'btn btn-outline-primary', 'style' => 'float:right'])
-            ?>
 
-          </div>
+            </div>
+            <div class="col-12 col-sm-12 col-lg-4" style="margin-bottom: 20px;">
+              <h5> VAT </h5>
+
+              <p>
+                <?= $businessLocation->business_location_tax ? $businessLocation->business_location_tax . '% charged on each order' : 'You do not charge VAT for this location'  ?>
+              </p>
+              <?=
+                Html::a($businessLocation->business_location_tax ? 'Remove VAT' : 'Set up VAT',
+                [$businessLocation->business_location_tax ? 'remove-tax' : 'configure-tax',  'id' => $businessLocation->business_location_id, 'storeUuid' => $store->restaurant_uuid],
+                ['class' => $businessLocation->business_location_tax ?  'btn btn-outline-danger' : 'btn btn-outline-primary'])
+              ?>
 
 
-          <div class="col-12" style="padding-top: 10px">
-            <?=
-              Html::a($businessLocation->business_location_tax ? 'Remove ' . $businessLocation->business_location_tax . '%' : 'Configure tax for this location',
-              [$businessLocation->business_location_tax ? 'remove-tax' : 'configure-tax',  'id' => $businessLocation->business_location_id, 'storeUuid' => $store->restaurant_uuid],
-              ['class' => $businessLocation->business_location_tax ?  'btn btn-danger' : 'btn btn-outline-primary', 'style' => 'float:right'])
-            ?>
-          </div>
+            </div>
 
 
 
-              </div>
 
 
-            <?php   if($businessLocation->getDeliveryZones()->count()  == 0 ){ ?>
-
-              <div class="card">
-                <h4>You currently do not have any places you deliver to</h4>
-                <?=  Html::a('Setup Delivery Zones', ['delivery-zone/create', 'storeUuid' => $store->restaurant_uuid, 'businessLocationId' => $businessLocation->business_location_id], ['class' => 'btn btn-primary']); ?>
-              </div>
-
-            <?php  } else {
-
-                $numberOfCoutnriesDeliveringToText = '';
-
-                $numberOfCoutnriesDeliveringToText =  $numberOfCoutnriesStoreDeliveringTo . $numberOfCoutnriesStoreDeliveringTo == 1 ? 'This business location delivers to '. $numberOfCoutnriesStoreDeliveringTo .' country' : 'This business location delivers to '. $numberOfCoutnriesStoreDeliveringTo .' countries';
-
-                ?>
-
-                <div class="card">
-                  <h4> <?= $numberOfCoutnriesDeliveringToText ?> </h4>
-                  <?=  Html::a('Make changes', ['delivery-zone/index', 'storeUuid' => $store->restaurant_uuid, 'businessLocationId' => $businessLocation->business_location_id], ['class' => 'btn btn-primary']) ?>
                 </div>
 
-            <?php  }      ?>
 
+
+          </div>
 
         </div>
-
-      </div>
       </div>
 
     <?php } ?>
