@@ -628,7 +628,7 @@ class Order extends \yii\db\ActiveRecord {
 
 
 
-        if ($this->order_mode == static::ORDER_MODE_DELIVERY && !$this->voucher  || ($this->voucher && $this->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY)){
+        if ($this->order_mode == static::ORDER_MODE_DELIVERY && (!$this->voucher  || ($this->voucher && $this->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY))){
             $totalPrice += $this->restaurantDelivery->delivery_fee;
         }
 
