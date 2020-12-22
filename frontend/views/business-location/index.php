@@ -27,7 +27,7 @@ $this->registerJs($js);
 
 
 
-    <?= Html::a($businessLocations ? 'Add another business location' : 'Add Business location', ['create', 'storeUuid' => $store->restaurant_uuid], ['class' => 'btn btn-success']); ?>
+    <?= Html::a($businessLocations ? 'Add another business location' : 'Add Business location', ['create', 'storeUuid' => $store->restaurant_uuid], ['class' => 'btn btn-primary']); ?>
 
 
       <?php
@@ -96,7 +96,7 @@ $this->registerJs($js);
               <p>
                 <?= !$businessLocation->support_pick_up ? 'You do not currently allow pickup from this location' : 'Your customer can pick up from this location' ?>
               </p>
-              
+
               <?=
                 Html::a($businessLocation->support_pick_up ? 'Disable pickup' : 'Enable pickup',
                 [$businessLocation->support_pick_up ? 'disable-pickup' : 'enable-pickup',  'id' => $businessLocation->business_location_id, 'storeUuid' => $store->restaurant_uuid],

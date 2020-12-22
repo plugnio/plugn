@@ -42,6 +42,11 @@ class Item extends \yii\db\ActiveRecord
     public $item_images;
 
 
+    //Values for `time_unit`
+    const TIME_UNIT_MIN = 'min';
+    const TIME_UNIT_HRS = 'hrs';
+    const TIME_UNIT_DAY = 'day';
+
 
     //Values for `item_status`
     const ITEM_STATUS_PUBLISH = 1;
@@ -62,12 +67,13 @@ class Item extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['item_name'], 'required', 'on' => 'create'],
+            [['item_name', 'prep_time_unit' , 'prep_time' ], 'required', 'on' => 'create'],
+            ['prep_time_unit', 'in', 'range' => [self::TIME_UNIT_MIN,self::TIME_UNIT_HRS, self::TIME_UNIT_DAY]],
             [['item_name', 'item_name_ar', 'item_price', 'items_category'], 'required'],
             [['sort_number', 'stock_qty'], 'integer', 'min' => 0],
             [['unit_sold'], 'integer', 'min' => 0],
             [['item_price'], 'number', 'min' => 0],
-            [['track_quantity', 'delivery_time'], 'integer'],
+            [['track_quantity', 'prep_time'], 'integer'],
             ['item_status', 'in', 'range' => [self::ITEM_STATUS_PUBLISH, self::ITEM_STATUS_UNPUBLISH]],
             ['stock_qty', 'required', 'when' => function($model) {
                 return $model->track_quantity;

@@ -63,6 +63,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property int $subtotal_before_refund
  * @property int $total_price_before_refund
  * @property int $restaurant_branch_id
+ * @property int $pickup_location_id
  * @property datetime $order_created_at
  * @property datetime $order_updated_at
  * @property int|null $bank_discount_id
@@ -135,13 +136,13 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['customer_name', 'order_mode','delivery_zone_id'], 'required'],
+            [['customer_name', 'order_mode'], 'required'],
             [['is_order_scheduled'], 'required' , 'on' => 'create'],
             [['payment_method_id'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status','mashkor_order_status', 'customer_id'], 'integer', 'min' => 0],
-            [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id', 'reminder_sent', 'sms_sent', 'customer_phone_country_code', 'delivery_zone_id', 'shipping_country_id', 'floor'], 'integer'],
+            [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id', 'reminder_sent', 'sms_sent', 'customer_phone_country_code', 'delivery_zone_id', 'shipping_country_id', 'floor', 'pickup_location_id'], 'integer'],
             ['mashkor_order_status', 'in', 'range' => [
               self::MASHKOR_ORDER_STATUS_NEW,
               self::MASHKOR_ORDER_STATUS_CONFIRMED,
@@ -159,9 +160,13 @@ class Order extends \yii\db\ActiveRecord {
             ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_PARTIALLY_REFUNDED, self::STATUS_CANCELED, self::STATUS_DRAFT, self::STATUS_ABANDONED_CHECKOUT, self::STATUS_ACCEPTED]],
 
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
-            ['restaurant_branch_id', function ($attribute, $params, $validator) {
-                    if (!$this->restaurant_branch_id && $this->order_mode == Order::ORDER_MODE_PICK_UP)
+            ['pickup_location_id', function ($attribute, $params, $validator) {
+                    if (!$this->pickup_location_id && $this->order_mode == Order::ORDER_MODE_PICK_UP)
                         $this->addError($attribute, 'Branch name cannot be blank.');
+                }, 'skipOnError' => false, 'skipOnEmpty' => false],
+            ['delivery_zone_id', function ($attribute, $params, $validator) {
+                    if (!$this->delivery_zone_id && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                        $this->addError($attribute, 'Delivery zone cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             [['scheduled_time_start_from', 'scheduled_time_to'], function ($attribute, $params, $validator) {
                     if ($this->is_order_scheduled && (!$this->scheduled_time_start_from || !$this->scheduled_time_to))
@@ -245,6 +250,7 @@ class Order extends \yii\db\ActiveRecord {
             [['payment_method_id'], 'exist', 'skipOnError' => false, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => false, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
             [['restaurant_branch_id'], 'exist', 'skipOnError' => false, 'targetClass' => RestaurantBranch::className(), 'targetAttribute' => ['restaurant_branch_id' => 'restaurant_branch_id']],
+            [['pickup_location_id'], 'exist', 'skipOnError' => true, 'targetClass' => BusinessLocation::className(), 'targetAttribute' => ['pickup_location_id' => 'business_location_id']],
             [['voucher_id'], 'exist', 'skipOnError' => true, 'targetClass' => Voucher::className(), 'targetAttribute' => ['voucher_id' => 'voucher_id']],
         ];
     }
@@ -708,12 +714,16 @@ class Order extends \yii\db\ActiveRecord {
           $totalPrice -= $discountAmount ;
         }
 
+        if($this->delivery_zone_id && $this->deliveryZone->delivery_zone_tax){
+          $totalPrice +=  $totalPrice * ($this->deliveryZone->delivery_zone_tax/100) ;
+        } else if($this->pickup_location_id && $this->pickupLocation->business_location_tax){
+          $totalPrice +=  $totalPrice * ($this->pickupLocation->business_location_tax/100) ;
 
+        }
 
         if ($this->order_mode == static::ORDER_MODE_DELIVERY && !$this->voucher  || ($this->voucher && $this->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY)){
             $totalPrice += $this->deliveryZone->delivery_fee;
         }
-
 
         return $totalPrice;
     }
@@ -765,6 +775,30 @@ class Order extends \yii\db\ActiveRecord {
 
 
       }
+
+      if (!$insert &&  $this->order_status == self::STATUS_PENDING) {
+
+
+        if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
+                //set ETA value
+                \Yii::$app->timeZone = 'Asia/Kuwait';
+
+                if ($this->is_order_scheduled)
+                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($this->scheduled_time_start_from));
+                else
+                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $this->deliveryZone->delivery_time . ' ' . $this->deliveryZone->timeUnit, Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
+          }
+
+        foreach ($this->items as $key => $item) {
+          if($item->prep_time)
+            $this->estimated_time_of_arrival = date("c", strtotime('+' . $item->prep_time . ' ' . $item->prep_time_unit,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+        }
+
+
+
+      }
+
+
 
       //Update delivery area
       if (!$insert &&  $this->order_mode == static::ORDER_MODE_DELIVERY && isset($changedAttributes['area_id']) && $changedAttributes['area_id'] != $this->getOldAttribute('area_id')  && $this->area_id) {
@@ -840,26 +874,15 @@ class Order extends \yii\db\ActiveRecord {
         if ($insert) {
 
             if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
-                //set ETA value
-                \Yii::$app->timeZone = 'Asia/Kuwait';
-
-                if ($this->is_order_scheduled)
-                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($this->scheduled_time_start_from));
-                else
-                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $this->deliveryZone->delivery_time . ' ' . $this->deliveryZone->timeUnit, Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
-
-
-
 
                 $this->delivery_time = $this->deliveryZone->delivery_time;
                 $this->save(false);
-            } else {
-                //set ETA value
-                \Yii::$app->timeZone = 'Asia/Kuwait';
-                $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $this->restaurantBranch->prep_time . ' minutes', Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
-
-                $this->delivery_time = $this->restaurantBranch->prep_time;
             }
+
+            // else {
+            //
+            //     $this->delivery_time = $this->restaurantBranch->prep_time;
+            // }
 
 
             //Save Customer data
@@ -1048,6 +1071,15 @@ class Order extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Gets query for [[OrderItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItems() {
+        return $this->hasMany(Item::className(), ['item_uuid' => 'item_uuid'])->via('orderItems');
+    }
+
+    /**
      * Gets query for [[Customer]].
      *
      * @return \yii\db\ActiveQuery
@@ -1081,6 +1113,17 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function getRefunds() {
         return $this->hasMany(Refund::className(), ['order_uuid' => 'order_uuid']);
+    }
+
+
+    /**
+     * Gets query for [[PickupLocation]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPickupLocation()
+    {
+        return $this->hasOne(BusinessLocation::className(), ['business_location_id' => 'pickup_location_id']);
     }
 
     /**

@@ -1314,6 +1314,17 @@ class Restaurant extends \yii\db\ActiveRecord {
         return $this->hasMany(BusinessLocation::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+
+    /**
+     * Gets query for [[BusinessLocations]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPickupBusinessLocations()
+    {
+        return $this->hasMany(BusinessLocation::className(), ['restaurant_uuid' => 'restaurant_uuid'])->where(['support_pick_up' => 1]);
+    }
+
     /**
      * Gets query for [[DeliveryZones]].
      *
@@ -1322,7 +1333,7 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function getDeliveryZones()
     {
         return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])
-            ->viaTable('business_location', ['restaurant_uuid' => 'restaurant_uuid']);
+            ->viaTable('business_location', ['restaurant_uuid' => 'restaurant_uuid'])->with('businessLocation');
     }
 
 

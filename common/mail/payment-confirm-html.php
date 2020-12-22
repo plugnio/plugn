@@ -366,7 +366,7 @@ use common\models\BankDiscount;
                                                                                 </tr>
                                                                                 <tr>
                                                                                     <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
-                                                                                        <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;"><?= $order->restaurantBranch->branch_name_en ?></div>
+                                                                                        <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;"><?= $order->pickupLocation->business_location_name ?></div>
                                                                                     </td>
                                                                                 </tr>
                                                                             </table>

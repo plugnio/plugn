@@ -148,6 +148,16 @@ $this->registerJs($js);
 
             <?= $form->field($modelItem, 'sort_number')->textInput(['type' => 'number']) ?>
 
+						<?= $form->field($modelItem, 'prep_time')->textInput(['type' => 'number']) ; ?>
+
+						<?= $form->field($modelItem, 'prep_time_unit')->dropDownList(
+										[
+												Item::TIME_UNIT_MIN => 'Minutes',
+												Item::TIME_UNIT_HRS => 'Hours',
+												Item::TIME_UNIT_DAY => 'Days'
+										],['value' => $modelItem->prep_time_unit ? $modelItem->prep_time_unit : Item::TIME_UNIT_DAY ]
+						)->label(''); ?>
+
         </div>
 
     </div>

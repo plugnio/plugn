@@ -140,7 +140,7 @@ class OrderController extends Controller {
                     $order->scheduled_time_to = date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_to")));
                 }
             } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
-                $order->restaurant_branch_id = Yii::$app->request->getBodyParam("restaurant_branch_id");
+                $order->pickup_location_id = Yii::$app->request->getBodyParam("business_location_id");
             }
 
 

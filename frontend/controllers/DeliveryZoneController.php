@@ -339,58 +339,6 @@ class DeliveryZoneController extends Controller {
         }
 
 
-        //
-        // if ($model->load(Yii::$app->request->post())) {
-        //
-        //   $storeDeliveryZones = $store_model->getDeliveryZonesForSpecificCountry($model->country_id);
-        //
-        //
-        //   if($model->save()){
-        //     AreaDeliveryZone::deleteAll(['delivery_zone_id' => $model->delivery_zone_id]);
-        //     if (($model['selectedAreas'])) {
-        //
-        //         foreach ($model['selectedAreas'] as $cities) {
-        //
-        //             if (is_array($cities)) {
-        //
-        //                 foreach ($cities as $areas) {
-        //                     if (is_array($areas)) {
-        //
-        //
-        //                         foreach ($areas as $area_id) {
-        //
-        //                             $delivery_zone_area_model = new AreaDeliveryZone();
-        //                             $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
-        //                             $delivery_zone_area_model->area_id = $area_id;
-        //                             $delivery_zone_area_model->restaurant_uuid = $storeUuid;
-        //                             $delivery_zone_area_model->save(false);
-        //                         }
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     } else {
-        //       $delivery_zone_area_model = new AreaDeliveryZone();
-        //       $delivery_zone_area_model->delivery_zone_id = $model->delivery_zone_id;
-        //       $delivery_zone_area_model->country_id = $model->country_id;
-        //       $delivery_zone_area_model->restaurant_uuid = $storeUuid;
-        //       $delivery_zone_area_model->save(false);
-        //     }
-        //
-        //
-        //     if( !AreaDeliveryZone::find()->where(['delivery_zone_id' => $model->delivery_zone_id])->exists()   ){
-        //       DeliveryZone::deleteAll(['delivery_zone_id' => $model->delivery_zone_id]);
-        //       Yii::$app->session->setFlash('errorResponse', "Cant add another zone");
-        //       $this->redirect(['index', 'storeUuid' => $storeUuid, 'businessLocationId' => $model->business_location_id]);
-        //     }
-        //
-        //
-        //
-        //   }
-        //
-        //   $this->redirect(['index', 'storeUuid' => $storeUuid, 'businessLocationId' => $model->business_location_id]);
-        // }
-
 
         return $this->render('update-areas', [
                     'cities' => $cities,

@@ -147,8 +147,6 @@ class DeliveryZone extends \yii\db\ActiveRecord
 
 
 
-
-
     /**
      * Gets query for [[Country]].
      *

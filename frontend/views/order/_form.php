@@ -56,6 +56,9 @@ $this->registerJs($js);
         $areaQuery = $restaurant_model->getAreas()->all();
         $areaList = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
 
+        $shippingCountryQuery = $restaurant_model->getShippingCountries()->all();
+        $shippingCountryList = ArrayHelper::map($shippingCountryQuery, 'country_id', 'country_name');
+
 
         $form = ActiveForm::begin([
                     'errorSummaryCssClass' => 'alert alert-danger'
@@ -77,10 +80,11 @@ $this->registerJs($js);
 
 
 
-        $restaurantBrnachesQuery = common\models\RestaurantBranch::find()->where(['restaurant_uuid' => $model->restaurant_uuid])->asArray()->all();
-        $restaurantBrnachesArray = ArrayHelper::map($restaurantBrnachesQuery, 'restaurant_branch_id', 'branch_name_en');
+        $businessLocationQuery = common\models\BusinessLocation::find()->where(['restaurant_uuid' => $model->restaurant_uuid])->asArray()->all();
+        $businessLocationArray = ArrayHelper::map($businessLocationQuery, 'business_location_id', 'business_location_name');
         ?>
 
+        <?= $form->field($model, 'shipping_country_id')->dropDownList($shippingCountryList, ['prompt' => 'Choose country...', 'class' => 'form-control select2'])->label('Country'); ?>
 
         <div id='customer-address' style='display:none; <?= $model->order_mode != null && $model->order_mode == Order::ORDER_MODE_DELIVERY ? "display:block" : "" ?>'>
             <div class="row">
@@ -117,7 +121,7 @@ $this->registerJs($js);
 
 
         <div id='pickup-branch' style='display:none; <?= $model->order_mode != null && $model->order_mode == Order::ORDER_MODE_DELIVERY ? "display:none" : "" ?>'>
-            <?= $form->field($model, 'restaurant_branch_id')->dropDownList($restaurantBrnachesArray, ['prompt' => 'Choose branch...', 'class' => 'select2'])->label('Pickup from'); ?>
+            <?= $form->field($model, 'pickup_location_id')->dropDownList($businessLocationArray, ['prompt' => 'Choose pickup location...', 'class' => 'select2'])->label('Pickup from'); ?>
         </div>
 
         <?= $form->field($model, 'customer_name')->textInput(['maxlength' => true]) ?>
