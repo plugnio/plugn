@@ -47,7 +47,7 @@ use common\models\CategoryItem;
 
 
                         $form = ActiveForm::begin([
-                                    'action' => ['item/index', 'restaurantUuid' => $restaurant_uuid],
+                                    'action' => ['item/index', 'storeUuid' => $restaurant_uuid],
                                     'method' => 'get',
                         ]);
                         ?>
@@ -71,7 +71,7 @@ use common\models\CategoryItem;
 
                         <div class="form-group">
                             <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-                            <?= Html::a('Reset', ['item/inventory', 'restaurantUuid' => $restaurant_uuid], ['class' => 'btn btn-outline-secondary', 'style' => 'margin-left: 10px;']) ?>
+                            <?= Html::a('Reset', ['item/inventory', 'storeUuid' => $restaurant_uuid], ['class' => 'btn btn-outline-secondary', 'style' => 'margin-left: 10px;']) ?>
                         </div>
                         <?php ActiveForm::end(); ?>
 

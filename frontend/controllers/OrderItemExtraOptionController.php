@@ -47,9 +47,9 @@ class OrderItemExtraOptionController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($id, $restaurantUuid) {
+    public function actionCreate($id, $storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         if ($order_item_model = OrderItem::find()->where(['order_item_id' => $id])->one()) {
             $model = new OrderItemExtraOption();
@@ -68,7 +68,7 @@ class OrderItemExtraOptionController extends Controller {
             $extraOptionsQuery = ArrayHelper::map($extraOptions, 'extra_option_id', 'extra_option_name');
 
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                return $this->redirect(['order-item/view', 'id' => $model->order_item_id, 'restaurantUuid' => $restaurant_model->restaurant_uuid]);
+                return $this->redirect(['order-item/view', 'id' => $model->order_item_id, 'storeUuid' => $restaurant_model->restaurant_uuid]);
             }
 
             return $this->render('create', [
@@ -87,11 +87,11 @@ class OrderItemExtraOptionController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id, $restaurantUuid) {
-        $model = $this->findModel($id, $restaurantUuid);
+    public function actionUpdate($id, $storeUuid) {
+        $model = $this->findModel($id, $storeUuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->order_item_extra_option_id, 'restaurantUuid' => $restaurantUuid]);
+            return $this->redirect(['view', 'id' => $model->order_item_extra_option_id, 'storeUuid' => $storeUuid]);
         }
 
         return $this->render('update', [
@@ -106,14 +106,14 @@ class OrderItemExtraOptionController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id, $restaurantUuid) {
+    public function actionDelete($id, $storeUuid) {
 
-        $model = $this->findModel($id, $restaurantUuid);
+        $model = $this->findModel($id, $storeUuid);
         $order_item_id = $model->order_item_id;
 
         $model->delete();
 
-        return $this->redirect(['order-item/view', 'id' => $order_item_id, 'restaurantUuid' => $restaurantUuid]);
+        return $this->redirect(['order-item/view', 'id' => $order_item_id, 'storeUuid' => $storeUuid]);
     }
 
     /**
@@ -123,9 +123,9 @@ class OrderItemExtraOptionController extends Controller {
      * @return OrderItemExtraOption the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $restaurantUuid) {
+    protected function findModel($id, $storeUuid) {
         if (($model = OrderItemExtraOption::findOne($id)) !== null) {
-         if ($model->restaurant->restaurant_uuid == Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid)
+         if ($model->restaurant->restaurant_uuid == Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid)
             return $model;
         }
 

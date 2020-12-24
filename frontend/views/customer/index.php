@@ -8,7 +8,7 @@ use yii\helpers\Url;
 /* @var $searchModel frontend\models\CustomerSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['restaurant_uuid'] = $restaurantUuid;
+$this->params['restaurant_uuid'] = $storeUuid;
 
 $this->title = 'Customers';
 $this->params['breadcrumbs'][] = $this->title;
@@ -28,11 +28,13 @@ $this->registerJs($js);
 
 <section id="data-list-view" class="data-list-view-header">
 
+  <?php if ($dataProvider->getCount() > 0) { ?>
+
   <!-- Data list view starts -->
   <div class="action-btns d-none">
       <div class="btn-dropdown mr-1 mb-1">
           <div class="btn-group dropdown actions-dropodown">
-             <?= Html::a('<i class="fa fa-file-excel-o"></i> Export to excel', ['export-to-excel','restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']) ?>
+            <?= Html::a('Add customer', ['create', 'storeUuid' => $storeUuid], ['class' => 'btn btn-primary']) ?>
           </div>
       </div>
   </div>
@@ -44,7 +46,7 @@ $this->registerJs($js);
         GridView::widget([
             'dataProvider' => $dataProvider,
             'rowOptions' => function($model) {
-                $url = Url::to(['customer/view', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid]);
+                $url = Url::to(['customer/view', 'id' => $model->customer_id, 'storeUuid' => $model->restaurant_uuid]);
 
                 return [
                     'onclick' => "window.location.href='{$url}'"
@@ -85,5 +87,29 @@ $this->registerJs($js);
     </div>
     <!-- DataTable ends -->
 
-  </section>
+  <?php } else {?>
+
+
+    <div class="card">
+      <div style="padding: 70px 0; text-align: center;">
+
+        <div>
+          <img src="https://res.cloudinary.com/plugn/image/upload/v1607881378/emptystate-customer.svg" width="226" alt="" />
+        </div>
+
+        <h3>
+          Manage customer details
+        </h3>
+
+        <p>
+          This is where you can manage your customer information and view their purchase history.
+        </p>
+        <?= Html::a('Add customer', ['create', 'storeUuid' => $storeUuid], ['class' => 'btn btn-primary']) ?>
+      </div>
+    </div>
+
+
+  <?php } ?>
+
+</section>
 <!-- Data list view end -->

@@ -50,15 +50,15 @@ class ItemController extends Controller
         ];
     }
 
-    public function actionExportToExcel($restaurantUuid)
+    public function actionExportToExcel($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $model = Item::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->all();
 
         header('Access-Control-Allow-Origin: *');
         header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        header("Content-Disposition: attachment;filename=\"inventory.xlsx\"");
+        header("Content-Disposition: attachment;filename=\"item-report.xlsx\"");
         header("Cache-Control: max-age=0");
 
 
@@ -86,17 +86,31 @@ class ItemController extends Controller
      * Lists all Item models.
      * @return mixed
      */
-    public function actionIndex($restaurantUuid)
+    public function actionIndex($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new ItemSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
 
+        return $this->render('index', [
+                    'searchModel' => $searchModel,
+                    'dataProvider' => $dataProvider,
+                    'restaurant_model' => $restaurant_model
+        ]);
+    }
 
-        if ($restaurant_model->load(Yii::$app->request->post())) {
+    /**
+     * Lists all Item models.
+     * @return mixed
+     */
+    public function actionItemsReport($storeUuid)
+    {
+        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-          list($start_date, $end_date) = explode(' - ', $restaurant_model->export_sold_items_data_in_specific_date_range);
+        if ($store_model->load(Yii::$app->request->post())) {
+
+          list($start_date, $end_date) = explode(' - ', $store_model->export_sold_items_data_in_specific_date_range);
 
 
             $searchResult = Item::find()
@@ -106,7 +120,7 @@ class ItemController extends Controller
                     ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
                     ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
                     ->orWhere(['order_status' => Order::STATUS_CANCELED])
-                    ->andWhere(['order.restaurant_uuid' => $restaurant_model->restaurant_uuid])
+                    ->andWhere(['order.restaurant_uuid' => $store_model->restaurant_uuid])
                     ->andWhere(['between', 'order.order_created_at', $start_date, $end_date])
                     ->all();
 
@@ -121,7 +135,10 @@ class ItemController extends Controller
                 'models' => $searchResult,
                 'columns' => [
                     'item_name',
+                    'sku',
+                    'barcode',
                     [
+                        'header' => 'Unit sold',
                         'label' => 'Sold items',
                         'format' => 'html',
                         'value' => function ($data)  use ($start_date,$end_date) {
@@ -133,10 +150,8 @@ class ItemController extends Controller
 
         }
 
-        return $this->render('index', [
-                    'searchModel' => $searchModel,
-                    'dataProvider' => $dataProvider,
-                    'restaurant_model' => $restaurant_model
+        return $this->render('items-report', [
+                    'store_model' => $store_model
         ]);
     }
 
@@ -144,9 +159,9 @@ class ItemController extends Controller
      * Lists all Item models.
      * @return mixed
      */
-    public function actionInventory($restaurantUuid)
+    public function actionInventory($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new ItemSearch();
         $dataProvider = $searchModel->searchTrackQuantity(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
@@ -167,13 +182,13 @@ class ItemController extends Controller
 
     /**
      * Delete item image
-     * @param type $restaurantUuid
+     * @param type $storeUuid
      * @param type $itemUuid
      * @return boolean
      */
-    public function actionDeleteItemImage($restaurantUuid, $itemUuid)
+    public function actionDeleteItemImage($storeUuid, $itemUuid)
     {
-        $model = $this->findModel($itemUuid, $restaurantUuid);
+        $model = $this->findModel($itemUuid, $storeUuid);
 
 
         $file_name = Yii::$app->request->getBodyParam("file");
@@ -193,9 +208,9 @@ class ItemController extends Controller
      * If creation is successful, the browser will be redirected to the 'index' page.
      * @return mixed
      */
-    public function actionCreate($restaurantUuid)
+    public function actionCreate($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $modelItem = new Item;
         $modelItem->restaurant_uuid = $restaurant_model->restaurant_uuid;
@@ -297,7 +312,7 @@ class ItemController extends Controller
 
                     if ($flag) {
                         $transaction->commit();
-                        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+                        return $this->redirect(['index', 'storeUuid' => $storeUuid]);
                     } else {
                         $transaction->rollBack();
                     }
@@ -312,24 +327,24 @@ class ItemController extends Controller
                     'categoryQuery' => $categoryQuery,
                     'modelsOption' => (empty($modelsOption)) ? [new Option] : $modelsOption,
                     'modelsExtraOption' => (empty($modelsExtraOption)) ? [[new ExtraOption]] : $modelsExtraOption,
-                    'restaurantUuid' => $restaurant_model->restaurant_uuid
+                    'storeUuid' => $restaurant_model->restaurant_uuid
         ]);
     }
 
     /**
      * Change item status
      * @param type $id
-     * @param type $restaurantUuid
+     * @param type $storeUuid
      * @return type
      */
-    public function actionChangeItemStatus($id, $restaurantUuid)
+    public function actionChangeItemStatus($id, $storeUuid)
     {
-        $model = $this->findModel($id, $restaurantUuid);
+        $model = $this->findModel($id, $storeUuid);
 
         $model->item_status = $model->item_status == Item::ITEM_STATUS_PUBLISH ? Item::ITEM_STATUS_UNPUBLISH : Item::ITEM_STATUS_PUBLISH;
         $model->save(false);
 
-        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+        return $this->redirect(['index', 'storeUuid' => $storeUuid]);
     }
 
     /**
@@ -338,9 +353,9 @@ class ItemController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionUpdate($id, $restaurantUuid)
+    public function actionUpdate($id, $storeUuid)
     {
-        $modelItem = $this->findModel($id, $restaurantUuid);
+        $modelItem = $this->findModel($id, $storeUuid);
         $categoryQuery = Category::find()->where(['restaurant_uuid' => $modelItem->restaurant_uuid])->asArray()->all();
 
         $modelsOption = $modelItem->getOptions()->all();
@@ -472,7 +487,7 @@ class ItemController extends Controller
 
                     if ($flag) {
                         $transaction->commit();
-                        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+                        return $this->redirect(['index', 'storeUuid' => $storeUuid]);
                     } else {
                         $transaction->rollBack();
                     }
@@ -488,7 +503,7 @@ class ItemController extends Controller
                     'categoryQuery' => $categoryQuery,
                     'modelsOption' => (empty($modelsOption)) ? [new Option] : $modelsOption,
                     'modelsExtraOption' => (empty($modelsExtraOption)) ? [[new ExtraOption]] : $modelsExtraOption,
-                    'restaurantUuid' => $restaurantUuid
+                    'storeUuid' => $storeUuid
         ]);
     }
 
@@ -499,11 +514,11 @@ class ItemController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id, $restaurantUuid)
+    public function actionDelete($id, $storeUuid)
     {
-        $this->findModel($id, $restaurantUuid)->delete();
+        $this->findModel($id, $storeUuid)->delete();
 
-        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+        return $this->redirect(['index', 'storeUuid' => $storeUuid]);
     }
 
     /**
@@ -513,9 +528,9 @@ class ItemController extends Controller
      * @return Item the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $restaurantUuid)
+    protected function findModel($id, $storeUuid)
     {
-        if (($model = Item::find()->where(['item_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
+        if (($model = Item::find()->where(['item_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
             return $model;
         }
 

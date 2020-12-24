@@ -8,7 +8,7 @@ use yii\helpers\Html;
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 $this->title = 'Invite Additional Agent';
-$this->params['breadcrumbs'][] = ['label' => 'Assigned Agents', 'url' => ['index', 'restaurantUuid' => $model->restaurant_uuid]];
+$this->params['breadcrumbs'][] = ['label' => 'Assigned Agents', 'url' => ['index', 'storeUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="agent-assignment-create">

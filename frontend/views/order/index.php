@@ -40,69 +40,25 @@ $this->registerJs($js);
 
 <section id="data-list-view" class="data-list-view-header">
 
+
+    <?php if ($dataProvider->getCount() > 0) { ?>
+
+
     <!-- Data list view starts -->
     <div class="action-btns ">
         <div class="btn-dropdown mr-1 mb-1">
             <div class="btn-group dropdown actions-dropodown">
-                <?= Html::a('<i class="feather icon-plus"></i> Create an order manually', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary']) ?>
+                <?= Html::a('Create order ', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
             </div>
         </div>
     </div>
 
 
-    <div class="card">
-        <div class="card-header">
-            <?php
-            $form = ActiveForm::begin(
-                            [
-                                'options' => [
-                                    'style' => 'width: 100%;'
-                                ]
-                            ]
-            );
-            ?>
+    <?php
+    // echo $this->render('_h', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]);
+    ?>
 
 
-            <?=
-            $form->field($restaurant_model, 'export_orders_data_in_specific_date_range', [
-                'labelOptions' => ['style' => ' margin-bottom: 10px;   font-size: 1.32rem;'],
-                'template' => '
-              {label}
-           <div class="position-relative has-icon-left">
-
-                {input}
-
-             <div class="form-control-position">
-              <i class="feather icon-calendar"></i>
-            </div>
-          </div>'
-            ])->widget(DateRangePicker::classname(), [
-                'presetDropdown' => false,
-                'convertFormat' => true,
-                'pluginOptions' => [
-                    'timePicker' => true,
-                    'timePickerIncrement' => 15,
-                    'locale' => ['format' => 'Y-m-d H:i:s']
-                ],
-            ]);
-            ?>
-
-            <div class="form-group">
-                <?=
-                Html::submitButton('<i class="fa fa-file-excel-o"></i> Export to Excel', ['class' => 'btn btn-success', 'id' => 'export-to-excel-btn', 'disabled' => true])
-                ?>
-            </div>
-
-
-
-            <?php ActiveForm::end(); ?>
-
-
-
-        </div>
-    </div>
-
-    <?php echo $this->render('_search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
 
 
     <!-- DataTable starts -->
@@ -112,7 +68,7 @@ $this->registerJs($js);
         GridView::widget([
             'dataProvider' => $dataProvider,
             'rowOptions' => function($model) {
-                $url = Url::to(['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid]);
+                $url = Url::to(['order/view', 'id' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid]);
 
                 return [
                     'onclick' => "window.location.href='{$url}'"
@@ -124,7 +80,7 @@ $this->registerJs($js);
                     'label' => 'Order ID',
                     "format" => "raw",
                     "value" => function($model) {
-                        return Html::a('#' . $model->order_uuid, ['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid]);
+                        return Html::a('#' . $model->order_uuid, ['order/view', 'id' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid]);
                     }
                 ],
                 [
@@ -139,7 +95,7 @@ $this->registerJs($js);
                   'format' => 'raw',
                   'value' => function ($data) {
                       if ($data->customer_id)
-                          return Html::a($data->customer_name, ['customer/view', 'id' => $data->customer_id, 'restaurantUuid' => $data->restaurant_uuid]);
+                          return Html::a($data->customer_name, ['customer/view', 'id' => $data->customer_id, 'storeUuid' => $data->restaurant_uuid]);
                       else
                         return $data->customer_name;
                   },
@@ -151,13 +107,7 @@ $this->registerJs($js);
                         return '<a href="tel:+'. $model->customer_phone_number .'"> '. $model->customer_phone_number.' </a>';
                     }
                 ],
-                [
-                    'label' => 'Branch',
-                    "format" => "raw",
-                    "value" => function($model) {
-                        return $model->businessLocation->business_location_name;
-                    }
-                ],
+          
                 [
                     'label' => 'When',
                     'format' => 'raw',
@@ -173,7 +123,7 @@ $this->registerJs($js);
                         if ($model->order_status == Order::STATUS_PENDING)
                             return '<i class="fa fa-circle font-small-3 text-warning mr-50"></i> <span class="text-warning">' . $model->orderStatusInEnglish . '</span>';
                         else if ($model->order_status == Order::STATUS_ACCEPTED)
-                            return '<i class="fa fa-circle font-small-3 text-success mr-50"></i> <span class="text-success">' . $model->orderStatusInEnglish . '</span>';
+                            return '<i  style="color: #2898C8" class="fa fa-circle font-small-3 mr-50"></i> <span style="color: #2898C8">' . $model->orderStatusInEnglish . '</span>';
                         else if ($model->order_status == Order::STATUS_BEING_PREPARED)
                             return '<i class="fa fa-circle font-small-3 text-primary mr-50"></i> <span class="text-primary">' . $model->orderStatusInEnglish . '</span>';
                         else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY)
@@ -212,6 +162,29 @@ $this->registerJs($js);
 
     </div>
     <!-- DataTable ends -->
+
+  <?php } else {?>
+
+
+
+    <div class="card">
+      <div style="padding: 70px 0; text-align: center;">
+
+        <div>
+          <img src="https://res.cloudinary.com/plugn/image/upload/c_scale,h_120,w_100/v1603286062/a64ef20cde1af82ef69556c7ab33c727_pa1xe7.svg" width="226" alt="" />
+        </div>
+
+        <h3>Your orders will show here</h3>
+
+        <p>
+          This is where you’ll fulfill orders, collect payments, and track order progress.
+        </p>
+        <?= Html::a('Create order', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+      </div>
+    </div>
+
+
+  <?php } ?>
 
 </section>
 <!-- Data list view end -->

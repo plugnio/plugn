@@ -114,7 +114,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                             <li class="dropdown dropdown-user nav-item"><a class="dropdown-toggle nav-link dropdown-user-link" href="#" data-toggle="dropdown">
                                     <div class="user-nav d-sm-flex d-none">
                                         <span class="user-name text-bold-600">
-                                            <?= Html::tag('span', Yii::$app->user->identity->agent_name, ['agent/index', 'restaurantUuid' => $this->params['restaurant_uuid']]) ?>
+                                            <?= Html::tag('span', Yii::$app->user->identity->agent_name, ['agent/index', 'storeUuid' => $this->params['restaurant_uuid']]) ?>
                                         </span>
                                     </div>
                                     <span>
@@ -125,7 +125,14 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
 
                                     <?=
                                     Html::a(
-                                            '<i class="feather icon-user"></i> Edit Profile', ['agent/update', 'restaurantUuid' => $this->params['restaurant_uuid']], ['class' => 'dropdown-item'])
+                                            '<i class="feather icon-user"></i> Edit Profile', ['agent/update', 'storeUuid' => $this->params['restaurant_uuid']], ['class' => 'dropdown-item'])
+                                    ?>
+
+                                    <div class="dropdown-divider"> </div>
+
+                                    <?=
+                                    Html::a(
+                                            '<i class="feather icon-lock"></i> Change Password', ['agent/change-password', 'storeUuid' => $this->params['restaurant_uuid']], ['class' => 'dropdown-item'])
                                     ?>
 
                                     <div class="dropdown-divider"> </div>
@@ -194,7 +201,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         <?=
                         Html::a(
                                 Html::tag('i', '', ['class' => 'feather icon-server']) .
-                                Html::tag('span', 'Real Time Orders'), ['site/real-time-orders', 'restaurant_uuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                Html::tag('span', 'Real Time Orders'), ['site/real-time-orders', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
                         )
                         ?>
                     </li>
@@ -211,7 +218,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'All Orders'), ['order/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                        Html::tag('span', 'All Orders'), ['order/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
                                 )
                                 ?>
                             </li>
@@ -219,7 +226,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'Drafts'), ['order/draft', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                        Html::tag('span', 'Drafts'), ['order/draft', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
                                 )
                                 ?>
                             </li>
@@ -227,7 +234,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'Abandoned checkouts'), ['order/abandoned-checkout', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                        Html::tag('span', 'Abandoned checkouts'), ['order/abandoned-checkout', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
                                 )
                                 ?>
                             </li>
@@ -239,7 +246,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         <?=
                         Html::a(
                                 Html::tag('i', '', ['class' => 'feather icon-grid']) .
-                                Html::tag('span', 'Categories'), ['category/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                Html::tag('span', 'Categories'), ['category/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                         )
                         ?>
                     </li>
@@ -254,7 +261,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'All Items'), ['item/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                        Html::tag('span', 'All Items'), ['item/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                                 )
                                 ?>
                             </li>
@@ -264,7 +271,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'Inventory'), ['item/inventory', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                        Html::tag('span', 'Inventory'), ['item/inventory', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                                 )
                                 ?>
                             </li>
@@ -285,7 +292,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'Voucher'), ['voucher/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                        Html::tag('span', 'Voucher'), ['voucher/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
                                 )
                                 ?>
                             </li>
@@ -294,7 +301,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'Bank Discount'), ['bank-discount/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                        Html::tag('span', 'Bank Discount'), ['bank-discount/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
                                 )
                                 ?>
                             </li>
@@ -318,20 +325,42 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         <?=
                         Html::a(
                                 Html::tag('i', '', ['class' => 'feather icon-user']) .
-                                Html::tag('span', 'Customers'), ['customer/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                Html::tag('span', 'Customers'), ['customer/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                         )
                         ?>
                     </li>
                     <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
-                        <li class=" nav-item <?= $this->context->route == 'restaurant/statistics' ? 'active' : '' ?> ">
 
-                            <?=
-                            Html::a(
-                                    Html::tag('i', '', ['class' => 'fa fa-line-chart']) .
-                                    Html::tag('span', 'Statistics'), ['restaurant/statistics', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
-                            )
-                            ?>
+                        <li class=" nav-item">
+                            <a>
+                                <i class="fa fa-signal"></i>
+                                <span class="menu-title">Analytics</span>
+                            </a>
+                            <ul class="menu-content" style="padding-left: 17px;">
+                              <li class=" nav-item <?= $this->context->route == 'store/statistics' ? 'active' : '' ?> ">
+
+                                  <?=
+                                  Html::a(
+                                    Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                          Html::tag('span', 'Statistics'), ['store/statistics', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                  )
+                                  ?>
+                              </li>
+                              <li class=" nav-item <?= $this->context->route == 'store/reports' ? 'active' : '' ?> ">
+
+                                  <?=
+                                  Html::a(
+                                    Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                          Html::tag('span', 'Reports'), ['store/reports', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                  )
+                                  ?>
+                              </li>
+
+                            </ul>
                         </li>
+
+
+
                     <?php } ?>
 
 
@@ -343,20 +372,20 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         <ul class="menu-content" style="padding-left: 17px;">
                             <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
 
-                                <li class=" nav-item <?= $this->context->route == 'restaurant/index' || $this->context->route == 'restaurant/update' ? 'active' : '' ?> ">
+                                <li class=" nav-item <?= $this->context->route == 'store/update' || $this->context->route == 'store/update' ? 'active' : '' ?> ">
                                     <?=
                                     Html::a(
                                             Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                            Html::tag('span', 'Store Info'), ['restaurant/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                            Html::tag('span', 'Store Info'), ['store/update', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                                     )
                                     ?>
                                 </li>
 
-                                <li class=" nav-item <?= $this->context->route == 'restaurant/view-payment-methods'  ? 'active' : '' ?> ">
+                                <li class=" nav-item <?= $this->context->route == 'store/view-payment-methods'  ? 'active' : '' ?> ">
                                     <?=
                                     Html::a(
                                             Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                            Html::tag('span', 'Payment Methods'), ['restaurant/view-payment-methods', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                            Html::tag('span', 'Payment Methods'), ['store/view-payment-methods', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                                     )
                                     ?>
                                 </li>
@@ -384,16 +413,16 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                     <?=
                                     Html::a(
                                             Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                            Html::tag('span', 'Domains'), ['site/domains', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                            Html::tag('span', 'Domains'), ['site/connect-domain', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                                     )
                                     ?>
                                 </li>
 
-                                <li class=" nav-item <?= $this->context->route == 'restaurant/view-design-layout' || $this->context->route == 'restaurant/update-design-layout' ? 'active' : '' ?> ">
+                                <li class=" nav-item <?= $this->context->route == 'store/view-design-layout' || $this->context->route == 'store/update-design-layout' ? 'active' : '' ?> ">
                                     <?=
                                     Html::a(
                                             Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                            Html::tag('span', 'Design & layout'), ['restaurant/view-design-layout', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                            Html::tag('span', 'Design & layout'), ['store/update-design-layout', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                                     )
                                     ?>
                                 </li>
@@ -401,7 +430,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                     <?=
                                     Html::a(
                                             Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                            Html::tag('span', 'Web Links'), ['web-link/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                            Html::tag('span', 'Web Links'), ['web-link/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                                     )
                                     ?>
                                 </li>
@@ -412,11 +441,11 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                         <span class="menu-title">Integrations</span>
                                     </a>
                                     <ul class="menu-content" style=" padding-left: 27px;">
-                                        <li  <?= $this->context->route == 'restaurant/update-analytics-integration' ? 'class="active"' : '' ?>>
+                                        <li  <?= $this->context->route == 'store/update-analytics-integration' ? 'class="active"' : '' ?>>
                                             <?=
                                             Html::a(
                                                     Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                                    Html::tag('span', 'Analytics'), ['restaurant/update-analytics-integration', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                                    Html::tag('span', 'Analytics'), ['store/update-analytics-integration', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
                                             )
                                             ?>
                                         </li>
@@ -425,7 +454,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                             <?=
                                             Html::a(
                                                     Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                                    Html::tag('span', 'Delivery'), ['restaurant/update-delivery-integration', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                                    Html::tag('span', 'Delivery'), ['store/update-delivery-integration', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
                                             )
                                             ?>
                                         </li>
@@ -439,7 +468,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'Opening Hours'), ['opening-hour/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                        Html::tag('span', 'Opening Hours'), ['opening-hour/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                                 )
                                 ?>
                             </li>
@@ -447,7 +476,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', "Store's Branches"), ['restaurant-branch/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                        Html::tag('span', "Store's Branches"), ['restaurant-branch/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                                 )
                                 ?>
                             </li>
@@ -457,7 +486,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                     <?=
                                     Html::a(
                                             Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                            Html::tag('span', 'Staff Management'), ['agent-assignment/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                            Html::tag('span', 'Staff Management'), ['agent-assignment/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
                                     )
                                     ?>
                                 </li>
@@ -469,7 +498,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         <?=
                         Html::a(
                                 Html::tag('i', '', ['class' => 'feather icon-eye']) .
-                                Html::tag('span', 'Visit Store'), ['site/redirect-to-store-domain', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title', 'style' => 'border: 2px solid #28c76f; border-radius: 5px;']
+                                Html::tag('span', 'Visit Store'), ['site/redirect-to-store-domain', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title', 'style' => 'border: 2px solid #28c76f; border-radius: 5px;']
                         )
                         ?>
                     </li>

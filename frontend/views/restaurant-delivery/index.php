@@ -12,7 +12,7 @@ use common\models\RestaurantDelivery;
 /* @var $searchModel frontend\models\RestaurantDeliverySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['restaurant_uuid'] = $restaurantUuid;
+$this->params['restaurant_uuid'] = $storeUuid;
 
 $this->title = 'Delivery Zones';
 $this->params['breadcrumbs'][] = $this->title;
@@ -37,7 +37,7 @@ if ($dataProvider) {
     ?>
     <div class="col-12">
     <p>
-        <?= Html::a('Edit Delivery Zones', ['update', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Edit Delivery Zones', ['update', 'storeUuid' => $storeUuid], ['class' => 'btn btn-success']) ?>
     </p>
   </div>
     <?php
@@ -53,7 +53,7 @@ if ($dataProvider) {
                           <?= $city->city_name ?>
                           <?=
                           Html::a(
-                           '<i class="feather icon-edit"></i>', ['restaurant-delivery/update-delivery-time-for-city', 'city_id' => $city->city_id, 'restaurantUuid' => $restaurantUuid],['class' => 'action-edit', 'style' =>'color: rgb(98, 98, 98);']
+                           '<i class="feather icon-edit"></i>', ['restaurant-delivery/update-delivery-time-for-city', 'city_id' => $city->city_id, 'storeUuid' => $storeUuid],['class' => 'action-edit', 'style' =>'color: rgb(98, 98, 98);']
                            );
                            ?>
                         </h4>
@@ -109,7 +109,7 @@ if ($dataProvider) {
                                                 Html::submitButton('<i class="feather icon-save"> </i> ', ['style' => 'margin-right: 20px;','class' => 'btn btn-success', 'name' => $restaurantDeliveryArea->area->area_id])
                                                 ?>
                                                 <?=
-                                                Html::a('<i class="fa fa-trash"></i> ', ['delete', 'area_id' => $restaurantDeliveryArea->area->area_id, 'restaurantUuid' => $restaurantDeliveryArea->restaurant_uuid], ['class' => 'btn btn-danger ',
+                                                Html::a('<i class="fa fa-trash"></i> ', ['delete', 'area_id' => $restaurantDeliveryArea->area->area_id, 'storeUuid' => $restaurantDeliveryArea->restaurant_uuid], ['class' => 'btn btn-danger ',
                                                     'data' => [
                                                         'method' => 'post',
                                                     ]
@@ -147,7 +147,7 @@ if ($dataProvider) {
 } else {
     echo'<div class="card"><div style="padding: 70px 0; text-align: center;">'
     . '     <h4>You currently do not have any places you deliver to</h4>'
-    . Html::a('Setup Delivery Zones', ['create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-success'])
+    . Html::a('Setup Delivery Zones', ['create', 'storeUuid' => $storeUuid], ['class' => 'btn btn-success'])
     . '</div></div>';
 }
 ?>

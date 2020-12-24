@@ -9,6 +9,7 @@ use yii\grid\GridView;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Delivery Zones for ' . $business_location_model->business_location_name . ' | ' . $business_location_model->country->country_name;
+$this->params['breadcrumbs'][] = ['label' => 'Business Locations', 'url' => ['business-location/index', 'storeUuid' => $business_location_model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
 $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
 

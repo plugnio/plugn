@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel common\models\RefundSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['restaurant_uuid'] = $restaurantUuid;
+$this->params['restaurant_uuid'] = $storeUuid;
 
 $this->title = 'Refunds';
 $this->params['breadcrumbs'][] = $this->title;
@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'buttons' => [
                         'view' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['view', 'id' => $model->refund_id, 'restaurantUuid' => $model->restaurant_uuid], [
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-eye"></span>', ['view', 'id' => $model->refund_id, 'storeUuid' => $model->restaurant_uuid], [
                                         'title' => 'View',
                                         'data-pjax' => '0',
                                             ]
@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         },
                         'update' => function ($url, $model) {
                             return Html::a(
-                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['view', 'id' => $model->refund_id, 'restaurantUuid' => $model->restaurant_uuid], [
+                                            '<span style="margin-right: 20px;" class="nav-icon fas fa-edit"></span>', ['view', 'id' => $model->refund_id, 'storeUuid' => $model->restaurant_uuid], [
                                         'title' => 'Update',
                                         'data-pjax' => '0',
                                             ]

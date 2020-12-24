@@ -34,8 +34,7 @@ $this->registerJs($js);
 
         foreach ($businessLocations as $key => $businessLocation) {
 
-          $numberOfAreasStoreDeliveringTo = $businessLocation->getAreaDeliveryZones()->where(['not', ['area_id' => null]])->count();
-          $numberOfCoutnriesStoreDeliveringTo = $store->getShippingCountries()->asArray()->count();
+          $numberOfCoutnriesStoreDeliveringTo = $store->getShippingCountries()->distinct()->count();
 
 
       ?>
@@ -58,6 +57,23 @@ $this->registerJs($js);
             ?>
           </h3>
         </div>
+
+
+        <?=
+          Html::a('Delete',
+          ['delete', 'id' => $businessLocation->business_location_id, 'storeUuid' => $store->restaurant_uuid],
+          [
+            'style' => ' position: absolute; top: 10px; right: 10px; color:#EA5455',
+            'data' => [
+                'confirm' => 'Are you sure you want to delete this location?',
+                'method' => 'post',
+            ]
+          ],
+          )
+        ?>
+
+
+
         </div>
         <div class="card-content">
 

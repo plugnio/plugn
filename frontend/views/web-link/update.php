@@ -8,7 +8,7 @@ use yii\helpers\Html;
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 $this->title = 'Update Web Link: ' . $model->getWebLinkType();
-$this->params['breadcrumbs'][] = ['label' => 'Web Links', 'url' => ['index', 'restaurantUuid' => $model->restaurant_uuid]];
+$this->params['breadcrumbs'][] = ['label' => 'Web Links', 'url' => ['index', 'storeUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = 'Update ' . $model->getWebLinkType();
 ?>
 <div class="web-link-update">

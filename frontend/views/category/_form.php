@@ -9,7 +9,7 @@ use common\components\FileUploader;
 /* @var $model common\models\Category */
 /* @var $form yii\widgets\ActiveForm */
 
-$url = yii\helpers\Url::to(['delete-category-image', 'restaurantUuid' => $model->restaurant_uuid, 'categoryId' => $model->category_id]);
+$url = yii\helpers\Url::to(['delete-category-image', 'storeUuid' => $model->restaurant_uuid, 'categoryId' => $model->category_id]);
 
 
 $js = <<< JS

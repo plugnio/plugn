@@ -33,7 +33,7 @@ class m201222_175532_add_pickup_location_id_field_to_order_table extends Migrati
       );
 
 
-      $this->addColumn('item', 'prep_time', $this->integer());
+      $this->addColumn('item', 'prep_time', $this->integer()->defaultValue(0));
       $this->addColumn('item', 'prep_time_unit', $this->char(3)->defaultValue('min')->notNull());
 
     }

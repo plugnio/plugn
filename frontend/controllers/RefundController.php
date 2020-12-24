@@ -44,8 +44,8 @@ class RefundController extends Controller {
      * Lists all Refund models.
      * @return mixed
      */
-    public function actionIndex($restaurantUuid) {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+    public function actionIndex($storeUuid) {
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new RefundSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
@@ -53,7 +53,7 @@ class RefundController extends Controller {
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
-                    'restaurantUuid' => $restaurantUuid
+                    'storeUuid' => $storeUuid
         ]);
     }
 
@@ -63,9 +63,9 @@ class RefundController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id, $restaurantUuid) {
+    public function actionView($id, $storeUuid) {
         return $this->render('view', [
-                    'model' => $this->findModel($id, $restaurantUuid),
+                    'model' => $this->findModel($id, $storeUuid),
         ]);
     }
 
@@ -74,14 +74,14 @@ class RefundController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($restaurantUuid, $orderUuid) {
+    public function actionCreate($storeUuid, $orderUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
         $order_model = Order::find()->where(['order_uuid' => $orderUuid])->exists();
 
         if ($restaurant_model && $order_model) {
             $model = new Refund();
-            $model->restaurant_uuid = $restaurantUuid;
+            $model->restaurant_uuid = $storeUuid;
             $model->order_uuid = $orderUuid;
 
             if ($model->load(Yii::$app->request->post())) {
@@ -106,7 +106,7 @@ class RefundController extends Controller {
                             $model->refund_status = $response->data['status'];
 
                             if ($model->save())
-                                return $this->redirect(['view', 'id' => $model->refund_id, 'restaurantUuid' => $model->restaurant_uuid]);
+                                return $this->redirect(['view', 'id' => $model->refund_id, 'storeUuid' => $model->restaurant_uuid]);
                         }
                     }else {
                         $model->addError('order_uuid', 'Invalid Order Uuid');
@@ -131,8 +131,8 @@ class RefundController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id, $restaurantUuid) {
-        $model = $this->findModel($id, $restaurantUuid);
+    public function actionUpdate($id, $storeUuid) {
+        $model = $this->findModel($id, $storeUuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->refund_id]);
@@ -150,8 +150,8 @@ class RefundController extends Controller {
      * @return Refund the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $restaurantUuid) {
-        if (($model = Refund::find()->where(['refund_id' => $id, 'restaurant_uuid' => $restaurantUuid])->one()) !== null) {
+    protected function findModel($id, $storeUuid) {
+        if (($model = Refund::find()->where(['refund_id' => $id, 'restaurant_uuid' => $storeUuid])->one()) !== null) {
             return $model;
         }
 

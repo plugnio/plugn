@@ -28,8 +28,7 @@ $this->registerJs($js);
 
 <section id="data-list-view" class="data-list-view-header">
 
-
-    <?php echo $this->render('_search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
+  <?php if ($dataProvider->getCount() > 0) { ?>
 
 
     <!-- DataTable starts -->
@@ -39,7 +38,7 @@ $this->registerJs($js);
         GridView::widget([
             'dataProvider' => $dataProvider,
             'rowOptions' => function($model) {
-                $url = Url::to(['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid]);
+                $url = Url::to(['order/view', 'id' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid]);
 
                 return [
                     'onclick' => "window.location.href='{$url}'"
@@ -66,7 +65,7 @@ $this->registerJs($js);
                     'format' => 'raw',
                     'value' => function ($data) {
                         if ($data->customer_id)
-                            return Html::a($data->customer->customer_name, ['customer/view', 'id' => $data->customer_id, 'restaurantUuid' => $data->restaurant_uuid]);
+                            return Html::a($data->customer->customer_name, ['customer/view', 'id' => $data->customer_id, 'storeUuid' => $data->restaurant_uuid]);
                     },
                     'visible' => function ($data) {
                         return $data->customer_id ? true : false;
@@ -110,6 +109,30 @@ $this->registerJs($js);
 
     </div>
     <!-- DataTable ends -->
+
+  <?php } else {?>
+
+
+
+    <div class="card">
+      <div style="padding: 70px 0; text-align: center;">
+
+        <div>
+          <img src="https://res.cloudinary.com/plugn/image/upload/v1607879689/emptystate--abandoncheckout" width="226" alt="" />
+        </div>
+
+        <h3>
+          Abandoned checkouts will show here
+        </h3>
+
+        <p>
+          See when customers put an item in their cart but don’t check out. You can also email customers a link to their cart.
+        </p>
+      </div>
+    </div>
+
+
+  <?php } ?>
 
 </section>
 <!-- Data list view end -->

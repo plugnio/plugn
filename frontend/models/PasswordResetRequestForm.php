@@ -49,12 +49,14 @@ class PasswordResetRequestForm extends Model {
         if (!Agent::isPasswordResetTokenValid($agent->agent_password_reset_token)) {
             $agent->generatePasswordResetToken();
             if (!$agent->save()) {
+              die(var_dump($agent->errors));
+
                 return false;
             }
         }
 
-        return Yii::$app
-                        ->mailer
+
+        return Yii::$app->mailer
                         ->compose(
                                 ['html' => 'passwordResetToken-html', 'text' => 'passwordResetToken-text'], ['agent' => $agent]
                         )

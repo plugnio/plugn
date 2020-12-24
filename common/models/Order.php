@@ -182,22 +182,25 @@ class Order extends \yii\db\ActiveRecord {
             //         if ($this->order_mode == Order::ORDER_MODE_DELIVERY && $this->shipping_country_id && !$this->area_id)
             //             $this->addError($attribute, 'Area name cannot be blank.');
             //     }, 'skipOnError' => false, 'skipOnEmpty' => false],
-            [['shipping_country_id'], 'validateCountry'],
+            ['shipping_country_id', 'validateCountry', 'when' => function($model) {
+                    return $model->order_mode == static::ORDER_MODE_DELIVERY;
+                }
+            ],
             [['area_id'], 'validateArea'],
             ['unit_type', function ($attribute, $params, $validator) {
-                    if ($this->area_id && !$this->unit_type && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                    if (!$this->unit_type && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                         $this->addError($attribute, 'Unit type cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['block', function ($attribute, $params, $validator) {
-                    if ($this->area_id && $this->block == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                    if ($this->block == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                         $this->addError($attribute, 'Block cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['street', function ($attribute, $params, $validator) {
-                    if ($this->area_id && $this->street  == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                    if ($this->street  == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                         $this->addError($attribute, 'Street cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['house_number', function ($attribute, $params, $validator) {
-                    if ($this->area_id && $this->house_number  == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                    if ($this->house_number  == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                         $this->addError($attribute, 'House number cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['order_mode', 'validateOrderMode'],
@@ -436,10 +439,10 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function validateCountry($attribute) {
 
-        $areaDeliveryZone = AreaDeliveryZone::find()->where(['country_id' => $this->shipping_country_id, 'delivery_zone_id' => $this->delivery_zone_id])->one();
+          $areaDeliveryZone = AreaDeliveryZone::find()->where(['country_id' => $this->shipping_country_id, 'delivery_zone_id' => $this->delivery_zone_id])->one();
 
         if (!$areaDeliveryZone || $areaDeliveryZone->area_id != null || ($areaDeliveryZone && $areaDeliveryZone->businessLocation->restaurant_uuid != $this->restaurant_uuid))
-            $this->addError($attribute, "Store does not deliver to this country. " . $areaDeliveryZone->area_id);
+            $this->addError($attribute, "Store does not deliver to this area. ");
     }
 
 
@@ -721,7 +724,7 @@ class Order extends \yii\db\ActiveRecord {
 
         }
 
-        if ($this->order_mode == static::ORDER_MODE_DELIVERY && !$this->voucher  || ($this->voucher && $this->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY)){
+        if ($this->order_mode == static::ORDER_MODE_DELIVERY && (!$this->voucher  || ($this->voucher && $this->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY))){
             $totalPrice += $this->deliveryZone->delivery_fee;
         }
 
@@ -746,8 +749,34 @@ class Order extends \yii\db\ActiveRecord {
             return false;
         }
 
-        if ($insert && $this->scenario == self::SCENARIO_CREATE_ORDER_BY_ADMIN)
-            $this->order_status = self::STATUS_DRAFT;
+        if ($insert && $this->scenario == self::SCENARIO_CREATE_ORDER_BY_ADMIN){
+          $this->order_status = self::STATUS_DRAFT;
+        }
+
+
+
+        if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
+            //set ETA value
+            \Yii::$app->timeZone = 'Asia/Kuwait';
+
+            if ($this->is_order_scheduled)
+                $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($this->scheduled_time_start_from));
+            else
+                $this->estimated_time_of_arrival =
+                date("Y-m-d H:i:s", strtotime('+' . $this->deliveryZone->delivery_time . ' ' . $this->deliveryZone->timeUnit, Yii::$app->formatter->asTimestamp( $insert  ? date('Y-m-d H:i:s', strtotime($this->order_created_at)) : date('Y-m-d H:i:s')  )));
+
+          } else {
+              $this->estimated_time_of_arrival =  $insert ? date('Y-m-d H:i:s', strtotime($this->order_created_at)) : date('Y-m-d H:i:s');
+          }
+
+        // if($this->items){
+        //   foreach ($this->items as $key => $item) {
+        //     if($item->prep_time)
+        //       $this->estimated_time_of_arrival = date("c", strtotime('+' . $item->prep_time . ' ' . $item->prep_time_unit,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+        //   }
+        // }
+
+
 
 
         return true;
@@ -776,27 +805,6 @@ class Order extends \yii\db\ActiveRecord {
 
       }
 
-      if (!$insert &&  $this->order_status == self::STATUS_PENDING) {
-
-
-        if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
-                //set ETA value
-                \Yii::$app->timeZone = 'Asia/Kuwait';
-
-                if ($this->is_order_scheduled)
-                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($this->scheduled_time_start_from));
-                else
-                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $this->deliveryZone->delivery_time . ' ' . $this->deliveryZone->timeUnit, Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
-          }
-
-        foreach ($this->items as $key => $item) {
-          if($item->prep_time)
-            $this->estimated_time_of_arrival = date("c", strtotime('+' . $item->prep_time . ' ' . $item->prep_time_unit,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
-        }
-
-
-
-      }
 
 
 

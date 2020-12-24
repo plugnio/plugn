@@ -290,6 +290,10 @@ $interval = $today->diff($expiry);
                                         <p style="margin-bottom: 1px;">IBAN</p>
                                         <p style="color: black;"><?= $model->iban ?></p>
                                     </div>
+                                    <div class="col-6">
+                                        <p style="margin-bottom: 1px;">	Email Address </p>
+                                        <p style="color: black;"><?= $model->owner_email ?></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -301,7 +305,7 @@ $interval = $today->diff($expiry);
 
             <?php
 
-            echo Html::a($isOnlinePaymentEnabled ? 'Disable online payments' : 'Enable online payments', [$isOnlinePaymentEnabled ? 'disable-online-payment' : 'enable-online-payment', 'restaurantUuid' => $model->restaurant_uuid], ['class' => $isOnlinePaymentEnabled ? 'btn btn-danger' : 'btn btn-success',
+            echo Html::a($isOnlinePaymentEnabled ? 'Disable online payments' : 'Enable online payments', [$isOnlinePaymentEnabled ? 'disable-online-payment' : 'enable-online-payment', 'storeUuid' => $model->restaurant_uuid], ['class' => $isOnlinePaymentEnabled ? 'btn btn-danger' : 'btn btn-success',
             'data' => [
                       'confirm' => $isOnlinePaymentEnabled ? 'Are you sure you want to disable online payments?' : 'Are you sure you want to enable online payments?',
                       'method' => 'post',
@@ -328,7 +332,7 @@ $interval = $today->diff($expiry);
                 <p style="color: black;">
                     Payments that are processed outside your online store. When a customer makes a manual payment, you need to approve their order before fulfilling.
                 </p>
-                <?= Html::a($isCashOnDeliveryEnabled ? 'Disable cash on delivery' : 'Enable cash on delivery', [$isCashOnDeliveryEnabled ? 'disable-cod' : 'enable-cod', 'restaurantUuid' => $model->restaurant_uuid], ['class' => $isCashOnDeliveryEnabled ? 'btn btn-danger' : 'btn btn-success',
+                <?= Html::a($isCashOnDeliveryEnabled ? 'Disable cash on delivery' : 'Enable cash on delivery', [$isCashOnDeliveryEnabled ? 'disable-cod' : 'enable-cod', 'storeUuid' => $model->restaurant_uuid], ['class' => $isCashOnDeliveryEnabled ? 'btn btn-danger' : 'btn btn-success',
                 'data' => [
                           'confirm' => $isCashOnDeliveryEnabled ? 'Are you sure you want to disable cash on delivery?' : 'Are you sure you want to enable cash on delivery?',
                           'method' => 'post',

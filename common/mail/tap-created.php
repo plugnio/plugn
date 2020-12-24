@@ -5,7 +5,7 @@ use common\models\Subscription;
 use common\models\Restaurant;
 
 
-$paymentSettingsUrl = Yii::$app->params['frontendUrl'] . '/restaurant/view-payment-methods?restaurantUuid=' . $store->restaurant_uuid;
+$paymentSettingsUrl = Yii::$app->params['frontendUrl'] . '/store/view-payment-methods?storeUuid=' . $store->restaurant_uuid;
 
 /* @var $this yii\web\View */
 /* @var $store common\models\Restaurant */

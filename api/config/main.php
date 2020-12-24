@@ -146,9 +146,11 @@ return [
                     'controller' => 'v1/zapier',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET get-store-list' => 'get-store-list',
                         'GET get-latest-order/<restaurant_uuid>' => 'get-latest-order',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS get-store-list' => 'options',
                         'OPTIONS get-latest-order/<restaurant_uuid>' => 'options',
                     ]
                 ],

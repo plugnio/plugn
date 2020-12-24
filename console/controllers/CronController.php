@@ -21,7 +21,11 @@ use common\models\CountryPaymentMethod;
 use common\models\Country;
 use common\models\ExtraOption;
 use common\models\ItemImage;
+use common\models\AreaDeliveryZone;
+use common\models\DeliveryZone;
 use common\models\RestaurantTheme;
+use common\models\BusinessLocation;
+use common\models\RestaurantBranch;
 use \DateTime;
 use yii\helpers\Console;
 use yii\helpers\ArrayHelper;
@@ -285,8 +289,109 @@ class CronController extends \yii\console\Controller {
         return self::EXIT_CODE_NORMAL;
     }
 
+    public function actionMigration(){
 
-        public function actionSiteStatus(){
+        // $restaurantBranches = RestaurantBranch::find()->all();
+        // foreach ($restaurantBranches as $key => $branch) {
+        //
+        //   $store = Restaurant::findOne($branch->restaurant_uuid);
+        //
+        //   if(!BusinessLocation::find()->where(['restaurant_uuid' => $branch->restaurant_uuid, 'business_location_name' =>  $branch->branch_name_en , 'business_location_name_ar' =>  $branch->branch_name_ar])->exists()){
+        //     $businessLocation = new BusinessLocation;
+        //     $businessLocation->country_id = 84;
+        //     $businessLocation->restaurant_uuid = $branch->restaurant_uuid;
+        //     $businessLocation->business_location_name = $branch->branch_name_en;
+        //     $businessLocation->business_location_name_ar = $branch->branch_name_ar;
+        //     $businessLocation->support_pick_up = $store->support_pick_up ? 1 : 0;
+        //     $businessLocation->save();
+        //   }
+        //
+        // }
+        //
+
+        $stores = Restaurant::find()->all();
+        foreach ($stores as $key => $store) {
+
+          if( $deliveryZones = $store->getRestaurantDeliveryAreas()->all()  ){
+
+
+            if(!$businessLocation = BusinessLocation::find()->where(['restaurant_uuid' => $store->restaurant_uuid])->one()){
+              $businessLocation = new BusinessLocation;
+              $businessLocation->restaurant_uuid = $store->restaurant_uuid;
+              $businessLocation->country_id = 84;
+              $businessLocation->business_location_name = 'Main branch';
+              $businessLocation->business_location_name_ar = 'الفرع الرئيسي';
+              $businessLocation->support_pick_up = $store->support_pick_up ? 1 : 0;
+              $businessLocation->save();
+
+            }
+
+
+
+            foreach ($deliveryZones as $key => $deliveryZone) {
+
+                if(!$delivery_zone_model = $store->getDeliveryZones()->where(
+                  [
+                    'delivery_time' => $deliveryZone->delivery_time,
+                    'delivery_fee' => $deliveryZone->delivery_fee,
+                    'min_charge'   => $deliveryZone->min_charge
+                  ]
+                )->one()){
+                  $delivery_zone_model = new DeliveryZone;
+                  $delivery_zone_model->business_location_id = $businessLocation->business_location_id;
+                  $delivery_zone_model->country_id = 84;
+                  $delivery_zone_model->delivery_time = $deliveryZone->delivery_time;
+                  $delivery_zone_model->delivery_fee = $deliveryZone->delivery_fee;
+                  $delivery_zone_model->min_charge = $deliveryZone->min_charge ? $deliveryZone->min_charge : 0 ;
+                  $delivery_zone_model->time_unit = 'min';
+
+                  if(!$delivery_zone_model->save()){
+                    die(var_dump($delivery_zone_model->errors) . var_dump($deliveryZone) );
+                  }
+                }
+
+
+                $area_model = Area::findOne($deliveryZone->area_id);
+
+                if($area_model){
+
+                  if(!$area_delivery_zone_model = $store->getAreaDeliveryZones()->where(
+                    [
+                      'restaurant_uuid' => $store->restaurant_uuid,
+                      'delivery_zone_id' => $delivery_zone_model->delivery_zone_id,
+                      'area_id'   => $area_model->area_id
+                    ]
+                  )->one()){
+                    $area_delivery_zone_model = new AreaDeliveryZone;
+                    $area_delivery_zone_model->restaurant_uuid = $store->restaurant_uuid;
+                    $area_delivery_zone_model->delivery_zone_id = $delivery_zone_model->delivery_zone_id;
+                    $area_delivery_zone_model->country_id = 84;
+                    $area_delivery_zone_model->city_id = $area_model->city_id;
+                    $area_delivery_zone_model->area_id = $area_model->area_id;
+
+
+                    if(!$area_delivery_zone_model->save()){
+                      die(var_dump($area_delivery_zone_model->errors) . var_dump($area_delivery_zone_model) );
+                    }
+                  }
+
+
+                }
+
+
+
+
+            }
+
+
+          }
+
+
+
+        }
+    }
+
+    public function actionSiteStatus(){
 
             $restaurants = Restaurant::find()
                           ->where(['has_deployed' => 0])

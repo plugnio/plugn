@@ -48,12 +48,12 @@ class RestaurantDeliveryController extends Controller {
      * Lists all RestaurantDelivery models.
      * @return mixed
      */
-    public function actionIndex($restaurantUuid) {
+    public function actionIndex($storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        $query = City::find()->with(['restaurantDeliveryAreas' => function($query) use($restaurantUuid) {
-                return $query->where(['restaurant_uuid' => $restaurantUuid]);
+        $query = City::find()->with(['restaurantDeliveryAreas' => function($query) use($storeUuid) {
+                return $query->where(['restaurant_uuid' => $storeUuid]);
             }])->all();
 
 
@@ -84,7 +84,7 @@ class RestaurantDeliveryController extends Controller {
 
         return $this->render('index', [
                     'dataProvider' => $dataProvider->query,
-                    'restaurantUuid' => $restaurant_model->restaurant_uuid
+                    'storeUuid' => $restaurant_model->restaurant_uuid
         ]);
     }
 
@@ -93,9 +93,9 @@ class RestaurantDeliveryController extends Controller {
      * If creation is successful, the browser will be redirected to the 'index' page.
      * @return mixed
      */
-    public function actionCreate($restaurantUuid) {
+    public function actionCreate($storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $model = new RestaurantDelivery();
         $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
@@ -105,11 +105,11 @@ class RestaurantDeliveryController extends Controller {
             if ($model->restaurant_delivery_area_array)
                 $model->saveRestaurantDeliveryArea($model->restaurant_delivery_area_array);
 
-            return $this->redirect(['index', 'restaurantUuid' => $model->restaurant_uuid]);
+            return $this->redirect(['index', 'storeUuid' => $model->restaurant_uuid]);
         }
         return $this->render('create', [
                     'model' => $model,
-                    'restaurantUuid' => $model->restaurant_uuid
+                    'storeUuid' => $model->restaurant_uuid
         ]);
     }
 
@@ -121,9 +121,9 @@ class RestaurantDeliveryController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($restaurantUuid) {
+    public function actionUpdate($storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $model = new RestaurantDelivery();
         $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
@@ -146,12 +146,12 @@ class RestaurantDeliveryController extends Controller {
             else
                 RestaurantDelivery::deleteAll(['restaurant_uuid' => $restaurant_model->restaurant_uuid]);
 
-            return $this->redirect(['index', 'restaurantUuid' => $restaurant_model->restaurant_uuid]);
+            return $this->redirect(['index', 'storeUuid' => $restaurant_model->restaurant_uuid]);
         }
 
         return $this->render('update', [
                     'model' => $model,
-                    'restaurantUuid' => $restaurantUuid,
+                    'storeUuid' => $storeUuid,
         ]);
     }
 
@@ -161,9 +161,9 @@ class RestaurantDeliveryController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdateDeliveryTimeForCity($city_id, $restaurantUuid) {
+    public function actionUpdateDeliveryTimeForCity($city_id, $storeUuid) {
 
-       $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+       $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
 
         $model = new DeliveryZoneForm;
@@ -172,7 +172,7 @@ class RestaurantDeliveryController extends Controller {
 
         if ($model->load(Yii::$app->request->post()) && $model->applyTimingAndDeliveryFeeForAllAreasBelongsToThisCity()) {
 
-            return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+            return $this->redirect(['index', 'storeUuid' => $storeUuid]);
         }
 
         return $this->render('update-delivery-zone', [
@@ -188,11 +188,11 @@ class RestaurantDeliveryController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($area_id, $restaurantUuid) {
+    public function actionDelete($area_id, $storeUuid) {
 
-        $this->findModel($restaurantUuid, $area_id)->delete();
+        $this->findModel($storeUuid, $area_id)->delete();
 
-        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+        return $this->redirect(['index', 'storeUuid' => $storeUuid]);
     }
 
     /**
@@ -203,8 +203,8 @@ class RestaurantDeliveryController extends Controller {
      * @return RestaurantDelivery the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($restaurantUuid, $area_id) {
-        if (($model = RestaurantDelivery::find()->where(['restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid, 'area_id' => $area_id])->one()) !== null) {
+    protected function findModel($storeUuid, $area_id) {
+        if (($model = RestaurantDelivery::find()->where(['restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid, 'area_id' => $area_id])->one()) !== null) {
             return $model;
         }
 

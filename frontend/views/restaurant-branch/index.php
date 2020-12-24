@@ -6,7 +6,7 @@ use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-$this->params['restaurant_uuid'] = $restaurantUuid;
+$this->params['restaurant_uuid'] = $storeUuid;
 
 $this->title = 'Store Branches';
 $this->params['breadcrumbs'][] = $this->title;
@@ -29,7 +29,7 @@ $this->registerJs($js);
     <div class="action-btns">
         <div class="btn-dropdown mr-1 mb-1">
             <div class="btn-group dropdown actions-dropodown">
-                <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-outline-primary']) ?>
+                <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'storeUuid' => $storeUuid], ['class' => 'btn btn-outline-primary']) ?>
             </div>
         </div>
     </div>
@@ -43,7 +43,7 @@ $this->registerJs($js);
         GridView::widget([
             'dataProvider' => $dataProvider,
             'rowOptions' => function($model) {
-                $url = Url::to(['restaurant-branch/view', 'id' => $model->restaurant_branch_id, 'restaurantUuid' => $model->restaurant_uuid]);
+                $url = Url::to(['restaurant-branch/view', 'id' => $model->restaurant_branch_id, 'storeUuid' => $model->restaurant_uuid]);
 
                 return [
                     'onclick' => "window.location.href='{$url}'"

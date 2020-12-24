@@ -42,12 +42,12 @@ class CategoryController extends Controller {
 
     /**
      *
-     * @param type $restaurantUuid
+     * @param type $storeUuid
      * @return type
      */
-    public function actionIndex($restaurantUuid) {
+    public function actionIndex($storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new CategorySearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
@@ -62,14 +62,14 @@ class CategoryController extends Controller {
 
     /**
      * Delete category image
-     * @param type $restaurantUuid
+     * @param type $storeUuid
      * @param type $itemUuid
      * @return boolean
      */
-    public function actionDeleteCategoryImage($restaurantUuid, $categoryId) {
+    public function actionDeleteCategoryImage($storeUuid, $categoryId) {
 
 
-        $model = $this->findModel($categoryId, $restaurantUuid);
+        $model = $this->findModel($categoryId, $storeUuid);
 
 
         $file_name = Yii::$app->request->getBodyParam("file");
@@ -92,10 +92,10 @@ class CategoryController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id, $restaurantUuid) {
+    public function actionView($id, $storeUuid) {
         return $this->render('view', [
-                    'model' => $this->findModel($id, $restaurantUuid),
-                    'restaurantUuid' => $restaurantUuid
+                    'model' => $this->findModel($id, $storeUuid),
+                    'storeUuid' => $storeUuid
         ]);
     }
 
@@ -104,9 +104,9 @@ class CategoryController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($restaurantUuid) {
+    public function actionCreate($storeUuid) {
         $model = new Category();
-        $model->restaurant_uuid = Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid;
+        $model->restaurant_uuid = Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
@@ -141,12 +141,12 @@ class CategoryController extends Controller {
                 $model->uploadCategoryImage($categoryImage[0]['file']);
 
 
-            return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+            return $this->redirect(['index', 'storeUuid' => $storeUuid]);
         }
 
         return $this->render('create', [
                     'model' => $model,
-                    'restaurantUuid' => $restaurantUuid
+                    'storeUuid' => $storeUuid
         ]);
     }
 
@@ -157,8 +157,8 @@ class CategoryController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id, $restaurantUuid) {
-        $model = $this->findModel($id, $restaurantUuid);
+    public function actionUpdate($id, $storeUuid) {
+        $model = $this->findModel($id, $storeUuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
@@ -191,12 +191,12 @@ class CategoryController extends Controller {
             if ($categoryImage)
             $model->uploadCategoryImage($categoryImage[0]['file']);
 
-            return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+            return $this->redirect(['index', 'storeUuid' => $storeUuid]);
         }
 
         return $this->render('update', [
                     'model' => $model,
-                    'restaurantUuid' => $restaurantUuid
+                    'storeUuid' => $storeUuid
         ]);
     }
 
@@ -207,10 +207,10 @@ class CategoryController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id, $restaurantUuid) {
-        $this->findModel($id, $restaurantUuid)->delete();
+    public function actionDelete($id, $storeUuid) {
+        $this->findModel($id, $storeUuid)->delete();
 
-        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
+        return $this->redirect(['index', 'storeUuid' => $storeUuid]);
     }
 
     /**
@@ -220,8 +220,8 @@ class CategoryController extends Controller {
      * @return Category the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $restaurantUuid) {
-        if (($model = Category::find()->where(['category_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($restaurantUuid)->restaurant_uuid])->one()) !== null) {
+    protected function findModel($id, $storeUuid) {
+        if (($model = Category::find()->where(['category_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
             return $model;
         }
 

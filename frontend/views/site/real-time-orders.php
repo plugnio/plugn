@@ -9,7 +9,7 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\OrderSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-$this->params['restaurant_uuid'] = $restaurant_uuid;
+$this->params['restaurant_uuid'] = $storeUuid;
 
 $this->title = 'Real Time Orders';
 $this->params['breadcrumbs'][] = $this->title;
@@ -45,13 +45,13 @@ var soundForNewOrders = new Audio("data:audio/wav;base64,//uQRAAAAWMSLwUIYAAsYkX
 
 
    async function CheckPendingOrders() {
-       const url = <?= "'" . Yii::$app->params['apiEndpoint'] . '/v1/order/check-for-pending-orders/' . $restaurant_uuid . "'" ?>;
+       const url = <?= "'" . Yii::$app->params['apiEndpoint'] . '/v1/order/check-for-pending-orders/' . $storeUuid . "'" ?>;
 
        fetch(url)
                .then(res => res.json())
                .then(data => {
 
-                   $("#new-order-table").load(<?= "'" . yii\helpers\Url::to(['site/check-for-new-orders', 'restaurant_uuid' => $restaurant_uuid]) . "'" ?>);
+                   $("#new-order-table").load(<?= "'" . yii\helpers\Url::to(['site/check-for-new-orders', 'storeUuid' => $storeUuid]) . "'" ?>);
 
                    if (data && document.getElementById("play-btn").value == 'true' && document.getElementById("stop-btn").value == 'false') {
                      // console.log('play');
@@ -97,7 +97,7 @@ var soundForNewOrders = new Audio("data:audio/wav;base64,//uQRAAAAWMSLwUIYAAsYkX
         GridView::widget([
             'dataProvider' => $dataProvider,
             'rowOptions' => function($model) {
-                $url = Url::to(['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid]);
+                $url = Url::to(['order/view', 'id' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid]);
 
                 return [
                     'onclick' => "window.location.href='{$url}'"
@@ -109,7 +109,7 @@ var soundForNewOrders = new Audio("data:audio/wav;base64,//uQRAAAAWMSLwUIYAAsYkX
                     'label' => 'Order ID',
                     "format" => "raw",
                     "value" => function($model) {
-                        return Html::a('#' . $model->order_uuid, ['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid]);
+                        return Html::a('#' . $model->order_uuid, ['order/view', 'id' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid]);
                     }
                 ],
                 [
@@ -124,7 +124,7 @@ var soundForNewOrders = new Audio("data:audio/wav;base64,//uQRAAAAWMSLwUIYAAsYkX
                     'format' => 'raw',
                     'value' => function ($data) {
                         if ($data->customer_id)
-                            return Html::a($data->customer->customer_name, ['customer/view', 'id' => $data->customer_id, 'restaurantUuid' => $data->restaurant_uuid]);
+                            return Html::a($data->customer->customer_name, ['customer/view', 'id' => $data->customer_id, 'storeUuid' => $data->restaurant_uuid]);
                     },
                     'visible' => function ($data) {
                         return $data->customer_id ? true : false;

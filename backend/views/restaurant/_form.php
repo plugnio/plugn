@@ -111,6 +111,8 @@ use borales\extensions\phoneInput\PhoneInput;
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'name_ar')->textInput(['maxlength' => true]) ?>
+    
+    <?= $form->field($model, 'company_name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'tagline')->textInput(['maxlength' => true]) ?>
 

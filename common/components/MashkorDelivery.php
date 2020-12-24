@@ -151,7 +151,7 @@ class MashkorDelivery extends Component {
         $mashkorParams = [
               "branch_id" => $model->restaurant->mashkor_branch_id,
               "customer_name" => $model->customer_name,
-              "payment_type" => $model->payment_method_id == 3 ? self::PAYMENT_TYPE_COD : self::PAYMENT_TYPE_CARD,
+              "payment_type" => $model->payment_method_id == 3 && $model->total_price > 0 ? self::PAYMENT_TYPE_COD : self::PAYMENT_TYPE_CARD,
               "mobile_number" =>  $model->customer_phone_number,
               "amount_to_collect" => $model->total_price,
               "vendor_order_id" => $model->order_uuid,

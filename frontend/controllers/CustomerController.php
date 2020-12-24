@@ -43,19 +43,64 @@ class CustomerController extends Controller {
      * Lists all Customer models.
      * @return mixed
      */
-    public function actionIndex($restaurantUuid) {
+    public function actionIndex($storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new CustomerSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurantUuid);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $storeUuid);
 
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
-                    'restaurantUuid' => $restaurantUuid
+                    'storeUuid' => $storeUuid
         ]);
     }
+
+
+      /**
+       * Creates a new Customer model.
+       * If creation is successful, the browser will be redirected to the 'view' page.
+       * @return mixed
+       */
+      public function actionCreate($storeUuid)
+      {
+          $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+          $model = new Customer();
+          $model->restaurant_uuid = $storeUuid;
+
+          if ($model->load(Yii::$app->request->post()) && $model->save()) {
+              return $this->redirect(['view', 'id' => $model->customer_id,'storeUuid' => $storeUuid]);
+          }
+
+          return $this->render('create', [
+              'model' => $model,
+          ]);
+      }
+
+
+      /**
+       * Updates an existing Customer model.
+       * If update is successful, the browser will be redirected to the 'view' page.
+       * @param integer $id
+       * @return mixed
+       * @throws NotFoundHttpException if the model cannot be found
+       */
+      public function actionUpdate($id, $storeUuid)
+      {
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $model = $this->findModel($id, $storeUuid);
+
+          if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->customer_id,'storeUuid' => $storeUuid]);
+          }
+
+          return $this->render('update', [
+              'model' => $model,
+          ]);
+      }
 
     /**
      * Displays a single Customer model.
@@ -63,8 +108,10 @@ class CustomerController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id, $restaurantUuid) {
-        $model = $this->findModel($id, $restaurantUuid);
+    public function actionView($id, $storeUuid) {
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $model = $this->findModel($id, $storeUuid);
 
         // Customer's Orders Data
         $customersOrdersData = new \yii\data\ActiveDataProvider([
@@ -83,8 +130,8 @@ class CustomerController extends Controller {
     * Export customers data to excel
     * @return mixed
     */
-    public function actionExportToExcel($restaurantUuid){
-           $restaurant_model = Yii::$app->accountManager->getManagedAccount($restaurantUuid);
+    public function actionExportToExcel($storeUuid){
+           $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
            $model = Customer::find()
            ->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
@@ -114,18 +161,6 @@ class CustomerController extends Controller {
            ]);
     }
 
-    /**
-     * Deletes an existing Customer model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id, $restaurantUuid) {
-        $this->findModel($id, $restaurantUuid)->delete();
-
-        return $this->redirect(['index', 'restaurantUuid' => $restaurantUuid]);
-    }
 
     /**
      * Finds the Customer model based on its primary key value.
@@ -134,8 +169,8 @@ class CustomerController extends Controller {
      * @return Customer the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $restaurantUuid) {
-        if (($model = Customer::find()->where(['customer_id'=>$id, 'restaurant_uuid' => $restaurantUuid])->one()) !== null) {
+    protected function findModel($id, $storeUuid) {
+        if (($model = Customer::find()->where(['customer_id'=>$id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->one()) !== null) {
             return $model;
         }
 

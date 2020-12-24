@@ -9,8 +9,8 @@ use yii\grid\GridView;
 $this->params['restaurant_uuid'] = $model->restaurant->restaurant_uuid;
 
 $this->title = 'Order Item: ' . $model->item_name;
-$this->params['breadcrumbs'][] = ['label' => 'Order #' . $model->order_uuid, 'url' => ['order/view','id' => $model->order_uuid, 'restaurantUuid' =>$model->restaurant->restaurant_uuid ]];
-$this->params['breadcrumbs'][] = ['label' => 'Update', 'url' => ['order/update','id' => $model->order_uuid, 'restaurantUuid' =>$model->restaurant->restaurant_uuid ]];
+$this->params['breadcrumbs'][] = ['label' => 'Order #' . $model->order_uuid, 'url' => ['order/view','id' => $model->order_uuid, 'storeUuid' =>$model->restaurant->restaurant_uuid ]];
+$this->params['breadcrumbs'][] = ['label' => 'Update', 'url' => ['order/update','id' => $model->order_uuid, 'storeUuid' =>$model->restaurant->restaurant_uuid ]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 
@@ -29,8 +29,8 @@ $this->registerJs($js);
 
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->order_item_id, 'restaurantUuid' =>$model->restaurant->restaurant_uuid ], ['class' => 'btn btn-primary  mr-1 mb-1']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->order_item_id, 'restaurantUuid' =>$model->restaurant->restaurant_uuid], [
+        <?= Html::a('Update', ['update', 'id' => $model->order_item_id, 'storeUuid' =>$model->restaurant->restaurant_uuid ], ['class' => 'btn btn-primary  mr-1 mb-1']) ?>
+        <?= Html::a('Delete', ['delete', 'id' => $model->order_item_id, 'storeUuid' =>$model->restaurant->restaurant_uuid], [
             'class' => 'btn btn-danger  mr-1 mb-1',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
@@ -82,7 +82,7 @@ $this->registerJs($js);
          <div class="action-btns">
              <div class="btn-dropdown mr-1 mb-1">
                  <div class="btn-group dropdown actions-dropodown">
-                   <?= Html::a('<i class="feather icon-plus"></i> Add New', ['order-item-extra-option/create', 'id' => $model->order_item_id, 'restaurantUuid' =>$model->restaurant->restaurant_uuid], ['class' => 'btn btn-outline-primary']) ?>
+                   <?= Html::a('<i class="feather icon-plus"></i> Add New', ['order-item-extra-option/create', 'id' => $model->order_item_id, 'storeUuid' =>$model->restaurant->restaurant_uuid], ['class' => 'btn btn-outline-primary']) ?>
                  </div>
              </div>
          </div>
@@ -112,7 +112,7 @@ $this->registerJs($js);
                                'delete' => function ($url, $model) {
                                    return Html::a(
                                        '<span style="margin-right: 20px; color: red;" class="feather icon-trash"></span>',
-                                       ['order-item-extra-option/delete', 'id' => $model->order_item_extra_option_id ,'restaurantUuid' =>$model->restaurant->restaurant_uuid],
+                                       ['order-item-extra-option/delete', 'id' => $model->order_item_extra_option_id ,'storeUuid' =>$model->restaurant->restaurant_uuid],
                                        [
                                                'title' => 'Delete',
                                                'data' => [

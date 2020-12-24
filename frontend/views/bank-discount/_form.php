@@ -47,7 +47,7 @@ $this->registerJs($js);
 
 if (!$model->isNewRecord) {
 
-    echo Html::a('Delete', ['delete', 'id' => $model->bank_discount_id, 'restaurantUuid' => $model->restaurant_uuid], [
+    echo Html::a('Delete', ['delete', 'id' => $model->bank_discount_id, 'storeUuid' => $model->restaurant_uuid], [
         'class' => 'btn btn-danger  mr-1 mb-1',
         'data' => [
             'confirm' => 'Are you sure you want to delete this item?',

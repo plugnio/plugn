@@ -6,10 +6,10 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\Agent */
 
-$this->params['restaurant_uuid'] = $restaurantUuid;
+$this->params['restaurant_uuid'] = $storeUuid;
 
 $this->title = $model->agent_name;
-$this->params['breadcrumbs'][] = ['label' => 'Agents', 'url' => ['index', 'restaurantUuid' => $restaurantUuid]];
+$this->params['breadcrumbs'][] = ['label' => 'Agents', 'url' => ['index', 'storeUuid' => $storeUuid]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -60,7 +60,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     </table>
                                 </div>
                                 <div class="col-12" style="margin-top:20px">
-                                  <?= Html::a('<i class="feather icon-edit-1"></i> Edit', ['update', 'id' => $model->agent_id, 'restaurantUuid' => $restaurantUuid], ['class' => 'btn btn-primary mr-1']) ?>
+                                  <?= Html::a('<i class="feather icon-edit-1"></i> Edit', ['update', 'id' => $model->agent_id, 'storeUuid' => $storeUuid], ['class' => 'btn btn-primary mr-1']) ?>
                                 </div>
                             </div>
                         </div>

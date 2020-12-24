@@ -91,7 +91,6 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'agent_email')->input('email') ?>
 
-    <?= $form->field($model, 'tempPassword')->passwordInput(['maxlength' => true])?>
 
     <?=
       $form->field($model, 'email_notification', [
@@ -116,7 +115,7 @@ $this->registerJs($js);
 
     <?php
 
-      if(AgentAssignment::isOwner($restaurantUuid)){
+      if(AgentAssignment::isOwner($storeUuid)){
         echo $form->field($model, 'reminder_email', [
             'template' => '
             <div class="vs-checkbox-con vs-checkbox-primary">

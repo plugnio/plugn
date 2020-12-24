@@ -14,11 +14,9 @@ use kartik\daterange\DateRangePicker;
 /* @var $model common\models\Order */
 /* @var $form yii\widgets\ActiveForm */
 
+$url = yii\helpers\Url::to(['get-areas-belongs-to-this-location', 'storeUuid' => $model->restaurant_uuid, 'business_location_id' => 2]);
 
 $js = "
-
-
-
 
     $('#order-estimated_time_of_arrival').attr('autocomplete','off');
     $('#order-estimated_time_of_arrival').attr('style', '  padding-right: 2rem !important; padding-left: 3rem !important; ');
@@ -56,27 +54,20 @@ $this->registerJs($js);
         $areaQuery = $restaurant_model->getAreas()->all();
         $areaList = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
 
-        $shippingCountryQuery = $restaurant_model->getShippingCountries()->all();
-        $shippingCountryList = ArrayHelper::map($shippingCountryQuery, 'country_id', 'country_name');
 
-
-        $form = ActiveForm::begin([
-                    'errorSummaryCssClass' => 'alert alert-danger'
-        ]);
+          $form = ActiveForm::begin([
+                      'errorSummaryCssClass' => 'alert alert-danger'
+          ]);
         ?>
 
         <?= $form->errorSummary($model, ['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
 
-
-
         <?php
-        $orderModeOptions = [];
-        $model->restaurant->support_delivery ? $orderModeOptions[Order::ORDER_MODE_DELIVERY] = 'Delivery' : null;
-        $model->restaurant->support_pick_up ? $orderModeOptions[Order::ORDER_MODE_PICK_UP] = 'Pick up' : null;
 
-
-        if (is_array($orderModeOptions) && sizeof($orderModeOptions) > 0)
-            echo $form->field($model, 'order_mode')->dropDownList($orderModeOptions, ['prompt' => 'Choose...', 'class' => 'form-control select2', 'id' => 'orderModeInput']);
+        echo $form->field($model, 'order_mode')->dropDownList([
+          Order::ORDER_MODE_DELIVERY => 'Delivery',
+          Order::ORDER_MODE_PICK_UP => 'Pick up'
+        ], ['prompt' => 'Choose...', 'class' => 'form-control select2', 'id' => 'orderModeInput']);
 
 
 
@@ -84,17 +75,16 @@ $this->registerJs($js);
         $businessLocationArray = ArrayHelper::map($businessLocationQuery, 'business_location_id', 'business_location_name');
         ?>
 
-        <?= $form->field($model, 'shipping_country_id')->dropDownList($shippingCountryList, ['prompt' => 'Choose country...', 'class' => 'form-control select2'])->label('Country'); ?>
 
         <div id='customer-address' style='display:none; <?= $model->order_mode != null && $model->order_mode == Order::ORDER_MODE_DELIVERY ? "display:block" : "" ?>'>
+
             <div class="row">
                 <div class="col-12 col-sm-4  col-md-4 col-lg-4">
 
                     <?= $form->field($model, 'area_id')->dropDownList($areaList, ['prompt' => 'Choose area name...', 'class' => 'form-control select2'])->label('Area'); ?>
                 </div>
                 <div class="col-12 col-sm-4  col-md-4 col-lg-4">
-
-                    <?= $form->field($model, 'unit_type')->textInput(['maxlength' => true]) ?>
+                    <?= $form->field($model, 'unit_type')->dropDownlist(['House' => 'House', 'Office' => 'Office', 'Apartment' => 'Apartment']) ?>
                 </div>
 
                 <div class="col-12 col-sm-4  col-md-4 col-lg-4">
@@ -134,6 +124,8 @@ $this->registerJs($js);
               ]
           ]);
         ?>
+
+        <?= $form->field($model, 'customer_email')->textInput(['maxlength' => true, 'type' => 'email']) ?>
 
         <?= $form->field($model, 'special_directions')->textInput(['maxlength' => true]) ?>
 

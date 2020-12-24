@@ -12,24 +12,17 @@ use yii\helpers\Url;
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 $this->title = $model->customer_name;
-$this->params['breadcrumbs'][] = ['label' => 'Customers', 'url' => ['index', 'restaurantUuid' => $model->restaurant_uuid]];
+$this->params['breadcrumbs'][] = ['label' => 'Customers', 'url' => ['index', 'storeUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="customer-view">
 
-    <p>
-        <?=
-        Html::a('Delete', ['delete', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this customer?',
-                'method' => 'post',
-            ],
-        ])
-        ?>
-    </p>
-    <div class="card">
+  <p>
+    <?= Html::a('Update', ['update', 'id' => $model->customer_id, 'storeUuid' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+  </p>
+
+  <div class="card">
         <div class="card-body">
             <div class="box-body table-responsive no-padding">
 
@@ -71,7 +64,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 GridView::widget([
                     'dataProvider' => $customersOrdersData,
                     'rowOptions' => function($model) {
-                        $url = Url::to(['order/view', 'id' => $model->order_uuid, 'restaurantUuid' => $model->restaurant_uuid]);
+                        $url = Url::to(['order/view', 'id' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid]);
 
                         return [
                             'onclick' => "window.location.href='{$url}'"

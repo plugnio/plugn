@@ -38,9 +38,9 @@ class CustomerSearch extends Customer
      *
      * @return ActiveDataProvider
      */
-    public function search($params, $restaurantUuid)
+    public function search($params, $storeUuid)
     {
-        $query = Customer::find()->where(['restaurant_uuid' => $restaurantUuid])
+        $query = Customer::find()->where(['restaurant_uuid' => $storeUuid])
         ->orderBy(['customer_created_at' => SORT_DESC]);
 
 

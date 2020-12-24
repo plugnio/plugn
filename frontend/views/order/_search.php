@@ -47,7 +47,7 @@ $this->registerJs($js);
 
                         <?php
                         $form = ActiveForm::begin([
-                                    'action' => ['order/index', 'restaurantUuid' => $restaurant_uuid],
+                                    'action' => ['order/index', 'storeUuid' => $restaurant_uuid],
                                     'method' => 'get',
                         ]);
                         ?>
@@ -102,7 +102,7 @@ $this->registerJs($js);
 
                         <div class="form-group">
                             <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-                            <?= Html::a('Reset', ['order/index', 'restaurantUuid' => $restaurant_uuid], ['class' => 'btn btn-outline-secondary', 'style' => 'margin-left: 10px;']) ?>
+                            <?= Html::a('Reset', ['order/index', 'storeUuid' => $restaurant_uuid], ['class' => 'btn btn-outline-secondary', 'style' => 'margin-left: 10px;']) ?>
                         </div>
                         <?php ActiveForm::end(); ?>
 

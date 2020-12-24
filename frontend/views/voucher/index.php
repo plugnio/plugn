@@ -22,22 +22,16 @@ $this->registerJs($js);
 ?>
 <section id="data-list-view" class="data-list-view-header">
 
+    <?php if ($dataProvider->getCount() > 0) { ?>
+
     <!-- Data list view starts -->
     <div class="action-btns d-none">
         <div class="btn-dropdown mr-1 mb-1">
             <div class="btn-group dropdown actions-dropodown">
-                <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary']) ?>
+                <?= Html::a('Create voucher code', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
             </div>
         </div>
     </div>
-
-
-
-    <?php if ($dataProvider->getCount() == 0) { ?>
-        <div style="padding-left:14px">
-            <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary', 'style' => '    padding: 0.85rem 1.7rem;']) ?>
-        </div>
-    <?php } ?>
 
 
     <div class="table-responsive">
@@ -46,7 +40,7 @@ $this->registerJs($js);
         GridView::widget([
             'dataProvider' => $dataProvider,
             'rowOptions' => function($model) {
-                $url = Url::to(['voucher/update', 'id' => $model->voucher_id, 'restaurantUuid' => $model->restaurant_uuid]);
+                $url = Url::to(['voucher/update', 'id' => $model->voucher_id, 'storeUuid' => $model->restaurant_uuid]);
 
                 return [
                     'onclick' => "window.location.href='{$url}'"
@@ -110,7 +104,7 @@ $this->registerJs($js);
                     'buttons' => [
                         'update' => function ($url, $model) {
                             return Html::a(
-                                           $model->voucher_status == Voucher::VOUCHER_STATUS_ACTIVE ? 'Deactivate' : 'Activate' , ['change-voucher-status', 'id' => $model->voucher_id, 'restaurantUuid' => $model->restaurant_uuid], [
+                                           $model->voucher_status == Voucher::VOUCHER_STATUS_ACTIVE ? 'Deactivate' : 'Activate' , ['change-voucher-status', 'id' => $model->voucher_id, 'storeUuid' => $model->restaurant_uuid], [
                                         'title' => $model->voucher_status == Voucher::VOUCHER_STATUS_ACTIVE ? 'Deactivate' : 'Activate',
                                         'data-pjax' => '0',
                                             ]
@@ -125,5 +119,32 @@ $this->registerJs($js);
         ]);
         ?>
 
+      </div>
+      <!-- DataTable ends -->
 
-</section>
+    <?php } else {?>
+
+
+      <div class="card">
+        <div style="padding: 70px 0; text-align: center;">
+
+          <div>
+            <img src="https://res.cloudinary.com/plugn/image/upload/v1607881378/emptystate-voucher.svg" width="226" alt="" />
+          </div>
+
+          <h3>
+            Manage voucher codes
+          </h3>
+
+          <p>
+            Create voucher codes that apply at checkout.
+          </p>
+          <?= Html::a('Create voucher code', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+        </div>
+      </div>
+
+
+    <?php } ?>
+
+  </section>
+  <!-- Data list view end -->

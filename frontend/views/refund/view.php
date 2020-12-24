@@ -9,7 +9,7 @@ use yii\widgets\DetailView;
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 $this->title = $model->refund_id;
-$this->params['breadcrumbs'][] = ['label' => 'Refunds', 'url' => ['index','restaurantUuid' => $model->restaurant_uuid]];
+$this->params['breadcrumbs'][] = ['label' => 'Refunds', 'url' => ['index','storeUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>

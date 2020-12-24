@@ -38,9 +38,9 @@ class VoucherSearch extends Voucher
      *
      * @return ActiveDataProvider
      */
-    public function search($params, $restaurantUuid)
+    public function search($params, $storeUuid)
     {
-      $query = Voucher::find()->where(['restaurant_uuid' => $restaurantUuid])->orderBy([
+      $query = Voucher::find()->where(['restaurant_uuid' => $storeUuid])->orderBy([
                   'voucher_created_at' => SORT_DESC
                 ]);
 

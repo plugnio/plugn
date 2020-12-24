@@ -18,7 +18,7 @@ use common\components\FileUploader;
 /* @var $model common\models\Item */
 /* @var $form yii\widgets\ActiveForm */
 
-$url = yii\helpers\Url::to(['delete-item-image', 'restaurantUuid' => $modelItem->restaurant_uuid, 'itemUuid' => $modelItem->item_uuid]);
+$url = yii\helpers\Url::to(['delete-item-image', 'storeUuid' => $modelItem->restaurant_uuid, 'itemUuid' => $modelItem->item_uuid]);
 
 
 $js = <<< JS
@@ -128,20 +128,20 @@ $this->registerJs($js);
                 'class' => 'select2',
                 'multiple' => 'multiple',
                 'value' => $itemCategoryValues
-            ]);
+            ])->label('Category *');
             ?>
             <div class="row">
                 <div class="col-12 col-sm-6 col-lg-6">
-                    <?= $form->field($modelItem, 'item_name')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger, Short sleeve t-shirt', 'autocomplete' => 'off']) ?>
+                    <?= $form->field($modelItem, 'item_name')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger, Short sleeve t-shirt', 'autocomplete' => 'off'])->label('Item name in English *') ?>
                 </div>
                 <div class="col-12 col-sm-6 col-lg-6">
-                    <?= $form->field($modelItem, 'item_name_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger', 'autocomplete' => 'off']) ?>
+                    <?= $form->field($modelItem, 'item_name_ar')->textInput(['maxlength' => true, 'placeholder' => 'e.g. The Famous Burger', 'autocomplete' => 'off'])->label('Item name in Arabic *') ?>
                 </div>
             </div>
 
             <?= $form->field($modelItem, 'item_description')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL']) ?>
 
-            <?= $form->field($modelItem, 'item_description_ar')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL']) ?>
+            <?= $form->field($modelItem, 'item_description_ar')->widget(Quill::class, ['theme' => 'snow', 'toolbarOptions' => 'FULL'])  ?>
 
 
 

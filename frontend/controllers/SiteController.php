@@ -100,7 +100,7 @@ class SiteController extends Controller {
                     ]);
                 } else {
                     return $this->redirect(['real-time-orders',
-                                'restaurant_uuid' => $managedRestaurant->restaurant_uuid
+                                'storeUuid' => $managedRestaurant->restaurant_uuid
                     ]);
                 }
             }
@@ -110,13 +110,13 @@ class SiteController extends Controller {
     /**
      * Check for new orders
      */
-    public function actionCheckForNewOrders($restaurant_uuid) {
+    public function actionCheckForNewOrders($storeUuid) {
 
         $this->layout = false;
-        $managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurant_uuid);
+        $managedRestaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $restaurant_uuid);
+        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid);
 
         return $this->render('incoming-orders-table', [
                     'searchModel' => $searchModel,
@@ -130,8 +130,8 @@ class SiteController extends Controller {
      *
      * @return mixed
      */
-    public function actionRedirectToStoreDomain($restaurantUuid) {
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($restaurantUuid)) {
+    public function actionRedirectToStoreDomain($storeUuid) {
+        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($storeUuid)) {
 
             if($managedRestaurant->has_deployed)
             return $this->redirect($managedRestaurant->restaurant_domain);
@@ -147,20 +147,6 @@ class SiteController extends Controller {
         }
     }
 
-
-    /**
-     * View Stores domains
-     *
-     * @return mixed
-     */
-    public function actionDomains($id) {
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
-
-            return $this->render('domains', [
-                        'restaurant_model' => $managedRestaurant
-            ]);
-        }
-    }
 
     /**
      * Displays  Real time orders
@@ -192,9 +178,6 @@ class SiteController extends Controller {
                              ->setSubject('[Plugn] Agent updated DN')
                              ->send();
 
-                     return $this->redirect(['domains',
-                                 'id' => $managedRestaurant->restaurant_uuid
-                     ]);
                    }
 
                 }
@@ -339,8 +322,8 @@ class SiteController extends Controller {
             Yii::$app->session->setFlash('error', print_r('There seems to be an issue with your payment, please try again.', true));
 
             // Redirect back to current plan page
-            return $this->redirect(['restaurant/view-payment-methods',
-                        'restaurantUuid' => $paymentRecord->restaurant_uuid
+            return $this->redirect(['store/view-payment-methods',
+                        'storeUuid' => $paymentRecord->restaurant_uuid
             ]);
 
         } catch (\Exception $e) {
@@ -354,15 +337,15 @@ class SiteController extends Controller {
      *
      * @return mixed
      */
-    public function actionRealTimeOrders($restaurant_uuid) {
+    public function actionRealTimeOrders($storeUuid) {
 
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $restaurant_uuid);
+        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid);
 
         return $this->render('real-time-orders', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
-                    'restaurant_uuid' => $restaurant_uuid
+                    'storeUuid' => $storeUuid
         ]);
     }
 
@@ -1111,7 +1094,7 @@ class SiteController extends Controller {
             } else {
 
                 return $this->redirect(['real-time-orders',
-                            'restaurant_uuid' => $managedRestaurant->restaurant_uuid
+                            'storeUuid' => $managedRestaurant->restaurant_uuid
                 ]);
             }
         }
@@ -1206,6 +1189,8 @@ class SiteController extends Controller {
         $store_model->setScenario(Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
 
         $agent_model = new Agent();
+        $agent_model->setScenario(Agent::SCENARIO_CREATE_NEW_AGENT);
+
         if ($agent_model->load(Yii::$app->request->post()) && $store_model->load(Yii::$app->request->post())) {
 
             $store_model->restaurant_email = $agent_model->agent_email;
@@ -1255,8 +1240,9 @@ class SiteController extends Controller {
                                'first_name' => trim($firstname),
                                'last_name' => trim($lastname),
                                'store_name' => $store_model->name,
+                               'phone_number' => $store_model->owner_number,
                                'email' => $agent_model->agent_email,
-                               'store_url' => $store_model->name
+                               'store_url' => $store_model->restaurant_domain
                           ]
                       ]);
                     }
@@ -1295,9 +1281,10 @@ class SiteController extends Controller {
 
 
         $model = new PasswordResetRequestForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail()) {
+        if ($model->load(Yii::$app->request->post()) ) {
 
+
+            if ($model->sendEmail()) {
                 Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
 
                 return $this->goHome();

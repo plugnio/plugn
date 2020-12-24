@@ -10,7 +10,7 @@ use yii\widgets\ActiveForm;
 $this->title = 'Opening Hours';
 $this->params['breadcrumbs'][] = $this->title;
 
-$this->params['restaurant_uuid'] = $restaurantUuid;
+$this->params['restaurant_uuid'] = $storeUuid;
 
 $js = "
 
