@@ -574,7 +574,7 @@ if ($refundDataProvider->totalCount > 0 && $model->payment) {
 
             <?php
 
-            if($model->payment_uuid)
+            if($model->payment_uuid && $model->payment->payment_current_status  != 'CAPTURED')
               echo Html::a('Request Payment Status Update from TAP', ['update-payment-status','id' => $model->payment_uuid, 'storeUuid' => $model->restaurant_uuid], ['class'=>'btn btn-outline-primary']);
 
             ?>
