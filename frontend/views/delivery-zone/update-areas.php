@@ -84,8 +84,22 @@ $form = ActiveForm::begin([
 
 
 foreach ($cities as $cityIndex => $city) {
-    $areaQuery = Area::find()->where(['city_id' => $city->city_id])->asArray()->all();
+    // $areaQuery = Area::find()->where(['city_id' => $city->city_id])->asArray()->all();
+
+    $sql = "
+    SELECT DISTINCT area_id, area_name FROM area
+      WHERE NOT EXISTS (
+                    SELECT * FROM area_delivery_zone
+                    WHERE area_delivery_zone.area_id = area.area_id AND  area_delivery_zone.restaurant_uuid = '" . $storeUuid ."' AND delivery_zone_id != ". $model->delivery_zone_id ."
+                   )
+       AND city_id = " . $city->city_id ."
+        ";
+
+    $areaQuery =  Yii::$app->db->createCommand($sql)->queryAll();
+
     $areaArray = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
+
+
 
     $selectAll[$city->city_id] = false;
 

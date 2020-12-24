@@ -326,6 +326,8 @@ class Order extends \yii\db\ActiveRecord {
               return $order->getOrderItems()->with('orderItemExtraOptions')->asArray()->all();
           },
           'restaurantBranch',
+          'deliveryZone',
+          'pickupLocation',
           'payment'
       ];
     }
@@ -761,20 +763,21 @@ class Order extends \yii\db\ActiveRecord {
 
             if ($this->is_order_scheduled)
                 $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($this->scheduled_time_start_from));
-            else
-                $this->estimated_time_of_arrival =
-                date("Y-m-d H:i:s", strtotime('+' . $this->deliveryZone->delivery_time . ' ' . $this->deliveryZone->timeUnit, Yii::$app->formatter->asTimestamp( $insert  ? date('Y-m-d H:i:s', strtotime($this->order_created_at)) : date('Y-m-d H:i:s')  )));
+            else{
+              $this->estimated_time_of_arrival =
+              date("Y-m-d H:i:s", strtotime('+' . $this->deliveryZone->delivery_time . ' ' . $this->deliveryZone->timeUnit, Yii::$app->formatter->asTimestamp( !$insert  ? date('Y-m-d H:i:s', strtotime($this->order_created_at)) : date('Y-m-d H:i:s')  )));
+            }
 
           } else {
               $this->estimated_time_of_arrival =  $insert ? date('Y-m-d H:i:s', strtotime($this->order_created_at)) : date('Y-m-d H:i:s');
           }
 
-        // if($this->items){
-        //   foreach ($this->items as $key => $item) {
-        //     if($item->prep_time)
-        //       $this->estimated_time_of_arrival = date("c", strtotime('+' . $item->prep_time . ' ' . $item->prep_time_unit,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
-        //   }
-        // }
+        if($this->items){
+          foreach ($this->items as $key => $item) {
+            if($item->prep_time)
+              $this->estimated_time_of_arrival = date("c", strtotime('+' . $item->prep_time . ' ' . $item->prep_time_unit,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+          }
+        }
 
 
 
@@ -989,17 +992,6 @@ class Order extends \yii\db\ActiveRecord {
     {
         return $this->hasOne(DeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id']);
     }
-
-    /**
-     * Gets query for [[BusinessLocation]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getBusinessLocation()
-    {
-        return $this->hasOne(BusinessLocation::className(), ['business_location_id' => 'business_location_id'])->via('deliveryZone');
-    }
-
 
 
     /**

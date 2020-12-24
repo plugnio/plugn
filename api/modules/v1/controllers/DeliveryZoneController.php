@@ -165,6 +165,8 @@ class DeliveryZoneController extends Controller {
                 $deliveryTime = $deliveryTime * 24 * 60 * 60;
               else if (DeliveryZone::TIME_UNIT_HRS == $deliveryZone['time_unit'])
                 $deliveryTime = $deliveryTime *  60 * 60;
+              else if (DeliveryZone::TIME_UNIT_MIN == $deliveryZone['time_unit'])
+                $deliveryTime = $deliveryTime *  60;
 
 
               $deliveryZone['delivery_time'] = Yii::$app->formatter->asDuration($deliveryTime);
