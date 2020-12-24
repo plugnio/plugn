@@ -568,7 +568,17 @@ if ($refundDataProvider->totalCount > 0 && $model->payment) {
 
     <div class="card">
         <div class="card-body">
-            <h3>Payment details</h3>
+            <h3>
+              Payment details
+            </h3>
+
+            <?php
+
+            if($model->payment_uuid)
+              echo Html::a('Request Payment Status Update from TAP', ['update-payment-status','id' => $model->payment_uuid, 'storeUuid' => $model->restaurant_uuid], ['class'=>'btn btn-outline-primary']);
+
+            ?>
+
             <p>
             <?php
 //              if($model->payment_method_id != 3 && $model->order_status != Order::STATUS_REFUNDED) echo Html::a('Create Refund', ['refund/create', 'storeUuid' => $model->restaurant_uuid, 'orderUuid' => $model->order_uuid], ['class' => 'btn btn-success']) ;
@@ -576,6 +586,8 @@ if ($refundDataProvider->totalCount > 0 && $model->payment) {
             <div class="box-body table-responsive no-padding">
 
                 </p>
+
+
 <?=
 DetailView::widget([
     'model' => $model,

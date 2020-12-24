@@ -12,6 +12,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use common\models\Customer;
 use common\models\Restaurant;
+use common\models\Payment;
 use common\models\PaymentMethod;
 use kartik\mpdf\Pdf;
 use yii\helpers\Html;
@@ -261,6 +262,29 @@ class OrderController extends Controller {
         }
 
         return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
+    }
+
+
+
+    /**
+     * Update payment's status
+     * @return mixed
+     */
+    public function actionUpdatePaymentStatus($id, $storeUuid)
+    {
+
+        try {
+            $payment = Payment::findOne($id);
+
+            if (($payment = Payment::find()->where(['payment_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->one()) !== null) {
+              $transaction_id = $payment->payment_gateway_transaction_id;
+              Payment::updatePaymentStatusFromTap($transaction_id, true);
+              return $this->redirect(['view', 'id' => $payment->order_uuid, 'storeUuid' => $storeUuid]);
+            }
+
+        } catch (\Exception $e) {
+            throw new NotFoundHttpException($e->getMessage());
+        }
     }
 
     /**
