@@ -135,11 +135,13 @@ class Payment extends \yii\db\ActiveRecord {
         }
 
 
+
         // Request response about it from TAP
         Yii::$app->tapPayments->setApiKeys($paymentRecord->restaurant->live_api_key, $paymentRecord->restaurant->test_api_key	);
 
         $response = Yii::$app->tapPayments->retrieveCharge($id);
         $responseContent = json_decode($response->content);
+
 
         // If there's an error from TAP, exit and display error
         if (isset($responseContent->errors)) {
@@ -237,7 +239,7 @@ class Payment extends \yii\db\ActiveRecord {
 
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
-
+        
         if ($this->payment_current_status == 'CAPTURED' && $this->received_callback){
 
           $this->order->changeOrderStatusToPending();
