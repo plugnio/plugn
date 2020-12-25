@@ -222,7 +222,7 @@ class OrderSearch extends Order {
             ->where(['order.restaurant_uuid' => $storeUuid])
             ->andWhere(['!=' , 'order_status' , Order::STATUS_DRAFT])
             ->andWhere(['!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
-            ->joinWith('businessLocation', true)
+            ->joinWith('pickupLocation', true)
             ->orderBy(['order_created_at' => SORT_DESC]);
 
 
@@ -233,8 +233,8 @@ class OrderSearch extends Order {
         ]);
 
         $dataProvider->sort->attributes['business_location_id'] = [
-            'asc' => ['businessLocation.business_location_name' => SORT_ASC],
-            'desc' => ['businessLocation.business_location_name' => SORT_DESC],
+            'asc' => ['pickupLocation.business_location_name' => SORT_ASC],
+            'desc' => ['pickupLocation.business_location_name' => SORT_DESC],
         ];
 
         $this->load($params);

@@ -490,6 +490,25 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                         </tbody>
     <?php } ?>
 
+
+                  <?php if ( ($model->pickupLocation && $model->pickupLocation->business_location_tax) || ($model->deliveryZone && $model->deliveryZone->delivery_zone_tax) ) { ?>
+
+                    <tbody>
+                        <tr>
+                            <td colspan="2">VAT</td>
+                            <td style="float: right;">
+                              <?php
+
+                              $tax = $model->deliveryZone && $model->deliveryZone->delivery_zone_tax ? $model->deliveryZone->delivery_zone_tax  :  $model->pickupLocation->business_location_tax;
+
+                              echo $tax.'%';
+
+                              ?>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <?php } ?>
+
                     <tbody>
                         <tr>
                             <td colspan="2">Total</td>
@@ -671,7 +690,7 @@ DetailView::widget([
                             "value" => function($model) {
                                 return $model->customer_email;
                             },
-                            'visible' => $model->customer_email,
+                            'visible' => $model->customer_email !== null,
                         ],
                         [
                             'attribute' => 'order_mode',

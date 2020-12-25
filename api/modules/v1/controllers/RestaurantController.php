@@ -107,7 +107,8 @@ class RestaurantController extends Controller {
               }
 
               $todayOpeningHours = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => date('w' , strtotime("now"))])->one();
-              $asap = date("c", strtotime('+' . $deliveryZone->delivery_time . ' minutes',  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
+              $asap = date("c", strtotime('+' . $deliveryZone->delivery_time . ' ' . $deliveryZone->timeUnit,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
+
 
              return [
                     'ASAP' => $store_model->isOpen() ? $asap : null,

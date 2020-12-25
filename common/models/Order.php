@@ -443,7 +443,7 @@ class Order extends \yii\db\ActiveRecord {
 
           $areaDeliveryZone = AreaDeliveryZone::find()->where(['country_id' => $this->shipping_country_id, 'delivery_zone_id' => $this->delivery_zone_id])->one();
 
-        if (!$areaDeliveryZone || $areaDeliveryZone->area_id != null || ($areaDeliveryZone && $areaDeliveryZone->businessLocation->restaurant_uuid != $this->restaurant_uuid))
+        if (!$areaDeliveryZone || $areaDeliveryZone->area_id != null || ($areaDeliveryZone && $areaDeliveryZone->pickupLocation->restaurant_uuid != $this->restaurant_uuid))
             $this->addError($attribute, "Store does not deliver to this area. ");
     }
 
@@ -684,7 +684,40 @@ class Order extends \yii\db\ActiveRecord {
 
         $this->subtotal = $this->calculateOrderItemsTotalPrice();
         $this->total_price = $this->calculateOrderTotalPrice();
+        $this->order_tax = $this->calculateOrderVAT();
         $this->save(false);
+    }
+
+
+    public function calculateOrderVAT() {
+
+        //TODO
+        //TOBE CONTINUE
+
+        $totalPrice = $this->calculateOrderItemsTotalPrice();
+
+        if($this->voucher){
+          $discountAmount = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->voucher->discount_amount /100)) : $this->voucher->discount_amount;
+          $totalPrice -= $discountAmount ;
+        }
+
+        else if($this->bank_discount_id && $this->bankDiscount->minimum_order_amount <= $totalPrice){
+          $discountAmount = $this->bankDiscount->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->bankDiscount->discount_amount /100)) : $this->bankDiscount->discount_amount;
+          $totalPrice -= $discountAmount ;
+        }
+
+        if($this->delivery_zone_id && $this->deliveryZone->delivery_zone_tax){
+          $totalPrice +=  $totalPrice * ($this->deliveryZone->delivery_zone_tax/100) ;
+        } else if($this->pickup_location_id && $this->pickupLocation->business_location_tax){
+          $totalPrice +=  $totalPrice * ($this->pickupLocation->business_location_tax/100) ;
+        }
+
+        if ($this->order_mode == static::ORDER_MODE_DELIVERY && (!$this->voucher  || ($this->voucher && $this->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY))){
+            $totalPrice += $this->deliveryZone->delivery_fee;
+        }
+
+
+        return $subtotal;
     }
 
     /**
@@ -723,7 +756,6 @@ class Order extends \yii\db\ActiveRecord {
           $totalPrice +=  $totalPrice * ($this->deliveryZone->delivery_zone_tax/100) ;
         } else if($this->pickup_location_id && $this->pickupLocation->business_location_tax){
           $totalPrice +=  $totalPrice * ($this->pickupLocation->business_location_tax/100) ;
-
         }
 
         if ($this->order_mode == static::ORDER_MODE_DELIVERY && (!$this->voucher  || ($this->voucher && $this->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY))){
@@ -757,6 +789,7 @@ class Order extends \yii\db\ActiveRecord {
 
 
 
+
         if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
             //set ETA value
             \Yii::$app->timeZone = 'Asia/Kuwait';
@@ -769,13 +802,15 @@ class Order extends \yii\db\ActiveRecord {
             }
 
           } else {
-              $this->estimated_time_of_arrival =  $insert ? date('Y-m-d H:i:s', strtotime($this->order_created_at)) : date('Y-m-d H:i:s');
+              $this->estimated_time_of_arrival =  !$insert ? date('Y-m-d H:i:s', strtotime($this->order_created_at)) : date('Y-m-d H:i:s');
           }
 
-        if($this->items){
-          foreach ($this->items as $key => $item) {
-            if($item->prep_time)
-              $this->estimated_time_of_arrival = date("c", strtotime('+' . $item->prep_time . ' ' . $item->prep_time_unit,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+        if($this->orderItems){
+          foreach ($this->orderItems as $key => $orderItem) {
+
+            if($orderItem->item->prep_time){
+              $this->estimated_time_of_arrival = date("c", strtotime('+' . ($orderItem->item->prep_time * $orderItem->qty) . ' ' . $orderItem->item->timeUnit,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+            }
           }
         }
 

@@ -291,23 +291,23 @@ class CronController extends \yii\console\Controller {
 
     public function actionMigration(){
 
-        // $restaurantBranches = RestaurantBranch::find()->all();
-        // foreach ($restaurantBranches as $key => $branch) {
-        //
-        //   $store = Restaurant::findOne($branch->restaurant_uuid);
-        //
-        //   if(!BusinessLocation::find()->where(['restaurant_uuid' => $branch->restaurant_uuid, 'business_location_name' =>  $branch->branch_name_en , 'business_location_name_ar' =>  $branch->branch_name_ar])->exists()){
-        //     $businessLocation = new BusinessLocation;
-        //     $businessLocation->country_id = 84;
-        //     $businessLocation->restaurant_uuid = $branch->restaurant_uuid;
-        //     $businessLocation->business_location_name = $branch->branch_name_en;
-        //     $businessLocation->business_location_name_ar = $branch->branch_name_ar;
-        //     $businessLocation->support_pick_up = $store->support_pick_up ? 1 : 0;
-        //     $businessLocation->save();
-        //   }
-        //
-        // }
-        //
+        $restaurantBranches = RestaurantBranch::find()->all();
+        foreach ($restaurantBranches as $key => $branch) {
+
+          $store = Restaurant::findOne($branch->restaurant_uuid);
+
+          if(!BusinessLocation::find()->where(['restaurant_uuid' => $branch->restaurant_uuid, 'business_location_name' =>  $branch->branch_name_en , 'business_location_name_ar' =>  $branch->branch_name_ar])->exists()){
+            $businessLocation = new BusinessLocation;
+            $businessLocation->country_id = 84;
+            $businessLocation->restaurant_uuid = $branch->restaurant_uuid;
+            $businessLocation->business_location_name = $branch->branch_name_en;
+            $businessLocation->business_location_name_ar = $branch->branch_name_ar;
+            $businessLocation->support_pick_up = $store->support_pick_up ? 1 : 0;
+            $businessLocation->save();
+          }
+
+        }
+
 
         $stores = Restaurant::find()->all();
         foreach ($stores as $key => $store) {
@@ -479,7 +479,7 @@ class CronController extends \yii\console\Controller {
     public function actionCreateTapAccount() {
 
       $queue = TapQueue::find()
-              // ->where(['queue_status' => Queue::QUEUE_STATUS_PENDING])
+              ->where(['queue_status' => Queue::QUEUE_STATUS_PENDING])
               ->orderBy(['queue_created_at' => SORT_ASC])
               ->one();
 

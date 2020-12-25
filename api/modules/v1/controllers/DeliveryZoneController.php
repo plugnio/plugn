@@ -195,6 +195,31 @@ class DeliveryZoneController extends Controller {
     }
 
     /**
+     * Return pickup location
+     */
+    public function actionGetPickupLocation($restaurant_uuid, $pickup_location_id) {
+
+        if ($store_model = Restaurant::findOne($restaurant_uuid)) {
+
+            if( $pickupLocation = $store_model->getBusinessLocations()->where(['business_location_id' => $pickup_location_id])->asArray()->one() ){
+              return $pickupLocation;
+            }
+            else {
+              return [
+                  'operation' => 'error',
+                  'message' => 'pick up location id is invalid'
+              ];
+            }
+
+        } else {
+            return [
+                'operation' => 'error',
+                'message' => 'Store Uuid is invalid'
+            ];
+        }
+    }
+
+    /**
      * Return list of areas available for delivery
      */
     public function actionListOfAreas($restaurant_uuid, $country_id) {

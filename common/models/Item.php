@@ -22,6 +22,8 @@ use yii\behaviors\TimestampBehavior;
  * @property string $barcode
  * @property string $sku
  * @property int|null $stock_qty
+ * @property int|null $prep_time
+ * @property int|null $prep_time_unit
  * @property int|null $unit_sold
  * @property string|null $item_image
  * @property float|null $item_price
@@ -42,7 +44,7 @@ class Item extends \yii\db\ActiveRecord
     public $item_images;
 
 
-    //Values for `time_unit`
+    //Values for `prep_time_unit`
     const TIME_UNIT_MIN = 'min';
     const TIME_UNIT_HRS = 'hrs';
     const TIME_UNIT_DAY = 'day';
@@ -88,6 +90,8 @@ class Item extends \yii\db\ActiveRecord
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
+
+
 
 
     /**

@@ -107,7 +107,7 @@ $this->registerJs($js);
                         return '<a href="tel:+'. $model->customer_phone_number .'"> '. $model->customer_phone_number.' </a>';
                     }
                 ],
-          
+
                 [
                     'label' => 'When',
                     'format' => 'raw',
