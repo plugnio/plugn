@@ -672,7 +672,8 @@ DetailView::widget([
             'label' => 'Address',
             'format' => 'html',
             'value' => function ($data) {
-                return $data->area_name . ', Block ' . $data->block . ', St ' . $data->street . ', ' . ($data->avenue ? 'Avenue ' . $data->avenue . ', ' : '') . $data->house_number;
+                return $data->area_name . ', Block ' . $data->block . ', St ' . $data->street . ', ' . ($data->avenue ? 'Avenue ' . $data->avenue . ', ' : '')
+                . 'Building ' . $data->house_number;
             },
             'visible' => $model->order_mode == Order::ORDER_MODE_DELIVERY,
         ],
