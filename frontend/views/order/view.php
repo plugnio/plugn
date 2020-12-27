@@ -491,23 +491,14 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
     <?php } ?>
 
 
-                  <?php if ( ($model->pickupLocation && $model->pickupLocation->business_location_tax) || ($model->deliveryZone && $model->deliveryZone->delivery_zone_tax) ) { ?>
 
                     <tbody>
                         <tr>
-                            <td colspan="2">VAT</td>
-                            <td style="float: right;">
-                              <?php
-
-                              $tax = $model->deliveryZone && $model->deliveryZone->delivery_zone_tax ? $model->deliveryZone->delivery_zone_tax  :  $model->pickupLocation->business_location_tax;
-
-                              echo $tax.'%';
-
-                              ?>
-                            </td>
+                            <td colspan="2">Tax</td>
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->tax, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                         </tr>
                     </tbody>
-                    <?php } ?>
+
 
                     <tbody>
                         <tr>

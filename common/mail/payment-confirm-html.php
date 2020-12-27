@@ -302,6 +302,17 @@ use common\models\BankDiscount;
 
                                                                                             <?php } ?>
                                                                                         <?php } ?>
+                                                                                        <?php if ($order->tax) { ?>
+                                                                                        <tr>
+                                                                                            <td colspan="2" style="padding: 0 15px; padding-top:0px; vertical-align:top;">
+                                                                                                <p style="margin:0;padding:0;">Tax</p>
+                                                                                            </td>
+                                                                                            <td style="color:#828585;padding-top:0px; text-align: right; vertical-align:top;">
+                                                                                                <?= \Yii::$app->formatter->asCurrency($order->tax,$order->currency->code) ?>
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                      <?php } ?>
+
                                                                                     </table>
                                                                                 </td>
                                                                             </tr>

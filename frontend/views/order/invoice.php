@@ -237,7 +237,12 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                 <?php } ?>
 
                             <?php } ?>
-
+                            <?php if ($model->tax) { ?>
+                            <tr>
+                                <th>Tax</th>
+                                <td><?= Yii::$app->formatter->asCurrency($model->tax, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                            </tr>
+                          <?php } ?>
                             <tr>
                                 <th>TOTAL</th>
                                 <td><?= Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>

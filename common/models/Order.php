@@ -49,6 +49,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property int|null $order_status
  * @property int $order_mode
  * @property int $subtotal
+ * @property int $tax
  * @property int $sms_sent
  * @property int $total_price
  * @property int $items_has_been_restocked
@@ -207,7 +208,7 @@ class Order extends \yii\db\ActiveRecord {
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['customer_phone_number'], 'string', 'min' => 6, 'max' => 15],
             [['customer_phone_number'], 'number'],
-            [['total_price', 'total_price_before_refund', 'delivery_fee', 'subtotal', 'subtotal_before_refund'], 'number', 'min' => 0],
+            [['total_price', 'total_price_before_refund', 'delivery_fee', 'subtotal', 'subtotal_before_refund', 'tax'], 'number', 'min' => 0],
             ['subtotal', 'validateMinCharge', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN, 'when' => function($model) {
                     return $model->order_mode == static::ORDER_MODE_DELIVERY;
                 }
@@ -522,6 +523,7 @@ class Order extends \yii\db\ActiveRecord {
             'estimated_time_of_arrival' => 'Expected at',
             'is_order_scheduled' => 'Is order scheduled',
             'voucher_id' => 'Voucher ID',
+            'tax' => 'Tax',
             'bank_discount_id' => 'Bank discount ID',
             'mashkor_order_number' => 'Mashkor order number',
             'mashkor_tracking_link' => 'Mashkor order tracking link',
@@ -684,40 +686,8 @@ class Order extends \yii\db\ActiveRecord {
 
         $this->subtotal = $this->calculateOrderItemsTotalPrice();
         $this->total_price = $this->calculateOrderTotalPrice();
-        $this->order_tax = $this->calculateOrderVAT();
+
         $this->save(false);
-    }
-
-
-    public function calculateOrderVAT() {
-
-        //TODO
-        //TOBE CONTINUE
-
-        $totalPrice = $this->calculateOrderItemsTotalPrice();
-
-        if($this->voucher){
-          $discountAmount = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->voucher->discount_amount /100)) : $this->voucher->discount_amount;
-          $totalPrice -= $discountAmount ;
-        }
-
-        else if($this->bank_discount_id && $this->bankDiscount->minimum_order_amount <= $totalPrice){
-          $discountAmount = $this->bankDiscount->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->bankDiscount->discount_amount /100)) : $this->bankDiscount->discount_amount;
-          $totalPrice -= $discountAmount ;
-        }
-
-        if($this->delivery_zone_id && $this->deliveryZone->delivery_zone_tax){
-          $totalPrice +=  $totalPrice * ($this->deliveryZone->delivery_zone_tax/100) ;
-        } else if($this->pickup_location_id && $this->pickupLocation->business_location_tax){
-          $totalPrice +=  $totalPrice * ($this->pickupLocation->business_location_tax/100) ;
-        }
-
-        if ($this->order_mode == static::ORDER_MODE_DELIVERY && (!$this->voucher  || ($this->voucher && $this->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY))){
-            $totalPrice += $this->deliveryZone->delivery_fee;
-        }
-
-
-        return $subtotal;
     }
 
     /**
@@ -752,15 +722,31 @@ class Order extends \yii\db\ActiveRecord {
           $totalPrice -= $discountAmount ;
         }
 
-        if($this->delivery_zone_id && $this->deliveryZone->delivery_zone_tax){
-          $totalPrice +=  $totalPrice * ($this->deliveryZone->delivery_zone_tax/100) ;
-        } else if($this->pickup_location_id && $this->pickupLocation->business_location_tax){
-          $totalPrice +=  $totalPrice * ($this->pickupLocation->business_location_tax/100) ;
-        }
+
+
 
         if ($this->order_mode == static::ORDER_MODE_DELIVERY && (!$this->voucher  || ($this->voucher && $this->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY))){
             $totalPrice += $this->deliveryZone->delivery_fee;
         }
+
+
+
+        if($this->delivery_zone_id){
+          if($this->deliveryZone->delivery_zone_tax){
+            $this->tax =  $totalPrice * ($this->deliveryZone->delivery_zone_tax/100) ;
+            $totalPrice +=  $this->tax;
+          }
+          else if (  $this->deliveryZone->businessLocation->business_location_tax  ){
+            $this->tax =  $totalPrice * ($this->deliveryZone->businessLocation->business_location_tax/100) ;
+            $totalPrice +=  $this->tax;
+
+          }
+
+        } else if(!$this->delivery_zone_id && $this->pickup_location_id && $this->pickupLocation->business_location_tax){
+          $this->tax =  $totalPrice * ($this->pickupLocation->business_location_tax/100) ;
+          $totalPrice +=  $this->tax ;
+        }
+
 
         return $totalPrice;
     }
