@@ -220,7 +220,7 @@ use common\models\BankDiscount;
                                                                                             ?>
                                                                                             <tr>
                                                                                                 <td colspan="2" style="padding: 0 15px;  vertical-align:top;">
-                                                                                                    <p style="margin:0;padding:0;">Voucher Discount (<?= $order->voucher->code ?>)</p>
+                                                                                                    <p style="margin:0;padding:0;">Voucher Discount</p>
                                                                                                 </td>
                                                                                                 <td style="color:#828585; text-align: right; vertical-align:top;">
                                                                                                     -<?= Yii::$app->formatter->asCurrency($voucherDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
@@ -283,7 +283,7 @@ use common\models\BankDiscount;
 
                                                                                                 <tr>
                                                                                                     <td colspan="2" style="padding: 0 15px;  vertical-align:top;">
-                                                                                                        <p style="margin:0;padding:0;">Voucher Discount (<?= $order->voucher->code ?>)</p>
+                                                                                                        <p style="margin:0;padding:0;">Voucher Discount</p>
                                                                                                     </td>
                                                                                                     <td style="color:#828585; text-align: right; vertical-align:top;">
                                                                                                         -<?= Yii::$app->formatter->asCurrency($order->delivery_fee, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
