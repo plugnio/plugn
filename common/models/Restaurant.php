@@ -40,6 +40,7 @@ use common\models\WebLink;
  * @property int $site_id
  * @property int $platform_fee
  * @property int $facebook_pixil_id
+ * @property int $hotjar_id
  * @property int $google_analytics_id
  * @property int $schedule_order
  * @property int $schedule_interval
@@ -179,7 +180,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['custom_css'], 'string'],
             [['platform_fee'], 'number'],
             [['instagram_url'], 'url'],
-            [['export_orders_data_in_specific_date_range','export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'site_id'], 'safe'],
+            [['export_orders_data_in_specific_date_range','export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'hotjar_id', 'site_id'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'app_id', 'armada_api_key', 'mashkor_branch_id', 'store_branch_name', 'live_public_key', 'test_public_key', 'company_name'], 'string', 'max' => 255],
             [['phone_number', 'owner_number'], 'string', 'min' => 8, 'max' => 8],
             [['live_public_key', 'test_public_key'], 'default', 'value' => null],
@@ -231,6 +232,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             'store_layout' => 'Store layout',
             'google_analytics_id' => 'Google Analytics ID',
             'facebook_pixil_id' => 'Facebook Pixil ID',
+            'hotjar_id' => 'Hotjar ID',
             'instagram_url' => 'Instagram url',
             'schedule_order' => 'Schedule order',
             'schedule_interval' => 'Schedule interval',

@@ -141,6 +141,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'restaurant_updated_at',
             'platform_fee:percent',
             'facebook_pixil_id',
+            'hotjar_id',
             'google_analytics_id',
             [
               'attribute' => 'Owner name',

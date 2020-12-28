@@ -146,8 +146,16 @@ class CronController extends \yii\console\Controller {
         if(!file_exists($dirName))
           $createStoreFolder = mkdir($dirName);
 
-        $myFolder = mkdir( $dirName . "/" . $queue->restaurant->store_branch_name);
+
+
+        if (!file_exists( $dirName . "/" . $queue->restaurant->store_branch_name )) {
+          $myFolder = mkdir( $dirName . "/" . $queue->restaurant->store_branch_name);
+        }
+
+
         $myfile =  fopen($dirName . "/" .   $queue->restaurant->store_branch_name . "/build.js", "w") or die("Unable to open file!");
+
+
 
 
         $apiEndpoint = Yii::$app->params['apiEndpoint'] . '/v1';
@@ -190,6 +198,7 @@ class CronController extends \yii\console\Controller {
                   console.log(store);
 
                   var facebookPixilId = store.facebook_pixil_id;
+                  var hotjarId = store.hotjar_id;
                   var googleAnalyticsId = store.google_analytics_id;
                   var storeName = store.name;
                   var storeUuid = store.restaurant_uuid;
@@ -230,6 +239,8 @@ class CronController extends \yii\console\Controller {
                                  fbq('init', '` + facebookPixilId + `');
                                  fbq('track', 'PageView');
                               </script>
+
+
                               <noscript>
                                       <img height='1' width='1' style='display:none'
                                  src='https://www.facebook.com/tr?id= .  facebookPixilId . &ev=PageView&noscript=1'
@@ -238,6 +249,24 @@ class CronController extends \yii\console\Controller {
                               <!-- End Facebook Pixel Code -->
                               `;
                   }
+
+                  var hotjarCode = '';
+                  if (hotjarId) {
+                      hotjarCode = `
+                           <!-- Hotjar -->
+                            <script>
+                            (function(h,o,t,j,a,r){
+                                h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+                                h._hjSettings={hjid:` + hotjarId + `,hjsv:6};
+                                a=o.getElementsByTagName('head')[0];
+                                r=o.createElement('script');r.async=1;
+                                r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+                                a.appendChild(r);
+                            })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+                          </script>`;
+                  }
+
+
                   var googleAnalyticsCode = '';
                   if (googleAnalyticsId) {
                       googleAnalyticsCode = `
@@ -285,12 +314,13 @@ class CronController extends \yii\console\Controller {
                                                       <link rel='manifest' href='manifest.webmanifest'>
                                                               <meta name='theme-color' content='` + storeThemeColor + `'>
                                     ` + facebookPixilCode + `
+                                    ` + hotjarCode + `
 
                                                                       <script src='https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js'></script>
                                                                       <script src='https://secure.gosell.io/js/sdk/tap.min.js'></script>
                                                               </head>
                                                               <body>
-                                                                      <app-root></app-root> 
+                                                                      <app-root></app-root>
                                     ` + googleAnalyticsCode + `
 
                                                                       <noscript>Please enable JavaScript to continue using this application.</noscript>
@@ -639,8 +669,8 @@ class CronController extends \yii\console\Controller {
 
         fclose($myfile);
 
-        $queue->queue_status = Queue::QUEUE_STATUS_COMPLETE;
-        $queue->save(false);
+        // $queue->queue_status = Queue::QUEUE_STATUS_COMPLETE;
+        // $queue->save(false);
 
         $this->stdout("File has been created! \n", Console::FG_RED, Console::BOLD);
       }
