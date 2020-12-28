@@ -103,7 +103,7 @@ class OrderController extends Controller {
             //if the order mode = 1 => Delivery
             if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
 
-              if(Yii::$app->request->getBodyParam("area_id")){
+              if(Yii::$app->request->getBodyParam("area_id") && Yii::$app->request->getBodyParam("area_delivery_zone") ){
                 $order->delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
                 $order->area_id = Yii::$app->request->getBodyParam("area_id");
                 $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
@@ -116,7 +116,7 @@ class OrderController extends Controller {
 
 
 
-              else if (Yii::$app->request->getBodyParam("country_id")){
+              if(!Yii::$app->request->getBodyParam("area_id") && !Yii::$app->request->getBodyParam("area_delivery_zone") ){
                 $order->delivery_zone_id = Yii::$app->request->getBodyParam("deliveryZone")['delivery_zone_id'];
                 $order->shipping_country_id = Yii::$app->request->getBodyParam("country_id");
                 $order->address_1 = Yii::$app->request->getBodyParam('address_1');
