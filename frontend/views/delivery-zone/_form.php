@@ -120,7 +120,7 @@ $this->registerJs($js);
                             DeliveryZone::TIME_UNIT_MIN => 'Minutes',
                             DeliveryZone::TIME_UNIT_HRS => 'Hours',
                             DeliveryZone::TIME_UNIT_DAY => 'Days'
-                        ],['value' => $model->time_unit ? $model->time_unit : DeliveryZone::TIME_UNIT_DAY ]
+                        ],['value' => $model->time_unit ? $model->time_unit : DeliveryZone::TIME_UNIT_MIN ]
                 )->label(''); ?>
               </div>
         </div>
