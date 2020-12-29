@@ -189,7 +189,7 @@ class CronController extends \yii\console\Controller {
                   overwriteCapacitorConfig(response.app_id, response.name);
                   overwriteGlobalScss(response.custom_css, response.name);
                   overwriteManifest(response.restaurant_uuid, response.name, response.theme_color, response.logo);
-                  overwriteEnvironment(response.restaurant_uuid, storebranchName);
+                  overwriteEnvironment(response.restaurant_uuid, storebranchName, apiEndPoint);
                   overwriteAngularFile(storebranchName);
                 });
 
@@ -339,7 +339,7 @@ class CronController extends \yii\console\Controller {
                                   " . '"bundledWebRuntime"' . ": false,
                                   " . '"npmClient"' . ":  " . '"npm"' . ",
                                   " . '"webDir"' . ":  " . '"www"' . ",
-                                  " . '"plugnins"' . ":  " . '"www"' . ": {
+                                  " . '"plugins"' . ":  {
                                   " . '"SplashScreen"' . ": {
                                   " . '"launchShowDuration"' . ": 0
                               }
@@ -452,12 +452,12 @@ class CronController extends \yii\console\Controller {
                 }
 
 
-                function overwriteEnvironment(storeUuid, storebranchName) {
+                function overwriteEnvironment(storeUuid, storebranchName, apiEndPoint) {
 
                   var environmentFile = `export const environment = {
                               production: true,
                               envName: 'prod',
-                              apiEndpoint: '$apiEndpoint',
+                              apiEndpoint : '` + apiEndPoint + `'
                               restaurantUuid : '` + storeUuid + `'
                               };`;
                   fs.writeFileSync('src/environments/environment.' + storebranchName + '.ts', environmentFile);
