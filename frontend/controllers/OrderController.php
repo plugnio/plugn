@@ -262,7 +262,7 @@ class OrderController extends Controller {
             Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . ']2 ');
             Yii::error(json_encode($createDeliveryApiResponse->data));
             Yii::error('Error while requesting driver from Armada  [3' );
-            Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->data));
+            Yii::error('Error while requesting driver from Armada  [1' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->data));
 
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
         }
