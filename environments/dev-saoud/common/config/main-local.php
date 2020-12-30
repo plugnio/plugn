@@ -74,7 +74,7 @@ return [
         ],
         'githubComponent' => [
             'class' => 'common\components\GithubComponent',
-            'branch' => 'develop'
+            'branch' => 'master'
         ]
     ],
 ];

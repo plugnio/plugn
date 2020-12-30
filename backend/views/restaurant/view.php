@@ -140,8 +140,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'restaurant_created_at',
             'restaurant_updated_at',
             'platform_fee:percent',
-            'facebook_pixil_id',
-            'hotjar_id',
+            'facebook_pixil_id',  
             'google_analytics_id',
             [
               'attribute' => 'Owner name',

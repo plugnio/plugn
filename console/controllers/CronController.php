@@ -198,7 +198,6 @@ class CronController extends \yii\console\Controller {
                   console.log(store);
 
                   var facebookPixilId = store.facebook_pixil_id;
-                  var hotjarId = store.hotjar_id;
                   var googleAnalyticsId = store.google_analytics_id;
                   var storeName = store.name;
                   var storeUuid = store.restaurant_uuid;
@@ -250,21 +249,6 @@ class CronController extends \yii\console\Controller {
                               `;
                   }
 
-                  var hotjarCode = '';
-                  if (hotjarId) {
-                      hotjarCode = `
-                           <!-- Hotjar -->
-                            <script>
-                            (function(h,o,t,j,a,r){
-                                h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-                                h._hjSettings={hjid:` + hotjarId + `,hjsv:6};
-                                a=o.getElementsByTagName('head')[0];
-                                r=o.createElement('script');r.async=1;
-                                r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-                                a.appendChild(r);
-                            })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-                          </script>`;
-                  }
 
 
                   var googleAnalyticsCode = '';
@@ -314,7 +298,6 @@ class CronController extends \yii\console\Controller {
                                                       <link rel='manifest' href='manifest.webmanifest'>
                                                               <meta name='theme-color' content='` + storeThemeColor + `'>
                                     ` + facebookPixilCode + `
-                                    ` + hotjarCode + `
 
                                                                       <script src='https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js'></script>
                                                                       <script src='https://secure.gosell.io/js/sdk/tap.min.js'></script>
@@ -457,7 +440,7 @@ class CronController extends \yii\console\Controller {
                   var environmentFile = `export const environment = {
                               production: true,
                               envName: 'prod',
-                              apiEndpoint : '` + apiEndPoint + `',
+                              apiEndpoint : '` + apiEndPoint + `'
                               restaurantUuid : '` + storeUuid + `'
                               };`;
                   fs.writeFileSync('src/environments/environment.' + storebranchName + '.ts', environmentFile);
