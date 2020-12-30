@@ -111,7 +111,7 @@ use borales\extensions\phoneInput\PhoneInput;
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'name_ar')->textInput(['maxlength' => true]) ?>
-    
+
     <?= $form->field($model, 'company_name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'tagline')->textInput(['maxlength' => true]) ?>
@@ -220,7 +220,7 @@ use borales\extensions\phoneInput\PhoneInput;
     <?= $form->field($model, 'google_analytics_id')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'facebook_pixil_id')->textInput(['maxlength' => true]) ?>
-
+    
     <?= $form->field($model, 'custom_css')->textarea(['rows' => '12']) ?>
 
     <?= $form->field($model, 'identification_file_id_front_side')->textInput() ?>

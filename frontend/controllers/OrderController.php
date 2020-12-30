@@ -219,6 +219,7 @@ class OrderController extends Controller {
             else
                Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse));
 
+            Yii::error('Error while requesting driver from Mashkor  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->data));
 
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
         }
@@ -259,6 +260,7 @@ class OrderController extends Controller {
             else
                Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse));
 
+            Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->data));
 
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
         }

@@ -510,8 +510,16 @@ class CronController extends \yii\console\Controller {
         if(!file_exists($dirName))
           $createStoreFolder = mkdir($dirName);
 
-        $myFolder = mkdir( $dirName . "/" . $queue->restaurant->store_branch_name);
+
+
+        if (!file_exists( $dirName . "/" . $queue->restaurant->store_branch_name )) {
+          $myFolder = mkdir( $dirName . "/" . $queue->restaurant->store_branch_name);
+        }
+
+
         $myfile =  fopen($dirName . "/" .   $queue->restaurant->store_branch_name . "/build.js", "w") or die("Unable to open file!");
+
+
 
 
         $apiEndpoint = Yii::$app->params['apiEndpoint'] . '/v1';
@@ -545,7 +553,7 @@ class CronController extends \yii\console\Controller {
                   overwriteCapacitorConfig(response.app_id, response.name);
                   overwriteGlobalScss(response.custom_css, response.name);
                   overwriteManifest(response.restaurant_uuid, response.name, response.theme_color, response.logo);
-                  overwriteEnvironment(response.restaurant_uuid, storebranchName);
+                  overwriteEnvironment(response.restaurant_uuid, storebranchName, apiEndPoint);
                   overwriteAngularFile(storebranchName);
                 });
 
@@ -594,6 +602,8 @@ class CronController extends \yii\console\Controller {
                                  fbq('init', '` + facebookPixilId + `');
                                  fbq('track', 'PageView');
                               </script>
+
+
                               <noscript>
                                       <img height='1' width='1' style='display:none'
                                  src='https://www.facebook.com/tr?id= .  facebookPixilId . &ev=PageView&noscript=1'
@@ -602,6 +612,9 @@ class CronController extends \yii\console\Controller {
                               <!-- End Facebook Pixel Code -->
                               `;
                   }
+
+
+
                   var googleAnalyticsCode = '';
                   if (googleAnalyticsId) {
                       googleAnalyticsCode = `
@@ -673,7 +686,7 @@ class CronController extends \yii\console\Controller {
                                   " . '"bundledWebRuntime"' . ": false,
                                   " . '"npmClient"' . ":  " . '"npm"' . ",
                                   " . '"webDir"' . ":  " . '"www"' . ",
-                                  " . '"plugnins"' . ":  " . '"www"' . ": {
+                                  " . '"plugins"' . ":  {
                                   " . '"SplashScreen"' . ": {
                                   " . '"launchShowDuration"' . ": 0
                               }
@@ -786,12 +799,12 @@ class CronController extends \yii\console\Controller {
                 }
 
 
-                function overwriteEnvironment(storeUuid, storebranchName) {
+                function overwriteEnvironment(storeUuid, storebranchName, apiEndPoint) {
 
                   var environmentFile = `export const environment = {
                               production: true,
                               envName: 'prod',
-                              apiEndpoint: '$apiEndpoint',
+                              apiEndpoint : '` + apiEndPoint + `',
                               restaurantUuid : '` + storeUuid + `'
                               };`;
                   fs.writeFileSync('src/environments/environment.' + storebranchName + '.ts', environmentFile);
