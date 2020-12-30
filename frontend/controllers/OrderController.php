@@ -249,19 +249,19 @@ class OrderController extends Controller {
 
         } else {
 
-            if ($createDeliveryApiResponse->client)
-                Yii::$app->session->setFlash('errorResponse', "Invalid api key");
-            else if ($createDeliveryApiResponse->data['errors'])
-                Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->data['errors'][0]['description']));
-            else  if ($createDeliveryApiResponse->data)
-               Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->data));
-            else
-               Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse));
+            // if ($createDeliveryApiResponse->client)
+            //     Yii::$app->session->setFlash('errorResponse', "Invalid api key");
+            // else if ($createDeliveryApiResponse->data['errors'])
+            //     Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->data['errors'][0]['description']));
+            // else  if ($createDeliveryApiResponse->data)
+            //    Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->data));
+            // else
+            //    Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse));
 
             Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ');
+            Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . ']2 ');
             Yii::error(json_encode($createDeliveryApiResponse->data));
-            Yii::error('Error while requesting driver from Armada  [22' );
-
+            Yii::error('Error while requesting driver from Armada  [3' );
             Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->data));
 
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
