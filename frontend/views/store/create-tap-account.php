@@ -86,6 +86,48 @@ businessTypeInput.change(function(e){
 $this->registerJs($js);
 
 
+
+$js = <<< JS
+
+// enable fileuploader plugin
+$('input[class="document-upload"]').fileuploader({
+	limit: 1,
+	fileMaxSize: 20,
+	extensions: ['image/*'],
+	addMore: true,
+	thumbnails: {
+		onItemShow: function (item) {
+      // add sorter button to the item html
+      		if (item.choosed )
+			item.html.find('.fileuploader-action-remove').before('<button type="button" class="fileuploader-action fileuploader-action-sort" title="Sort"><i class="fileuploader-icon-sort"></i></button>');
+
+			if (item.choosed && !item.html.find('.fileuploader-action-edit').length)
+				item.html.find('.fileuploader-action-remove').before('<button type="button" class="fileuploader-action fileuploader-action-popup fileuploader-action-edit" title="Edit"><i class="fileuploader-icon-edit"></i></button>');
+		}
+	},
+	sorter: {
+		selectorExclude: null,
+		placeholder: null,
+		scrollContainer: window,
+		onSort: function (list, listEl, parentEl, newInputEl, inputEl) {
+			// onSort callback
+		}
+	},
+	editor: {
+		cropper: {
+			ratio: '1:1',
+			minWidth: 100,
+			minHeight: 100,
+			showGrid: true
+		}
+	}
+
+});
+
+JS;
+$this->registerJs($js);
+
+
 ?>
 
 
@@ -146,7 +188,7 @@ $this->registerJs($js);
                 <div class="col-12  col-lg-6">
 
                     <?=
-                    $form->field($model, 'owner_identification_file_front_side')->fileinput(['name' => 'identification_file_front_side', 'class' => 'files'])->label('Upload National ID front side  *');
+                    $form->field($model, 'owner_identification_file_front_side')->fileinput(['name' => 'identification_file_front_side', 'class' => 'document-upload'])->label('Upload National ID front side  *');
                     ?>
 
                 </div>
@@ -154,7 +196,7 @@ $this->registerJs($js);
                 <div class="col-12  col-lg-6 ">
 
                     <?=
-                    $form->field($model, 'owner_identification_file_back_side')->fileinput(['name' => 'identification_file_back_side', 'class' => 'files'])->label('Upload National ID back side  *');
+                    $form->field($model, 'owner_identification_file_back_side')->fileinput(['name' => 'identification_file_back_side', 'class' => 'document-upload'])->label('Upload National ID back side  *');
                     ?>
 
                 </div>
@@ -240,7 +282,7 @@ $this->registerJs($js);
                 <div class="col-12">
 
                     <?=
-                    $form->field($model, 'restaurant_commercial_license_file')->fileinput(['name' => 'commercial_license', 'class' => 'files'])->label('License copy *');
+                    $form->field($model, 'restaurant_commercial_license_file')->fileinput(['name' => 'commercial_license', 'class' => 'document-upload'])->label('License copy *');
                     ?>
 
                 </div>
@@ -249,7 +291,7 @@ $this->registerJs($js);
                 <div class="col-12">
 
                     <?=
-                    $form->field($model, 'restaurant_authorized_signature_file')->fileinput(['name' => 'authorized_signature', 'class' => 'files'])->label('Authorized signatory *');
+                    $form->field($model, 'restaurant_authorized_signature_file')->fileinput(['name' => 'authorized_signature', 'class' => 'document-upload'])->label('Authorized signatory *');
                     ?>
 
                 </div>

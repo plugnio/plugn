@@ -136,10 +136,12 @@ $interval = $today->diff($expiry);
                             <td>
                               <?php
 
-                                  if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 2])->exists())
-                                    echo Html::a('Disable', ['disable-payment-method', 'restaurantUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 2], ['class' => 'btn btn-danger']);
-                                  else
-                                    echo Html::a('Enable', ['enable-payment-method', 'restaurantUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 2], ['class' => 'btn btn-success']);
+                              if($model->is_tap_enable){
+                                if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 2])->exists())
+                                  echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 2], ['class' => 'btn btn-danger']);
+                                else
+                                  echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 2], ['class' => 'btn btn-success']);
+                              }
 
                               ?>
                             </td>
@@ -169,11 +171,13 @@ $interval = $today->diff($expiry);
                             </td>
                             <td >
                               <?php
+                              if($model->is_tap_enable){
 
                                   if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 1])->exists())
-                                    echo Html::a('Disable', ['disable-payment-method', 'restaurantUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 1], ['class' => 'btn btn-danger']);
+                                    echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 1], ['class' => 'btn btn-danger']);
                                   else
-                                    echo Html::a('Enable', ['enable-payment-method', 'restaurantUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 1], ['class' => 'btn btn-success']);
+                                    echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 1], ['class' => 'btn btn-success']);
+                                }
 
                               ?>
                             </td>
@@ -203,12 +207,13 @@ $interval = $today->diff($expiry);
                             </td>
                             <td >
                               <?php
+                              if($model->is_tap_enable){
 
                                   if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 4])->exists())
-                                    echo Html::a('Disable', ['disable-payment-method', 'restaurantUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 4], ['class' => 'btn btn-danger']);
+                                    echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 4], ['class' => 'btn btn-danger']);
                                   else
-                                    echo Html::a('Enable', ['enable-payment-method', 'restaurantUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 4], ['class' => 'btn btn-success']);
-
+                                    echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 4], ['class' => 'btn btn-success']);
+                                }
                               ?>
                             </td>
                         </tr>
@@ -237,11 +242,13 @@ $interval = $today->diff($expiry);
                             </td>
                             <td >
                               <?php
+                              if($model->is_tap_enable){
 
                                   if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 5])->exists())
-                                    echo Html::a('Disable', ['disable-payment-method', 'restaurantUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-danger']);
+                                    echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-danger']);
                                   else
-                                    echo Html::a('Enable', ['enable-payment-method', 'restaurantUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-success']);
+                                    echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-success']);
+                                }
 
                               ?>
                             </td>

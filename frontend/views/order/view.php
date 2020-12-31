@@ -257,7 +257,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                             'value' => function ($data) {
                                 return $data->special_directions;
                             },
-                            'visible' => $model->special_directions !== null,
+                            'visible' => $model->special_directions != null || $model->special_directions,
                         ],
                         [
                             'attribute' => 'armada_tracking_link',
@@ -672,7 +672,7 @@ DetailView::widget([
                             'attribute' => 'customer_phone_number',
                             "format" => "raw",
                             "value" => function($model) {
-                                return '<a href="tel:+'. $model->customer_phone_number .'"> '. $model->customer_phone_number.' </a>';
+                                return '<a href="tel:'. $model->customer_phone_number .'"> '. $model->customer_phone_number.' </a>';
                             }
                         ],
                         [
@@ -748,7 +748,7 @@ DetailView::widget([
                             'visible' => $model->area_id && $model->avenue ? true : false,
                         ],
                         [
-                            'label' => 'House number',
+                            'label' => 'Building',
                             'format' => 'html',
                             'value' => function ($data) {
                                 return $data->house_number;

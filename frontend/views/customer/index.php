@@ -59,7 +59,7 @@ $this->registerJs($js);
                       'attribute' => 'customer_phone_number',
                       "format" => "raw",
                       "value" => function($model) {
-                          return '<a href="tel:+'. $model->customer_phone_number .'"> '. $model->customer_phone_number.' </a>';
+                          return '<a href="tel:'. $model->customer_phone_number .'"> '. $model->customer_phone_number.' </a>';
                       }
                   ],
                   'customer_email:email',

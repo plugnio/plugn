@@ -9,6 +9,7 @@ use yii\bootstrap\ActiveForm;
 use yii\captcha\Captcha;
 use common\models\Country;
 use common\models\Currency;
+use borales\extensions\phoneInput\PhoneInput;
 
 
 $this->title = 'Create an Online Store';
@@ -51,9 +52,14 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                 <?= $form->field($agent_model, 'agent_email')->textInput(['maxlength' => true,'type' => 'email'])->label('Your email *') ?>
 
-                                <?= $form->field($store_model, 'owner_number')->textInput(['maxlength' => true])->label('Your phone number *') ?>
-
-                                <?= $form->field($store_model, 'name')->textInput(['maxlength' => true])->label('Your store name *') ?>
+                                <?=
+                                    $form->field($store_model, 'owner_number')->widget(PhoneInput::className(), [
+                                         'jsOptions' => [
+                                             'preferredCountries' => ['kw', 'sa', 'aed','qa','bh','om'],
+                                         ]
+                                     ])->label('Phone Number *');
+                               ?>
+                                <?= $form->field($store_model, 'name')->textInput(['maxlength' => true])->label('Your phone number *') ?>
 
 
                                 <?=

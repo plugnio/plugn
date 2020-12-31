@@ -189,19 +189,19 @@ class Order extends \yii\db\ActiveRecord {
             ],
             [['area_id'], 'validateArea'],
             ['unit_type', function ($attribute, $params, $validator) {
-                    if (!$this->unit_type && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                    if ($this->area_id && !$this->unit_type && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                         $this->addError($attribute, 'Unit type cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['block', function ($attribute, $params, $validator) {
-                    if ($this->block == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                    if ($this->area_id && $this->block == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                         $this->addError($attribute, 'Block cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['street', function ($attribute, $params, $validator) {
-                    if ($this->street  == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                    if ($this->area_id && $this->street  == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                         $this->addError($attribute, 'Street cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['house_number', function ($attribute, $params, $validator) {
-                    if ($this->house_number  == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                    if ($this->area_id && $this->house_number  == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                         $this->addError($attribute, 'House number cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['order_mode', 'validateOrderMode'],
@@ -444,7 +444,7 @@ class Order extends \yii\db\ActiveRecord {
 
           $areaDeliveryZone = AreaDeliveryZone::find()->where(['country_id' => $this->shipping_country_id, 'delivery_zone_id' => $this->delivery_zone_id])->one();
 
-        if (!$areaDeliveryZone || $areaDeliveryZone->area_id != null || ($areaDeliveryZone && $areaDeliveryZone->pickupLocation->restaurant_uuid != $this->restaurant_uuid))
+        if (!$areaDeliveryZone || $areaDeliveryZone->area_id != null || ($areaDeliveryZone && $areaDeliveryZone->businessLocation->restaurant_uuid != $this->restaurant_uuid))
             $this->addError($attribute, "Store does not deliver to this area. ");
     }
 

@@ -556,11 +556,11 @@ class StoreController extends Controller {
      * Disable payment method
      * @return mixed
      */
-    public function actionDisablePaymentMethod($restaurantUuid, $paymentMethodId) {
+    public function actionDisablePaymentMethod($storeUuid, $paymentMethodId) {
 
-      $model = $this->findModel($restaurantUuid);
+      $model = $this->findModel($storeUuid);
       RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => $paymentMethodId]);
-      return $this->redirect(['view-payment-methods', 'restaurantUuid' => $model->restaurant_uuid]);
+      return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
 
     }
 
@@ -568,16 +568,16 @@ class StoreController extends Controller {
      * Enable payment method
      * @return mixed
      */
-    public function actionEnablePaymentMethod($restaurantUuid, $paymentMethodId) {
+    public function actionEnablePaymentMethod($storeUuid, $paymentMethodId) {
 
-      $model = $this->findModel($restaurantUuid);
+      $model = $this->findModel($storeUuid);
 
       $restaurant_payment_method_model = new RestaurantPaymentMethod();
       $restaurant_payment_method_model->payment_method_id = $paymentMethodId;
       $restaurant_payment_method_model->restaurant_uuid = $model->restaurant_uuid;
       $restaurant_payment_method_model->save(false);
 
-      return $this->redirect(['view-payment-methods', 'restaurantUuid' => $model->restaurant_uuid]);
+      return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
 
     }
 
@@ -619,7 +619,7 @@ class StoreController extends Controller {
             // initialize FileUploader
             $FileUploader = new FileUploader('identification_file_front_side', array(
                 'limit' => null,
-                'maxSize' => null,
+                'maxSize' => 30,
                 'extensions' => null,
                 'uploadDir' => 'uploads/',
                 'title' => 'name'
@@ -646,8 +646,10 @@ class StoreController extends Controller {
                 'title' => 'name'
             ));
 
+
             // call to upload the files
             $data = $FileUploader->upload();
+            die(var_dump($data));
 
             // if uploaded and success
             if ($data['isSuccess'] && count($data['files']) > 0) {
