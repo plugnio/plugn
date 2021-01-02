@@ -77,7 +77,7 @@ class OrderController extends Controller {
 
             //Save Customer Info
             $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
-            $order->customer_phone_number = strval(Yii::$app->request->getBodyParam("phone_number"));
+            $order->customer_phone_number = str_replace(' ','',strval(Yii::$app->request->getBodyParam("phone_number")));
             $order->customer_phone_country_code = Yii::$app->request->getBodyParam("country_code") ? Yii::$app->request->getBodyParam("country_code") : 965;
             $order->customer_email = Yii::$app->request->getBodyParam("email"); //optional
             //payment method

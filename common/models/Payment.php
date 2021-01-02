@@ -194,10 +194,10 @@ class Payment extends \yii\db\ActiveRecord {
             // BENEFIT Gateway Fee Calculation
             else if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_BENEFIT) {
 
-                if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->benefitGatewayFe) > Yii::$app->tapPayments->minBenefitGatewayFee)
-                    $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->benefitGatewayFe;
+                if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->benefitGatewayFee) > Yii::$app->tapPayments->minBenefitGatewayFee)
+                    $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->benefitGatewayFee;
                 else
-                    $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->benefitGatewayFe;
+                    $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->benefitGatewayFee;
             }
 
 
@@ -239,7 +239,7 @@ class Payment extends \yii\db\ActiveRecord {
 
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
-        
+
         if ($this->payment_current_status == 'CAPTURED' && $this->received_callback){
 
           $this->order->changeOrderStatusToPending();

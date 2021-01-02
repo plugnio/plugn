@@ -5,7 +5,7 @@ $(document).ready(function() {
 	// enable fileuploader plugin
 	$('input[class="files-limited"]').fileuploader({
 		limit: 1,
-		fileMaxSize: 20,
+		fileMaxSize: 30,
 		extensions: ['image/*'],
 		addMore: true,
         thumbnails: {
@@ -41,7 +41,7 @@ $(document).ready(function() {
 		// enable fileuploader plugin
 		$('input[class="files"]').fileuploader({
 			limit: 1,
-			fileMaxSize: 20,
+			fileMaxSize: 30,
 			extensions: ['image/*'],
 			addMore: true,
 	        thumbnails: {

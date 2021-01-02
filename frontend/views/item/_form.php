@@ -46,7 +46,7 @@ trackQuantityInput.change(function(e){
 // enable fileuploader plugin
 $('input[class="item-upload"]').fileuploader({
 	limit:10,
-	fileMaxSize: 20,
+	fileMaxSize: 30,
 	extensions: ['image/*'],
 	addMore: true,
 	thumbnails: {

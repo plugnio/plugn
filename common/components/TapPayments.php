@@ -246,7 +246,7 @@ class TapPayments extends Component
                         "email" => $restaurant->owner_email,
                         "phone" => [
                             "country_code" => $restaurant->owner_phone_country_code,
-                            "number" => str_replace('+'.$restaurant->owner_phone_country_code, '',$restaurant->owner_number)
+                            "number" => str_replace(' ','',(str_replace('+'.$restaurant->owner_phone_country_code, '',$restaurant->owner_number)))
                         ]
                     ]
                 ],
@@ -315,7 +315,6 @@ class TapPayments extends Component
         } else {
             $bussinessParams['entity']['is_licensed'] = 'false';
         }
-
 
         $client = new Client();
         $response = $client->createRequest()

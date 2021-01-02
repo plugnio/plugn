@@ -59,7 +59,7 @@ $(document).ready(function() {
 	
 	$('input[name="files"]').fileuploader({
 		limit: 20,
-		fileMaxSize: 20,
+		fileMaxSize: 30,
 		extensions: ['image/*'],
         changeInput: '<div class="fileuploader-input">' +
 					      '<div class="fileuploader-input-inner">' +

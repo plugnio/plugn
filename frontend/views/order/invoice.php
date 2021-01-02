@@ -30,10 +30,8 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                 <div class="media " style="margin-bttom: 20px">
                     <?php if ($model->armada_qr_code_link) { ?>
                         <img src="<?= $model->armada_qr_code_link ?>" width="100" height="100" />
-                        <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: 320px;margin-right: auto;display: block;" />
-                    <?php } else { ?>
-                        <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: auto; margin-right: auto; display:block" />
                     <?php } ?>
+                    <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: auto; margin-right: auto; display:block" />
 
                 </div>
             </div>

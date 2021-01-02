@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\helpers\Url;
+use common\models\Order;
 
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\CustomerSearch */
@@ -69,6 +70,20 @@ $this->registerJs($js);
                       "format" => "raw",
                       "value" => function($model) {
                           return  $model->getOrders()->count();
+                      }
+                  ],
+                  [
+                      'attribute' => 'Total spent',
+                      "format" => "raw",
+                      "value" => function($model) {
+                        $total_spent = $model->getOrders()
+                                        ->where(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                                        ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                                        ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                                        ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                                        ->sum('total_price');
+
+                          return  Yii::$app->formatter->asCurrency($total_spent, $model->currency->code) ;
                       }
                   ],
                   [

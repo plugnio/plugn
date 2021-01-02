@@ -66,7 +66,13 @@ class ItemController extends Controller
             'isMultipleSheet' => false,
             'models' => $model,
             'columns' => [
-                'item_name',
+                [
+                    'header' => 'Item name',
+                    "format" => "raw",
+                    "value" => function($data) {
+                      return $data->item_name;
+                    }
+                ],
                 'sku',
                 'barcode',
                 'stock_qty',
@@ -74,7 +80,7 @@ class ItemController extends Controller
                 [
                     'attribute' => 'item_price',
                     "format" => "raw",
-                    "value" => function($model) {
+                    "value" => function($data) {
                       return Yii::$app->formatter->asCurrency($data->item_price, $data->currency->code);
                     }
                 ]

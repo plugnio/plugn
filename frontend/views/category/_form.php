@@ -17,7 +17,7 @@ $js = <<< JS
 // enable fileuploader plugin
 $('input[class="category-upload"]').fileuploader({
 	limit: 1,
-	fileMaxSize: 20,
+	fileMaxSize: 30,
 	extensions: ['image/*'],
 	addMore: true,
 	thumbnails: {

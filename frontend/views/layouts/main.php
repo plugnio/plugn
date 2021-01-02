@@ -312,8 +312,8 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                     <li  <?= $this->context->route == 'voucher/index' ? 'class="active"' : '' ?>>
                         <?=
                         Html::a(
-                                Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                Html::tag('span', 'Voucher'), ['voucher/index', 'restaurantUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                Html::tag('i', '', ['class' =>  'fa  fa-tags']) .
+                                Html::tag('span', 'Voucher'), ['voucher/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
                         )
                         ?>
                     </li>

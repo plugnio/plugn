@@ -149,8 +149,6 @@ $interval = $today->diff($expiry);
                         </tr>
 
                         <!-- KNET -->
-                        <?php if ($model->country->iso == 'KW') { ?>
-
                         <tr>
                             <th scope="row">
                               <div style="text-align: center; display:block">
@@ -163,10 +161,10 @@ $interval = $today->diff($expiry);
 
                             </th>
                             <td>  3 working days</td>
-                            <td class="<?= $model->plan->plan_id == 2 ? 'current-plan-body-row current-plan-bottom-row' : '' ?>">
+                            <td class="<?= $model->plan->plan_id == 2 ? 'current-plan-body-row' : '' ?>">
                                 1% per transaction, a minimum of 100 fills.
                             </td>
-                            <td class="<?= $model->plan->plan_id == 1 ? 'current-plan-body-row current-plan-bottom-row' : '' ?>">
+                            <td class="<?= $model->plan->plan_id == 1 ? 'current-plan-body-row' : '' ?>">
                                 5% per transaction, a minimum of 200 fills.
                             </td>
                             <td >
@@ -182,7 +180,42 @@ $interval = $today->diff($expiry);
                               ?>
                             </td>
                         </tr>
-                      <?php  }  ?>
+
+                        <!-- BH -->
+
+                          <tr>
+                              <th scope="row">
+                                <div style="text-align: center; display:block">
+
+                                  <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/benefit.png' ?>" style="max-width:50px">
+
+                                </div>
+                                <span style="text-align: center; display:block">Benefit</span>
+
+
+                              </th>
+                              <td>  3 working days</td>
+                                <td class="<?= $model->plan->plan_id == 2  ? (($model->country->iso !=  'SA') ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
+
+                                  1% per transaction, a minimum of 100 fills.
+                              </td>
+                              <td class="<?= $model->plan->plan_id == 1  ? (($model->country->iso !=  'SA') ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
+                                  5% per transaction, a minimum of 200 fills.
+                              </td>
+                              <td >
+                                <?php
+                                if($model->is_tap_enable){
+
+                                    if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 5])->exists())
+                                      echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-danger']);
+                                    else
+                                      echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-success']);
+                                  }
+
+                                ?>
+                              </td>
+                          </tr>
+
 
                       <!-- SA -->
                         <?php if ($model->country->iso == 'SA') { ?>
@@ -219,41 +252,6 @@ $interval = $today->diff($expiry);
                         </tr>
                       <?php  }  ?>
 
-                      <!-- BH -->
-                        <?php if ($model->country->iso == 'BH') { ?>
-
-                        <tr>
-                            <th scope="row">
-                              <div style="text-align: center; display:block">
-
-                                <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/benefit.png' ?>" style="max-width:50px">
-
-                              </div>
-                              <span style="text-align: center; display:block">Benefit</span>
-
-
-                            </th>
-                            <td>  3 working days</td>
-                            <td class="<?= $model->plan->plan_id == 2 ? 'current-plan-body-row current-plan-bottom-row' : '' ?>">
-                                1% per transaction, a minimum of 100 fills.
-                            </td>
-                            <td class="<?= $model->plan->plan_id == 1 ? 'current-plan-body-row current-plan-bottom-row' : '' ?>">
-                                5% per transaction, a minimum of 200 fills.
-                            </td>
-                            <td >
-                              <?php
-                              if($model->is_tap_enable){
-
-                                  if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 5])->exists())
-                                    echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-danger']);
-                                  else
-                                    echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-success']);
-                                }
-
-                              ?>
-                            </td>
-                        </tr>
-                      <?php  }  ?>
 
 
                     </tbody>

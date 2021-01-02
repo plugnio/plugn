@@ -48,204 +48,6 @@ class StoreController extends Controller {
         ];
     }
 
-    public function actionExportTodaySoldItems($storeUuid) {
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($storeUuid)) {
-
-
-            $today_sold_item = Item::find()
-                    ->joinWith(['orderItems', 'orderItems.order'])
-                    ->where(['order.order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
-                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['DATE(order.order_created_at)' => new Expression('CURDATE()')])
-                    ->all();
-
-            header('Access-Control-Allow-Origin: *');
-            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
-            header("Cache-Control: max-age=0");
-
-
-            \moonland\phpexcel\Excel::export([
-                'isMultipleSheet' => false,
-                'models' => $today_sold_item,
-                'columns' => [
-                    'item_name',
-                    [
-                        'label' => 'Sold items',
-                        'format' => 'html',
-                        'value' => function ($data) {
-
-                            return $data->getTodaySoldUnits();
-                        },
-                    ],
-                ],
-            ]);
-        }
-    }
-
-    public function actionExportLastSevenDaysSoldItems($storeUuid) {
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($storeUuid)) {
-
-
-            $this_week_sold_item = Item::find()
-                    ->joinWith(['orderItems', 'orderItems.order'])
-                    ->where(['order.order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
-                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
-                    ->all();
-
-            header('Access-Control-Allow-Origin: *');
-            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
-            header("Cache-Control: max-age=0");
-
-
-            \moonland\phpexcel\Excel::export([
-                'isMultipleSheet' => false,
-                'models' => $this_week_sold_item,
-                'columns' => [
-                    'item_name',
-                    [
-                        'attribute' => 'Sold items',
-                        'format' => 'html',
-                        'value' => function ($data) {
-                            return $data->getThisWeekSoldUnits();
-                        },
-                    ],
-                ],
-            ]);
-        }
-    }
-
-    public function actionExportCurrentMonthSoldItems($storeUuid) {
-
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($storeUuid)) {
-
-
-            $current_month_sold_item = Item::find()
-                    ->joinWith(['orderItems', 'orderItems.order'])
-                    ->where(['order.order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
-                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
-                    ->all();
-
-            header('Access-Control-Allow-Origin: *');
-            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
-            header("Cache-Control: max-age=0");
-
-            \moonland\phpexcel\Excel::export([
-                'isMultipleSheet' => false,
-                'models' => $current_month_sold_item,
-                'columns' => [
-                    'item_name',
-                    [
-                        'attribute' => 'Sold items',
-                        'format' => 'html',
-                        'value' => function ($data) {
-
-                            return $data->getCurrentMonthSoldUnits();
-                        },
-                    ],
-                ],
-            ]);
-        }
-    }
-
-    public function actionExportLastMonthSoldItems($storeUuid) {
-
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($storeUuid)) {
-
-
-            $last_month_sold_item = Item::find()
-                    ->joinWith(['orderItems', 'orderItems.order'])
-                    ->where(['order.order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
-                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->all();
-
-            header('Access-Control-Allow-Origin: *');
-            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
-            header("Cache-Control: max-age=0");
-
-
-            \moonland\phpexcel\Excel::export([
-                'isMultipleSheet' => false,
-                'models' => $last_month_sold_item,
-                'columns' => [
-                    'item_name',
-                    'order.order_created_at',
-                    [
-                        'attribute' => 'Sold items',
-                        'format' => 'html',
-                        'value' => function ($data) {
-
-                            return $data->getLastMonthSoldUnits();
-                        },
-                    ],
-                ],
-            ]);
-        }
-    }
-
-    public function actionExportLastThreeMonthsSoldItems($storeUuid) {
-
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($storeUuid)) {
-
-            $last_three_month_sold_item = Item::find()
-                    ->joinWith(['orderItems', 'orderItems.order'])
-                    ->where(['order.order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
-                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
-                    ->all();
-
-            header('Access-Control-Allow-Origin: *');
-            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
-            header("Cache-Control: max-age=0");
-
-
-            \moonland\phpexcel\Excel::export([
-                'isMultipleSheet' => false,
-                'models' => $last_three_month_sold_item,
-                'columns' => [
-                    'item_name',
-                    [
-                        'attribute' => 'Sold items',
-                        'format' => 'html',
-                        'value' => function ($data) {
-
-                            return $data->getLastThreeMonthSoldUnits();
-                        },
-                    ],
-                ],
-            ]);
-        }
-    }
 
     /**
      * @return mixed
@@ -355,7 +157,7 @@ class StoreController extends Controller {
                 ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
                 ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
                 ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
-                ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 0 MONTH)')
                 ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
                 ->sum('total_price');
 
@@ -439,7 +241,7 @@ class StoreController extends Controller {
                 ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
                 ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
                 ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
-                ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 0 MONTH)')
                 ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
                 ->count();
 
@@ -499,7 +301,7 @@ class StoreController extends Controller {
 
         $customer_gained_current_month = Customer::find()
                 ->where(['restaurant_uuid' => $model->restaurant_uuid])
-                ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 0 MONTH)')
                 ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
                 ->count();
 
@@ -591,9 +393,6 @@ class StoreController extends Controller {
         $isCashOnDeliveryEnabled = $model->getPaymentMethods()->where(['payment_method_id' => 3])->exists();
         $isOnlinePaymentEnabled = $model->getPaymentMethods()->where(['payment_method_id' => 1])->exists();
 
-        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
-          die('FUCL');
-        }
         return $this->render('payment-methods', [
                   'model' => $model,
                   'isCashOnDeliveryEnabled' => $isCashOnDeliveryEnabled,
@@ -640,7 +439,7 @@ class StoreController extends Controller {
             // initialize FileUploader
             $FileUploader = new FileUploader('identification_file_back_side', array(
                 'limit' => null,
-                'maxSize' => null,
+                'maxSize' => 30,
                 'extensions' => null,
                 'uploadDir' => 'uploads/',
                 'title' => 'name'
@@ -649,7 +448,6 @@ class StoreController extends Controller {
 
             // call to upload the files
             $data = $FileUploader->upload();
-            die(var_dump($data));
 
             // if uploaded and success
             if ($data['isSuccess'] && count($data['files']) > 0) {
@@ -664,7 +462,7 @@ class StoreController extends Controller {
             // initialize FileUploader
             $FileUploader = new FileUploader('commercial_license', array(
                 'limit' => null,
-                'maxSize' => null,
+                'maxSize' => 30,
                 'extensions' => null,
                 'uploadDir' => 'uploads/',
                 'title' => 'name'
@@ -685,7 +483,7 @@ class StoreController extends Controller {
             // initialize FileUploader
             $FileUploader = new FileUploader('authorized_signature', array(
                 'limit' => null,
-                'maxSize' => null,
+                'maxSize' => 30,
                 'extensions' => null,
                 'uploadDir' => 'uploads/',
                 'title' => 'name'
@@ -849,8 +647,7 @@ class StoreController extends Controller {
         }
 
         return $this->render('update', [
-                    'model' => $model,
-                    'madeAnySales' => $model->getOrders()->exists()
+                    'model' => $model
         ]);
     }
 
@@ -914,7 +711,7 @@ class StoreController extends Controller {
 
                 $FileUploader = new FileUploader('restaurant_logo', array(
                     'limit' => 1,
-                    'maxSize' => null,
+                    'maxSize' => 30,
                     'extensions' => null,
                     'uploadDir' => 'uploads/',
                     'title' => 'name'
@@ -939,7 +736,7 @@ class StoreController extends Controller {
 
                 $FileUploader = new FileUploader('restaurant_thumbnail_image', array(
                     'limit' => 1,
-                    'maxSize' => null,
+                    'maxSize' => 30,
                     'extensions' => null,
                     'uploadDir' => 'uploads/',
                     'title' => 'name'

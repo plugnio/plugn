@@ -37,7 +37,7 @@ $('#primaryColorInput').change(function(e){
 // enable fileuploader plugin
 $('input[class="upload-logo"]').fileuploader({
 	limit: 1,
-  fileMaxSize: 20,
+  fileMaxSize: 30,
 	extensions: ['image/*'],
 	addMore: true,
 	thumbnails: {
@@ -88,7 +88,7 @@ $('input[class="upload-logo"]').fileuploader({
 // enable fileuploader plugin
 $('input[class="upload-thumbnail"]').fileuploader({
 	limit: 1,
-  fileMaxSize: 20,
+  fileMaxSize: 30,
 	extensions: ['image/*'],
 	addMore: true,
 	thumbnails: {
@@ -230,10 +230,10 @@ $this->registerJs($js);
         <div class="row">
             <div class="col-12 col-sm-6 col-lg-6">
 
-                <div id="phoneNumberDisplay" <?= $model->phone_number ? "style = display:block " : "style = display:none " ?> >
+                <div>
                     <?=
                     $form->field($model, 'phone_number_display')->radioList(
-                            [2 => '📞', 3 => '+965 12345678', 1 => 'Dont show phone number button'], [
+                              [2 => "`📞", 3 => '+965 12345678', 1 => 'Dont show phone number button'], [
                         'style' => 'display:grid',
                         'item' => function($index, $label, $name, $checked, $value) {
 

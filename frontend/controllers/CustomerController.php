@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use Yii;
 use common\models\Customer;
+use common\models\Order;
 use frontend\models\CustomerSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -147,8 +148,28 @@ class CustomerController extends Controller {
                'models' => $model,
                'columns' => [
                    'customer_name',
-                   'customer_phone_number',
                    'customer_email',
+                   [
+                       'attribute' => 'customer_phone_number',
+                       "format" => "raw",
+                       "value" => function($model) {
+                           return str_replace(' ','',  strval($model->customer_phone_number));
+                       }
+                   ],
+                   [
+                       'attribute' => 'Total spent',
+                       "format" => "raw",
+                       "value" => function($data) {
+                         $total_spent = $data->getOrders()
+                                         ->where(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                                         ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                                         ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                                         ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                                         ->sum('total_price');
+
+                         return  Yii::$app->formatter->asCurrency($total_spent , $data->currency->code) ;
+                       }
+                   ],
                    [
                        'attribute' => 'Number of orders',
                        "format" => "raw",
@@ -156,7 +177,13 @@ class CustomerController extends Controller {
                            return  $model->getOrders()->count();
                        }
                    ],
-                   'customer_created_at',
+                   [
+                       'header' => 'Account created at',
+                       "format" => "raw",
+                       "value" => function($data) {
+                         return  $data->customer_created_at ;
+                       }
+                   ]
                ]
            ]);
     }

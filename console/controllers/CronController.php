@@ -1016,8 +1016,8 @@ class CronController extends \yii\console\Controller {
 
         fclose($myfile);
 
-        $queue->queue_status = Queue::QUEUE_STATUS_COMPLETE;
-        $queue->save(false);
+        // $queue->queue_status = Queue::QUEUE_STATUS_COMPLETE;
+        // $queue->save(false);
 
         $this->stdout("File has been created! \n", Console::FG_RED, Console::BOLD);
       }
