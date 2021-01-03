@@ -35,7 +35,7 @@ $this->registerJs($js);
 
     <div class="alert alert-danger alert-dismissible">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-        <h5><i class="icon fa fa-ban"></i> Warning!</h5>
+        <h5><i class="icon fa fa-ban"></i> Error!</h5>
         <?= (Yii::$app->session->getFlash('errorResponse')) ?>
     </div>
 <?php } elseif (Yii::$app->session->getFlash('successResponse') != null) { ?>
