@@ -522,7 +522,7 @@ class CronController extends \yii\console\Controller {
 
 
 
-        $apiEndpoint = Yii::$app->params['apiEndpoint'] . '/v1';
+        $apiEndpoint = Yii::$app->params['apiEndpoint'] . '/v2';
 
         $txt = "
 

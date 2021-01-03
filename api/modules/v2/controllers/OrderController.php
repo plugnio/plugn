@@ -1,6 +1,6 @@
 <?php
 
-namespace api\modules\v1\controllers;
+namespace api\modules\v2\controllers;
 
 use Yii;
 use yii\rest\Controller;
@@ -68,7 +68,6 @@ class OrderController extends Controller {
 
         $restaurant_model = Restaurant::findOne($id);
 
-
         if ($restaurant_model) {
 
 
@@ -78,7 +77,8 @@ class OrderController extends Controller {
 
             //Save Customer Info
             $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
-            $order->customer_phone_number = strval(Yii::$app->request->getBodyParam("phone_number"));
+            $order->customer_phone_number = str_replace(' ','',strval(Yii::$app->request->getBodyParam("phone_number")));
+            $order->customer_phone_country_code = Yii::$app->request->getBodyParam("country_code") ? Yii::$app->request->getBodyParam("country_code") : 965;
             $order->customer_email = Yii::$app->request->getBodyParam("email"); //optional
             //payment method
             $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
@@ -102,12 +102,30 @@ class OrderController extends Controller {
 
             //if the order mode = 1 => Delivery
             if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
+
+              if(Yii::$app->request->getBodyParam("area_id") && Yii::$app->request->getBodyParam("area_delivery_zone") ){
+                $order->delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
                 $order->area_id = Yii::$app->request->getBodyParam("area_id");
                 $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
                 $order->block = Yii::$app->request->getBodyParam("block");
                 $order->street = Yii::$app->request->getBodyParam("street");
                 $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
                 $order->house_number = Yii::$app->request->getBodyParam("house_number");
+                $order->delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
+              }
+
+
+
+              if(!Yii::$app->request->getBodyParam("area_id") && !Yii::$app->request->getBodyParam("area_delivery_zone") ){
+                $order->delivery_zone_id = Yii::$app->request->getBodyParam("deliveryZone")['delivery_zone_id'];
+                $order->shipping_country_id = Yii::$app->request->getBodyParam("country_id");
+                $order->address_1 = Yii::$app->request->getBodyParam('address_1');
+                $order->address_2 = Yii::$app->request->getBodyParam('address_2');
+                $order->postalcode = Yii::$app->request->getBodyParam('postal_code');
+                $order->city = Yii::$app->request->getBodyParam("city");
+              }
+
+
                 $order->special_directions = Yii::$app->request->getBodyParam("special_directions"); //optional
 
                 if (Yii::$app->request->getBodyParam("deliver_location_latitude"))
@@ -122,14 +140,13 @@ class OrderController extends Controller {
                     $order->scheduled_time_to = date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_to")));
                 }
             } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
-                $order->restaurant_branch_id = Yii::$app->request->getBodyParam("restaurant_branch_id");
+                $order->pickup_location_id = Yii::$app->request->getBodyParam("business_location_id");
             }
 
 
             $response = [];
 
             if ($order->save()) {
-
                 $items = Yii::$app->request->getBodyParam("items");
 
 
@@ -209,10 +226,10 @@ class OrderController extends Controller {
             if ($response == null) {
 
                 $order->updateOrderTotalPrice();
-                if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->restaurantDelivery->min_charge) {
+                if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
                     $response = [
                         'operation' => 'error',
-                        'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->restaurantDelivery->min_charge, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
+                        'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->deliveryZone->min_charge, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
                     ];
                 }
 
@@ -223,7 +240,7 @@ class OrderController extends Controller {
                     // Create new payment record
                     $payment = new Payment;
                     $payment->restaurant_uuid = $restaurant_model->restaurant_uuid;
-                    $payment->payment_mode = $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
+                    $payment->payment_mode = $order->paymentMethod->source_id;
 
                     if ($payment->payment_mode == TapPayments::GATEWAY_VISA_MASTERCARD && Yii::$app->request->getBodyParam("payment_token") && Yii::$app->request->getBodyParam("bank_name")) {
 
@@ -295,29 +312,27 @@ class OrderController extends Controller {
                         $order->save(false);
                         $order->updateOrderTotalPrice();
 
-                        Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
+                        Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
 
 
                         // Redirect to payment gateway
                         Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
 
-                        if ($order->payment_method_id == 1) {
-                            $source_id = TapPayments::GATEWAY_KNET;
-                        } else {
-                            if ($payment->payment_token)
-                                $source_id = $payment->payment_token;
-                            else
-                                $source_id = TapPayments::GATEWAY_VISA_MASTERCARD;
-                        }
 
                         // $source_id
                         $response = Yii::$app->tapPayments->createCharge(
+                                $order->currency->code,
                                 "Order placed from: " . $order->customer_name, // Description
                                 $order->restaurant->name, //Statement Desc.
                                 $payment->payment_uuid, // Reference
-                                $order->total_price, $order->customer_name, $order->customer_email, $order->customer_phone_number, $order->restaurant->platform_fee, Url::to(['order/callback'], true),
-                                // $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET :  TapPayments::GATEWAY_VISA_MASTERCARD
-                                $source_id
+                                $order->total_price,
+                                 $order->customer_name,
+                                 $order->customer_email,
+                                 $order->customer_phone_country_code,
+                                 $order->customer_phone_number,
+                                 $order->restaurant->platform_fee,
+                                 Url::to(['order/callback'], true),
+                                $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id
                         );
 
                         $responseContent = json_decode($response->content);
@@ -389,7 +404,7 @@ class OrderController extends Controller {
                         $order->changeOrderStatusToPending();
                         $order->sendPaymentConfirmationEmail();
 
-                        Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
+                        Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
 
 
 //                            //Update product inventory

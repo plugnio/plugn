@@ -1,6 +1,6 @@
 <?php
 
-namespace api\modules\v1\controllers;
+namespace api\modules\v2\controllers;
 
 use Yii;
 use yii\rest\Controller;
@@ -75,7 +75,7 @@ class ItemController extends Controller {
       } else {
           return [
               'operation' => 'error',
-              'message' => 'Restaurant Uuid is invalid'
+              'message' => 'Store Uuid is invalid'
           ];
       }
     }
@@ -136,7 +136,7 @@ class ItemController extends Controller {
         } else {
             return [
                 'operation' => 'error',
-                'message' => 'Restaurant Uuid is invalid'
+                'message' => 'Store Uuid is invalid'
             ];
         }
     }

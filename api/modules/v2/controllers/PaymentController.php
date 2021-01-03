@@ -1,6 +1,6 @@
 <?php
 
-namespace api\modules\v1\controllers;
+namespace api\modules\v2\controllers;
 
 use Yii;
 use yii\rest\Controller;
@@ -53,16 +53,16 @@ class PaymentController extends Controller {
         return $actions;
     }
 
+
     /**
      *  Return Payment details
      */
-    public function actionPaymentDetail($id) {
-
-        $model = Payment::find()->where(['payment_uuid' => $id])->with('order')->asArray()->one();
-
-        return $model;
-    }
-
+    // public function actionPaymentDetail($id) {
+    //
+    //     $model = Payment::find()->where(['payment_uuid' => $id])->with('order')->asArray()->one();
+    //
+    //     return $model;
+    // }
 
 
     /**
