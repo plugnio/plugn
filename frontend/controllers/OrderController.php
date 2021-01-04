@@ -212,7 +212,7 @@ class OrderController extends Controller {
 
               if(array_key_exists('message',$response )){
                 $errorMessage =
-                str_replace( array( '\'', '"', ',' , ';', '<', '>' ), ' ', $response['message']); 
+                str_replace( array( '\'', '"', ',' , ';', '<', '>' ), ' ', $response['message']);
 
                 Yii::$app->session->setFlash('errorResponse', json_encode($errorMessage));
 
@@ -256,16 +256,18 @@ class OrderController extends Controller {
 
         } else {
 
-            if ($createDeliveryApiResponse->client)
-                Yii::$app->session->setFlash('errorResponse', "Invalid api key");
-            else if ($createDeliveryApiResponse->data['errors'])
-                Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->data['errors'][0]['description']));
-            else  if ($createDeliveryApiResponse->data)
-               Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->data));
-            else
-               Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse));
+            if ($createDeliveryApiResponse->content){
 
-            Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->data));
+
+              Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->content));
+              Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->content));
+
+            } else {
+
+              Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
+              Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
+
+            }
 
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
         }

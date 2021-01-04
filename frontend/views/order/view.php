@@ -102,24 +102,62 @@ $this->registerJs($js);
 
             if ($model->restaurant->armada_api_key != null && $model->armada_tracking_link == null) {
 
-                if ($difference <= 1  && $model->restaurant_uuid != 'rest_6a55139f-f340-11ea-808a-0673128d0c9c')
-                    echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary mr-1 mb-1', 'style' => 'margin-right: 7px;']);
+                if ($difference <= 1  && $model->restaurant_uuid != 'rest_6a55139f-f340-11ea-808a-0673128d0c9c' && $model->restaurant_uuid != 'rest_5d657108-c91f-11ea-808a-0673128d0c9c'){
+                          echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], [
+                              'class' => 'btn btn-dark mr-1 mb-1',
+                              'style' => 'margin-right: 7px;',
+                              'data' => [
+                                  'confirm' => 'Are you sure you want to request a driver from Armada?',
+                                  'method' => 'post',
+                              ],
+                          ]);
+                }
+
+                if ($model->restaurant_uuid == 'rest_6a55139f-f340-11ea-808a-0673128d0c9c' || $model->restaurant_uuid = 'rest_5d657108-c91f-11ea-808a-0673128d0c9c')  {
+                      echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], [
+                          'class' => 'btn btn-dark mr-1 mb-1',
+                          'style' => 'margin-right: 7px;',
+                          'data' => [
+                              'confirm' => 'Are you sure you want to request a driver from Armada?',
+                              'method' => 'post',
+                          ],
+                      ]);
+                    }
 
 
-                if ($model->restaurant_uuid == 'rest_6a55139f-f340-11ea-808a-0673128d0c9c')
-                    echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-primary mr-1 mb-1', 'style' => 'margin-right: 7px;']);
             }
 
             if ($model->restaurant->mashkor_branch_id != null && $model->mashkor_order_number == null) {
 
-                if ($difference <= 1  && $model->restaurant_uuid != 'rest_1276d589-f41c-11ea-808a-0673128d0c9c' && $model->restaurant_uuid != 'rest_f6bc4e4a-e7c6-11ea-808a-0673128d0c9c' && $model->restaurant_uuid != 'rest_6a55139f-f340-11ea-808a-0673128d0c9c')
-                    echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-info mr-1 mb-1', 'style' => 'margin-right: 7px;']);
+                if ($difference <= 1  &&
+                $model->restaurant_uuid != 'rest_1276d589-f41c-11ea-808a-0673128d0c9c' &&
+                $model->restaurant_uuid != 'rest_5d657108-c91f-11ea-808a-0673128d0c9c' &&
+                $model->restaurant_uuid != 'rest_f6bc4e4a-e7c6-11ea-808a-0673128d0c9c' &&
+                $model->restaurant_uuid != 'rest_6a55139f-f340-11ea-808a-0673128d0c9c'){
+                  echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], [
+                      'class' => 'btn btn-dark mr-1 mb-1',
+                      'style' => 'margin-right: 7px;',
+                      'data' => [
+                          'confirm' => 'Are you sure you want to request a driver from Mashkor?',
+                          'method' => 'post',
+                      ],
+                  ]);
+                }
+
 
                 if ($model->restaurant_uuid == 'rest_1276d589-f41c-11ea-808a-0673128d0c9c' ||
+                        $model->restaurant_uuid == 'rest_5d657108-c91f-11ea-808a-0673128d0c9c' ||
                         $model->restaurant_uuid == 'rest_f6bc4e4a-e7c6-11ea-808a-0673128d0c9c' ||
-                        $model->restaurant_uuid == 'rest_6a55139f-f340-11ea-808a-0673128d0c9c')
-
-                    echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], ['class' => 'btn btn-info mr-1 mb-1', 'style' => 'margin-right: 7px;']);
+                        $model->restaurant_uuid == 'rest_6a55139f-f340-11ea-808a-0673128d0c9c'){
+                          echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], [
+                              'class' => 'btn btn-dark mr-1 mb-1',
+                              'style' => 'margin-right: 7px;',
+                              'data' => [
+                                  'confirm' => 'Are you sure you want to request a driver from Mashkor?',
+                                  'method' => 'post',
+                              ],
+                          ]);
+                        }
             }
         }
         ?>
