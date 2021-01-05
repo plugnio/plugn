@@ -98,7 +98,7 @@ $this->registerJs($js);
               <div class="col-12">
                 <?=
                     $form->field($model, 'country_id')->dropDownList($countryArray, [
-                        'prompt' => 'Choose area name...',
+                        'prompt' => 'Choose country',
                         'class' => 'form-control select2',
                         'multiple' => false,
                         'id' => 'country-id',
