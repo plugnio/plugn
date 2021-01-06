@@ -98,7 +98,7 @@ $this->registerJs($js);
 
         if ($model->order_mode == Order::ORDER_MODE_DELIVERY) {
 
-            if ($model->restaurant->armada_api_key !== null && $model->armada_tracking_link == null) {
+            if ($model->restaurant->armada_api_key != null && $model->armada_tracking_link == null) {
 
                 if (
                     $difference <= 1  &&
