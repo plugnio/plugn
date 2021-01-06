@@ -11,6 +11,7 @@ use common\models\Order;
 use common\models\OrderItem;
 use common\models\CustomerBankDiscount;
 use common\models\OrderItemExtraOption;
+use common\models\AreaDeliveryZone;
 use common\models\Restaurant;
 use common\models\BankDiscount;
 use common\models\Payment;
@@ -73,12 +74,20 @@ class OrderController extends Controller {
 
 
             $order = new Order();
+            $order->setScenario(Order::SCENARIO_OLD_VERSION);
 
             $order->restaurant_uuid = $restaurant_model->restaurant_uuid;
 
             //Save Customer Info
             $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
-            $order->customer_phone_number = strval(Yii::$app->request->getBodyParam("phone_number"));
+            $order->customer_phone_country_code = '965';
+            $order->customer_phone_number = '+' . $order->customer_phone_country_code . strval(Yii::$app->request->getBodyParam("phone_number"));
+
+
+            $order->customer_phone_number = str_replace(' ','',$order->customer_phone_number)
+
+
+
             $order->customer_email = Yii::$app->request->getBodyParam("email"); //optional
             //payment method
             $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
@@ -103,6 +112,10 @@ class OrderController extends Controller {
             //if the order mode = 1 => Delivery
             if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
                 $order->area_id = Yii::$app->request->getBodyParam("area_id");
+
+                if($order->area_id && $areaDeliveryZone = AreaDeliveryZone::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid, 'area_id' =>  $order->area_id])->one())
+                   $order->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
+
                 $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
                 $order->block = Yii::$app->request->getBodyParam("block");
                 $order->street = Yii::$app->request->getBodyParam("street");
@@ -212,7 +225,7 @@ class OrderController extends Controller {
                 if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->restaurantDelivery->min_charge) {
                     $response = [
                         'operation' => 'error',
-                        'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->restaurantDelivery->min_charge, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
+                        'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->restaurantDelivery->min_charge,  '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
                     ];
                 }
 
@@ -295,7 +308,7 @@ class OrderController extends Controller {
                         $order->save(false);
                         $order->updateOrderTotalPrice();
 
-                        Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
+                          Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
 
 
                         // Redirect to payment gateway

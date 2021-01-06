@@ -123,6 +123,7 @@ class Order extends \yii\db\ActiveRecord {
 
 
     const SCENARIO_CREATE_ORDER_BY_ADMIN = 'manual';
+    const SCENARIO_OLD_VERSION = 'old_version';
 
 
     /**
@@ -157,7 +158,7 @@ class Order extends \yii\db\ActiveRecord {
             ]],
 
             [['customer_phone_number'], 'required', 'on' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
-            [['customer_phone_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number'],
+            [['customer_phone_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number',  'except' => self::SCENARIO_OLD_VERSION],
             ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_PARTIALLY_REFUNDED, self::STATUS_CANCELED, self::STATUS_DRAFT, self::STATUS_ABANDONED_CHECKOUT, self::STATUS_ACCEPTED]],
 
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
@@ -583,12 +584,6 @@ class Order extends \yii\db\ActiveRecord {
                     ->send();
         }
 
-
-        if($this->payment_uuid)
-            Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $this->payment_method_name, __METHOD__);
-
-
-
     }
 
     /**
@@ -783,8 +778,12 @@ class Order extends \yii\db\ActiveRecord {
             if ($this->is_order_scheduled)
                 $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($this->scheduled_time_start_from));
             else{
-              $this->estimated_time_of_arrival =
-              date("Y-m-d H:i:s", strtotime('+' . $this->deliveryZone->delivery_time . ' ' . $this->deliveryZone->timeUnit, Yii::$app->formatter->asTimestamp( !$insert  ? date('Y-m-d H:i:s', strtotime($this->order_created_at)) : date('Y-m-d H:i:s')  )));
+
+              if($this->delivery_zone_id){
+                $this->estimated_time_of_arrival =
+                date("Y-m-d H:i:s", strtotime('+' . $this->deliveryZone->delivery_time . ' ' . $this->deliveryZone->timeUnit, Yii::$app->formatter->asTimestamp( !$insert  ? date('Y-m-d H:i:s', strtotime($this->order_created_at)) : date('Y-m-d H:i:s')  )));
+              }
+
             }
 
           } else {
@@ -794,7 +793,7 @@ class Order extends \yii\db\ActiveRecord {
         if($this->orderItems){
           foreach ($this->orderItems as $key => $orderItem) {
 
-            if($orderItem->item->prep_time){
+            if($orderItem->item_uuid && $orderItem->item->prep_time){
               $this->estimated_time_of_arrival = date("c", strtotime('+' . ($orderItem->item->prep_time * $orderItem->qty) . ' ' . $orderItem->item->timeUnit,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
             }
           }
@@ -808,6 +807,11 @@ class Order extends \yii\db\ActiveRecord {
 
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
+
+      if ($this->order_status == self::STATUS_CANCELED) {
+        $this->restockItems();
+      }
+
 
       //Send SMS To customer
       if ($this->customer_phone_country_code == 965 && !$insert && $this->restaurant_uuid != 'rest_7351b2ff-c73d-11ea-808a-0673128d0c9c'  && $this->restaurant_uuid != 'rest_085f7a5f-19db-11eb-b97d-0673128d0c9c' && !$this->sms_sent &&  isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_PENDING && $this->order_status == self::STATUS_ACCEPTED) {
@@ -841,8 +845,12 @@ class Order extends \yii\db\ActiveRecord {
 
 
       if (!$insert &&  $this->order_mode == static::ORDER_MODE_DELIVERY) {
-              $this->country_name = $this->deliveryZone->country->country_name;
-              $this->country_name_ar = $this->deliveryZone->country->country_name_ar;
+
+          if($this->delivery_zone_id){
+            $this->country_name = $this->deliveryZone->country->country_name;
+            $this->country_name_ar = $this->deliveryZone->country->country_name_ar;
+          }
+    
       }
 
 

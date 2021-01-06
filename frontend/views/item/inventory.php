@@ -58,6 +58,13 @@ $this->registerJs($js);
                     },
                 ],
                 [
+                    'label' => 'Item name',
+                    'format' => 'raw',
+                    'value' => function ($item) {
+                        return $item->item_name ;
+                    },
+                ],
+                [
                     'attribute' => 'sku',
                     'format' => 'raw',
                     'value' => function ($item) {
