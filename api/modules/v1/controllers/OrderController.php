@@ -84,7 +84,7 @@ class OrderController extends Controller {
             $order->customer_phone_number = '+' . $order->customer_phone_country_code . strval(Yii::$app->request->getBodyParam("phone_number"));
 
 
-            $order->customer_phone_number = str_replace(' ','',$order->customer_phone_number)
+            $order->customer_phone_number = str_replace(' ','',$order->customer_phone_number);
 
 
 

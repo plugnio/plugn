@@ -76,7 +76,7 @@ $this->registerJs($js);
         ?>
 
         <?php
-        if ($model->restaurant_uuid != 'rest_f6bc4e4a-e7c6-11ea-808a-0673128d0c9c') {
+        if ($model->delivery_zone_id || $model->pickup_location_id) {
             echo Html::a('Delete', ['delete', 'id' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid], [
                 'class' => 'btn btn-danger mr-1 mb-1',
                 'data' => [

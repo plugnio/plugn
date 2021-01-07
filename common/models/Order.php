@@ -808,27 +808,22 @@ class Order extends \yii\db\ActiveRecord {
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-      if ($this->order_status == self::STATUS_CANCELED) {
-        $this->restockItems();
-      }
+        //Send SMS To customer
+        if ($this->customer_phone_country_code == 965 && !$insert && $this->restaurant_uuid != 'rest_7351b2ff-c73d-11ea-808a-0673128d0c9c'  && $this->restaurant_uuid != 'rest_085f7a5f-19db-11eb-b97d-0673128d0c9c' && !$this->sms_sent &&  isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_PENDING && $this->order_status == self::STATUS_ACCEPTED) {
 
+          try {
+            $response = Yii::$app->smsComponent->sendSms($this->customer_phone_country_code, str_replace('+' . $this->customer_phone_country_code, '', $this->customer_phone_number), $this->order_uuid);
 
-      //Send SMS To customer
-      if ($this->customer_phone_country_code == 965 && !$insert && $this->restaurant_uuid != 'rest_7351b2ff-c73d-11ea-808a-0673128d0c9c'  && $this->restaurant_uuid != 'rest_085f7a5f-19db-11eb-b97d-0673128d0c9c' && !$this->sms_sent &&  isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_PENDING && $this->order_status == self::STATUS_ACCEPTED) {
+            if(!$response->isOk)
+              Yii::error('Error while Sending SMS' . json_encode($respons->data));
+            else {
+              $this->sms_sent = 1;
+              $this->save(false);
+            }
 
-        try {
-          $response = Yii::$app->smsComponent->sendSms($this->customer_phone_country_code, str_replace('+' . $this->customer_phone_country_code, '', $this->customer_phone_number), $this->order_uuid);
-
-          if(!$response->isOk)
-            Yii::error('Error while Sending SMS' . json_encode($respons->data));
-          else {
-            $this->sms_sent = 1;
-            $this->save(false);
+          } catch (\Exception $err) {
+            Yii::error('Error while Sending SMS.' . json_encode($err));
           }
-
-        } catch (\Exception $err) {
-          Yii::error('Error while Sending SMS.' . json_encode($err));
-        }
 
 
       }
@@ -850,7 +845,7 @@ class Order extends \yii\db\ActiveRecord {
             $this->country_name = $this->deliveryZone->country->country_name;
             $this->country_name_ar = $this->deliveryZone->country->country_name_ar;
           }
-    
+
       }
 
 

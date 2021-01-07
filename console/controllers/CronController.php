@@ -388,21 +388,6 @@ class CronController extends \yii\console\Controller {
 
         }
 
-
-        $orders = Order::find()->all();
-        foreach ($orders as $key => $order) {
-          // if($order->order_mode == Order::ORDER_MODE_DELIVERY && $areaDeliveryZone = AreaDeliveryZone::find()->where(['restaurant_uuid' => $order->restaurant_uuid, 'area_id' =>  $order->area_id])->one())
-          //   $order->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
-
-          // if($order->order_mode == Order::ORDER_MODE_PICK_UP && $order->restaurant_branch_id &&  $businessLocation = BusinessLocation::find()->where(['restaurant_uuid' => $order->restaurant_uuid, 'business_location_name' => $order->restaurantBranch->branch_name_en ]))
-          //     $order->pickup_location_id = $businessLocation->business_location_id;
-
-          $order->customer_phone_number = $order->customer->customer_phone_number;
-
-          if(!$order->save(false))
-            die(var_dump($order->errors));
-
-        }
     }
 
     public function actionSiteStatus(){
