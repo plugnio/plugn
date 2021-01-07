@@ -139,6 +139,7 @@ class OrderController extends Controller {
                         },
                     ],
                     'total_price_before_refund:currency',
+                    'delivery_fee:currency',
                     'order_created_at'
                 ]
             ]);
