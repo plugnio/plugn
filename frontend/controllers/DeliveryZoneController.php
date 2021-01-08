@@ -151,16 +151,7 @@ class DeliveryZoneController extends Controller {
             $delivery_zone_model->country_id = $countryId;
 
 
-        if ($delivery_zone_model->load(Yii::$app->request->post())) {
-
-          $storeDeliveryZones = $store_model->getDeliveryZonesForSpecificCountry($delivery_zone_model->country_id);
-
-          if($storeDeliveryZones->exists() && $store_model->getAreaDeliveryZonesForSpecificCountry($delivery_zone_model->country_id)->count() == 0){
-            Yii::$app->session->setFlash('errorResponse', "Cant add another zone1"); //TODO
-            $this->redirect(['index', 'storeUuid' => $storeUuid, 'businessLocationId' => $businessLocationId]);
-          }
-
-          if( $delivery_zone_model->save()){
+        if ($delivery_zone_model->load(Yii::$app->request->post()) && $delivery_zone_model->save()) {
 
 
             if($delivery_zone_model->country->getAreas()->count() > 0){
@@ -183,9 +174,6 @@ class DeliveryZoneController extends Controller {
               $this->redirect(['index', 'storeUuid' => $storeUuid, 'businessLocationId' => $businessLocationId]);
             }
 
-
-
-          }
         }
 
         return $this->render('create', [

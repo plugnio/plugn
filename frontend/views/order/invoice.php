@@ -52,8 +52,6 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                     <p>
                         <?= $model->payment_method_name ?>
                     </p>
-                    <h6 class="mt-2">When</h6>
-                    <p>  <?= $model->is_order_scheduled ? 'Scheduled' : 'As soon as possible'; ?> </p>
 
                     <h6 class="mt-2">Shipping address</h6>
                       <span style="display: block; margin-bottom:3px" >
@@ -83,6 +81,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                       <span style="display: block" >
                         <?= $model->area_id ?  $model->customer_phone_number :  '' ?>
                       </span>
+
                 </div>
 
             </div>
@@ -96,25 +95,6 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                     <p>
                         <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy h:mm a') ?>
                     </p>
-
-
-
-
-                    <?php if ($model->order_mode == Order::ORDER_MODE_PICK_UP) { ?>
-
-                        <h6 class="mt-2">Type</h6>
-                        <p>  Pick up </p>
-
-                    <?php } else { ?>
-                        <h6 class="mt-2">Type</h6>
-                        <p>  Delivery </p>
-                    <?php } ?>
-
-                    <h6 class="mt-2">Expected at</h6>
-                    <p>
-                        <?= \Yii::$app->formatter->asDatetime($model->estimated_time_of_arrival, 'MMM dd, yyyy h:mm a') ?>
-                    </p>
-
 
                 </div>
 

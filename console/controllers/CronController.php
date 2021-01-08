@@ -232,11 +232,10 @@ class CronController extends \yii\console\Controller {
 
 
     public function actionIndex(){
-        $restaurants = Restaurant::find()->all();
-
+        $restaurants = Restaurant::find()->where(['IS NOT', 'phone_number', null])->all();
 
         foreach ($restaurants as  $restaurant) {
-          if($restaurant){
+          if($restaurant && $restaurant->phone_number){
 
             $restaurant->phone_number = "+965" . $restaurant->phone_number;
             $restaurant->owner_number = "+965" . $restaurant->owner_number;
@@ -312,6 +311,9 @@ class CronController extends \yii\console\Controller {
         $stores = Restaurant::find()->all();
         foreach ($stores as $key => $store) {
 
+
+
+
           if( $deliveryZones = $store->getRestaurantDeliveryAreas()->all()  ){
 
 
@@ -385,6 +387,28 @@ class CronController extends \yii\console\Controller {
 
 
           }
+
+
+
+          foreach ($store->getOrders()->all() as $key => $order) {
+
+            if($order->order_mode == 1 && $areaDeliveryArea = $store->getAreaDeliveryZones()->where(['area_id' => $order->area_id])->one()){
+              $order->delivery_zone_id = $areaDeliveryArea->delivery_zone_id;
+            }
+
+
+            if($order->order_mode == 2 && $order->restaurant_branch_id && $businessLocation = $store->getBusinessLocations()->where(['business_location_name' => $order->restaurantBranch->branch_name_en])->one()){
+              $order->pickup_location_id = $businessLocation->business_location_id;
+            }
+
+            $order->customer_phone_number = '+965' . $order->customer_phone_number;
+
+
+            $order->save(false);
+
+
+          }
+
 
         }
 
