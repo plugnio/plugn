@@ -307,14 +307,22 @@ class OrderController extends Controller {
      * @param type $status
      * @return type
      */
-    public function actionChangeOrderStatus($order_uuid, $storeUuid, $status) {
-        $order_model = $this->findModel($order_uuid, $storeUuid);
+     public function actionChangeOrderStatus($order_uuid, $storeUuid, $status) {
+         $order_model = $this->findModel($order_uuid, $storeUuid);
 
-        $order_model->order_status = $status;
-        $order_model->save(false);
+         $previousOrderStatus =  $order_model->order_status;
 
-        return $this->redirect(['view', 'id' => $order_model->order_uuid, 'storeUuid' => $storeUuid]);
-    }
+         $order_model->order_status = $status;
+         
+         if($order_model->save(false)){
+
+           if($previousOrderStatus == Order::STATUS_DRAFT && $order_model->order_status == Order::STATUS_PENDING){
+             $order_model->sendPaymentConfirmationEmail();
+           }
+         }
+
+         return $this->redirect(['view', 'id' => $order_model->order_uuid, 'storeUuid' => $storeUuid]);
+     }
 
     /**
      * Change order status
