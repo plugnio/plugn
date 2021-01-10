@@ -59,7 +59,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                          ]
                                      ])->label('Phone Number *');
                                ?>
-                                <?= $form->field($store_model, 'name')->textInput(['maxlength' => true])->label('Your phone number *') ?>
+
+                               <?= $form->field($store_model, 'name')->textInput(['maxlength' => true])->label('Your store name *') ?>
 
 
                                 <?=

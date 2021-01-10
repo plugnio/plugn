@@ -15,6 +15,7 @@ use frontend\models\OrderSearch;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use common\models\Agent;
+use common\models\BusinessLocation;
 use common\models\Restaurant;
 use common\models\OrderItem;
 use common\models\Category;
@@ -1204,6 +1205,21 @@ class SiteController extends Controller {
 
             if ($agent_model->validate() && $store_model->validate() && $store_model->save() && $agent_model->save()) {
 
+
+                //Create a catrgory for a store by default named "Products". so they can get started adding products without having to add category first
+                $category_model = new Category();
+                $category_model->restaurant_uuid = $store_model->restaurant_uuid;
+                $category_model->title = 'Products';
+                $category_model->title_ar = 'منتجات';
+                $category_model->save();
+
+                //Create a business Location for a store by default named "Main Branch".
+                $business_location_model = new BusinessLocation();
+                $business_location_model->restaurant_uuid = $store_model->restaurant_uuid;
+                $business_location_model->country_id = $store_model->country_id;
+                $business_location_model->business_location_name = 'Main Branch';
+                $business_location_model->business_location_name_ar = 'الفرع الرئيسي';
+                $business_location_model->save();
 
                 //Create a catrgory for a store by default named "Products". so they can get started adding products without having to add category first
                 $category_model = new Category();

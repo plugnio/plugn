@@ -67,6 +67,9 @@ class CronController extends \yii\console\Controller {
 
 
       }
+
+      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
+      return self::EXIT_CODE_NORMAL;
     }
 
     public function actionKsa(){
@@ -99,6 +102,9 @@ class CronController extends \yii\console\Controller {
 
 
       }
+
+      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
+      return self::EXIT_CODE_NORMAL;
     }
 
     public function actionEgypt(){
@@ -132,6 +138,9 @@ class CronController extends \yii\console\Controller {
 
 
       }
+
+      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
+      return self::EXIT_CODE_NORMAL;
     }
 
     public function actionBahrain(){
@@ -164,6 +173,9 @@ class CronController extends \yii\console\Controller {
 
 
       }
+
+      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
+      return self::EXIT_CODE_NORMAL;
     }
 
     public function actionUae(){
@@ -196,6 +208,9 @@ class CronController extends \yii\console\Controller {
 
 
       }
+
+      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
+      return self::EXIT_CODE_NORMAL;
     }
 
     public function actionOman(){
@@ -228,6 +243,9 @@ class CronController extends \yii\console\Controller {
 
 
       }
+
+      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
+      return self::EXIT_CODE_NORMAL;
     }
 
 
@@ -412,6 +430,9 @@ class CronController extends \yii\console\Controller {
 
         }
 
+        $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
+        return self::EXIT_CODE_NORMAL;
+
     }
 
     public function actionSiteStatus(){
@@ -449,6 +470,9 @@ class CronController extends \yii\console\Controller {
               }
 
             }
+
+            $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
+            return self::EXIT_CODE_NORMAL;
         }
 
 
@@ -1037,8 +1061,8 @@ export const environment = {
 
         fclose($myfile);
 
-        // $queue->queue_status = Queue::QUEUE_STATUS_COMPLETE;
-        // $queue->save(false);
+        $queue->queue_status = Queue::QUEUE_STATUS_COMPLETE;
+        $queue->save(false);
 
         $this->stdout("File has been created! \n", Console::FG_RED, Console::BOLD);
       }

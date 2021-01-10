@@ -472,14 +472,6 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 )
                                 ?>
                             </li>
-                            <li class=" nav-item <?= $this->context->route == 'restaurant-branch/index' ? 'active' : '' ?> ">
-                                <?=
-                                Html::a(
-                                        Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', "Store's Branches"), ['restaurant-branch/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
-                                )
-                                ?>
-                            </li>
                             <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
                                 <li class=" nav-item <?= $this->context->route == 'agent-assignment/index' ? 'active' : '' ?> ">
 

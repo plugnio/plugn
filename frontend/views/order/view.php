@@ -681,7 +681,7 @@ DetailView::widget([
                             "value" => function($model) {
                                 return $model->customer_email;
                             },
-                            'visible' => $model->customer_email !== null,
+                            'visible' => $model->customer_email != null && $model->customer_email,
                         ],
                         [
                             'attribute' => 'order_mode',
