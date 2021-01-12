@@ -30,6 +30,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
   * @property string|null $logo
   * @property int|null $support_delivery
   * @property int|null $support_pick_up
+  * @property int|null $hide_request_driver_button // hide requerst driver button if the order is scheduled
   * @property string|null $phone_number
   * @property string|null $phone_number_country_code
   * @property string $restaurant_email
@@ -222,7 +223,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_domain'], 'string',  'min' => 3, 'max' => 20, 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png, pdf', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
-            [['restaurant_status', 'support_delivery', 'support_pick_up'], 'integer', 'min' => 0],
+            [['restaurant_status', 'support_delivery', 'support_pick_up', 'hide_request_driver_button'], 'integer', 'min' => 0],
             [['schedule_interval'], 'integer', 'min' => 5],
             ['restaurant_status', 'in', 'range' => [self::RESTAURANT_STATUS_OPEN, self::RESTAURANT_STATUS_BUSY, self::RESTAURANT_STATUS_CLOSED]],
             ['store_layout', 'in', 'range' => [self::STORE_LAYOUT_LIST_FULLWIDTH, self::STORE_LAYOUT_GRID_FULLWIDTH, self::STORE_LAYOUT_CATEGORY_FULLWIDTH, self::STORE_LAYOUT_LIST_HALFWIDTH, self::STORE_LAYOUT_GRID_HALFWIDTH, self::STORE_LAYOUT_CATEGORY_HALFWIDTH]],
@@ -278,6 +279,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             'restaurant_logo' => 'Logo',
             'support_delivery' => 'Support Delivery',
             'support_pick_up' => 'Support Pick Up',
+            'hide_request_driver_button' => 'Hide request driver button',
             'restaurant_delivery_area' => 'Delivery Areas',
             'export_orders_data_in_specific_date_range' => 'Export orders data in a specific date range',
             'export_sold_items_data_in_specific_date_range' => 'Export sold items data in a specific date range',

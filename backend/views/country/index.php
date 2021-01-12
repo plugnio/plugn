@@ -28,7 +28,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'country_name',
             'iso',
-            'iso3',
             'country_code',
 
             ['class' => 'yii\grid\ActionColumn'],

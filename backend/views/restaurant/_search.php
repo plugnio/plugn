@@ -17,14 +17,6 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'restaurant_uuid') ?>
 
-    <?= $form->field($model, 'agent_id') ?>
-
-    <?= $form->field($model, 'name') ?>
-
-    <?= $form->field($model, 'name_ar') ?>
-
-    <?= $form->field($model, 'tagline') ?>
-
     <?php // echo $form->field($model, 'tagline_ar') ?>
 
     <?php // echo $form->field($model, 'status') ?>
@@ -49,7 +41,8 @@ use yii\widgets\ActiveForm;
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton('Reset', ['class' => 'btn btn-outline-secondary']) ?>
+          <?= Html::a('Reset', ['index'], ['class' => 'btn btn-default']) ?>
+
     </div>
 
     <?php ActiveForm::end(); ?>

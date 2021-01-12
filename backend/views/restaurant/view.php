@@ -21,54 +21,53 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= $model->status ?>
         </span>
         <?= $model->is_tap_enable ? '' : Html::a('Create Tap account', ['create-tap-account', 'restaurant_uuid' => $model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
-        <?=
-        Html::a('Send store data to Tap', ['send-email-to-tap', 'id' => $model->restaurant_uuid], [
-            'class' => 'btn btn-warning',
-            'data' => [
-                'confirm' => 'Are you sure you want to send an email to Tap?',
-                'method' => 'post',
-            ],
-        ])
-        ?>
+
 
     </h1>
 
 
     <p>
+        <?= Html::a('Create BuildJs file', ['create-build-js-file', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>
+        <?=
+          Html::a($model->hide_request_driver_button == 1 ? 'Display request driver button' : 'Hide request driver button',
+          [
+            $model->hide_request_driver_button == 1 ?  'display-request-driver-button' : 'hide-request-driver-button'
+         , 'id' => $model->restaurant_uuid], ['class' => $model->hide_request_driver_button == 0 ? 'btn btn-success' : 'btn btn-danger'])
+         ?>
         <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
         <?=
         Html::a('Delete', ['delete', 'id' => $model->restaurant_uuid], [
             'class' => 'btn btn-danger',
             'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
+                'confirm' => 'Are you sure you want to delete this store?',
                 'method' => 'post',
             ],
         ])
         ?>
 
-        <?php if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_OPEN) { ?>
-            <?=
-            Html::a('Open', ['promote-to-open', 'id' => $model->restaurant_uuid], [
-                'class' => 'btn btn-success',
-                'data' => [
-                    'confirm' => 'Are you sure you want to change store status to open?',
-                    'method' => 'post',
-                ],
-            ])
-            ?>
-        <?php } ?>
-
-        <?php if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_BUSY) { ?>
-            <?=
-            Html::a('Busy', ['promote-to-busy', 'id' => $model->restaurant_uuid], [
-                'class' => 'btn btn-warning',
-                'data' => [
-                    'confirm' => 'Are you sure you want to change store status to busy?',
-                    'method' => 'post',
-                ],
-            ])
-            ?>
-        <?php } ?>
+        <?php
+        // if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_OPEN) {
+        //
+        //     echo Html::a('Open', ['promote-to-open', 'id' => $model->restaurant_uuid], [
+        //         'class' => 'btn btn-success',
+        //         'data' => [
+        //             'confirm' => 'Are you sure you want to change store status to open?',
+        //             'method' => 'post',
+        //         ],
+        //     ])
+        //    }
+        //
+        //  if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_BUSY) {
+        //     echo Html::a('Busy', ['promote-to-busy', 'id' => $model->restaurant_uuid], [
+        //         'class' => 'btn btn-warning',
+        //         'data' => [
+        //             'confirm' => 'Are you sure you want to change store status to busy?',
+        //             'method' => 'post',
+        //         ],
+        //     ])
+        //
+        // }
+         ?>
 
     </p>
 
@@ -81,6 +80,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label' => 'Store currency',
                 'value' => function ($data) {
                   return $data->currency->title;
+                }
+            ],
+            [
+                'label' => 'Hide Request driver button',
+                'value' => function ($data) {
+                  return $data->hide_request_driver_button  == 1 ? 'Yes' : 'No';
                 }
             ],
             'restaurant_uuid',
@@ -150,7 +155,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'restaurant_created_at',
             'restaurant_updated_at',
             'platform_fee:percent',
-            'facebook_pixil_id',  
+            'facebook_pixil_id',
             'google_analytics_id',
             [
               'attribute' => 'Owner name',

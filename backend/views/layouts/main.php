@@ -44,10 +44,12 @@ AppAsset::register($this);
     } else {
         $menuItems = [
 
-            ['label' => 'Agents', 'url' => ['/agent/index']],
-
-            ['label' => 'Agent Assignment', 'url' => ['/agent-assignment/index']],
-            ['label' => 'Restaurants', 'url' => ['/restaurant/index']],
+            // ['label' => 'Agents', 'url' => ['/agent/index']],
+            //
+            // ['label' => 'Agent Assignment', 'url' => ['/agent-assignment/index']],
+            // ['label' => 'Restaurants', 'url' => ['/restaurant/index']],
+            ['label' => 'Queue', 'url' => ['/queue/index']],
+            ['label' => 'Tap Queue', 'url' => ['/tap-queue/index']],
 
             ['label' => 'Subscription', 'url' => ['/subscription/index']],
 
@@ -63,8 +65,7 @@ AppAsset::register($this);
                   ['label' => 'Payments Method', 'url' => ['/payment-method/index']],
                   ['label' => 'Plans', 'url' => ['/plan/index']],
                   ['label' => 'Bank', 'url' => ['/bank/index']],
-                  ['label' => 'Queue', 'url' => ['/queue/index']],
-                  ['label' => 'Tap Queue', 'url' => ['/tap-queue/index']],
+
                   ['label' => 'Admins', 'url' => ['/admin/index']],
 
                 ],

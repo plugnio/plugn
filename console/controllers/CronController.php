@@ -329,7 +329,16 @@ class CronController extends \yii\console\Controller {
         $stores = Restaurant::find()->all();
         foreach ($stores as $key => $store) {
 
-
+          if(
+            $store->restaurant_uuid == 'rest_6a55139f-f340-11ea-808a-0673128d0c9c' ||
+            $store->restaurant_uuid == 'rest_1276d589-f41c-11ea-808a-0673128d0c9c' ||
+            $store->restaurant_uuid == 'rest_aa69124d-2346-11eb-b97d-0673128d0c9c' ||
+            $store->restaurant_uuid == 'rest_f6bc4e4a-e7c6-11ea-808a-0673128d0c9c' ||
+            $store->restaurant_uuid == 'rest_5d657108-c91f-11ea-808a-0673128d0c9c'
+          ){
+            $store->hide_request_driver_button = 0;
+            $store->save(false);
+          }
 
 
           if( $deliveryZones = $store->getRestaurantDeliveryAreas()->all()  ){

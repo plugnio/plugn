@@ -48,7 +48,7 @@ class RestaurantSearch extends Restaurant
      */
     public function search($params)
     {
-        $query = Restaurant::find()->joinWith(['country', 'currency']);
+        $query = Restaurant::find()->joinWith(['country', 'currency'])->orderBy(['restaurant_created_at' => SORT_DESC]);
 
         // add conditions that should always apply here
 
