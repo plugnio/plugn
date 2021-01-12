@@ -135,6 +135,7 @@ $this->registerJs($js);
 
                 if ($difference <= 1  &&
                 $model->restaurant_uuid != 'rest_1276d589-f41c-11ea-808a-0673128d0c9c' &&
+                $model->restaurant_uuid != 'rest_aa69124d-2346-11eb-b97d-0673128d0c9c' &&
                 $model->restaurant_uuid != 'rest_5d657108-c91f-11ea-808a-0673128d0c9c' &&
                 $model->restaurant_uuid != 'rest_f6bc4e4a-e7c6-11ea-808a-0673128d0c9c' &&
                 $model->restaurant_uuid != 'rest_6a55139f-f340-11ea-808a-0673128d0c9c'){
@@ -151,6 +152,7 @@ $this->registerJs($js);
 
                 if ($model->restaurant_uuid == 'rest_1276d589-f41c-11ea-808a-0673128d0c9c' ||
                         $model->restaurant_uuid == 'rest_5d657108-c91f-11ea-808a-0673128d0c9c' ||
+                        $model->restaurant_uuid == 'rest_aa69124d-2346-11eb-b97d-0673128d0c9c' ||
                         $model->restaurant_uuid == 'rest_f6bc4e4a-e7c6-11ea-808a-0673128d0c9c' ||
                         $model->restaurant_uuid == 'rest_6a55139f-f340-11ea-808a-0673128d0c9c'){
                           echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], [
