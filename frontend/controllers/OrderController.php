@@ -314,7 +314,7 @@ class OrderController extends Controller {
      * @param type $status
      * @return type
      */
-     public function actionChangeOrderStatus($order_uuid, $storeUuid, $status) {
+     public function actionChangeOrderStatus($order_uuid, $storeUuid, $status, $redirect = null) {
          $order_model = $this->findModel($order_uuid, $storeUuid);
 
          $previousOrderStatus =  $order_model->order_status;
@@ -328,7 +328,11 @@ class OrderController extends Controller {
            }
          }
 
-         return $this->redirect(['view', 'id' => $order_model->order_uuid, 'storeUuid' => $storeUuid]);
+         if($redirect)
+          return $this->redirect(['index', 'storeUuid' => $storeUuid]);
+
+         else
+            return $this->redirect(['view', 'id' => $order_model->order_uuid, 'storeUuid' => $storeUuid]);
      }
 
     /**

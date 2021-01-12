@@ -108,13 +108,13 @@ $this->registerJs($js);
                     }
                 ],
 
-                [
-                    'label' => 'When',
-                    'format' => 'raw',
-                    'value' => function ($data) {
-                        return $data->is_order_scheduled ? 'Scheduled' : 'As soon as possible';
-                    },
-                ],
+                // [
+                //     'label' => 'When',
+                //     'format' => 'raw',
+                //     'value' => function ($data) {
+                //         return $data->is_order_scheduled ? 'Scheduled' : 'As soon as possible';
+                //     },
+                // ],
                 [
                     'attribute' => 'order_status',
                     "format" => "raw",
@@ -153,6 +153,79 @@ $this->registerJs($js);
                     "value" => function($data) {
                             return Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code);
                     },
+                ],
+                [
+                    'header' => 'Action',
+                    'class' => 'yii\grid\ActionColumn',
+                    'template' => ' {update-order-status}' ,
+                    'buttons' => [
+                        'update-order-status' => function ($url, $model) {
+
+                          if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Order::STATUS_ABANDONED_CHECKOUT || $model->order_status == Order::STATUS_CANCELED ) && $model->getOrderItems()->count()) {
+                              return Html::a('Mark as pending', [
+                                  'change-order-status',
+                                  'order_uuid' => $model->order_uuid,
+                                  'storeUuid' => $model->restaurant_uuid,
+                                  'status' => Order::STATUS_PENDING,
+                                  'redirect' =>'index'
+
+                                      ], [
+                                  'style' => 'margin-right: 10px;',
+                                  'class' => ' mb-1  btn btn-warning',
+                                  'data' => [
+                                      'confirm' => 'Are you sure you want to mark it as pending?',
+                                      'method' => 'post',
+                                  ]
+                              ]);
+                          } else if ($model->order_status == Order::STATUS_PENDING) {
+                              return Html::a('Accept order', [
+                                  'change-order-status',
+                                  'order_uuid' => $model->order_uuid,
+                                  'storeUuid' => $model->restaurant_uuid,
+                                  'status' => Order::STATUS_ACCEPTED,
+                                  'redirect' =>'index'
+                                      ], [
+                                  'style' => 'margin-right: 10px; color: white; background-color: #2898C8',
+                                  'class' => ' mb-1  btn',
+                              ]);
+                          } else if ($model->order_status == Order::STATUS_ACCEPTED) {
+                              return Html::a('Being Prepared', [
+                                  'change-order-status',
+                                  'order_uuid' => $model->order_uuid,
+                                  'storeUuid' => $model->restaurant_uuid,
+                                  'status' => Order::STATUS_BEING_PREPARED,
+                                  'redirect' =>'index'
+                                      ], [
+                                  'style' => 'margin-right: 10px;',
+                                  'class' => ' mb-1  btn btn-primary',
+                              ]);
+                          } else if ($model->order_status == Order::STATUS_BEING_PREPARED) {
+                              return Html::a('Out for Delivery', [
+                                  'change-order-status',
+                                  'order_uuid' => $model->order_uuid,
+                                  'storeUuid' => $model->restaurant_uuid,
+                                  'status' => Order::STATUS_OUT_FOR_DELIVERY,
+                                  'redirect' =>'index'
+                                      ], [
+                                  'style' => 'margin-right: 10px;',
+                                  'class' => ' mb-1  btn btn-info',
+                              ]);
+                          } else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY) {
+                              return Html::a('Mark as Complete', [
+                                  'change-order-status',
+                                  'order_uuid' => $model->order_uuid,
+                                  'storeUuid' => $model->restaurant_uuid,
+                                  'status' => Order::STATUS_COMPLETE,
+                                  'redirect' =>'index'
+                                      ], [
+                                  'style' => 'margin-right: 10px;',
+                                  'class' => ' mb-1  btn btn-success',
+                              ]);
+                          }
+
+
+                        },
+                    ],
                 ],
             ],
             'layout' => '{summary}{items}{pager}',

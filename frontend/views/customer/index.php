@@ -69,7 +69,12 @@ $this->registerJs($js);
                       'label' => 'Number of orders',
                       "format" => "raw",
                       "value" => function($model) {
-                          return  $model->getOrders()->count();
+                          return  $model->getOrders()
+                          ->where(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
+                          ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                          ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                          ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                          ->count();
                       }
                   ],
                   [
@@ -83,7 +88,7 @@ $this->registerJs($js);
                                         ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
                                         ->sum('total_price');
 
-                          return  Yii::$app->formatter->asCurrency($total_spent, $model->currency->code) ;
+                          return  Yii::$app->formatter->asCurrency($total_spent ? $total_spent : 0, $model->currency->code) ;
                       }
                   ],
                   [
