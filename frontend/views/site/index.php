@@ -469,7 +469,7 @@ $this->registerJs($js);
                     <div>
                         <h3><span>Strengthen your brand with a custom domain</span></h3>
                     </div>
-                    <p>Your current domain is <?= $restaurant_model->restaurant_domain ?> but you can add a custom domain to help customers find your online store.</p>
+                    <p>Your current domain is <a target="_blank" href="<?= $restaurant_model->restaurant_domain ?>"> <?= $restaurant_model->restaurant_domain ?> </a> but you can add a custom domain to help customers find your online store.</p>
                     <div>
                         <div>
                             <div>

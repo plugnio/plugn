@@ -536,7 +536,6 @@ class Order extends \yii\db\ActiveRecord {
 
     public function sendPaymentConfirmationEmail() {
 
-
         if ($this->customer_email) {
 
             \Yii::$app->mailer->compose([

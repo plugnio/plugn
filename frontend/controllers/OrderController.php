@@ -141,6 +141,12 @@ class OrderController extends Controller {
                                 return Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code);
                         },
                     ],
+                    [
+                        'attribute' => 'delivery_fee',
+                        "value" => function($data) {
+                                return Yii::$app->formatter->asCurrency($data->delivery_fee, $data->currency->code);
+                        },
+                    ],
                     'order_created_at'
                 ]
             ]);
@@ -210,14 +216,21 @@ class OrderController extends Controller {
 
         } else {
 
-            if ($createDeliveryApiResponse->client)
-                Yii::$app->session->setFlash('errorResponse', "Invalid api key");
-            else if ($createDeliveryApiResponse->data['errors'])
-                Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->data['errors'][0]['description']));
-            else  if ($createDeliveryApiResponse->data)
-               Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->data));
+           if ($response = $createDeliveryApiResponse->data){
+
+              if(array_key_exists('message',$response )){
+                $errorMessage =
+                str_replace( array( '\'', '"', ',' , ';', '<', '>' ), ' ', $response['message']);
+
+                Yii::$app->session->setFlash('errorResponse', json_encode($errorMessage));
+
+              }
+              else
+                Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->data));
+
+            }
             else
-               Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse));
+               Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
 
             Yii::error('Error while requesting driver from Mashkor  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->data));
 
@@ -251,16 +264,18 @@ class OrderController extends Controller {
 
         } else {
 
-            if ($createDeliveryApiResponse->client)
-                Yii::$app->session->setFlash('errorResponse', "Invalid api key");
-            else if ($createDeliveryApiResponse->data['errors'])
-                Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->data['errors'][0]['description']));
-            else  if ($createDeliveryApiResponse->data)
-               Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->data));
-            else
-               Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse));
+            if ($createDeliveryApiResponse->content){
 
-            Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->data));
+
+              Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->content));
+              Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->content));
+
+            } else {
+
+              Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
+              Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
+
+            }
 
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
         }
@@ -299,14 +314,22 @@ class OrderController extends Controller {
      * @param type $status
      * @return type
      */
-    public function actionChangeOrderStatus($order_uuid, $storeUuid, $status) {
-        $order_model = $this->findModel($order_uuid, $storeUuid);
+     public function actionChangeOrderStatus($order_uuid, $storeUuid, $status) {
+         $order_model = $this->findModel($order_uuid, $storeUuid);
 
-        $order_model->order_status = $status;
-        $order_model->save(false);
+         $previousOrderStatus =  $order_model->order_status;
 
-        return $this->redirect(['view', 'id' => $order_model->order_uuid, 'storeUuid' => $storeUuid]);
-    }
+         $order_model->order_status = $status;
+
+         if($order_model->save(false)){
+
+           if($previousOrderStatus == Order::STATUS_DRAFT && $order_model->order_status == Order::STATUS_PENDING){
+             $order_model->sendPaymentConfirmationEmail();
+           }
+         }
+
+         return $this->redirect(['view', 'id' => $order_model->order_uuid, 'storeUuid' => $storeUuid]);
+     }
 
     /**
      * Change order status
