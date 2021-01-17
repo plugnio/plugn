@@ -706,16 +706,12 @@ class Order extends \yii\db\ActiveRecord {
     public function calculateOrderTotalPrice() {
         $totalPrice = $this->calculateOrderItemsTotalPrice();
 
-        if($this->voucher){
+        if($this->voucher && $totalPrice > 0){
           $discountAmount = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->voucher->discount_amount /100)) : $this->voucher->discount_amount;
-
-          Yii::error('[$discountAmount]' . json_encode($discountAmount), __METHOD__);
-          Yii::error('[$totalPrice]' . json_encode($totalPrice), __METHOD__);
-
           $totalPrice -= $discountAmount ;
         }
 
-        else if($this->bank_discount_id && $this->bankDiscount->minimum_order_amount <= $totalPrice){
+        else if($this->bank_discount_id && $this->bankDiscount->minimum_order_amount <= $totalPrice && $totalPrice > 0){
           $discountAmount = $this->bankDiscount->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->bankDiscount->discount_amount /100)) : $this->bankDiscount->discount_amount;
           $totalPrice -= $discountAmount ;
         }
