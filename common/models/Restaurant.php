@@ -236,7 +236,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['instagram_url'], 'url'],
             [['export_orders_data_in_specific_date_range','export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'site_id'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'app_id', 'armada_api_key', 'mashkor_branch_id', 'store_branch_name', 'live_public_key', 'test_public_key', 'company_name'], 'string', 'max' => 255],
-            [['phone_number'], 'string', 'min' => 5, 'max' => 15],
+            [['phone_number'], 'string', 'min' => 5, 'max' => 20],
 
             [['live_public_key', 'test_public_key'], 'default', 'value' => null],
             [['phone_number', 'owner_number'], 'integer', 'min' => 0],

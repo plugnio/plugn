@@ -88,7 +88,9 @@ $this->registerJs($js);
                                         ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
                                         ->sum('total_price');
 
+                          $total_spent = \Yii::$app->formatter->asDecimal($total_spent ? $total_spent : 0 , 3);
                           return  Yii::$app->formatter->asCurrency($total_spent ? $total_spent : 0, $model->currency->code) ;
+
                       }
                   ],
                   [

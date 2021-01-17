@@ -207,7 +207,7 @@ class Order extends \yii\db\ActiveRecord {
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['order_mode', 'validateOrderMode'],
             [['restaurant_uuid'], 'string', 'max' => 60],
-            [['customer_phone_number'], 'string', 'min' => 6, 'max' => 15],
+            [['customer_phone_number'], 'string', 'min' => 6, 'max' => 20],
             [['customer_phone_number'], 'number'],
             [['total_price', 'total_price_before_refund', 'delivery_fee', 'subtotal', 'subtotal_before_refund', 'tax'], 'number', 'min' => 0],
             ['subtotal', 'validateMinCharge', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN, 'when' => function($model) {
@@ -708,6 +708,9 @@ class Order extends \yii\db\ActiveRecord {
 
         if($this->voucher){
           $discountAmount = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->voucher->discount_amount /100)) : $this->voucher->discount_amount;
+
+          Yii::error('[$discountAmount]' . json_encode($discountAmount), __METHOD__);
+
           $totalPrice -= $discountAmount ;
         }
 
