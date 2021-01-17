@@ -710,6 +710,7 @@ class Order extends \yii\db\ActiveRecord {
           $discountAmount = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->voucher->discount_amount /100)) : $this->voucher->discount_amount;
 
           Yii::error('[$discountAmount]' . json_encode($discountAmount), __METHOD__);
+          Yii::error('[$totalPrice]' . json_encode($totalPrice), __METHOD__);
 
           $totalPrice -= $discountAmount ;
         }
