@@ -62,8 +62,7 @@ class Voucher extends \yii\db\ActiveRecord {
             ['discount_amount', 'required', 'when' => function($model) {
                return $model->discount_type != self::DISCOUNT_TYPE_FREE_DELIVERY;
            }],
-            [['discount_type', 'voucher_status', 'max_redemption', 'limit_per_customer'], 'integer'],
-            [['minimum_order_amount'], 'number'],
+            [['discount_type', 'voucher_status', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'integer'],
             [['valid_from', 'valid_until', 'duration'], 'safe'],
             ['discount_type', 'in', 'range' => [self::DISCOUNT_TYPE_PERCENTAGE, self::DISCOUNT_TYPE_AMOUNT, self::DISCOUNT_TYPE_FREE_DELIVERY]],
             ['voucher_status', 'in', 'range' => [self::VOUCHER_STATUS_ACTIVE, self::VOUCHER_STATUS_EXPIRED]],
