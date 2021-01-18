@@ -171,7 +171,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                     ?>
                                     <tr>
                                         <th>Voucher Discount</th>
-                                        <td>-<?= Yii::$app->formatter->asCurrency($voucherDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                                        <td><?= Yii::$app->formatter->asCurrency($voucherDiscount, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                                     </tr>
                                     <tr>
                                         <th>Subtotal After Voucher</th>
@@ -222,7 +222,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                             </tr>
                           <?php } ?>
                             <tr>
-                                <th>TOTAL</th>
+                                <th>Total Price</th>
                                 <td><?= Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
                             </tr>
                             </tbody>

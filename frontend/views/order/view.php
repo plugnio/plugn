@@ -810,16 +810,14 @@ DetailView::widget([
                             'label' => 'City',
                             'value' => function ($data) {
                                 return  $data->area_id ? $data->area->city->city_name : $data->city;
-                            },
-                            'visible' => !$model->pickup_location_id,
+                            }
                         ],
                         [
                             'label' => 'Country',
                             'format' => 'html',
                             'value' => function ($data) {
-                                return  $data->country_name;
-                            },
-                            'visible' => !$model->pickup_location_id,
+                                return  $data->country_name ? $data->country_name  : $data->deliveryZone->country->country_name;
+                            }
                         ],
                         [
                             'label' => 'Pickup from',

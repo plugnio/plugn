@@ -1223,12 +1223,6 @@ class SiteController extends Controller {
                 $business_location_model->business_location_name_ar = 'الفرع الرئيسي';
                 $business_location_model->save();
 
-                //Create a catrgory for a store by default named "Products". so they can get started adding products without having to add category first
-                $category_model = new Category();
-                $category_model->restaurant_uuid = $store_model->restaurant_uuid;
-                $category_model->title = 'Products';
-                $category_model->title_ar = 'منتجات';
-                $category_model->save();
 
                 $assignment_agent_model = new AgentAssignment();
                 $assignment_agent_model->agent_id = $agent_model->agent_id;

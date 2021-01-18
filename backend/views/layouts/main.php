@@ -47,17 +47,16 @@ AppAsset::register($this);
             // ['label' => 'Agents', 'url' => ['/agent/index']],
             //
             // ['label' => 'Agent Assignment', 'url' => ['/agent-assignment/index']],
-            // ['label' => 'Restaurants', 'url' => ['/restaurant/index']],
+            ['label' => 'Stores', 'url' => ['/restaurant/index']],
             ['label' => 'Queue', 'url' => ['/queue/index']],
             ['label' => 'Tap Queue', 'url' => ['/tap-queue/index']],
-
-            ['label' => 'Subscription', 'url' => ['/subscription/index']],
 
 
 
             [
             'label' => 'Other',
                 'items' => [
+                  ['label' => 'Subscription', 'url' => ['/subscription/index']],
                   ['label' => 'Country', 'url' => ['/country/index']],
                   ['label' => 'Cities', 'url' => ['/city/index']],
                   ['label' => 'Areas', 'url' => ['/area/index']],

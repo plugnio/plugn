@@ -103,10 +103,12 @@ foreach ($cities as $cityIndex => $city) {
 
     $selectAll[$city->city_id] = false;
 
+
+
     ?>
 
     <div class="card mb-75" id="city-<?= $city->city_id ?>">
-      <a style="font-size: 15px;" id="<?= $city->city_id ?>" class="collapseBtn" data-action="collapse">
+      <a style="font-size: 15px;" id="<?= $city->city_id ?>" class=<?= sizeof($areaArray) > 0 ? 'collapseBtn' : ''?> data-action=<?= sizeof($areaArray) > 0 ? 'collapse' : '' ?> >
 
         <div class="card-header p-50" style="border-radius: 0.25rem; border: 1px solid #ecedf1; border-bottom-left-radius: 0px;
              border-bottom-right-radius: 0px;">
@@ -124,8 +126,14 @@ foreach ($cities as $cityIndex => $city) {
 
         <div class="card-content collapse" id="collapse-<?= $city->city_id ?>"   style="border-radius: 0.25rem; border: 1px solid #ecedf1; border-top:none; padding-top:10px">
 
-            <?=  Html::button(' Select all', ['class' => 'btn selectAll', 'id' => 'selectAll-' . $city->city_id, 'style' => 'color :#7367F0; padding-top: 0px; padding-left: 14px;' ]); ?>
-            <?=  Html::button(' Clear all', ['class' => 'btn clearAll', 'id' => 'clearAll-' . $city->city_id, 'style' => 'display :none; color :#7367F0; padding-top: 0px; padding-left: 14px;']); ?>
+            <?php
+
+              if(sizeof($areaArray)){
+                  echo Html::button(' Select all', ['class' => 'btn selectAll', 'id' => 'selectAll-' . $city->city_id, 'style' => 'color :#7367F0; padding-top: 0px; padding-left: 14px;' ]);
+                  echo Html::button(' Clear all', ['class' => 'btn clearAll', 'id' => 'clearAll-' . $city->city_id, 'style' => 'display :none; color :#7367F0; padding-top: 0px; padding-left: 14px;']);
+              }
+
+            ?>
 
             <?php foreach ($areaQuery as $key => $area) { ?>
 

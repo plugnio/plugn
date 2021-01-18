@@ -75,6 +75,7 @@ $this->params['breadcrumbs'][] = $this->title;
     DetailView::widget([
         'model' => $model,
         'attributes' => [
+            'tap_queue_id',
             'country.country_name',
             [
                 'label' => 'Store currency',
