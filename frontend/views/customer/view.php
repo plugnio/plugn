@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\grid\GridView;
 use common\models\Order;
+use common\models\AgentAssignment;
 use yii\helpers\Url;
 
 /* @var $this yii\web\View */
@@ -20,6 +21,20 @@ $this->params['breadcrumbs'][] = $this->title;
 
   <p>
     <?= Html::a('Update', ['update', 'id' => $model->customer_id, 'storeUuid' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+
+    <?php
+
+      if(AgentAssignment::isOwner($model->restaurant_uuid)){
+         echo Html::a('Delete', ['delete', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
+             'class' => 'btn btn-danger',
+             'data' => [
+                 'confirm' => 'Are you sure you want to delete this customer?',
+                 'method' => 'post',
+             ],
+         ]);
+       }
+   ?>
+
   </p>
 
   <div class="card">

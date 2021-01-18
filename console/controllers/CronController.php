@@ -253,10 +253,13 @@ class CronController extends \yii\console\Controller {
         $restaurants = Restaurant::find()->where(['IS NOT', 'phone_number', null])->all();
 
         foreach ($restaurants as  $restaurant) {
-          if($restaurant && $restaurant->phone_number){
+          if($restaurant){
 
-            $restaurant->phone_number = "+965" . $restaurant->phone_number;
-            $restaurant->owner_number = "+965" . $restaurant->owner_number;
+            if($restaurant->phone_number)
+              $restaurant->phone_number = str_replace(' ', '',"+965" . $restaurant->phone_number);
+
+            if($restaurant->owner_number)
+               $restaurant->owner_number = str_replace(' ', '',"+965" . $restaurant->owner_number);
 
             $restaurant->save(false);
           }
@@ -269,7 +272,7 @@ class CronController extends \yii\console\Controller {
         foreach ($customers as  $customer) {
           if($customer){
 
-            $customer->customer_phone_number = "+965" . $customer->customer_phone_number;
+            $customer->customer_phone_number = str_replace(' ', '',"+965" . $customer->customer_phone_number);
 
             $customer->save(false);
           }
