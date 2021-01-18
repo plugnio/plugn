@@ -615,16 +615,17 @@ class Order extends \yii\db\ActiveRecord {
     public function calculateOrderTotalPrice() {
         $totalPrice = $this->calculateOrderItemsTotalPrice();
 
-        if($this->voucher){
-          $discountAmount = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->voucher->discount_amount /100)) : $this->voucher->discount_amount;
-          $totalPrice -= $discountAmount ;
-        }
+        if($totalPrice > 0 ) {
+          if($this->voucher){
+            $discountAmount = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->voucher->discount_amount /100)) : $this->voucher->discount_amount;
+            $totalPrice -= $discountAmount ;
+          }
 
-        else if($this->bank_discount_id && $this->bankDiscount->minimum_order_amount <= $totalPrice){
-          $discountAmount = $this->bankDiscount->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->bankDiscount->discount_amount /100)) : $this->bankDiscount->discount_amount;
-          $totalPrice -= $discountAmount ;
+          else if($this->bank_discount_id && $this->bankDiscount->minimum_order_amount <= $totalPrice){
+            $discountAmount = $this->bankDiscount->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->bankDiscount->discount_amount /100)) : $this->bankDiscount->discount_amount;
+            $totalPrice -= $discountAmount ;
+          }
         }
-
 
 
         if ($this->order_mode == static::ORDER_MODE_DELIVERY && (!$this->voucher  || ($this->voucher && $this->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY))){
