@@ -309,6 +309,7 @@ class CronController extends \yii\console\Controller {
         return self::EXIT_CODE_NORMAL;
     }
 
+
     public function actionMigration(){
 
         $restaurantBranches = RestaurantBranch::find()->all();
