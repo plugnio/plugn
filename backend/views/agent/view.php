@@ -39,6 +39,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label' => 'Status',
                 'value' => $model->status,
             ],
+            [
+                'attribute' => 'email_notification',
+                'value' => $model->email_notification ? 'Yes' : 'No',
+            ],
             'agent_created_at:datetime',
             'agent_updated_at:datetime',
         ],
