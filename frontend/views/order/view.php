@@ -816,14 +816,15 @@ DetailView::widget([
                             'label' => 'Country',
                             'format' => 'html',
                             'value' => function ($data) {
-                                return  $data->country_name ? $data->country_name  : $data->deliveryZone->country->country_name;
+                                return  $data->country_name ? $data->country_name  :
+                                 ( $data->order_mode == 1 ? ($data->deliveryZone->country && $data->deliveryZone ? $data->deliveryZone->country->country_name : '(not set)') : ($data->pickupLocation && $data->pickupLocation->country ? $data->pickupLocation->country->country_name : '(not set)'));
                             }
                         ],
                         [
                             'label' => 'Pickup from',
                             'format' => 'html',
                             'value' => function ($data) {
-                                return $data->pickupLocation->business_location_name;
+                              return  $data->pickupLocation ?  $data->pickupLocation->business_location_name : '(not set)';
                             },
                             'visible' => $model->order_mode == Order::ORDER_MODE_PICK_UP,
                         ],
