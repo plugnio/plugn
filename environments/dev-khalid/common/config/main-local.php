@@ -7,7 +7,7 @@ return [
             'dsn' => 'mysql:host=localhost;dbname=plugn',
             'username' => 'plugnuser',
             'password' => 'plugnpass',
-            'charset' => 'utf8',
+            'charset' => 'utf8mb4',
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
