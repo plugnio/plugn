@@ -311,12 +311,12 @@ $interval = $today->diff($expiry);
 
             <?php
 
-            echo Html::a($isOnlinePaymentEnabled ? 'Disable online payments' : 'Enable online payments', [$isOnlinePaymentEnabled ? 'disable-online-payment' : 'enable-online-payment', 'storeUuid' => $model->restaurant_uuid], ['class' => $isOnlinePaymentEnabled ? 'btn btn-danger' : 'btn btn-success',
-            'data' => [
-                      'confirm' => $isOnlinePaymentEnabled ? 'Are you sure you want to disable online payments?' : 'Are you sure you want to enable online payments?',
-                      'method' => 'post',
-                  ],
-          ]);
+          //   echo Html::a($isOnlinePaymentEnabled ? 'Disable online payments' : 'Enable online payments', [$isOnlinePaymentEnabled ? 'disable-online-payment' : 'enable-online-payment', 'storeUuid' => $model->restaurant_uuid], ['class' => $isOnlinePaymentEnabled ? 'btn btn-danger' : 'btn btn-success',
+          //   'data' => [
+          //             'confirm' => $isOnlinePaymentEnabled ? 'Are you sure you want to disable online payments?' : 'Are you sure you want to enable online payments?',
+          //             'method' => 'post',
+          //         ],
+          // ]);
 
           } ?>
         </div>

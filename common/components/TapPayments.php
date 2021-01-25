@@ -511,6 +511,7 @@ class TapPayments extends Component
         }
 
 
+        \Yii::error($chargeParams, __METHOD__); // Log error faced by user
 
         $client = new Client();
         $response = $client->createRequest()
