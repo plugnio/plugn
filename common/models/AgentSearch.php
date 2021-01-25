@@ -37,7 +37,7 @@ class AgentSearch extends Agent {
      * @return ActiveDataProvider
      */
     public function search($params) {
-        $query = Agent::find();
+        $query = Agent::find()->orderBy(['agent_created_at' => SORT_DESC]);;
 
         // add conditions that should always apply here
 

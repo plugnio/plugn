@@ -44,18 +44,19 @@ AppAsset::register($this);
     } else {
         $menuItems = [
 
-            // ['label' => 'Agents', 'url' => ['/agent/index']],
-            //
-            // ['label' => 'Agent Assignment', 'url' => ['/agent-assignment/index']],
+
             ['label' => 'Stores', 'url' => ['/restaurant/index']],
-            ['label' => 'Queue', 'url' => ['/queue/index']],
+            ['label' => 'Agents', 'url' => ['/agent/index']],
+            ['label' => 'Agent Assignment', 'url' => ['/agent-assignment/index']],
             ['label' => 'Tap Queue', 'url' => ['/tap-queue/index']],
+
 
 
 
             [
             'label' => 'Other',
                 'items' => [
+                  ['label' => 'Queue', 'url' => ['/queue/index']],
                   ['label' => 'Subscription', 'url' => ['/subscription/index']],
                   ['label' => 'Country', 'url' => ['/country/index']],
                   ['label' => 'Cities', 'url' => ['/city/index']],
