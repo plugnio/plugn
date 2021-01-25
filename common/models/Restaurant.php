@@ -602,12 +602,9 @@ class Restaurant extends \yii\db\ActiveRecord {
         //Upload documents file on our server before we create an account on tap we gonaa delete them
         $this->uploadDocumentsToTap();
 
-        Yii::error('Error while uploadDocumentsToTap2 [' . $this->name . '] ');
 
         //Create a business for a vendor on Tap
         $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
-        Yii::error('Error while create Business [' . $this->name . '] ');
-        Yii::error('Error while create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
 
         if ($businessApiResponse->isOk) {
 

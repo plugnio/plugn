@@ -511,8 +511,6 @@ class TapPayments extends Component
         }
 
 
-        Yii::error( json_encode($chargeParams), __METHOD__);
-
         $client = new Client();
         $response = $client->createRequest()
                 ->setMethod('POST')
