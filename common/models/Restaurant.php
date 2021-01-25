@@ -607,6 +607,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         //Create a business for a vendor on Tap
         $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
         Yii::error('Error while create Business [' . $this->name . '] ');
+        Yii::error('Error while create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
 
         if ($businessApiResponse->isOk) {
 
