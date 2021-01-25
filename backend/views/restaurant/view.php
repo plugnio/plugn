@@ -75,6 +75,13 @@ $this->params['breadcrumbs'][] = $this->title;
     DetailView::widget([
         'model' => $model,
         'attributes' => [
+          [
+              'label' => 'is_tap_enable',
+              'value' => function ($data) {
+                  return $data->is_tap_enable ? 'Yes' : 'No';
+              },
+              'format' => 'raw'
+          ],
             'tap_queue_id',
             'country.country_name',
             [
