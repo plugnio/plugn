@@ -1,6 +1,6 @@
 .iti {
   position: relative;
-  display: inline-block; }
+  display: block; }
   .iti * {
     box-sizing: border-box;
     -moz-box-sizing: border-box; }
@@ -79,7 +79,6 @@
   .iti--allow-dropdown input, .iti--allow-dropdown input[type=text], .iti--allow-dropdown input[type=tel], .iti--separate-dial-code input, .iti--separate-dial-code input[type=text], .iti--separate-dial-code input[type=tel] {
     padding-right: 6px;
     padding-left: 52px !important;
-    display:block !important;
     margin-left: 0; }
     .iti--allow-dropdown{
       width: 100%;
