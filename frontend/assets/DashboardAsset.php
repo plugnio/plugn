@@ -46,13 +46,15 @@ class DashboardAsset extends AssetBundle {
         'app-assets/css/plugins/file-uploaders/dropzone.css',
         'app-assets/vendors/css/editors/quill/quill.snow.css',
         'app-assets/vendors/css/charts/apexcharts.css',
+
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
         'app-assets/css/pages/invoice.css',
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
         'css/bootstrap-duallistbox.css',
         'app-assets/css/pages/coming-soon.css',
-        'css/intlTelInput.css',
+        'app-assets/css/intlTelInput.css',
+        // 'css/intlTelInput.css',
 
         'https://fonts.googleapis.com/css?family=Roboto:400,700',
         'fileuploader/dist/font/font-fileuploader.css',
