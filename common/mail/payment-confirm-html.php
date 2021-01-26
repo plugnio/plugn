@@ -373,10 +373,10 @@ use common\models\BankDiscount;
                                                                                         </div>
                                                                                         <?php
                                                                                            if($order->area_id){
-                                                                                             echo 'Block '  . $order->block  ',';
-                                                                                             echo 'Street ' . $order->street ',';
+                                                                                             echo 'Block '  . $order->block . ',';
+                                                                                             echo 'Street ' . $order->street . ',';
                                                                                              echo $order->avenue != null ? 'Avenue' . $order->avenue . ' ,' : '';
-                                                                                             echo 'House ' . $order->house_number ',';
+                                                                                             echo 'House ' . $order->house_number . ',';
                                                                                              echo $order->area_name . ',';
                                                                                              echo $order->area->city->city_name . ',';
                                                                                              echo $order->area->country->country_name;
