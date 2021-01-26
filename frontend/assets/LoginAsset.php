@@ -26,7 +26,7 @@ class LoginAsset extends AssetBundle {
   'app-assets/css/pages/authentication.css',
   'assets/css/style.css',
   'app-assets/css/plugins/forms/wizard.css',
-  'css/intlTelInput',
+  'css/intlTelInput.css',
 
     ];
     public $js = [
