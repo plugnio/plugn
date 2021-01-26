@@ -24,7 +24,7 @@ class LoginAsset extends AssetBundle {
   'app-assets/css/core/menu/menu-types/vertical-menu.css',
   'app-assets/css/core/colors/palette-gradient.css',
   'app-assets/css/pages/authentication.css',
-  'assets/css/style.css',
+  'css/style.css',
   'app-assets/css/plugins/forms/wizard.css',
   'css/intlTelInput.css',
 
