@@ -375,9 +375,20 @@ use common\models\BankDiscount;
                                                                                         Street <?= $order->street ?>,
                                                                                         <?= $order->avenue != null ? 'Avenue' . $order->avenue . ' ,' : '' ?>
                                                                                         House <?= $order->house_number ?>,
-                                                                                        <?= $order->area_name ?>,
-                                                                                        <?= $order->area->city->city_name ?>,
-                                                                                        <?= $order->area->country->country_name ?>,
+                                                                                        <?php
+                                                                                           if($order->area_id){
+                                                                                             echo $order->area_name . ',';
+                                                                                             echo $order->area->city->city_name . ',';
+                                                                                             echo $order->area->country->country_name;
+                                                                                           } else if ($order->shipping_country_id){
+                                                                                             echo $order->address_1. ',';
+                                                                                             echo $order->address_2. ',';
+                                                                                             echo $order->postalcode. ',';
+                                                                                             echo $order->city. ',';
+                                                                                             echo $order->country->country_name;
+                                                                                           }
+                                                                                         ?>
+
                                                                                       </div>
                                                                                   </td>
                                                                                 </tr>
@@ -393,7 +404,7 @@ use common\models\BankDiscount;
                                                                                     <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
                                                                                         <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">
                                                                                           <?= $order->pickupLocation->business_location_name ?>,
-                                                                                          <?= $order->pickupLocation->country->country_name ?>,
+                                                                                          <?= $order->pickupLocation->country->country_name ?>
                                                                                         </div>
                                                                                     </td>
                                                                                 </tr>
