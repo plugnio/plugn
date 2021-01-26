@@ -371,11 +371,14 @@ use common\models\BankDiscount;
                                                                                         <div style="display:block">
                                                                                           <?= $order->customer_phone_number ?>
                                                                                         </div>
-                                                                                        <?= $order->area_name ?>,
                                                                                         Block <?= $order->block ?>,
                                                                                         Street <?= $order->street ?>,
                                                                                         <?= $order->avenue != null ? 'Avenue' . $order->avenue . ' ,' : '' ?>
-                                                                                        House <?= $order->house_number ?></div>
+                                                                                        House <?= $order->house_number ?>,
+                                                                                        <?= $order->area_name ?>,
+                                                                                        <?= $order->area->city->city_name ?>,
+                                                                                        <?= $order->area->country->country_name ?>,
+                                                                                      </div>
                                                                                   </td>
                                                                                 </tr>
                                                                             </table>
@@ -388,7 +391,10 @@ use common\models\BankDiscount;
                                                                                 </tr>
                                                                                 <tr>
                                                                                     <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
-                                                                                        <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;"><?= $order->pickupLocation->business_location_name ?></div>
+                                                                                        <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">
+                                                                                          <?= $order->pickupLocation->business_location_name ?>,
+                                                                                          <?= $order->pickupLocation->country->country_name ?>,
+                                                                                        </div>
                                                                                     </td>
                                                                                 </tr>
                                                                             </table>
