@@ -376,9 +376,11 @@ class SiteController extends Controller {
                         ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
                         ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
                         ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                        ->orWhere(['order_status' => Order::STATUS_ACCEPTED])
                         ->orWhere(['order_status' => Order::STATUS_CANCELED])
                         ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                        ->andWhere(['DATE(order_created_at)' => new Expression('CURDATE()')])
+                        // ->andWhere(['DATE(order_created_at)' => new Expression('CURDATE()')])
+                        ->andWhere(new Expression("date(order_created_at) = date(NOW())"))
                         ->count();
 
                 $number_of_all_orders_received_last_month = Order::find()

@@ -21,6 +21,14 @@ use kartik\select2\Select2;
     <?= $form->field($model, 'agent_name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'agent_email')->textInput(['maxlength' => true]) ?>
+    <?=
+    $form->field($model, 'email_notification')->dropDownList(
+            [
+        1 => 'Yes',
+        0 => 'No',
+            ]
+    );
+    ?>
 
     <?= $form->field($model, 'tempPassword')->passwordInput(['maxlength' => true]) ?>
 

@@ -126,7 +126,7 @@ class Voucher extends \yii\db\ActiveRecord {
     }
 
     public function getDiscountType() {
-       
+
         switch ($this->discount_type) {
             case self::DISCOUNT_TYPE_PERCENTAGE:
                 return "Percentage";
