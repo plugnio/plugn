@@ -371,12 +371,12 @@ use common\models\BankDiscount;
                                                                                         <div style="display:block">
                                                                                           <?= $order->customer_phone_number ?>
                                                                                         </div>
-                                                                                        Block <?= $order->block ?>,
-                                                                                        Street <?= $order->street ?>,
-                                                                                        <?= $order->avenue != null ? 'Avenue' . $order->avenue . ' ,' : '' ?>
-                                                                                        House <?= $order->house_number ?>,
                                                                                         <?php
                                                                                            if($order->area_id){
+                                                                                             echo 'Block '  . $order->block  ,
+                                                                                             echo 'Street ' . $order->street ,
+                                                                                             echo $order->avenue != null ? 'Avenue' . $order->avenue . ' ,' : '';
+                                                                                             echo 'House ' . $order->house_number ,
                                                                                              echo $order->area_name . ',';
                                                                                              echo $order->area->city->city_name . ',';
                                                                                              echo $order->area->country->country_name;
