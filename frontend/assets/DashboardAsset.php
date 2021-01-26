@@ -12,6 +12,8 @@ class DashboardAsset extends AssetBundle {
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
+      'css/intlTelInput',
+      
         'app-assets/vendors/css/vendors.min.css',
         'app-assets/vendors/css/charts/apexcharts.css',
         'app-assets/vendors/css/extensions/tether-theme-arrows.css',
@@ -52,7 +54,6 @@ class DashboardAsset extends AssetBundle {
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
         'css/bootstrap-duallistbox.css',
         'app-assets/css/pages/coming-soon.css',
-        'css/intlTelInput',
 
         'https://fonts.googleapis.com/css?family=Roboto:400,700',
         'fileuploader/dist/font/font-fileuploader.css',
