@@ -83,6 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
               'format' => 'raw'
           ],
             'tap_queue_id',
+            'version',
             'country.country_name',
             [
                 'label' => 'Store currency',

@@ -284,6 +284,13 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                                 return $model->order_mode == Order::ORDER_MODE_DELIVERY ? ($model->delivery_zone_id ? $model->deliveryZone->businessLocation->business_location_name : '(not set)') : $model->pickupLocation->business_location_name;
                             }
                         ],
+                        [
+                            'attribute' => 'order_mode',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return $data->order_mode == Order::ORDER_MODE_DELIVERY ? 'Delivery' : 'Pickup';
+                            },
+                        ],
                         // 'total_price:currency',
                         // 'subtotal:currency',
                         // 'delivery_fee:currency',
@@ -740,13 +747,7 @@ DetailView::widget([
                             },
                             'visible' => $model->customer_email != null && $model->customer_email,
                         ],
-                        [
-                            'attribute' => 'order_mode',
-                            'format' => 'html',
-                            'value' => function ($data) {
-                                return $data->order_mode == Order::ORDER_MODE_DELIVERY ? 'Delivery' : 'Pickup';
-                            },
-                        ],
+
 
                         [
                             'attribute' => 'address_1',

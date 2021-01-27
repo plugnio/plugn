@@ -768,6 +768,22 @@ class Order extends \yii\db\ActiveRecord {
         }
 
 
+        if($this->restaurant->version == 1 $this->restaurant_branch_id && !$this->pickup_location_id ){
+          $pickupLocation = BusinessLocation::find()
+          ->where(['business_location_name' => $this->restaurantBranch->branch_name_en,
+                   'business_location_name_ar' => $this->restaurantBranch->branch_name_ar
+                 ])->one();
+
+          if($pickupLocation)
+            $this->pickup_location_id = $pickupLocation->business_location_id;
+          else {
+            $this->addError($attribute, 'Branch name cannot be blank.');
+            Yii::error('Branch name cannot be blank.');
+          }
+
+
+        }
+
 
 
         if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
