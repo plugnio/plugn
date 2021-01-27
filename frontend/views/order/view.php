@@ -191,7 +191,6 @@ $this->registerJs($js);
     <div class="card">
 
         <div class="card-body">
-            <h3>Order details</h3>
 
             <p style="margin-top: 1rem">
 
@@ -277,6 +276,13 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                             'value' => function ($data) {
                                 return '<span  style="font-size:25px; font-weight: 700" >' . $data->orderStatusInEnglish . '</span>';
                             },
+                        ],
+                        [
+                            'label' => 'Branch',
+                            "format" => "raw",
+                            "value" => function($model) {
+                                return $model->order_mode == Order::ORDER_MODE_DELIVERY ? ($model->delivery_zone_id ? $model->deliveryZone->businessLocation->business_location_name : '(not set)') : $model->pickupLocation->business_location_name;
+                            }
                         ],
                         // 'total_price:currency',
                         // 'subtotal:currency',

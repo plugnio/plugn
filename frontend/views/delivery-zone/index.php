@@ -132,7 +132,7 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
 
 
                 <h5>
-                  Minimum charge on each orde:
+                  Minimum charge on each order:
                 </h5>
                 <p style=" margin: 0px;">
                   <?= Yii::$app->formatter->asCurrency($deliveryZone->min_charge, $deliveryZone->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>

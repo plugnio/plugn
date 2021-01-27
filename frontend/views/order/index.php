@@ -91,6 +91,14 @@ $this->registerJs($js);
                     }
                 ],
                 [
+                    'label' => 'Branch',
+                    "format" => "raw",
+                    "value" => function($model) {
+                        $businessLocationName =  $model->order_mode == Order::ORDER_MODE_DELIVERY ? ($model->delivery_zone_id ? $model->deliveryZone->businessLocation->business_location_name : '(not set)') : $model->pickupLocation->business_location_name;
+                        return $businessLocationName;
+                    }
+                ],
+                [
                   'attribute' => 'customer_name',
                   'format' => 'raw',
                   'value' => function ($data) {
