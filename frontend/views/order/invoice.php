@@ -53,6 +53,10 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                         <?= $model->payment_method_name ?>
                     </p>
 
+                    <?php
+                      if($model->order_mode == Order::ORDER_MODE_DELIVERY){
+                    ?>
+
                     <h6 class="mt-2">Shipping address</h6>
                       <span style="display: block; margin-bottom:3px" >
                         <?=  $model->customer_name ?>
@@ -81,7 +85,17 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                       <span style="display: block" >
                         <?= $model->area_id ?  $model->customer_phone_number :  '' ?>
                       </span>
-
+                      <?php
+                    } else {
+                      ?>
+                      <h6 class="mt-2">Customer</h6>
+                        <span style="display: block; margin-bottom:3px" >
+                          <?=  $model->customer_name ?>
+                        </span>
+                        <span style="display: block" >
+                          <?=  $model->customer_phone_number ?>
+                        </span>
+                    <?php } ?>
                 </div>
 
             </div>

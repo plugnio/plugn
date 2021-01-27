@@ -59,8 +59,8 @@ $this->params['breadcrumbs'][] = $this->title;
                               Track and understand the movement of your products.
                             </p>
 
-                            <?= Html::a('Download historical report', ['item/export-to-excel', 'storeUuid' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
-                            <?= Html::a('Download for specific date range', ['item/items-report', 'storeUuid' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                            <?= Html::a('Download historical report', ['item/export-to-excel', 'storeUuid' => $model->restaurant_uuid], ['class' => 'btn btn-primary mr-1 mb-1']) ?>
+                            <?= Html::a('Download for specific date range', ['item/items-report', 'storeUuid' => $model->restaurant_uuid], ['class' => 'btn btn-primary mr-1 mb-1']) ?>
 
                         </div>
                     </div>

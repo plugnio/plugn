@@ -817,7 +817,8 @@ DetailView::widget([
                             'label' => 'City',
                             'value' => function ($data) {
                                 return  $data->area_id ? $data->area->city->city_name : $data->city;
-                            }
+                            },
+                            'visible' => $model->area_id || $model->city
                         ],
                         [
                             'label' => 'Country',
