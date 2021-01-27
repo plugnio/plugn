@@ -14,6 +14,8 @@ use common\models\OrderItemExtraOption;
 use common\models\AreaDeliveryZone;
 use common\models\Restaurant;
 use common\models\BankDiscount;
+use common\models\RestaurantBranch;
+use common\models\BusinessLocation;
 use common\models\Payment;
 use common\components\TapPayments;
 use yii\helpers\Url;
@@ -143,6 +145,20 @@ class OrderController extends Controller {
                 }
             } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
                 $order->restaurant_branch_id = Yii::$app->request->getBodyParam("restaurant_branch_id");
+
+                $restaurantBranch = RestaurantBranch::findOne($order->restaurant_branch_id);
+
+                if($restaurantBranch){
+                  $pickupLocation = BusinessLocation::find()
+                  ->where(['business_location_name' => $restaurantBranch->branch_name_en,
+                           'business_location_name_ar' => $restaurantBranch->branch_name_ar
+                         ])->one();
+
+                  if($pickupLocation)
+                    $this->pickup_location_id = $pickupLocation->business_location_id;
+
+                }
+
             }
 
 
