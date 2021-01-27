@@ -155,7 +155,7 @@ class OrderController extends Controller {
                          ])->one();
 
                   if($pickupLocation)
-                    $this->pickup_location_id = $pickupLocation->business_location_id;
+                    $order->pickup_location_id = $pickupLocation->business_location_id;
 
                 }
 
