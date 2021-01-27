@@ -93,6 +93,11 @@ use borales\extensions\phoneInput\PhoneInput;
     ]);
     ?>
 
+
+    <?=
+      $form->field($model, 'country_id')->dropDownList(  $countryArray  );
+    ?>
+
     <?=
     $form->field($model, 'restaurant_payments_method')->widget(Select2::classname(), [
         'data' => $paymentMethodArray,
@@ -163,6 +168,9 @@ use borales\extensions\phoneInput\PhoneInput;
     );
     ?>
 
+
+
+
     <?=
     $form->field($model, 'support_pick_up')->dropDownList(
             [
@@ -220,7 +228,7 @@ use borales\extensions\phoneInput\PhoneInput;
     <?= $form->field($model, 'google_analytics_id')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'facebook_pixil_id')->textInput(['maxlength' => true]) ?>
-    
+
     <?= $form->field($model, 'custom_css')->textarea(['rows' => '12']) ?>
 
     <?= $form->field($model, 'identification_file_id_front_side')->textInput() ?>
