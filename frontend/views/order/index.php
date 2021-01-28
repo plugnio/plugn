@@ -75,7 +75,7 @@ $this->registerJs($js);
                 ];
             },
             'columns' => [
-                // ['class' => 'yii\grid\SerialColumn'],
+                ['class' => 'yii\grid\SerialColumn'],
                 [
                     'label' => 'Order ID',
                     "format" => "raw",
