@@ -120,6 +120,14 @@ var soundForNewOrders = new Audio("data:audio/wav;base64,//uQRAAAAWMSLwUIYAAsYkX
                     }
                 ],
                 [
+                    'label' => 'Branch',
+                    "format" => "raw",
+                    "value" => function($model) {
+                        $businessLocationName =  $model->order_mode == Order::ORDER_MODE_DELIVERY ? ($model->delivery_zone_id ? $model->deliveryZone->businessLocation->business_location_name : '(not set)') : $model->pickupLocation->business_location_name;
+                        return $businessLocationName;
+                    }
+                ],
+                [
                     'attribute' => 'customer_name',
                     'format' => 'raw',
                     'value' => function ($data) {
@@ -136,13 +144,6 @@ var soundForNewOrders = new Audio("data:audio/wav;base64,//uQRAAAAWMSLwUIYAAsYkX
                     "value" => function($model) {
                         return '<a href="tel:'. $model->customer_phone_number .'"> '. $model->customer_phone_number.' </a>';
                     }
-                ],
-                [
-                    'label' => 'When',
-                    'format' => 'raw',
-                    'value' => function ($data) {
-                        return $data->is_order_scheduled ? 'Scheduled' : 'As soon as possible';
-                    },
                 ],
                 [
                     'label' => 'Payment',
