@@ -113,7 +113,7 @@ class RestaurantController extends Controller {
 
       if ($commitSitemapXmlFileResponse->isOk) {
 
-        $dirPath = $dirName .  $store->store_branch_name;
+        $dirPath = $dirName . '/'. $store->store_branch_name;
         $file_pointer =  $dirPath . '/sitemap.xml';
 
         // Use unlink() function to delete a file
