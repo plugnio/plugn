@@ -113,6 +113,13 @@ class RestaurantController extends Controller {
 
       if ($commitSitemapXmlFileResponse->isOk) {
 
+
+        if($store->sitemap_require_update == 1){
+          $store->sitemap_require_update = 0;
+          $store->save(false);
+        }
+
+
         $dirPath = $dirName . '/'. $store->store_branch_name;
         $file_pointer =  $dirPath . '/sitemap.xml';
 
@@ -123,11 +130,6 @@ class RestaurantController extends Controller {
             if (!rmdir($dirPath)) {
                 Yii::error("Could not remove $dirPath", __METHOD__);
             }
-        }
-
-        if($store->sitemap_require_update){
-          $store->sitemap_require_update = 0;
-          $store->save(false);
         }
 
       } else {
