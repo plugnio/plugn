@@ -106,11 +106,9 @@ class GithubComponent extends Component {
     public function createFileContent($content, $branch_name, $path, $commitMessage = null) {
         $createBranchEndpoint = $this->apiEndpoint . "/contents/" . $path;
 
-        if($commitMessage == null){
-          $commitMessage = "first commit for $branch_name store";
-        }
+        
         $branchParams = [
-            "message" => $commitMessage,
+            "message" => $commitMessage ? $commitMessage : "first commit for $branch_name store",
             "content" => $content,
             "branch" => $branch_name
         ];
