@@ -624,7 +624,7 @@ class CronController extends \yii\console\Controller {
                 $data = base64_encode($fileToBeUploaded);
 
                 //Replace test with store branch name
-                $commitBuildJsFileResponse = Yii::$app->githubComponent->createFileContent($data, $store->store_branch_name, 'sitemap.xml');
+                $commitBuildJsFileResponse = Yii::$app->githubComponent->createFileContent($data, $store->store_branch_name, 'sitemap.xml','Update sitemap');
 
                 if (!$commitBuildJsFileResponse->isOk) {
                   Yii::error('[Github > Commit Sitemap xml]' . json_encode($commitBuildJsFileResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);

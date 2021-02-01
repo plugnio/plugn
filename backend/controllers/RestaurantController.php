@@ -109,7 +109,7 @@ class RestaurantController extends Controller {
       $data = base64_encode($fileToBeUploaded);
 
       //Replace test with store branch name
-      $commitSitemapXmlFileResponse = Yii::$app->githubComponent->createFileContent($data, $store->store_branch_name, 'sitemap.xml');
+      $commitSitemapXmlFileResponse = Yii::$app->githubComponent->createFileContent($data, $store->store_branch_name, 'sitemap.xml', 'Update sitemap');
 
       if ($commitSitemapXmlFileResponse->isOk) {
 
