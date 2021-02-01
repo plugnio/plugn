@@ -113,7 +113,6 @@ class RestaurantController extends Controller {
 
       if ($commitSitemapXmlFileResponse->isOk) {
 
-        Yii::error('ok commitSitemapXmlFileResponse');
         if($store->sitemap_require_update == 1){
           $store->sitemap_require_update = 0;
           $store->save(false);
