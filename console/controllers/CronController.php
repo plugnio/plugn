@@ -589,7 +589,6 @@ class CronController extends \yii\console\Controller {
 
     }
 
-
         public function actionUpdateSitemap() {
 
           $now = new DateTime('now');
@@ -624,30 +623,34 @@ class CronController extends \yii\console\Controller {
                 $data = base64_encode($fileToBeUploaded);
 
                 //Replace test with store branch name
-                $commitBuildJsFileResponse = Yii::$app->githubComponent->createFileContent($data, $store->store_branch_name, 'sitemap.xml','Update sitemap');
+                $commitSitemaXMlResponse = Yii::$app->githubComponent->createFileContent($data, $store->store_branch_name, 'sitemap.xml','Update sitemap');
 
-                if (!$commitBuildJsFileResponse->isOk) {
-                  Yii::error('[Github > Commit Sitemap xml]' . json_encode($commitBuildJsFileResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+                if ($commitSitemaXMlResponse->isOk) {
+
+                  $store->sitemap_require_update = 0;
+                  $store->save(false);
+
+                  //Delete sitemap file
+                  $dirPath = "store/" .  $store->store_branch_name;
+                  $file_pointer =  $dirPath . '/sitemap.xml';
+
+                  // Use unlink() function to delete a file
+                  if (!unlink($file_pointer)) {
+                      Yii::error("$file_pointer cannot be deleted due to an error", __METHOD__);
+                  } else {
+                      if (!rmdir($dirPath)) {
+                          Yii::error("Could not remove $dirPath", __METHOD__);
+                      }
+                  }
+
+                } else {
+                  Yii::error('[Github > Commit Sitemap xml]' . json_encode($commitSitemaXMlResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
 
                   return false;
                 }
 
 
-                //Delete sitemap file
-                $dirPath = "store/" .  $store->store_branch_name;
-                $file_pointer =  $dirPath . '/sitemap.xml';
 
-                // Use unlink() function to delete a file
-                if (!unlink($file_pointer)) {
-                    Yii::error("$file_pointer cannot be deleted due to an error", __METHOD__);
-                } else {
-                    if (!rmdir($dirPath)) {
-                        Yii::error("Could not remove $dirPath", __METHOD__);
-                    }
-                }
-
-                $store->sitemap_require_update = 0;
-                $store->save(false);
               }
             }
           }
