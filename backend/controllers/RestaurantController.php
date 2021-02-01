@@ -103,7 +103,7 @@ class RestaurantController extends Controller {
       fclose($sitemap);
 
 
-      $fileToBeUploaded = file_get_contents($dirName . "/sitemap.xml");
+      $fileToBeUploaded = file_get_contents($dirName .  "/" .   $store->store_branch_name  . "/sitemap.xml");
 
       // Encode the image string data into base64
       $data = base64_encode($fileToBeUploaded);
@@ -125,13 +125,10 @@ class RestaurantController extends Controller {
             }
         }
 
-
       } else {
         Yii::error('[Github > Commit sitemap Xml]' . json_encode($commitSitemapXmlFileResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
-        return false;
+        return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
       }
-
-
 
       return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
 
