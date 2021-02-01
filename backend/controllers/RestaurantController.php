@@ -125,6 +125,11 @@ class RestaurantController extends Controller {
             }
         }
 
+        if($store->sitemap_require_update){
+          $store->sitemap_require_update = 0;
+          $store->save(false);
+        }
+
       } else {
         Yii::error('[Github > Commit sitemap Xml]' . json_encode($commitSitemapXmlFileResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
         return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
