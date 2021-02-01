@@ -89,6 +89,7 @@ $this->params['breadcrumbs'][] = $this->title;
           ],
             'tap_queue_id',
             'version',
+            'sitemap_require_update',
             'country.country_name',
             [
                 'label' => 'Store currency',
