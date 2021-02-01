@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
     <p>
-        <?= Html::a('Create BuildJs file', ['create-build-js-file', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>
+
         <?=
           Html::a($model->hide_request_driver_button == 1 ? 'Display request driver button' : 'Hide request driver button',
           [
@@ -69,6 +69,11 @@ $this->params['breadcrumbs'][] = $this->title;
         // }
          ?>
 
+    </p>
+
+    <p>
+      <?= Html::a('Update sitemap', ['update-sitemap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>
+      <?= Html::a('Create BuildJs file', ['create-build-js-file', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>
     </p>
 
     <?=
