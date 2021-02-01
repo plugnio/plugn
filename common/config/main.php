@@ -65,6 +65,9 @@ return [
         'smsComponent' => [
             'class' => 'common\components\SmsComponent'
         ],
+        'fileGeneratorComponent' => [
+            'class' => 'common\components\FileGeneratorComponent'
+        ],
         'mashkorDelivery' => [
             'class' => 'common\components\MashkorDelivery',
             'keyToUse' => \common\components\MashkorDelivery::USE_LIVE_KEY

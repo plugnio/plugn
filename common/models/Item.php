@@ -186,7 +186,23 @@ class Item extends \yii\db\ActiveRecord
         }
 
 
+    /**
+     *
+     * @param type $insert
+     * @param type $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes) {
+        parent::afterSave($insert, $changedAttributes);
 
+        $store = $this->restaurant;
+
+        if($store->sitemap_require_update == 0){
+          $store->sitemap_require_update = 1;
+          $store->save(false);
+        }
+
+      return true;
+    }
 
     /**
      * increase stock_qty

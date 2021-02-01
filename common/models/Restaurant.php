@@ -29,6 +29,8 @@ use borales\extensions\phoneInput\PhoneInputValidator;
   * @property string|null $thumbnail_image
   * @property string|null $logo
   * @property int|null $support_delivery
+  * @property int|null $version
+  * @property int|null $sitemap_require_update
   * @property int|null $support_pick_up
   * @property int|null $hide_request_driver_button // hide requerst driver button if the order is scheduled
   * @property string|null $phone_number
@@ -223,7 +225,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_domain'], 'string',  'min' => 3, 'max' => 20, 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png, pdf', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
-            [['restaurant_status', 'support_delivery', 'support_pick_up', 'hide_request_driver_button'], 'integer', 'min' => 0],
+            [['restaurant_status', 'support_delivery', 'support_pick_up', 'hide_request_driver_button' , 'sitemap_require_update', 'version'], 'integer', 'min' => 0],
             [['schedule_interval'], 'integer', 'min' => 5],
             ['restaurant_status', 'in', 'range' => [self::RESTAURANT_STATUS_OPEN, self::RESTAURANT_STATUS_BUSY, self::RESTAURANT_STATUS_CLOSED]],
             ['store_layout', 'in', 'range' => [self::STORE_LAYOUT_LIST_FULLWIDTH, self::STORE_LAYOUT_GRID_FULLWIDTH, self::STORE_LAYOUT_CATEGORY_FULLWIDTH, self::STORE_LAYOUT_LIST_HALFWIDTH, self::STORE_LAYOUT_GRID_HALFWIDTH, self::STORE_LAYOUT_CATEGORY_HALFWIDTH]],

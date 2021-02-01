@@ -47,8 +47,13 @@ class GithubComponent extends Component {
     /**
      * Returns the contents of a single commit reference
      */
-    public function getLastCommit() {
-        $lastCommitEndpoint = $this->apiEndpoint . "/commits/" . $this->branch;
+    public function getLastCommit($branch = null) {
+
+        if($branch == null)
+          $branch = $this->branch;
+
+
+        $lastCommitEndpoint = $this->apiEndpoint . "/commits/" . $branch;
 
 
         $client = new Client();
@@ -98,8 +103,8 @@ class GithubComponent extends Component {
      * @param type $content The new file content, using Base64 encoding.
      * @return type
      */
-    public function createFileContent($content, $branch_name) {
-        $createBranchEndpoint = $this->apiEndpoint . "/contents/build.js";
+    public function createFileContent($content, $branch_name, $path) {
+        $createBranchEndpoint = $this->apiEndpoint . "/contents/" . $path;
 
         $branchParams = [
             "message" => "first commit for $branch_name store",

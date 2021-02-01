@@ -63,6 +63,17 @@ return [
                         'OPTIONS <category_id>' => 'options',
                     ]
                 ],
+                [ // SitemapController
+                  'class' => 'yii\rest\UrlRule',
+                  'controller' => 'v2/sitemap',
+                  'pluralize' => false,
+                  'patterns' => [
+                      'GET <storeUuid>' => 'index',
+                      // OPTIONS VERBS
+                      'OPTIONS' => 'options',
+                      'OPTIONS <storeUuid>' => 'options',
+                  ]
+                ],
                 [// ItemController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v2/item',

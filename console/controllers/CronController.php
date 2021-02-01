@@ -553,526 +553,33 @@ class CronController extends \yii\console\Controller {
 
     public function actionCreateBuildJsFile() {
 
-        $now = new DateTime('now');
-        $queue = Queue::find()
-                ->joinWith('restaurant')
-                ->andWhere(['queue_status' => Queue::QUEUE_STATUS_PENDING])
-                ->orderBy(['queue_created_at' => SORT_ASC])
-                ->one();
+      $now = new DateTime('now');
+            $queue = Queue::find()
+                    ->joinWith('restaurant')
+                    ->andWhere(['queue_status' => Queue::QUEUE_STATUS_PENDING])
+                    ->orderBy(['queue_created_at' => SORT_ASC])
+                    ->one();
 
-        if($queue && $queue->restaurant_uuid){
-          $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
-          $queue->save();
+            if($queue && $queue->restaurant_uuid){
+              $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
+              $queue->save();
 
-        $restaurant = $queue->restaurant;
+            $restaurant = $queue->restaurant;
 
-        $dirName = "store";
-        if(!file_exists($dirName))
-          $createStoreFolder = mkdir($dirName);
-
-
-
-        if (!file_exists( $dirName . "/" . $queue->restaurant->store_branch_name )) {
-          $myFolder = mkdir( $dirName . "/" . $queue->restaurant->store_branch_name);
-        }
-
-
-        $myfile =  fopen($dirName . "/" .   $queue->restaurant->store_branch_name . "/build.js", "w") or die("Unable to open file!");
+            $dirName = "store";
+            if(!file_exists($dirName))
+              $createStoreFolder = mkdir($dirName);
 
 
 
+            if (!file_exists( $dirName . "/" . $queue->restaurant->store_branch_name )) {
+              $myFolder = mkdir( $dirName . "/" . $queue->restaurant->store_branch_name);
+            }
 
-        $apiEndpoint = Yii::$app->params['apiEndpoint'] . '/v2';
+            $buildJsFile =  fopen($dirName . "/" .   $queue->restaurant->store_branch_name . "/build.js", "w") or die("Unable to open file!");
+            fwrite($buildJsFile, Yii::$app->fileGeneratorComponent->createBuildJsFile(Yii::$app->params['apiEndpoint'] . '/v2', $queue->restaurant->store_branch_name ));
+            fclose($buildJsFile);
 
-        $txt = "
-
-                var fs = require('fs');
-                const request = require('request');
-
-                var apiEndPoint = '$apiEndpoint';
-
-                var storebranchName = '$restaurant->store_branch_name';
-
-
-                var url = apiEndPoint + '/store/get-restaurant-data/' + storebranchName;
-
-                request(url, function(err, res, body) {
-
-                  var response = JSON.parse(body);
-
-                  overwriteIndexHtml(response);
-                  overwriteCapacitorConfig(response.app_id, response.name);
-                  overwriteGlobalScss(response.custom_css, response.name);
-                  overwriteManifest(response.restaurant_uuid, response.name, response.theme_color, response.logo);
-                  overwriteEnvironment(response.restaurant_uuid, storebranchName, apiEndPoint);
-                  overwriteAngularFile(storebranchName);
-                });
-
-                function overwriteIndexHtml(store) {
-
-                  console.log(store);
-
-                  var facebookPixilId = store.facebook_pixil_id;
-                  var googleAnalyticsId = store.google_analytics_id;
-                  var storeName = store.name;
-                  var storeUuid = store.restaurant_uuid;
-                  var storeTagline = store.tagline;
-                  var storeLogo = store.logo;
-                  var storeDomain = store.restaurant_domain;
-                  var storeThemeColor = store.theme_color;
-
-                  var storeContent = store.name;
-
-                  if (store.tagline)
-                    storeContent = storeContent + ' | ' + store.tagline;
-
-
-                  var buildFileJs = `
-                              #!/usr/bin/env bash
-                              ng build -c=` + storebranchName;
-                  fs.writeFileSync('build.sh', buildFileJs);
-                  fs.chmod('build.sh', 0o775, (err) => {
-                      if (err) throw err;
-                      fs.writeFileSync('build.sh', buildFileJs);
-                  });
-
-                  var facebookPixilCode = '';
-                  if (facebookPixilId) {
-                      facebookPixilCode = `
-
-                              <!-- Facebook Pixel Code -->
-                              <script>
-                                 !function(f,b,e,v,n,t,s)
-                                 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-                                 n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-                                 if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-                                 n.queue=[];t=b.createElement(e);t.async=!0;
-                                 t.src=v;s=b.getElementsByTagName(e)[0];
-                                 s.parentNode.insertBefore(t,s)}(window, document,'script',
-                                 'https://connect.facebook.net/en_US/fbevents.js');
-                                 fbq('init', '` + facebookPixilId + `');
-                                 fbq('track', 'PageView');
-                              </script>
-
-
-                              <noscript>
-                                      <img height='1' width='1' style='display:none'
-                                 src='https://www.facebook.com/tr?id= .  facebookPixilId . &ev=PageView&noscript=1'
-                                 />
-                              </noscript>
-                              <!-- End Facebook Pixel Code -->
-                              `;
-                  }
-
-
-
-                  var googleAnalyticsCode = '';
-                  if (googleAnalyticsId) {
-                      googleAnalyticsCode = `
-
-                              <script>
-                                 (function (i, s, o, g, r, a, m) {
-                                   i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
-                                     (i[r].q = i[r].q || []).push(arguments)
-                                   }, i[r].l = 1 * new Date(); a = s.createElement(o),
-                                     m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
-                                 })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
-                              </script>
-                              `;
-                  }
-                  var htmlFile = `
-    <!DOCTYPE html>
-      <html lang='en' dir='ltr'>
-
-      <head>
-        <meta charset='utf-8' />
-        <title>` + storeName + `</title>
-        <base href='/' />
-        <meta name='description' content='` + storeContent + ` '>
-        <meta name='viewport'
-          content='viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no' />
-        <meta name='format-detection' content='telephone=no' />
-        <meta name='msapplication-tap-highlight' content='no' />
-        <link rel='icon' type='image/png'
-          href='https://res.cloudinary.com/plugn/image/upload/w_100,h_100/restaurants/` + storeUuid + `/logo/` + storeLogo + `' />
-        <link rel='apple-touch-icon'
-          href='https://res.cloudinary.com/plugn/image/upload/w_300,h_300,b_rgb:ffffff/restaurants/` + storeUuid + `/logo/` + storeLogo + `' />
-        <link rel='apple-touch-startup-image'
-          href='https://res.cloudinary.com/plugn/image/upload/w_200,h_200,b_rgb:ffffff/restaurants/` + storeUuid + `/logo/` + storeLogo + `' />
-        <!-- add to homescreen for ios -->
-        <meta name='mobile-web-app-capable' content='yes' />
-        <meta name='apple-touch-fullscreen' content='yes' />
-        <meta name='apple-mobile-web-app-title' content='Expo' />
-        <meta name='apple-mobile-web-app-capable' content='yes' />
-        <meta name='apple-mobile-web-app-status-bar-style' content='default' />
-        <!-- Meta tags for social media -->
-        <meta property='og:type' content='website' />
-        <meta property='og:url' content='` + storeDomain + `' />
-        <meta property='og:site_name' content='` + storeContent + `' />
-        <meta property='og:image' itemprop='image primaryImageOfPage'
-          content='https://res.cloudinary.com/plugn/image/upload/w_300,h_300/restaurants/` + storeUuid + `/logo/` + storeLogo + `' />
-        <meta name='twitter:card' content='summary' />
-        <meta name='twitter:domain' content='` + storeDomain + ` ' />
-        <meta name='twitter:title' property='og:title' itemprop='name' content='` + storeContent + ` ' />
-        <meta name='twitter:description' property='og:description' itemprop='description | description'
-          content='` + storeName + `' />
-        <link rel='manifest' href='manifest.webmanifest'>
-        <meta name='theme-color' content='` + storeThemeColor + `'>
-        ` + facebookPixilCode + `
-
-        <script src='https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js'></script>
-        <script src='https://secure.gosell.io/js/sdk/tap.min.js'></script>
-      </head>
-
-      <body>
-        <app-root></app-root>
-        ` + googleAnalyticsCode + `
-
-        <noscript>Please enable JavaScript to continue using this application.</noscript>
-      </body>
-
-      </html>  `;
-                  fs.writeFileSync('src/index.html', htmlFile);
-                }
-
-
-                function overwriteCapacitorConfig(storeAppId, storeName) {
-                  var capacitorConfig = `
-                              {
-                                  " . '"appId"' . ":  " . '"` + storeAppId + `"' . ",
-                                  " . '"appName"' . ":  " . '"` + storeName + `"' . ",
-                                  " . '"bundledWebRuntime"' . ": false,
-                                  " . '"npmClient"' . ":  " . '"npm"' . ",
-                                  " . '"webDir"' . ":  " . '"www"' . ",
-                                  " . '"plugins"' . ":  {
-                                  " . '"SplashScreen"' . ": {
-                                  " . '"launchShowDuration"' . ": 0
-                              }
-                              },
-                              " . '"cordova"' . ": {
-                                  " . '"preferences"' . ": {
-                                  " . '"ScrollEnabled"' . ":  " . '"false"' . ",
-                                  " . '"android-minSdkVersion"' . ":  " . '"19"' . ",
-                                  " . '"BackupWebStorage"' . ":  " . '"none"' . ",
-                                  " . '"SplashMaintainAspectRatio"' . ":  " . '"true"' . ",
-                                  " . '"FadeSplashScreenDuration"' . ":  " . '"300"' . ",
-                                  " . '"SplashShowOnlyFirstTime"' . ":  " . '"false"' . ",
-                                  " . '"SplashScreen"' . ":  " . '"screen"' . ",
-                                  " . '"SplashScreenDelay"' . ":  " . '"3000"' . "
-                                  }
-                               }
-                              }
-                              `;
-                  fs.writeFileSync('capacitor.config.json', capacitorConfig);
-                }
-
-                function overwriteGlobalScss(storeCustomCss) {
-
-                  if (storeCustomCss)
-                      fs.appendFileSync('src/global.scss', storeCustomCss);
-                  var dir = 'src/assets/icons';
-                  if (!fs.existsSync(dir)) {
-                      fs.mkdirSync(dir);
-                  }
-                }
-
-                function overwriteManifest(storeUuid, storeName, storeThemeColor, storeLogo) {
-
-
-                  var download = function(uri, filename, callback) {
-                      request.head(uri, function(err, res, body) {
-                          request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
-                      });
-                  };
-                  download('https://res.cloudinary.com/plugn/image/upload/w_72,h_72/restaurants/' + storeUuid + '/logo/' + storeLogo, 'src/assets/icons/icon-72x72.png', function() {});
-                  download('https://res.cloudinary.com/plugn/image/upload/w_96,h_96/restaurants/' + storeUuid + '/logo/' + storeLogo, 'src/assets/icons/icon-96x96.png', function() {});
-                  download('https://res.cloudinary.com/plugn/image/upload/w_128,h_128/restaurants/' + storeUuid + '/logo/' + storeLogo, 'src/assets/icons/icon-128x128.png', function() {});
-                  download('https://res.cloudinary.com/plugn/image/upload/w_144,h_144/restaurants/' + storeUuid + '/logo/' + storeLogo, 'src/assets/icons/icon-144x144.png', function() {});
-                  download('https://res.cloudinary.com/plugn/image/upload/w_152,h_152/restaurants/' + storeUuid + '/logo/' + storeLogo, 'src/assets/icons/icon-152x152.png', function() {});
-                  download('https://res.cloudinary.com/plugn/image/upload/w_192,h_192/restaurants/' + storeUuid + '/logo/' + storeLogo, 'src/assets/icons/icon-192x192.png', function() {});
-                  download('https://res.cloudinary.com/plugn/image/upload/w_384,h_384/restaurants/' + storeUuid + '/logo/' + storeLogo, 'src/assets/icons/icon-384x384.png', function() {});
-                  download('https://res.cloudinary.com/plugn/image/upload/w_512,h_512/restaurants/' + storeUuid + '/logo/' + storeLogo, 'src/assets/icons/icon-512x512.png', function() {});
-                  var manifestFile = `
-{
-  " . '"name"' . ": " . '"` + storeName + `"' . ",
-  " . '"short_name"' . ": " . '"` + storeName + `"' . ",
-  " . '"theme_color"' . ": " . '"` + storeThemeColor + `"' . ",
-  " . '"background_color"' . ": " . '"#fafafa"' . ",
-  " . '"display"' . ": " . '"standalone"' . ",
-  " . '"scope"' . ": " . '"./"' . ",
-  " . '"start_url"' . ": " . '"./"' . ",
-  " . '"icons"' . ": [
-      {
-          " . '"src"' . ": " . '"assets/icons/icon-72x72.png"' . ",
-          " . '"sizes"' . ": " . '"72x72"' . ",
-          " . '"type"' . ": " . '"image/png"' . ",
-          " . '"purpose"' . ": " . '"maskable any"' . "
-      },
-      {
-          " . '"src"' . ": " . '"assets/icons/icon-96x96.png"' . ",
-          " . '"sizes"' . ": " . '"96x96"' . ",
-          " . '"type"' . ": " . '"image/png"' . ",
-          " . '"purpose"' . ": " . '"maskable any"' . "
-      },
-      {
-          " . '"src"' . ": " . '"assets/icons/icon-128x128.png"' . ",
-          " . '"sizes"' . ": " . '"128x128"' . ",
-          " . '"type"' . ": " . '"image/png"' . ",
-          " . '"purpose"' . ": " . '"maskable any"' . "
-      },
-      {
-          " . '"src"' . ": " . '"assets/icons/icon-144x144.png"' . ",
-          " . '"sizes"' . ": " . '"144x144"' . ",
-          " . '"type"' . ": " . '"image/png"' . ",
-          " . '"purpose"' . ": " . '"maskable any"' . "
-      },
-      {
-          " . '"src"' . ": " . '"assets/icons/icon-152x152.png"' . ",
-          " . '"sizes"' . ": " . '"152x152"' . ",
-          " . '"type"' . ": " . '"image/png"' . ",
-          " . '"purpose"' . ": " . '"maskable any"' . "
-      },
-      {
-          " . '"src"' . ": " . '"assets/icons/icon-192x192.png"' . ",
-          " . '"sizes"' . ": " . '"192x192"' . ",
-          " . '"type"' . ": " . '"image/png"' . ",
-          " . '"purpose"' . ": " . '"maskable any"' . "
-      },
-      {
-          " . '"src"' . ": " . '"assets/icons/icon-384x384.png"' . ",
-          " . '"sizes"' . ": " . '"384x384"' . ",
-          " . '"type"' . ": " . '"image/png"' . ",
-          " . '"purpose"' . ": " . '"maskable any"' . "
-      },
-      {
-          " . '"src"' . ": " . '"assets/icons/icon-512x512.png"' . ",
-          " . '"sizes"' . ": " . '"512x512"' . ",
-          " . '"type"' . ": " . '"image/png"' . ",
-          " . '"purpose"' . ": " . '"maskable any"' . "
-      }
-  ]
-}`;
-                  fs.writeFileSync('src/manifest.webmanifest', manifestFile);
-                }
-
-
-                function overwriteEnvironment(storeUuid, storebranchName, apiEndPoint) {
-
-                  var environmentFile = `
-export const environment = {
-  production: true,
-  envName: 'prod',
-  apiEndpoint : '` + apiEndPoint + `',
-  restaurantUuid : '` + storeUuid + `'
-};`;
-                  fs.writeFileSync('src/environments/environment.' + storebranchName + '.ts', environmentFile);
-
-                }
-
-                function overwriteAngularFile(storebranchName) {
-
-                  var angularFile = `{
-    " . '"$schema"' . ": " . '"./node_modules/@angular/cli/lib/config/schema.json"' . ",
-    " . '"version"' . ": 1,
-    " . '"defaultProject"' . ": " . '"app"' . ",
-    " . '"newProjectRoot"' . ": " . '"projects"' . ",
-    " . '"projects"' . ": {
-        " . '"app"' . ": {
-            " . '"root"' . ": " . '""' . ",
-            " . '"sourceRoot"' . ": " . '"src"' . ",
-            " . '"projectType"' . ": " . '"application"' . ",
-            " . '"prefix"' . ": " . '"app"' . ",
-            " . '"schematics"' . ": {},
-            " . '"architect"' . ": {
-                " . '"build"' . ": {
-                    " . '"builder"' . ": " . '"@angular-devkit/build-angular:browser"' . ",
-                    " . '"options"' . ": {
-                        " . '"outputPath"' . ": " . '"www"' . ",
-                        " . '"index"' . ": " . '"src/index.html"' . ",
-                        " . '"main"' . ": " . '"src/main.ts"' . ",
-                        " . '"polyfills"' . ": " . '"src/polyfills.ts"' . ",
-                        " . '"tsConfig"' . ": " . '"tsconfig.app.json"' . ",
-                        " . '"assets"' . ": [
-                            {
-                                " . '"glob"' . ": " . '"**/*"' . ",
-    " . '"input"' . ": " . '"src/assets"' . ",
-    " . '"output"' . ": " . '"assets"' . "
-},
-{
-    " . '"glob"' . ": " . '"**/*.svg"' . ",
-                                " . '"input"' . ": " . '"node_modules/ionicons/dist/ionicons/svg"' . ",
-                                " . '"output"' . ": " . '"./svg"' . "
-                            },
-                            " . '"src/manifest.webmanifest"' . ",
-                            " . '"src/_redirects"' . "
-                        ],
-                        " . '"styles"' . ": [
-                            " . '"src/assets/tel-input/css/intlTelInput.css"' . ",
-                            " . '"src/assets/tel-input/css/bootstrap.min.css"' . ",
-                            {
-                                " . '"input"' . ": " . '"src/theme/variables.scss"' . "
-                            },
-                            {
-                                " . '"input"' . ": " . '"src/global.scss"' . "
-                            }
-                        ],
-                        " . '"scripts"' . ": []
-                    },
-                    " . '"configurations"' . ": {
-                        " . '"` + storebranchName + `"' . ": {
-                            " . '"fileReplacements"' . ": [
-                                {
-                                    " . '"replace"' . ": " . '"src/environments/environment.ts"' . ",
-                                    " . '"with"' . ": " . '"src/environments/environment.` + storebranchName + `.ts"' . "
-                                }
-                            ],
-                            " . '"optimization"' . ": true,
-                            " . '"outputHashing"' . ": " . '"all"' . ",
-                            " . '"sourceMap"' . ": false,
-                            " . '"extractCss"' . ": true,
-                            " . '"namedChunks"' . ": false,
-                            " . '"aot"' . ": true,
-                            " . '"extractLicenses"' . ": true,
-                            " . '"vendorChunk"' . ": false,
-                            " . '"buildOptimizer"' . ": true,
-                            " . '"budgets"' . ": [
-                                {
-                                    " . '"type"' . ": " . '"initial"' . ",
-                                    " . '"maximumWarning"' . ": " . '"2mb"' . ",
-                                    " . '"maximumError"' . ": " . '"5mb"' . "
-                                }
-                            ],
-                            " . '"serviceWorker"' . ": true,
-                            " . '"ngswConfigPath"' . ": " . '"ngsw-config.json"' . "
-                        },
-                        " . '"ci"' . ": {
-                            " . '"progress"' . ": false
-                        }
-                    }
-                },
-                " . '"serve"' . ": {
-                    " . '"builder"' . ": " . '"@angular-devkit/build-angular:dev-server"' . ",
-                    " . '"options"' . ": {
-                        " . '"browserTarget"' . ": " . '"app:build"' . "
-                    },
-                    " . '"configurations"' . ": {
-                        " . '"` + storebranchName + `"' . ": {
-                            " . '"browserTarget"' . ": " . '"app:build:` + storebranchName + `"' . "
-                        },
-                        " . '"ci"' . ": {
-                            " . '"progress"' . ": false
-                        }
-                    }
-                },
-                " . '"extract-i18n"' . ": {
-                    " . '"builder"' . ": " . '"@angular-devkit/build-angular:extract-i18n"' . ",
-                    " . '"options"' . ": {
-                        " . '"browserTarget"' . ": " . '"app:build"' . "
-                    }
-                },
-                " . '"test"' . ": {
-                    " . '"builder"' . ": " . '"@angular-devkit/build-angular:karma"' . ",
-                    " . '"options"' . ": {
-                        " . '"main"' . ": " . '"src/test.ts"' . ",
-                        " . '"polyfills"' . ": " . '"src/polyfills.ts"' . ",
-                        " . '"tsConfig"' . ": " . '"tsconfig.spec.json"' . ",
-                        " . '"karmaConfig"' . ": " . '"karma.conf.js"' . ",
-                        " . '"styles"' . ": [],
-                        " . '"scripts"' . ": [],
-                        " . '"assets"' . ": [
-                            {
-                                " . '"glob"' . ": " . '"favicon.ico"' . ",
-                                " . '"input"' . ": " . '"src/"' . ",
-                                " . '"output"' . ": " . '"/"' . "
-                            },
-                            {
-                                " . '"glob"' . ": " . '"**/*"' . ",
-    " . '"input"' . ": " . '"src/assets"' . ",
-    " . '"output"' . ": " . '"/assets"' . "
-},
-    " . '"src/manifest.webmanifest"' . "
-]
-},
-    " . '"configurations"' . ": {
-    " . '"ci"' . ": {
-    " . '"progress"' . ": false,
-    " . '"watch"' . ": false
-}
-}
-},
-    " . '"lint"' . ": {
-    " . '"builder"' . ": " . '"@angular-devkit/build-angular:tslint"' . ",
-    " . '"options"' . ": {
-    " . '"tsConfig"' . ": [
-    " . '"tsconfig.app.json"' . ",
-    " . '"tsconfig.spec.json"' . ",
-    " . '"e2e/tsconfig.json"' . "
-],
-    " . '"exclude"' . ": [" . '"**/node_modules/**"' . "]
-}
-},
-    " . '"e2e"' . ": {
-    " . '"builder"' . ": " . '"@angular-devkit/build-angular:protractor"' . ",
-    " . '"options"' . ": {
-    " . '"protractorConfig"' . ": " . '"e2e/protractor.conf.js"' . ",
-    " . '"devServerTarget"' . ": " . '"app:serve"' . "
-},
-    " . '"configurations"' . ": {
-    " . '"production"' . ": {
-    " . '"devServerTarget"' . ": " . '"app:serve:production"' . "
-},
-    " . '"ci"' . ": {
-    " . '"devServerTarget"' . ": " . '"app:serve:ci"' . "
-}
-}
-},
-    " . '"ionic-cordova-build"' . ": {
-    " . '"builder"' . ": " . '"@ionic/angular-toolkit:cordova-build"' . ",
-    " . '"options"' . ": {
-    " . '"browserTarget"' . ": " . '"app:build"' . "
-},
-    " . '"configurations"' . ": {
-    " . '"production"' . ": {
-    " . '"browserTarget"' . ": " . '"app:build:production"' . "
-}
-}
-},
-    " . '"ionic-cordova-serve"' . ": {
-    " . '"builder"' . ": " . '"@ionic/angular-toolkit:cordova-serve"' . ",
-    " . '"options"' . ": {
-    " . '"cordovaBuildTarget"' . ": " . '"app:ionic-cordova-build"' . ",
-    " . '"devServerTarget"' . ": " . '"app:serve"' . "
-},
-    " . '"configurations"' . ": {
-    " . '"production"' . ": {
-    " . '"cordovaBuildTarget"' . ": " . '"app:ionic-cordova-build:production"' . ",
-    " . '"devServerTarget"' . ": " . '"app:serve:production"' . "
- }
- }
-    }
- }
-    }
-},
-    " . '"cli"' . ": {
-    " . '"defaultCollection"' . ": " . '"@ionic/angular-toolkit"' . "
-},
-    " . '"schematics"' . ": {
-    " . '"@ionic/angular-toolkit:component"' . ": {
-    " . '"styleext"' . ": " . '"scss"' . "
-},
-    " . '"@ionic/angular-toolkit:page"' . ": {
-    " . '"styleext"' . ": " . '"scss"' . "
- }
-    }
-}`;
-                  fs.writeFileSync('angular.json', angularFile);
-                }
-        ";
-
-
-        fwrite($myfile, $txt);
-
-        fclose($myfile);
 
         $queue->queue_status = Queue::QUEUE_STATUS_COMPLETE;
         $queue->save(false);
@@ -1080,8 +587,73 @@ export const environment = {
         $this->stdout("File has been created! \n", Console::FG_RED, Console::BOLD);
       }
 
-        return self::EXIT_CODE_NORMAL;
     }
+
+
+        public function actionUpdateSitemap() {
+
+          $now = new DateTime('now');
+          $stores = Restaurant::find()
+                  ->where(['sitemap_require_update' => 1])
+                  ->all();
+
+            if($stores){
+              foreach ($stores as $key => $store) {
+
+                if($store){
+
+                  $dirName = "store";
+                  if(!file_exists($dirName))
+                    $createStoreFolder = mkdir($dirName);
+
+                  if (!file_exists( $dirName . "/" . $store->store_branch_name )) {
+                    $myFolder = mkdir( $dirName . "/" . $store->store_branch_name);
+                  }
+
+                $sitemap =  fopen($dirName . "/" .   $store->store_branch_name . "/sitemap.xml", "w") or die("Unable to open file!");
+
+                fwrite($sitemap, Yii::$app->fileGeneratorComponent->createSitemapXml($store->restaurant_uuid));
+                fclose($sitemap);
+
+
+
+                //Create sitemap.xml file
+                $fileToBeUploaded = file_get_contents("store/" . $store->store_branch_name . "/sitemap.xml");
+
+                // Encode the image string data into base64
+                $data = base64_encode($fileToBeUploaded);
+
+                //Replace test with store branch name
+                $commitBuildJsFileResponse = Yii::$app->githubComponent->createFileContent($data, $store->store_branch_name, 'sitemap.xml');
+
+                if (!$commitBuildJsFileResponse->isOk) {
+                  Yii::error('[Github > Commit Sitemap xml]' . json_encode($commitBuildJsFileResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+
+                  return false;
+                }
+
+
+                //Delete sitemap file
+                $dirPath = "store/" .  $store->store_branch_name;
+                $file_pointer =  $dirPath . '/sitemap.xml';
+
+                // Use unlink() function to delete a file
+                if (!unlink($file_pointer)) {
+                    Yii::error("$file_pointer cannot be deleted due to an error", __METHOD__);
+                } else {
+                    if (!rmdir($dirPath)) {
+                        Yii::error("Could not remove $dirPath", __METHOD__);
+                    }
+                }
+
+                $store->sitemap_require_update = 0;
+                $store->save(false);
+              }
+            }
+          }
+
+          return self::EXIT_CODE_NORMAL;
+        }
 
 
     /**

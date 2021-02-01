@@ -66,9 +66,11 @@ class Queue extends \yii\db\ActiveRecord {
 
             $store_model = $this->restaurant;
 
+            //Create Build.js file
             $getLastCommitResponse = Yii::$app->githubComponent->getLastCommit();
 
             if ($getLastCommitResponse->isOk) {
+
                 $sha = $getLastCommitResponse->data['sha'];
 
                 //Replace test with store branch name
@@ -83,7 +85,7 @@ class Queue extends \yii\db\ActiveRecord {
                     $data = base64_encode($fileToBeUploaded);
 
                     //Replace test with store branch name
-                    $commitBuildJsFileResponse = Yii::$app->githubComponent->createFileContent($data, $store_model->store_branch_name);
+                    $commitBuildJsFileResponse = Yii::$app->githubComponent->createFileContent($data, $store_model->store_branch_name, 'build.js');
 
                     if ($commitBuildJsFileResponse->isOk) {
 
@@ -119,6 +121,7 @@ class Queue extends \yii\db\ActiveRecord {
                 return false;
             }
 
+
             $this->deleteBuildJsFolder();
         }
         return parent::beforeSave($insert);
@@ -126,7 +129,6 @@ class Queue extends \yii\db\ActiveRecord {
 
 
     public function deleteBuildJsFolder(){
-
 
       $dirPath = "store/" .  $this->restaurant->store_branch_name;
       $file_pointer =  $dirPath . '/build.js';
