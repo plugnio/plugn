@@ -322,12 +322,11 @@ class FileGeneratorComponent extends Component
                       }
 
                       function overwriteRobotsTxt(domainName) {
-
-                        var robotTxt = `
-                        User-agent: *
-                        Disallow:
-                        Sitemap:  `+ domainName +`/sitemap.xml
-                    `;
+var robotTxt = `
+User-agent: *
+Disallow:
+Sitemap:  `+ domainName +`/sitemap.xml
+`;
                         fs.writeFileSync('src/' + 'robots.txt', robotTxt);
 
                       }

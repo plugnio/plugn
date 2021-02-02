@@ -114,7 +114,7 @@ class RestaurantController extends Controller {
 
       if ($getSitemapXmlSHA->isOk && $getSitemapXmlSHA->data) {
 
-          $commitSitemapXmlFileResponse = Yii::$app->githubComponent->createFileContent($data, $store->store_branch_name, 'sitemap.xml', 'Update sitemap', $getSitemapXmlSHA->data['sha']);
+          $commitSitemapXmlFileResponse = Yii::$app->githubComponent->createFileContent($data, $store->store_branch_name, 'src/sitemap.xml', 'Update sitemap', $getSitemapXmlSHA->data['sha']);
 
           if ($commitSitemapXmlFileResponse->isOk) {
 
