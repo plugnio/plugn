@@ -69,6 +69,30 @@ class GithubComponent extends Component {
         return $response;
     }
 
+
+    /**
+     * Returns file SHA
+     */
+    public function getFileSHA($path, $branch = null) {
+
+        if($branch == null)
+          $branch = $this->branch;
+
+        $lastCommitEndpoint = $this->apiEndpoint . "/contents/" . $path . "?ref=" . $branch;
+
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setMethod('GET')
+                ->setUrl($lastCommitEndpoint)
+                ->addHeaders([
+                    'Authorization' => 'token ' . $this->token,
+                    'User-Agent' => 'request',
+                ])
+                ->send();
+
+        return $response;
+    }
+
     /**
      * Creates a reference for repository.
      * @param type $sha The SHA1 value for the last commit.
@@ -103,14 +127,15 @@ class GithubComponent extends Component {
      * @param type $content The new file content, using Base64 encoding.
      * @return type
      */
-    public function createFileContent($content, $branch_name, $path, $commitMessage = null) {
+    public function createFileContent($content, $branch_name, $path, $commitMessage = null, $sha = null) {
         $createBranchEndpoint = $this->apiEndpoint . "/contents/" . $path;
 
-        
+
         $branchParams = [
             "message" => $commitMessage ? $commitMessage : "first commit for $branch_name store",
             "content" => $content,
-            "branch" => $branch_name
+            "branch" => $branch_name,
+            "sha" => $sha ? $sha : ''
         ];
 
         $client = new Client();
