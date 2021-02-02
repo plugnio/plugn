@@ -543,7 +543,7 @@ class CronController extends \yii\console\Controller {
               ->orderBy(['queue_created_at' => SORT_ASC])
               ->one();
 
-      if($queue && $queue->restaurant_uuid){
+      if($queue && $restaurant_uuid){
         $queue->queue_status = TapQueue::QUEUE_STATUS_CREATING;
         $queue->save();
       }
@@ -577,7 +577,7 @@ class CronController extends \yii\console\Controller {
             }
 
             $buildJsFile =  fopen($dirName . "/" .   $queue->restaurant->store_branch_name . "/build.js", "w") or die("Unable to open file!");
-            fwrite($buildJsFile, Yii::$app->fileGeneratorComponent->createBuildJsFile(Yii::$app->params['apiEndpoint'] . '/v2', $queue->restaurant->store_branch_name ));
+            fwrite($buildJsFile, Yii::$app->fileGeneratorComponent->createBuildJsFile(Yii::$app->params['apiEndpoint'] . '/v2', $restaurant->store_branch_name, $restaurant->restaurant_domain ));
             fclose($buildJsFile);
 
 

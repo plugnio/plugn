@@ -30,7 +30,7 @@ class FileGeneratorComponent extends Component
      * Check refund object for status updates
      * @param  string $chargeId
      */
-    public function createBuildJsFile($apiEndpoint, $branch)
+    public function createBuildJsFile($apiEndpoint, $branch, $domainName)
     {
 
       $buildJsContent = "
@@ -41,6 +41,8 @@ class FileGeneratorComponent extends Component
                       var apiEndPoint = '$apiEndpoint';
 
                       var storebranchName = '$branch';
+                      var storeDomainName = '$domainName';
+
 
 
                       var url = apiEndPoint + '/store/get-restaurant-data/' + storebranchName;
@@ -54,6 +56,7 @@ class FileGeneratorComponent extends Component
                         overwriteGlobalScss(response.custom_css, response.name);
                         overwriteManifest(response.restaurant_uuid, response.name, response.theme_color, response.logo);
                         overwriteEnvironment(response.restaurant_uuid, storebranchName, apiEndPoint);
+                        overwriteRobotsTxt(storeDomainName);
                         overwriteAngularFile(storebranchName);
                       });
 
@@ -308,13 +311,24 @@ class FileGeneratorComponent extends Component
                       function overwriteEnvironment(storeUuid, storebranchName, apiEndPoint) {
 
                         var environmentFile = `
-      export const environment = {
-        production: true,
-        envName: 'prod',
-        apiEndpoint : '` + apiEndPoint + `',
-        restaurantUuid : '` + storeUuid + `'
-      };`;
+                        export const environment = {
+                          production: true,
+                          envName: 'prod',
+                          apiEndpoint : '` + apiEndPoint + `',
+                          restaurantUuid : '` + storeUuid + `'
+                        };`;
                         fs.writeFileSync('src/environments/environment.' + storebranchName + '.ts', environmentFile);
+
+                      }
+
+                      function overwriteRobotsTxt(domainName) {
+
+                        var robotTxt = `
+                        User-agent: *
+                        Disallow:
+                        Sitemap:  `+ domainName +`/sitemap.xml
+                    `;
+                        fs.writeFileSync('src/' + 'robots.txt', robotTxt);
 
                       }
 
@@ -353,6 +367,8 @@ class FileGeneratorComponent extends Component
                                       " . '"output"' . ": " . '"./svg"' . "
                                   },
                                   " . '"src/manifest.webmanifest"' . ",
+                                  " . '"src/robots.txt"' . ",
+                                  " . '"src/sitemap.xml"' . ",
                                   " . '"src/_redirects"' . "
                               ],
                               " . '"styles"' . ": [

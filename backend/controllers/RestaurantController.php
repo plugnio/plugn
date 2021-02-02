@@ -167,7 +167,7 @@ class RestaurantController extends Controller {
         $myfile =  fopen($dirName . "/" .   $store->store_branch_name . "/build.js", "w") or die("Unable to open file!");
 
         $buildJsFile =  fopen($dirName . "/" .   $store->store_branch_name . "/build.js", "w") or die("Unable to open file!");
-        fwrite($buildJsFile, Yii::$app->fileGeneratorComponent->createBuildJsFile(Yii::$app->params['apiEndpoint'] . '/v2', $store->store_branch_name ));
+        fwrite($buildJsFile, Yii::$app->fileGeneratorComponent->createBuildJsFile(Yii::$app->params['apiEndpoint'] . '/v2', $store->store_branch_name, $store->restaurant_domain ));
         fclose($buildJsFile);
 
         return $this->redirect(['view', 'id' => $store->restaurant_uuid]);

@@ -78,7 +78,7 @@ class GithubComponent extends Component {
         if($branch == null)
           $branch = $this->branch;
 
-        $lastCommitEndpoint = $this->apiEndpoint . "/contents/" . $path . "?ref=" . $branch;
+        $lastCommitEndpoint = $this->apiEndpoint . "/contents/src/" . $path . "?ref=" . $branch;
 
         $client = new Client();
         $response = $client->createRequest()
