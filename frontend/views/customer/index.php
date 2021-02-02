@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\helpers\Url;
+use common\models\Order;
 
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\CustomerSearch */
@@ -61,7 +62,14 @@ $this->registerJs($js);
                       'label' => 'Number of orders',
                       "format" => "raw",
                       "value" => function($model) {
-                          return  $model->getOrders()->count();
+                          return  $model->getOrders()
+                          ->where(['order.order_status' => Order::STATUS_PENDING])
+                          ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
+                          ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                          ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+                          ->orWhere(['order.order_status' => Order::STATUS_ACCEPTED])
+                          ->count();
+
                       }
                   ],
                   [

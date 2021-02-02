@@ -39,6 +39,7 @@ use common\models\WebLink;
  * @property int $has_deployed
  * @property int $site_id
  * @property int $platform_fee
+ * @property int $warehouse_fee
  * @property int $facebook_pixil_id
  * @property int $google_analytics_id
  * @property int $schedule_order
@@ -177,7 +178,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_uuid'], 'string', 'max' => 60],
 
             [['custom_css'], 'string'],
-            [['platform_fee'], 'number'],
+            [['platform_fee', 'warehouse_fee'], 'number'],
             [['instagram_url'], 'url'],
             [['export_orders_data_in_specific_date_range','export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'site_id'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'app_id', 'armada_api_key', 'mashkor_branch_id', 'store_branch_name', 'live_public_key', 'test_public_key', 'company_name'], 'string', 'max' => 255],
@@ -227,6 +228,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             'store_branch_name' => 'Branch name',
             'custom_css' => 'Custom css',
             'platform_fee' => 'Platform fee',
+            'warehouse_fee' => 'Warehouse fee',
             'company_name' => 'Company name',
             'store_layout' => 'Store layout',
             'google_analytics_id' => 'Google Analytics ID',
@@ -695,6 +697,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset($fields['developer_id']);
         unset($fields['site_id']);
         unset($fields['platform_fee']);
+        unset($fields['warehouse_fee']);
         unset($fields['store_branch_name']);
         unset($fields['armada_api_key']);
         unset($fields['mashkor_branch_id']);
