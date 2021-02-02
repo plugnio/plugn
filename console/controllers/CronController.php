@@ -650,7 +650,7 @@ class CronController extends \yii\console\Controller {
                       Yii::error('[Github > Commit Sitemap xml]' . json_encode($commitSitemaXMlResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
                       return false;
                     }
-                else {
+                } else {
                   Yii::error('[Github > Error while getting file sha]' . json_encode($getSitemapXmlSHA->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
                   return false;
                 }
