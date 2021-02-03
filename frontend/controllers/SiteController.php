@@ -233,7 +233,8 @@ class SiteController extends Controller {
                        $managedRestaurant->owner_number ? $managedRestaurant->owner_number : null,
                        0, //Comission
                       Url::to(['site/callback'], true),
-                      $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET :  TapPayments::GATEWAY_VISA_MASTERCARD
+                      $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET :  TapPayments::GATEWAY_VISA_MASTERCARD,
+                      $order->restaurant->warehouse_fee
               );
 
               $responseContent = json_decode($response->content);

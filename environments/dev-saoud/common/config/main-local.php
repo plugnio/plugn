@@ -6,7 +6,7 @@ return [
             'class' => 'yii\db\Connection',
             'dsn' => 'mysql:host=127.0.0.1;dbname=vendor',
             'username' => 'vendor',
-            'password' => 'saoud1607',
+            'password' => '',
             'charset' => 'utf8',
         ],
         // 'log' => [
