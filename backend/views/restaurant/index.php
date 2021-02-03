@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'store_branch_name',
             'restaurant_created_at:datetime',
             'platform_fee:percent',
-
+            'warehouse_fee',
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
