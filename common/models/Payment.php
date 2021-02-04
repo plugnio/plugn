@@ -224,6 +224,7 @@ class Payment extends \yii\db\ActiveRecord {
         Yii::info('Debug1', __METHOD__);
 
         if ($this->payment_current_status == 'CAPTURED' && $this->received_callback){
+          Yii::info('Debug2', __METHOD__);
 
           $this->order->changeOrderStatusToPending();
           $this->order->sendPaymentConfirmationEmail();
