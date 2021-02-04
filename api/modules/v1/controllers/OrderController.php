@@ -359,7 +359,8 @@ class OrderController extends Controller {
                                  $order->customer_phone_number,
                                  $order->restaurant->platform_fee,
                                  Url::to(['order/callback'], true),
-                                $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id
+                                $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id,
+                                $order->restaurant->warehouse_fee
                         );
 
 

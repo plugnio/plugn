@@ -67,7 +67,7 @@ class TapPayments extends Component
     /**
      * @var float gateway fee charged by portal
      */
-    public $minChargeAmount = 5; // How much is charged per KNET transaction
+    public $minChargeAmount = 4; // How much is charged per KNET transaction
 
     /**
      * @var float gateway fee charged by portal
@@ -429,7 +429,7 @@ class TapPayments extends Component
     /**
      * Create a charge for redirect
      */
-    public function createCharge($currency, $desc = "Pay", $statementDesc = "", $ref, $amount ,$firstName, $email, $country_code ,$phone,$platform_fee, $redirectUrl, $gateway)
+    public function createCharge($currency, $desc = "Pay", $statementDesc = "", $ref, $amount ,$firstName, $email, $country_code ,$phone,$platform_fee, $redirectUrl, $gateway, $warehouse_fee)
     {
 
         $chargeEndpoint = $this->apiEndpoint . "/charges";
@@ -470,45 +470,57 @@ class TapPayments extends Component
 
 
         if($platform_fee > 0){
-          if($gateway == static::GATEWAY_KNET){
+           if($gateway == static::GATEWAY_KNET){
 
-            //if greater than 10KD
-          if (($amount * $this->knetGatewayFee) >= $this->minKnetGatewayFee) {
-              $platform_fee = $amount *  ( $platform_fee  - $this->knetGatewayFee );
-            }
-            // if amount between > 5 and < 10
-            else if  ($amount > $this->minChargeAmount && (($amount * $this->knetGatewayFee) < $this->minKnetGatewayFee)){ //10KD
-              $platform_fee = ($amount *  $platform_fee ) - $this->minKnetGatewayFee;
-            }
-            else if ($this->minChargeAmount >= $amount) {
-              $platform_fee = 0.100;
-            }
+                 //if greater than 10KD
+                if (($amount * $this->knetGatewayFee) >= $this->minKnetGatewayFee){
+                  $platform_fee = $amount *  ( $platform_fee  - $this->knetGatewayFee );
+                }
 
-          }
+                 // if amount greater than  4 and  equal 10
+                 else if  ($amount > $this->minChargeAmount && ( ($amount * $this->knetGatewayFee) < $this->minKnetGatewayFee)){
+                   $platform_fee = ($amount *  $platform_fee ) - $this->minKnetGatewayFee;
+                 }
 
-          else if($gateway == static::GATEWAY_MADA){
-              $platform_fee = $amount *  ( $platform_fee  - $this->madaGatewayFee );
-          }
+                 //if amount less than or equal 4
+                 else if ($this->minChargeAmount >= $amount) {
+                   $platform_fee = 0.100;
+                 }
 
-          else if($gateway == static::GATEWAY_BENEFIT){
+          } else if($gateway == static::GATEWAY_BENEFIT)
               $platform_fee = $amount *  ( $platform_fee  - $this->benefitGatewayFee );
-          }
-
-          else { //Credit card
-            $platform_fee = $amount *  ($platform_fee  - $this->creditcardGatewayFeePercentage);
-          }
+          else
+             $platform_fee = $amount *  ($platform_fee  - $this->creditcardGatewayFeePercentage);
 
 
-          $destination = [
-              "id" => $this->destinationId,
-              "amount" => $platform_fee,
-              "currency" => $currency,
-          ];
+           if($warehouse_fee > 0)
+             $charge_amount = $warehouse_fee + $platform_fee;
+          else
+               $charge_amount = $platform_fee;
 
 
-          array_push($chargeParams['destinations']['destination'], $destination);
+           $destination = [
+               "id" => $this->destinationId,
+               "amount" => $charge_amount,
+               "currency" => "KWD",
+           ];
 
-        }
+
+           array_push($chargeParams['destinations']['destination'], $destination);
+
+         } else if ($platform_fee == 0 && $warehouse_fee > 0) {
+
+           $charge_amount = $warehouse_fee;
+
+           $destination = [
+               "id" => $this->destinationId,
+               "amount" => $charge_amount,
+               "currency" => "KWD",
+           ];
+
+           array_push($chargeParams['destinations']['destination'], $destination);
+
+         }
 
 
         $client = new Client();

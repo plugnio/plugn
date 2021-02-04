@@ -316,14 +316,6 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                             }
                         ],
                         [
-                            'attribute' => 'special_directions',
-                            'format' => 'html',
-                            'value' => function ($data) {
-                                return $data->special_directions;
-                            },
-                            'visible' => $model->special_directions != null || $model->special_directions,
-                        ],
-                        [
                             'attribute' => 'armada_tracking_link',
                             'format' => 'raw',
                             'value' => function ($data) {
@@ -426,8 +418,21 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                 'format' => 'raw',
                 'value' => 'item.sku',
             ],
-            'customer_instruction',
-            'qty',
+            // 'customer_instruction',
+            [
+                'attribute' => 'customer_instruction',
+                'format' => 'html',
+                'value' => function ($data) {
+                    return  $data->customer_instruction ? '<b>' . $data->customer_instruction  . '</b>' : '(not set)' ;
+                }
+            ],
+            [
+                'attribute' => 'qty',
+                'format' => 'html',
+                'value' => function ($data) {
+                    return  '<b>' . $data->qty  . '</b>';
+                }
+            ],
             [
                 'label' => 'Extra Options',
                 'value' => function ($data) {
@@ -836,6 +841,14 @@ DetailView::widget([
                             },
                             'visible' => $model->order_mode == Order::ORDER_MODE_PICK_UP,
                         ],
+                        [
+                            'attribute' => 'special_directions',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return $data->special_directions;
+                            },
+                            'visible' => $model->special_directions,
+                        ]
                     ],
                     'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
                 ])

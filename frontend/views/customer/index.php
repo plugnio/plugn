@@ -69,12 +69,13 @@ $this->registerJs($js);
                       'label' => 'Number of orders',
                       "format" => "raw",
                       "value" => function($model) {
-                          return  $model->getOrders()
-                          ->where(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
-                          ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
-                          ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
-                          ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
-                          ->count();
+                        return  $model->getOrders()
+                               ->where(['order.order_status' => Order::STATUS_PENDING])
+                               ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
+                               ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                               ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+                               ->orWhere(['order.order_status' => Order::STATUS_ACCEPTED])
+                               ->count();
                       }
                   ],
                   [
@@ -82,11 +83,12 @@ $this->registerJs($js);
                       "format" => "raw",
                       "value" => function($model) {
                         $total_spent = $model->getOrders()
-                                        ->where(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
-                                        ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
-                                        ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
-                                        ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
-                                        ->sum('total_price');
+                                              ->where(['order.order_status' => Order::STATUS_PENDING])
+                                              ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
+                                              ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                                              ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+                                              ->orWhere(['order.order_status' => Order::STATUS_ACCEPTED])
+                                              ->sum('total_price');
 
                           $total_spent = \Yii::$app->formatter->asDecimal($total_spent ? $total_spent : 0 , 3);
                           return  Yii::$app->formatter->asCurrency($total_spent ? $total_spent : 0, $model->currency->code) ;

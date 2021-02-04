@@ -223,6 +223,8 @@ use borales\extensions\phoneInput\PhoneInput;
 
     <?= $form->field($model, 'platform_fee')->textInput([ 'maxlength' => true, 'placeholder' => 'Platform fee']) ?>
 
+    <?= $form->field($model, 'warehouse_fee')->textInput([ 'maxlength' => true, 'placeholder' => 'Warehouse fee']) ?>
+
     <?= $form->field($model, 'armada_api_key')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'mashkor_branch_id')->textInput(['maxlength' => true]) ?>

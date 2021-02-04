@@ -104,7 +104,13 @@ class ZapierController extends Controller {
 
             $orders = Order::find()
                     ->joinWith('orderItems')
-                    ->where(['restaurant_uuid' => $restaurant_uuid])
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                    ->orWhere(['order_status' => Order::STATUS_ACCEPTED])
+                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere(['order.restaurant_uuid' => $restaurant_uuid])
                     ->asArray()
                     ->all();
 
