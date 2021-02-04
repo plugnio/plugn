@@ -591,7 +591,6 @@ class CronController extends \yii\console\Controller {
 
         public function actionUpdateSitemap() {
 
-          $now = new DateTime('now');
           $stores = Restaurant::find()
                   ->where(['sitemap_require_update' => 1])
                   ->all();
@@ -615,7 +614,6 @@ class CronController extends \yii\console\Controller {
                 fclose($sitemap);
 
 
-
                 //Create sitemap.xml file
                 $fileToBeUploaded = file_get_contents("store/" . $store->store_branch_name . "/sitemap.xml");
 
@@ -625,10 +623,12 @@ class CronController extends \yii\console\Controller {
                 $getSitemapXmlSHA = Yii::$app->githubComponent->getFileSHA('sitemap.xml', $store->store_branch_name,);
 
                 if ($getSitemapXmlSHA->isOk && $getSitemapXmlSHA->data) {
-                    //Replace test with store branch name
-                    $commitSitemapXmlFileResponse = Yii::$app->githubComponent->createFileContent($data, $store->store_branch_name, 'sitemap.xml', 'Update sitemap', $getSitemapXmlSHA->data['sha']);
 
-                    if ($commitSitemaXMlResponse->isOk) {
+                    //Replace test with store branch name
+                    $commitSitemapXmlFileResponse = Yii::$app->githubComponent->createFileContent($data, $store->store_branch_name, 'src/sitemap.xml', 'Update sitemap', $getSitemapXmlSHA->data['sha']);
+
+                    if ($commitSitemapXmlFileResponse->isOk) {
+
 
                       $store->sitemap_require_update = 0;
                       $store->save(false);
@@ -647,9 +647,11 @@ class CronController extends \yii\console\Controller {
                       }
 
                     } else {
-                      Yii::error('[Github > Commit Sitemap xml]' . json_encode($commitSitemaXMlResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+                      Yii::error('[Github > Commit Sitemap xml]' . json_encode($commitSitemapXmlFileResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
                       return false;
                     }
+
+
                 } else {
                   Yii::error('[Github > Error while getting file sha]' . json_encode($getSitemapXmlSHA->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
                   return false;
