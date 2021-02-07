@@ -111,12 +111,12 @@ class OrderController extends Controller {
                 $order->street = Yii::$app->request->getBodyParam("street");
                 $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
                 $order->house_number = Yii::$app->request->getBodyParam("house_number");
-                $order->delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
               }
 
 
 
               if(!Yii::$app->request->getBodyParam("area_id") && !Yii::$app->request->getBodyParam("area_delivery_zone") ){
+
                 $order->delivery_zone_id = Yii::$app->request->getBodyParam("deliveryZone")['delivery_zone_id'];
                 $order->shipping_country_id = Yii::$app->request->getBodyParam("country_id");
                 $order->address_1 = Yii::$app->request->getBodyParam('address_1');
@@ -319,21 +319,51 @@ class OrderController extends Controller {
                         Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
 
 
-                        // $source_id
-                        $response = Yii::$app->tapPayments->createCharge(
-                                $order->currency->code,
-                                "Order placed from: " . $order->customer_name, // Description
-                                $order->restaurant->name, //Statement Desc.
-                                $payment->payment_uuid, // Reference
-                                $order->total_price,
-                                 $order->customer_name,
-                                 $order->customer_email,
-                                 $order->customer_phone_country_code,
-                                 $order->customer_phone_number,
-                                 $order->restaurant->platform_fee,
-                                 Url::to(['order/callback'], true),
-                                $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id
-                        );
+                        //Convert to BHD
+                        if($order->currency->code != 'BHD' && $order->paymentMethod->source_id == TapPayments::GATEWAY_BENEFIT){
+
+                          $convertAmountToBHDCurrency = Yii::$app->tapPayments->createDCC($order->currency->code,$order->total_price);
+
+                          if($convertAmountToBHDCurrency->isOk){
+                              $totalPriceInBhd = $convertAmountToBHDCurrency->data['to'][0]['value'];
+
+                              $response = Yii::$app->tapPayments->createCharge(
+                                      'BHD',
+                                      "Order placed from: " . $order->customer_name, // Description
+                                       $order->restaurant->name, //Statement Desc.
+                                       $payment->payment_uuid, // Reference
+                                       $totalPriceInBhd,
+                                       $order->customer_name,
+                                       $order->customer_email,
+                                       $order->customer_phone_country_code,
+                                       $order->customer_phone_number,
+                                       $order->restaurant->platform_fee,
+                                       Url::to(['order/callback'], true),
+                                      $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id,
+                                      $order->restaurant->warehouse_fee
+                              );
+                          }
+                        } else {
+
+                          $response = Yii::$app->tapPayments->createCharge(
+                                  $order->currency->code,
+                                  "Order placed from: " . $order->customer_name, // Description
+                                  $order->restaurant->name, //Statement Desc.
+                                  $payment->payment_uuid, // Reference
+                                  $order->total_price,
+                                   $order->customer_name,
+                                   $order->customer_email,
+                                   $order->customer_phone_country_code,
+                                   $order->customer_phone_number,
+                                   $order->restaurant->platform_fee,
+                                   Url::to(['order/callback'], true),
+                                  $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id,
+                                  $order->restaurant->warehouse_fee
+                          );
+                        }
+
+
+
 
                         $responseContent = json_decode($response->content);
 

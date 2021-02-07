@@ -538,6 +538,45 @@ class TapPayments extends Component
     }
 
     /**
+     * The dynamic currency conversion API allows merchants
+     * to get realtime and accurate currency exchange rates
+     * as used by Tap and add a markup to those rates.
+     * @param type $amount
+     */
+    public function createDCC($currentCurrency, $amount, $toCurrency = 'USD')
+    {
+        $dccEndpoint = $this->apiEndpoint . "/currency/dcc/v1";
+
+        $dccParams = [
+            "from" => [
+              "currency"  => $currentCurrency,
+              "value" => $amount
+            ],
+            "to" => [
+              [
+                "currency" => $toCurrency,
+                "dcc_rate" => "2.5%"
+              ]
+            ],
+            "by" => "PROVIDER"
+        ];
+
+
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setMethod('POST')
+                ->setUrl($dccEndpoint)
+                ->setData($dccParams)
+                ->addHeaders([
+                    'authorization' => 'Bearer ' . $this->plugnScretApiKey,
+                    'content-type' => 'application/json',
+                ])
+                ->send();
+
+        return $response;
+    }
+
+    /**
      * isValidToken
      * @param  string $chargeId
      */
