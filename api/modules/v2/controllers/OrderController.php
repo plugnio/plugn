@@ -321,12 +321,14 @@ class OrderController extends Controller {
 
                         //Convert to BHD
                         if($order->currency->code != 'BHD' && $order->paymentMethod->source_id == TapPayments::GATEWAY_BENEFIT){
-                          Yii::error('if', __METHOD__);
+
 
                           $convertAmountToBHDCurrency = Yii::$app->tapPayments->createDCC($order->currency->code,$order->total_price);
 
                           if($convertAmountToBHDCurrency->isOk){
+
                               $totalPriceInBhd = $convertAmountToBHDCurrency->data['to'][0]['value'];
+                              Yii::error('if=???' $totalPriceInBhd, __METHOD__);
 
                               $response = Yii::$app->tapPayments->createCharge(
                                       'BHD',
@@ -343,6 +345,9 @@ class OrderController extends Controller {
                                       $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id,
                                       $order->restaurant->warehouse_fee
                               );
+                          }else {
+                            Yii::error('iferrror', __METHOD__);
+
                           }
                         } else {
                           Yii::error('else', __METHOD__);
