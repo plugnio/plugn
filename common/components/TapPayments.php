@@ -573,6 +573,8 @@ class TapPayments extends Component
                 ])
                 ->send();
                 Yii::error('[PARAMS]' . json_encode($response->data) , __METHOD__);
+                Yii::error('[PARAMS]1' . json_encode($response->data['to'][0]) , __METHOD__);
+                Yii::error('[PARAMS]2' . json_encode($response->data['to'][0]['value']) , __METHOD__);
 
         return $response;
     }
