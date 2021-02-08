@@ -325,9 +325,8 @@ class OrderController extends Controller {
                           $convertAmountToBHDCurrency = Yii::$app->tapPayments->createDCC('KWD',$order->total_price);
 
                           if($convertAmountToBHDCurrency->isOk){
-                            $responseData = json_encode($convertAmountToBHDCurrency->data);
-                            Yii::error('[PARAMS77777]' . $responseData , __METHOD__);
-                              $totalPriceInBhd = json_encode($convertAmountToBHDCurrency->data['to'][0]['value']);
+
+                              $totalPriceInBhd =  (int) json_encode($convertAmountToBHDCurrency->data['to'][0]['value']);
 
                               $response = Yii::$app->tapPayments->createCharge(
                                       'BHD',
