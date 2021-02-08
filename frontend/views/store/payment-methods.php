@@ -127,10 +127,10 @@ $interval = $today->diff($expiry);
                             <td>
                                 5 working days
                             </td>
-                            <td class="<?= $model->plan->plan_id == 2 ? 'current-plan-body-row' : '' ?>">
+                            <td class="<?= $model->plan->plan_id == 2  ? (($model->country->iso !=  'BH' && $model->country->iso !=  'SA' && $model->country->iso !=  'KW') || ($model->country->iso ==  'SA' && $model->plan->plan_id == 1 ) ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
                                 2.5% per transaction, no minimum.
                             </td>
-                            <td class="<?= $model->plan->plan_id == 1 ? (  $model->country->iso == 'SA'  ? 'current-plan-body-row current-plan-bottom-row': 'current-plan-body-row') : '' ?>">
+                            <td class="<?= $model->plan->plan_id == 1  ? (($model->country->iso !=  'BH' && $model->country->iso !=  'SA' && $model->country->iso !=  'KW') || ($model->country->iso ==  'SA' && $model->plan->plan_id == 1 ) ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
                                 5% per transaction, no minimum.
                             </td>
                             <td>
@@ -149,7 +149,7 @@ $interval = $today->diff($expiry);
                         </tr>
 
                         <!-- KNET -->
-                        <?php if ($model->country->iso != 'SA') { ?>
+                        <?php if ($model->country->iso == 'KW') { ?>
 
                         <tr>
                             <th scope="row">
@@ -163,10 +163,10 @@ $interval = $today->diff($expiry);
 
                             </th>
                             <td>  3 working days</td>
-                            <td class="<?= $model->plan->plan_id == 2 ? 'current-plan-body-row' : '' ?>">
+                            <td class="<?= $model->plan->plan_id == 2  ? (($model->country->iso ==  'KW') ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
                                 1% per transaction, a minimum of 100 fills.
                             </td>
-                            <td class="<?= $model->plan->plan_id == 1 ? 'current-plan-body-row' : '' ?>">
+                            <td class="<?= $model->plan->plan_id == 1  ? (($model->country->iso ==  'KW') ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
                                 5% per transaction, a minimum of 200 fills.
                             </td>
                             <td >
@@ -185,7 +185,7 @@ $interval = $today->diff($expiry);
                       <?php  }  ?>
 
                         <!-- BH -->
-                        <?php if ($model->country->iso != 'SA') { ?>
+                        <?php if ($model->country->iso == 'BH') { ?>
 
                           <tr>
                               <th scope="row">
@@ -199,11 +199,11 @@ $interval = $today->diff($expiry);
 
                               </th>
                               <td>  3 working days</td>
-                                <td class="<?= $model->plan->plan_id == 2  ? (($model->country->iso !=  'SA') ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
+                                <td class="<?= $model->plan->plan_id == 2  ? (($model->country->iso ==  'BH') ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
 
                                   1.5% per transaction, no minimum.
                               </td>
-                              <td class="<?= $model->plan->plan_id == 1  ? (($model->country->iso !=  'SA') ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
+                              <td class="<?= $model->plan->plan_id == 1  ? (($model->country->iso ==  'BH') ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
                                   5% per transaction, no minimum.
                               </td>
                               <td >

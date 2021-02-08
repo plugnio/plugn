@@ -242,114 +242,134 @@ class OrderController extends Controller {
                     $payment->restaurant_uuid = $restaurant_model->restaurant_uuid;
                     $payment->payment_mode = $order->paymentMethod->source_id;
 
-                    if ($payment->payment_mode == TapPayments::GATEWAY_VISA_MASTERCARD && Yii::$app->request->getBodyParam("payment_token") && Yii::$app->request->getBodyParam("bank_name")) {
-
-                        Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
-
-                        $response = Yii::$app->tapPayments->retrieveToken(Yii::$app->request->getBodyParam("payment_token"));
-
-                        $responseContent = json_decode($response->content);
 
 
-                        try {
+                    if($restaurant_model->is_tap_enable){
 
-                            // Validate that theres no error from TAP gateway
-                            if (isset($responseContent->status) && $responseContent->status == "fail") {
-                                $errorMessage = "Error: Invalid Token ID";
-                                \Yii::error($errorMessage, __METHOD__); // Log error faced by user
+                      if ($payment->payment_mode == TapPayments::GATEWAY_VISA_MASTERCARD && Yii::$app->request->getBodyParam("payment_token") && Yii::$app->request->getBodyParam("bank_name")) {
 
-                                return [
-                                    'operation' => 'error',
-                                    'message' => 'Invalid Token ID'
-                                ];
-                            } else if (isset($responseContent->id) && $responseContent->id) {
+                          Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
 
-                                $bank_name = Yii::$app->request->getBodyParam("bank_name");
+                          $response = Yii::$app->tapPayments->retrieveToken(Yii::$app->request->getBodyParam("payment_token"));
 
-                                $bank_discount_model = BankDiscount::find()
-                                        ->innerJoin('bank', 'bank.bank_id = bank_discount.bank_id')
-                                        ->where(['bank.bank_name' => $bank_name])
-                                        ->andWhere(['restaurant_uuid' => $order->restaurant_uuid])
-                                        ->andWhere(['<=' ,'minimum_order_amount' , $order->total_price])
-                                        ->one();
+                          $responseContent = json_decode($response->content);
 
 
-                                if ($bank_discount_model) {
-                                    if ($bank_discount_model->isValid($order->customer_phone_number)) {
-                                        $customerBankDiscount = new CustomerBankDiscount();
-                                        $customerBankDiscount->customer_id = $order->customer_id;
-                                        $customerBankDiscount->bank_discount_id = $bank_discount_model->bank_discount_id;
-                                        $customerBankDiscount->save();
-                                    }
+                          try {
 
-                                    $order->bank_discount_id = $bank_discount_model->bank_discount_id;
+                              // Validate that theres no error from TAP gateway
+                              if (isset($responseContent->status) && $responseContent->status == "fail") {
+                                  $errorMessage = "Error: Invalid Token ID";
+                                  \Yii::error($errorMessage, __METHOD__); // Log error faced by user
 
-                                }
+                                  return [
+                                      'operation' => 'error',
+                                      'message' => 'Invalid Token ID'
+                                  ];
+                              } else if (isset($responseContent->id) && $responseContent->id) {
 
-                                $payment->payment_token = Yii::$app->request->getBodyParam("payment_token");
+                                  $bank_name = Yii::$app->request->getBodyParam("bank_name");
 
-                            }
-                        } catch (\Exception $e) {
-                            Yii::error('[TAP Payment Issue > Invalid Token ID]' . json_encode($responseContent), __METHOD__);
-
-                            $response = [
-                                'operation' => 'error',
-                                'message' => 'Invalid Token id'
-                            ];
-                        }
-                    }
+                                  $bank_discount_model = BankDiscount::find()
+                                          ->innerJoin('bank', 'bank.bank_id = bank_discount.bank_id')
+                                          ->where(['bank.bank_name' => $bank_name])
+                                          ->andWhere(['restaurant_uuid' => $order->restaurant_uuid])
+                                          ->andWhere(['<=' ,'minimum_order_amount' , $order->total_price])
+                                          ->one();
 
 
-                    $payment->customer_id = $order->customer->customer_id; //customer id
-                    $payment->order_uuid = $order->order_uuid;
-                    $payment->payment_amount_charged = $order->total_price;
-                    $payment->payment_current_status = "Redirected to payment gateway";
+                                  if ($bank_discount_model) {
+                                      if ($bank_discount_model->isValid($order->customer_phone_number)) {
+                                          $customerBankDiscount = new CustomerBankDiscount();
+                                          $customerBankDiscount->customer_id = $order->customer_id;
+                                          $customerBankDiscount->bank_discount_id = $bank_discount_model->bank_discount_id;
+                                          $customerBankDiscount->save();
+                                      }
 
-                    if ($payment->save()) {
+                                      $order->bank_discount_id = $bank_discount_model->bank_discount_id;
 
-                        //Update payment_uuid in order
-                        $order->payment_uuid = $payment->payment_uuid;
-                        $order->save(false);
-                        $order->updateOrderTotalPrice();
+                                  }
 
-                        Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
+                                  $payment->payment_token = Yii::$app->request->getBodyParam("payment_token");
 
+                              }
+                          } catch (\Exception $e) {
+                              Yii::error('[TAP Payment Issue > Invalid Token ID]' . json_encode($responseContent), __METHOD__);
 
-                        // Redirect to payment gateway
-                        Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
-
-
-                        //Convert to BHD
-                        if($order->currency->code != 'BHD' && $order->paymentMethod->source_id == TapPayments::GATEWAY_BENEFIT){
-
-                          $convertAmountToBHDCurrency = Yii::$app->tapPayments->createDCC('KWD',$order->total_price);
-
-                          if($convertAmountToBHDCurrency->isOk){
-
-                              $totalPriceInBhd =  (float) $convertAmountToBHDCurrency->data['to'][0]['value'];
-
-                              $response = Yii::$app->tapPayments->createCharge(
-                                      'BHD',
-                                      "Order placed from: " . $order->customer_name, // Description
-                                       $order->restaurant->name, //Statement Desc.
-                                       $payment->payment_uuid, // Reference
-                                       $totalPriceInBhd,
-                                       $order->customer_name,
-                                       $order->customer_email,
-                                       $order->customer_phone_country_code,
-                                       $order->customer_phone_number,
-                                       $order->restaurant->platform_fee,
-                                       Url::to(['order/callback'], true),
-                                      $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id,
-                                      $order->restaurant->warehouse_fee
-                              );
-
-                          } else {
-                            Yii::error('[Error when converting to BHD Currency]' . json_decode($convertAmountToBHDCurrency->data) . ' orderCurrency: '. $order->currency->code, __METHOD__);
-                            // Yii::error('[Error when converting to BHD Currency]' . json_encode($convertAmountToBHDCurrency->data) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
+                              $response = [
+                                  'operation' => 'error',
+                                  'message' => 'Invalid Token id'
+                              ];
                           }
-                        } else {
-                          Yii::error('[Error when converting to BHD Currency]111' , __METHOD__);
+                      }
+
+                      $payment->customer_id = $order->customer->customer_id; //customer id
+                      $payment->order_uuid = $order->order_uuid;
+                      $payment->payment_amount_charged = $order->total_price;
+                      $payment->payment_current_status = "Redirected to payment gateway";
+
+                      if ($payment->save()) {
+
+                          //Update payment_uuid in order
+                          $order->payment_uuid = $payment->payment_uuid;
+                          $order->save(false);
+                          $order->updateOrderTotalPrice();
+
+                          Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
+
+
+                          // Redirect to payment gateway
+                          Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
+
+
+                          //Convert to BHD
+                          // if($order->currency->code != 'BHD' && $order->paymentMethod->source_id == TapPayments::GATEWAY_BENEFIT){
+                          //
+                          //   $convertAmountToBHDCurrency = Yii::$app->tapPayments->createDCC('KWD',$order->total_price);
+                          //
+                          //   if($convertAmountToBHDCurrency->isOk){
+                          //
+                          //       $totalPriceInBhd =  (float) $convertAmountToBHDCurrency->data['to'][0]['value'];
+                          //
+                          //       $response = Yii::$app->tapPayments->createCharge(
+                          //               'BHD',
+                          //               "Order placed from: " . $order->customer_name, // Description
+                          //                $order->restaurant->name, //Statement Desc.
+                          //                $payment->payment_uuid, // Reference
+                          //                $totalPriceInBhd,
+                          //                $order->customer_name,
+                          //                $order->customer_email,
+                          //                $order->customer_phone_country_code,
+                          //                $order->customer_phone_number,
+                          //                $order->restaurant->platform_fee,
+                          //                Url::to(['order/callback'], true),
+                          //               $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id,
+                          //               $order->restaurant->warehouse_fee
+                          //       );
+                          //
+                          //   } else {
+                          //     Yii::error('[Error when converting to BHD Currency]' . json_decode($convertAmountToBHDCurrency->data) . ' orderCurrency: '. $order->currency->code, __METHOD__);
+                          //     // Yii::error('[Error when converting to BHD Currency]' . json_encode($convertAmountToBHDCurrency->data) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
+                          //   }
+                          // } else {
+                          //   Yii::error('[Error when converting to BHD Currency]111' , __METHOD__);
+                          //
+                          //   $response = Yii::$app->tapPayments->createCharge(
+                          //           $order->currency->code,
+                          //           "Order placed from: " . $order->customer_name, // Description
+                          //           $order->restaurant->name, //Statement Desc.
+                          //           $payment->payment_uuid, // Reference
+                          //           $order->total_price,
+                          //            $order->customer_name,
+                          //            $order->customer_email,
+                          //            $order->customer_phone_country_code,
+                          //            $order->customer_phone_number,
+                          //            $order->restaurant->platform_fee,
+                          //            Url::to(['order/callback'], true),
+                          //           $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id,
+                          //           $order->restaurant->warehouse_fee
+                          //   );
+                          // }
 
                           $response = Yii::$app->tapPayments->createCharge(
                                   $order->currency->code,
@@ -366,69 +386,76 @@ class OrderController extends Controller {
                                   $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id,
                                   $order->restaurant->warehouse_fee
                           );
-                        }
 
 
-                        $responseContent = json_decode($response->content);
+                          $responseContent = json_decode($response->content);
 
-                        try {
+                          try {
 
-                            // Validate that theres no error from TAP gateway
-                            if (isset($responseContent->errors)) {
-                                $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
-                                \Yii::error($errorMessage, __METHOD__); // Log error faced by user
+                              // Validate that theres no error from TAP gateway
+                              if (isset($responseContent->errors)) {
+                                  $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
+                                  \Yii::error($errorMessage, __METHOD__); // Log error faced by user
 
-                                return [
-                                    'operation' => 'error',
-                                    'message' => $errorMessage
-                                ];
-                            }
+                                  return [
+                                      'operation' => 'error',
+                                      'message' => $errorMessage
+                                  ];
+                              }
 
-                            if ($responseContent->id) {
+                              if ($responseContent->id) {
 
-                                $chargeId = $responseContent->id;
-                                $redirectUrl = $responseContent->transaction->url;
+                                  $chargeId = $responseContent->id;
+                                  $redirectUrl = $responseContent->transaction->url;
 
-                                $payment->payment_gateway_transaction_id = $chargeId;
+                                  $payment->payment_gateway_transaction_id = $chargeId;
 
-                                if (!$payment->save(false)) {
+                                  if (!$payment->save(false)) {
 
-                                    \Yii::error($payment->errors, __METHOD__); // Log error faced by user
+                                      \Yii::error($payment->errors, __METHOD__); // Log error faced by user
 
-                                    return [
-                                        'operation' => 'error',
-                                        'message' => $payment->getErrors()
-                                    ];
-                                }
-                            } else {
-                                \Yii::error('[Payment Issue > Charge id is missing ]' . $responseContent, __METHOD__); // Log error faced by user
-                            }
+                                      return [
+                                          'operation' => 'error',
+                                          'message' => $payment->getErrors()
+                                      ];
+                                  }
+                              } else {
+                                  \Yii::error('[Payment Issue > Charge id is missing ]' . $responseContent, __METHOD__); // Log error faced by user
+                              }
 
 
-                            return [
-                                'operation' => 'redirecting',
-                                'redirectUrl' => $redirectUrl,
-                            ];
-                        } catch (\Exception $e) {
-                          Yii::error('[Error when converting to BHD Currency]222' , __METHOD__);
+                              return [
+                                  'operation' => 'redirecting',
+                                  'redirectUrl' => $redirectUrl,
+                              ];
+                          } catch (\Exception $e) {
+                            Yii::error('[Error when converting to BHD Currency]222' , __METHOD__);
 
-                            if ($payment)
-                                Yii::error('[TAP Payment Issue > ]' . json_encode($payment->getErrors()), __METHOD__);
+                              if ($payment)
+                                  Yii::error('[TAP Payment Issue > ]' . json_encode($payment->getErrors()), __METHOD__);
 
-                            Yii::error('[TAP Payment Issue > Charge id is missing]' . json_encode($responseContent), __METHOD__);
+                              Yii::error('[TAP Payment Issue > Charge id is missing]' . json_encode($responseContent), __METHOD__);
 
-                            $response = [
-                                'operation' => 'error',
-                                'message' => $responseContent
-                            ];
-                        }
-                    } else {
+                              $response = [
+                                  'operation' => 'error',
+                                  'message' => $responseContent
+                              ];
+                          }
+                      } else {
 
-                        $response = [
-                            'operation' => 'error',
-                            'message' => $payment->getErrors()
-                        ];
-                    }
+                          $response = [
+                              'operation' => 'error',
+                              'message' => $payment->getErrors()
+                          ];
+                      }
+
+                  } else {
+                    $response = [
+                        'operation' => 'error',
+                        'message' => 'Sorry we are not able to process your request Please try again later'
+                    ];
+                  }
+
                 } else {
 
 
@@ -441,11 +468,6 @@ class OrderController extends Controller {
 
                         Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
 
-
-//                            //Update product inventory
-//                            foreach ($order->getOrderItems()->all() as $orderItem) {
-//                                $orderItem->item->decreaseStockQty($orderItem->qty);
-//                            }
 
                         $response = [
                             'operation' => 'success',
