@@ -374,7 +374,7 @@ $this->registerJs($js);
 <section id="tutorial-card">
 
 
-  <?php if( !$restaurant_model->is_tap_enable ){ ?>
+  <?php if( !$restaurant_model->tap_queue_id ){ ?>
 
   <div class="card">
       <div class="card-body">

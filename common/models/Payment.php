@@ -229,8 +229,8 @@ class Payment extends \yii\db\ActiveRecord {
             throw new \Exception($errorMessage);
         }
 
-        if ($showUpdatedFlashNotification)
-            Yii::$app->session->setFlash('success', 'Updated payment status');
+        // if ($showUpdatedFlashNotification)
+        //     Yii::$app->session->setFlash('success', 'Updated payment status');
 
         return $paymentRecord;
     }

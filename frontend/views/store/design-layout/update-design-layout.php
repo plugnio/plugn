@@ -233,7 +233,7 @@ $this->registerJs($js);
                 <div>
                     <?=
                     $form->field($model, 'phone_number_display')->radioList(
-                              [2 => "`📞", 3 => '+965 12345678', 1 => 'Dont show phone number button'], [
+                              [2 => "📞", 3 => '+965 12345678', 1 => 'Dont show phone number button'], [
                         'style' => 'display:grid',
                         'item' => function($index, $label, $name, $checked, $value) {
 

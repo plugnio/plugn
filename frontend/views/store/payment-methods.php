@@ -149,7 +149,7 @@ $interval = $today->diff($expiry);
                         </tr>
 
                         <!-- KNET -->
-                        <?php if ($model->country->iso == 'KW') { ?>
+                        <?php if ($model->country->iso == 'KW' && $model->currency->code == 'KWD') { ?>
 
                         <tr>
                             <th scope="row">
@@ -185,7 +185,7 @@ $interval = $today->diff($expiry);
                       <?php  }  ?>
 
                         <!-- BH -->
-                        <?php if ($model->country->iso == 'BH') { ?>
+                        <?php if ($model->country->iso == 'BH' && $model->currency->code == 'BHD') { ?>
 
                           <tr>
                               <th scope="row">
@@ -223,7 +223,7 @@ $interval = $today->diff($expiry);
 
 
                       <!-- SA -->
-                        <?php if ($model->country->iso == 'SA' && $model->plan->plan_id == 2 ) { ?>
+                        <?php if ($model->country->iso == 'SA' && $model->plan->plan_id == 2 && $model->currency->code == 'SAR' ) { ?>
 
                         <tr>
                             <th scope="row">
