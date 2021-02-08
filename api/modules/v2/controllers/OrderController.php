@@ -426,7 +426,7 @@ class OrderController extends Controller {
                     } else {
 
                         $response = [
-                            'operation' => 'error',
+                            'operation' => 'error5',
                             'message' => $payment->getErrors()
                         ];
                     }
