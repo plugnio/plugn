@@ -543,7 +543,7 @@ class CronController extends \yii\console\Controller {
               ->orderBy(['queue_created_at' => SORT_ASC])
               ->one();
 
-      if($queue && $restaurant_uuid){
+      if($queue && $queue->restaurant_uuid){
         $queue->queue_status = TapQueue::QUEUE_STATUS_CREATING;
         $queue->save();
       }
