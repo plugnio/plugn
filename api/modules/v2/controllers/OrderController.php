@@ -326,7 +326,7 @@ class OrderController extends Controller {
 
                           if($convertAmountToBHDCurrency->isOk){
 
-                              $totalPriceInBhd =  (float) json_encode($convertAmountToBHDCurrency->data['to'][0]['value']);
+                              $totalPriceInBhd =  (float) $convertAmountToBHDCurrency->data['to'][0]['value'];
                               Yii::error('[PARAMS77777] =>' . $totalPriceInBhd . "=>>>convertAmountToBHDCurrency=>" . json_encode($convertAmountToBHDCurrency->data['to'][0]['value']) , __METHOD__);
                               Yii::error('[PARAMS999] =>' . $totalPriceInBhd . "=>>>totalPriceInBhd=>" . $totalPriceInBhd , __METHOD__);
 
