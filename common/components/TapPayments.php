@@ -568,7 +568,7 @@ class TapPayments extends Component
                 ->setUrl($dccEndpoint)
                 ->setData($dccParams)
                 ->addHeaders([
-                    'authorization' => 'Bearer ' . $this->plugnScretApiKey,
+                    'authorization' => 'Bearer sk_test_p07NquMX4HgwLT8mycdJnZv5',
                     'content-type' => 'application/json',
                 ])
                 ->send();
