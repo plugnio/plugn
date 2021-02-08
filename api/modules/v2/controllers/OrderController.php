@@ -346,7 +346,7 @@ class OrderController extends Controller {
                                       $order->restaurant->warehouse_fee
                               );
                           }else {
-                            Yii::error('[errrorrrrrrrrrrrrr]' . json_encode($convertAmountToBHDCurrency->data['message']) , __METHOD__);
+                            Yii::error('[errrorrrrrrrrrrrrr]' . json_encode($convertAmountToBHDCurrency->data) , __METHOD__);
                           }
                         } else {
                           Yii::error('else', __METHOD__);
