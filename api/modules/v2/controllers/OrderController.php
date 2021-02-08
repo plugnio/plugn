@@ -328,7 +328,7 @@ class OrderController extends Controller {
                           if($convertAmountToBHDCurrency->isOk){
 
                               $totalPriceInBhd = $convertAmountToBHDCurrency->data['to'][0]['value'];
-                              Yii::error('if=???' json_encode($convertAmountToBHDCurrency->data), __METHOD__);
+                              Yii::error('if=???' . json_encode($convertAmountToBHDCurrency->data), __METHOD__);
 
                               $response = Yii::$app->tapPayments->createCharge(
                                       'BHD',
