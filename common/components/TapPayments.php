@@ -561,7 +561,7 @@ class TapPayments extends Component
             "by" => "PROVIDER"
         ];
 
-        // Yii::error('[PARAMS]' . json_encode($dccParams) . ' orderCurrency: ', __METHOD__);
+        Yii::error('[PARAMS]' . json_encode($dccParams) . ' orderCurrency: ', __METHOD__);
 
 
         $client = new Client();
