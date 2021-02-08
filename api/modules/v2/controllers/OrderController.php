@@ -321,6 +321,7 @@ class OrderController extends Controller {
 
                         //Convert to BHD
                         if($order->currency->code != 'BHD' && $order->paymentMethod->source_id == TapPayments::GATEWAY_BENEFIT){
+                          Yii::error('if', __METHOD__);
 
                           $convertAmountToBHDCurrency = Yii::$app->tapPayments->createDCC($order->currency->code,$order->total_price);
 
@@ -344,6 +345,7 @@ class OrderController extends Controller {
                               );
                           }
                         } else {
+                          Yii::error('else', __METHOD__);
 
                           $response = Yii::$app->tapPayments->createCharge(
                                   $order->currency->code,
@@ -363,11 +365,8 @@ class OrderController extends Controller {
                         }
 
 
-                        Yii::error('[TAP Payment Issue > Charge id is missing]111' . json_encode($response), __METHOD__);
-                        Yii::error('[TAP Payment Issue > Charge id is missing]2222' . json_encode($response->errors[0]), __METHOD__);
 
                         $responseContent = json_decode($response->content);
-                        Yii::error('[TAP Payment Issue > Charge id is missing]333' . json_encode($responseContent), __METHOD__);
 
                         try {
 
