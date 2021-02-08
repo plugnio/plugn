@@ -554,13 +554,14 @@ class TapPayments extends Component
             ],
             "to" => [
               [
-                "currency" => $toCurrency,
+                "currency" => 'USD',
                 "dcc_rate" => "2.5%"
               ]
             ],
             "by" => "PROVIDER"
         ];
-        Yii::error('[PARAMS]' . json_encode($dccParams) . ' orderCurrency: ', __METHOD__);
+
+        // Yii::error('[PARAMS]' . json_encode($dccParams) . ' orderCurrency: ', __METHOD__);
 
 
         $client = new Client();
