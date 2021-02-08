@@ -322,7 +322,7 @@ class OrderController extends Controller {
                         //Convert to BHD
                         if($order->currency->code != 'BHD' && $order->paymentMethod->source_id == TapPayments::GATEWAY_BENEFIT){
 
-                          $convertAmountToBHDCurrency = Yii::$app->tapPayments->createDCC($order->currency->code,$order->total_price);
+                          $convertAmountToBHDCurrency = Yii::$app->tapPayments->createDCC('KWD',$order->total_price);
 
                           if($convertAmountToBHDCurrency->isOk){
                               $totalPriceInBhd = $convertAmountToBHDCurrency->data['to'][0]['value'];
