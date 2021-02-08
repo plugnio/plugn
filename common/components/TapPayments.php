@@ -543,13 +543,13 @@ class TapPayments extends Component
      * as used by Tap and add a markup to those rates.
      * @param type $amount
      */
-    public function createDCC($currentCurrency, $amount, $toCurrency = 'USD')
+    public function createDCC($transferCurrencyCode, $amount, $toCurrency = 'USD')
     {
         $dccEndpoint = $this->apiEndpoint . "/currency/dcc/v1";
 
         $dccParams = [
             "from" => [
-              "currency"  => $currentCurrency,
+              "currency"  => 'KWD',
               "value" => $amount
             ],
             "to" => [
