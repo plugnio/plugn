@@ -419,7 +419,7 @@ class OrderController extends Controller {
                             Yii::error('[TAP Payment Issue > Charge id is missing]' . json_encode($responseContent), __METHOD__);
 
                             $response = [
-                                'operation' => 'error',
+                                'operation' => 'errorHERE',
                                 'message' => $responseContent
                             ];
                         }
