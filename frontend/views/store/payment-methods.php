@@ -127,7 +127,13 @@ $interval = $today->diff($expiry);
                             <td>
                                 5 working days
                             </td>
-                            <td class="<?= $model->plan->plan_id == 2  ? (($model->country->iso !=  'BH' && $model->country->iso !=  'SA' && $model->country->iso !=  'KW') || ($model->country->iso ==  'SA' && $model->plan->plan_id == 1 ) ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
+                            <td class="<?= $model->plan->plan_id == 2  ? (
+                              ($model->country->iso !=  'BH' && $model->country->iso !=  'SA' && $model->country->iso !=  'KW')
+                              || ($model->country->iso ==  'SA' && $model->plan->plan_id == 1 )
+                              || ($model->country->iso == 'SA' && ($model->currency->code == 'BHD' ||  $model->currency->code == 'KWD' ))
+                              || ($model->country->iso == 'KW' && ($model->currency->code == 'BHD' ||  $model->currency->code == 'SAR' ))
+                              || ($model->country->iso == 'BH' && ($model->currency->code == 'KWD' ||  $model->currency->code == 'SAR' ))
+                              ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
                                 2.5% per transaction, no minimum.
                             </td>
                             <td class="<?= $model->plan->plan_id == 1  ? (($model->country->iso !=  'BH' && $model->country->iso !=  'SA' && $model->country->iso !=  'KW') || ($model->country->iso ==  'SA' && $model->plan->plan_id == 1 ) ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
