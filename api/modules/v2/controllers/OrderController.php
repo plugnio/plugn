@@ -322,13 +322,10 @@ class OrderController extends Controller {
                         //Convert to BHD
                         if($order->currency->code != 'BHD' && $order->paymentMethod->source_id == TapPayments::GATEWAY_BENEFIT){
 
-
                           $convertAmountToBHDCurrency = Yii::$app->tapPayments->createDCC($order->currency->code,$order->total_price);
 
                           if($convertAmountToBHDCurrency->isOk){
-
                               $totalPriceInBhd = $convertAmountToBHDCurrency->data['to'][0]['value'];
-                              Yii::error('if=???' . json_encode($convertAmountToBHDCurrency->data), __METHOD__);
 
                               $response = Yii::$app->tapPayments->createCharge(
                                       'BHD',
@@ -345,11 +342,11 @@ class OrderController extends Controller {
                                       $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id,
                                       $order->restaurant->warehouse_fee
                               );
-                          }else {
-                            Yii::error('[errrorrrrrrrrrrrrr]' . json_encode($convertAmountToBHDCurrency->data) , __METHOD__);
+                          } else {
+                            Yii::error('[Error when converting to BHD Currency]' . json_encode($convertAmountToBHDCurrency->data) . ' orderCurrency: '. $order->currency->code, __METHOD__);
+                            // Yii::error('[Error when converting to BHD Currency]' . json_encode($convertAmountToBHDCurrency->data) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
                           }
                         } else {
-                          Yii::error('else', __METHOD__);
 
                           $response = Yii::$app->tapPayments->createCharge(
                                   $order->currency->code,
@@ -367,6 +364,7 @@ class OrderController extends Controller {
                                   $order->restaurant->warehouse_fee
                           );
                         }
+
 
 
 
