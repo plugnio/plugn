@@ -572,9 +572,6 @@ class TapPayments extends Component
                     'authorization' => 'Bearer sk_test_p07NquMX4HgwLT8mycdJnZv5'
                 ])
                 ->send();
-                Yii::error('[PARAMS0]' . json_encode($response->data) , __METHOD__);
-                Yii::error('[PARAMS1]1' . json_encode($response->data['to'][0]) , __METHOD__);
-                Yii::error('[PARAMS2]2' . json_encode($response->data['to'][0]['value']) , __METHOD__);
 
         return $response;
     }
