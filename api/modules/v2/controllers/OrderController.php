@@ -381,7 +381,7 @@ class OrderController extends Controller {
                                 \Yii::error($errorMessage, __METHOD__); // Log error faced by user
 
                                 return [
-                                    'operation' => 'error',
+                                    'operation' => 'errorMaybeHERE',
                                     'message' => $errorMessage
                                 ];
                             }
