@@ -128,7 +128,8 @@ $interval = $today->diff($expiry);
                                 5 working days
                             </td>
                             <td class="<?= $model->plan->plan_id == 2  ? (
-                              ($model->country->iso !=  'BH' && $model->country->iso !=  'SA' && $model->country->iso !=  'KW')
+                              (
+                              $model->country->iso !=  'BH' && $model->country->iso !=  'SA' && $model->country->iso !=  'KW')
                               || ($model->country->iso ==  'SA' && $model->plan->plan_id == 1 )
                               || ($model->country->iso == 'SA' && ($model->currency->code == 'BHD' ||  $model->currency->code == 'KWD' ))
                               || ($model->country->iso == 'KW' && ($model->currency->code == 'BHD' ||  $model->currency->code == 'SAR' ))
