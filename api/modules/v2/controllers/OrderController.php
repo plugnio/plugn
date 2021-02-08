@@ -343,7 +343,7 @@ class OrderController extends Controller {
                                       $order->restaurant->warehouse_fee
                               );
                           } else {
-                            Yii::error('[Error when converting to BHD Currency]' . json_encode($convertAmountToBHDCurrency->data) . ' orderCurrency: '. $order->currency->code, __METHOD__);
+                            Yii::error('[Error when converting to BHD Currency]' . json_decode($convertAmountToBHDCurrency->data) . ' orderCurrency: '. $order->currency->code, __METHOD__);
                             // Yii::error('[Error when converting to BHD Currency]' . json_encode($convertAmountToBHDCurrency->data) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
                           }
                         } else {
