@@ -152,6 +152,9 @@ class Payment extends \yii\db\ActiveRecord {
             return $paymentRecord;
         }
 
+
+        $currentPaymentStatus = $paymentRecord->payment_current_status;
+
         $paymentRecord->payment_current_status = $responseContent->status; // 'CAPTURED' ?
         $paymentRecord->response_message = $responseContent->response->message;
 
@@ -161,6 +164,10 @@ class Payment extends \yii\db\ActiveRecord {
         // On Successful Payments
         if ($responseContent->status == 'CAPTURED') {
 
+            if($currentPaymentStatus != $paymentRecord->payment_current_status ){
+              $this->order->changeOrderStatusToPending();
+              $this->order->sendPaymentConfirmationEmail();
+            }
 
             // KNET Gateway Fee Calculation
             if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
@@ -235,19 +242,20 @@ class Payment extends \yii\db\ActiveRecord {
         return $paymentRecord;
     }
 
-    public function afterSave($insert, $changedAttributes) {
-        parent::afterSave($insert, $changedAttributes);
-        Yii::info("[ENTER afterSave]", __METHOD__);
-        if ($this->payment_current_status == 'CAPTURED' && $this->received_callback){
-
-          $this->order->changeOrderStatusToPending();
-          $this->order->sendPaymentConfirmationEmail();
-
-          Yii::info("[ENTER HERE1]", __METHOD__);
-          Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $this->order->payment_method_name, __METHOD__);
-
-        }
-    }
+    // public function afterSave($insert, $changedAttributes) {
+    //     parent::afterSave($insert, $changedAttributes);
+    //
+    //     Yii::info("[ENTER afterSave]", __METHOD__);
+    //     if ($this->payment_current_status == 'CAPTURED' && $this->received_callback && $this->received_callback){
+    //
+    //       $this->order->changeOrderStatusToPending();
+    //       $this->order->sendPaymentConfirmationEmail();
+    //
+    //       Yii::info("[ENTER HERE1]", __METHOD__);
+    //       Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $this->order->payment_method_name, __METHOD__);
+    //
+    //     }
+    // }
 
     /**
      * @return \yii\db\ActiveQuery
