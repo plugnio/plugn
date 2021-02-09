@@ -242,8 +242,8 @@ class Payment extends \yii\db\ActiveRecord {
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-        if( isset($changedAttributes['payment_current_status']) )
-          Yii::info("[TEST]" . print_r($changedAttributes['payment_current_status']), __METHOD__);
+        if( !$insert )
+          Yii::info("[TEST]" . print_r($changedAttributes), __METHOD__);
 
         if( (isset($changedAttributes['payment_current_status']) && $changedAttributes['payment_current_status'] != 'CAPTURED' && $this->payment_current_status == 'CAPTURED') && $this->received_callback){
 
