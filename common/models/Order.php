@@ -535,7 +535,8 @@ class Order extends \yii\db\ActiveRecord {
     }
 
     public function sendPaymentConfirmationEmail() {
-      Yii::info("[ENTER sendPaymentConfirmationEmail]", __METHOD__);
+        Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $this->payment_method_name, __METHOD__);
+
         if ($this->customer_email) {
 
             \Yii::$app->mailer->compose([
