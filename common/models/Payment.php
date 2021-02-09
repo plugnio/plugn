@@ -242,7 +242,7 @@ class Payment extends \yii\db\ActiveRecord {
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-        if(isset($changedAttributes['payment_current_status']) && $changedAttributes['payment_current_status'] != 'CAPTURED' && $this->payment_current_status == 'CAPTURED') && $this->received_callback){
+        if( (isset($changedAttributes['payment_current_status']) && $changedAttributes['payment_current_status'] != 'CAPTURED' && $this->payment_current_status == 'CAPTURED') && $this->received_callback){
 
             $this->order->changeOrderStatusToPending();
             $this->order->sendPaymentConfirmationEmail();
