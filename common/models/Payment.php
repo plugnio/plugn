@@ -237,12 +237,13 @@ class Payment extends \yii\db\ActiveRecord {
 
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
-
+        Yii::info("[ENTER afterSave]", __METHOD__);
         if ($this->payment_current_status == 'CAPTURED' && $this->received_callback){
 
           $this->order->changeOrderStatusToPending();
           $this->order->sendPaymentConfirmationEmail();
 
+          Yii::info("[ENTER HERE1]", __METHOD__);
           Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $this->order->payment_method_name, __METHOD__);
 
         }

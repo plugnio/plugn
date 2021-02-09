@@ -746,6 +746,7 @@ class CronController extends \yii\console\Controller {
             foreach ($payments as $payment) {
                 try {
                     if ($payment->payment_gateway_transaction_id) {
+                        Yii::info("[ENTER cron]", __METHOD__);
                         $payment = Payment::updatePaymentStatusFromTap($payment->payment_gateway_transaction_id);
                         $payment->received_callback = true;
                         $payment->save(false);
