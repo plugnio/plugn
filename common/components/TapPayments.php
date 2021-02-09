@@ -502,7 +502,7 @@ class TapPayments extends Component
            $destination = [
                "id" => $this->destinationId,
                "amount" => $charge_amount,
-               "currency" => "KWD",
+               "currency" => $currency,
            ];
 
 
@@ -515,7 +515,7 @@ class TapPayments extends Component
            $destination = [
                "id" => $this->destinationId,
                "amount" => $charge_amount,
-               "currency" => "KWD",
+               "currency" => $currency,
            ];
 
            array_push($chargeParams['destinations']['destination'], $destination);
