@@ -482,7 +482,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
             echo 'Partially refunded';
         } elseif ($model->order_status == Order::STATUS_REFUNDED) {
             echo 'Refunded';
-        } else if ($model->order_status != Order::STATUS_REFUNDED && $model->order_status != Order::STATUS_PARTIALLY_REFUNDED && $model->payment_method_id != 3 && $model->payment->payment_current_status == 'CAPTURED') {
+        } else if ($model->order_status != Order::STATUS_REFUNDED && $model->order_status != Order::STATUS_PARTIALLY_REFUNDED && $model->payment_method_id != 3 && $model->payment_uuid && $model->payment->payment_current_status == 'CAPTURED') {
             echo 'Paid';
         } else {
             echo 'Payment pending';

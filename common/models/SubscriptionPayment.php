@@ -138,7 +138,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
         // If there's an error from TAP, exit and display error
         if (isset($responseContent->errors)) {
-            $errorMessage = "Error from TAP: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
+            $errorMessage = "Error from TAP: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description . ' - ' . $paymentRecord->restaurant->name;
             \Yii::error($errorMessage, __METHOD__); // Log error faced by user
             \Yii::$app->getSession()->setFlash('error', $errorMessage);
             return $paymentRecord;

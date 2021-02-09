@@ -38,7 +38,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                       $form = ActiveForm::begin(['id' => 'store-form', 'enableClientScript' => false]);
 
-                                      $countryQuery = Country::find()->asArray()->all();
+                                      $countryQuery = Country::find()
+                                                      ->where(['iso' => 'KW'])
+                                                      ->orWhere(['iso' => 'BH'])
+                                                      ->orWhere(['iso' => 'SA'])
+                                                      ->asArray()->all();
+                                                      
                                       $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
 
 
