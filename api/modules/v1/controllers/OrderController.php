@@ -435,7 +435,6 @@ class OrderController extends Controller {
                         $order->changeOrderStatusToPending();
                         $order->sendPaymentConfirmationEmail();
 
-                        Yii::info("[ENTER HERE0]", __METHOD__);
                         Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
 
 
