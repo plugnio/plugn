@@ -164,11 +164,6 @@ class Payment extends \yii\db\ActiveRecord {
         // On Successful Payments
         if ($responseContent->status == 'CAPTURED') {
 
-            if($currentPaymentStatus != $paymentRecord->payment_current_status ){
-              $paymentRecord->order->changeOrderStatusToPending();
-              $paymentRecord->order->sendPaymentConfirmationEmail();
-              Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $this->payment_method_name, __METHOD__);
-            }
 
             // KNET Gateway Fee Calculation
             if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
@@ -221,6 +216,14 @@ class Payment extends \yii\db\ActiveRecord {
 
             // Net amount after deducting gateway fee
             $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee;
+
+            if($currentPaymentStatus != $paymentRecord->payment_current_status ){
+              $paymentRecord->order->changeOrderStatusToPending();
+              $paymentRecord->order->sendPaymentConfirmationEmail();
+              Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $this->order->payment_method_name, __METHOD__);
+            }
+
+
         }else {
             Yii::info('[TAP Payment Issue > ' . $paymentRecord->customer->customer_name . ']'
                     . $paymentRecord->customer->customer_name .
