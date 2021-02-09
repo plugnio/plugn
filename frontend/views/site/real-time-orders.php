@@ -149,10 +149,10 @@ var soundForNewOrders = new Audio("data:audio/wav;base64,//uQRAAAAWMSLwUIYAAsYkX
                     'label' => 'Payment',
                     "format" => "raw",
                     "value" => function($data) {
-                        if ($data->payment_uuid)
-                            return $data->payment->payment_current_status;
-                        else
-                            return $data->paymentMethod->payment_method_name;
+                        return $data->paymentMethod->payment_method_name;
+                    },
+                    "visible" => function($data) {
+                        return $data->payment->payment_current_status;
                     },
                 ],
                 [
