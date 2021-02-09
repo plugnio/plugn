@@ -403,8 +403,15 @@ use common\models\BankDiscount;
                                                                                 <tr>
                                                                                     <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
                                                                                         <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">
-                                                                                          <?= $order->pickupLocation->business_location_name ?>,
-                                                                                          <?= $order->pickupLocation->country->country_name ?>
+                                                                                          <div style="display:block">
+                                                                                            <?= $order->customer_name ?>
+                                                                                          </div>
+                                                                                          <div style="display:block">
+                                                                                            <?= $order->customer_phone_number ?>
+                                                                                          </div>
+                                                                                          <div style="display:block">
+                                                                                            <?= $order->pickupLocation->business_location_name ?>,
+                                                                                            <?= $order->pickupLocation->country->country_name ?>                                                                                          </div>
                                                                                         </div>
                                                                                     </td>
                                                                                 </tr>
