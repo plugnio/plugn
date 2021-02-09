@@ -165,8 +165,8 @@ class Payment extends \yii\db\ActiveRecord {
         if ($responseContent->status == 'CAPTURED') {
 
             if($currentPaymentStatus != $paymentRecord->payment_current_status ){
-              $this->order->changeOrderStatusToPending();
-              $this->order->sendPaymentConfirmationEmail();
+              $paymentRecord->order->changeOrderStatusToPending();
+              $paymentRecord->order->sendPaymentConfirmationEmail();
             }
 
             // KNET Gateway Fee Calculation
