@@ -220,7 +220,7 @@ class Payment extends \yii\db\ActiveRecord {
             if($currentPaymentStatus != $paymentRecord->payment_current_status ){
               $paymentRecord->order->changeOrderStatusToPending();
               $paymentRecord->order->sendPaymentConfirmationEmail();
-              Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $this->order->payment_method_name, __METHOD__);
+              Yii::info("[" . $paymentRecord->restaurant->name . ": " . $paymentRecord->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $paymentRecord->order->payment_method_name, __METHOD__);
             }
 
 
