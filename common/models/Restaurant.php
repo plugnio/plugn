@@ -788,6 +788,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset($fields['restaurant_email_notification']);
         unset($fields['developer_id']);
         unset($fields['site_id']);
+        unset($fields['hide_request_driver_button']);
         unset($fields['platform_fee']);
         unset($fields['warehouse_fee']);
         unset($fields['store_branch_name']);
@@ -1016,6 +1017,12 @@ class Restaurant extends \yii\db\ActiveRecord {
             },
             'currency' => function($restaurant) {
                 return $restaurant->getCurrency()->one();
+            },
+            'supportDelivery' => function($restaurant) {
+                return $restaurant->getAreaDeliveryZones()->count() > 0 ? 1 : 0;
+            },
+            'supportPickup' => function($restaurant) {
+                return $restaurant->getPickupBusinessLocations()->count() > 0 ? 1 : 0;
             }
         ];
     }
