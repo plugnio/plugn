@@ -45,6 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
               'value' =>     'country.country_name'
             ],
             'warehouse_fee',
+            'version',
             // [
             //   'attribute' => 'currency_title',
             //   'value' =>     'currency.title'

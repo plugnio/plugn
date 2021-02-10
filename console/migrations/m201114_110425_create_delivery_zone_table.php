@@ -23,11 +23,30 @@ class m201114_110425_create_delivery_zone_table extends Migration
       $this->createTable('{{%delivery_zone}}', [
           'delivery_zone_id' => $this->bigPrimaryKey(),
           'country_id' => $this->integer()->notNull(),
+          'restaurant_uuid' => $this->char(60)->notNull(),
           'business_location_id' => $this->bigInteger()->notNull(),
           'delivery_time' => $this->integer()->unsigned()->defaultValue(60),
           'delivery_fee' => $this->float()->unsigned()->defaultValue(0),
           'min_charge' => $this->float()->unsigned()->defaultValue(0)
       ],$tableOptions);
+
+
+      $this->createIndex(
+              'idx-delivery_zone-restaurant_uuid',
+              'delivery_zone',
+              'restaurant_uuid'
+      );
+
+      // add foreign key for table `delivery_zone`
+      $this->addForeignKey(
+              'fk-delivery_zone-restaurant_uuid',
+              'delivery_zone',
+              'restaurant_uuid',
+              'restaurant',
+              'restaurant_uuid',
+              'CASCADE'
+      );
+
 
 
       // creates index for column `country_id`

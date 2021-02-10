@@ -10,6 +10,7 @@ use Yii;
  *
  * @property int $delivery_zone_id
  * @property int $country_id
+ * @property int $restaurant_uuid
  * @property int $business_location_id
  * @property int|null $delivery_time
  * @property float|null $delivery_fee
@@ -19,6 +20,7 @@ use Yii;
  * @property AreaDeliveryZone[] $areaDeliveryZones
  * @property Area[] $areas
  * @property BusinessLocation $businessLocation
+ * @property Restaurant $restaurant
  * @property Country $country
  */
 class DeliveryZone extends \yii\db\ActiveRecord
@@ -47,13 +49,14 @@ class DeliveryZone extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['country_id','business_location_id', 'time_unit', 'delivery_fee', 'min_charge', 'delivery_time'], 'required'],
+            [['country_id','business_location_id', 'restaurant_uuid','time_unit', 'delivery_fee', 'min_charge', 'delivery_time'], 'required'],
             ['time_unit', 'in', 'range' => [self::TIME_UNIT_MIN,self::TIME_UNIT_HRS, self::TIME_UNIT_DAY]],
             ['time_unit', 'string','min' => 3  , 'max' => 3],
             [['business_location_id', 'delivery_time','country_id'], 'integer'],
             [['delivery_zone_tax'], 'number', 'max' => 100],
             [['delivery_fee', 'min_charge'], 'number'],
             [['selectedAreas'], 'safe'],
+            [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
             [['business_location_id'], 'exist', 'skipOnError' => true, 'targetClass' => BusinessLocation::className(), 'targetAttribute' => ['business_location_id' => 'business_location_id']],
             [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country_id' => 'country_id']]
         ];
@@ -132,7 +135,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
      */
     public function getRestaurant()
     {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('businessLocation');
+        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**

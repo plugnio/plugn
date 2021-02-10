@@ -847,7 +847,7 @@ DetailView::widget([
                             'value' => function ($data) {
                                 return $data->special_directions;
                             },
-                            'visible' => $model->special_directions,
+                            'visible' => $model->special_directions && $model->special_directions != null,
                         ]
                     ],
                     'options' => ['class' => 'table table-hover text-nowrap table-bordered'],

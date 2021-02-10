@@ -119,6 +119,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property Queue[] $queues
  * @property Subscription[] $subscriptions
  * @property BusinessLocation[] $businessLocations
+ * @property DeliveryZones[] $deliveryZones
 
  */
 class Restaurant extends \yii\db\ActiveRecord {
@@ -1316,7 +1317,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getCountryDeliveryZones($countryId)
     {
-        return $this->hasMany(BusinessLocation::className(), ['restaurant_uuid' => 'restaurant_uuid'])->joinWith(['deliveryZones'])->where(['business_location.country_id' => $countryId]);
+        return $this->hasMany(DeliveryZone::className(), ['restaurant_uuid' => 'restaurant_uuid'])->where(['country_id' => $countryId]);
     }
 
 
@@ -1348,23 +1349,22 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getDeliveryZones()
     {
-        return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])
-            ->viaTable('business_location', ['restaurant_uuid' => 'restaurant_uuid'])->with('businessLocation');
+        return $this->hasMany(DeliveryZone::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
 
-    /**
-     * Gets query for [[BusinessLocations]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getDeliveryZonesForSpecificCountry($countryId)
-    {
-
-      return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])
-          ->viaTable('business_location', ['restaurant_uuid' => 'restaurant_uuid'])  ->where(['delivery_zone.country_id' => $countryId]);
-
-    }
+    // /**
+    //  * Gets query for [[BusinessLocations]].
+    //  *
+    //  * @return \yii\db\ActiveQuery
+    //  */
+    // public function getDeliveryZonesForSpecificCountry($countryId)
+    // {
+    //
+    //   return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])
+    //       ->viaTable('business_location', ['restaurant_uuid' => 'restaurant_uuid'])  ->where(['delivery_zone.country_id' => $countryId]);
+    //
+    // }
 
 
     /**
@@ -1407,7 +1407,12 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getShippingCountries()
     {
-        return $this->hasMany(Country::className(), ['country_id' => 'country_id'])->via('deliveryZones')->joinWith('deliveryZones');
+        return $this->hasMany(Country::className(), ['country_id' => 'country_id'])
+        ->joinWith([
+            'deliveryZones' => function ($query) {
+                $query->onCondition(['delivery_zone.restaurant_uuid' => 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290']);
+            },
+        ]);
     }
 
 

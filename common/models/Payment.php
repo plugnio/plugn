@@ -215,7 +215,7 @@ class Payment extends \yii\db\ActiveRecord {
               $paymentRecord->payment_gateway_order_id = $responseContent->reference->payment;
 
             // Net amount after deducting gateway fee
-            $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee;
+            $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee;
 
         }else {
             Yii::info('[TAP Payment Issue > ' . $paymentRecord->customer->customer_name . ']'

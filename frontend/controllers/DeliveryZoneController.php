@@ -145,6 +145,7 @@ class DeliveryZoneController extends Controller {
 
         $delivery_zone_model = new DeliveryZone();
         $delivery_zone_model->business_location_id = $business_location_model->business_location_id;
+        $delivery_zone_model->restaurant_uuid = $storeUuid;
 
 
         if($countryId)

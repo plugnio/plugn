@@ -89,24 +89,36 @@ class DeliveryZoneController extends Controller {
 
         if ($store_model = Restaurant::findOne($restaurant_uuid)) {
 
-            $shipping_countries = $store_model->getShippingCountries()->asArray()->all();
+            $deliveryZones = $store_model->getDeliveryZones()->with('country')->asArray()->all();
+            $shipping_countries = [];
 
+            foreach ($deliveryZones as $key => $deliveryZone) {
+              if(!array_search($deliveryZone['country']['country_id'], array_column($shipping_countries, 'country_id')))
 
-            foreach ($shipping_countries as $key => $shippingCountry) {
+              $isExist = false;
 
-
-              if($areaDeliveryZone = $store_model->getAreaDeliveryZonesForSpecificCountry($shippingCountry['country_id'])->one()){
-                  $shipping_countries[$key]['areas'] =
-                  !isset($areaDeliveryZone['area_id']) &&  $areaDeliveryZone->area_id  == null ? 0 : $store_model->getAreaDeliveryZonesForSpecificCountry($shippingCountry['country_id'])->count() ;
-
-                    if($shipping_countries[$key]['areas'] == 0 ){
-                      $shipping_countries[$key]['deliveryZone'] = $shippingCountry['deliveryZones'][0];
-                      unset($shipping_countries[$key]['deliveryZones']);
-                    }
-
+              foreach ($shipping_countries as  $shipping_country) {
+                if($deliveryZone['country']['country_id'] == $shipping_country['country_id'])
+                $isExist = true;
               }
 
 
+              if(!$isExist)
+                $shipping_countries[] = $deliveryZone['country'];
+            }
+
+
+            foreach ($shipping_countries as $key => $shippingCountry) {
+                if($areaDeliveryZone = $store_model->getAreaDeliveryZonesForSpecificCountry($shippingCountry['country_id'])->one()){
+                    $shipping_countries[$key]['areas'] =
+                    !isset($areaDeliveryZone['area_id']) &&  $areaDeliveryZone->area_id  == null ? 0 : $store_model->getAreaDeliveryZonesForSpecificCountry($shippingCountry['country_id'])->count() ;
+                }
+
+
+                if($shipping_countries[$key]['areas'] == 0){
+                  $countryDeliveryZone = $store_model->getCountryDeliveryZones($shipping_country['country_id'])->one();
+                  $shipping_countries[$key]['delivery_zone_id'] = strval($countryDeliveryZone['delivery_zone_id']);
+                }
 
             }
 
@@ -149,7 +161,6 @@ class DeliveryZoneController extends Controller {
 
 
         $area_id = Yii::$app->request->get("area_id");
-
 
 
         if ($store_model = Restaurant::findOne($restaurant_uuid)) {

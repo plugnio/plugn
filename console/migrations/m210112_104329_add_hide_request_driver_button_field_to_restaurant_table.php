@@ -21,7 +21,7 @@ class m210112_104329_add_hide_request_driver_button_field_to_restaurant_table ex
      */
     public function safeDown()
     {
-      $this->addColumn('restaurant', 'hide_request_driver_button', $this->string());
+      $this->dropColumn('restaurant', 'hide_request_driver_button');
     }
 
 }

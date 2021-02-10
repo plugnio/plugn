@@ -372,6 +372,7 @@ class CronController extends \yii\console\Controller {
                 )->one()){
                   $delivery_zone_model = new DeliveryZone;
                   $delivery_zone_model->business_location_id = $businessLocation->business_location_id;
+                  $delivery_zone_model->restaurant_uuid = $store->restaurant_uuid;
                   $delivery_zone_model->country_id = 84;
                   $delivery_zone_model->delivery_time = $deliveryZone->delivery_time;
                   $delivery_zone_model->delivery_fee = $deliveryZone->delivery_fee;
@@ -593,6 +594,7 @@ class CronController extends \yii\console\Controller {
 
           $stores = Restaurant::find()
                   ->where(['sitemap_require_update' => 1])
+                  ->andWhere(['version' => 2])
                   ->all();
 
             if($stores){

@@ -434,6 +434,9 @@ class TapPayments extends Component
 
         $chargeEndpoint = $this->apiEndpoint . "/charges";
 
+        $phone =  str_replace(' ', '', $phone);
+        $phone =  str_replace('+'.$country_code, '', $phone);
+
         $chargeParams = [
             "amount" => $amount,
             "currency" => $currency,

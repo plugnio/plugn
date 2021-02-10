@@ -1217,6 +1217,7 @@ class SiteController extends Controller {
         $this->layout = 'login';
 
         $store_model = new Restaurant();
+        $store_model->version = 2;
         $store_model->setScenario(Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
 
         $agent_model = new Agent();
