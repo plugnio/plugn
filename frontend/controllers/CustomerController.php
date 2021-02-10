@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use Yii;
 use common\models\Customer;
+use common\models\Order;
 use frontend\models\CustomerSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
