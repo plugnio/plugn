@@ -34,7 +34,32 @@ $this->registerJs($js);
 
         foreach ($businessLocations as $key => $businessLocation) {
 
-          $numberOfCoutnriesStoreDeliveringTo = $store->getShippingCountries()->distinct()->count();
+          $numberOfCoutnriesStoreDeliveringTo = 0;
+
+
+
+          $deliveryZones = $store->getDeliveryZones()->with('country')->asArray()->all();
+          $shipping_countries = [];
+
+          foreach ($deliveryZones as $key => $deliveryZone) {
+            if(!array_search($deliveryZone['country']['country_id'], array_column($shipping_countries, 'country_id')))
+
+            $isExist = false;
+
+            foreach ($shipping_countries as  $shipping_country) {
+              if($deliveryZone['country']['country_id'] == $shipping_country['country_id'])
+                $isExist = true;
+            }
+
+
+            if(!$isExist)
+              $shipping_countries[] = $deliveryZone['country'];
+          }
+
+
+
+           $numberOfCoutnriesStoreDeliveringTo = sizeof($shipping_countries);
+
 
 
       ?>

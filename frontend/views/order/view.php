@@ -830,7 +830,7 @@ DetailView::widget([
                             'format' => 'html',
                             'value' => function ($data) {
                                 return  $data->country_name ? $data->country_name  :
-                                 ( $data->order_mode == 1 ? ($data->deliveryZone->country && $data->deliveryZone ? $data->deliveryZone->country->country_name : '(not set)') : ($data->pickupLocation && $data->pickupLocation->country ? $data->pickupLocation->country->country_name : '(not set)'));
+                                 ( $data->order_mode == 1 ? ($data->delivery_zone_id && $data->deliveryZone->country ? $data->deliveryZone->country->country_name : '(not set)') : ($data->pickupLocation && $data->pickupLocation->country ? $data->pickupLocation->country->country_name : '(not set)'));
                             }
                         ],
                         [

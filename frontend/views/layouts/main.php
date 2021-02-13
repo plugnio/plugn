@@ -280,7 +280,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                     </li>
 
 
-                    <?php if($restaurant_model->country->country_name == 'Kuwait') { ?>
+                    <?php if($restaurant_model->country->country_name == 'Kuwait' && $restaurant_model->is_tap_enable) { ?>
 
                     <li class=" nav-item">
                         <a>
