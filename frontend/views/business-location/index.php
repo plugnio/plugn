@@ -120,7 +120,7 @@ $this->registerJs($js);
                   $numberOfCoutnriesDeliveringToText = '';
 
                   $numberOfCoutnriesDeliveringToText =
-                  $numberOfCoutnriesStoreDeliveringTo . $numberOfCoutnriesStoreDeliveringTo == 1 ?
+                  $numberOfCoutnriesStoreDeliveringTo  == 1 ?
                    'Delivering to '. $numberOfCoutnriesStoreDeliveringTo .' country' : 'Delivering to '. $numberOfCoutnriesStoreDeliveringTo .' countries';
 
                   ?>
