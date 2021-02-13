@@ -168,7 +168,7 @@ class Order extends \yii\db\ActiveRecord {
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['delivery_zone_id', function ($attribute, $params, $validator) {
                     if (!$this->delivery_zone_id && $this->order_mode == Order::ORDER_MODE_DELIVERY)
-                        $this->addError($attribute, 'Delivery zone cannot be blank. =? ' . $this->delivery_zone_id);
+                        $this->addError($attribute, 'Delivery zone cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
             [['scheduled_time_start_from', 'scheduled_time_to'], function ($attribute, $params, $validator) {
                     if ($this->is_order_scheduled && (!$this->scheduled_time_start_from || !$this->scheduled_time_to))
