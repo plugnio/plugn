@@ -234,7 +234,7 @@ class SiteController extends Controller {
                        0, //Comission
                       Url::to(['site/callback'], true),
                       $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET :  TapPayments::GATEWAY_VISA_MASTERCARD,
-                      $order->restaurant->warehouse_fee
+                      0 
               );
 
               $responseContent = json_decode($response->content);
