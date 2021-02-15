@@ -149,20 +149,20 @@ $this->params['breadcrumbs'][] = $this->title;
                     return Html::img($data->getRestaurantLogoUrl());
                 },
             ],
-            [
-                'label' => 'Support Delivery',
-                'value' => function ($data) {
-                    return $data->support_delivery ? 'Yes' : 'No';
-                },
-                'format' => 'raw'
-            ],
-            [
-                'label' => 'Support Pick up',
-                'value' => function ($data) {
-                    return $data->support_pick_up ? 'Yes' : 'No';
-                },
-                'format' => 'raw'
-            ],
+            // [
+            //     'label' => 'Support Delivery',
+            //     'value' => function ($data) {
+            //         return $data->support_delivery ? 'Yes' : 'No';
+            //     },
+            //     'format' => 'raw'
+            // ],
+            // [
+            //     'label' => 'Support Pick up',
+            //     'value' => function ($data) {
+            //         return $data->support_pick_up ? 'Yes' : 'No';
+            //     },
+            //     'format' => 'raw'
+            // ],
             'phone_number',
             'restaurant_email:email',
             'instagram_url:url',

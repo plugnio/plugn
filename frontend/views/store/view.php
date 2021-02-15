@@ -38,20 +38,20 @@ $this->params['breadcrumbs'][] = $this->title;
                               return $data->currency->title;
                             }
                         ],
-                        [
-                            'label' => 'Support Delivery',
-                            'value' => function ($data) {
-                                return $data->support_delivery ? 'Yes' : 'No';
-                            },
-                            'format' => 'raw'
-                        ],
-                        [
-                            'label' => 'Support Pick up',
-                            'value' => function ($data) {
-                                return $data->support_pick_up ? 'Yes' : 'No';
-                            },
-                            'format' => 'raw'
-                        ],
+                        // [
+                        //     'label' => 'Support Delivery',
+                        //     'value' => function ($data) {
+                        //         return $data->support_delivery ? 'Yes' : 'No';
+                        //     },
+                        //     'format' => 'raw'
+                        // ],
+                        // [
+                        //     'label' => 'Support Pick up',
+                        //     'value' => function ($data) {
+                        //         return $data->support_pick_up ? 'Yes' : 'No';
+                        //     },
+                        //     'format' => 'raw'
+                        // ],
                         [
                             'attribute' => 'phone_number',
                             'format' => 'html',
