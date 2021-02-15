@@ -455,10 +455,10 @@ class Order extends \yii\db\ActiveRecord {
      * @param type $attribute
      */
     public function validateOrderMode($attribute) {
-        if ($this->$attribute == static::ORDER_MODE_DELIVERY && !$this->restaurant->support_delivery)
+        if ($this->$attribute == static::ORDER_MODE_DELIVERY && !$this->delivery_zone_id)
             $this->addError($attribute, "Store doesn't accept delviery");
 
-        else if ($this->$attribute == static::ORDER_MODE_PICK_UP && !$this->restaurant->support_pick_up)
+        else if ($this->$attribute == static::ORDER_MODE_PICK_UP && !$this->pickupLocation->support_pick_up)
             $this->addError($attribute, "Store doesn't accept pick up");
     }
 

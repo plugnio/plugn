@@ -577,7 +577,7 @@ $this->registerJs($js);
                     </div>
                     <div style="  margin-bottom: 0.5rem;  margin-top: 1rem !important;">
                         <h2 style="  display: contents;" class="text-bold-700 mt-1 number-of-revenue-generated">
-                            <?= Yii::$app->formatter->asCurrency($number_of_all_revenue_generated_this_week, $restaurant_model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                            <?= Yii::$app->formatter->asCurrency($number_of_all_revenue_generated_this_week, $restaurant_model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
                         </h2>
                     </div>
                     <p class="mb-0">Revenue Generated</p>
@@ -684,7 +684,7 @@ $this->registerJs($js);
                             </div>
                         </div>
                         <h2 class="text-bold-700">
-                          <?= Yii::$app->formatter->asCurrency($today_revenue_generated, $restaurant_model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                          <?= Yii::$app->formatter->asCurrency($today_revenue_generated, $restaurant_model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
                         </h2>
                         <p class="mb-0 line-ellipsis">Today's Revenue Generated</p>
                     </div>
