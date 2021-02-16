@@ -62,16 +62,13 @@ class Queue extends \yii\db\ActiveRecord {
 
     public function beforeSave($insert) {
 
-        if ($this->queue_status == self::QUEUE_STATUS_COMPLETE) {
-          Yii::info('[createSitecreateSite]', __METHOD__);
-          \Yii::$app->netlifyComponent->createSite('angular.plugn.store', 'angularadvance');
-        }
+        // if ($this->queue_status == self::QUEUE_STATUS_COMPLETE) {
+        //   Yii::info('[createSitecreateSite]', __METHOD__);
+        //   \Yii::$app->netlifyComponent->createSite('angular.plugn.store', 'angularadvance');
+        // }
 
         if ($this->queue_status == self::QUEUE_STATUS_PENDING) {
 
-          Yii::info('[beforeSave1]', __METHOD__);
-          Yii::info('[Queue1] => ' .   $this->queue_id, __METHOD__);
-          Yii::info('[Queue Statusssss] => ' .   $this->queue_status, __METHOD__);
 
             $store_model = $this->restaurant;
 
@@ -147,12 +144,31 @@ class Queue extends \yii\db\ActiveRecord {
                 return false;
             }
 
-            $this->queue_status = Queue::QUEUE_STATUS_COMPLETE;
+            // $this->queue_status = Queue::QUEUE_STATUS_COMPLETE;
 
             // $this->deleteBuildJsFolder();
         }
         return parent::beforeSave($insert);
     }
+
+
+
+    /**
+     *
+     * @param type $insert
+     * @param type $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes) {
+        parent::afterSave($insert, $changedAttributes);
+
+        if (!$insert && $this->queue_status == self::QUEUE_STATUS_COMPLETE) {
+          Yii::info('[createSitecreateSite]', __METHOD__);
+          \Yii::$app->netlifyComponent->createSite('angular.plugn.store', 'angularadvance');
+        }
+    }
+
+
+
 
 
     // public function deleteBuildJsFolder(){
