@@ -80,7 +80,7 @@ class Queue extends \yii\db\ActiveRecord {
                 $branchName = 'refs/heads/' . $store_model->store_branch_name;
                 $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, $branchName);
 
-                if (!$createBranchResponse->isOk) {
+                if ($createBranchResponse->isOk) {
 
 
 
@@ -142,7 +142,7 @@ class Queue extends \yii\db\ActiveRecord {
                 return false;
             }
 
-            \Yii::$app->netlifyComponent->createSite('angular.plugn.store', 'angular');
+            \Yii::$app->netlifyComponent->createSite('angular.plugn.store', 'angularadvance');
             $this->queue_status = Queue::QUEUE_STATUS_COMPLETE;
 
 
