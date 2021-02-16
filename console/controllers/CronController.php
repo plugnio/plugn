@@ -562,30 +562,9 @@ class CronController extends \yii\console\Controller {
                     ->one();
 
             if($queue && $queue->restaurant_uuid){
-
               $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
-              if($queue->save()){
-                \Yii::$app->netlifyComponent->createSite(parse_url($queue->restaurant->restaurant_domain)['host'], $queue->restaurant->store_branch_name);
-              }
-
-            $restaurant = $queue->restaurant;
-
-            // $dirName = "store";
-            // if(!file_exists($dirName))
-            //   $createStoreFolder = mkdir($dirName);
-
-
-            //
-            // if (!file_exists( $dirName . "/" . $queue->restaurant->store_branch_name )) {
-            //   $myFolder = mkdir( $dirName . "/" . $queue->restaurant->store_branch_name);
-            // }
-
-            // $buildJsFile =  fopen($dirName . "/" .   $queue->restaurant->store_branch_name . "/build.js", "w") or die("Unable to open file!");
-            // fwrite($buildJsFile, Yii::$app->fileGeneratorComponent->createBuildJsFile(Yii::$app->params['apiEndpoint'] . '/v2' ));
-            // fclose($buildJsFile);
-
-
-
+              $queue->save()
+            }
 
         $this->stdout("File has been created! \n", Console::FG_RED, Console::BOLD);
       }

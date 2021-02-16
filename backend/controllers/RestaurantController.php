@@ -149,30 +149,30 @@ class RestaurantController extends Controller {
     }
 
 
-    public function actionCreateBuildJsFile($id) {
-
-        $store = $this->findModel($id);
-
-        $dirName = "../runtime/store";
-        if(!file_exists($dirName)){
-          $createStoreFolder = mkdir($dirName);
-        }
-
-
-        if (!file_exists( $dirName . "/" . $store->store_branch_name )) {
-          $myFolder = mkdir( $dirName . "/" . $store->store_branch_name);
-        }
-
-
-        $myfile =  fopen($dirName . "/" .   $store->store_branch_name . "/build.js", "w") or die("Unable to open file!");
-
-        $buildJsFile =  fopen($dirName . "/" .   $store->store_branch_name . "/build.js", "w") or die("Unable to open file!");
-        fwrite($buildJsFile, Yii::$app->fileGeneratorComponent->createBuildJsFile(Yii::$app->params['apiEndpoint'] . '/v2'));
-        fclose($buildJsFile);
-
-        return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
-
-    }
+    // public function actionCreateBuildJsFile($id) {
+    //
+    //     $store = $this->findModel($id);
+    //
+    //     $dirName = "../runtime/store";
+    //     if(!file_exists($dirName)){
+    //       $createStoreFolder = mkdir($dirName);
+    //     }
+    //
+    //
+    //     if (!file_exists( $dirName . "/" . $store->store_branch_name )) {
+    //       $myFolder = mkdir( $dirName . "/" . $store->store_branch_name);
+    //     }
+    //
+    //
+    //     $myfile =  fopen($dirName . "/" .   $store->store_branch_name . "/build.js", "w") or die("Unable to open file!");
+    //
+    //     $buildJsFile =  fopen($dirName . "/" .   $store->store_branch_name . "/build.js", "w") or die("Unable to open file!");
+    //     fwrite($buildJsFile, Yii::$app->fileGeneratorComponent->createBuildJsFile(Yii::$app->params['apiEndpoint'] . '/v2'));
+    //     fclose($buildJsFile);
+    //
+    //     return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+    //
+    // }
 
 
     /**
