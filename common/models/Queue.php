@@ -82,8 +82,8 @@ class Queue extends \yii\db\ActiveRecord {
 
                 if ($createBranchResponse->isOk) {
 
+                  sleep(10);
                   Yii::info('[createSitecreateSite]', __METHOD__);
-
                   \Yii::$app->netlifyComponent->createSite('angular.plugn.store', 'angularadvance');
 
                    // $url = parse_url($store_model->restaurant_domain);
