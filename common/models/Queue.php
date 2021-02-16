@@ -62,6 +62,11 @@ class Queue extends \yii\db\ActiveRecord {
 
     public function beforeSave($insert) {
 
+        if ($this->queue_status == self::QUEUE_STATUS_COMPLETE) {
+          Yii::info('[createSitecreateSite]', __METHOD__);
+          \Yii::$app->netlifyComponent->createSite('angular.plugn.store', 'angularadvance');
+        }
+
         if ($this->queue_status == self::QUEUE_STATUS_PENDING) {
 
           Yii::info('[beforeSave1]', __METHOD__);
@@ -82,9 +87,7 @@ class Queue extends \yii\db\ActiveRecord {
 
                 if ($createBranchResponse->isOk) {
 
-                  sleep(10);
-                  Yii::info('[createSitecreateSite]', __METHOD__);
-                  \Yii::$app->netlifyComponent->createSite('angular.plugn.store', 'angularadvance');
+
 
                    // $url = parse_url($store_model->restaurant_domain);
                    //  $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
