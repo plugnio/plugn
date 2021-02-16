@@ -64,9 +64,9 @@ class Queue extends \yii\db\ActiveRecord {
 
         if ($this->queue_status == self::QUEUE_STATUS_PENDING) {
 
-          Yii::info('[beforeSave]', __METHOD__);
-          Yii::info('[Queue] => ' .   $this->queue_id, __METHOD__);
-          Yii::info('[Queue Status] => ' .   $this->queue_status, __METHOD__);
+          Yii::info('[beforeSave1]', __METHOD__);
+          Yii::info('[Queue1] => ' .   $this->queue_id, __METHOD__);
+          Yii::info('[Queue Statusssss] => ' .   $this->queue_status, __METHOD__);
 
             $store_model = $this->restaurant;
 
@@ -80,7 +80,7 @@ class Queue extends \yii\db\ActiveRecord {
                 $branchName = 'refs/heads/' . $store_model->store_branch_name;
                 $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, $branchName);
 
-                if (!$createBranchResponse->isOk) {
+                if ($createBranchResponse->isOk) {
 
                   Yii::info('[createSitecreateSite]', __METHOD__);
 
@@ -132,7 +132,7 @@ class Queue extends \yii\db\ActiveRecord {
                     //   $this->deleteBuildJsFolder();
                     //   return false;
                     // }
-                // } else{
+                } else{
                   Yii::error('[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
                   $this->deleteBuildJsFolder();
                   return false;
