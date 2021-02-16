@@ -126,7 +126,7 @@ class BankDiscount extends \yii\db\ActiveRecord
         //Make sure we're nt exceeding limit_per_customer
         if($this->limit_per_customer != 0 ){
 
-          $customer_model = Customer::find()->where(['customer_phone_number' => $phone_number, 'restaurant_uuid' => $this->restaurant_uuid])->one();
+          $customer_model = Customer::find()->where(['customer_phone_number' => '+' . $phone_number, 'restaurant_uuid' => $this->restaurant_uuid])->one();
 
           if ($customer_model) {
               $customerBankDiscount = CustomerBankDiscount::find()->where(['customer_id' => $customer_model->customer_id, 'bank_discount_id' => $this->bank_discount_id])->count();
