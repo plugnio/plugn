@@ -61,7 +61,7 @@ class Queue extends \yii\db\ActiveRecord {
     }
 
     public function beforeSave($insert) {
-          Yii::info('[beforeSave]', __METHOD__);
+        
         if ($this->queue_status == self::QUEUE_STATUS_COMPLETE) {
 
             $store_model = $this->restaurant;

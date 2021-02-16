@@ -553,7 +553,7 @@ class CronController extends \yii\console\Controller {
 
 
     public function actionCreateBuildJsFile() {
-
+  Yii::info('[actionCreateBuildJsFile]', __METHOD__);
       $now = new DateTime('now');
             $queue = Queue::find()
                     ->joinWith('restaurant')
