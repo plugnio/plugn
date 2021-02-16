@@ -78,7 +78,8 @@ class Queue extends \yii\db\ActiveRecord {
                 $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, $branchName);
 
                 if ($createBranchResponse->isOk) {
-
+                  
+                   $url = parse_url($store_model->restaurant_domain);
                     $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
 
                         if ($createNewSiteResponse->isOk) {
