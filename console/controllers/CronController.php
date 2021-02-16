@@ -564,7 +564,9 @@ class CronController extends \yii\console\Controller {
             if($queue && $queue->restaurant_uuid){
 
               $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
-              $queue->save();
+              if($queue->save()){
+                \Yii::$app->netlifyComponent->createSite(parse_url($queue->restaurant->restaurant_domain)['host'], $queue->restaurant->store_branch_name);
+              }
 
             $restaurant = $queue->restaurant;
 

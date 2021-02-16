@@ -71,9 +71,8 @@ class Queue extends \yii\db\ActiveRecord {
 
 
             $store_model = $this->restaurant;
-            // $getLastCommitResponse = Yii::$app->githubComponent->getLastCommit();
-            $createBranchResponse = Yii::$app->githubComponent->createBranch('091e004f3ad0e93d948802844114e3fab5e84d57', 'refs/heads/' . $store_model->store_branch_name);
-            \Yii::$app->netlifyComponent->createSite(parse_url($store_model->restaurant_domain)['host'], $store_model->store_branch_name);
+            $getLastCommitResponse = Yii::$app->githubComponent->getLastCommit();
+            $createBranchResponse = Yii::$app->githubComponent->createBranch($getLastCommitResponse->data['sha'], 'refs/heads/' . $store_model->store_branch_name);
 
             // $getLastCommitResponse = Yii::$app->githubComponent->getLastCommit();
             //
