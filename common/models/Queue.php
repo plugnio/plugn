@@ -62,7 +62,7 @@ class Queue extends \yii\db\ActiveRecord {
 
     public function beforeSave($insert) {
 
-        if ($this->queue_status == self::QUEUE_STATUS_COMPLETE) {
+        if ($this->queue_status == self::QUEUE_STATUS_PENDING) {
 
           Yii::info('[beforeSave]', __METHOD__);
           Yii::info('[Queue] => ' .   $this->queue_id, __METHOD__);
@@ -82,6 +82,7 @@ class Queue extends \yii\db\ActiveRecord {
 
                 if ($createBranchResponse->isOk) {
 
+                  Yii::info('[before creating new SIte]', __METHOD__);
 
 
                    $url = parse_url($store_model->restaurant_domain);
@@ -142,7 +143,7 @@ class Queue extends \yii\db\ActiveRecord {
                 return false;
             }
 
-            
+
             $this->queue_status = Queue::QUEUE_STATUS_COMPLETE;
 
 
