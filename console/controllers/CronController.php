@@ -562,8 +562,8 @@ class CronController extends \yii\console\Controller {
                     ->one();
 
             if($queue && $queue->restaurant_uuid){
-              // $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
-              // $queue->save();
+              $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
+              $queue->save();
 
             $restaurant = $queue->restaurant;
 
@@ -582,8 +582,8 @@ class CronController extends \yii\console\Controller {
             // fclose($buildJsFile);
 
 
-        // $queue->queue_status = Queue::QUEUE_STATUS_COMPLETE;
-        // $queue->save(false);
+        $queue->queue_status = Queue::QUEUE_STATUS_COMPLETE;
+        $queue->save(false);
 
         $this->stdout("File has been created! \n", Console::FG_RED, Console::BOLD);
       }

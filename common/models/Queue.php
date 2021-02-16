@@ -66,7 +66,6 @@ class Queue extends \yii\db\ActiveRecord {
 
             $store_model = $this->restaurant;
 
-            //Create Build.js file
             $getLastCommitResponse = Yii::$app->githubComponent->getLastCommit();
 
             if ($getLastCommitResponse->isOk) {
@@ -79,6 +78,8 @@ class Queue extends \yii\db\ActiveRecord {
 
                 if ($createBranchResponse->isOk) {
                   
+                  Yii::info('[Netlify]', __METHOD__);
+
                    $url = parse_url($store_model->restaurant_domain);
                     $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
 
