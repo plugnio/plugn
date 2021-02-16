@@ -563,7 +563,7 @@ class CronController extends \yii\console\Controller {
 
             if($queue && $queue->restaurant_uuid){
               $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
-              $queue->save()
+              $queue->save();
             }
 
         $this->stdout("File has been created! \n", Console::FG_RED, Console::BOLD);
