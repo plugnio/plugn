@@ -583,8 +583,7 @@ class CronController extends \yii\console\Controller {
             // fclose($buildJsFile);
 
 
-        $queue->queue_status = Queue::QUEUE_STATUS_COMPLETE;
-        $queue->save(false);
+
 
         $this->stdout("File has been created! \n", Console::FG_RED, Console::BOLD);
       }

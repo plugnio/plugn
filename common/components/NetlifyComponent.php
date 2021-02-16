@@ -49,6 +49,7 @@ class NetlifyComponent extends Component {
      * @return type
      */
     public function createSite($custom_domain, $store_branch) {
+      Yii::info('[createSite]', __METHOD__);
 
         $createSiteEndpoint = $this->apiEndpoint . "/sites";
 
