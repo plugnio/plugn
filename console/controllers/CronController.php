@@ -562,9 +562,7 @@ class CronController extends \yii\console\Controller {
                     ->one();
 
             if($queue && $queue->restaurant_uuid){
-              Yii::info('[actionCreateBuildJsFile]', __METHOD__);
-              Yii::info('[Queue] => ' .   $queue->queue_id, __METHOD__);
-              Yii::info('[Queue Status] => ' .   $queue->queue_status, __METHOD__);
+
               $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
               $queue->save();
 
