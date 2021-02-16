@@ -80,7 +80,7 @@ class Queue extends \yii\db\ActiveRecord {
                 $branchName = 'refs/heads/' . $store_model->store_branch_name;
                 $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, $branchName);
 
-                if ($createBranchResponse->isOk) {
+                if (!$createBranchResponse->isOk) {
 
 
 
