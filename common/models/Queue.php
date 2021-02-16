@@ -142,7 +142,7 @@ class Queue extends \yii\db\ActiveRecord {
                 return false;
             }
 
-            \Yii::$app->netlifyComponent->createSite('angular.plugn.store', 'angularadvance');
+            // \Yii::$app->netlifyComponent->createSite('angular.plugn.store', 'angularadvance');
             $this->queue_status = Queue::QUEUE_STATUS_COMPLETE;
 
 
