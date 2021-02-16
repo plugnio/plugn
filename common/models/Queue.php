@@ -152,20 +152,20 @@ class Queue extends \yii\db\ActiveRecord {
     }
 
 
-    public function deleteBuildJsFolder(){
-
-      $dirPath = "store/" .  $this->restaurant->store_branch_name;
-      $file_pointer =  $dirPath . '/build.js';
-
-      // Use unlink() function to delete a file
-      if (!unlink($file_pointer)) {
-          Yii::error("$file_pointer cannot be deleted due to an error", __METHOD__);
-      } else {
-          if (!rmdir($dirPath)) {
-              Yii::error("Could not remove $dirPath", __METHOD__);
-          }
-      }
-    }
+    // public function deleteBuildJsFolder(){
+    //
+    //   $dirPath = "store/" .  $this->restaurant->store_branch_name;
+    //   $file_pointer =  $dirPath . '/build.js';
+    //
+    //   // Use unlink() function to delete a file
+    //   if (!unlink($file_pointer)) {
+    //       Yii::error("$file_pointer cannot be deleted due to an error", __METHOD__);
+    //   } else {
+    //       if (!rmdir($dirPath)) {
+    //           Yii::error("Could not remove $dirPath", __METHOD__);
+    //       }
+    //   }
+    // }
 
 
 
