@@ -74,7 +74,7 @@ $this->registerJs($js);
                     'label' => 'Amount',
                     "format" => "raw",
                     "value" => function($model) {
-                        return $model->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? $model->discount_amount . '%' : $model->discount_amount;
+                        return $model->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? $model->discount_amount . '%' : ($model->discount_amount  ? $model->discount_amount : 'Free Delivery');
                     }
                 ],
                 'minimum_order_amount',
