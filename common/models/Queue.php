@@ -80,14 +80,14 @@ class Queue extends \yii\db\ActiveRecord {
                 $branchName = 'refs/heads/' . $store_model->store_branch_name;
                 $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, $branchName);
 
-                if (!$createBranchResponse->isOk) {
+                if ($createBranchResponse->isOk) {
 
                   // Yii::info('[createSitecreateSite]', __METHOD__);
                   //
                   // \Yii::$app->netlifyComponent->createSite('angular.plugn.store', 'angularadvance');
 
                    // $url = parse_url($store_model->restaurant_domain);
-                   //  $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
+      \Yii::$app->netlifyComponent->createSite('angular.plugn.store', 'angularadvance');
                    //
                    //      if ($createNewSiteResponse->isOk) {
                    //
@@ -132,7 +132,7 @@ class Queue extends \yii\db\ActiveRecord {
                     //   $this->deleteBuildJsFolder();
                     //   return false;
                     // }
-                // } else{
+                } else{
                   Yii::error('[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
                   $this->deleteBuildJsFolder();
                   return false;
