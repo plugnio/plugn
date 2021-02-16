@@ -567,7 +567,6 @@ class CronController extends \yii\console\Controller {
             }
 
         $this->stdout("File has been created! \n", Console::FG_RED, Console::BOLD);
-      }
 
     }
 
