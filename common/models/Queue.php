@@ -79,19 +79,7 @@ class Queue extends \yii\db\ActiveRecord {
 
                 if ($createBranchResponse->isOk) {
 
-                    $fileToBeUploaded = file_get_contents("store/" . $store_model->store_branch_name . "/build.js");
-
-                    // Encode the image string data into base64
-                    $data = base64_encode($fileToBeUploaded);
-
-                    //Replace test with store branch name
-                    $commitBuildJsFileResponse = Yii::$app->githubComponent->createFileContent($data, $store_model->store_branch_name, 'build.js');
-
-                    if ($commitBuildJsFileResponse->isOk) {
-
-                        //Replace test with store domain name
-                        $url = parse_url($store_model->restaurant_domain);
-                        $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
+                    $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
 
                         if ($createNewSiteResponse->isOk) {
 
@@ -104,11 +92,38 @@ class Queue extends \yii\db\ActiveRecord {
                             $this->deleteBuildJsFolder();
                             return false;
                         }
-                    } else {
-                      Yii::error('[Github > Commit build JS]' . json_encode($commitBuildJsFileResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
-                      $this->deleteBuildJsFolder();
-                      return false;
-                    }
+
+
+                    // $fileToBeUploaded = file_get_contents("store/" . $store_model->store_branch_name . "/build.js");
+                    //
+                    // // Encode the image string data into base64
+                    // $data = base64_encode($fileToBeUploaded);
+
+                    //Replace test with store branch name
+                    // $commitBuildJsFileResponse = Yii::$app->githubComponent->createFileContent($data, $store_model->store_branch_name, 'build.js');
+                    //
+                    // if ($commitBuildJsFileResponse->isOk) {
+                    //
+                    //     //Replace test with store domain name
+                    //     $url = parse_url($store_model->restaurant_domain);
+                    //     $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
+                    //
+                    //     if ($createNewSiteResponse->isOk) {
+                    //
+                    //         $site_id = $createNewSiteResponse->data['site_id'];
+                    //         $store_model->site_id = $site_id;
+                    //         $store_model->save(false);
+                    //
+                    //     } else {
+                    //         Yii::error('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data), __METHOD__);
+                    //         $this->deleteBuildJsFolder();
+                    //         return false;
+                    //     }
+                    // } else {
+                    //   Yii::error('[Github > Commit build JS]' . json_encode($commitBuildJsFileResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
+                    //   $this->deleteBuildJsFolder();
+                    //   return false;
+                    // }
                 } else{
                   Yii::error('[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
                   $this->deleteBuildJsFolder();

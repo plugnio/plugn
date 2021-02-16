@@ -566,20 +566,20 @@ class CronController extends \yii\console\Controller {
               $queue->save();
 
             $restaurant = $queue->restaurant;
+            // 
+            // $dirName = "store";
+            // if(!file_exists($dirName))
+            //   $createStoreFolder = mkdir($dirName);
 
-            $dirName = "store";
-            if(!file_exists($dirName))
-              $createStoreFolder = mkdir($dirName);
 
+            //
+            // if (!file_exists( $dirName . "/" . $queue->restaurant->store_branch_name )) {
+            //   $myFolder = mkdir( $dirName . "/" . $queue->restaurant->store_branch_name);
+            // }
 
-
-            if (!file_exists( $dirName . "/" . $queue->restaurant->store_branch_name )) {
-              $myFolder = mkdir( $dirName . "/" . $queue->restaurant->store_branch_name);
-            }
-
-            $buildJsFile =  fopen($dirName . "/" .   $queue->restaurant->store_branch_name . "/build.js", "w") or die("Unable to open file!");
-            fwrite($buildJsFile, Yii::$app->fileGeneratorComponent->createBuildJsFile(Yii::$app->params['apiEndpoint'] . '/v2' ));
-            fclose($buildJsFile);
+            // $buildJsFile =  fopen($dirName . "/" .   $queue->restaurant->store_branch_name . "/build.js", "w") or die("Unable to open file!");
+            // fwrite($buildJsFile, Yii::$app->fileGeneratorComponent->createBuildJsFile(Yii::$app->params['apiEndpoint'] . '/v2' ));
+            // fclose($buildJsFile);
 
 
         $queue->queue_status = Queue::QUEUE_STATUS_COMPLETE;
