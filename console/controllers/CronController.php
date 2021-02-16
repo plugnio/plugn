@@ -578,7 +578,7 @@ class CronController extends \yii\console\Controller {
             }
 
             $buildJsFile =  fopen($dirName . "/" .   $queue->restaurant->store_branch_name . "/build.js", "w") or die("Unable to open file!");
-            fwrite($buildJsFile, Yii::$app->fileGeneratorComponent->createBuildJsFile(Yii::$app->params['apiEndpoint'] . '/v2', $restaurant->store_branch_name, $restaurant->restaurant_domain ));
+            fwrite($buildJsFile, Yii::$app->fileGeneratorComponent->createBuildJsFile(Yii::$app->params['apiEndpoint'] . '/v2' ));
             fclose($buildJsFile);
 
 

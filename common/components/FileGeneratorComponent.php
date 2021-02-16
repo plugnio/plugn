@@ -30,7 +30,7 @@ class FileGeneratorComponent extends Component
      * Check refund object for status updates
      * @param  string $chargeId
      */
-    public function createBuildJsFile($apiEndpoint, $branch, $domainName)
+    public function createBuildJsFile($apiEndpoint)
     {
 
       $buildJsContent = "
@@ -40,9 +40,7 @@ class FileGeneratorComponent extends Component
 
                       var apiEndPoint = '$apiEndpoint';
 
-                      var storebranchName = '$branch';
-                      var storeDomainName = '$domainName';
-
+                      var storebranchName = process.env.BRANCH;
 
 
                       var url = apiEndPoint + '/store/get-restaurant-data/' + storebranchName;
@@ -50,8 +48,9 @@ class FileGeneratorComponent extends Component
                       request(url, function(err, res, body) {
 
                         var response = JSON.parse(body);
+                        var storeDomainName = response.restaurant_domain;
 
-                        overwriteIndexHtml(response);
+                        overwriteIndexHtml(response, storeDomainName);
                         overwriteCapacitorConfig(response.app_id, response.name);
                         overwriteGlobalScss(response.custom_css, response.name);
                         overwriteManifest(response.restaurant_uuid, response.name, response.theme_color, response.logo);
@@ -60,7 +59,7 @@ class FileGeneratorComponent extends Component
                         overwriteAngularFile(storebranchName);
                       });
 
-                      function overwriteIndexHtml(store) {
+                      function overwriteIndexHtml(store, storeDomainName) {
 
                         console.log(store);
 
@@ -70,7 +69,6 @@ class FileGeneratorComponent extends Component
                         var storeUuid = store.restaurant_uuid;
                         var storeTagline = store.tagline;
                         var storeLogo = store.logo;
-                        var storeDomain = store.restaurant_domain;
                         var storeThemeColor = store.theme_color;
 
                         var storeContent = store.name;
@@ -101,7 +99,7 @@ class FileGeneratorComponent extends Component
                                        n.queue=[];t=b.createElement(e);t.async=!0;
                                        t.src=v;s=b.getElementsByTagName(e)[0];
                                        s.parentNode.insertBefore(t,s)}(window, document,'script',
-                                       'https://connect.facebook.net/en_US/fbevents.js');
+                                       'https://connect.facebook.net/en_US/fbevents.js', 'fbq');
                                        fbq('init', '` + facebookPixilId + `');
                                        fbq('track', 'PageView');
                                     </script>
@@ -159,12 +157,12 @@ class FileGeneratorComponent extends Component
               <meta name='apple-mobile-web-app-status-bar-style' content='default' />
               <!-- Meta tags for social media -->
               <meta property='og:type' content='website' />
-              <meta property='og:url' content='` + storeDomain + `' />
+              <meta property='og:url' content='` + storeDomainName + `' />
               <meta property='og:site_name' content='` + storeContent + `' />
               <meta property='og:image' itemprop='image primaryImageOfPage'
                 content='https://res.cloudinary.com/plugn/image/upload/w_300,h_300/restaurants/` + storeUuid + `/logo/` + storeLogo + `' />
               <meta name='twitter:card' content='summary' />
-              <meta name='twitter:domain' content='` + storeDomain + ` ' />
+              <meta name='twitter:domain' content='` + storeDomainName + ` ' />
               <meta name='twitter:title' property='og:title' itemprop='name' content='` + storeContent + ` ' />
               <meta name='twitter:description' property='og:description' itemprop='description | description'
                 content='` + storeName + `' />
