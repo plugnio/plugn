@@ -62,101 +62,95 @@ class Queue extends \yii\db\ActiveRecord {
 
     public function beforeSave($insert) {
 
-        // if ($this->queue_status == self::QUEUE_STATUS_COMPLETE) {
-        //   Yii::info('[createSitecreateSite]', __METHOD__);
-        //   \Yii::$app->netlifyComponent->createSite('angular.plugn.store', 'angularadvance');
-        // }
-
         if ($this->queue_status == self::QUEUE_STATUS_PENDING) {
 
+          Yii::info('[beforeSave]', __METHOD__);
+          Yii::info('[Queue] => ' .   $this->queue_id, __METHOD__);
+          Yii::info('[Queue Status] => ' .   $this->queue_status, __METHOD__);
 
             $store_model = $this->restaurant;
-            $getLastCommitResponse = Yii::$app->githubComponent->getLastCommit();
-            $createBranchResponse = Yii::$app->githubComponent->createBranch($getLastCommitResponse->data['sha'], 'refs/heads/' . $store_model->store_branch_name);
 
-            // $getLastCommitResponse = Yii::$app->githubComponent->getLastCommit();
-            //
-            // if ($getLastCommitResponse->isOk) {
-            //
-            //     $sha = $getLastCommitResponse->data['sha'];
-            //
-            //     //Replace test with store branch name
-            //     $branchName = 'refs/heads/' . $store_model->store_branch_name;
-            //     $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, $branchName);
-            //
-            //     if ($createBranchResponse->isOk) {
-            //
-            //
-            //
-            //        // $url = parse_url($store_model->restaurant_domain);
-            //        //  $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
-            //        //
-            //        //      if ($createNewSiteResponse->isOk) {
-            //        //
-            //        //          $site_id = $createNewSiteResponse->data['site_id'];
-            //        //          $store_model->site_id = $site_id;
-            //        //          $store_model->save(false);
-            //        //
-            //        //      } else {
-            //        //          Yii::error('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data), __METHOD__);
-            //        //          $this->deleteBuildJsFolder();
-            //        //          return false;
-            //        //      }
-            //        //
-            //
-            //         // $fileToBeUploaded = file_get_contents("store/" . $store_model->store_branch_name . "/build.js");
-            //         //
-            //         // // Encode the image string data into base64
-            //         // $data = base64_encode($fileToBeUploaded);
-            //
-            //         //Replace test with store branch name
-            //         // $commitBuildJsFileResponse = Yii::$app->githubComponent->createFileContent($data, $store_model->store_branch_name, 'build.js');
-            //         //
-            //         // if ($commitBuildJsFileResponse->isOk) {
-            //         //
-            //         //     //Replace test with store domain name
-            //         //     $url = parse_url($store_model->restaurant_domain);
-            //         //     $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
-            //         //
-            //         //     if ($createNewSiteResponse->isOk) {
-            //         //
-            //         //         $site_id = $createNewSiteResponse->data['site_id'];
-            //         //         $store_model->site_id = $site_id;
-            //         //         $store_model->save(false);
-            //         //
-            //         //     } else {
-            //         //         Yii::error('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data), __METHOD__);
-            //         //         $this->deleteBuildJsFolder();
-            //         //         return false;
-            //         //     }
-            //         // } else {
-            //         //   Yii::error('[Github > Commit build JS]' . json_encode($commitBuildJsFileResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
-            //         //   $this->deleteBuildJsFolder();
-            //         //   return false;
-            //         // }
-            //     } else{
-            //       Yii::error('[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
-            //       $this->deleteBuildJsFolder();
-            //       return false;
-            //     }
-            //
-            // } else {
-            //     Yii::error('[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
-            //     $this->deleteBuildJsFolder();
-            //     return false;
-            // }
+            $getLastCommitResponse = Yii::$app->githubComponent->getLastCommit();
+
+            if ($getLastCommitResponse->isOk) {
+
+                $sha = $getLastCommitResponse->data['sha'];
+
+                //Replace test with store branch name
+                $branchName = 'refs/heads/' . $store_model->store_branch_name;
+                $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, $branchName);
+
+                if (!$createBranchResponse->isOk) {
+
+                  // Yii::info('[createSitecreateSite]', __METHOD__);
+                  //
+                  // \Yii::$app->netlifyComponent->createSite('angular.plugn.store', 'angularadvance');
+
+                   // $url = parse_url($store_model->restaurant_domain);
+                   //  $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
+                   //
+                   //      if ($createNewSiteResponse->isOk) {
+                   //
+                   //          $site_id = $createNewSiteResponse->data['site_id'];
+                   //          $store_model->site_id = $site_id;
+                   //          $store_model->save(false);
+                   //
+                   //      } else {
+                   //          Yii::error('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data), __METHOD__);
+                   //          $this->deleteBuildJsFolder();
+                   //          return false;
+                   //      }
+                   //
+
+                    // $fileToBeUploaded = file_get_contents("store/" . $store_model->store_branch_name . "/build.js");
+                    //
+                    // // Encode the image string data into base64
+                    // $data = base64_encode($fileToBeUploaded);
+
+                    //Replace test with store branch name
+                    // $commitBuildJsFileResponse = Yii::$app->githubComponent->createFileContent($data, $store_model->store_branch_name, 'build.js');
+                    //
+                    // if ($commitBuildJsFileResponse->isOk) {
+                    //
+                    //     //Replace test with store domain name
+                    //     $url = parse_url($store_model->restaurant_domain);
+                    //     $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
+                    //
+                    //     if ($createNewSiteResponse->isOk) {
+                    //
+                    //         $site_id = $createNewSiteResponse->data['site_id'];
+                    //         $store_model->site_id = $site_id;
+                    //         $store_model->save(false);
+                    //
+                    //     } else {
+                    //         Yii::error('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data), __METHOD__);
+                    //         $this->deleteBuildJsFolder();
+                    //         return false;
+                    //     }
+                    // } else {
+                    //   Yii::error('[Github > Commit build JS]' . json_encode($commitBuildJsFileResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
+                    //   $this->deleteBuildJsFolder();
+                    //   return false;
+                    // }
+                // } else{
+                  Yii::error('[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
+                  $this->deleteBuildJsFolder();
+                  return false;
+                }
+
+            } else {
+                Yii::error('[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
+                $this->deleteBuildJsFolder();
+                return false;
+            }
 
             $this->queue_status = Queue::QUEUE_STATUS_COMPLETE;
+
 
             // $this->deleteBuildJsFolder();
         }
         return parent::beforeSave($insert);
     }
-
-
-
-
-
 
 
     // public function deleteBuildJsFolder(){
