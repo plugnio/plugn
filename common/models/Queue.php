@@ -144,7 +144,7 @@ class Queue extends \yii\db\ActiveRecord {
                 return false;
             }
 
-            // $this->queue_status = Queue::QUEUE_STATUS_COMPLETE;
+            $this->queue_status = Queue::QUEUE_STATUS_COMPLETE;
 
             // $this->deleteBuildJsFolder();
         }
