@@ -125,54 +125,6 @@ $this->registerJs($js);
         </div>
 
 
-        <!-- <div class="row"> -->
-            <!-- <div class="col-12 col-sm-6 col-lg-6"> -->
-                <?php
-                // echo $form->field($model, 'support_delivery')->radioList([1 => 'Yes', 0 => 'No',], [
-                //     'style' => 'display:grid',
-                //     'item' => function($index, $label, $name, $checked, $value) {
-                //
-                //         $return = '<label class="vs-radio-con">';
-                //         /* -----> */ if ($checked)
-                //             $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                //         /* -----> */
-                //         else
-                //             $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                //         $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
-                //         $return .= '<span>' . ucwords($label) . '</span>';
-                //         $return .= '</label>';
-                //
-                //         return $return;
-                //     }
-                // ]);
-                ?>
-            <!-- </div> -->
-
-            <!-- <div class="col-12 col-sm-6 col-lg-6"> -->
-
-                <?php
-                // echo $form->field($model, 'support_pick_up')->radioList([1 => 'Yes', 0 => 'No',], [
-                //     'style' => 'display:grid',
-                //     'item' => function($index, $label, $name, $checked, $value) {
-                //
-                //         $return = '<label class="vs-radio-con">';
-                //         /* -----> */ if ($checked)
-                //             $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                //         /* -----> */
-                //         else
-                //             $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                //         $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
-                //         $return .= '<span>' . ucwords($label) . '</span>';
-                //         $return .= '</label>';
-                //
-                //         return $return;
-                //     }
-                // ]);
-                ?>
-
-            <!-- </div> -->
-        <!-- </div> -->
-
         <div class="row">
             <div class="col-12 col-sm-6 col-lg-6">
                 <?=

@@ -42,8 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                       ->where(['iso' => 'KW'])
                                                       ->orWhere(['iso' => 'BH'])
                                                       ->orWhere(['iso' => 'SA'])
-                                                      ->asArray()
-                                                      ->all();
+                                                      ->asArray()->all();
 
                                       $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
 
@@ -88,23 +87,15 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ])->label('Store URL *')
                                 ?>
 
-                                <?= $form->field($store_model, 'country_id')->dropDownList($countryArray,['value' => '84'])->label('Business location *'); ?>
+                                <?= $form->field($store_model, 'country_id')->dropDownList($countryArray)->label('Business location *'); ?>
 
-                                <?= $form->field($store_model, 'currency_id')->dropDownList($currencyArray,['value' => '2'])->label('Store Currency *'); ?>
+
+                                <?= $form->field($store_model, 'currency_id')->dropDownList($currencyArray)->label('Store Currency *'); ?>
 
                                 <?= $form->field($agent_model, 'tempPassword')->passwordInput(['maxlength' => true])->label('Password *') ?>
 
-
-                                <div class="form-group" >
-                                        <?= Html::submitButton('Create', ['class' => 'btn btn-primary  btn-inline',  'style' => 'width: 100%;',  'name' => 'register-button',
-                                        'onclick' => "this.disabled=true;this.style.display = 'none'; this.value='Creating, please wait...';this.form.submit(); document.getElementById('loading').style.display = 'block'; "
-                                        ]) ?>
-
-                                      <button class="btn btn-success" type="button" id="loading" disabled style="width: 100%;height: 50px; display:none">
-                                        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
-                                        <span class="ml-25 align-middle">Loading...</span>
-                                      </button>
-
+                                <div class="form-group">
+                                    <?= Html::submitButton('Create', ['class' => 'btn btn-primary  btn-inline', 'style' => 'width: 100%;',  'name' => 'register-button']) ?>
                                 </div>
 
 
