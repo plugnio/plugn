@@ -87,10 +87,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ])->label('Store URL *')
                                 ?>
 
-                                <?= $form->field($store_model, 'country_id')->dropDownList($countryArray)->label('Business location *'); ?>
+                                <?= $form->field($store_model, 'country_id')->dropDownList($countryArray,['value'=>'84'])->label('Business location *'); ?>
 
 
-                                <?= $form->field($store_model, 'currency_id')->dropDownList($currencyArray)->label('Store Currency *'); ?>
+                                <?= $form->field($store_model, 'currency_id')->dropDownList($currencyArray,['value'=>'2'])->label('Store Currency *'); ?>
 
                                 <?= $form->field($agent_model, 'tempPassword')->passwordInput(['maxlength' => true])->label('Password *') ?>
 
