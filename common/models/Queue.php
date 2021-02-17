@@ -64,16 +64,19 @@ class Queue extends \yii\db\ActiveRecord {
 
         if ($this->queue_status == self::QUEUE_STATUS_PENDING) {
 
+Yii::$app->githubComponent->createBranch('091e004f3ad0e93d948802844114e3fab5e84d57','refs/heads/testdarkchoc'
+ \Yii::$app->netlifyComponent->createSite('darkchoc.plugn.store', 'testdarkchoc');
 
 
-            $store_model = $this->restaurant;
 
-            $getLatestCommitResponse = Yii::$app->githubComponent->getLastCommit();
-            $branchName = 'refs/heads/' . $store_model->store_branch_name;
-            $sha = $getLatestCommitResponse->data['sha'];
-            $url = parse_url($store_model->restaurant_domain);
-            Yii::$app->githubComponent->createBranch($sha, $branchName);
-            Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
+            // $store_model = $this->restaurant;
+            //
+            // $getLatestCommitResponse = Yii::$app->githubComponent->getLastCommit();
+            // $branchName = 'refs/heads/' . $store_model->store_branch_name;
+            // $sha = $getLatestCommitResponse->data['sha'];
+            // $url = parse_url($store_model->restaurant_domain);
+            // Yii::$app->githubComponent->createBranch($sha, $branchName);
+            // Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
 
 
             // if ($getLatestCommitResponse->isOk) {
