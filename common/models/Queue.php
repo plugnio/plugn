@@ -72,19 +72,20 @@ class Queue extends \yii\db\ActiveRecord {
 
             if ($getLatestCommitResponse->isOk) {
 
-              $sha = $getLatestCommitResponse->data['sha'];
-               $url = parse_url($store_model->restaurant_domain);
-              $branchName = 'refs/heads/' . $store_model->store_branch_name;
-              Yii::$app->githubComponent->createBranch($sha, $store_model->store_branch_name);
-              Yii::$app->netlifyComponent->createSite($url['host'], $branchName);
 
-                // $sha = $getLatestCommitResponse->data['sha'];
-                //
-                // //Replace test with store branch name
-                // $branchName = 'refs/heads/' . $store_model->store_branch_name;
-                // $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, $branchName);
-                //
-                // if ($createBranchResponse->isOk) {
+                $sha = $getLatestCommitResponse->data['sha'];
+
+                //Replace test with store branch name
+                $branchName = 'refs/heads/' . $store_model->store_branch_name;
+                $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, $branchName);
+
+                if ($createBranchResponse->isOk) {
+
+                   $url = parse_url($store_model->restaurant_domain);
+
+                  Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name;);
+
+
                 //
                 //
                 //    $url = parse_url($store_model->restaurant_domain);
@@ -104,8 +105,8 @@ class Queue extends \yii\db\ActiveRecord {
                 // } else{
                 //   Yii::error('[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
                 //   return false;
-                // }
-                //
+                }
+
             } else {
                 Yii::error('[Github > Last commit]' . json_encode($getLatestCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
                 return false;
