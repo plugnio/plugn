@@ -64,7 +64,7 @@ class Queue extends \yii\db\ActiveRecord {
 
         if ($this->queue_status == self::QUEUE_STATUS_PENDING) {
 
-Yii::$app->githubComponent->createBranch('091e004f3ad0e93d948802844114e3fab5e84d57','refs/heads/testdarkchoc');
+// Yii::$app->githubComponent->createBranch('091e004f3ad0e93d948802844114e3fab5e84d57','refs/heads/testdarkchoc');
  \Yii::$app->netlifyComponent->createSite('darkchoc.plugn.store', 'testdarkchoc');
 
 
