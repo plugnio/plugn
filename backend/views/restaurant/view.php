@@ -50,7 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
       <?= Html::a('Update sitemap', ['update-sitemap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>
       <?= Html::a('Delete Build Js', ['delete-build-js', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-danger']) ?>
-      <?= Html::a('Merge w/ dev', ['merge-with-dev', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-danger']) ?>
+      <?= Html::a('Merge w/ dev', ['merge-with-dev', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
     </p>
 
     <?=
