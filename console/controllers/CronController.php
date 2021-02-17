@@ -562,6 +562,11 @@ class CronController extends \yii\console\Controller {
                     ->one();
 
             if($queue && $queue->restaurant_uuid){
+
+              Yii::$app->githubComponent->createBranch('091e004f3ad0e93d948802844114e3fab5e84d57','refs/heads/testdarkchoc');
+              \Yii::$app->netlifyComponent->createSite('darkchoc.plugn.store', 'testdarkchoc');
+
+              
               $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
               $queue->save();
             }
