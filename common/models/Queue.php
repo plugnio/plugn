@@ -83,7 +83,7 @@ class Queue extends \yii\db\ActiveRecord {
 
                    $url = parse_url($store_model->restaurant_domain);
 
-                  Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name;);
+                  Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
 
 
                 //
