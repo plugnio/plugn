@@ -80,6 +80,58 @@ class RestaurantController extends Controller {
     }
 
     /**
+     * Delete build js
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionDeleteBuildJs($id) {
+
+        $store = $this->findModel($id);
+
+
+        //Replace test with store branch name
+        $getBuildJsSHA = Yii::$app->githubComponent->getFileSHA('build.js', $store->store_branch_name);
+
+        if ($getBuildJsSHA->isOk && $getBuildJsSHA->data) {
+
+            $deleteBuildJs = Yii::$app->githubComponent->deleteFile('build.js', $getBuildJsSHA->data['sha'],  $store->store_branch_name);
+
+            if (!$deleteBuildJs->isOk) {
+              Yii::error('[Github > Error While deleting build.js]' . json_encode($deleteBuildJs->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+              return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+            }
+      } else {
+        Yii::error('[Github > Error while getting file sha]' . json_encode($getBuildJsSHA->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+        return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+      }
+
+      return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+
+    }
+
+    /**
+     * Merge
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionMergeBranch($id) {
+
+        $store = $this->findModel($id);
+
+        $mergeDevelopResponse = Yii::$app->githubComponent->mergeABranch('Merge branch develop into' . $store->store_branch_name, $store->store_branch_name,  'staging');
+
+        if (!$mergeDevelopResponse->isOk) {
+          Yii::error('[Github > Error While merging with develop]' . json_encode($mergeResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+          return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
+
+      return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+
+    }
+
+    /**
      * Update sitemap
      * @param integer $id
      * @return mixed
@@ -145,14 +197,6 @@ class RestaurantController extends Controller {
     }
 
       return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
-
-    }
-
-
-    public function actionCreateBuildJsFile($id) {
-Yii::$app->githubComponent->createBranch('091e004f3ad0e93d948802844114e3fab5e84d57','refs/heads/testdarkchoc');
-\Yii::$app->netlifyComponent->createSite('darkchoc.plugn.store', 'testdarkchoc');
-return $this->redirect(['view', 'id' => $id]);
 
     }
 

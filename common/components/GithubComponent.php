@@ -124,6 +124,69 @@ class GithubComponent extends Component {
     }
 
     /**
+     * Delete a file in a repository.
+     * @param type $sha The SHA1 value for the last commit.
+     * @param type $branch_name name of branch
+     * @return type
+     */
+    public function deleteFile($filePath, $sha, $branch) {
+
+        $deleteFileEndpoint = $this->apiEndpoint . "/contents/" . $filePath;
+
+        $deleteFileParams = [
+            "message" => "Delete " . $filePath,
+            "sha" => $sha,
+            "branch" => $branch
+
+        ];
+
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setMethod('DELETE')
+                ->setUrl($deleteFileEndpoint)
+                ->setFormat(Client::FORMAT_JSON)
+                ->setData($deleteFileParams)
+                ->addHeaders([
+                    'Authorization' => 'token ' . $this->token,
+                    'User-Agent' => 'request',
+                ])
+                ->send();
+
+        return $response;
+    }
+
+    /**
+     * The Repo Merging API supports merging branches in a repository.
+     * @param type $sha The SHA1 value for the last commit.
+     * @param type $branch_name name of branch
+     * @return type
+     */
+    public function mergeABranch($commitMessage, $base, $head) {
+
+        $mergeABranchEndpoint = $this->apiEndpoint . "/merges";
+
+        $mergeABranchParams = [
+            "commit_message" =>  $commitMessage,
+            "base" => $base,
+            "head" => $head
+        ];
+
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setMethod('POST')
+                ->setUrl($mergeABranchEndpoint)
+                ->setFormat(Client::FORMAT_JSON)
+                ->setData($mergeABranchParams)
+                ->addHeaders([
+                    'Authorization' => 'token ' . $this->token,
+                    'User-Agent' => 'request',
+                ])
+                ->send();
+
+        return $response;
+    }
+
+    /**
      * Creates a new file or replaces an existing file in a repository.
      * @param type $content The new file content, using Base64 encoding.
      * @return type

@@ -45,36 +45,12 @@ $this->params['breadcrumbs'][] = $this->title;
         ])
         ?>
 
-        <?php
-        // if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_OPEN) {
-        //
-        //     echo Html::a('Open', ['promote-to-open', 'id' => $model->restaurant_uuid], [
-        //         'class' => 'btn btn-success',
-        //         'data' => [
-        //             'confirm' => 'Are you sure you want to change store status to open?',
-        //             'method' => 'post',
-        //         ],
-        //     ])
-        //    }
-        //
-        //  if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_BUSY) {
-        //     echo Html::a('Busy', ['promote-to-busy', 'id' => $model->restaurant_uuid], [
-        //         'class' => 'btn btn-warning',
-        //         'data' => [
-        //             'confirm' => 'Are you sure you want to change store status to busy?',
-        //             'method' => 'post',
-        //         ],
-        //     ])
-        //
-        // }
-         ?>
-
     </p>
 
     <p>
       <?= Html::a('Update sitemap', ['update-sitemap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>
-      <?= Html::a('Create BuildJs file', ['create-build-js-file', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>
-
+      <?= Html::a('Delete Build Js', ['delete-build-js', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-danger']) ?>
+      <?= Html::a('Merge w/ dev', ['merge-with-dev', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-danger']) ?>
     </p>
 
     <?=
