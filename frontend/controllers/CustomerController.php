@@ -177,7 +177,13 @@ class CustomerController extends Controller {
                        'attribute' => 'Number of orders',
                        "format" => "raw",
                        "value" => function($model) {
-                           return  $model->getOrders()->count();
+                           return  $model->getOrders()
+                           ->where(['order.order_status' => Order::STATUS_PENDING])
+                           ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
+                           ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                           ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+                           ->orWhere(['order.order_status' => Order::STATUS_ACCEPTED])
+                           ->count();
                        }
                    ],
                    [
