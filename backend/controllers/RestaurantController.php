@@ -150,45 +150,9 @@ class RestaurantController extends Controller {
 
 
     public function actionCreateBuildJsFile($id) {
-      $store_model = $this->findModel($id);
-
-
-                $getLastCommitResponse = Yii::$app->githubComponent->getLastCommit();
-
-                if ($getLastCommitResponse->isOk) {
-
-                    $sha = $getLastCommitResponse->data['sha'];
-
-                    //Replace test with store branch name
-                    $branchName = 'refs/heads/' . $store_model->store_branch_name;
-                    $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, $branchName);
-
-                    if ($createBranchResponse->isOk) {
-
-
-                       $url = parse_url($store_model->restaurant_domain);
-                        $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
-
-                            if ($createNewSiteResponse->isOk) {
-
-                                $site_id = $createNewSiteResponse->data['site_id'];
-                                $store_model->site_id = $site_id;
-                                $store_model->save(false);
-
-                            } else {
-                                Yii::error('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data), __METHOD__);
-                                return false;
-                            }
-
-                    } else{
-                      Yii::error('[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
-                      return false;
-                    }
-
-                } else {
-                    Yii::error('[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
-                    return false;
-                }
+Yii::$app->githubComponent->createBranch('091e004f3ad0e93d948802844114e3fab5e84d57','refs/heads/testdarkchoc');
+\Yii::$app->netlifyComponent->createSite('darkchoc.plugn.store', 'testdarkchoc');
+return $this->redirect(['view', 'id' => $id]);
 
     }
 
