@@ -149,30 +149,48 @@ class RestaurantController extends Controller {
     }
 
 
-    // public function actionCreateBuildJsFile($id) {
-    //
-    //     $store = $this->findModel($id);
-    //
-    //     $dirName = "../runtime/store";
-    //     if(!file_exists($dirName)){
-    //       $createStoreFolder = mkdir($dirName);
-    //     }
-    //
-    //
-    //     if (!file_exists( $dirName . "/" . $store->store_branch_name )) {
-    //       $myFolder = mkdir( $dirName . "/" . $store->store_branch_name);
-    //     }
-    //
-    //
-    //     $myfile =  fopen($dirName . "/" .   $store->store_branch_name . "/build.js", "w") or die("Unable to open file!");
-    //
-    //     $buildJsFile =  fopen($dirName . "/" .   $store->store_branch_name . "/build.js", "w") or die("Unable to open file!");
-    //     fwrite($buildJsFile, Yii::$app->fileGeneratorComponent->createBuildJsFile(Yii::$app->params['apiEndpoint'] . '/v2'));
-    //     fclose($buildJsFile);
-    //
-    //     return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
-    //
-    // }
+    public function actionCreateBuildJsFile($id) {
+      $store_model = $this->findModel($id);
+
+
+                $getLastCommitResponse = Yii::$app->githubComponent->getLastCommit();
+
+                if ($getLastCommitResponse->isOk) {
+
+                    $sha = $getLastCommitResponse->data['sha'];
+
+                    //Replace test with store branch name
+                    $branchName = 'refs/heads/' . $store_model->store_branch_name;
+                    $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, $branchName);
+
+                    if ($createBranchResponse->isOk) {
+
+
+                       $url = parse_url($store_model->restaurant_domain);
+                        $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
+
+                            if ($createNewSiteResponse->isOk) {
+
+                                $site_id = $createNewSiteResponse->data['site_id'];
+                                $store_model->site_id = $site_id;
+                                $store_model->save(false);
+
+                            } else {
+                                Yii::error('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data), __METHOD__);
+                                return false;
+                            }
+
+                    } else{
+                      Yii::error('[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
+                      return false;
+                    }
+
+                } else {
+                    Yii::error('[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
+                    return false;
+                }
+
+    }
 
 
     /**
