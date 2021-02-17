@@ -100,6 +100,10 @@ class GithubComponent extends Component {
      * @return type
      */
     public function createBranch($sha, $branch_name) {
+
+      \Yii::info("[createBranch] " , __METHOD__);
+
+
         $createBranchEndpoint = $this->apiEndpoint . "/git/refs";
 
         $branchParams = [
