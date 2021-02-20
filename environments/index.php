@@ -12,8 +12,8 @@ return [
             'frontend/web/uploads/',
             'api/runtime',
             'api/web/assets',
-            'vendors/runtime',
-            'vendors/web/assets',
+            'agent/runtime',
+            'agent/web/assets',
             'shortner/runtime'
         ],
         'setExecutable' => [
@@ -26,7 +26,7 @@ return [
             'common/config/codeception-local.php',
             'frontend/config/main-local.php',
             'api/config/main-local.php',
-            'vendors/config/main-local.php',
+            'agent/config/main-local.php',
             'shortner/config/main-local.php',
         ],
     ],
@@ -42,8 +42,8 @@ return [
             'frontend/web/uploads/',
             'api/runtime',
             'api/web/assets',
-            'vendors/runtime',
-            'vendors/web/assets',
+            'agent/runtime',
+            'agent/web/assets',
             'shortner/runtime'
         ],
         'setExecutable' => [
@@ -56,7 +56,7 @@ return [
             'common/config/codeception-local.php',
             'frontend/config/main-local.php',
             'api/config/main-local.php',
-            'vendors/config/main-local.php',
+            'agent/config/main-local.php',
         ],
     ],
     'Dev-Server' => [
@@ -71,8 +71,8 @@ return [
             'frontend/web/uploads/',
             'api/runtime',
             'api/web/assets',
-            'vendors/runtime',
-            'vendors/web/assets',
+            'agent/runtime',
+            'agent/web/assets',
             'shortner/runtime'
         ],
         'setExecutable' => [
@@ -85,7 +85,7 @@ return [
             'common/config/codeception-local.php',
             'frontend/config/main-local.php',
             'api/config/main-local.php',
-            'vendors/config/main-local.php',
+            'agent/config/main-local.php',
             'shortner/config/main-local.php',
         ],
     ],
@@ -101,8 +101,8 @@ return [
             'frontend/web/uploads/',
             'api/runtime',
             'api/web/assets',
-            'vendors/runtime',
-            'vendors/web/assets',
+            'agent/runtime',
+            'agent/web/assets',
             'shortner/runtime'
         ],
         'setExecutable' => [
@@ -112,7 +112,7 @@ return [
             'backend/config/main-local.php',
             'frontend/config/main-local.php',
             'api/config/main-local.php',
-            'vendors/config/main-local.php',
+            'agent/config/main-local.php',
             'shortner/config/main-local.php',
         ],
     ],

@@ -5,19 +5,19 @@ $params = array_merge(
 );
 
 return [
-    'id' => 'app-vendors',
+    'id' => 'app-agent',
     'basePath' => dirname(__DIR__),
-    'controllerNamespace' => 'vendors\controllers',
+    'controllerNamespace' => 'agent\controllers',
     'bootstrap' => ['log'],
     'modules' => [
         'v1' => [
-            'basePath' => '@vendors/modules/v1',
-            'class' => 'vendors\modules\v1\Module',
+            'basePath' => '@agent/modules/v1',
+            'class' => 'agent\modules\v1\Module',
         ]
     ],
     'components' => [
         'user' => [
-          'identityClass' => 'vendors\models\Agent',
+          'identityClass' => 'agent\models\Agent',
           'enableAutoLogin' => false,
           'enableSession' => false,
           'loginUrl' => null
