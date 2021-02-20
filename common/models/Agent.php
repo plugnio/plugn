@@ -306,15 +306,6 @@ public function getAccessToken() {
 
 
     /**
-     * Get all Restaurant accounts this agent owns
-     * @return \yii\db\ActiveQuery
-     */
-    public function getAccountsOwned()
-    {
-        return $this->hasMany(Restaurant::className(), ['agent_id' => 'agent_id']);
-    }
-
-    /**
      * Get all RestauranZ accounts this agent is assigned to manage
      * @return \yii\db\ActiveQuery
      */

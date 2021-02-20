@@ -13,11 +13,7 @@ return [
         'v1' => [
             'basePath' => '@vendors/modules/v1',
             'class' => 'vendors\modules\v1\Module',
-        ],
-        'v2' => [
-            'basePath' => '@vendors/modules/v2',
-            'class' => 'vendors\modules\v2\Module',
-        ],
+        ]
     ],
     'components' => [
         'user' => [

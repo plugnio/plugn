@@ -107,8 +107,24 @@ class AuthController extends Controller {
             "token" => $accessToken,
             "id" => $agent->agent_id,
             "username" => $agent->agent_id,
-            "name" => $agent->agent_name,
-            "email" => $agent->agent_email,
+            "agent_name" => $agent->agent_name,
+            "agent_email" => $agent->agent_email,
+            "selectedStore" => $agent->getAccountsManaged()
+            ->select([
+              'restaurant_uuid',
+              'name',
+              'name_ar',
+              'restaurant_domain'
+            ])
+            ->one(),
+            "stores" => $agent->getAccountsManaged()
+            ->select([
+              'restaurant_uuid',
+              'name',
+              'name_ar',
+              'restaurant_domain'
+            ])
+            ->all(),
         ];
     }
 
