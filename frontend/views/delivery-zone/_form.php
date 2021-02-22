@@ -86,8 +86,11 @@ $this->registerJs($js);
             $areaQuery = $model->getAreas()->all();
             $areaArray[] = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
 
+            if($model->restaurant->version == 2)
+              $countryQuery = Country::find()->asArray()->all();
+            else
+              $countryQuery = Country::find()->where(['country_id' => 84])->asArray()->all();
 
-            $countryQuery = Country::find()->asArray()->all();
             $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
 
             $form = ActiveForm::begin();

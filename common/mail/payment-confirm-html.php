@@ -377,7 +377,7 @@ use common\models\BankDiscount;
                                                                                              echo 'Street ' . $order->street . ', ';
                                                                                              echo $order->avenue != null ? 'Avenue ' . $order->avenue . ' , ' : '';
                                                                                              echo 'House ' . $order->house_number . ', ';
-                                                                                             echo $order->area_name . ',';
+                                                                                             echo $order->area_name . ', ';
                                                                                              echo $order->area->city->city_name . ', ';
                                                                                              echo $order->area->country->country_name;
                                                                                            } else if ($order->shipping_country_id){
