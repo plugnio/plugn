@@ -51,7 +51,16 @@ $this->params['breadcrumbs'][] = $this->title;
       <?= Html::a('Update sitemap', ['update-sitemap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>
       <?= Html::a('Delete Build Js', ['delete-specific-file','filePath' =>'build.js' ,'id' => $model->restaurant_uuid], ['class' => 'btn btn-danger']) ?>
       <?= Html::a('Delete branch-name txt', ['delete-specific-file','filePath' =>'branch-name.txt' ,'id' => $model->restaurant_uuid], ['class' => 'btn btn-danger']) ?>
-      <?= Html::a('Merge w/ dev', ['merge-branch', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+      <?= Html::a('Merge w/ dev', ['merge-branch', 'id' => $model->restaurant_uuid, 'head' => 'staging'], ['class' => 'btn btn-primary']) ?>
+      <?= Html::a('Merge w/ master', ['merge-branch', 'id' => $model->restaurant_uuid, 'head' => 'master-temp'], ['class' => 'btn btn-primary']) ?>
+
+
+
+      <?= Html::a('Merge', ['merge-to-master-branch', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+
+
+
+
     </p>
 
     <?=

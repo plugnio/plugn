@@ -69,15 +69,7 @@ class OrderController extends Controller {
      */
     public function actionPlaceAnOrder($id) {
 
-      //TEMP
-
-      // return [
-      //     'operation' => 'error',
-      //     'message' => 'Sorry we are not able to process your request Please try again later ',
-      // ];
-
         $restaurant_model = Restaurant::findOne($id);
-
 
         if ($restaurant_model) {
 
