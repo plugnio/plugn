@@ -122,47 +122,66 @@ class RestaurantController extends Controller {
 
         $store = $this->findModel($id);
 
-
-        //Replace test with store branch name
-        $getBuildJsSHA = Yii::$app->githubComponent->getFileSHA('build.js', $store->store_branch_name);
-
-        if ($getBuildJsSHA->isOk && $getBuildJsSHA->data) {
-
-            $deleteBuildJs = Yii::$app->githubComponent->deleteFile('build.js', $getBuildJsSHA->data['sha'],  $store->store_branch_name);
-            if ($deleteBuildJs->isOk){
-
-              $mergeToMasterResponse = Yii::$app->githubComponent->mergeABranch('Merge branch master-temp into ' . $store->store_branch_name, $store->store_branch_name,  'master-temp');
-
-              if ($mergeToMasterResponse->isOk) {
-
-                $mergeToDevelopResponse = Yii::$app->githubComponent->mergeABranch('Merge branch staging into ' . $store->store_branch_name, $store->store_branch_name,  'staging');
-
-                if ($mergeToDevelopResponse->isOk) {
-                    $store->version = 2;
-                    $store->save(false);
-                } else {
-                  Yii::error('[Github > Error While merging with develop]' . json_encode($mergeToDevelopResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
-                  Yii::$app->session->setFlash('errorResponse', json_encode($mergeToMasterResponse->data['message']));
-                  return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
-                }
-
-
-              } else {
-                Yii::error('[Github > Error While merging with Master]' . json_encode($mergeToMasterResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
-                Yii::$app->session->setFlash('errorResponse', json_encode($mergeToMasterResponse->data['message']));
-                return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
-              }
-
-            } else {
-              Yii::error('[Github > Error While deleting build.js]' . json_encode($deleteBuildJs->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
-              Yii::$app->session->setFlash('errorResponse', json_encode($deleteBuildJs->data['message']));
+        //Delete src/environments/environment.develop.ts file
+        $getDevEnvFile = Yii::$app->githubComponent->getFileSHA('src/environments/environment.develop.ts', $store->store_branch_name);
+        if ($getDevEnvFile->isOk && $getDevEnvFile->data) {
+            $deleteDevEnvFile = Yii::$app->githubComponent->deleteFile('src/environments/environment.develop.ts', $getDevEnvFile->data['sha'],  $store->store_branch_name);
+            if (!$deleteDevEnvFile->isOk){
+              Yii::error('[Github > Error While deleting environment.develop.ts]' . json_encode($deleteDevEnvFile->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+              Yii::$app->session->setFlash('errorResponse', json_encode($deleteDevEnvFile->data['message']));
               return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
             }
-      } else {
-        Yii::error('[Github > Error while getting file sha]' . json_encode($getBuildJsSHA->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
-        Yii::$app->session->setFlash('errorResponse', json_encode($getBuildJsSHA->data['message']));
-        return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
-      }
+        }
+
+        //Delete branch-name.txt file
+        $getBranchNameFile = Yii::$app->githubComponent->getFileSHA('branch-name.txt', $store->store_branch_name);
+        if ($getBranchNameFile->isOk && $getBranchNameFile->data) {
+            $deleteBranchNameFile = Yii::$app->githubComponent->deleteFile('branch-name.txt', $getBranchNameFile->data['sha'],  $store->store_branch_name);
+            if (!$deleteBranchNameFile->isOk){
+              Yii::error('[Github > Error While deleting branch-name.txt]' . json_encode($deleteDevEnvFile->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+              Yii::$app->session->setFlash('errorResponse', json_encode($deleteDevEnvFile->data['message']));
+              return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+            }
+        }
+
+
+        //Delete Build.js file
+        $getBuildJsSHA = Yii::$app->githubComponent->getFileSHA('build.js', $store->store_branch_name);
+        if ($getBuildJsSHA->isOk && $getBuildJsSHA->data) {
+            $deleteBuildJs = Yii::$app->githubComponent->deleteFile('build.js', $getBuildJsSHA->data['sha'],  $store->store_branch_name);
+            if (!$deleteBuildJs->isOk){
+              Yii::error('[Github > Error While deleting build.js]' . json_encode($deleteDevEnvFile->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+              Yii::$app->session->setFlash('errorResponse', json_encode($deleteDevEnvFile->data['message']));
+              return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+            }
+        } else {
+          Yii::error('[Github > Error while getting file sha]' . json_encode($getBuildJsSHA->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+          Yii::$app->session->setFlash('errorResponse', json_encode($getBuildJsSHA->data['message']));
+          return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
+
+
+        $mergeToMasterResponse = Yii::$app->githubComponent->mergeABranch('Merge branch master-temp into ' . $store->store_branch_name, $store->store_branch_name,  'master-temp');
+
+        if ($mergeToMasterResponse->isOk) {
+
+          $mergeToDevelopResponse = Yii::$app->githubComponent->mergeABranch('Merge branch staging into ' . $store->store_branch_name, $store->store_branch_name,  'staging');
+
+          if ($mergeToDevelopResponse->isOk) {
+              $store->version = 2;
+              $store->save(false);
+          } else {
+            Yii::error('[Github > Error While merging with develop]' . json_encode($mergeToDevelopResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+            Yii::$app->session->setFlash('errorResponse', json_encode($mergeToMasterResponse->data['message']));
+            return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+          }
+
+
+        } else {
+          Yii::error('[Github > Error While merging with Master]' . json_encode($mergeToMasterResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+          Yii::$app->session->setFlash('errorResponse', json_encode($mergeToMasterResponse->data['message']));
+          return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
 
 
       return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
