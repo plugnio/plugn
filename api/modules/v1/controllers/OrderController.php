@@ -634,11 +634,14 @@ class OrderController extends Controller {
 
 
 
-            if ($order_model->save()) {
+            if ($order_model->save(false)) {
                 return [
                     'operation' => 'success'
                 ];
             } else {
+
+             Yii::error('[Mashkor (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
+
               return [
                   'operation' => 'error',
                   'message' => $order_model->getErrors(),
