@@ -917,7 +917,7 @@ class Order extends \yii\db\ActiveRecord {
 
 
             //Save Customer data
-            $customer_model = Customer::find()->where(['customer_phone_number' => $this->customer_phone_number, 'restaurant_uuid' => $this->restaurant_uuid])->one();
+            $customer_model = Customer::find()->where(['customer_phone_number' => '+' . $this->customer_phone_number, 'restaurant_uuid' => $this->restaurant_uuid])->one();
 
             if (!$customer_model) {//new customer
                 $customer_model = new Customer();
