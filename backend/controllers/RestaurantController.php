@@ -148,7 +148,7 @@ class RestaurantController extends Controller {
 
 
               } else {
-                Yii::error('[Github > Error While merging with develop]' . json_encode($mergeToMasterResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+                Yii::error('[Github > Error While merging with Master]' . json_encode($mergeToMasterResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
                 Yii::$app->session->setFlash('errorResponse', json_encode($mergeToMasterResponse->data['message']));
                 return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
               }
