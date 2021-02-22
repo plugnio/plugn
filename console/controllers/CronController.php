@@ -601,7 +601,7 @@ class CronController extends \yii\console\Controller {
                 // Encode the image string data into base64
                 $data = base64_encode($fileToBeUploaded);
 
-                $getSitemapXmlSHA = Yii::$app->githubComponent->getFileSHA('sitemap.xml', $store->store_branch_name,);
+                $getSitemapXmlSHA = Yii::$app->githubComponent->getFileSHA('src/sitemap.xml', $store->store_branch_name,);
 
                 if ($getSitemapXmlSHA->isOk && $getSitemapXmlSHA->data) {
 

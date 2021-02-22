@@ -14,7 +14,6 @@ $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="restaurant-view">
-
     <h1>
         <?= Html::encode($this->title) ?>
         <span class="badge">
@@ -24,6 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
     </h1>
+    <?= Yii::$app->session->getFlash('errorResponse') ? '<h2>'. Yii::$app->session->getFlash('errorResponse') . '</h2>' : '' ?>
 
 
     <p>
@@ -49,8 +49,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
       <?= Html::a('Update sitemap', ['update-sitemap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>
-      <?= Html::a('Delete Build Js', ['delete-build-js', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-danger']) ?>
-      <?= Html::a('Merge w/ dev', ['merge-with-dev', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+      <?= Html::a('Delete Build Js', ['delete-specific-file','filePath' =>'build.js' ,'id' => $model->restaurant_uuid], ['class' => 'btn btn-danger']) ?>
+      <?= Html::a('Delete branch-name txt', ['delete-specific-file','filePath' =>'branch-name.txt' ,'id' => $model->restaurant_uuid], ['class' => 'btn btn-danger']) ?>
+      <?= Html::a('Merge w/ dev', ['merge-branch', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
     </p>
 
     <?=
