@@ -472,7 +472,7 @@ class OrderController extends Controller {
                         $response = [
                             'operation' => 'success',
                             'order_uuid' => $order->order_uuid,
-                            'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
+                            // 'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
                             'message' => 'Order created successfully',
                         ];
                     }

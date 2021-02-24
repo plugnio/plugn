@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php
 
-      if(AgentAssignment::isOwner($model->restaurant_uuid)){
+      if(Yii::$app->user->identity->isOwner($model->restaurant_uuid)){
          echo Html::a('Delete', ['delete', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
              'class' => 'btn btn-danger',
              'data' => [
@@ -110,6 +110,8 @@ $this->params['breadcrumbs'][] = $this->title;
                           'value' => function($model) {
                               if ($model->order_status == Order::STATUS_PENDING)
                                   return '<span class="badge bg-warning" >' . $model->orderStatusInEnglish . '</span>';
+                              else if ($model->order_status == Order::STATUS_ACCEPTED)
+                                  return '<span class="badge" style="background-color:#2898C8;" >' . $model->orderStatusInEnglish . '</span>';
                               else if ($model->order_status == Order::STATUS_DRAFT)
                                   return '<span class="badge bg-info" >' . $model->orderStatusInEnglish . '</span>';
                               else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY)

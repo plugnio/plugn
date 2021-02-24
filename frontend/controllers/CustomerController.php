@@ -69,6 +69,7 @@ class CustomerController extends Controller {
           $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
           $model = new Customer();
+          $model->setScenario(Customer::SCENARIO_CREATE_ORDER_BY_AGENT);
           $model->restaurant_uuid = $storeUuid;
 
           if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -116,7 +117,7 @@ class CustomerController extends Controller {
 
         // Customer's Orders Data
         $customersOrdersData = new \yii\data\ActiveDataProvider([
-            'query' => $model->getOrders()->orderBy(['order_created_at' => SORT_ASC]),
+            'query' => $model->getOrders()->with(['currency'])->orderBy(['order_created_at' => SORT_ASC]),
             'pagination' => false
         ]);
 

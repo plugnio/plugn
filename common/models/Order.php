@@ -808,7 +808,9 @@ class Order extends \yii\db\ActiveRecord {
         if ($this->customer_phone_country_code == 965 && !$insert && $this->restaurant_uuid != 'rest_7351b2ff-c73d-11ea-808a-0673128d0c9c'  && $this->restaurant_uuid != 'rest_085f7a5f-19db-11eb-b97d-0673128d0c9c' && !$this->sms_sent &&  isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_PENDING && $this->order_status == self::STATUS_ACCEPTED) {
 
           try {
-            $response = Yii::$app->smsComponent->sendSms($this->customer_phone_country_code, str_replace('+' . $this->customer_phone_country_code, '', $this->customer_phone_number), $this->order_uuid);
+
+
+            $response = Yii::$app->smsComponent->sendSms($this->customer_phone_number, $this->order_uuid);
 
             if(!$response->isOk)
               Yii::error('Error while Sending SMS' . json_encode($respons->data));
@@ -917,8 +919,7 @@ class Order extends \yii\db\ActiveRecord {
 
 
             //Save Customer data
-            $customer_model = Customer::find()->where(['customer_phone_number' => '+' . $this->customer_phone_number, 'restaurant_uuid' => $this->restaurant_uuid])->one();
-
+            $customer_model = Customer::find()->where(['customer_phone_number' =>  $this->customer_phone_number, 'restaurant_uuid' => $this->restaurant_uuid])->one();
             if (!$customer_model) {//new customer
                 $customer_model = new Customer();
                 $customer_model->restaurant_uuid = $this->restaurant_uuid;
@@ -1088,6 +1089,15 @@ class Order extends \yii\db\ActiveRecord {
      */
     public function getOrderItems() {
         return $this->hasMany(OrderItem::className(), ['order_uuid' => 'order_uuid'])->with('item', 'orderItemExtraOptions');
+    }
+
+    /**
+     * Gets query for [[OrderItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSelectedItems() {
+        return $this->hasMany(OrderItem::className(), ['order_uuid' => 'order_uuid']);
     }
 
     /**

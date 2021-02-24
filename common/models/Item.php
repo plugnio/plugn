@@ -375,6 +375,11 @@ class Item extends \yii\db\ActiveRecord
         return $this->hasMany(ItemImage::className(), ['item_uuid' => 'item_uuid']);
     }
 
+
+    public function getItemImage(){
+      return $this->hasOne(ItemImage::className(), ['item_uuid' => 'item_uuid']);
+    }
+
     /**
      * Gets query for [[Options]].
      *

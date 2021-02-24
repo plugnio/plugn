@@ -170,7 +170,7 @@ $this->registerJs($js);
                     'buttons' => [
                         'update-order-status' => function ($url, $model) {
 
-                          if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Order::STATUS_ABANDONED_CHECKOUT || $model->order_status == Order::STATUS_CANCELED ) && $model->getOrderItems()->count()) {
+                          if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Order::STATUS_ABANDONED_CHECKOUT || $model->order_status == Order::STATUS_CANCELED ) && sizeof($model->selectedItems)) {
                               return Html::a('Mark as pending', [
                                   'change-order-status',
                                   'order_uuid' => $model->order_uuid,

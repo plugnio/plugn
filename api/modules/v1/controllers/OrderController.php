@@ -240,7 +240,7 @@ class OrderController extends Controller {
                 if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->restaurantDelivery->min_charge) {
                     $response = [
                         'operation' => 'error',
-                        'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->restaurantDelivery->min_charge,  '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
+                        'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->restaurantDelivery->min_charge,  $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
                     ];
                 }
 
@@ -438,7 +438,7 @@ class OrderController extends Controller {
                         $response = [
                             'operation' => 'success',
                             'order_uuid' => $order->order_uuid,
-                            'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
+                            // 'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
                             'message' => 'Order created successfully',
                         ];
                     }

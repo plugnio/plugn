@@ -208,9 +208,9 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItemImages()
+    public function getItemImage()
     {
-        return $this->hasMany(ItemImage::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasOne(ItemImage::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**

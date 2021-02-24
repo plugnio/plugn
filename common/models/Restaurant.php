@@ -1249,7 +1249,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      * @return \yii\db\ActiveQuery
      */
     public function getCustomers() {
-        return $this->hasMany(Customer::className(), ['customer_id' => 'customer_id']);
+        return $this->hasMany(Customer::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**

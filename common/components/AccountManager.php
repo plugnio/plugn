@@ -40,7 +40,7 @@ class AccountManager  extends BaseObject
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT '.Yii::$app->user->identity->agent_id.', COUNT(*) FROM agent WHERE agent_id='.Yii::$app->user->identity->agent_id,
+            'sql' => 'SELECT '.Yii::$app->user->identity->agent_id.', COUNT(*) FROM agent_assignment WHERE agent_id='.Yii::$app->user->identity->agent_id,
 
 
             // we SELECT agent_id as well to make sure every cached sql statement is unique to this agent
@@ -48,11 +48,11 @@ class AccountManager  extends BaseObject
             // SUM of agent_status is to bust the cache when status changes
         ]);
 //
-        $cacheDuration = 60*15; //15 minutes then delete from cache
+        $cacheDuration = 60*1; //1 minute then delete from cache
 
-        // $this->_managedAccounts = Restaurant::getDb()->cache(function($db) {
-        //     return Yii::$app->user->identity->getAccountsManaged()->all();
-        // }, $cacheDuration, $cacheDependency);
+        $this->_managedAccounts = Restaurant::getDb()->cache(function($db) {
+            return Yii::$app->user->identity->getAccountsManaged()->all();
+        }, $cacheDuration, $cacheDependency);
 
 
          // Getting a list of Restaurants this agent manages

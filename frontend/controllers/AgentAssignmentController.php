@@ -47,17 +47,17 @@ class AgentAssignmentController extends Controller {
      */
     public function actionIndex($storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
 
-        if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) {
+        if (Yii::$app->user->identity->isOwner($store_model->restaurant_uuid)) {
             $dataProvider = new ActiveDataProvider([
-                'query' => AgentAssignment::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid]),
+                'query' => AgentAssignment::find()->where(['restaurant_uuid' => $store_model->restaurant_uuid]),
             ]);
 
             return $this->render('index', [
                         'dataProvider' => $dataProvider,
-                        'restaurant_uuid' => $restaurant_model->restaurant_uuid
+                        'restaurant_uuid' => $store_model->restaurant_uuid
             ]);
         } else {
             throw new \yii\web\BadRequestHttpException('Sorry, you are not allowed to access this page.');
@@ -87,7 +87,7 @@ class AgentAssignmentController extends Controller {
         $model = new AgentAssignment();
         $model->restaurant_uuid = Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid;
 
-        if (AgentAssignment::isOwner($model->restaurant_uuid)) {
+        if (Yii::$app->user->identity->isOwner($model->restaurant_uuid)) {
 
             if ($model->load(Yii::$app->request->post())) {
 
@@ -146,7 +146,7 @@ class AgentAssignmentController extends Controller {
     protected function findModel($assignment_id, $agent_id, $storeUuid) {
         if (Yii::$app->accountManager->getManagedAccount($storeUuid)) {
 
-            if (AgentAssignment::isOwner($storeUuid)) {
+            if (Yii::$app->user->identity->isOwner($storeUuid)) {
 
                 if (($model = AgentAssignment::find()->where(['assignment_id' => $assignment_id, 'agent_id' => $agent_id, 'restaurant_uuid' => $storeUuid])->one()) !== null) {
                     return $model;

@@ -11,10 +11,11 @@ use common\models\BankDiscount;
 /* @var $this yii\web\View */
 /* @var $model common\models\Order */
 
-$this->params['restaurant_uuid'] = $model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $storeUuid;
+
 
 $this->title = 'Order #' . $model->order_uuid;
-$this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index', 'storeUuid' => $model->restaurant_uuid]];
+$this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index', 'storeUuid' => $storeUuid]];
 $this->params['breadcrumbs'][] = $this->title;
 
 \yii\web\YiiAsset::register($this);
@@ -53,13 +54,13 @@ $this->registerJs($js);
     <p>
         <?php
         if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT) {
-            echo Html::a('<i class="feather icon-file-text"></i> View Invoice', ['view-invoice', 'order_uuid' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid], ['class' => 'btn btn-outline-primary mr-1 mb-1', 'style' => 'margin-right: 7px']);
+            echo Html::a('<i class="feather icon-file-text"></i> View Invoice', ['view-invoice', 'order_uuid' => $model->order_uuid, 'storeUuid' => $storeUuid], ['class' => 'btn btn-outline-primary mr-1 mb-1', 'style' => 'margin-right: 7px']);
         }
         ?>
 
         <?php
         if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT) {
-            echo Html::a('Update', ['update', 'id' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid,], ['class' => 'btn btn-primary mr-1 mb-1', 'style' => 'margin-right: 7px;']);
+            echo Html::a('Update', ['update', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid,], ['class' => 'btn btn-primary mr-1 mb-1', 'style' => 'margin-right: 7px;']);
         }
         ?>
 
@@ -71,13 +72,13 @@ $this->registerJs($js);
 
         <?php
         // if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT ) {
-        //     echo Html::a('Refund', ['refund-order', 'order_uuid' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid,], ['class' => 'btn btn-warning', 'style'=>'margin-left: 5px;']) ;
+        //     echo Html::a('Refund', ['refund-order', 'order_uuid' => $model->order_uuid, 'storeUuid' => $storeUuid,], ['class' => 'btn btn-warning', 'style'=>'margin-left: 5px;']) ;
         // }
         ?>
 
         <?php
         if ($model->delivery_zone_id || $model->pickup_location_id) {
-            echo Html::a('Delete', ['delete', 'id' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid], [
+            echo Html::a('Delete', ['delete', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid], [
                 'class' => 'btn btn-danger mr-1 mb-1',
                 'data' => [
                     'confirm' => 'Are you sure you want to delete this order?',
@@ -103,10 +104,10 @@ $this->registerJs($js);
                 if (
                     $difference <= 1  &&
                     $model->restaurant->hide_request_driver_button
-                    // $model->restaurant_uuid != 'rest_6a55139f-f340-11ea-808a-0673128d0c9c' &&
-                    // $model->restaurant_uuid != 'rest_5d657108-c91f-11ea-808a-0673128d0c9c'
+                    // $storeUuid != 'rest_6a55139f-f340-11ea-808a-0673128d0c9c' &&
+                    // $storeUuid != 'rest_5d657108-c91f-11ea-808a-0673128d0c9c'
                    ){
-                          echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], [
+                          echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
                               'class' => 'btn btn-dark mr-1 mb-1',
                               'style' => 'margin-right: 7px;',
                               'data' => [
@@ -118,10 +119,10 @@ $this->registerJs($js);
 
                 if (
                     !$model->restaurant->hide_request_driver_button
-                    // $model->restaurant_uuid == 'rest_6a55139f-f340-11ea-808a-0673128d0c9c' ||
-                    // $model->restaurant_uuid == 'rest_5d657108-c91f-11ea-808a-0673128d0c9c'
+                    // $storeUuid == 'rest_6a55139f-f340-11ea-808a-0673128d0c9c' ||
+                    // $storeUuid == 'rest_5d657108-c91f-11ea-808a-0673128d0c9c'
                    )  {
-                      echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], [
+                      echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
                           'class' => 'btn btn-dark mr-1 mb-1',
                           'style' => 'margin-right: 7px;',
                           'data' => [
@@ -137,13 +138,13 @@ $this->registerJs($js);
 
                 if ($difference <= 1  &&
                 $model->restaurant->hide_request_driver_button
-                // $model->restaurant_uuid != 'rest_1276d589-f41c-11ea-808a-0673128d0c9c' &&
-                // $model->restaurant_uuid != 'rest_aa69124d-2346-11eb-b97d-0673128d0c9c' &&
-                // $model->restaurant_uuid != 'rest_5d657108-c91f-11ea-808a-0673128d0c9c' &&
-                // $model->restaurant_uuid != 'rest_f6bc4e4a-e7c6-11ea-808a-0673128d0c9c' &&
-                // $model->restaurant_uuid != 'rest_6a55139f-f340-11ea-808a-0673128d0c9c'
+                // $storeUuid != 'rest_1276d589-f41c-11ea-808a-0673128d0c9c' &&
+                // $storeUuid != 'rest_aa69124d-2346-11eb-b97d-0673128d0c9c' &&
+                // $storeUuid != 'rest_5d657108-c91f-11ea-808a-0673128d0c9c' &&
+                // $storeUuid != 'rest_f6bc4e4a-e7c6-11ea-808a-0673128d0c9c' &&
+                // $storeUuid != 'rest_6a55139f-f340-11ea-808a-0673128d0c9c'
               ){
-                  echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], [
+                  echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
                       'class' => 'btn btn-dark mr-1 mb-1',
                       'style' => 'margin-right: 7px;',
                       'data' => [
@@ -156,13 +157,13 @@ $this->registerJs($js);
 
                 if (
                         !$model->restaurant->hide_request_driver_button
-                        // $model->restaurant_uuid == 'rest_1276d589-f41c-11ea-808a-0673128d0c9c' ||
-                        // $model->restaurant_uuid == 'rest_5d657108-c91f-11ea-808a-0673128d0c9c' ||
-                        // $model->restaurant_uuid == 'rest_aa69124d-2346-11eb-b97d-0673128d0c9c' ||
-                        // $model->restaurant_uuid == 'rest_f6bc4e4a-e7c6-11ea-808a-0673128d0c9c' ||
-                        // $model->restaurant_uuid == 'rest_6a55139f-f340-11ea-808a-0673128d0c9c'
+                        // $storeUuid == 'rest_1276d589-f41c-11ea-808a-0673128d0c9c' ||
+                        // $storeUuid == 'rest_5d657108-c91f-11ea-808a-0673128d0c9c' ||
+                        // $storeUuid == 'rest_aa69124d-2346-11eb-b97d-0673128d0c9c' ||
+                        // $storeUuid == 'rest_f6bc4e4a-e7c6-11ea-808a-0673128d0c9c' ||
+                        // $storeUuid == 'rest_6a55139f-f340-11ea-808a-0673128d0c9c'
                       ){
-                          echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $model->restaurant_uuid, 'order_uuid' => $model->order_uuid], [
+                          echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
                               'class' => 'btn btn-dark mr-1 mb-1',
                               'style' => 'margin-right: 7px;',
                               'data' => [
@@ -199,7 +200,7 @@ if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Orde
     echo Html::a('Mark as pending', [
         'change-order-status',
         'order_uuid' => $model->order_uuid,
-        'storeUuid' => $model->restaurant_uuid,
+        'storeUuid' => $storeUuid,
         'status' => Order::STATUS_PENDING
             ], [
         'style' => 'margin-right: 10px;',
@@ -213,7 +214,7 @@ if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Orde
     echo Html::a('Accept order', [
         'change-order-status',
         'order_uuid' => $model->order_uuid,
-        'storeUuid' => $model->restaurant_uuid,
+        'storeUuid' => $storeUuid,
         'status' => Order::STATUS_ACCEPTED
             ], [
         'style' => 'margin-right: 10px; color: white; background-color: #2898C8',
@@ -223,7 +224,7 @@ if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Orde
     echo Html::a('Being Prepared', [
         'change-order-status',
         'order_uuid' => $model->order_uuid,
-        'storeUuid' => $model->restaurant_uuid,
+        'storeUuid' => $storeUuid,
         'status' => Order::STATUS_BEING_PREPARED
             ], [
         'style' => 'margin-right: 10px;',
@@ -233,7 +234,7 @@ if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Orde
     echo Html::a('Out for Delivery', [
         'change-order-status',
         'order_uuid' => $model->order_uuid,
-        'storeUuid' => $model->restaurant_uuid,
+        'storeUuid' => $storeUuid,
         'status' => Order::STATUS_OUT_FOR_DELIVERY
             ], [
         'style' => 'margin-right: 10px;',
@@ -243,7 +244,7 @@ if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Orde
     echo Html::a('Mark as Complete', [
         'change-order-status',
         'order_uuid' => $model->order_uuid,
-        'storeUuid' => $model->restaurant_uuid,
+        'storeUuid' => $storeUuid,
         'status' => Order::STATUS_COMPLETE
             ], [
         'style' => 'margin-right: 10px;',
@@ -255,7 +256,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
     echo Html::a('Cancel order', [
         'change-order-status',
         'order_uuid' => $model->order_uuid,
-        'storeUuid' => $model->restaurant_uuid,
+        'storeUuid' => $storeUuid,
         'status' => Order::STATUS_CANCELED
             ], [
         'style' => 'margin-right: 10px;',
@@ -389,7 +390,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
             </div>
         </div>
     </div>
-                <?php if ($orderItems->totalCount > 0) { ?>
+    <?php if ($orderItems->totalCount > 0) { ?>
         <section id="data-list-view" class="data-list-view-header">
 
             <div class="card">
@@ -404,10 +405,11 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
             [
                 'label' => 'Item image',
                 'format' => 'html',
-                'value' => function ($data) {
-                    $itemItmage = $data->getItemImages()->one();
-                    if ($itemItmage) {
-                        return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/" . $data->restaurant->restaurant_uuid . "/items/" . $itemItmage->product_file_name);
+                'value' => function ($data) use ($storeUuid) {
+                    $itemItmage = $data->itemImage;
+
+                      if ($data->itemImage && $data->itemImage->product_file_name) {
+                        return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/" . $storeUuid. "/items/" . $itemItmage->product_file_name);
                     }
                 },
                 'contentOptions' => ['style' => 'width: 100px;'],
@@ -469,10 +471,9 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                     <?php } ?>
 
                     <?php
-                    $totalNumberOfItems = $model->getOrderItems()->count();
-                    $refunds = $model->getRefunds();
+                    $totalNumberOfItems = $orderItems->query->count();
 
-                    if ($totalNumberOfItems > 0 || $refunds->count() > 0) {
+                    if ( $totalNumberOfItems > 0 ) {
                         ?>
         <div class="card">
             <div class="card-body">
@@ -653,13 +654,13 @@ if ($refundDataProvider->totalCount > 0 && $model->payment) {
             <?php
 
             if($model->payment_uuid && $model->payment->payment_current_status  != 'CAPTURED')
-              echo Html::a('Request Payment Status Update from TAP', ['update-payment-status','id' => $model->payment_uuid, 'storeUuid' => $model->restaurant_uuid], ['class'=>'btn btn-outline-primary']);
+              echo Html::a('Request Payment Status Update from TAP', ['update-payment-status','id' => $model->payment_uuid, 'storeUuid' => $storeUuid], ['class'=>'btn btn-outline-primary']);
 
             ?>
 
             <p>
             <?php
-//              if($model->payment_method_id != 3 && $model->order_status != Order::STATUS_REFUNDED) echo Html::a('Create Refund', ['refund/create', 'storeUuid' => $model->restaurant_uuid, 'orderUuid' => $model->order_uuid], ['class' => 'btn btn-success']) ;
+//              if($model->payment_method_id != 3 && $model->order_status != Order::STATUS_REFUNDED) echo Html::a('Create Refund', ['refund/create', 'storeUuid' => $storeUuid, 'orderUuid' => $model->order_uuid], ['class' => 'btn btn-success']) ;
             ?>
             <div class="box-body table-responsive no-padding">
 

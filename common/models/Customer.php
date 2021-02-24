@@ -86,6 +86,30 @@ class Customer extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Gets query for [[Orders]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getActiveOrders() {
+        return $this->hasMany(Order::className(), ['customer_id' => 'customer_id'])
+        ->where(['order_status' => Order::STATUS_PENDING])
+        ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+        ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+        ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+        ->orWhere(['order_status' => Order::STATUS_ACCEPTED]);
+    }
+
+    public function getTotalSpent() {
+        return $this->hasMany(Order::className(), ['customer_id' => 'customer_id'])
+        ->where(['order_status' => Order::STATUS_PENDING])
+        ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+        ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+        ->orWhere(['order_status' => Order::STATUS_COMPLETE])
+        ->orWhere(['order_status' => Order::STATUS_ACCEPTED])
+        ->sum('total_price');
+    }
+
+    /**
      * Gets query for [[CustomerVouchers]].
      *
      * @return \yii\db\ActiveQuery

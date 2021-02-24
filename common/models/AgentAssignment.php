@@ -49,7 +49,7 @@ class AgentAssignment extends \yii\db\ActiveRecord {
 //            ['assignment_agent_email', 'unique', 'filter' => function($query) {
 //                    $query->where(['agent_id' => $this->agent_id, 'restaurant_uuid' => $this->restaurant_uuid]);
 //                }, 'message' => 'This person has already been added as an agent.'],
-//       
+//
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
             [['agent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Agent::className(), 'targetAttribute' => ['agent_id' => 'agent_id']],
         ];
@@ -96,21 +96,6 @@ class AgentAssignment extends \yii\db\ActiveRecord {
         ];
     }
 
-    /**
-     * 
-     * @param type $restaurant_uuid
-     * @param type $agent_id
-     * @return type
-     */
-    public static function isOwner($restaurant_uuid, $agent_id = null) {
-
-        if (!$agent_id)
-            $agent_id = Yii::$app->user->identity->agent_id;
-
-        return AgentAssignment::find()
-                        ->where(['agent_id' => $agent_id, 'restaurant_uuid' => $restaurant_uuid, 'role' => static::AGENT_ROLE_OWNER])
-                        ->exists();
-    }
 
     /**
      * @return \yii\db\ActiveQuery

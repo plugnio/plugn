@@ -84,7 +84,7 @@ $this->registerJs($js);
                     'format' => 'raw',
                     'value' => function ($item) {
 
-                            $itemItmage = $item->getItemImages()->one();
+                            $itemItmage = $item->itemImage;
 
                             if ($itemItmage)
                               return  Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_60,w_60/restaurants/" . $item->restaurant->restaurant_uuid . "/items/" . $itemItmage->product_file_name, ['style' => 'border-radius: 3px;margin-right: 20px;']);
@@ -136,7 +136,7 @@ $this->registerJs($js);
                     'attribute' => 'item_price',
                     "format" => "raw",
                     "value" => function($model) {
-                        if ($model->getExtraOptions()->where(['>','extra_option_price', '0'])->exists())
+                        if ($model->extraOptions)
                           return 'Price on selection';
                         else
                         return Yii::$app->formatter->asCurrency($model->item_price, $model->currency->code);

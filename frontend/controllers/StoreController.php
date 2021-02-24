@@ -837,7 +837,7 @@ class StoreController extends Controller {
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($id);
 
         if ($restaurant_model !== null) {
-            if (AgentAssignment::isOwner($id))
+            if (Yii::$app->user->identity->isOwner($id))
                 return $restaurant_model;
             else
                 throw new \yii\web\BadRequestHttpException('Sorry, you are not allowed to access this page.');

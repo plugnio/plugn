@@ -32,13 +32,15 @@ $this->registerJs($js);
   <?php if ($dataProvider->getCount() > 0) { ?>
 
   <!-- Data list view starts -->
-  <div class="action-btns d-none">
+  <!-- <div class="action-btns d-none">
       <div class="btn-dropdown mr-1 mb-1">
-          <div class="btn-group dropdown actions-dropodown">
-            <?= Html::a('Add customer', ['create', 'storeUuid' => $storeUuid], ['class' => 'btn btn-primary']) ?>
-          </div>
+          <div class="btn-group dropdown actions-dropodown"> -->
+            <?php
+            // Html::a('Add customer', ['create', 'storeUuid' => $storeUuid], ['class' => 'btn btn-primary']);
+             ?>
+          <!-- </div>
       </div>
-  </div>
+  </div> -->
 
     <!-- DataTable starts -->
     <div class="table-responsive">
@@ -69,32 +71,20 @@ $this->registerJs($js);
                       'label' => 'Number of orders',
                       "format" => "raw",
                       "value" => function($model) {
-                        return  $model->getOrders()
-                               ->where(['order.order_status' => Order::STATUS_PENDING])
-                               ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-                               ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                               ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-                               ->orWhere(['order.order_status' => Order::STATUS_ACCEPTED])
-                               ->count();
+                        return  sizeof($model->activeOrders);
                       }
                   ],
-                  [
-                      'attribute' => 'Total spent',
-                      "format" => "raw",
-                      "value" => function($model) {
-                        $total_spent = $model->getOrders()
-                                              ->where(['order.order_status' => Order::STATUS_PENDING])
-                                              ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-                                              ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                                              ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-                                              ->orWhere(['order.order_status' => Order::STATUS_ACCEPTED])
-                                              ->sum('total_price');
-
-                          $total_spent = \Yii::$app->formatter->asDecimal($total_spent ? $total_spent : 0 , 3);
-                          return  Yii::$app->formatter->asCurrency($total_spent ? $total_spent : 0, $model->currency->code) ;
-
-                      }
-                  ],
+                  // [
+                  //     'attribute' => 'Total spent',
+                  //     "format" => "raw",
+                  //     "value" => function($model) {
+                  //       return $model->activeOrders;
+                  //
+                  //         $total_spent = \Yii::$app->formatter->asDecimal($total_spent ? $total_spent : 0 , 3);
+                  //         return  Yii::$app->formatter->asCurrency($total_spent ? $total_spent : 0, $model->currency->code) ;
+                  //
+                  //     }
+                  // ],
                   [
                       'attribute' => 'customer_created_at',
                       "format" => "raw",

@@ -15,7 +15,7 @@ use yii\helpers\Url;
 
 DashboardAsset::register($this);
 
-$restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
+$restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->params['restaurant_uuid']])->one();
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -183,7 +183,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                 <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
 
 
-                    <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
+                    <?php if (Yii::$app->user->identity->isOwner($restaurant_model->restaurant_uuid)) { ?>
 
                         <li class=" nav-item <?= $this->context->route == 'site/vendor-dashboard' ? 'active' : '' ?> ">
 
@@ -280,7 +280,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                     </li>
 
 
-                    <?php if($restaurant_model->country->country_name == 'Kuwait' && $restaurant_model->is_tap_enable) { ?>
+                    <?php if($restaurant_model->country_id = 84 && $restaurant_model->is_tap_enable) { ?>
 
                     <li class=" nav-item">
                         <a>
@@ -329,7 +329,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         )
                         ?>
                     </li>
-                    <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
+                    <?php if (Yii::$app->user->identity->isOwner($restaurant_model->restaurant_uuid)) { ?>
 
                         <li class=" nav-item">
                             <a>
@@ -370,7 +370,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                             <span class="menu-title">Settings</span>
                         </a>
                         <ul class="menu-content" style="padding-left: 17px;">
-                            <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
+                            <?php if (Yii::$app->user->identity->isOwner($restaurant_model->restaurant_uuid)) { ?>
 
                                 <li class=" nav-item <?= $this->context->route == 'store/update' || $this->context->route == 'store/update' ? 'active' : '' ?> ">
                                     <?=
@@ -390,6 +390,8 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                     ?>
                                 </li>
 
+                              <?php if ($restaurant_model->version == 2) { ?>
+
                                 <li class=" nav-item <?= $this->context->route == 'business-location/index'  ? 'active' : '' ?> ">
                                     <?=
                                     Html::a(
@@ -398,16 +400,8 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                     )
                                     ?>
                                 </li>
+                              <?php }  ?>
 
-
-                                <li class=" nav-item <?= $this->context->route == 'site/current-plan' || $this->context->route == 'restaurant/update-payment-settings' ? 'active' : '' ?> ">
-                                    <?=
-                                    Html::a(
-                                            Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                            Html::tag('span', 'Plan'), ['site/current-plan', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
-                                    )
-                                    ?>
-                                </li>
 
                                 <li class=" nav-item <?= $this->context->route == 'site/domains'  ? 'active' : '' ?> ">
                                     <?=
@@ -449,7 +443,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                             )
                                             ?>
                                         </li>
-                                        <?php if($restaurant_model->country->country_name == 'Kuwait') { ?>
+                                        <?php if($restaurant_model->country_id = 84) { ?>
                                         <li  <?= $this->context->route == 'restaurant/update-delivery-integration' ? 'class="active"' : '' ?>>
                                             <?=
                                             Html::a(
@@ -472,7 +466,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 )
                                 ?>
                             </li>
-                            <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
+                            <?php if (Yii::$app->user->identity->isOwner($restaurant_model->restaurant_uuid)) { ?>
                                 <li class=" nav-item <?= $this->context->route == 'agent-assignment/index' ? 'active' : '' ?> ">
 
                                     <?=

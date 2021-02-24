@@ -46,7 +46,9 @@ class ItemSearch extends Item
      */
     public function search($params, $storeUuid)
     {
-        $query = Item::find()->where(['item.restaurant_uuid' => $storeUuid])->joinWith('category', true);
+        $query = Item::find()->where(['item.restaurant_uuid' => $storeUuid])
+        ->with(['currency','extraOptions','itemImage'])
+        ->joinWith('category', true);
 
         // add conditions that should always apply here
 
@@ -106,7 +108,9 @@ class ItemSearch extends Item
     public function searchTrackQuantity($params, $storeUuid)
     {
 
-        $query = Item::find()->where(['item.restaurant_uuid' => $storeUuid , 'track_quantity' => 1])->joinWith('category', true);
+        $query = Item::find()->where(['item.restaurant_uuid' => $storeUuid , 'track_quantity' => 1])
+        ->with(['restaurant','itemImage'])
+        ->joinWith('category', true);
 
         // add conditions that should always apply here
 

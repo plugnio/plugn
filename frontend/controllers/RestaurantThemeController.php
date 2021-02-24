@@ -59,7 +59,7 @@ class RestaurantThemeController extends Controller {
       ]);
     }
 
-  
+
     /**
      * Finds the RestaurantTheme model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
@@ -70,7 +70,7 @@ class RestaurantThemeController extends Controller {
     protected function findModel($storeUuid) {
         if (Yii::$app->accountManager->getManagedAccount($storeUuid)) {
 
-            if (AgentAssignment::isOwner($storeUuid)) {
+            if (Yii::$app->user->identity->isOwner($storeUuid)) {
                 if (($model = RestaurantTheme::findOne(Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid)) !== null) {
                     return $model;
                 }

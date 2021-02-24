@@ -18,7 +18,6 @@ use common\components\FileUploader;
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 $this->title = 'Update Store design and layout';
-$this->params['breadcrumbs'][] = ['label' => 'Design & layout', 'url' => ['view-design-layout','storeUuid' =>$model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = 'Update design & layout';
 
 

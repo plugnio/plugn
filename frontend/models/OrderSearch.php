@@ -45,6 +45,7 @@ class OrderSearch extends Order {
 
 
         $query = Order::find()
+            ->with(['restaurant','country', 'pickupLocation', 'payment','paymentMethod','currency','deliveryZone','deliveryZone.businessLocation','customer'])
             ->where(['order.restaurant_uuid' => $storeUuid])
             ->andWhere(['order_status' => Order::STATUS_ABANDONED_CHECKOUT])
             ->orderBy(['order_created_at' => SORT_DESC]);
@@ -102,7 +103,8 @@ class OrderSearch extends Order {
     public function searchDraftOrders($params, $storeUuid) {
 
         $query = Order::find()
-            ->where(['order.restaurant_uuid' => $storeUuid])
+        ->with(['restaurant','country', 'pickupLocation', 'payment','paymentMethod','currency','deliveryZone','deliveryZone.businessLocation','customer'])
+            ->where(['restaurant_uuid' => $storeUuid])
             ->andWhere(['order_status' => Order::STATUS_DRAFT])
             ->orderBy(['order_created_at' => SORT_DESC]);
 
@@ -159,10 +161,10 @@ class OrderSearch extends Order {
     public function searchPendingOrders($params, $storeUuid) {
 
         $query = Order::find()
-            ->where(['order.restaurant_uuid' => $storeUuid])
+            ->with(['country', 'pickupLocation', 'payment','paymentMethod','currency','deliveryZone','deliveryZone.businessLocation','customer'])
+            ->where(['restaurant_uuid' => $storeUuid])
             ->andWhere(['order_status' => Order::STATUS_PENDING])
             ->orderBy(['order_created_at' => SORT_DESC]);
-
 
         // add conditions that should always apply here
         $dataProvider = new ActiveDataProvider([
@@ -219,6 +221,7 @@ class OrderSearch extends Order {
     public function search($params, $storeUuid) {
 
         $query = Order::find()
+            ->with(['paymentMethod','currency','deliveryZone','deliveryZone.businessLocation', 'selectedItems'])
             ->where(['order.restaurant_uuid' => $storeUuid])
             ->andWhere(['!=' , 'order_status' , Order::STATUS_DRAFT])
             ->andWhere(['!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])

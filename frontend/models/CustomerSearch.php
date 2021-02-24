@@ -41,6 +41,7 @@ class CustomerSearch extends Customer
     public function search($params, $storeUuid)
     {
         $query = Customer::find()->where(['restaurant_uuid' => $storeUuid])
+          ->with(['currency','activeOrders'])
         ->orderBy(['customer_created_at' => SORT_DESC]);
 
 

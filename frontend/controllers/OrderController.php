@@ -348,20 +348,19 @@ class OrderController extends Controller {
 
         // Item
         $orderItems = new \yii\data\ActiveDataProvider([
-            'query' => $order_model->getOrderItems(),
+            'query' => $order_model->getOrderItems()->with(['currency']),
             'sort' => false,
         ]);
 
         // Item extra optn
-        $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
-            'query' => $order_model->getOrderItemExtraOptions()
-        ]);
+        // $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
+        //     'query' => $order_model->getOrderItemExtraOptions()
+        // ]);
 
 
         return $this->render('invoice', [
                     'model' => $order_model,
-                    'orderItems' => $orderItems,
-                    'itemsExtraOpitons' => $itemsExtraOpitons,
+                    'orderItems' => $orderItems
         ]);
     }
 
@@ -373,27 +372,25 @@ class OrderController extends Controller {
      */
     public function actionView($id, $storeUuid) {
 
-        $order_model = $this->findModel($id, $storeUuid);
-
-
+        $order_model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->with(['currency','country','deliveryZone.country','pickupLocation','deliveryZone.businessLocation'])->one();
 
         // Item
         $orderItems = new \yii\data\ActiveDataProvider([
-            'query' => $order_model->getOrderItems(),
+            'query' => $order_model->getOrderItems()->with(['orderItemExtraOptions','item','currency']),
             'sort' => false,
             'pagination' => false
         ]);
 
         // Item extra optn
-        $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
-            'query' => $order_model->getOrderItemExtraOptions(),
-            'pagination' => false
-        ]);
+        // $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
+        //     'query' => $order_model->getOrderItemExtraOptions(),
+        //     'pagination' => false
+        // ]);
 
         return $this->render('view', [
                     'model' => $order_model,
-                    'orderItems' => $orderItems,
-                    'itemsExtraOpitons' => $itemsExtraOpitons
+                    'storeUuid' => $storeUuid,
+                    'orderItems' => $orderItems
         ]);
     }
 
@@ -546,7 +543,7 @@ class OrderController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id, $storeUuid) {
-        if (($model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->one()) !== null) {
+        if (($model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->with(['restaurant','currency','country','deliveryZone.country'])->one()) !== null) {
             return $model;
         }
 

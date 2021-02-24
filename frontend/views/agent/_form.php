@@ -115,7 +115,7 @@ $this->registerJs($js);
 
     <?php
 
-      if(AgentAssignment::isOwner($storeUuid)){
+      if(Yii::$app->user->identity->isOwner($storeUuid)) {
         echo $form->field($model, 'reminder_email', [
             'template' => '
             <div class="vs-checkbox-con vs-checkbox-primary">

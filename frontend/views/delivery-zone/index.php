@@ -147,7 +147,7 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
                 <div class="col-12" style=" margin-bottom:12px; border-width: 0.5px; border-style: solid; border-color: #e2e8f0; padding: 10px; border-radius: 7px;     position: relative;">
 
                   <?php
-                    if($deliveryZone->country->getAreas()->count() > 0){
+                    if($deliveryZone->country->areas){
                         echo  Html::a('Edit <i class="feather icon-edit"></i>',
                                       ['update-areas', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
                                       [ 'style' => ' position: absolute; top: 10px; right: 10px;']);
@@ -161,8 +161,8 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
 
                   <p>
                     <?=
-                        $deliveryZone->country->getAreas()->count() > 0 ?
-                        $deliveryZone->getAreaDeliveryZones()->count() . ' out of ' . $deliveryZone->country->getAreas()->count() .' areas in ' . $deliveryZone->country->country_name :
+                        sizeof($deliveryZone->country->areas) > 0 ?
+                        $deliveryZone->getAreaDeliveryZones()->count() . ' out of ' . sizeof($deliveryZone->country->areas) .' areas in ' . $deliveryZone->country->country_name :
                         'All over ' . $deliveryZone->country->country_name
                     ?>
                   </p>
