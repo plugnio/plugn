@@ -86,13 +86,10 @@ class OrderController extends Controller {
 
 
             $searchResult = Order::find()
-                    ->where(['restaurant_uuid' => $store_model->restaurant_uuid])
+                    ->activeOrders($storeUuid)
                     ->andWhere(['between', 'order_created_at', $start_date, $end_date])
-                    ->andWhere([ '!=' , 'order_status' , Order::STATUS_DRAFT])
-                    ->andWhere([ '!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
                     ->orderBy(['order_created_at' => SORT_ASC])
                     ->all();
-
 
             header('Access-Control-Allow-Origin: *');
             header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -138,13 +135,13 @@ class OrderController extends Controller {
                     [
                         'attribute' => 'total_price',
                         "value" => function($data) {
-                                return Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code);
+                                return \Yii::$app->formatter->asDecimal($data->total_price, 3);
                         },
                     ],
                     [
                         'attribute' => 'delivery_fee',
                         "value" => function($data) {
-                                return Yii::$app->formatter->asCurrency($data->delivery_fee, $data->currency->code);
+                                return \Yii::$app->formatter->asDecimal($data->delivery_fee, 3);
                         },
                     ],
                     'order_created_at'

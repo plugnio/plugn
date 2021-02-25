@@ -92,21 +92,17 @@ class Customer extends \yii\db\ActiveRecord {
      */
     public function getActiveOrders() {
         return $this->hasMany(Order::className(), ['customer_id' => 'customer_id'])
-        ->where(['order_status' => Order::STATUS_PENDING])
-        ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
-        ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-        ->orWhere(['order_status' => Order::STATUS_COMPLETE])
-        ->orWhere(['order_status' => Order::STATUS_ACCEPTED]);
+        ->activeOrders($this->restaurant_uuid);
     }
 
     public function getTotalSpent() {
         return $this->hasMany(Order::className(), ['customer_id' => 'customer_id'])
-        ->where(['order_status' => Order::STATUS_PENDING])
-        ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
-        ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-        ->orWhere(['order_status' => Order::STATUS_COMPLETE])
-        ->orWhere(['order_status' => Order::STATUS_ACCEPTED])
+        ->activeOrders($this->restaurant_uuid)
         ->sum('total_price');
+    }
+
+    public static function find() {
+      return new query\CustomerQuery(get_called_class());
     }
 
     /**

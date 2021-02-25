@@ -992,6 +992,12 @@ class Order extends \yii\db\ActiveRecord {
     }
 
 
+    public static function find() {
+      return new query\OrderQuery(get_called_class());
+    }
+
+
+
     /**
      * Gets query for [[Country]].
      *

@@ -46,6 +46,8 @@ class CustomerController extends Controller {
      */
     public function actionIndex($storeUuid) {
 
+      // add conditions that should always apply here
+
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new CustomerSearch();
@@ -162,9 +164,10 @@ class CustomerController extends Controller {
                        "format" => "raw",
                        "value" => function($data) {
                          $total_spent = $data->getOrders()
-                                         ->where(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
-                                         ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                                         ->where([ '!=' , 'order_status' , Order::STATUS_DRAFT])
+                                         ->andWhere([ '!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
                                          ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                                         ->andWhere(['!=', 'order_status', Order::STATUS_PARTIALLY_REFUNDED])
                                          ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
                                          ->sum('total_price');
 
@@ -179,11 +182,11 @@ class CustomerController extends Controller {
                        "format" => "raw",
                        "value" => function($model) {
                            return  $model->getOrders()
-                           ->where(['order.order_status' => Order::STATUS_PENDING])
-                           ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-                           ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                           ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-                           ->orWhere(['order.order_status' => Order::STATUS_ACCEPTED])
+                           ->where([ '!=' , 'order_status' , Order::STATUS_DRAFT])
+                           ->andWhere([ '!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
+                           ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                           ->andWhere(['!=', 'order_status', Order::STATUS_PARTIALLY_REFUNDED])
+                           ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
                            ->count();
                        }
                    ],

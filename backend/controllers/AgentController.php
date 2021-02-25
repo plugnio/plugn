@@ -56,6 +56,22 @@ class AgentController extends Controller
        ]);
     }
 
+
+        public function actionSendMaintenanceEmail(){
+          $model = Agent::findOne('1');
+          \Yii::$app->mailer->compose([
+                      'html' => 'maintenance-announcement-html',
+                          ], [
+                      'agent' => $model
+                  ])
+                  ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                  ->setTo($model->agent_email)
+                  ->setSubject('Scheduled downtime on Sunday, February 28, starting from 12:00am')
+                  ->setReplyTo(['contact@plugn.io'])
+                  ->send();
+        }
+        
+
     /**
      * Displays a single Agent model.
      * @param integer $id

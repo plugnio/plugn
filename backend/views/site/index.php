@@ -11,6 +11,9 @@ $this->title = 'Admin dashboard';
         <h1>Plugn Management!</h1>
 
         <p class="lead">Dashboard with a summary of whats going on in the project</p>
+        <?= Html::a('Send email', ['agent/send-maintenance-email'], ['class' => 'btn btn-default']) ?>
+
+
 
     </div>
 

@@ -75,11 +75,15 @@ class StoreController extends Controller {
 
             if($deliveryZone){
 
+              $timeUnit = $deliveryZone->time_unit == 'hrs' ? 'hour' : $deliveryZone->time_unit;
+              $startDate = strtotime('+ ' . $deliveryZone->delivery_time . ' ' . $timeUnit );
+
+
               for ($i = 0; $i <= OpeningHour::DAY_OF_WEEK_SATURDAY; $i++) {
 
-                  $deliveryDate = strtotime("+$i day");
-
+                  $deliveryDate = strtotime(date('Y-m-d', strtotime("+ " . $i . " day" ,$startDate)));
                   $opening_hrs = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => date('w' , $deliveryDate)])->one();
+
 
                   if($opening_hrs->is_closed)
                       continue;
@@ -87,9 +91,15 @@ class StoreController extends Controller {
                   $selectedDay = 'next '  . date('l', $deliveryDate);
 
 
+                  $startTime =   date('c',  mktime(
+                                            date('H', strtotime($opening_hrs->open_at)),
+                                            date('i', strtotime($opening_hrs->open_at)),
+                                            date('s', strtotime($opening_hrs->open_at)),
+                                            date('m', $deliveryDate),
+                                            date('d',$deliveryDate),
+                                            date('Y',$deliveryDate)
+                                          ));
 
-
-                  $startTime =   date('c',strtotime( date('Y-m-d', strtotime($i == 0 ? "now" : $selectedDay)) . ' ' . $opening_hrs->open_at));
 
                   if($store_model->schedule_order){
 
