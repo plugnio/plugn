@@ -65,10 +65,10 @@ class AgentController extends Controller
               \Yii::$app->mailer->compose([
                           'html' => 'maintenance-announcement-html',
                               ], [
-                          'agent' => $model
+                          'agent' => $agent
                       ])
                       ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-                      ->setTo($model->agent_email)
+                      ->setTo($agent->agent_email)
                       ->setSubject('Scheduled downtime on Sunday, February 28, starting from 12:00am')
                       ->setReplyTo(['contact@plugn.io'])
                       ->send();
