@@ -992,8 +992,6 @@ class Order extends \yii\db\ActiveRecord {
                     $customer_model = Customer::findOne($this->customer_id);
 
                     $customer_model->customer_name = $this->customer_name;
-                    $customer_model->country_code = $this->customer_phone_country_code;
-                    $customer_model->customer_phone_number = $this->customer_phone_number;
 
                     if ($this->customer_email != null)
                         $customer_model->customer_email = $this->customer_email;
