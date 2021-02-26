@@ -1358,13 +1358,11 @@ class Restaurant extends \yii\db\ActiveRecord {
     //  *
     //  * @return \yii\db\ActiveQuery
     //  */
-    // public function getDeliveryZonesForSpecificCountry($countryId)
-    // {
-    //
-    //   return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])
-    //       ->viaTable('business_location', ['restaurant_uuid' => 'restaurant_uuid'])  ->where(['delivery_zone.country_id' => $countryId]);
-    //
-    // }
+    public function getDeliveryZonesForSpecificCountry($countryId)
+    {
+      return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])
+          ->viaTable('business_location', ['restaurant_uuid' => 'restaurant_uuid']);
+    }
 
 
     /**

@@ -109,21 +109,18 @@ class DeliveryZoneController extends Controller {
 
 
             foreach ($shipping_countries as $key => $shippingCountry) {
-                    if(isset($shipping_countries[$key]['areas'])){
 
-                      if($areaDeliveryZone = $store_model->getAreaDeliveryZonesForSpecificCountry($shippingCountry['country_id'])->one()){
-                        $shipping_countries[$key]['areas'] =
-                        !isset($areaDeliveryZone['area_id']) &&  $areaDeliveryZone->area_id  == null ? 0 : $store_model->getAreaDeliveryZonesForSpecificCountry($shippingCountry['country_id'])->count();
-                      }
-
-                      if($shipping_countries[$key]['areas'] == 0){
-                        $countryDeliveryZone = $store_model->getCountryDeliveryZones($shippingCountry['country_id'])->one();
-                        $shipping_countries[$key]['delivery_zone_id'] = strval($countryDeliveryZone['delivery_zone_id']);
-                      }
+                if($areaDeliveryZone = $store_model->getAreaDeliveryZonesForSpecificCountry($shippingCountry['country_id'])->one()){
+                  $shipping_countries[$key]['areas'] =
+                  !isset($areaDeliveryZone['area_id']) &&  $areaDeliveryZone->area_id  == null ? 0 : $store_model->getAreaDeliveryZonesForSpecificCountry($shippingCountry['country_id'])->count();
+                }  else
+                    $shipping_countries[$key]['areas'] = 0;
 
 
-
-                    }
+                if($shipping_countries[$key]['areas'] == 0){
+                  $countryDeliveryZone = $store_model->getCountryDeliveryZones($shippingCountry['country_id'])->one();
+                  $shipping_countries[$key]['delivery_zone_id'] = strval($countryDeliveryZone['delivery_zone_id']);
+                }
 
             }
 
@@ -271,9 +268,7 @@ class DeliveryZoneController extends Controller {
                             }
                       }
                   }
-              } else
-                    return $store_model->getDeliveryZonesForSpecificCountry($country_id)->asArray()->all();
-
+              }
 
           $citiesData = [];
           foreach ($countryCities as $key => $city) {
@@ -284,10 +279,7 @@ class DeliveryZoneController extends Controller {
 
           if(!empty($citiesData))
             return $citiesData ;
-          else
-          return $store_model->getDeliveryZonesForSpecificCountry($country_id)->asArray()->all();
-
-
+  
 
         } else {
             return [
