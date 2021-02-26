@@ -7,6 +7,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use yii\db\ActiveRecord;
 use common\models\Customer;
+use common\models\Restaurant;
 use common\models\Agent;
 use yii\behaviors\AttributeBehavior;
 use Segment;
