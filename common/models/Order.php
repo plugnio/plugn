@@ -926,9 +926,10 @@ class Order extends \yii\db\ActiveRecord {
             if (!$customer_model) {//new customer
               \Yii::error('[Duplicate customer]' . $this->customer_phone_number, __METHOD__); // Log error faced by user
               \Yii::error('[Duplicate customer111]' . $this->restaurant_uuid, __METHOD__); // Log error faced by user
-              \Yii::error('[Duplicate customer22]' . json_encode(var_dump($customer_model)), __METHOD__); // Log error faced by user
-              \Yii::error('[Duplicate customer3]' . json_encode(var_dump(Restaurant::findOne($this->restaurant_uuid))), __METHOD__); // Log error faced by user
-
+              \Yii::error('[Duplicate customer22]' . json_encode(print_r($customer_model)), __METHOD__); // Log error faced by user
+              \Yii::error('[Duplicate customer3]' . json_encode(print_r(Restaurant::findOne($this->restaurant_uuid))), __METHOD__); // Log error faced by user
+              \Yii::error('[Duplicate customer4]' . json_encode(print_r($this)), __METHOD__); // Log error faced by user
+            
                 $customer_model = new Customer();
                 $customer_model->restaurant_uuid = $this->restaurant_uuid;
                 $customer_model->customer_name = $this->customer_name;
