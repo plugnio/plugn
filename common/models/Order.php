@@ -923,6 +923,9 @@ class Order extends \yii\db\ActiveRecord {
 
 
             if (!$customer_model) {//new customer
+              \Yii::error('[Suplicate customer]' . $this->customer_phone_number, __METHOD__); // Log error faced by user
+              \Yii::error('[Suplicate customer22]' . json_encode(var_dump($customer_model)), __METHOD__); // Log error faced by user
+
                 $customer_model = new Customer();
                 $customer_model->restaurant_uuid = $this->restaurant_uuid;
                 $customer_model->customer_name = $this->customer_name;
