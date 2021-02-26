@@ -74,6 +74,7 @@ class OrderController extends Controller {
             $order = new Order();
 
             $order->restaurant_uuid = $restaurant_model->restaurant_uuid;
+            \Yii::error('[Placeorder]' . json_encode(var_dump(Restaurant::findOne($restaurant_model->restaurant_uuid))), __METHOD__); // Log error faced by user
 
             //Save Customer Info
             $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
