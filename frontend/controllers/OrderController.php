@@ -87,6 +87,7 @@ class OrderController extends Controller {
 
             $searchResult = Order::find()
                     ->activeOrders($storeUuid)
+                    ->with('voucher')
                     ->andWhere(['between', 'order_created_at', $start_date, $end_date])
                     ->orderBy(['order_created_at' => SORT_ASC])
                     ->all();
@@ -130,6 +131,16 @@ class OrderController extends Controller {
                                 return $data->payment->payment_current_status;
                             else
                                 return $data->paymentMethod->payment_method_name;
+                        },
+                    ],
+                    [
+                        'attribute' => 'Voucher Code',
+                        "format" => "raw",
+                        "value" => function($data) {
+                            if ($data->voucher_id)
+                                return $data->voucher->code;
+                            else
+                                return '';
                         },
                     ],
                     [

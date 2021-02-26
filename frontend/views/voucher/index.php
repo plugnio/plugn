@@ -53,7 +53,7 @@ $this->registerJs($js);
                     'label' => 'Redeemed',
                     "format" => "raw",
                     "value" => function($model) {
-                        return $model->getCustomerVouchers()->count();
+                        return sizeof($model->activeOrders);
                     }
                 ],
                 [

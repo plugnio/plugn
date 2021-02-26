@@ -221,6 +221,16 @@ class Voucher extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Gets query for [[Orders]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getActiveOrders() {
+        return $this->hasMany(Order::className(), ['voucher_id' => 'voucher_id'])
+        ->activeOrders($this->restaurant_uuid);
+    }
+
+    /**
      * Gets query for [[RestaurantUu]].
      *
      * @return \yii\db\ActiveQuery
