@@ -165,20 +165,20 @@ class RestaurantController extends Controller {
 
         if ($mergeToMasterResponse->isOk) {
 
-          $mergeToDevelopResponse = Yii::$app->githubComponent->mergeABranch('Merge branch staging into ' . $store->store_branch_name, $store->store_branch_name,  'staging');
+          $mergeToDevelopResponse = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
 
           if ($mergeToDevelopResponse->isOk) {
               $store->version = 2;
               $store->save(false);
           } else {
-            Yii::error('[Github > Error While merging with develop]' . json_encode($mergeToDevelopResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+            Yii::error('[Github > Error While merging with master]' . json_encode($mergeToDevelopResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
             Yii::$app->session->setFlash('errorResponse', json_encode($mergeToMasterResponse->data['message']));
             return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
           }
 
 
         } else {
-          Yii::error('[Github > Error While merging with Master]' . json_encode($mergeToMasterResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+          Yii::error('[Github > Error While merging with Master-staging]' . json_encode($mergeToMasterResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
           Yii::$app->session->setFlash('errorResponse', json_encode($mergeToMasterResponse->data['message']));
           return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
         }
