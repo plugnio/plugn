@@ -354,7 +354,7 @@ class CronController extends \yii\console\Controller {
               $businessLocation->country_id = 84;
               $businessLocation->business_location_name = 'Main branch';
               $businessLocation->business_location_name_ar = 'الفرع الرئيسي';
-              $businessLocation->support_pick_up = $store->support_pick_up ? 1 : 0;
+              $businessLocation->support_pick_up = 0;
               $businessLocation->save();
 
             }
