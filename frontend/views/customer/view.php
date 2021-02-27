@@ -21,20 +21,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
   <p>
     <?= Html::a('Update', ['update', 'id' => $model->customer_id, 'storeUuid' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
-
-    <?php
-
-      if(Yii::$app->user->identity->isOwner($model->restaurant_uuid)){
-         echo Html::a('Delete', ['delete', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
-             'class' => 'btn btn-danger',
-             'data' => [
-                 'confirm' => 'Are you sure you want to delete this customer?',
-                 'method' => 'post',
-             ],
-         ]);
-       }
-   ?>
-
   </p>
 
   <div class="card">
