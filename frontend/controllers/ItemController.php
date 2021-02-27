@@ -201,8 +201,8 @@ class ItemController extends Controller
 
         if ($model && $file_name) {
             $item_image = \common\models\ItemImage::find()->where(['item_uuid' => $itemUuid, 'product_file_name' => $file_name])->one();
-
-            $item_image->delete();
+            if($item_image)
+                $item_image->delete();
 
             return true;
         }
