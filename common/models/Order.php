@@ -215,10 +215,11 @@ class Order extends \yii\db\ActiveRecord {
                     return $model->order_mode == static::ORDER_MODE_DELIVERY;
                 }
             ],
-            [['building', 'floor', 'appartment', 'office'], 'required', 'when' => function($model) {
-                    return $model->unit_type == 'Office' ||  $model->unit_type == 'Apartment';
-                }
-            ],
+            //TODO
+            // [['building', 'floor', 'office'], 'required', 'when' => function($model) {
+            //         return $model->unit_type == 'Office' ||  $model->unit_type == 'Apartment';
+            //     }
+            // ],
             [['postalcode', 'city', 'address_1' , 'address_2'], 'required', 'when' => function($model) {
                     return $model->shipping_country_id;
                 }
