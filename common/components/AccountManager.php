@@ -78,6 +78,9 @@ class AccountManager  extends BaseObject
      * @throws \yii\web\NotFoundHttpException if the account isnt one this agent owns
      */
     public function getManagedAccount($restaurantUuid){
+
+      throw new \yii\web\BadRequestHttpException('Temporarily Down for Maintenance');
+
         foreach($this->_managedAccounts as $restaurant){
             if($restaurant->restaurant_uuid == $restaurantUuid){
                  return $restaurant;
