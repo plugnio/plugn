@@ -81,11 +81,7 @@ class AccountManager  extends BaseObject
     public function getManagedAccount($restaurantUuid){
         foreach($this->_managedAccounts as $restaurant){
             if($restaurant->restaurant_uuid == $restaurantUuid){
-                 if($restaurant->version == 2 || Yii::$app->user->identity->agent_id == 1 || Yii::$app->user->identity->agent_id == 21)
-                    return $restaurant;
-                else
-                throw new \yii\web\BadRequestHttpException('Temporarily Down for Maintenance');
-
+                return $restaurant;
             }
         }
 
