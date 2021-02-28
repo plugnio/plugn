@@ -67,12 +67,15 @@ class ArmadaDelivery extends Component {
      */
     public function createDelivery($model) {
 
+      $phone =  str_replace(' ', '', $model->customer_phone_number);
+      $phone =  str_replace('+'.$model->customer_phone_country_code, '', $phone);
+
         $deliveryParams = [
             "platformName" => "pos",
             "platformData" => [
                     "orderId" => $model->order_uuid,
                     "name" => $model->customer_name,
-                    "phone" =>  $model->customer_phone_number,
+                    "phone" =>  $phone,
                     "area" => $model->area_name,
                     "block" => $model->block,
                     "street" => $model->street,
