@@ -25,10 +25,9 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property int|null $shipping_country_id
  * @property string|null $country_name
  * @property string|null $country_name_ar
- * @property int|null $floor
- * @property int|null $apartment
- * @property int|null $building
- * @property int|null $office
+ * @property string|null $floor
+ * @property string|null $apartment
+ * @property string|null $office
  * @property string|null $postalcode
  * @property string|null $address_1
  * @property string|null $address_2
@@ -145,7 +144,7 @@ class Order extends \yii\db\ActiveRecord {
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status','mashkor_order_status', 'customer_id'], 'integer', 'min' => 0],
-            [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id', 'reminder_sent', 'sms_sent', 'customer_phone_country_code', 'delivery_zone_id', 'shipping_country_id', 'floor', 'pickup_location_id'], 'integer'],
+            [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id', 'reminder_sent', 'sms_sent', 'customer_phone_country_code', 'delivery_zone_id', 'shipping_country_id', 'pickup_location_id'], 'integer'],
             ['mashkor_order_status', 'in', 'range' => [
               self::MASHKOR_ORDER_STATUS_NEW,
               self::MASHKOR_ORDER_STATUS_CONFIRMED,
@@ -215,11 +214,10 @@ class Order extends \yii\db\ActiveRecord {
                     return $model->order_mode == static::ORDER_MODE_DELIVERY;
                 }
             ],
-            //TODO
-            // [['building', 'floor', 'office'], 'required', 'when' => function($model) {
-            //         return $model->unit_type == 'Office' ||  $model->unit_type == 'Apartment';
-            //     }
-            // ],
+            [['apartment', 'floor', 'office'], 'required', 'when' => function($model) {
+                    return ($model->unit_type == 'Office' ||  $model->unit_type == 'Apartment') && $model->restaurant->version == 2;
+                }
+            ],
             [['postalcode', 'city', 'address_1' , 'address_2'], 'required', 'when' => function($model) {
                     return $model->shipping_country_id;
                 }
@@ -245,7 +243,7 @@ class Order extends \yii\db\ActiveRecord {
                  'payment_method_name', 'payment_method_name_ar',
                  'armada_tracking_link', 'armada_qr_code_link', 'armada_delivery_code',
                  'country_name','country_name_ar',
-                 'building', 'apartment', 'city',  'address_1' , 'address_2','postalcode'
+                 'building', 'apartment', 'city',  'address_1' , 'address_2','postalcode', 'floor', 'office'
              ],
              'string', 'max' => 255],
              [['postalcode'], 'string', 'max' => 10],

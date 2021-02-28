@@ -62,29 +62,38 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                         <?=  $model->customer_name ?>
                       </span>
                       <span style="display: block" >
-                        <?= $model->area_id ? $model->area_name : $model->address_1  . ', ' ?>
+                        <?= $model->area_id ? $model->area_name : $model->address_1  ?>
                       </span>
                       <span style="display: block" >
-                        <?= $model->area_id ? 'Block: ' . $model->block : $model->address_2  . ', ' ?>
+                        <?= $model->area_id ? 'Block: ' . $model->block : $model->address_2  ?>
                       </span>
                       <span style="display: block" >
-                        <?= $model->area_id ? 'St: ' . $model->street : $model->postalcode . ' ' . $model->city  . ', ' ?>
+                        <?= $model->area_id ? 'St: ' . $model->street : $model->postalcode . ' ' . $model->city  ?>
                       </span>
                       <span style="display: block" >
                         <?= $model->area_id && $model->avenue ? 'Avenue: ' . $model->avenue : ''; ?>
                       </span>
                       <span style="display: block" >
-                        <?= $model->area_id ? 'House: ' . $model->house_number :  $model->country_name  . ', ' ?>
+                        <?= $model->area_id && $model->floor && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? 'Floor: ' . $model->floor : ''?>
                       </span>
                       <span style="display: block" >
-                        <?= $model->area_id ?  $model->area->city->city_name . ', ' :  $model->customer_phone_number  ?>
+                        <?=  $model->area_id && $model->apartment && $model->unit_type == 'Apartment' ? 'Apartment No. ' . $model->apartment : ''?>
+                      </span>
+                      <span style="display: block" >
+                        <?=  $model->area_id && $model->office && $model->unit_type == 'Office'  ? 'Office No. ' . $model->office : ''?>
+                      </span>
+                      <span style="display: block" >
+                        <?= $model->area_id ? ($model->unit_type == 'House' ? 'House No. ' : 'Building: ') . $model->house_number :  ''  ?>
+                      </span>
+                      <span style="display: block" >
+                        <?= $model->area_id ?  $model->area->city->city_name :  $model->customer_phone_number  ?>
                       </span>
                       <span style="display: block" >
                         <?=  $model->country_name ?
-                        $model->country_name . ', ' : ( $model->order_mode == 1 ?
+                        $model->country_name : ( $model->order_mode == 1 ?
                         ($model->delivery_zone_id && $model->deliveryZone->country ?
-                        $model->deliveryZone->country->country_name  . ', ' : '') : ($model->pickupLocation && $model->pickupLocation->country ?
-                        $model->pickupLocation->country->country_name . ', ' : ''));
+                        $model->deliveryZone->country->country_name  : '') : ($model->pickupLocation && $model->pickupLocation->country ?
+                        $model->pickupLocation->country->country_name : ''));
                           ?>
                       </span>
                       <span style="display: block" >

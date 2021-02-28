@@ -753,8 +753,6 @@ DetailView::widget([
                             },
                             'visible' => $model->customer_email != null && $model->customer_email,
                         ],
-
-
                         [
                             'attribute' => 'address_1',
                             'format' => 'html',
@@ -812,12 +810,36 @@ DetailView::widget([
                             'visible' => $model->area_id && $model->avenue ? true : false,
                         ],
                         [
-                            'label' => 'Building',
+                            'label' => 'Floor',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return $data->floor;
+                            },
+                            'visible' => $model->area_id && $model->floor && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? true : false,
+                        ],
+                        [
+                            'label' => 'Office No.',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return $data->office;
+                            },
+                            'visible' => $model->area_id && $model->unit_type == 'Office' && $model->office ? true : false,
+                        ],
+                        [
+                            'label' => 'Apartment No.',
+                            'format' => 'html',
+                            'value' => function ($data) {
+                                return $data->apartment;
+                            },
+                            'visible' => $model->area_id && $model->unit_type == 'Apartment' && $model->apartment ? true : false,
+                        ],
+                        [
+                            'label' => $model->unit_type == 'House' ? 'House No.' : 'Building',
                             'format' => 'html',
                             'value' => function ($data) {
                                 return $data->house_number;
                             },
-                            'visible' => $model->area_id  ? true : false,
+                            'visible' => $model->area_id  && $model->house_number ? true : false,
                         ],
                         [
                             'label' => 'City',
