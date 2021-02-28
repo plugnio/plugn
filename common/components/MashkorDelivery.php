@@ -148,11 +148,15 @@ class MashkorDelivery extends Component {
      */
     public function createOrder($model) {
 
+      $phone =  str_replace(' ', '', $model->customer_phone_number);
+      $phone =  str_replace('+'.$model->customer_phone_country_code, '', $phone);
+
+
         $mashkorParams = [
               "branch_id" => $model->restaurant->mashkor_branch_id,
               "customer_name" => $model->customer_name,
               "payment_type" => $model->payment_method_id == 3 && $model->total_price > 0 ? self::PAYMENT_TYPE_COD : self::PAYMENT_TYPE_CARD,
-              "mobile_number" =>  $model->customer_phone_number,
+              "mobile_number" =>  $phone,
               "amount_to_collect" => \Yii::$app->formatter->asDecimal($model->total_price, 3) ,
               "vendor_order_id" => $model->order_uuid,
               "drop_off" => [
