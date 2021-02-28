@@ -125,6 +125,14 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                     </p>
 
                 </div>
+                <div class="invoice-details my-2">
+
+                    <h6 class="mt-2">EXPECTED AT</h6>
+                    <p>
+                      <?= \Yii::$app->formatter->asDatetime($model->estimated_time_of_arrival, 'MMM dd, yyyy h:mm a') ?>
+                    </p>
+
+                </div>
 
 
             </div>
