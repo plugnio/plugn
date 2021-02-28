@@ -214,8 +214,16 @@ class Order extends \yii\db\ActiveRecord {
                     return $model->order_mode == static::ORDER_MODE_DELIVERY;
                 }
             ],
-            [['apartment', 'floor', 'office'], 'required', 'when' => function($model) {
+            [['floor'], 'required', 'when' => function($model) {
                     return ($model->unit_type == 'Office' ||  $model->unit_type == 'Apartment') && $model->restaurant->version == 2;
+                }
+            ],
+            [['office'], 'required', 'when' => function($model) {
+                    return $model->unit_type == 'Office' && $model->restaurant->version == 2;
+                }
+            ],
+            [['apartment'], 'required', 'when' => function($model) {
+                    return $model->unit_type == 'Apartment' && $model->restaurant->version == 2;
                 }
             ],
             [['postalcode', 'city', 'address_1' , 'address_2'], 'required', 'when' => function($model) {
