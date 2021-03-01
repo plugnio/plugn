@@ -60,12 +60,8 @@ $this->registerJs($js);
                     'label' => 'Total spent',
                     "format" => "raw",
                     "value" => function($model) {
-                        $totalSpent = $model
-                        ->getOrders()
-                        ->where(['restaurant_uuid' => $model->restaurant_uuid])
-                        ->sum('total_price');
+                        $totalSpent = $model->getOrders()->where(['restaurant_uuid' => $model->restaurant_uuid])->sum('total_price');
 
-                        $totalSpent = \Yii::$app->formatter->asDecimal($totalSpent ? $totalSpent : 0 , 3);
                         return  Yii::$app->formatter->asCurrency($totalSpent ? $totalSpent : 0, $model->restaurant->currency->code) ;
 
                     }
