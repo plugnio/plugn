@@ -168,6 +168,7 @@ class RestaurantController extends Controller {
           $mergeToDevelopResponse = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
 
           if ($mergeToDevelopResponse->isOk) {
+              $store->sitemap_require_update = 1;
               $store->version = 2;
               $store->save(false);
           } else {

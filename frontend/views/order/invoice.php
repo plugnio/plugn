@@ -86,7 +86,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                         <?= $model->area_id ? ($model->unit_type == 'House' ? 'House No. ' : 'Building: ') . $model->house_number :  ''  ?>
                       </span>
                       <span style="display: block" >
-                        <?= $model->area_id ?  $model->area->city->city_name :  $model->customer_phone_number  ?>
+                        <?= $model->area_id ?  $model->area->city->city_name :  '' ?>
                       </span>
                       <span style="display: block" >
                         <?=  $model->country_name ?
@@ -97,7 +97,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                           ?>
                       </span>
                       <span style="display: block" >
-                        <?= $model->area_id ?  $model->customer_phone_number :  '' ?>
+                        <?=  $model->customer_phone_number  ?>
                       </span>
                       <?php
                     } else {

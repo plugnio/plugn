@@ -490,52 +490,66 @@ class CronController extends \yii\console\Controller {
         }
 
 
+    /**
+     * Anything we can help with? Once either when 2 days passed no products added OR 5 days passed and no sales
+     */
+    // public function actionRetentionEmails(){
+    //
+    //   $stores = Restaurant::find()
+    //           ->joinWith(['items','orders'])
+    //           ->where(['<' ,'restaurant_created_at', NOW()])
+    //           ->asArray()
+    //           ->all();
+    //           die(json_encode($stores));
+    //
+    //   foreach ($stores as $key => $store) {
+    //     die(json_encode($store));
+    //   }
+    //
+    //   $this->stdout("Email sent to all agents of employer that have applicants will expire soon \n", Console::FG_RED, Console::NORMAL);
+    //   return self::EXIT_CODE_NORMAL;
+    //
+    // }
+
 
     // public function actionNotifyAgentsForSubscriptionThatWillExpireSoon(){
-
-      // $now = new DateTime('now');
-      // $subscriptions = Subscription::find()
-      //         ->where(['subscription_status' => Subscription::STATUS_ACTIVE])
-      //         ->andWhere(['notified_email' => 0])
-      //         ->andWhere(['not', ['subscription_end_at' => null]])
-      //
-      //         ->andWhere(['<=' ,'subscription_end_at', date('Y-m-d H:i:s', strtotime('+5 days'))])
-      //
-      //         ->all();
-
-
-      // foreach ($subscriptions as $subscription) {
-      //   echo (json_encode(($subscription->subscription_end_at)) . "\r\n");
-
-
-        // foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
-        //   $result = \Yii::$app->mailer->compose([
-        //               'html' => 'subscription-will-expire-soon-html',
-        //                   ], [
-        //               'subscription' => $subscription,
-        //               'agent_name' => $agent->agent_name,
-        //           ])
-        //           ->setFrom([\Yii::$app->params['supportEmail']])
-        //           ->setTo($agent->agent_email)
-        //           ->setSubject('Your Subscription is Expiring')
-        //           ->send();
-        //
-        //     if($result){
-        //       $subscription->notified_email = 1;
-        //       $subscription->save(false);
-        //     }
-        // }
-      // }
-
-      // $this->stdout("Email sent to all agents of employer that have applicants will expire soon \n", Console::FG_RED, Console::NORMAL);
-      // return self::EXIT_CODE_NORMAL;
-
-       // $origin =  new DateTime(date('Y-m-d'));
-       // $target =  new DateTime(date('Y-m-d', strtotime($sub->subscription_end_at)));
-       // $interval = $origin->diff($target);
-       // echo $interval->format('%a');
-
+    //
+    //   $subscriptions = Subscription::find()
+    //           ->where(['subscription_status' => Subscription::STATUS_ACTIVE])
+    //           ->andWhere(['notified_email' => 0])
+    //           ->andWhere(['not', ['subscription_end_at' => null]])
+    //           ->andWhere(['<=' ,'subscription_end_at', date('Y-m-d H:i:s', strtotime('+5 days'))])
+    //           ->with(['plan'])
+    //           ->all();
+    //
+    //
+    //   foreach ($subscriptions as $subscription) {
+    //
+    //     foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
+    //       $result = \Yii::$app->mailer->compose([
+    //                   'html' => 'subscription-will-expire-soon-html',
+    //                       ], [
+    //                   'subscription' => $subscription,
+    //                   'plan' => $subscription->plan->name,
+    //                   'agent_name' => $agent->agent_name,
+    //               ])
+    //               ->setFrom([\Yii::$app->params['supportEmail']])
+    //               ->setTo($agent->agent_email)
+    //               ->setSubject('Your Subscription is Expiring')
+    //               ->send();
+    //
+    //         if($result){
+    //           $subscription->notified_email = 1;
+    //           $subscription->save(false);
+    //         }
+    //     }
+    //   }
+    //
+    //   $this->stdout("Email sent to all agents of employer that have applicants will expire soon \n", Console::FG_RED, Console::NORMAL);
+    //   return self::EXIT_CODE_NORMAL;
+    //
     // }
+
 
     public function actionCreateTapAccount() {
 

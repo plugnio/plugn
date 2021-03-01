@@ -375,10 +375,10 @@ use common\models\BankDiscount;
                                                                                            if($order->area_id){
                                                                                              echo 'Block '  . $order->block . ', ';
                                                                                              echo 'Street ' . $order->street . ', ';
-                                                                                             echo $order->avenue != null ? 'Avenue ' . $order->avenue . ' , ' : '';
-                                                                                             echo $order->unit_type != 'House' && $order->floor != null ? 'Floor ' . $order->floor . ' , ' : '';
-                                                                                             echo $order->unit_type == 'Apartment' && $order->apartment != null ? 'Apartment ' . $order->apartment . ' , ' : '';
-                                                                                             echo $order->unit_type == 'Office' && $order->office != null ? 'Office No. ' . $order->office . ' , ' : '';
+                                                                                             echo $order->avenue != null ? 'Avenue ' . $order->avenue . ', ' : '';
+                                                                                             echo $order->unit_type != 'House' && $order->floor != null ? 'Floor ' . $order->floor . ', ' : '';
+                                                                                             echo $order->unit_type == 'Apartment' && $order->apartment != null ? 'Apartment ' . $order->apartment . ', ' : '';
+                                                                                             echo $order->unit_type == 'Office' && $order->office != null ? 'Office No. ' . $order->office . ', ' : '';
                                                                                              echo $order->unit_type == 'House' ? 'House No. ' . $order->house_number . ', ' : 'Building ' . $order->house_number . ', ';
                                                                                              echo $order->area_name . ', ';
                                                                                              echo $order->area->city->city_name . ', ';

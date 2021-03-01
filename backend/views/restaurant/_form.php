@@ -114,7 +114,7 @@ use borales\extensions\phoneInput\PhoneInput;
     ?>
 
     <?= $form->field($model, 'version')->textInput(['maxlength' => true]) ?>
-    
+
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'name_ar')->textInput(['maxlength' => true]) ?>
@@ -197,6 +197,7 @@ use borales\extensions\phoneInput\PhoneInput;
        $form->field($model, 'phone_number')->widget(PhoneInput::className(), [
           'jsOptions' => [
               'preferredCountries' => ['kw', 'sa', 'aed','qa','bh','om'],
+              'initialCountry' => 'kw'
           ]
       ]);
     ?>

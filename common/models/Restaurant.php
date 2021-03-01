@@ -186,7 +186,6 @@ class Restaurant extends \yii\db\ActiveRecord {
                 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT
             ],
 
-            [['owner_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_STORE_BY_AGENT]],
 
             [['commercial_license_file', 'authorized_signature_file'], 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function($model) {
                 return $model->business_type == 'corp';
@@ -239,11 +238,16 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['instagram_url'], 'url'],
             [['export_orders_data_in_specific_date_range','export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'site_id'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'app_id', 'armada_api_key', 'mashkor_branch_id', 'store_branch_name', 'live_public_key', 'test_public_key', 'company_name'], 'string', 'max' => 255],
-            [['phone_number'], 'string', 'min' => 5, 'max' => 20],
 
             [['live_public_key', 'test_public_key'], 'default', 'value' => null],
-            [['phone_number', 'owner_number'], 'integer', 'min' => 0],
-            [['phone_number', 'country_id', 'currency_id', 'owner_phone_country_code', 'phone_number_country_code', 'owner_number'], 'integer'],
+            [[ 'country_id', 'currency_id', 'owner_phone_country_code', 'phone_number_country_code'], 'integer'],
+
+            [['phone_number' , 'owner_number'], 'string', 'min' => 6, 'max' => 20],
+            [['phone_number' , 'owner_number'], 'number'],
+
+            [['owner_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_STORE_BY_AGENT]],
+            [['phone_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number'],
+
 
            //  ['currency_id', function ($attribute, $params, $validator) {
            //     if ($this->getOrders()->exists())

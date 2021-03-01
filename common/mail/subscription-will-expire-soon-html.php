@@ -13,7 +13,7 @@ use yii\helpers\Html;
     <p class="lead">
       	The following subscription will expire soon:
           <br/>
-          <?= $subscription->plan->name ?> - <?= date('d M', $subscription->subscription_end_at) ?>
+          <?= $plan ?> - <?=  $subscription->subscription_end_at ?>
           <br/>
           To renew or learn more,
           <br/>
