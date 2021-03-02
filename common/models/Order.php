@@ -205,7 +205,7 @@ class Order extends \yii\db\ActiveRecord {
                     if ($this->area_id && $this->house_number  == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                         $this->addError($attribute, 'House number cannot be blank.');
                 }, 'skipOnError' => false, 'skipOnEmpty' => false],
-            ['order_mode', 'validateOrderMode'],
+            ['order_mode', 'validateOrderMode', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['customer_phone_number'], 'string', 'min' => 6, 'max' => 20],
             [['customer_phone_number'], 'number'],
@@ -463,10 +463,11 @@ class Order extends \yii\db\ActiveRecord {
      * @param type $attribute
      */
     public function validateOrderMode($attribute) {
+
         if ($this->$attribute == static::ORDER_MODE_DELIVERY && !$this->delivery_zone_id)
             $this->addError($attribute, "Store doesn't accept delviery");
 
-        else if ($this->$attribute == static::ORDER_MODE_PICK_UP && !$this->pickupLocation->support_pick_up)
+        else if ($this->$attribute == static::ORDER_MODE_PICK_UP && $this->pickup_location_id && !$this->pickupLocation->support_pick_up)
             $this->addError($attribute, "Store doesn't accept pick up");
     }
 

@@ -109,8 +109,7 @@ $this->registerJs($js);
 
         </div>
 
-
-        <div id='pickup-branch' style='display:none; <?= $model->order_mode != null && $model->order_mode == Order::ORDER_MODE_DELIVERY ? "display:none" : "" ?>'>
+        <div id='pickup-branch' style='<?= $model->order_mode != null && $model->order_mode == Order::ORDER_MODE_DELIVERY ? "display:none" : "" ?>'>
             <?= $form->field($model, 'pickup_location_id')->dropDownList($businessLocationArray, ['prompt' => 'Choose pickup location...', 'class' => 'select2'])->label('Pickup from'); ?>
         </div>
 
