@@ -57,7 +57,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                       if($model->order_mode == Order::ORDER_MODE_DELIVERY){
                     ?>
 
-                    <h6 class="mt-2">Shipping address</h6>
+                    <h6 class="mt-2">Shipping Address</h6>
                       <span style="display: block; margin-bottom:3px" >
                         <?=  $model->customer_name ?>
                       </span>
@@ -119,7 +119,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
                 <div class="invoice-details my-2">
 
-                    <h6 class="mt-2">INVOICE DATE</h6>
+                    <h6 class="mt-2">Invoice Date</h6>
                     <p>
                         <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy h:mm a') ?>
                     </p>
@@ -127,10 +127,17 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                 </div>
                 <div class="invoice-details my-2">
 
-                    <h6 class="mt-2">EXPECTED AT</h6>
+                    <h6 class="mt-2">Expected At</h6>
                     <p>
                       <?= \Yii::$app->formatter->asDatetime($model->estimated_time_of_arrival, 'MMM dd, yyyy h:mm a') ?>
                     </p>
+
+                </div>
+
+                <div class="invoice-details my-2">
+
+                    <h6 class="mt-2">When</h6>
+                      <p>  <?= $model->is_order_scheduled ? 'Scheduled' : 'As soon as possible'; ?> </p>
 
                 </div>
 
