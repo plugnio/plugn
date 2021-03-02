@@ -223,7 +223,6 @@ class SiteController extends Controller {
               // Redirect to payment gateway
               Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
 
-
               $response = Yii::$app->tapPayments->createCharge(
                       "KWD",
                       "Upgrade $managedRestaurant->name's plan to " . $subscription_model->plan->name, // Description
@@ -232,6 +231,7 @@ class SiteController extends Controller {
                        $subscription_model->plan->price,
                        $managedRestaurant->name,
                        $managedRestaurant->getAgents()->one()->agent_email,
+                       $managedRestaurant->country->country_code,
                        $managedRestaurant->owner_number ? $managedRestaurant->owner_number : null,
                        0, //Comission
                       Url::to(['site/callback'], true),

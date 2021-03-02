@@ -32,7 +32,7 @@ $this->title = "Confirm " . $selectedPlan->name;
 
         <?php
 
-          $paymentMethodQuery = PaymentMethod::find()->where(['<>','payment_method_id' , '3'])->asArray()->all();
+          $paymentMethodQuery = PaymentMethod::find()->where(['payment_method_id' => '1'])->orWhere(['payment_method_id' => '2'])->asArray()->all();
           $paymentMethodArray = ArrayHelper::map($paymentMethodQuery, 'payment_method_id', 'payment_method_name');
 
             $form = ActiveForm::begin();
@@ -54,7 +54,8 @@ $this->title = "Confirm " . $selectedPlan->name;
                 $return .= '</label>';
 
                 return $return;
-            }
+            },
+            'value' => '1'
         ])->label(false);
         ?>
 
@@ -62,6 +63,7 @@ $this->title = "Confirm " . $selectedPlan->name;
         <div class="form-group">
             <?= Html::submitButton('Make Payment ('.  \Yii::$app->formatter->asCurrency($selectedPlan->price,$restaurant_model->currency->code) .')', ['class' => 'btn btn-success', 'style' => '    float: left;']) ?>
         </div>
+
 
         <?php ActiveForm::end();  ?>
 
