@@ -142,14 +142,6 @@ class ZapierController extends Controller {
                   unset($orders[$key]['orderItems'][$orderItemKey]['item_uuid']);
                 }
 
-                unset($orders[$key]['estimated_time_of_arrival']);
-                unset($orders[$key]['order_created_at']);
-                unset($orders[$key]['order_updated_at']);
-                unset($orders[$key]['scheduled_time_to']);
-                unset($orders[$key]['scheduled_time_start_from']);
-
-
-
 
                 unset($orders[$key]['restaurant_uuid']);
                 unset($orders[$key]['restaurant_branch_id']);
