@@ -84,6 +84,8 @@ class OrderController extends Controller {
                               'order.customer_name',
                               'order.customer_phone_number',
                               'order.restaurant_uuid',
+                              'order.restaurant_uuid',
+                              'order.estimated_time_of_arrival',
                               'delivery_zone_id',
                               'pickup_location_id',
                               'restaurant.name'
