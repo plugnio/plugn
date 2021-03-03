@@ -85,7 +85,7 @@ class Item extends \yii\db\ActiveRecord
             [['item_uuid'], 'string', 'max' => 300],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['item_name', 'item_name_ar', 'item_image','barcode', 'sku'], 'string', 'max' => 255],
-            [['item_description', 'item_description_ar'], 'string', 'max' => 2100],
+            [['item_description', 'item_description_ar'], 'string', 'max' => 2500],
             [['item_uuid'], 'unique'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
