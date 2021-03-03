@@ -122,7 +122,7 @@ class ZapierController extends Controller {
 
 
                 $orders[$key]['id'] = $order['order_uuid'];
-                
+
                 $orders[$key]['estimated_time_of_arrival'] = date('c', strtotime($order['estimated_time_of_arrival']));
                 $orders[$key]['order_created_at'] = date('c', strtotime($order['order_created_at']));
                 $orders[$key]['order_updated_at'] =  date('c', strtotime($order['order_updated_at']));
@@ -141,6 +141,15 @@ class ZapierController extends Controller {
                   unset($orders[$key]['orderItems'][$orderItemKey]['order_item_id']);
                   unset($orders[$key]['orderItems'][$orderItemKey]['item_uuid']);
                 }
+
+                unset($orders[$key]['estimated_time_of_arrival']);
+                unset($orders[$key]['order_created_at']);
+                unset($orders[$key]['order_updated_at']);
+                unset($orders[$key]['scheduled_time_to']);
+                unset($orders[$key]['scheduled_time_start_from']);
+
+
+
 
                 unset($orders[$key]['restaurant_uuid']);
                 unset($orders[$key]['restaurant_branch_id']);
