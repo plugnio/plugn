@@ -116,9 +116,16 @@ class ZapierController extends Controller {
 
             foreach ($orders as $key => $order) {
                 $orders[$key]['id'] = $order['order_uuid'];
+
+                $customer_phone_number =  str_replace('+'.$order->customer_phone_number, '', $order->customer_phone_number);
+                $customer_phone_number =  str_replace(' ', '', $customer_phone_number);
+
+
+                $orders[$key]['id'] = $order['order_uuid'];
                 $orders[$key]['estimated_time_of_arrival'] = date('c', strtotime($order['estimated_time_of_arrival']));
                 $orders[$key]['order_created_at'] = date('c', strtotime($order['order_created_at']));
                 $orders[$key]['order_updated_at'] = date('c', strtotime($order['order_updated_at']));
+                $orders[$key]['customer_phone_number'] =   $customer_phone_number ;
 
 
                 foreach ($order['orderItems'] as $orderItemKey => $orderItem) {
