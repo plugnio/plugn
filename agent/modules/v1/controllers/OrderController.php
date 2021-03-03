@@ -72,7 +72,22 @@ class OrderController extends Controller {
                   ->where(['order.restaurant_uuid' => $store_uuid])
                   ->andWhere(['order.order_status' => Order::STATUS_PENDING])
                   ->joinWith('restaurant',false)
-                  ->select(['order.order_uuid' , 'order.customer_name', 'order.customer_phone_number','order.restaurant_uuid','restaurant.name'])
+                  ->with([
+                          'deliveryZone' => function ($query) {
+                              $query
+                              ->with('businessLocation');
+                          }
+                  ])
+                  ->with(['pickupLocation'])
+                  ->select([
+                              'order.order_uuid' ,
+                              'order.customer_name',
+                              'order.customer_phone_number',
+                              'order.restaurant_uuid',
+                              'delivery_zone_id',
+                              'pickup_location_id',
+                              'restaurant.name'
+                  ])
                   ->asArray()
                   ->all();
 
