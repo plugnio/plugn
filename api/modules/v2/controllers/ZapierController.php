@@ -117,7 +117,7 @@ class ZapierController extends Controller {
             foreach ($orders as $key => $order) {
                 $orders[$key]['id'] = $order['order_uuid'];
 
-                $customer_phone_number =  str_replace('+'.$order['customer_phone_number'], '', $order['customer_phone_number']);
+                $customer_phone_number =  str_replace('+', '', $order['customer_phone_number']);
                 $customer_phone_number =  str_replace(' ', '', $customer_phone_number);
 
 
