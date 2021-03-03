@@ -171,6 +171,23 @@ class MashkorDelivery extends Component {
               ]
         ];
 
+
+                  if($model->unit_type == 'Office'){
+
+                    $mashkorParams['drop_off']['floor'] = $model->floor;
+                    $mashkorParams['drop_off']['room_number'] = $model->office;
+
+                  } else if( $model->unit_type == 'Apartment' ) {
+
+                      $mashkorParams['drop_off']['floor'] = $model->floor;
+                      $mashkorParams['drop_off']['room_number'] = $model->apartment;
+
+                  }
+
+              // die(json_encode($mashkorParams));
+              // return;
+
+
         $client = new Client();
         $response = $client->createRequest()
                 ->setMethod('POST')
