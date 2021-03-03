@@ -68,14 +68,16 @@ class OrderController extends Controller {
      */
     public function actionGetAllPendingOrders($store_uuid) {
 
-        $model =  Order::find()
-                  ->select(['order.order_uuid' , 'order.customer_name', 'order.customer_phone_number'])
+        $pendingOrders =  Order::find()
                   ->where(['order.restaurant_uuid' => $store_uuid])
                   ->andWhere(['order.order_status' => Order::STATUS_PENDING])
+                  ->joinWith('restaurant',false)
+                  ->select(['order.order_uuid' , 'order.customer_name', 'order.customer_phone_number','order.restaurant_uuid','restaurant.name'])
                   ->asArray()
                   ->all();
 
-        if (!$model) {
+
+        if (!$pendingOrders) {
             return [
                 'operation' => 'error',
                 'message' => 'No incoming orders'
@@ -84,7 +86,7 @@ class OrderController extends Controller {
 
         return [
             'operation' => 'success',
-            'body' => $model
+            'body' => $pendingOrders
         ];
     }
 }
