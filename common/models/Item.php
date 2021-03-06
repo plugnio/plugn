@@ -194,14 +194,18 @@ class Item extends \yii\db\ActiveRecord
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-        $store = $this->restaurant;
+        if($insert){
 
-        if($store->sitemap_require_update == 0){
-          $store->sitemap_require_update = 1;
-          $store->save(false);
+          $store = $this->restaurant;
+
+          if($store->sitemap_require_update == 0){
+            $store->sitemap_require_update = 1;
+            $store->save(false);
+          }
+          
         }
 
-      return true;
+        return true;
     }
 
     /**
