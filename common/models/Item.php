@@ -194,7 +194,7 @@ class Item extends \yii\db\ActiveRecord
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-        if($insert){
+        if($insert || isset($changedAttributes['item_name']) ) {
 
           $store = $this->restaurant;
 
@@ -202,7 +202,7 @@ class Item extends \yii\db\ActiveRecord
             $store->sitemap_require_update = 1;
             $store->save(false);
           }
-          
+
         }
 
         return true;
