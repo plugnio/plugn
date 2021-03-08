@@ -233,10 +233,10 @@ class OrderController extends Controller {
                 ];
             }
 
-
             if ($response == null) {
 
                 $order->updateOrderTotalPrice();
+
                 if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
                     $response = [
                         'operation' => 'error',
@@ -321,6 +321,7 @@ class OrderController extends Controller {
 
                       if ($payment->save()) {
 
+
                           //Update payment_uuid in order
                           $order->payment_uuid = $payment->payment_uuid;
                           $order->save(false);
@@ -381,6 +382,7 @@ class OrderController extends Controller {
                           //           $order->restaurant->warehouse_fee
                           //   );
                           // }
+
 
                           $response = Yii::$app->tapPayments->createCharge(
                                   $order->currency->code,

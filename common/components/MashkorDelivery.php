@@ -184,10 +184,6 @@ class MashkorDelivery extends Component {
 
                   }
 
-              // die(json_encode($mashkorParams));
-              // return;
-
-
         $client = new Client();
         $response = $client->createRequest()
                 ->setMethod('POST')

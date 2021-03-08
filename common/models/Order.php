@@ -690,6 +690,7 @@ class Order extends \yii\db\ActiveRecord {
         $this->subtotal = $this->calculateOrderItemsTotalPrice();
         $this->total_price = $this->calculateOrderTotalPrice();
 
+
         $this->save(false);
     }
 
@@ -719,11 +720,16 @@ class Order extends \yii\db\ActiveRecord {
           if($this->voucher){
             $discountAmount = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->voucher->discount_amount /100)) : $this->voucher->discount_amount;
             $totalPrice -= $discountAmount ;
+
+            $totalPrice = $totalPrice > 0 ? $totalPrice : 0;
           }
 
           else if($this->bank_discount_id && $this->bankDiscount->minimum_order_amount <= $totalPrice){
             $discountAmount = $this->bankDiscount->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->bankDiscount->discount_amount /100)) : $this->bankDiscount->discount_amount;
             $totalPrice -= $discountAmount ;
+
+            $totalPrice = $totalPrice > 0 ? $totalPrice : 0;
+
           }
         }
 
@@ -749,6 +755,7 @@ class Order extends \yii\db\ActiveRecord {
           $this->tax =  $totalPrice * ($this->pickupLocation->business_location_tax/100) ;
           $totalPrice +=  $this->tax ;
         }
+
 
 
         return $totalPrice;
