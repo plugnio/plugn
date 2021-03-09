@@ -588,13 +588,14 @@ class CronController extends \yii\console\Controller {
           $stores = Restaurant::find()
                   ->where(['sitemap_require_update' => 1])
                   ->andWhere(['version' => 2])
-                  ->andWhere(['!=', 'restaurant_uuid', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])
+                  ->andWhere(['!=', 'restaurant.restaurant_uuid', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])
                   ->all();
+
 
             if($stores){
               foreach ($stores as $key => $store) {
 
-                if($store){
+                if($store && $store->getItems()->count() > 0){
 
                   $dirName = "store";
                   if(!file_exists($dirName))
@@ -652,8 +653,6 @@ class CronController extends \yii\console\Controller {
                   Yii::error('[Github > Error while getting file sha]' . json_encode($getSitemapXmlSHA->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
                   return false;
                 }
-
-
 
               }
             }
