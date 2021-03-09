@@ -46,13 +46,14 @@ class DashboardAsset extends AssetBundle {
         'app-assets/css/plugins/file-uploaders/dropzone.css',
         'app-assets/vendors/css/editors/quill/quill.snow.css',
         'app-assets/vendors/css/charts/apexcharts.css',
+
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
         'app-assets/css/pages/invoice.css',
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
         'app-assets/vendors/css/pickers/pickadate/pickadate.css',
         'css/bootstrap-duallistbox.css',
         'app-assets/css/pages/coming-soon.css',
-
+        'css/intlTelInput.css',
 
         'https://fonts.googleapis.com/css?family=Roboto:400,700',
         'fileuploader/dist/font/font-fileuploader.css',
@@ -104,14 +105,14 @@ class DashboardAsset extends AssetBundle {
         'app-assets/vendors/js/pickers/pickadate/picker.time.js',
         'app-assets/vendors/js/pickers/pickadate/legacy.js',
         'app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js',
-
+        'js/intlTelInput-jquery.js',
         // 'https://code.jquery.com/jquery-3.2.1.slim.min.js',
         'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js',
         'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js',
         'js/jquery.bootstrap-duallistbox.min.js',
         'app-assets/js/scripts/pages/coming-soon.js',
         'app-assets/vendors/js/coming-soon/jquery.countdown.min.js',
-        
+
         // 'https://code.jquery.com/jquery-3.2.1.min.js',
         'fileuploader/dist/jquery.fileuploader.min.js',
         'fileuploader/dist/js/custom.js',

@@ -31,20 +31,27 @@ $this->params['breadcrumbs'][] = $this->title;
                         'name_ar',
                         'tagline',
                         'tagline_ar',
+                        'country.country_name',
                         [
-                            'label' => 'Support Delivery',
+                            'label' => 'Store currency',
                             'value' => function ($data) {
-                                return $data->support_delivery ? 'Yes' : 'No';
-                            },
-                            'format' => 'raw'
+                              return $data->currency->title;
+                            }
                         ],
-                        [
-                            'label' => 'Support Pick up',
-                            'value' => function ($data) {
-                                return $data->support_pick_up ? 'Yes' : 'No';
-                            },
-                            'format' => 'raw'
-                        ],
+                        // [
+                        //     'label' => 'Support Delivery',
+                        //     'value' => function ($data) {
+                        //         return $data->support_delivery ? 'Yes' : 'No';
+                        //     },
+                        //     'format' => 'raw'
+                        // ],
+                        // [
+                        //     'label' => 'Support Pick up',
+                        //     'value' => function ($data) {
+                        //         return $data->support_pick_up ? 'Yes' : 'No';
+                        //     },
+                        //     'format' => 'raw'
+                        // ],
                         [
                             'attribute' => 'phone_number',
                             'format' => 'html',

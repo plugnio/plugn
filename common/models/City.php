@@ -12,6 +12,7 @@ use Yii;
  * @property string $city_name_ar
  *
  * @property Area[] $areas
+  * @property Country $country
  */
 class City extends \yii\db\ActiveRecord
 {
@@ -46,6 +47,18 @@ class City extends \yii\db\ActiveRecord
         ];
     }
 
+
+    /**
+     * Gets query for [[Country]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCountry()
+    {
+        return $this->hasOne(Country::className(), ['country_id' => 'country_id']);
+    }
+
+
     /**
      * Gets query for [[Areas]].
      *
@@ -55,7 +68,7 @@ class City extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Area::className(), ['city_id' => 'city_id']);
     }
-    
+
         /**
      * Gets query for [[RestaurantDeliveryAreas]].
      *
@@ -66,6 +79,6 @@ class City extends \yii\db\ActiveRecord
         return $this->hasMany(RestaurantDelivery::className(), ['area_id' => 'area_id'])->via('areas')->with('area');
     }
 
-    
-    
+
+
 }

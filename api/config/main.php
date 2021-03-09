@@ -14,6 +14,10 @@ return [
             'basePath' => '@api/modules/v1',
             'class' => 'api\modules\v1\Module',
         ],
+        'v2' => [
+            'basePath' => '@api/modules/v2',
+            'class' => 'api\modules\v2\Module',
+        ],
     ],
     'components' => [
         'user' => [
@@ -59,6 +63,54 @@ return [
                         'OPTIONS <category_id>' => 'options',
                     ]
                 ],
+                [ // SitemapController
+                  'class' => 'yii\rest\UrlRule',
+                  'controller' => 'v2/sitemap',
+                  'pluralize' => false,
+                  'patterns' => [
+                      'GET <storeUuid>' => 'index',
+                      // OPTIONS VERBS
+                      'OPTIONS' => 'options',
+                      'OPTIONS <storeUuid>' => 'options',
+                  ]
+                ],
+                [// ItemController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/item',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET detail' => 'item-data',
+                        'GET' => 'restaurant-menu',
+                        'POST delete-item-image' => 'delete-item-image',
+                        'GET <category_id>' => 'category-products',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS delete-item-image' => 'options',
+                        'OPTIONS <category_id>' => 'options',
+                    ]
+                ],
+                [// ZoneController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/delivery-zone',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET list-of-countries/<restaurant_uuid>' => 'list-of-countries',
+                        'GET list-pickup-locations/<restaurant_uuid>' => 'list-pickup-locations',
+                        'GET list-of-areas/<restaurant_uuid>/<country_id>' => 'list-of-areas',
+                        'GET pickup-location/<restaurant_uuid>/<pickup_location_id>' => 'get-pickup-location',
+                        'GET <restaurant_uuid>/<delivery_zone_id>' => 'get-delivery-zone',
+                        'GET <restaurant_uuid>' => 'delivery-zone',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS list-of-countries/<restaurant_uuid>' => 'options',
+                        'OPTIONS list-pickup-locations/<restaurant_uuid>' => 'options',
+                        'OPTIONS list-of-areas/<restaurant_uuid>/<country_id>' => 'options',
+                        'OPTIONS pickup-location/<restaurant_uuid>/<pickup_location_id>' => 'options',
+                        'OPTIONS <restaurant_uuid>/<delivery_zone_id>' => 'options',
+                        'OPTIONS <restaurant_uuid>' => 'options'
+                    ]
+                ],
                 [// RestaurantController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/restaurant',
@@ -69,6 +121,22 @@ return [
                         'GET get-restaurant-data/<branch_name>' => 'get-restaurant-data',
                         // OPTIONS VERBS
                         'OPTIONS get-opening-hours' => 'options',
+                        'OPTIONS branches/<id>' => 'options',
+                        'OPTIONS get-restaurant-data/<branch_name>' => 'options',
+                    ]
+                ],
+                [// StoreController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/store',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET get-opening-hours' => 'get-opening-hours',
+                        'GET locations/<id>' => 'list-all-stores-locations',
+                        'GET branches/<id>' => 'list-all-restaurants-branches',
+                        'GET get-restaurant-data/<branch_name>' => 'get-restaurant-data',
+                        // OPTIONS VERBS
+                        'OPTIONS get-opening-hours' => 'options',
+                        'OPTIONS locations/<id>' => 'options',
                         'OPTIONS branches/<id>' => 'options',
                         'OPTIONS get-restaurant-data/<branch_name>' => 'options',
                     ]
@@ -91,11 +159,20 @@ return [
                     'controller' => 'v1/payment',
                     'pluralize' => false,
                     'patterns' => [
-                        'GET payment-detail/<id>' => 'payment-detail',
                         'GET <id>' => 'list-all-restaurants-payment-method',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS payment-detail/<id>' => 'options',
+                        'OPTIONS <id>' => 'options',
+                    ]
+                ],
+                [// PaymentMethodController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/payment',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET <id>' => 'list-all-restaurants-payment-method',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
                         'OPTIONS <id>' => 'options',
                     ]
                 ],
@@ -124,9 +201,47 @@ return [
                         'OPTIONS order-details/<id>/<restaurant_uuid>' => 'options',
                     ]
                 ],
+                [// OrderController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/order',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'POST status-update-webhook' => 'update-mashkor-order-status',
+                        'POST <id>' => 'place-an-order',
+                        'GET check-for-pending-orders/<restaurant_uuid>' => 'check-pending-orders',
+                        'GET callback' => 'callback',
+                        'GET apply-promo-code' => 'apply-promo-code',
+                        'GET apply-bank-discount' => 'apply-bank-discount',
+                        'GET <id>/<restaurant_uuid>' => 'order-details',
+                        'GET order-details/<id>/<restaurant_uuid>' => 'get-order-details',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS status-update-webhook' => 'options',
+                        'OPTIONS <id>' => 'options',
+                        'OPTIONS check-for-pending-orders/<restaurant_uuid>' => 'options',
+                        'OPTIONS callback' => 'options',
+                        'OPTIONS apply-promo-code' => 'options',
+                        'OPTIONS apply-bank-discount' => 'options',
+                        'OPTIONS <id>/<restaurant_uuid>' => 'options',
+                        'OPTIONS order-details/<id>/<restaurant_uuid>' => 'options',
+                    ]
+                ],
                 [//ZapierController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/zapier',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET get-store-list' => 'get-store-list',
+                        'GET get-latest-order/<restaurant_uuid>' => 'get-latest-order',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS get-store-list' => 'options',
+                        'OPTIONS get-latest-order/<restaurant_uuid>' => 'options',
+                    ]
+                ],
+                [//ZapierController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/zapier',
                     'pluralize' => false,
                     'patterns' => [
                         'GET get-store-list' => 'get-store-list',

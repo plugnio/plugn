@@ -30,10 +30,8 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                 <div class="media " style="margin-bttom: 20px">
                     <?php if ($model->armada_qr_code_link) { ?>
                         <img src="<?= $model->armada_qr_code_link ?>" width="100" height="100" />
-                        <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: 320px;margin-right: auto;display: block;" />
-                    <?php } else { ?>
-                        <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: auto; margin-right: auto; display:block" />
                     <?php } ?>
+                    <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: auto; margin-right: auto; display:block" />
 
                 </div>
             </div>
@@ -54,36 +52,66 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                     <p>
                         <?= $model->payment_method_name ?>
                     </p>
-                    <h6 class="mt-2">When</h6>
-                    <p>  <?= $model->is_order_scheduled ? 'Scheduled' : 'As soon as possible'; ?> </p>
 
+                    <?php
+                      if($model->order_mode == Order::ORDER_MODE_DELIVERY){
+                    ?>
 
-
+                    <h6 class="mt-2">Shipping Address</h6>
+                      <span style="display: block; margin-bottom:3px" >
+                        <?=  $model->customer_name ?>
+                      </span>
+                      <span style="display: block" >
+                        <?= $model->area_id ? $model->area_name : $model->address_1  ?>
+                      </span>
+                      <span style="display: block" >
+                        <?= $model->area_id ? 'Block: ' . $model->block : $model->address_2  ?>
+                      </span>
+                      <span style="display: block" >
+                        <?= $model->area_id ? 'St: ' . $model->street : $model->postalcode . ' ' . $model->city  ?>
+                      </span>
+                      <span style="display: block" >
+                        <?= $model->area_id && $model->avenue ? 'Avenue: ' . $model->avenue : ''; ?>
+                      </span>
+                      <span style="display: block" >
+                        <?= $model->area_id && $model->floor && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? 'Floor: ' . $model->floor : ''?>
+                      </span>
+                      <span style="display: block" >
+                        <?=  $model->area_id && $model->apartment && $model->unit_type == 'Apartment' ? 'Apartment No. ' . $model->apartment : ''?>
+                      </span>
+                      <span style="display: block" >
+                        <?=  $model->area_id && $model->office && $model->unit_type == 'Office'  ? 'Office No. ' . $model->office : ''?>
+                      </span>
+                      <span style="display: block" >
+                        <?= $model->area_id ? ($model->unit_type == 'House' ? 'House No. ' : 'Building: ') . $model->house_number :  ''  ?>
+                      </span>
+                      <span style="display: block" >
+                        <?= $model->area_id ?  $model->area->city->city_name :  '' ?>
+                      </span>
+                      <span style="display: block" >
+                        <?=  $model->country_name ?
+                        $model->country_name : ( $model->order_mode == 1 ?
+                        ($model->delivery_zone_id && $model->deliveryZone->country ?
+                        $model->deliveryZone->country->country_name  : '') : ($model->pickupLocation && $model->pickupLocation->country ?
+                        $model->pickupLocation->country->country_name : ''));
+                          ?>
+                      </span>
+                      <span style="display: block" >
+                        <?=  $model->customer_phone_number  ?>
+                      </span>
+                      <?php
+                    } else {
+                      ?>
+                      <h6 class="mt-2">Customer</h6>
+                        <span style="display: block; margin-bottom:3px" >
+                          <?=  $model->customer_name ?>
+                        </span>
+                        <span style="display: block" >
+                          <?=  $model->customer_phone_number ?>
+                        </span>
+                    <?php } ?>
                 </div>
 
-                <div class="recipient-contact pb-2">
-                    <div class="table-responsive">
-
-                        <table class="table table-bordered table-hover" style="margin-top:1.5rem !important;">
-                            <tbody>
-                                <tr>
-                                    <th>Customer name</th>
-                                    <td><?= $model->customer_name ?></td>
-                                </tr>
-                                <tr>
-                                    <th>Customer phone number</th>
-                                    <td><?= $model->customer_phone_number ?></td>
-                                </tr>
-                                <?php if ($model->customer_email) { ?>
-                                    <tr>
-                                        <th>Customer email address</th>
-                                        <td><?= $model->customer_email ?></td>
-                                    </tr>
-                                <?php } ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
 
             <div class="col-sm-6 col-12 text-left">
@@ -91,73 +119,33 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
                 <div class="invoice-details my-2">
 
-                    <h6 class="mt-2">INVOICE DATE</h6>
+                    <h6 class="mt-2">Invoice Date</h6>
                     <p>
                         <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy h:mm a') ?>
                     </p>
 
+                </div>
+                <div class="invoice-details my-2">
 
-
-
-                    <?php if ($model->order_mode == Order::ORDER_MODE_PICK_UP) { ?>
-
-                        <h6 class="mt-2">Type</h6>
-                        <p>  Pick up </p>
-
-                    <?php } else { ?>
-                        <h6 class="mt-2">Type</h6>
-                        <p>  Delivery </p>
-                    <?php } ?>
-
-                    <h6 class="mt-2">Expected at</h6>
+                    <h6 class="mt-2">Expected At</h6>
                     <p>
-                        <?= \Yii::$app->formatter->asDatetime($model->estimated_time_of_arrival, 'MMM dd, yyyy h:mm a') ?>
+                      <?= \Yii::$app->formatter->asDatetime($model->estimated_time_of_arrival, 'MMM dd, yyyy h:mm a') ?>
                     </p>
 
+                </div>
+
+                <div class="invoice-details my-2">
+
+                    <h6 class="mt-2">When</h6>
+                      <p>  <?= $model->is_order_scheduled ? 'Scheduled' : 'As soon as possible'; ?> </p>
 
                 </div>
-                <div class="recipient-info my-2">
 
-                    <?php if ($model->order_mode == Order::ORDER_MODE_DELIVERY) { ?>
-
-
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover" style="margin-top: 1.5rem !important;">
-                                <thead>
-                                    <tr>
-                                        <th>Area</th>
-                                        <th>Block</th>
-                                        <th>Street</th>
-                                        <?= $model->avenue != null ? '<th>Avenue</th>' : '' ?>
-                                        <th>House</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                <td><?= $model->area_name ?></td>
-                                <td><?= $model->block ?></td>
-                                <td><?= $model->street ?></td>
-                                <?= $model->avenue != null ? '<td>' . $model->avenue . '</td>' : '' ?></td>
-                                <td> <?= $model->house_number ?></td>
-                                </tbody>
-                            </table>
-                            <?php if ($model->special_directions) { ?>
-
-                                <table class="table table-bordered table-hover" style="margin-top: 1.5rem !important;">
-                                    <tbody>
-                                    <th>Special Directions</th>
-                                    <td> <?= $model->special_directions ?></td>
-                                    </tbody>
-                                </table>
-                            <?php } ?>
-
-                        <?php } ?>
-                    </div>
-                </div>
 
             </div>
 
         </div>
+
         <!--/ Invoice Recipient Details -->
 
         <!-- Invoice Items Details -->
@@ -198,9 +186,8 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                             [
                                 'label' => 'Subtotal',
                                 'value' => function ($orderItem) {
-                                    return $orderItem->item_price;
-                                },
-                                'format' => 'currency'
+                                    return Yii::$app->formatter->asCurrency($orderItem->item_price, $orderItem->currency->code);
+                                }
                             ],
                         ],
                         'layout' => '{items}',
@@ -218,7 +205,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                             <tbody>
                                 <tr>
                                     <th>Subtotal</th>
-                                    <td><?= \Yii::$app->formatter->asCurrency($model->subtotal) ?></td>
+                                    <td><?= \Yii::$app->formatter->asCurrency($model->subtotal, $model->currency->code) ?></td>
                                 </tr>
                                 <?php
                                 if ($model->voucher_id != null && $model->voucher_id && $model->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY) {
@@ -227,25 +214,35 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                     ?>
                                     <tr>
                                         <th>Voucher Discount</th>
-                                        <td>-<?= Yii::$app->formatter->asCurrency($voucherDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                                        <td><?= Yii::$app->formatter->asCurrency($voucherDiscount, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
                                     </tr>
                                     <tr>
                                         <th>Subtotal After Voucher</th>
-                                        <td><?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                                        <td>
+                                          <?php
+                                            $subtotalAfterDiscount = $subtotalAfterDiscount > 0 ? $subtotalAfterDiscount : 0;
+
+                                            echo Yii::$app->formatter->asCurrency($subtotalAfterDiscount, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3])
+                                          ?>
+                                        </td>
                                     </tr>
                                     <?php
                                 } else if ($model->bank_discount_id != null && $model->bank_discount_id) {
                                     $bankDiscount = $model->bankDiscount->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ? ($model->subtotal * ($model->bankDiscount->discount_amount / 100)) : $model->bankDiscount->discount_amount;
                                     $subtotalAfterDiscount = $model->subtotal - $bankDiscount;
+
+                                    $subtotalAfterDiscount = $subtotalAfterDiscount > 0 ? $subtotalAfterDiscount : 0;
+
+
                                     ?>
                                     <tr>
                                         <th>Bank Discount</th>
-                                        <td>-<?= Yii::$app->formatter->asCurrency($bankDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                                        <td>-<?= Yii::$app->formatter->asCurrency($bankDiscount, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
                                     </tr>
                                 <tbody>
                                     <tr>
                                         <th>Subtotal After Bank Discount</th>
-                                        <td><?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                                        <td><?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
                                     </tr>
                                 </tbody>
                             <?php } ?>
@@ -254,27 +251,32 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
                                 <tr>
                                     <th>Delivery fee</th>
-                                    <td><?= \Yii::$app->formatter->asCurrency($model->delivery_fee) ?></td>
+                                    <td><?= \Yii::$app->formatter->asCurrency($model->delivery_fee, $model->currency->code) ?></td>
                                 </tr>
 
                                 <?php if ($model->voucher_id != null && $model->voucher_id && $model->voucher->discount_type == Voucher::DISCOUNT_TYPE_FREE_DELIVERY) { ?>
                                     <tr>
                                         <th>Voucher Discount</th>
-                                        <td>-<?= Yii::$app->formatter->asCurrency($model->delivery_fee, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                                        <td>-<?= Yii::$app->formatter->asCurrency($model->delivery_fee, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
 
                                     </tr>
 
                                     <tr>
                                         <th>Delivery fee After Voucher</th>
-                                        <td><?= Yii::$app->formatter->asCurrency(0, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                                        <td><?= Yii::$app->formatter->asCurrency(0, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
                                     </tr>
                                 <?php } ?>
 
                             <?php } ?>
-
+                            <?php if ($model->tax > 0) { ?>
                             <tr>
-                                <th>TOTAL</th>
-                                <td><?= Yii::$app->formatter->asCurrency($model->total_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></td>
+                                <th>Tax</th>
+                                <td><?= Yii::$app->formatter->asCurrency($model->tax, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
+                            </tr>
+                          <?php } ?>
+                            <tr>
+                                <th>Total Price</th>
+                                <td><?= Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
                             </tr>
                             </tbody>
                         </table>

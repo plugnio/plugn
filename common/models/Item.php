@@ -22,6 +22,8 @@ use yii\behaviors\TimestampBehavior;
  * @property string $barcode
  * @property string $sku
  * @property int|null $stock_qty
+ * @property int|null $prep_time
+ * @property int|null $prep_time_unit
  * @property int|null $unit_sold
  * @property string|null $item_image
  * @property float|null $item_price
@@ -40,6 +42,12 @@ class Item extends \yii\db\ActiveRecord
 {
     public $items_category;
     public $item_images;
+
+
+    //Values for `prep_time_unit`
+    const TIME_UNIT_MIN = 'min';
+    const TIME_UNIT_HRS = 'hrs';
+    const TIME_UNIT_DAY = 'day';
 
 
     //Values for `item_status`
@@ -61,12 +69,13 @@ class Item extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['item_name'], 'required', 'on' => 'create'],
+            [['item_name', 'prep_time_unit' , 'prep_time' ], 'required', 'on' => 'create'],
+            ['prep_time_unit', 'in', 'range' => [self::TIME_UNIT_MIN,self::TIME_UNIT_HRS, self::TIME_UNIT_DAY]],
             [['item_name', 'item_name_ar', 'item_price', 'items_category'], 'required'],
             [['sort_number', 'stock_qty'], 'integer', 'min' => 0],
             [['unit_sold'], 'integer', 'min' => 0],
             [['item_price'], 'number', 'min' => 0],
-            [['track_quantity'], 'integer'],
+            [['track_quantity', 'prep_time'], 'integer'],
             ['item_status', 'in', 'range' => [self::ITEM_STATUS_PUBLISH, self::ITEM_STATUS_UNPUBLISH]],
             ['stock_qty', 'required', 'when' => function($model) {
                 return $model->track_quantity;
@@ -76,11 +85,14 @@ class Item extends \yii\db\ActiveRecord
             [['item_uuid'], 'string', 'max' => 300],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['item_name', 'item_name_ar', 'item_image','barcode', 'sku'], 'string', 'max' => 255],
-            [['item_description', 'item_description_ar'], 'string', 'max' => 2000],
+            [['item_description', 'item_description_ar'], 'string', 'max' => 2500],
             [['item_uuid'], 'unique'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
+
+
+
 
     /**
      * {@inheritdoc}
@@ -102,11 +114,31 @@ class Item extends \yii\db\ActiveRecord
             'sku' => 'SKU (Stock Keeping Unit)',
             'item_image' => 'Item image',
             'item_price' => 'Price',
+            'prep_time' => 'Preparation time',
+            'prep_time_unit' => 'Preparation time unit',
             'item_status' => 'Item status',
             'items_category' => 'Category',
             'item_created_at' => 'Item created at',
             'item_updated_at' => 'Item updated qt',
         ];
+    }
+
+    /**
+     * Returns String value of current status
+     * @return string
+     */
+    public function getTimeUnit() {
+        switch ($this->prep_time_unit) {
+          case self::TIME_UNIT_MIN:
+              return "Minutes";
+              break;
+          case self::TIME_UNIT_HRS:
+            return  $this->prep_time == 1 ?  "Hour" : "Hours";
+              break;
+          case self::TIME_UNIT_DAY:
+              return  $this->prep_time == 1 ?  "Day" : "Days";
+              break;
+        }
     }
 
     /**
@@ -136,6 +168,44 @@ class Item extends \yii\db\ActiveRecord
                 'value' => new Expression('NOW()'),
             ],
         ];
+    }
+
+
+        /**
+         * @inheritdoc
+         */
+        public function fields() {
+            $fields = parent::fields();
+
+            // remove fields that contain sensitive information
+            unset($fields['item_created_at']);
+            unset($fields['item_updated_at']);
+            unset($fields['barcode']);
+
+            return $fields;
+        }
+
+
+    /**
+     *
+     * @param type $insert
+     * @param type $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes) {
+        parent::afterSave($insert, $changedAttributes);
+
+        if($insert || isset($changedAttributes['item_name']) ) {
+
+          $store = $this->restaurant;
+
+          if($store->sitemap_require_update == 0){
+            $store->sitemap_require_update = 1;
+            $store->save(false);
+          }
+
+        }
+
+        return true;
     }
 
     /**
@@ -280,6 +350,16 @@ class Item extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[Currency]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+    }
+
+    /**
      * Gets query for [[Options]].
      *
      * @return \yii\db\ActiveQuery
@@ -297,6 +377,11 @@ class Item extends \yii\db\ActiveRecord
     public function getItemImages()
     {
         return $this->hasMany(ItemImage::className(), ['item_uuid' => 'item_uuid']);
+    }
+
+
+    public function getItemImage(){
+      return $this->hasOne(ItemImage::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**

@@ -6,7 +6,8 @@ use kartik\time\TimePicker;
 use common\models\Agent;
 use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
-use common\models\Area;
+use common\models\Currency;
+use common\models\Country;
 use common\models\RestaurantDelivery;
 use common\models\RestaurantPaymentMethod;
 use common\models\PaymentMethod;
@@ -42,6 +43,7 @@ supportPickupInput.change(function(){
 
 
 $this->registerJs($js);
+use borales\extensions\phoneInput\PhoneInput;
 
 
 /* @var $this yii\web\View */
@@ -54,6 +56,12 @@ $this->registerJs($js);
     <?php
     $paymentMethodQuery = PaymentMethod::find()->asArray()->all();
     $paymentMethodArray = ArrayHelper::map($paymentMethodQuery, 'payment_method_id', 'payment_method_name');
+
+    $countryQuery = Country::find()->asArray()->all();
+    $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
+
+    $currencyQuery = Currency::find()->asArray()->all();
+    $currencyArray = ArrayHelper::map($currencyQuery, 'currency_id', 'title');
 
     $sotredRestaurantPaymentMethod = [];
 
@@ -73,6 +81,23 @@ $this->registerJs($js);
     $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]);
     ?>
 
+
+    <?=
+    $form->field($model, 'currency_id')->widget(Select2::classname(), [
+        'data' => $currencyArray,
+        'options' => [
+            'placeholder' => 'Select currency ...',
+            'multiple' => false,
+            'value' => $model->currency_id
+        ],
+    ]);
+    ?>
+
+
+    <?=
+      $form->field($model, 'country_id')->dropDownList(  $countryArray  );
+    ?>
+
     <?=
     $form->field($model, 'restaurant_payments_method')->widget(Select2::classname(), [
         'data' => $paymentMethodArray,
@@ -87,6 +112,8 @@ $this->registerJs($js);
         ],
     ]);
     ?>
+
+    <?= $form->field($model, 'version')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
@@ -143,6 +170,9 @@ $this->registerJs($js);
     );
     ?>
 
+
+
+
     <?=
     $form->field($model, 'support_pick_up')->dropDownList(
             [
@@ -163,7 +193,14 @@ $this->registerJs($js);
         );
         ?>
 
-    <?= $form->field($model, 'phone_number')->textInput(['maxlength' => true]) ?>
+    <?=
+       $form->field($model, 'phone_number')->widget(PhoneInput::className(), [
+          'jsOptions' => [
+              'preferredCountries' => ['kw', 'sa', 'aed','qa','bh','om'],
+              'initialCountry' => 'kw'
+          ]
+      ]);
+    ?>
 
     <?= $form->field($model, 'restaurant_email')->input('email') ?>
 
@@ -174,7 +211,14 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'owner_email')->input('email') ?>
 
-    <?= $form->field($model, 'owner_number')->textInput() ?>
+
+    <?=
+       $form->field($model, 'owner_number')->widget(PhoneInput::className(), [
+          'jsOptions' => [
+              'preferredCountries' => ['kw', 'sa', 'aed','qa','bh','om'],
+          ]
+      ]);
+    ?>
 
     <?= $form->field($model, 'store_branch_name')->textInput() ?>
 

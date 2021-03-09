@@ -35,6 +35,26 @@ class TapPayments extends Component
     const GATEWAY_VISA_MASTERCARD = "src_card";
 
     /**
+     * @var string Generated link sends user directly to VISA/MASTER portal
+     */
+    const GATEWAY_MADA = "src_sa.mada";
+
+    /**
+     * @var string Generated link sends user directly to VISA/MASTER portal
+     */
+    const GATEWAY_BENEFIT = "src_bh.benefit";
+
+    /**
+     * @var float gateway fee charged by portal
+     */
+    public $madaGatewayFee = 0.015; // How much is charged per Mada transaction
+
+    /**
+     * @var float gateway fee charged by portal
+     */
+    public $benefitGatewayFee = 0.015; // How much is charged per BENEFIT transaction
+
+    /**
      * @var float gateway fee charged by portal
      */
     public $knetGatewayFee = 0.01; // How much is charged per KNET transaction
@@ -58,6 +78,16 @@ class TapPayments extends Component
      * @var float gateway fee charged by portal
      */
     public $minCreditcardGatewayFee = 0; // How much is charged per Creditcard transaction
+
+    /**
+     * @var float gateway fee charged by portal
+     */
+    public $minMadaGatewayFee = 0; // How much is charged per Creditcard transaction
+
+    /**
+     * @var float gateway fee charged by portal
+     */
+    public $minBenefitGatewayFee = 0; // How much is charged per Creditcard transaction
 
     /**
      * @var string destination id
@@ -185,7 +215,6 @@ class TapPayments extends Component
     public function createBussiness($restaurant)
     {
 
-
         $bussinessEndpoint = $this->apiEndpoint . "/business";
 
         $bussinessParams = [
@@ -201,7 +230,7 @@ class TapPayments extends Component
                 ],
                 "is_licensed" => 'true',
                 "license_number" => $restaurant->license_number,
-                "country" => "KW",
+                "country" => $restaurant->country->iso,
                 "documents" => [],
                 "bank_account" => [
                     "iban" => $restaurant->iban
@@ -216,15 +245,15 @@ class TapPayments extends Component
                     "primary" => [
                         "email" => $restaurant->owner_email,
                         "phone" => [
-                            "country_code" => "965",
-                            "number" => $restaurant->owner_number
+                            "country_code" => $restaurant->owner_phone_country_code,
+                            "number" => str_replace(' ','',(str_replace('+'.$restaurant->owner_phone_country_code, '',$restaurant->owner_number)))
                         ]
                     ]
                 ],
                 "identification" => [
                     [
                         "type" => "Identity Card",
-                        "issuing_country" => $restaurant->identification_issuing_country,
+                        "issuing_country" => $restaurant->country->iso,
                         "images" => [
                             $restaurant->identification_file_id_front_side,
                             $restaurant->identification_file_id_back_side,
@@ -249,15 +278,15 @@ class TapPayments extends Component
 
 
         if (
-                $restaurant->authorized_signature_issuing_country &&
+
                 $restaurant->authorized_signature_file_id &&
-                $restaurant->commercial_license_issuing_country &&
+
                 $restaurant->commercial_license_file_id
         ) {
             $authorizedSignatureDocument = [
                 "type" => "Authorized Signature",
                 "number" => 1,
-                "issuing_country" => $restaurant->authorized_signature_issuing_country,
+                "issuing_country" => $restaurant->country->iso,
                 "issuing_date" => $restaurant->authorized_signature_issuing_date,
                 "expiry_date" => $restaurant->authorized_signature_expiry_date,
                 "images" => [
@@ -271,7 +300,7 @@ class TapPayments extends Component
             $commercialLicenseDocument = [
                 "type" => "Commercial License",
                 "number" => 1,
-                "issuing_country" => $restaurant->commercial_license_issuing_country,
+                "issuing_country" => $restaurant->country->iso,
                 "issuing_date" => $restaurant->commercial_license_issuing_date,
                 "expiry_date" => $restaurant->commercial_license_expiry_date,
                 "images" => [
@@ -286,7 +315,6 @@ class TapPayments extends Component
         } else {
             $bussinessParams['entity']['is_licensed'] = 'false';
         }
-
 
         $client = new Client();
         $response = $client->createRequest()
@@ -310,7 +338,7 @@ class TapPayments extends Component
      * @param type $iban
      * @return type
      */
-    public function createMergentAccount($company_name, $business_id, $business_entity_id, $iban)
+    public function createMergentAccount($company_name,$currency,  $business_id, $business_entity_id, $iban)
     {
         $merchantEndpoint = $this->apiEndpoint . "/merchant";
 
@@ -322,7 +350,7 @@ class TapPayments extends Component
                 "iban" => $iban
             ],
             "charge_currenices" => [
-                "KWD"
+                $currency
             ]
         ];
 
@@ -372,7 +400,7 @@ class TapPayments extends Component
     /**
      * Create a refund for a customer
      */
-    public function createRefund($chargeId, $amount, $currency = "KWD", $reason="requested_by_customer")  {
+    public function createRefund($chargeId, $amount, $currency , $reason="requested_by_customer")  {
 
         $refundEndpoint = $this->apiEndpoint . "/refunds";
 
@@ -401,22 +429,21 @@ class TapPayments extends Component
     /**
      * Create a charge for redirect
      */
-    public function createCharge($desc = "Pay", $statementDesc = "", $ref, $amount, $firstName, $email, $phone,$platform_fee, $redirectUrl, $gateway, $warehouse_fee)
+    public function createCharge($currency, $desc = "Pay", $statementDesc = "", $ref, $amount ,$firstName, $email, $country_code ,$phone,$platform_fee, $redirectUrl, $gateway, $warehouse_fee)
     {
 
         $chargeEndpoint = $this->apiEndpoint . "/charges";
 
+        $phone =  str_replace(' ', '', $phone);
+        $phone =  str_replace('+'.$country_code, '', $phone);
+
         $chargeParams = [
             "amount" => $amount,
-            "currency" => "KWD",
+            "currency" => $currency,
             "threeDSecure" => true,
             "save_card" => false,
             "description" => $desc,
             "statement_descriptor" => $statementDesc,
-            "metadata" => [
-            // "udf1" => "test 1",
-            // "udf2" => "test 2"
-            ],
             "reference" => [
                 "transaction" => $ref,
                 "order" => $ref
@@ -429,7 +456,7 @@ class TapPayments extends Component
                 "first_name" => $firstName,
                 "email" => $email,
                 "phone" => [
-                    "country_code" => "965",
+                    "country_code" => $country_code,
                     "number" => $phone
                 ]
             ],
@@ -446,56 +473,57 @@ class TapPayments extends Component
 
 
         if($platform_fee > 0){
-          if($gateway == static::GATEWAY_KNET){
+           if($gateway == static::GATEWAY_KNET){
 
-                //if greater than 10KD
-               if (($amount * $this->knetGatewayFee) >= $this->minKnetGatewayFee){
-                 $platform_fee = $amount *  ( $platform_fee  - $this->knetGatewayFee );
-               }
-
-                // if amount greater than  4 and  equal 10
-                else if  ($amount > $this->minChargeAmount && ( ($amount * $this->knetGatewayFee) < $this->minKnetGatewayFee)){
-                  $platform_fee = ($amount *  $platform_fee ) - $this->minKnetGatewayFee;
+                 //if greater than 10KD
+                if (($amount * $this->knetGatewayFee) >= $this->minKnetGatewayFee){
+                  $platform_fee = $amount *  ( $platform_fee  - $this->knetGatewayFee );
                 }
 
-                //if amount less than or equal 4
-                else if ($this->minChargeAmount >= $amount) {
-                  $platform_fee = 0.100;
-                }
+                 // if amount greater than  4 and  equal 10
+                 else if  ($amount > $this->minChargeAmount && ( ($amount * $this->knetGatewayFee) < $this->minKnetGatewayFee)){
+                   $platform_fee = ($amount *  $platform_fee ) - $this->minKnetGatewayFee;
+                 }
 
-          } else {
-            $platform_fee = $amount *  ($platform_fee  - $this->creditcardGatewayFeePercentage);
-          }
+                 //if amount less than or equal 4
+                 else if ($this->minChargeAmount >= $amount) {
+                   $platform_fee = 0.100;
+                 }
 
-
-          if($warehouse_fee > 0){
-            $charge_amount = $warehouse_fee + $platform_fee;
-          } else {
-              $charge_amount = $platform_fee;
-          }
-
-          $destination = [
-              "id" => $this->destinationId,
-              "amount" => $charge_amount,
-              "currency" => "KWD",
-          ];
+          } else if($gateway == static::GATEWAY_BENEFIT)
+              $platform_fee = $amount *  ( $platform_fee  - $this->benefitGatewayFee );
+          else
+             $platform_fee = $amount *  ($platform_fee  - $this->creditcardGatewayFeePercentage);
 
 
-          array_push($chargeParams['destinations']['destination'], $destination);
+           if($warehouse_fee > 0)
+             $charge_amount = $warehouse_fee + $platform_fee;
+          else
+               $charge_amount = $platform_fee;
 
-        } else if ($platform_fee == 0 && $warehouse_fee > 0) {
 
-          $charge_amount = $warehouse_fee;
+           $destination = [
+               "id" => $this->destinationId,
+               "amount" => $charge_amount,
+               "currency" => $currency,
+           ];
 
-          $destination = [
-              "id" => $this->destinationId,
-              "amount" => $charge_amount,
-              "currency" => "KWD",
-          ];
 
-          array_push($chargeParams['destinations']['destination'], $destination);
+           array_push($chargeParams['destinations']['destination'], $destination);
 
-        }
+         } else if ($platform_fee == 0 && $warehouse_fee > 0) {
+
+           $charge_amount = $warehouse_fee;
+
+           $destination = [
+               "id" => $this->destinationId,
+               "amount" => $charge_amount,
+               "currency" => $currency,
+           ];
+
+           array_push($chargeParams['destinations']['destination'], $destination);
+
+         }
 
         $client = new Client();
         $response = $client->createRequest()
@@ -505,6 +533,45 @@ class TapPayments extends Component
                 ->addHeaders([
                     'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
                     'content-type' => 'application/json',
+                ])
+                ->send();
+
+        return $response;
+    }
+
+    /**
+     * The dynamic currency conversion API allows merchants
+     * to get realtime and accurate currency exchange rates
+     * as used by Tap and add a markup to those rates.
+     * @param type $amount
+     */
+    public function createDCC($transferCurrencyCode, $amount, $toCurrency = 'USD')
+    {
+        $dccEndpoint = $this->apiEndpoint . "/currency/dcc/v1";
+
+        $dccParams = [
+            "from" => [
+              "currency"  => 'KWD',
+              "value" => $amount
+            ],
+            "to" => [
+              [
+                "currency" => 'USD',
+                "dcc_rate" => "2.5%"
+              ]
+            ],
+            "by" => "PROVIDER"
+        ];
+
+
+
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setMethod('POST')
+                ->setUrl($dccEndpoint)
+                ->setData($dccParams)
+                ->addHeaders([
+                    'authorization' => 'Bearer sk_test_p07NquMX4HgwLT8mycdJnZv5'
                 ])
                 ->send();
 

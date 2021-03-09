@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\grid\GridView;
 use common\models\Order;
+use common\models\AgentAssignment;
 use yii\helpers\Url;
 
 /* @var $this yii\web\View */
@@ -31,7 +32,13 @@ $this->params['breadcrumbs'][] = $this->title;
                     'model' => $model,
                     'attributes' => [
                         'customer_name',
-                        'customer_phone_number',
+                        [
+                            'attribute' => 'customer_phone_number',
+                            "format" => "raw",
+                            "value" => function($model) {
+                              return '<a href="tel:'. $model->customer_phone_number .'"> '. str_replace(' ', '', $model->customer_phone_number) .' </a>';
+                            }
+                        ],
                         'customer_email:email',
                         'customer_created_at',
                         'customer_updated_at',
@@ -89,6 +96,8 @@ $this->params['breadcrumbs'][] = $this->title;
                           'value' => function($model) {
                               if ($model->order_status == Order::STATUS_PENDING)
                                   return '<span class="badge bg-warning" >' . $model->orderStatusInEnglish . '</span>';
+                              else if ($model->order_status == Order::STATUS_ACCEPTED)
+                                  return '<span class="badge" style="background-color:#2898C8;" >' . $model->orderStatusInEnglish . '</span>';
                               else if ($model->order_status == Order::STATUS_DRAFT)
                                   return '<span class="badge bg-info" >' . $model->orderStatusInEnglish . '</span>';
                               else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY)
@@ -107,8 +116,18 @@ $this->params['breadcrumbs'][] = $this->title;
                                   return '<span class="badge bg-danger" >' . $model->orderStatusInEnglish . '</span>';
                           }
                       ],
-                      'delivery_fee:currency',
-                      'total_price:currency',
+                      [
+                          'attribute' => 'delivery_fee',
+                          "value" => function($data) {
+                                  return Yii::$app->formatter->asCurrency($data->delivery_fee, $data->currency->code);
+                          },
+                      ],
+                      [
+                          'attribute' => 'total_price',
+                          "value" => function($data) {
+                                  return Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code);
+                          },
+                      ],
                       [
                           'attribute' => 'order_created_at',
                           "format" => "raw",

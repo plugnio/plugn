@@ -13,7 +13,7 @@ use backend\models\LoginForm;
 class SiteController extends Controller
 {
     public $enableCsrfValidation = false;
-    
+
     /**
      * {@inheritdoc}
      */
@@ -88,6 +88,8 @@ class SiteController extends Controller
             ]);
         }
     }
+
+
 
     /**
      * Logout action.

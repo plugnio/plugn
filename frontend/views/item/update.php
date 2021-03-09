@@ -10,7 +10,7 @@ use common\models\Option;
 $this->params['restaurant_uuid'] = $storeUuid;
 
 $this->title = 'Update Item: ' . $modelItem->item_name;
-$this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['index', 'storeUuid' => $modelItem->restaurant_uuid]];
+$this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['index', 'storeUuid' => $storeUuid]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
 <div class="item-update">

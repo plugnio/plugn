@@ -44,6 +44,12 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     public $tempPassword;
 
     /**
+     * Field for temporary password. If set, it will overwrite the old password on save
+     * @var string
+     */
+     public $isOwner = null;
+
+    /**
      * {@inheritdoc}
      */
     public static function tableName() {
@@ -144,10 +150,32 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public static function findIdentityByAccessToken($token, $type = null) {
-        throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
+        $token = AgentToken::find()->where([
+                    'token_value' => $token,
+                    'token_status' => AgentToken::STATUS_ACTIVE
+                ])
+                ->with('agent')
+                ->one();
+
+        if (!$token)
+            return false;
+
+        //update last used datetime
+
+        $token->token_last_used_datetime = new Expression('NOW()');
+        $token->save();
+
+        //should not able to login, if email not verified but have valid token
+
+        if ($token->agent) {
+            return $token->agent;
+        }
+
+        //invalid token
+        $token->delete();
     }
 
     /**
@@ -282,14 +310,20 @@ public function getAccessToken() {
         $this->agent_password_reset_token = null;
     }
 
-
     /**
-     * Get all Restaurant accounts this agent owns
-     * @return \yii\db\ActiveQuery
+     *
+     * @param type $restaurant_uuid
+     * @return type
      */
-    public function getAccountsOwned()
-    {
-        return $this->hasMany(Restaurant::className(), ['agent_id' => 'agent_id']);
+    public function isOwner($storeUuid) {
+
+      if($this->isOwner == null){
+
+          $this->isOwner = AgentAssignment::find()
+                            ->where(['agent_id' => Yii::$app->user->identity->agent_id, 'restaurant_uuid' => $storeUuid, 'role' => AgentAssignment::AGENT_ROLE_OWNER])
+                            ->exists();
+      }
+        return $this->isOwner;
     }
 
     /**

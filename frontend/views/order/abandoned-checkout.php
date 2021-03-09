@@ -71,7 +71,13 @@ $this->registerJs($js);
                         return $data->customer_id ? true : false;
                     },
                 ],
-                'customer_phone_number',
+                [
+                    'attribute' => 'customer_phone_number',
+                    "format" => "raw",
+                    "value" => function($model) {
+                      return '<a href="tel:'. $model->customer_phone_number .'"> '. str_replace(' ', '', $model->customer_phone_number) .' </a>';                      
+                    }
+                ],
                 [
                     'label' => 'When',
                     'format' => 'raw',
@@ -89,7 +95,12 @@ $this->registerJs($js);
                             return $data->paymentMethod->payment_method_name;
                     },
                 ],
-                'total_price:currency',
+                [
+                    'attribute' => 'total_price',
+                    "value" => function($data) {
+                            return Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code);
+                    },
+                ],
             ],
             'layout' => '{summary}{items}{pager}',
             'tableOptions' => ['class' => 'table data-list-view'],

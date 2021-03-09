@@ -12,6 +12,10 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 $this->title = 'Overview dashboard';
 $this->params['breadcrumbs'][] = $this->title;
 // \yii\web\YiiAsset::register($this);
+
+
+$currencyCode = $model->currency->code;
+
 ?>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -19,6 +23,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <!-- <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script> -->
 <script type="text/javascript">
+
+  var currency_code = "<?= $currencyCode ?>";
+
 
     $(document).ready(function () {
 
@@ -69,7 +76,14 @@ $this->params['breadcrumbs'][] = $this->title;
             yaxis: {
                 tickAmount: 5,
                 opposite: yaxis_opposite
-            }
+            },
+            tooltip: {
+                y: {
+                  formatter: function (val) {
+                    return  currency_code +  ' ' + val  ;
+                  }
+                }
+          }
         }
 
         var revenueChart = new ApexCharts(
@@ -258,30 +272,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="card-header">
                         <h4 class="card-title">Sold Items</h4>
 
-                        <!-- <div class="btn-group mb-1">
-                                            <div class="dropdown">
-                                                <button class="btn btn-success dropdown-toggle mr-1 waves-effect waves-light" type="button" id="dropdownMenuButton2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                  <i class="fa fa-file-excel-o"></i>  Export to excel
-                                                </button>
-                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 38px, 0px);">
-                                                    <?php
-                                                     // echo Html::a('Today', ['export-today-sold-items','storeUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
-                                                     ?>
-                                                    <?php
-                                                    // echo Html::a('Last 7 days', ['export-last-seven-days-sold-items','storeUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
-                                                    ?>
-                                                    <?php
-                                                    // echo Html::a('Current month', ['export-current-month-sold-items','storeUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
-                                                    ?>
-                                                    <?php
-                                                    // echo Html::a('Last month', ['export-last-month-sold-items','storeUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
-                                                    ?>
-                                                    <?php
-                                                     // echo Html::a('Last 3 months', ['export-last-three-months-sold-items','storeUuid'=>$model->restaurant_uuid], ['class' => 'dropdown-item'])
-                                                     ?>
-                                                </div>
-                                            </div>
-                                        </div> -->
                     </div>
                     <div class="card-content">
                         <div class="card-body">

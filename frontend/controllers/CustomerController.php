@@ -46,6 +46,8 @@ class CustomerController extends Controller {
      */
     public function actionIndex($storeUuid) {
 
+      // add conditions that should always apply here
+
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new CustomerSearch();
@@ -69,6 +71,7 @@ class CustomerController extends Controller {
           $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
           $model = new Customer();
+          $model->setScenario(Customer::SCENARIO_CREATE_ORDER_BY_AGENT);
           $model->restaurant_uuid = $storeUuid;
 
           if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -116,7 +119,7 @@ class CustomerController extends Controller {
 
         // Customer's Orders Data
         $customersOrdersData = new \yii\data\ActiveDataProvider([
-            'query' => $model->getOrders()->orderBy(['order_created_at' => SORT_ASC]),
+            'query' => $model->getOrders()->with(['currency'])->orderBy(['order_created_at' => SORT_ASC]),
             'pagination' => false
         ]);
 
@@ -148,22 +151,52 @@ class CustomerController extends Controller {
                'models' => $model,
                'columns' => [
                    'customer_name',
-                   'customer_phone_number',
                    'customer_email',
+                   [
+                       'attribute' => 'customer_phone_number',
+                       "format" => "raw",
+                       "value" => function($model) {
+                           return str_replace(' ','',  strval($model->customer_phone_number));
+                       }
+                   ],
+                   [
+                       'attribute' => 'Total spent',
+                       "format" => "raw",
+                       "value" => function($data) {
+                         $total_spent = $data->getOrders()
+                                         ->where([ '!=' , 'order_status' , Order::STATUS_DRAFT])
+                                         ->andWhere([ '!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
+                                         ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                                         ->andWhere(['!=', 'order_status', Order::STATUS_PARTIALLY_REFUNDED])
+                                         ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                                         ->sum('total_price');
+
+
+                         $total_spent = \Yii::$app->formatter->asDecimal($total_spent ? $total_spent : 0 , 3);
+
+                         return  Yii::$app->formatter->asCurrency($total_spent ? $total_spent : 0, $data->currency->code);
+                       }
+                   ],
                    [
                        'attribute' => 'Number of orders',
                        "format" => "raw",
                        "value" => function($model) {
                            return  $model->getOrders()
-                           ->where(['order.order_status' => Order::STATUS_PENDING])
-                           ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-                           ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                           ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-                           ->orWhere(['order.order_status' => Order::STATUS_ACCEPTED])
+                           ->where([ '!=' , 'order_status' , Order::STATUS_DRAFT])
+                           ->andWhere([ '!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
+                           ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                           ->andWhere(['!=', 'order_status', Order::STATUS_PARTIALLY_REFUNDED])
+                           ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
                            ->count();
                        }
                    ],
-                   'customer_created_at',
+                   [
+                       'header' => 'Account created at',
+                       "format" => "raw",
+                       "value" => function($data) {
+                         return  $data->customer_created_at ;
+                       }
+                   ]
                ]
            ]);
     }

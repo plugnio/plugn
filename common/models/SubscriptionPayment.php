@@ -138,7 +138,8 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
         // If there's an error from TAP, exit and display error
         if (isset($responseContent->errors)) {
-            $errorMessage = "Error from TAP: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
+            $errorMessage = "[Error from TAP]" . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description  . ' - Store Name: ' . $paymentRecord->restaurant->name . ' - Order Uuid: ' . $paymentRecord->order_uuid;
+
             \Yii::error($errorMessage, __METHOD__); // Log error faced by user
             \Yii::$app->getSession()->setFlash('error', $errorMessage);
             return $paymentRecord;
@@ -201,7 +202,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         } else {
             Yii::info('[TAP Payment Issue > ' . $paymentRecord->restaurant->name . ']'
                     . $paymentRecord->restaurant->name .
-                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) .
+                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) .
                     ' and has failed at gateway. Maybe card issue.', __METHOD__);
 
             Yii::info('[Response from TAP for Failed Payment] ' .
@@ -265,6 +266,16 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
      */
     public function getRestaurant() {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * Gets query for [[Currency]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
     }
 
 }

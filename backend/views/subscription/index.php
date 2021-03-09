@@ -29,12 +29,18 @@ $this->params['breadcrumbs'][] = $this->title;
               'attribute' => 'restaurant_name',
               'value' => 'restaurant.name'
             ],
-            'plan.platform_fee:percent',
+            [
+              'attribute' => 'platform_fee',
+              'value' =>     'plan.platform_fee'
+            ],
             [
               'attribute' => 'plan_name',
               'value' =>     'plan.name'
             ],
-            'status',
+            [
+              'attribute' => 'subscription_status',
+              'value' =>     'status'
+            ],
             'subscription_start_at',
             'subscription_end_at',
 

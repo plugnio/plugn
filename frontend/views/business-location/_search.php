@@ -4,28 +4,28 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model frontend\models\OptionSearch */
+/* @var $model frontend\models\BusinessLocationSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="option-search">
+<div class="business-location-search">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
         'method' => 'get',
     ]); ?>
 
-    <?= $form->field($model, 'option_id') ?>
+    <?= $form->field($model, 'business_location_id') ?>
 
-    <?= $form->field($model, 'item_uuid') ?>
+    <?= $form->field($model, 'restaurant_uuid') ?>
 
-    <?= $form->field($model, 'min_qty') ?>
+    <?= $form->field($model, 'business_location_name') ?>
 
-    <?= $form->field($model, 'max_qty') ?>
+    <?= $form->field($model, 'business_location_name_ar') ?>
 
-    <?= $form->field($model, 'option_name') ?>
+    <?= $form->field($model, 'support_delivery') ?>
 
-    <?php // echo $form->field($model, 'option_name_ar') ?>
+    <?php // echo $form->field($model, 'support_pick_up') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>

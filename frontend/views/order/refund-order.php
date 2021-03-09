@@ -186,7 +186,7 @@ $this->registerJs($js);
                                             </div>
                                             <!-- Product price -->
                                             <div>
-                                                <?= Yii::$app->formatter->asCurrency($refundedItem->orderItem->item_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?>
+                                                <?= Yii::$app->formatter->asCurrency($refundedItem->orderItem->item_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
                                             </div>
                                         </div>
                                     </div>
@@ -359,7 +359,7 @@ $this->registerJs($js);
                                 ])->label(false)
                                 ?>
 
-                            <span class="avaliable-amount-to-refund">  <?= Yii::$app->formatter->asCurrency($refundedItem->orderItem->order->total_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5,]) ?> available for refund</span>
+                            <span class="avaliable-amount-to-refund">  <?= Yii::$app->formatter->asCurrency($refundedItem->orderItem->order->total_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3,]) ?> available for refund</span>
 
                         </div>
                         <div class="form-group refund-btn">

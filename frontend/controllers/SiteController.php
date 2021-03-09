@@ -15,6 +15,7 @@ use frontend\models\OrderSearch;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use common\models\Agent;
+use common\models\BusinessLocation;
 use common\models\Restaurant;
 use common\models\OrderItem;
 use common\models\Category;
@@ -94,7 +95,7 @@ class SiteController extends Controller {
         else {
             foreach (Yii::$app->accountManager->getManagedAccounts() as $managedRestaurant) {
 
-                if (AgentAssignment::isOwner($managedRestaurant->restaurant_uuid)) {
+                if (Yii::$app->user->identity->isOwner($managedRestaurant->restaurant_uuid)) {
                     return $this->redirect(['vendor-dashboard',
                                 'id' => $managedRestaurant->restaurant_uuid
                     ]);
@@ -113,7 +114,7 @@ class SiteController extends Controller {
     public function actionCheckForNewOrders($storeUuid) {
 
         $this->layout = false;
-        $managedRestaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $managedRestaurant = $this->findModel($storeUuid);
 
         $searchModel = new OrderSearch();
         $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid);
@@ -131,7 +132,7 @@ class SiteController extends Controller {
      * @return mixed
      */
     public function actionRedirectToStoreDomain($storeUuid) {
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($storeUuid)) {
+        if ($managedRestaurant = $this->findModel($storeUuid)) {
 
             if($managedRestaurant->has_deployed)
             return $this->redirect($managedRestaurant->restaurant_domain);
@@ -154,7 +155,7 @@ class SiteController extends Controller {
      * @return mixed
      */
     public function actionConnectDomain($id) {
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
+        if ($managedRestaurant = $this->findModel($id)) {
 
             $old_domain = $managedRestaurant->restaurant_domain;
 
@@ -190,7 +191,7 @@ class SiteController extends Controller {
 
 
     public function actionConfirmPlan($id, $selectedPlanId) {
-      if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
+      if ($managedRestaurant = $this->findModel($id)) {
 
 
 
@@ -222,19 +223,20 @@ class SiteController extends Controller {
               // Redirect to payment gateway
               Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
 
-
               $response = Yii::$app->tapPayments->createCharge(
+                      "KWD",
                       "Upgrade $managedRestaurant->name's plan to " . $subscription_model->plan->name, // Description
                       'Plugn', //Statement Desc.
                        $payment->payment_uuid, // Reference
                        $subscription_model->plan->price,
                        $managedRestaurant->name,
                        $managedRestaurant->getAgents()->one()->agent_email,
+                       $managedRestaurant->country->country_code,
                        $managedRestaurant->owner_number ? $managedRestaurant->owner_number : null,
                        0, //Comission
                       Url::to(['site/callback'], true),
                       $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET :  TapPayments::GATEWAY_VISA_MASTERCARD,
-                      0 
+                      0
               );
 
               $responseContent = json_decode($response->content);
@@ -356,8 +358,8 @@ class SiteController extends Controller {
      */
     public function actionVendorDashboard($id) {
 
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
-            if (AgentAssignment::isOwner($managedRestaurant->restaurant_uuid)) {
+        if ($managedRestaurant = $this->findModel($id)) {
+            if (Yii::$app->user->identity->isOwner($managedRestaurant->restaurant_uuid)) {
 
                 $incoming_orders = Order::find()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
                         ->orderBy(['order_created_at' => SORT_DESC])
@@ -1173,6 +1175,8 @@ class SiteController extends Controller {
      * @return mixed
      */
     public function actionLogin() {
+      //temp
+      // return $this->redirect('https://plugn.io/');
 
         $this->layout = 'login';
 
@@ -1213,6 +1217,7 @@ class SiteController extends Controller {
         $this->layout = 'login';
 
         $store_model = new Restaurant();
+        $store_model->version = 2;
         $store_model->setScenario(Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
 
         $agent_model = new Agent();
@@ -1238,6 +1243,15 @@ class SiteController extends Controller {
                 $category_model->title = 'Products';
                 $category_model->title_ar = 'منتجات';
                 $category_model->save();
+
+                //Create a business Location for a store by default named "Main Branch".
+                $business_location_model = new BusinessLocation();
+                $business_location_model->restaurant_uuid = $store_model->restaurant_uuid;
+                $business_location_model->country_id = $store_model->country_id;
+                $business_location_model->business_location_name = 'Main Branch';
+                $business_location_model->business_location_name_ar = 'الفرع الرئيسي';
+                $business_location_model->save();
+
 
                 $assignment_agent_model = new AgentAssignment();
                 $assignment_agent_model->agent_id = $agent_model->agent_id;
@@ -1273,7 +1287,6 @@ class SiteController extends Controller {
                           ]
                       ]);
                     }
-
 
                         return $this->redirect(['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
                     } else {
@@ -1362,7 +1375,7 @@ class SiteController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id) {
-        if (($model = Yii::$app->accountManager->getManagedAccount($id))) {
+        if (($model = Yii::$app->accountManager->getManagedAccount($id)) ) {
             return $model;
         }
 

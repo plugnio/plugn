@@ -24,8 +24,9 @@ class LoginAsset extends AssetBundle {
   'app-assets/css/core/menu/menu-types/vertical-menu.css',
   'app-assets/css/core/colors/palette-gradient.css',
   'app-assets/css/pages/authentication.css',
-  'assets/css/style.css',
   'app-assets/css/plugins/forms/wizard.css',
+  'css/intlTelInput.css',
+
     ];
     public $js = [
       'app-assets/vendors/js/vendors.min.js',
@@ -35,6 +36,8 @@ class LoginAsset extends AssetBundle {
       // 'app-assets/vendors/js/extensions/jquery.steps.min.js',
       'app-assets/vendors/js/forms/validation/jquery.validate.min.js',
       // 'app-assets/js/scripts/forms/wizard-steps.js',
+      'js/intlTelInput-jquery.js',
+
     ];
     public $depends = [
         'yii\web\YiiAsset',

@@ -12,8 +12,7 @@ return [
             'class' => 'yii\caching\FileCache',
         ],
         'formatter' => [
-            'currencyCode' => 'KWD',
-                   'thousandSeparator' => ',',
+        'thousandSeparator' => ',',
         'decimalSeparator' => '.',
             'defaultTimeZone' => 'Asia/Kuwait',
             'timeZone' => 'Asia/Kuwait',
@@ -65,6 +64,9 @@ return [
         ],
         'smsComponent' => [
             'class' => 'common\components\SmsComponent'
+        ],
+        'fileGeneratorComponent' => [
+            'class' => 'common\components\FileGeneratorComponent'
         ],
         'mashkorDelivery' => [
             'class' => 'common\components\MashkorDelivery',

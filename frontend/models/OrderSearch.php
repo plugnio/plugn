@@ -12,6 +12,7 @@ use common\models\Order;
 class OrderSearch extends Order {
 
     public $date_range;
+    public $business_location_id;
 
     /**
      * {@inheritdoc}
@@ -20,7 +21,7 @@ class OrderSearch extends Order {
         return [
             [['area_id', 'payment_method_id', 'order_status'], 'integer'],
             [['total_price_before_refund'], 'number'],
-            [['date_range'], 'safe'],
+            [['date_range','business_location_id'], 'safe'],
             [['order_uuid', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name', 'payment_method_name_ar'], 'safe'],
         ];
     }
@@ -44,6 +45,7 @@ class OrderSearch extends Order {
 
 
         $query = Order::find()
+            ->with(['restaurant','country', 'pickupLocation', 'payment','paymentMethod','currency','deliveryZone','deliveryZone.businessLocation','customer'])
             ->where(['order.restaurant_uuid' => $storeUuid])
             ->andWhere(['order_status' => Order::STATUS_ABANDONED_CHECKOUT])
             ->orderBy(['order_created_at' => SORT_DESC]);
@@ -101,7 +103,8 @@ class OrderSearch extends Order {
     public function searchDraftOrders($params, $storeUuid) {
 
         $query = Order::find()
-            ->where(['order.restaurant_uuid' => $storeUuid])
+        ->with(['restaurant','country', 'pickupLocation', 'payment','paymentMethod','currency','deliveryZone','deliveryZone.businessLocation','customer'])
+            ->where(['restaurant_uuid' => $storeUuid])
             ->andWhere(['order_status' => Order::STATUS_DRAFT])
             ->orderBy(['order_created_at' => SORT_DESC]);
 
@@ -158,16 +161,17 @@ class OrderSearch extends Order {
     public function searchPendingOrders($params, $storeUuid) {
 
         $query = Order::find()
-            ->where(['order.restaurant_uuid' => $storeUuid])
+            ->with(['country', 'pickupLocation', 'payment','paymentMethod','currency','deliveryZone','deliveryZone.businessLocation','customer'])
+            ->where(['restaurant_uuid' => $storeUuid])
             ->andWhere(['order_status' => Order::STATUS_PENDING])
             ->orderBy(['order_created_at' => SORT_DESC]);
-
 
         // add conditions that should always apply here
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => false
         ]);
+
 
         $this->load($params);
 
@@ -217,9 +221,11 @@ class OrderSearch extends Order {
     public function search($params, $storeUuid) {
 
         $query = Order::find()
+            ->with(['paymentMethod','currency','deliveryZone','deliveryZone.businessLocation', 'selectedItems'])
             ->where(['order.restaurant_uuid' => $storeUuid])
             ->andWhere(['!=' , 'order_status' , Order::STATUS_DRAFT])
             ->andWhere(['!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
+            ->joinWith('pickupLocation', true)
             ->orderBy(['order_created_at' => SORT_DESC]);
 
 
@@ -228,6 +234,11 @@ class OrderSearch extends Order {
             'query' => $query,
             'pagination' => false
         ]);
+
+        $dataProvider->sort->attributes['business_location_id'] = [
+            'asc' => ['pickupLocation.business_location_name' => SORT_ASC],
+            'desc' => ['pickupLocation.business_location_name' => SORT_DESC],
+        ];
 
         $this->load($params);
 
@@ -261,6 +272,7 @@ class OrderSearch extends Order {
                 ->andFilterWhere(['like', 'block', $this->block])
                 ->andFilterWhere(['like', 'street', $this->street])
                 ->andFilterWhere(['like', 'avenue', $this->avenue])
+                ->andFilterWhere(['like', 'businessLocation.business_location_id', $this->business_location_id])
                 ->andFilterWhere(['like', 'total_price_before_refund', $this->total_price_before_refund])
                 ->andFilterWhere(['like', 'house_number', $this->house_number])
                 ->andFilterWhere(['like', 'special_directions', $this->special_directions])

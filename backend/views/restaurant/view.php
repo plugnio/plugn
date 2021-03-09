@@ -14,61 +14,52 @@ $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="restaurant-view">
-
     <h1>
         <?= Html::encode($this->title) ?>
         <span class="badge">
             <?= $model->status ?>
         </span>
         <?= $model->is_tap_enable ? '' : Html::a('Create Tap account', ['create-tap-account', 'restaurant_uuid' => $model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
-        <?=
-        Html::a('Send store data to Tap', ['send-email-to-tap', 'id' => $model->restaurant_uuid], [
-            'class' => 'btn btn-warning',
-            'data' => [
-                'confirm' => 'Are you sure you want to send an email to Tap?',
-                'method' => 'post',
-            ],
-        ])
-        ?>
+
 
     </h1>
+    <?= Yii::$app->session->getFlash('errorResponse') ? '<h2>'. Yii::$app->session->getFlash('errorResponse') . '</h2>' : '' ?>
 
 
     <p>
+
+        <?=
+          Html::a($model->hide_request_driver_button == 1 ? 'Display request driver button' : 'Hide request driver button',
+          [
+            $model->hide_request_driver_button == 1 ?  'display-request-driver-button' : 'hide-request-driver-button'
+         , 'id' => $model->restaurant_uuid], ['class' => $model->hide_request_driver_button == 0 ? 'btn btn-success' : 'btn btn-danger'])
+         ?>
         <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
         <?=
         Html::a('Delete', ['delete', 'id' => $model->restaurant_uuid], [
             'class' => 'btn btn-danger',
             'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
+                'confirm' => 'Are you sure you want to delete this store?',
                 'method' => 'post',
             ],
         ])
         ?>
 
-        <?php if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_OPEN) { ?>
-            <?=
-            Html::a('Open', ['promote-to-open', 'id' => $model->restaurant_uuid], [
-                'class' => 'btn btn-success',
-                'data' => [
-                    'confirm' => 'Are you sure you want to change store status to open?',
-                    'method' => 'post',
-                ],
-            ])
-            ?>
-        <?php } ?>
+    </p>
 
-        <?php if ($model->restaurant_status != Restaurant::RESTAURANT_STATUS_BUSY) { ?>
-            <?=
-            Html::a('Busy', ['promote-to-busy', 'id' => $model->restaurant_uuid], [
-                'class' => 'btn btn-warning',
-                'data' => [
-                    'confirm' => 'Are you sure you want to change store status to busy?',
-                    'method' => 'post',
-                ],
-            ])
-            ?>
-        <?php } ?>
+    <p>
+      <?= Html::a('Update sitemap', ['update-sitemap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>
+      <?= Html::a('Delete Build Js', ['delete-specific-file','filePath' =>'build.js' ,'id' => $model->restaurant_uuid], ['class' => 'btn btn-danger']) ?>
+      <?= Html::a('Delete branch-name txt', ['delete-specific-file','filePath' =>'branch-name.txt' ,'id' => $model->restaurant_uuid], ['class' => 'btn btn-danger']) ?>
+      <?= Html::a('Merge w/ master', ['merge-branch', 'id' => $model->restaurant_uuid, 'head' => 'master'], ['class' => 'btn btn-primary']) ?>
+      <?= Html::a('Merge w/ master-temp', ['merge-branch', 'id' => $model->restaurant_uuid, 'head' => 'master-temp'], ['class' => 'btn btn-primary']) ?>
+
+
+
+      <?= Html::a('Merge', ['merge-to-master-branch', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+
+
+
 
     </p>
 
@@ -76,6 +67,29 @@ $this->params['breadcrumbs'][] = $this->title;
     DetailView::widget([
         'model' => $model,
         'attributes' => [
+          [
+              'label' => 'is_tap_enable',
+              'value' => function ($data) {
+                  return $data->is_tap_enable ? 'Yes' : 'No';
+              },
+              'format' => 'raw'
+          ],
+            'tap_queue_id',
+            'version',
+            'sitemap_require_update',
+            'country.country_name',
+            [
+                'label' => 'Store currency',
+                'value' => function ($data) {
+                  return $data->currency->title;
+                }
+            ],
+            [
+                'label' => 'Hide Request driver button',
+                'value' => function ($data) {
+                  return $data->hide_request_driver_button  == 1 ? 'Yes' : 'No';
+                }
+            ],
             'restaurant_uuid',
             [
                 'label' => 'Payment Methods',
@@ -100,11 +114,14 @@ $this->params['breadcrumbs'][] = $this->title;
             'name_ar',
             'tagline',
             'tagline_ar',
+            'app_id',
             'status',
             'business_type',
             'restaurant_domain',
             'thumbnail_image',
             'logo',
+            'identification_file_front_side',
+            'identification_file_back_side',
             [
                 'attribute' => 'thumbnail_image',
                 'format' => 'html',
@@ -119,20 +136,20 @@ $this->params['breadcrumbs'][] = $this->title;
                     return Html::img($data->getRestaurantLogoUrl());
                 },
             ],
-            [
-                'label' => 'Support Delivery',
-                'value' => function ($data) {
-                    return $data->support_delivery ? 'Yes' : 'No';
-                },
-                'format' => 'raw'
-            ],
-            [
-                'label' => 'Support Pick up',
-                'value' => function ($data) {
-                    return $data->support_pick_up ? 'Yes' : 'No';
-                },
-                'format' => 'raw'
-            ],
+            // [
+            //     'label' => 'Support Delivery',
+            //     'value' => function ($data) {
+            //         return $data->support_delivery ? 'Yes' : 'No';
+            //     },
+            //     'format' => 'raw'
+            // ],
+            // [
+            //     'label' => 'Support Pick up',
+            //     'value' => function ($data) {
+            //         return $data->support_pick_up ? 'Yes' : 'No';
+            //     },
+            //     'format' => 'raw'
+            // ],
             'phone_number',
             'restaurant_email:email',
             'instagram_url:url',
@@ -161,7 +178,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'commercial_license_file_id',
             'identification_file_id_front_side',
             'identification_file_id_back_side',
-            'identification_issuing_country',
             'identification_title',
             'commercial_license_title',
             'authorized_signature_title',

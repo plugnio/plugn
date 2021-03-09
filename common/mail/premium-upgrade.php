@@ -375,7 +375,7 @@ use common\components\TapPayments;
                                                                                     <div
                                                                                         style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;"
                                                                                         >
-                                                                                        Payment of <?= \Yii::$app->formatter->asCurrency($subscription->plan->price); ?>
+                                                                                        Payment of <?= \Yii::$app->formatter->asCurrency($subscription->plan->price, $store->currency->code ); ?>
 
                                                                                     </div>
 

@@ -151,10 +151,15 @@ class RestaurantController extends Controller {
      */
     public function actionGetRestaurantData($branch_name) {
 
-        $restaurant = Restaurant::find()
+      $store = Restaurant::find()
+              ->where(['store_branch_name' => $branch_name]);
+
+      if( $store->exists() ){
+
+        $restaurant = $store
                 ->select(['restaurant_uuid', 'name', 'logo', 'tagline', 'restaurant_domain', 'app_id', 'google_analytics_id', 'facebook_pixil_id', 'custom_css'])
-                ->where(['store_branch_name' => $branch_name])
                 ->one();
+
 
         $themeColor = RestaurantTheme::find()
                 ->select(['primary'])
@@ -175,6 +180,14 @@ class RestaurantController extends Controller {
                 'theme_color' => $themeColor->primary,
             ];
         } else {
+            return [
+                'operation' => 'error',
+                'message' => 'Branch name is invalid'
+            ];
+        }
+
+
+      } else {
             return [
                 'operation' => 'error',
                 'message' => 'Branch name is invalid'

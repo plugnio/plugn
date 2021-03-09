@@ -44,30 +44,32 @@ AppAsset::register($this);
     } else {
         $menuItems = [
 
-            ['label' => 'Admins', 'url' => ['/admin/index']],
-     ['label' => 'Agents', 'url' => ['/agent/index']],
-     ['label' => 'Cities', 'url' => ['/city/index']],
-     ['label' => 'Areas', 'url' => ['/area/index']],
-     ['label' => 'Agent Assignment', 'url' => ['/agent-assignment/index']],
-     ['label' => 'Restaurants', 'url' => ['/restaurant/index']],
 
-     ['label' => 'Subscription', 'url' => ['/subscription/index']],
+            ['label' => 'Stores', 'url' => ['/restaurant/index']],
+            ['label' => 'Agents', 'url' => ['/agent/index']],
+            ['label' => 'Agent Assignment', 'url' => ['/agent-assignment/index']],
+            ['label' => 'Tap Queue', 'url' => ['/tap-queue/index']],
 
 
 
-     [
-     'label' => 'Other',
-         'items' => [
-           ['label' => 'Country', 'url' => ['/country/index']],
-           ['label' => 'Currency', 'url' => ['/currency/index']],
-           ['label' => 'Plans', 'url' => ['/plan/index']],
-           ['label' => 'Bank', 'url' => ['/bank/index']],
-           ['label' => 'Queue', 'url' => ['/queue/index']],
-           ['label' => 'Tap Queue', 'url' => ['/tap-queue/index']],
-           ['label' => 'Payments Method', 'url' => ['/payment-method/index']],
 
-         ],
-     ],
+            [
+            'label' => 'Other',
+                'items' => [
+                  ['label' => 'Queue', 'url' => ['/queue/index']],
+                  ['label' => 'Subscription', 'url' => ['/subscription/index']],
+                  ['label' => 'Country', 'url' => ['/country/index']],
+                  ['label' => 'Cities', 'url' => ['/city/index']],
+                  ['label' => 'Areas', 'url' => ['/area/index']],
+                  ['label' => 'Currency', 'url' => ['/currency/index']],
+                  ['label' => 'Payments Method', 'url' => ['/payment-method/index']],
+                  ['label' => 'Plans', 'url' => ['/plan/index']],
+                  ['label' => 'Bank', 'url' => ['/bank/index']],
+
+                  ['label' => 'Admins', 'url' => ['/admin/index']],
+
+                ],
+            ],
 
 
         ];

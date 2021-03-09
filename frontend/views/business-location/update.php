@@ -1,0 +1,21 @@
+<?php
+
+use yii\helpers\Html;
+
+/* @var $this yii\web\View */
+/* @var $model common\models\BusinessLocation */
+
+$this->title = 'Update Business Location: ' . $model->business_location_name;
+$this->params['restaurant_uuid'] = $storeUuid;
+
+$this->params['breadcrumbs'][] = ['label' => 'Business Locations', 'url' => ['index',  'storeUuid' => $storeUuid]];
+$this->params['breadcrumbs'][] = 'Update';
+?>
+<div class="business-location-update">
+
+    <?= $this->render('_form', [
+        'model' => $model,
+        'storeUuid' => $storeUuid
+    ]) ?>
+
+</div>

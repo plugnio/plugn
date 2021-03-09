@@ -29,7 +29,7 @@ $this->registerJs($js);
     <div class="action-btns d-none">
         <div class="btn-dropdown mr-1 mb-1">
             <div class="btn-group dropdown actions-dropodown">
-                <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary']) ?>
+              <?= Html::a('Create draft order ', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
             </div>
         </div>
     </div>
@@ -83,7 +83,12 @@ $this->registerJs($js);
                             return $data->paymentMethod->payment_method_name;
                     },
                 ],
-                'total_price:currency',
+                [
+                    'attribute' => 'total_price',
+                    "value" => function($data) {
+                            return Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code);
+                    },
+                ],
                 'order_created_at:datetime',
             ],
             'layout' => '{summary}{items}{pager}',

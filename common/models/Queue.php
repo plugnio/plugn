@@ -62,13 +62,14 @@ class Queue extends \yii\db\ActiveRecord {
 
     public function beforeSave($insert) {
 
-        if ($this->queue_status == self::QUEUE_STATUS_COMPLETE) {
+        if (!$insert && $this->queue_status == self::QUEUE_STATUS_CREATING) {
 
             $store_model = $this->restaurant;
 
             $getLastCommitResponse = Yii::$app->githubComponent->getLastCommit();
 
             if ($getLastCommitResponse->isOk) {
+
                 $sha = $getLastCommitResponse->data['sha'];
 
                 //Replace test with store branch name
@@ -77,19 +78,9 @@ class Queue extends \yii\db\ActiveRecord {
 
                 if ($createBranchResponse->isOk) {
 
-                    $fileToBeUploaded = file_get_contents("store/" . $store_model->store_branch_name . "/build.js");
-
-                    // Encode the image string data into base64
-                    $data = base64_encode($fileToBeUploaded);
-
-                    //Replace test with store branch name
-                    $commitBuildJsFileResponse = Yii::$app->githubComponent->createFileContent($data, $store_model->store_branch_name);
-
-                    if ($commitBuildJsFileResponse->isOk) {
-
-                        //Replace test with store domain name
-                        $url = parse_url($store_model->restaurant_domain);
-                        $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
+                    sleep(1);
+                    $url = parse_url($store_model->restaurant_domain);
+                    $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
 
                         if ($createNewSiteResponse->isOk) {
 
@@ -99,47 +90,25 @@ class Queue extends \yii\db\ActiveRecord {
 
                         } else {
                             Yii::error('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data), __METHOD__);
-                            $this->deleteBuildJsFolder();
                             return false;
                         }
-                    } else {
-                      Yii::error('[Github > Commit build JS]' . json_encode($commitBuildJsFileResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
-                      $this->deleteBuildJsFolder();
-                      return false;
-                    }
+
                 } else{
                   Yii::error('[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
-                  $this->deleteBuildJsFolder();
                   return false;
                 }
 
             } else {
                 Yii::error('[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
-                $this->deleteBuildJsFolder();
                 return false;
             }
 
-            $this->deleteBuildJsFolder();
+            $this->queue_status = Queue::QUEUE_STATUS_COMPLETE;
+
         }
         return parent::beforeSave($insert);
     }
 
-
-    public function deleteBuildJsFolder(){
-
-
-      $dirPath = "store/" .  $this->restaurant->store_branch_name;
-      $file_pointer =  $dirPath . '/build.js';
-
-      // Use unlink() function to delete a file
-      if (!unlink($file_pointer)) {
-          Yii::error("$file_pointer cannot be deleted due to an error", __METHOD__);
-      } else {
-          if (!rmdir($dirPath)) {
-              Yii::error("Could not remove $dirPath", __METHOD__);
-          }
-      }
-    }
 
 
 

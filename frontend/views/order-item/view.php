@@ -55,7 +55,12 @@ $this->registerJs($js);
                     'item_uuid',
                     'item_name',
                     'item_name_ar',
-                    'item_price:currency',
+                    [
+                        'attribute' => 'item_price',
+                        "value" => function($data) {
+                                return Yii::$app->formatter->asCurrency($data->item_price, $data->currency->code);
+                        },
+                    ],
                     'qty',
                     'customer_instruction',
                   ],
@@ -93,7 +98,12 @@ $this->registerJs($js);
                        ['class' => 'yii\grid\SerialColumn'],
                        'extra_option_name',
                        'extra_option_name_ar',
-                       'extra_option_price:currency',
+                       [
+                           'attribute' => 'extra_option_price',
+                           "value" => function($data) {
+                                   return Yii::$app->formatter->asCurrency($data->extra_option_price, $data->currency->code);
+                           },
+                       ],
                        [
                            'class' => 'yii\grid\ActionColumn',
                            'controller' => 'option',

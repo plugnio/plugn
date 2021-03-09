@@ -33,6 +33,10 @@ $this->registerJs($js);
 
 <section id="data-list-view" class="data-list-view-header">
 
+
+
+
+
   <?php if ($dataProvider->getCount() > 0) { ?>
 
 
@@ -47,7 +51,7 @@ $this->registerJs($js);
                     'format' => 'raw',
                     'value' => function ($item) {
 
-                            $itemItmage = $item->getItemImages()->one();
+                            $itemItmage = $item->itemImage;
 
                             if ($itemItmage)
                               return  Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_60,w_60/restaurants/" . $item->restaurant->restaurant_uuid . "/items/" . $itemItmage->product_file_name, ['style' => 'border-radius: 3px;margin-right: 20px;']);
@@ -55,6 +59,13 @@ $this->registerJs($js);
                                 return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_60,w_60/no-image.jpg", ['style' => 'border-radius: 3px;margin-right: 20px;']);
 
 
+                    },
+                ],
+                [
+                    'label' => 'Item name',
+                    'format' => 'raw',
+                    'value' => function ($item) {
+                        return $item->item_name ;
                     },
                 ],
                 [

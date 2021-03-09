@@ -26,7 +26,12 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
             'name',
-            'price:currency',
+            [
+                'attribute' => 'price',
+                "value" => function($data) {
+                        return Yii::$app->formatter->asCurrency($data->price, 'KWD');
+                },
+            ],
             'valid_for',
             'platform_fee:percent',
 

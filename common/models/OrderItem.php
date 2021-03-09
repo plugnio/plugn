@@ -208,9 +208,9 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItemImages()
+    public function getItemImage()
     {
-        return $this->hasMany(ItemImage::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasOne(ItemImage::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -229,6 +229,16 @@ class OrderItem extends \yii\db\ActiveRecord {
      */
     public function getRestaurant() {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('order');
+    }
+
+    /**
+     * Gets query for [[Currency]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
     }
 
     /**

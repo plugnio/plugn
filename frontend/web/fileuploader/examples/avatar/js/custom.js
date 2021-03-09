@@ -1,10 +1,10 @@
 $(document).ready(function() {
-	
+
 	// enable fileupload plugin
 	$('input[name="files"]').fileuploader({
 		limit: 2,
         extensions: ['image/*'],
-		fileMaxSize: 10,
+		fileMaxSize: 30,
 		changeInput: ' ',
 		theme: 'avatar',
 		addMore: true,
@@ -57,7 +57,7 @@ $(document).ready(function() {
 						item.popup.close = null;
 						item.remove();
 					}
-				} 	
+				}
 			},
 			onItemShow: function(item) {
 				if (item.choosed)
@@ -99,30 +99,30 @@ $(document).ready(function() {
 			},
 			onSave: function(base64, item, listEl, parentEl, newInputEl, inputEl) {
 				var api = $.fileuploader.getInstance(inputEl);
-                
+
                 if (!base64)
                     return;
-				
+
 				// blob
 				item.editor._blob = api.assets.dataURItoBlob(base64, item.type);
-				
+
 				if (item.upload) {
 					if (api.getFiles().length == 2 && (api.getFiles()[0].data.isDefault || api.getFiles()[0].upload))
 						api.getFiles()[0].remove();
 					parentEl.find('.fileuploader-menu ul a').show();
-					
+
 					if (item.upload.send)
 						return item.upload.send();
 					if (item.upload.resend)
 						return item.upload.resend();
 				} else if (item.appended) {
 					var form = new FormData();
-					
+
 					// hide current thumbnail (this is only animation)
 					item.image.addClass('fileuploader-loading').html('');
 					item.html.find('.fileuploader-action-popup').hide();
 					parentEl.find('[data-action="fileuploader-edit"]').hide();
-					
+
 					// send ajax
 					form.append(inputEl.attr('name'), item.editor._blob);
 					form.append('fileuploader', true);
@@ -172,30 +172,30 @@ $(document).ready(function() {
                 var api = $.fileuploader.getInstance(inputEl),
 					$progressBar = item.html.find('.progressbar3'),
 					data = {};
-				
+
 				if (result && result.files)
                     data = result;
                 else
 					data.hasWarnings = true;
-				
+
 				if (api.getFiles().length > 1)
 					api.getFiles()[0].remove();
-                
+
 				// if success
                 if (data.isSuccess && data.files[0]) {
                     item.name = data.files[0].name;
 				}
-				
+
 				// if warnings
 				if (data.hasWarnings) {
 					for (var warning in data.warnings) {
 						alert(data.warnings[warning]);
 					}
-					
+
 					item.html.removeClass('upload-successful').addClass('upload-failed');
 					return this.onError ? this.onError(item) : null;
 				}
-				
+
 				delete item.isSaving;
 				item.html.addClass('upload-complete').removeClass('is-image-waiting');
 				$progressBar.find('span').html('<i class="fileuploader-icon-success"></i>');
@@ -207,14 +207,14 @@ $(document).ready(function() {
             },
             onError: function(item, listEl, parentEl, newInputEl, inputEl) {
 				var $progressBar = item.html.find('.progressbar3');
-				
+
 				item.html.addClass('upload-complete');
 				if (item.upload.status != 'cancelled')
 					$progressBar.find('span').attr('data-action', 'fileuploader-retry').html('<i class="fileuploader-icon-retry"></i>');
             },
             onProgress: function(data, item) {
                 var $progressBar = item.html.find('.progressbar3');
-				
+
 				if (data.percentage == 0)
 					$progressBar.addClass('is-reset').fadeIn(250).html('');
 				else if (data.percentage >= 99)
@@ -223,7 +223,7 @@ $(document).ready(function() {
 					$progressBar.removeClass('is-reset');
 				if (!$progressBar.children().length)
 					$progressBar.html('<span></span><svg><circle class="progress-dash"></circle><circle class="progress-circle"></circle></svg>');
-				
+
 				var $span = $progressBar.find('span'),
 					$svg = $progressBar.find('svg'),
 					$bar = $svg.find('.progress-circle'),
@@ -231,7 +231,7 @@ $(document).ready(function() {
 					radius = Math.round(hh / 2.28),
 					circumference = radius * 2 * Math.PI,
 					offset = circumference - data.percentage / 100 * circumference;
-				
+
 				$svg.find('circle').attr({
 					r: radius,
 					cx: hh,
@@ -241,31 +241,31 @@ $(document).ready(function() {
 					strokeDasharray: circumference + ' ' + circumference,
 					strokeDashoffset: offset
 				});
-				
+
 				$span.html(data.percentage + '%');
             },
             onComplete: null,
         },
 		afterRender: function(listEl, parentEl, newInputEl, inputEl) {
 			var api = $.fileuploader.getInstance(inputEl);
-			
+
 			// remove multiple attribute
 			inputEl.removeAttr('multiple');
-            
+
             // set drop container
             api.getOptions().dragDrop.container = parentEl.find('.fileuploader-wrapper');
-			
+
 			// disabled input
 			if (api.isDisabled()) {
 				parentEl.find('.fileuploader-menu').remove();
 			}
-			
+
 			// [data-action]
 			parentEl.on('click', '[data-action]', function() {
 				var $this = $(this),
 					action = $this.attr('data-action'),
 					item = api.getFiles().length ? api.getFiles()[api.getFiles().length-1] : null;
-				
+
 				switch (action) {
 					case 'fileuploader-input':
 						api.open();
@@ -287,12 +287,12 @@ $(document).ready(function() {
 						break;
 				}
 			});
-			
+
 			// menu
 			$('body').on('click', function(e) {
 				var $target = $(e.target),
 					$parent = $target.closest('.fileuploader');
-				
+
 				$('.fileuploader-menu').removeClass('is-shown');
 				if ($target.is('.fileuploader-menu-open') || $target.closest('.fileuploader-menu-open').length)
 					$parent.find('.fileuploader-menu').addClass('is-shown');
@@ -301,10 +301,10 @@ $(document).ready(function() {
 		onEmpty: function(listEl, parentEl, newInputEl, inputEl) {
 			var api = $.fileuploader.getInstance(inputEl),
 				defaultAvatar = inputEl.attr('data-fileuploader-default');
-			
+
 			if (defaultAvatar && !listEl.find('> .is-default').length)
 				api.append({name: '', type: 'image/png', size: 0, file: defaultAvatar, data: {isDefault: true, popup: false, listProps: {is_default: true}}});
-			
+
 			parentEl.find('.fileuploader-menu ul a').hide().filter('[data-action="fileuploader-input"]').show();
 		},
 		onRemove: function(item) {

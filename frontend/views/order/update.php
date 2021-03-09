@@ -10,6 +10,7 @@ use yii\helpers\Url;
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 $this->title = 'Update Order: #' . $model->order_uuid;
+$this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index', 'storeUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = ['label' => 'Order #' . $model->order_uuid, 'url' => ['order/view', 'id' => $model->order_uuid,'storeUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = 'Update';
 
@@ -68,7 +69,12 @@ $this->registerJs($js);
                 'columns' => [
                   ['class' => 'yii\grid\SerialColumn'],
                   'item_name',
-                  'item_price:currency',
+                  [
+                      'attribute' => 'item_price',
+                      "value" => function($data) {
+                              return Yii::$app->formatter->asCurrency($data->item_price, $data->currency->code);
+                      },
+                  ],
                   'qty',
                   [
                       'label' => 'Extra Options',

@@ -10,6 +10,10 @@ use common\models\Area;
 use common\models\RestaurantDelivery;
 use kartik\file\FileInput;
 use common\models\Restaurant;
+use common\models\Currency;
+use common\models\Country;
+use common\models\Order;
+use borales\extensions\phoneInput\PhoneInput;
 
 $js = "
 $('#primaryColorInput').change(function(e){
@@ -56,6 +60,16 @@ $this->registerJs($js);
                 'id' => 'dynamic-form',
                 'errorSummaryCssClass' => 'alert alert-danger'
     ]);
+
+    $countryQuery = Country::find()->asArray()->all();
+    $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
+
+    $currencyQuery = Currency::find()->asArray()->all();
+    $currencyArray = ArrayHelper::map($currencyQuery, 'currency_id', 'title');
+
+
+    $madeAnySales = Order::find()->where(['restaurant_uuid' => $model->restaurant_uuid ])->exists();
+
     ?>
 
 
@@ -90,58 +104,37 @@ $this->registerJs($js);
             </div>
         </div>
 
-
         <div class="row">
-            <div class="col-12 col-sm-6 col-lg-6">
-                <?=
-                $form->field($model, 'support_delivery')->radioList([1 => 'Yes', 0 => 'No',], [
-                    'style' => 'display:grid',
-                    'item' => function($index, $label, $name, $checked, $value) {
-
-                        $return = '<label class="vs-radio-con">';
-                        /* -----> */ if ($checked)
-                            $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                        /* -----> */
-                        else
-                            $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                        $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
-                        $return .= '<span>' . ucwords($label) . '</span>';
-                        $return .= '</label>';
-
-                        return $return;
-                    }
-                ]);
-                ?>
-            </div>
 
             <div class="col-12 col-sm-6 col-lg-6">
-
-                <?=
-                $form->field($model, 'support_pick_up')->radioList([1 => 'Yes', 0 => 'No',], [
-                    'style' => 'display:grid',
-                    'item' => function($index, $label, $name, $checked, $value) {
-
-                        $return = '<label class="vs-radio-con">';
-                        /* -----> */ if ($checked)
-                            $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                        /* -----> */
-                        else
-                            $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                        $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
-                        $return .= '<span>' . ucwords($label) . '</span>';
-                        $return .= '</label>';
-
-                        return $return;
-                    }
-                ]);
-                ?>
-
+              <?= $form->field($model, 'country_id')->dropDownList($countryArray); ?>
             </div>
+
+
+            <div class="col-12 col-sm-6 col-lg-6">
+              <?= $form->field($model, 'currency_id', ['template' =>
+                               $madeAnySales  ? "
+                               {label} {input} {hint}  {error}
+                                    <p>
+                                        You've made your first sale, so you need to <a href='mailto:contact@plugn.io'>contact support</a> if you want to change your currency.
+                                    </p>"
+                              : '{label} {input} {hint}  {error}'
+            ])->dropDownList($currencyArray, ['disabled' => $madeAnySales ]); ?>
+          </div>
+
         </div>
 
+
         <div class="row">
             <div class="col-12 col-sm-6 col-lg-6">
-                <?= $form->field($model, 'phone_number')->input('number', ['id' => 'phoneNumberInput']) ?>
+                <?=
+                   $form->field($model, 'phone_number')->widget(PhoneInput::className(), [
+                      'jsOptions' => [
+                          'preferredCountries' => ['kw', 'sa', 'aed','qa','bh','om'],
+                          'initialCountry' => $model->country->iso
+                      ]
+                  ]);
+                ?>
             </div>
             <div class="col-12 col-sm-6 col-lg-6">
 
@@ -149,30 +142,40 @@ $this->registerJs($js);
             </div>
         </div>
 
+        <div class="row">
+            <div class="col-12 col-sm-6 col-lg-6">
+              <?= $form->field($model, 'schedule_order', [
+                  'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Schedule Order</span>{input}<label class='custom-control-label' for='scheduleOrder'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
+              ])->checkbox([
+                  'checked' => $model->schedule_order == 0 ? false : true,
+                  'id' => 'scheduleOrder',
+                  'class' => 'custom-control-input'
+                      ], false)->label(false)
+              ?>
+            </div>
 
-        <?= $form->field($model, 'schedule_order', [
-            'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Schedule Order</span>{input}<label class='custom-control-label' for='scheduleOrder'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
-        ])->checkbox([
-            'checked' => $model->schedule_order == 0 ? false : true,
-            'id' => 'scheduleOrder',
-            'class' => 'custom-control-input'
-                ], false)->label(false)
-        ?>
+            <div class="col-12 col-sm-6 col-lg-6">
+
+                  <?=
+                  $form->field($model, 'restaurant_email_notification', [
+                      'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Email notification</span>{input}<label class='custom-control-label' for='customSwitch1'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
+                  ])->checkbox([
+                      'checked' => $model->restaurant_email_notification == 0 ? false : true,
+                      'id' => 'customSwitch1',
+                      'class' => 'custom-control-input'
+                          ], false)->label(false)
+                  ?>
+
+          </div>
+
+        </div>
 
         <?=
         $form->field($model, 'schedule_interval')->textInput(['maxlength' => true, 'type' => 'number'])->label('Schedule Interval <span style="color: rgba(0,0,0,.45);">(Period in minutes)</span>') ?>
 
 
 
-        <?=
-        $form->field($model, 'restaurant_email_notification', [
-            'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Email notification</span>{input}<label class='custom-control-label' for='customSwitch1'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
-        ])->checkbox([
-            'checked' => $model->restaurant_email_notification == 0 ? false : true,
-            'id' => 'customSwitch1',
-            'class' => 'custom-control-input'
-                ], false)->label(false)
-        ?>
+
 
       </div>
       </div>

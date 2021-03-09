@@ -3,7 +3,7 @@ $(document).ready(function() {
 	// enable fileuploader plugin
 	var $fileuploader = $('input.gallery_media').fileuploader({
 		limit: 100,
-		fileMaxSize: 20,
+		fileMaxSize: 30,
 		extensions: ['image/*', 'video/*', 'audio/*'],
 		changeInput: ' ',
 		theme: 'gallery',

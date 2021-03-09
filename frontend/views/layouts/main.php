@@ -15,7 +15,7 @@ use yii\helpers\Url;
 
 DashboardAsset::register($this);
 
-$restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
+$restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->params['restaurant_uuid']])->one();
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -183,7 +183,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                 <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
 
 
-                    <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
+                    <?php if (Yii::$app->user->identity->isOwner($restaurant_model->restaurant_uuid)) { ?>
 
                         <li class=" nav-item <?= $this->context->route == 'site/vendor-dashboard' ? 'active' : '' ?> ">
 
@@ -280,6 +280,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                     </li>
 
 
+                    <?php if($restaurant_model->country_id = 84 && $restaurant_model->is_tap_enable) { ?>
 
                     <li class=" nav-item">
                         <a>
@@ -295,6 +296,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 )
                                 ?>
                             </li>
+
                             <li  <?= $this->context->route == 'bank-discount/index' ? 'class="active"' : '' ?>>
                                 <?=
                                 Html::a(
@@ -303,8 +305,20 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 )
                                 ?>
                             </li>
+
                         </ul>
                     </li>
+                  <?php } else { ?>
+                    <li  <?= $this->context->route == 'voucher/index' ? 'class="active"' : '' ?>>
+                        <?=
+                        Html::a(
+                                Html::tag('i', '', ['class' =>  'fa  fa-tags']) .
+                                Html::tag('span', 'Voucher'), ['voucher/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                        )
+                        ?>
+                    </li>
+                  <?php } ?>
+
 
                     <li class=" nav-item <?= $this->context->route == 'customer/index' ? 'active' : '' ?> ">
 
@@ -315,7 +329,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                         )
                         ?>
                     </li>
-                    <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
+                    <?php if (Yii::$app->user->identity->isOwner($restaurant_model->restaurant_uuid)) { ?>
 
                         <li class=" nav-item">
                             <a>
@@ -356,7 +370,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                             <span class="menu-title">Settings</span>
                         </a>
                         <ul class="menu-content" style="padding-left: 17px;">
-                            <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
+                            <?php if (Yii::$app->user->identity->isOwner($restaurant_model->restaurant_uuid)) { ?>
 
                                 <li class=" nav-item <?= $this->context->route == 'store/update' || $this->context->route == 'store/update' ? 'active' : '' ?> ">
                                     <?=
@@ -376,7 +390,20 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                     ?>
                                 </li>
 
-                                <li class=" nav-item <?= $this->context->route == 'site/connect-domain'  ? 'active' : '' ?> ">
+                              <?php if ($restaurant_model->version == 2) { ?>
+
+                                <li class=" nav-item <?= $this->context->route == 'business-location/index'  ? 'active' : '' ?> ">
+                                    <?=
+                                    Html::a(
+                                            Html::tag('i', '', ['class' => 'feather icon-circle']) .
+                                            Html::tag('span', 'Business Locations'), ['business-location/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                    )
+                                    ?>
+                                </li>
+                              <?php }  ?>
+
+
+                                <li class=" nav-item <?= $this->context->route == 'site/domains'  ? 'active' : '' ?> ">
                                     <?=
                                     Html::a(
                                             Html::tag('i', '', ['class' => 'feather icon-circle']) .
@@ -416,7 +443,8 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                             )
                                             ?>
                                         </li>
-                                        <li  <?= $this->context->route == 'store/update-delivery-integration' ? 'class="active"' : '' ?>>
+                                        <?php if($restaurant_model->country_id = 84) { ?>
+                                        <li  <?= $this->context->route == 'restaurant/update-delivery-integration' ? 'class="active"' : '' ?>>
                                             <?=
                                             Html::a(
                                                     Html::tag('i', '', ['class' => 'feather icon-circle']) .
@@ -424,6 +452,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                             )
                                             ?>
                                         </li>
+                                      <?php } ?>
                                     </ul>
                                 </li>
 
@@ -437,23 +466,7 @@ $restaurant_model = Restaurant::findOne($this->params['restaurant_uuid']);
                                 )
                                 ?>
                             </li>
-                            <li class=" nav-item <?= $this->context->route == 'restaurant-delivery/index' ? 'active' : '' ?> ">
-                                <?=
-                                Html::a(
-                                        Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'Delivery Zone'), ['restaurant-delivery/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
-                                )
-                                ?>
-                            </li>
-                            <li class=" nav-item <?= $this->context->route == 'restaurant-branch/index' ? 'active' : '' ?> ">
-                                <?=
-                                Html::a(
-                                        Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', "Store's Branches"), ['restaurant-branch/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
-                                )
-                                ?>
-                            </li>
-                            <?php if (AgentAssignment::isOwner($restaurant_model->restaurant_uuid)) { ?>
+                            <?php if (Yii::$app->user->identity->isOwner($restaurant_model->restaurant_uuid)) { ?>
                                 <li class=" nav-item <?= $this->context->route == 'agent-assignment/index' ? 'active' : '' ?> ">
 
                                     <?=

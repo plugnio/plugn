@@ -18,7 +18,6 @@ use common\components\FileUploader;
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 $this->title = 'Update Store design and layout';
-$this->params['breadcrumbs'][] = ['label' => 'Design & layout', 'url' => ['view-design-layout','storeUuid' =>$model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = 'Update design & layout';
 
 
@@ -37,7 +36,7 @@ $('#primaryColorInput').change(function(e){
 // enable fileuploader plugin
 $('input[class="upload-logo"]').fileuploader({
 	limit: 1,
-  fileMaxSize: 20,
+  fileMaxSize: 30,
 	extensions: ['image/*'],
 	addMore: true,
 	thumbnails: {
@@ -88,7 +87,7 @@ $('input[class="upload-logo"]').fileuploader({
 // enable fileuploader plugin
 $('input[class="upload-thumbnail"]').fileuploader({
 	limit: 1,
-  fileMaxSize: 20,
+  fileMaxSize: 30,
 	extensions: ['image/*'],
 	addMore: true,
 	thumbnails: {
@@ -230,10 +229,10 @@ $this->registerJs($js);
         <div class="row">
             <div class="col-12 col-sm-6 col-lg-6">
 
-                <div id="phoneNumberDisplay" <?= $model->phone_number ? "style = display:block " : "style = display:none " ?> >
+                <div>
                     <?=
                     $form->field($model, 'phone_number_display')->radioList(
-                            [2 => '📞', 3 => '+965 12345678', 1 => 'Dont show phone number button'], [
+                              [2 => "📞", 3 => '+965 12345678', 1 => 'Dont show phone number button'], [
                         'style' => 'display:grid',
                         'item' => function($index, $label, $name, $checked, $value) {
 
@@ -259,15 +258,6 @@ $this->registerJs($js);
 
                 <?php
 
-
-//                 if(
-// $model->restaurant_uuid == 'rest_b07610b9-bcbb-11ea-808a-0673128d0c9c' ||
-// $model->restaurant_uuid == 'rest_204f0963-e94f-11ea-808a-0673128d0c9c' ||
-// $model->restaurant_uuid == 'rest_d7f4f8b8-ebc7-11ea-808a-0673128d0c9c' ||
-// $model->restaurant_uuid == 'rest_d7f4f8b8-ebc7-11ea-808a-0673128d0c9c' ||
-// $model->restaurant_uuid == 'rest_c2aff830-ebd4-11ea-808a-0673128d0c9c' ||
-// $model->restaurant_uuid == 'rest_3afe275f-ebd4-11ea-808a-0673128d0c9c' ||
-//                   $model->restaurant_uuid == 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290' || $model->restaurant_uuid == 'rest_73100b93-cf41-11ea-808a-0673128d0c9c'){
                   echo  $form->field($model, 'store_layout')->radioList([
                               Restaurant::STORE_LAYOUT_LIST_FULLWIDTH => 'List - Fullwidth',
                               Restaurant::STORE_LAYOUT_GRID_FULLWIDTH  => 'Grid - Fullwidth',
@@ -292,33 +282,37 @@ $this->registerJs($js);
                                     return $return;
                                 },
                             ]);
-                // }
-
-                //  else {
-                //   echo $form->field($model, 'store_layout')->radioList([
-                //             Restaurant::STORE_LAYOUT_LIST_FULLWIDTH => 'List',
-                //             Restaurant::STORE_LAYOUT_GRID_FULLWIDTH  => 'Grid'
-                //           ], [
-                //               'style' => 'display:grid',
-                //               'item' => function($index, $label, $name, $checked, $value) {
-                //
-                //                   $return = '<label class="vs-radio-con">';
-                //                   /* -----> */ if ($checked)
-                //                       $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                //                   /* -----> */
-                //                   else
-                //                       $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                //                   $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
-                //                   $return .= '<span>' . ucwords($label) . '</span>';
-                //                   $return .= '</label>';
-                //
-                //                   return $return;
-                //               },
-                //           ]);
-                // }
                 ?>
             </div>
         </div>
+        <!-- <div class="row"> -->
+
+            <!-- <div class="col-12 col-sm-6 col-lg-6"> -->
+
+                <?php
+
+                  // echo  $form->field($model, 'default_language')->radioList([
+                  //              'en' =>     'English',
+                  //              'ar' => 'عربي'
+                  //           ], [
+                  //               'item' => function($index, $label, $name, $checked, $value) {
+                  //
+                  //                   $return = '<label class="vs-radio-con">';
+                  //                   /* -----> */ if ($checked)
+                  //                       $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                  //                   /* -----> */
+                  //                   else
+                  //                       $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                  //                   $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
+                  //                   $return .= '<span>' . ucwords($label) . '</span>';
+                  //                   $return .= '</label>';
+                  //
+                  //                   return $return;
+                  //               },
+                  //           ])->label("Choose your store's default language for your customers");
+                ?>
+            <!-- </div> -->
+        <!-- </div> -->
 
 
       </div>

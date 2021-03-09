@@ -66,12 +66,24 @@ class ItemController extends Controller
             'isMultipleSheet' => false,
             'models' => $model,
             'columns' => [
-                'item_name',
+                [
+                    'header' => 'Item name',
+                    "format" => "raw",
+                    "value" => function($data) {
+                      return $data->item_name;
+                    }
+                ],
                 'sku',
                 'barcode',
                 'stock_qty',
                 'unit_sold',
-                'item_price:currency'
+                [
+                    'attribute' => 'item_price',
+                    "format" => "raw",
+                    "value" => function($data) {
+                      return Yii::$app->formatter->asCurrency($data->item_price, $data->currency->code);
+                    }
+                ]
             ],
         ]);
     }
@@ -189,8 +201,8 @@ class ItemController extends Controller
 
         if ($model && $file_name) {
             $item_image = \common\models\ItemImage::find()->where(['item_uuid' => $itemUuid, 'product_file_name' => $file_name])->one();
-
-            $item_image->delete();
+            if($item_image)
+                $item_image->delete();
 
             return true;
         }

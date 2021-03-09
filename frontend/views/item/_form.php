@@ -6,6 +6,7 @@ use common\models\Category;
 use kartik\select2\Select2;
 use yii\helpers\ArrayHelper;
 use common\models\CategoryItem;
+use common\models\Item;
 use kartik\file\FileInput;
 use wbraganca\dynamicform\DynamicFormWidget;
 use common\models\ExtraOption;
@@ -45,7 +46,7 @@ trackQuantityInput.change(function(e){
 // enable fileuploader plugin
 $('input[class="item-upload"]').fileuploader({
 	limit:10,
-	fileMaxSize: 20,
+	fileMaxSize: 30,
 	extensions: ['image/*'],
 	addMore: true,
 	thumbnails: {
@@ -147,6 +148,15 @@ $this->registerJs($js);
 
             <?= $form->field($modelItem, 'sort_number')->textInput(['type' => 'number']) ?>
 
+						<?= $form->field($modelItem, 'prep_time')->textInput(['type' => 'number']) ; ?>
+
+						<?= $form->field($modelItem, 'prep_time_unit')->dropDownList(
+										[
+												Item::TIME_UNIT_MIN => 'Minutes',
+												Item::TIME_UNIT_HRS => 'Hours',
+												Item::TIME_UNIT_DAY => 'Days'
+										],['value' => $modelItem->prep_time_unit ? $modelItem->prep_time_unit : Item::TIME_UNIT_DAY ]
+						)->label(''); ?>
 
         </div>
 
@@ -165,7 +175,7 @@ $this->registerJs($js);
             // add files to our array with
             // made to use the correct structure of a file
             foreach ($uploadsFiles as $file_name) {
-                $file_location = "https://res.cloudinary.com/plugn/image/upload/restaurants/" . $modelItem->restaurant->restaurant_uuid . "/items/" . $file_name;
+                $file_location = "https://res.cloudinary.com/plugn/image/upload/restaurants/" . $modelItem->restaurant_uuid . "/items/" . $file_name;
 
                 // add file to our array
                 // !important please follow the structure below
@@ -213,7 +223,7 @@ $this->registerJs($js);
             <?=
             $form->field($modelItem, 'item_price', [
                 'template' => "{label}"
-                . "<div class='input-group'> <div class='input-group-prepend'> <span class='input-group-text'>KWD</span> </div>{input}"
+                . "<div class='input-group'> <div class='input-group-prepend'> <span class='input-group-text'>" . $modelItem->currency->code . " </span> </div>{input}"
                 . "</div>"
                 . "{error}{hint}"
             ])->textInput([

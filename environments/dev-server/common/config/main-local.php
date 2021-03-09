@@ -7,7 +7,13 @@ return [
             'dsn' => 'mysql:host=localhost;dbname=plugn',
             'username' => 'root',
             'password' => 'saoud',
-            'charset' => 'utf8',
+            'charset' => 'utf8mb4',
+            // Enable Caching of Schema to Reduce SQL Queries
+            'enableSchemaCache' => true,
+            // Duration of schema cache.
+            'schemaCacheDuration' => 60, // 1 minute
+            // Name of the cache component used to store schema information
+            'schemaCache' => 'cache',
         ],
         'log' => [
             'targets' => [
@@ -37,6 +43,14 @@ return [
                 ],
             ],
         ],
+        // 'mailer' => [
+        //          'class' => 'yii\swiftmailer\Mailer',
+        //          'viewPath' => '@common/mail',
+        //          // send all mails to a file by default. You have to set
+        //          // 'useFileTransport' to false and configure a transport
+        //          // for the mailer to send real emails.
+        //          'useFileTransport' => true,
+        // ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             'viewPath' => '@common/mail',

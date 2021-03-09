@@ -146,11 +146,14 @@ class Payment extends \yii\db\ActiveRecord {
         // If there's an error from TAP, exit and display error
         if (isset($responseContent->errors)) {
 
-            $errorMessage = "Error from TAP: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
+            $errorMessage = "[Error from TAP]" . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description  . ' - Store Name: ' . $paymentRecord->restaurant->name . ' - Order Uuid: ' . $paymentRecord->order_uuid;
             \Yii::error($errorMessage, __METHOD__); // Log error faced by user
             \Yii::$app->getSession()->setFlash('error', $errorMessage);
             return $paymentRecord;
         }
+
+
+        $currentPaymentStatus = $paymentRecord->payment_current_status;
 
         $paymentRecord->payment_current_status = $responseContent->status; // 'CAPTURED' ?
         $paymentRecord->response_message = $responseContent->response->message;
@@ -172,12 +175,30 @@ class Payment extends \yii\db\ActiveRecord {
             }
 
             // Creditcard Gateway Fee Calculation
-            if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_VISA_MASTERCARD) {
+            else if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_VISA_MASTERCARD) {
 
                 if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage) > Yii::$app->tapPayments->minCreditcardGatewayFee)
                     $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage;
                 else
                     $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minCreditcardGatewayFee;
+            }
+
+            // Mada Gateway Fee Calculation
+            else if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_MADA) {
+
+                if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->madaGatewayFee) > Yii::$app->tapPayments->minMadaGatewayFee)
+                    $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->madaGatewayFee;
+                else
+                    $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->madaGatewayFee;
+            }
+
+            // BENEFIT Gateway Fee Calculation
+            else if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_BENEFIT) {
+
+                if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->benefitGatewayFee) > Yii::$app->tapPayments->minBenefitGatewayFee)
+                    $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->benefitGatewayFee;
+                else
+                    $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->benefitGatewayFee;
             }
 
 
@@ -194,11 +215,12 @@ class Payment extends \yii\db\ActiveRecord {
               $paymentRecord->payment_gateway_order_id = $responseContent->reference->payment;
 
             // Net amount after deducting gateway fee
-            $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee;
+            $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee;
+
         }else {
             Yii::info('[TAP Payment Issue > ' . $paymentRecord->customer->customer_name . ']'
                     . $paymentRecord->customer->customer_name .
-                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) .
+                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) .
                     ' and has failed at gateway. Maybe card issue.', __METHOD__);
 
             Yii::info('[Response from TAP for Failed Payment] ' .
@@ -211,8 +233,8 @@ class Payment extends \yii\db\ActiveRecord {
             throw new \Exception($errorMessage);
         }
 
-        if ($showUpdatedFlashNotification)
-            Yii::$app->session->setFlash('success', 'Updated payment status');
+        // if ($showUpdatedFlashNotification)
+        //     Yii::$app->session->setFlash('success', 'Updated payment status');
 
         return $paymentRecord;
     }
@@ -221,10 +243,14 @@ class Payment extends \yii\db\ActiveRecord {
         parent::afterSave($insert, $changedAttributes);
 
 
-        if ($this->payment_current_status == 'CAPTURED' && $this->received_callback){
-          $this->order->changeOrderStatusToPending();
-          $this->order->sendPaymentConfirmationEmail();
-        }
+        if( !$insert  && (isset($changedAttributes['received_callback']) && $changedAttributes['received_callback'] == 0  && $this->payment_current_status == 'CAPTURED' && $this->received_callback) ) {
+
+            $this->order->changeOrderStatusToPending();
+            $this->order->sendPaymentConfirmationEmail();
+
+            Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $this->order->payment_method_name, __METHOD__);
+
+          }
     }
 
     /**
@@ -255,6 +281,16 @@ class Payment extends \yii\db\ActiveRecord {
      */
     public function getRestaurant() {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * Gets query for [[Currency]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
     }
 
 }

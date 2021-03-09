@@ -11,6 +11,7 @@ use yii\grid\GridView;
 $this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
 $this->title = 'Dashboard';
 
+$currencyCode = $restaurant_model->currency->code;
 
 $js = "
  $(document).ready(function(){
@@ -23,12 +24,14 @@ $js = "
 $this->registerJs($js);
 ?>
 
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
 
 <!-- <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script> -->
 <script type="text/javascript">
 
+    var currency_code = "<?= $currencyCode ?>";
 
     $(window).on('load', function () {
 
@@ -216,6 +219,11 @@ $this->registerJs($js);
                     padding: {left: 0, right: 0},
                 }],
             tooltip: {
+                y: {
+                  formatter: function (val) {
+                    return val + ' ' + currency_code ;
+                  }
+                },
                 x: {show: false}
             },
         }
@@ -366,7 +374,7 @@ $this->registerJs($js);
 <section id="tutorial-card">
 
 
-  <?php if( !$restaurant_model->is_tap_enable ){ ?>
+  <?php if( !$restaurant_model->tap_queue_id && !$restaurant_model->is_tap_enable ){ ?>
 
   <div class="card">
       <div class="card-body">
@@ -569,10 +577,7 @@ $this->registerJs($js);
                     </div>
                     <div style="  margin-bottom: 0.5rem;  margin-top: 1rem !important;">
                         <h2 style="  display: contents;" class="text-bold-700 mt-1 number-of-revenue-generated">
-                            <?= number_format($number_of_all_revenue_generated_this_week, 3); ?>
-                        </h2>
-                        <h2 style="  display: contents;">
-                            KWD
+                            <?= Yii::$app->formatter->asCurrency($number_of_all_revenue_generated_this_week, $currencyCode, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
                         </h2>
                     </div>
                     <p class="mb-0">Revenue Generated</p>
@@ -678,7 +683,9 @@ $this->registerJs($js);
                                 <i class="feather icon-credit-card text-success font-medium-5"></i>
                             </div>
                         </div>
-                        <h2 class="text-bold-700">  <?= Yii::$app->formatter->asCurrency($today_revenue_generated, 'KWD', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 5]) ?></h2>
+                        <h2 class="text-bold-700">
+                          <?= Yii::$app->formatter->asCurrency($today_revenue_generated, $currencyCode, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
+                        </h2>
                         <p class="mb-0 line-ellipsis">Today's Revenue Generated</p>
                     </div>
                 </div>

@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use Yii;
 use common\models\Order;
 use common\models\Refund;
+use common\models\AreaDeliveryZone;
 use common\models\RefundedItem;
 use frontend\models\OrderSearch;
 use yii\web\Controller;
@@ -14,6 +15,7 @@ use common\models\Customer;
 use common\models\Restaurant;
 use common\models\Payment;
 use common\models\PaymentMethod;
+use common\models\BusinessLocation;
 use kartik\mpdf\Pdf;
 use yii\helpers\Html;
 use yii\base\Model;
@@ -59,6 +61,7 @@ class OrderController extends Controller {
         $searchModel = new OrderSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
 
+
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
@@ -83,13 +86,11 @@ class OrderController extends Controller {
 
 
             $searchResult = Order::find()
-                    ->where(['restaurant_uuid' => $store_model->restaurant_uuid])
+                    ->activeOrders($storeUuid)
+                    ->with('voucher')
                     ->andWhere(['between', 'order_created_at', $start_date, $end_date])
-                    ->andWhere([ '!=' , 'order_status' , Order::STATUS_DRAFT])
-                    ->andWhere([ '!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
                     ->orderBy(['order_created_at' => SORT_ASC])
                     ->all();
-
 
             header('Access-Control-Allow-Origin: *');
             header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -114,13 +115,7 @@ class OrderController extends Controller {
                             return $data->customer_name;
                         },
                     ],
-                    [
-                        'attribute' => 'customer_phone_number',
-                        'format' => 'raw',
-                        'value' => function ($data) {
-                            return $data->customer_phone_number;
-                        },
-                    ],
+                    'customer_phone_number',
                     [
                         'attribute' => 'order_status',
                         "format" => "raw",
@@ -138,8 +133,28 @@ class OrderController extends Controller {
                                 return $data->paymentMethod->payment_method_name;
                         },
                     ],
-                    'total_price_before_refund:currency',
-                    'delivery_fee:currency',
+                    [
+                        'attribute' => 'Voucher Code',
+                        "format" => "raw",
+                        "value" => function($data) {
+                            if ($data->voucher_id)
+                                return $data->voucher->code;
+                            else
+                                return '';
+                        },
+                    ],
+                    [
+                        'attribute' => 'total_price',
+                        "value" => function($data) {
+                          return \Yii::$app->formatter->asCurrency($data->total_price, 'KWD');
+                        },
+                    ],
+                    [
+                        'attribute' => 'delivery_fee',
+                        "value" => function($data) {
+                          return \Yii::$app->formatter->asCurrency($data->delivery_fee, 'KWD');
+                        },
+                    ],
                     'order_created_at'
                 ]
             ]);
@@ -307,13 +322,13 @@ class OrderController extends Controller {
      * @param type $status
      * @return type
      */
-     public function actionChangeOrderStatus($order_uuid, $storeUuid, $status) {
+     public function actionChangeOrderStatus($order_uuid, $storeUuid, $status, $redirect = null) {
          $order_model = $this->findModel($order_uuid, $storeUuid);
 
          $previousOrderStatus =  $order_model->order_status;
 
          $order_model->order_status = $status;
-         
+
          if($order_model->save(false)){
 
            if($previousOrderStatus == Order::STATUS_DRAFT && $order_model->order_status == Order::STATUS_PENDING){
@@ -321,7 +336,11 @@ class OrderController extends Controller {
            }
          }
 
-         return $this->redirect(['view', 'id' => $order_model->order_uuid, 'storeUuid' => $storeUuid]);
+         if($redirect)
+          return $this->redirect(['index', 'storeUuid' => $storeUuid]);
+
+         else
+            return $this->redirect(['view', 'id' => $order_model->order_uuid, 'storeUuid' => $storeUuid]);
      }
 
     /**
@@ -337,20 +356,19 @@ class OrderController extends Controller {
 
         // Item
         $orderItems = new \yii\data\ActiveDataProvider([
-            'query' => $order_model->getOrderItems(),
+            'query' => $order_model->getOrderItems()->with(['currency']),
             'sort' => false,
         ]);
 
         // Item extra optn
-        $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
-            'query' => $order_model->getOrderItemExtraOptions()
-        ]);
+        // $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
+        //     'query' => $order_model->getOrderItemExtraOptions()
+        // ]);
 
 
         return $this->render('invoice', [
                     'model' => $order_model,
-                    'orderItems' => $orderItems,
-                    'itemsExtraOpitons' => $itemsExtraOpitons,
+                    'orderItems' => $orderItems
         ]);
     }
 
@@ -362,27 +380,25 @@ class OrderController extends Controller {
      */
     public function actionView($id, $storeUuid) {
 
-        $order_model = $this->findModel($id, $storeUuid);
-
-
+        $order_model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->with(['currency','country','deliveryZone.country','pickupLocation','deliveryZone.businessLocation'])->one();
 
         // Item
         $orderItems = new \yii\data\ActiveDataProvider([
-            'query' => $order_model->getOrderItems(),
+            'query' => $order_model->getOrderItems()->with(['orderItemExtraOptions','item','currency']),
             'sort' => false,
             'pagination' => false
         ]);
 
         // Item extra optn
-        $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
-            'query' => $order_model->getOrderItemExtraOptions(),
-            'pagination' => false
-        ]);
+        // $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
+        //     'query' => $order_model->getOrderItemExtraOptions(),
+        //     'pagination' => false
+        // ]);
 
         return $this->render('view', [
                     'model' => $order_model,
-                    'orderItems' => $orderItems,
-                    'itemsExtraOpitons' => $itemsExtraOpitons
+                    'storeUuid' => $storeUuid,
+                    'orderItems' => $orderItems
         ]);
     }
 
@@ -402,8 +418,11 @@ class OrderController extends Controller {
         $model->is_order_scheduled = 0;
 
         if ($model->load(Yii::$app->request->post())) {
-            $model->payment_method_id = 3;
+            // $model->payment_method_id = 3;
 
+        if($model->order_mode == Order::ORDER_MODE_DELIVERY){
+          $model->delivery_zone_id = AreaDeliveryZone::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid, 'area_id' => $model->area_id])->one()->delivery_zone_id ;
+        }
 
 
         // order's Item
@@ -413,13 +432,9 @@ class OrderController extends Controller {
 
 
 
-            if ($model->validate() && $model->save()) {
-                return $this->render('update', [
-                            'model' => $model,
-                            'ordersItemDataProvider' => $ordersItemDataProvider,
-                            'restaurant_model' => $restaurant_model
-                ]);
-            }
+        if ($model->validate() && $model->save())
+            return $this->redirect(['update', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid]);
+
         }
 
         return $this->render('create', [
@@ -427,6 +442,7 @@ class OrderController extends Controller {
                     'restaurant_model' => $restaurant_model
         ]);
     }
+
 
     /**
      * Updates an existing Order model.
@@ -441,6 +457,7 @@ class OrderController extends Controller {
 
         $model = $this->findModel($id, $storeUuid);
         $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
+
 
         // order's Item
         $ordersItemDataProvider = new \yii\data\ActiveDataProvider([
@@ -534,7 +551,7 @@ class OrderController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id, $storeUuid) {
-        if (($model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->one()) !== null) {
+        if (($model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->with(['restaurant','currency','country','deliveryZone.country'])->one()) !== null) {
             return $model;
         }
 
