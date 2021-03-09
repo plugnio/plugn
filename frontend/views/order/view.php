@@ -513,7 +513,15 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                         <tbody>
                             <tr>
                                 <td colspan="2">Subtotal After Voucher</td>
-                                <td style="float: right;"><?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
+                                <td style="float: right;">
+                                  <?php
+
+                                  $subtotalAfterDiscount = $subtotalAfterDiscount > 0 ?  $subtotalAfterDiscount : 0;
+
+                                  echo Yii::$app->formatter->asCurrency($subtotalAfterDiscount, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3])
+
+                                  ?>
+                                </td>
                             </tr>
                         </tbody>
                         <?php
@@ -530,7 +538,14 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                                 <tbody>
                                     <tr>
                                         <td colspan="2">Subtotal After Bank Discount</td>
-                                        <td style="float: right;"><?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
+                                        <td style="float: right;">
+                                          <?php
+
+                                            $subtotalAfterDiscount = $subtotalAfterDiscount > 0 ? $subtotalAfterDiscount : 0;
+
+                                            echo Yii::$app->formatter->asCurrency($subtotalAfterDiscount, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3])
+                                          ?>
+                                        </td>
                                     </tr>
                                 </tbody>
                             <?php }
@@ -561,13 +576,14 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
     <?php } ?>
 
 
-
+                  <?php if ($model->tax > 0) { ?>
                     <tbody>
                         <tr>
                             <td colspan="2">Tax</td>
                             <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->tax, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
                         </tr>
                     </tbody>
+                    <?php } ?>
 
 
                     <tbody>

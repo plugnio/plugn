@@ -218,12 +218,22 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                     </tr>
                                     <tr>
                                         <th>Subtotal After Voucher</th>
-                                        <td><?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
+                                        <td>
+                                          <?php
+                                            $subtotalAfterDiscount = $subtotalAfterDiscount > 0 ? $subtotalAfterDiscount : 0;
+
+                                            echo Yii::$app->formatter->asCurrency($subtotalAfterDiscount, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3])
+                                          ?>
+                                        </td>
                                     </tr>
                                     <?php
                                 } else if ($model->bank_discount_id != null && $model->bank_discount_id) {
                                     $bankDiscount = $model->bankDiscount->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ? ($model->subtotal * ($model->bankDiscount->discount_amount / 100)) : $model->bankDiscount->discount_amount;
                                     $subtotalAfterDiscount = $model->subtotal - $bankDiscount;
+
+                                    $subtotalAfterDiscount = $subtotalAfterDiscount > 0 ? $subtotalAfterDiscount : 0;
+
+
                                     ?>
                                     <tr>
                                         <th>Bank Discount</th>
@@ -258,7 +268,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                 <?php } ?>
 
                             <?php } ?>
-                            <?php if ($model->tax) { ?>
+                            <?php if ($model->tax > 0) { ?>
                             <tr>
                                 <th>Tax</th>
                                 <td><?= Yii::$app->formatter->asCurrency($model->tax, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
