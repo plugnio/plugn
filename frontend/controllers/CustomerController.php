@@ -66,22 +66,22 @@ class CustomerController extends Controller {
        * If creation is successful, the browser will be redirected to the 'view' page.
        * @return mixed
        */
-      public function actionCreate($storeUuid)
-      {
-          $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
-
-          $model = new Customer();
-          $model->setScenario(Customer::SCENARIO_CREATE_ORDER_BY_AGENT);
-          $model->restaurant_uuid = $storeUuid;
-
-          if ($model->load(Yii::$app->request->post()) && $model->save()) {
-              return $this->redirect(['view', 'id' => $model->customer_id,'storeUuid' => $storeUuid]);
-          }
-
-          return $this->render('create', [
-              'model' => $model,
-          ]);
-      }
+      // public function actionCreate($storeUuid)
+      // {
+          // $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+          //
+          // $model = new Customer();
+          // $model->setScenario(Customer::SCENARIO_CREATE_ORDER_BY_AGENT);
+          // $model->restaurant_uuid = $storeUuid;
+          //
+          // if ($model->load(Yii::$app->request->post()) && $model->save()) {
+          //     return $this->redirect(['view', 'id' => $model->customer_id,'storeUuid' => $storeUuid]);
+          // }
+          //
+          // return $this->render('create', [
+          //     'model' => $model,
+          // ]);
+      // }
 
 
       /**
