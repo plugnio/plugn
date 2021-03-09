@@ -588,7 +588,7 @@ class CronController extends \yii\console\Controller {
           $stores = Restaurant::find()
                   ->where(['sitemap_require_update' => 1])
                   ->andWhere(['version' => 2])
-                  ->andWhere(['!=', 'restaurant.restaurant_uuid', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])
+                  ->andWhere(['!=', 'restaurant_uuid', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])
                   ->all();
 
 
