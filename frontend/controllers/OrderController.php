@@ -421,7 +421,10 @@ class OrderController extends Controller {
             // $model->payment_method_id = 3;
 
         if($model->order_mode == Order::ORDER_MODE_DELIVERY){
-          $model->delivery_zone_id = AreaDeliveryZone::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid, 'area_id' => $model->area_id])->one()->delivery_zone_id ;
+
+          if($areaDeliveryZone = AreaDeliveryZone::find() ->where([ 'restaurant_uuid' => $restaurant_model->restaurant_uuid, 'area_id' => $model->area_id ])->one())
+             $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
+
         }
 
 
