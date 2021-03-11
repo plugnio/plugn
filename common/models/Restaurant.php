@@ -196,6 +196,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['not_for_profit'], 'number'],
             [['authorized_signature_issuing_date', 'authorized_signature_expiry_date', 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             ['owner_email', 'email'],
+            ['iban', 'safe'],
             [
                 [
                     'business_type', 'vendor_sector', 'license_number',
