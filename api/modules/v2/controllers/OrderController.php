@@ -113,13 +113,13 @@ class OrderController extends Controller {
                 $order->house_number = Yii::$app->request->getBodyParam("house_number");
 
 
-                if( Yii::$app->request->getBodyParam("floor") && ($order->unit_type == 'Apartment' || $order->unit_type == 'Office' ) )
+                if( Yii::$app->request->getBodyParam("floor") != null && ($order->unit_type == 'Apartment' || $order->unit_type == 'Office' ) )
                   $order->floor = Yii::$app->request->getBodyParam("floor");
 
-                if( Yii::$app->request->getBodyParam("apartment") && $order->unit_type == 'Apartment' )
+                if( Yii::$app->request->getBodyParam("apartment") != null && $order->unit_type == 'Apartment' )
                   $order->apartment = Yii::$app->request->getBodyParam("apartment");
 
-                if( Yii::$app->request->getBodyParam("office") && $order->unit_type == 'Office' )
+                if( Yii::$app->request->getBodyParam("office") != null && $order->unit_type == 'Office' )
                   $order->office = Yii::$app->request->getBodyParam("office");
 
               }
