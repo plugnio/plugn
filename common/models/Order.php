@@ -25,7 +25,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property int|null $shipping_country_id
  * @property string|null $country_name
  * @property string|null $country_name_ar
- * @property string|null business_location_name
+ * @property string|null $business_location_name
  * @property string|null $floor
  * @property string|null $apartment
  * @property string|null $office
@@ -863,8 +863,7 @@ class Order extends \yii\db\ActiveRecord {
 
             if($this->deliveryZone->business_location_id)
               $this->business_location_name = $this->deliveryZone->businessLocation->business_location_name;
-          }
-
+          } 
       } else if (!$insert && $this->order_mode == Order::ORDER_MODE_PICK_UP){
         if ($this->pickup_location_id){
           $this->country_name = $this->pickupLocation->country->country_name;

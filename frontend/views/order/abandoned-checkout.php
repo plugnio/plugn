@@ -75,7 +75,7 @@ $this->registerJs($js);
                     'attribute' => 'customer_phone_number',
                     "format" => "raw",
                     "value" => function($model) {
-                      return '<a href="tel:'. $model->customer_phone_number .'"> '. str_replace(' ', '', $model->customer_phone_number) .' </a>';                      
+                      return '<a href="tel:'. $model->customer_phone_number .'"> '. str_replace(' ', '', $model->customer_phone_number) .' </a>';
                     }
                 ],
                 [
@@ -111,8 +111,6 @@ $this->registerJs($js);
     <!-- DataTable ends -->
 
   <?php } else {?>
-
-
 
     <div class="card">
       <div style="padding: 70px 0; text-align: center;">

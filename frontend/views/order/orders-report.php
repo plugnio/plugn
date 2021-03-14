@@ -83,9 +83,7 @@ $this->registerJs($js);
           </div>
 
 
-
           <?php ActiveForm::end(); ?>
-
 
 
       </div>

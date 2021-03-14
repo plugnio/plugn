@@ -35,11 +35,6 @@ $this->registerJs($js);
     </div>
 
 
-    <?php
-    // echo $this->render('_search', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]);
-    ?>
-
-
     <!-- DataTable starts -->
     <div class="table-responsive">
 

@@ -40,7 +40,7 @@ class CronController extends \yii\console\Controller {
     public function actionTest(){
 
       $orders = Order::find()
-                ->with(['deliveryZone','deliveryZone.country', 'pickupLocation', 'pickupLocation.country'])
+                ->with(['deliveryZone','deliveryZone.country', 'pickupLocation', 'pickupLocation.country', 'area', 'area.country'])
                 ->all();
 
 
@@ -52,7 +52,16 @@ class CronController extends \yii\console\Controller {
               $order->country_name =  $order->deliveryZone->country->country_name;
               $order->country_name_ar =  $order->deliveryZone->country->country_name_ar;
               $order->save(false);
+            } else if( !$order->delivery_zone_id ){
+
+              if($order->area_id){
+                $order->country_name = $order->area->country->country_name;
+                $order->country_name_ar = $order->area->country->country_name_ar;
+                $order->save(false);
+              }
+
             }
+
 
         } else {
 
