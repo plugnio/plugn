@@ -279,10 +279,10 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                             },
                         ],
                         [
-                            'label' => 'Branch',
+                            'attribute' => 'business_location_name',
                             "format" => "raw",
                             "value" => function($model) {
-                                return $model->order_mode == Order::ORDER_MODE_DELIVERY ? ($model->delivery_zone_id ? $model->deliveryZone->businessLocation->business_location_name : '(not set)') : $model->pickupLocation->business_location_name;
+                               return $model->business_location_name ? $model->business_location_name : '';
                             }
                         ],
                         [
@@ -830,8 +830,7 @@ DetailView::widget([
                             'format' => 'html',
                             'value' => function ($data) {
                                 return $data->floor;
-                            },
-                            'visible' => $model->area_id && $model->floor && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? true : false,
+                            }
                         ],
                         [
                             'label' => 'Office No.',
@@ -868,17 +867,8 @@ DetailView::widget([
                             'label' => 'Country',
                             'format' => 'html',
                             'value' => function ($data) {
-                                return  $data->country_name ? $data->country_name  :
-                                 ( $data->order_mode == 1 ? ($data->delivery_zone_id && $data->deliveryZone->country ? $data->deliveryZone->country->country_name : '(not set)') : ($data->pickupLocation && $data->pickupLocation->country ? $data->pickupLocation->country->country_name : '(not set)'));
+                                return  $data->country_name ? $data->country_name  : '(not set)';
                             }
-                        ],
-                        [
-                            'label' => 'Pickup from',
-                            'format' => 'html',
-                            'value' => function ($data) {
-                              return  $data->pickupLocation ?  $data->pickupLocation->business_location_name : '(not set)';
-                            },
-                            'visible' => $model->order_mode == Order::ORDER_MODE_PICK_UP,
                         ],
                         [
                             'attribute' => 'special_directions',

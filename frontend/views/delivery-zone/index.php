@@ -76,17 +76,17 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
 
       <div class="card" style="position:relative">
 
-        <?php
-          // Html::a('Delete',
-          // ['delete', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
-          // [
-          //   'style' => ' position: absolute; top: 10px; right: 10px; color:#EA5455',
-          //   'data' => [
-          //       'confirm' => 'Are you sure you want to delete this delivery zone?',
-          //       'method' => 'post',
-          //   ]
-          // ],
-          // )
+        <?=
+          Html::a('Delete',
+          ['delete', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
+          [
+            'style' => ' position: absolute; top: 10px; right: 10px; color:#EA5455',
+            'data' => [
+                'confirm' => 'Are you sure you want to delete this delivery zone?',
+                'method' => 'post',
+            ]
+          ],
+          )
         ?>
 
 

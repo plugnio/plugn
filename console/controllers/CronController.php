@@ -37,6 +37,42 @@ use yii\db\Expression;
 class CronController extends \yii\console\Controller {
 
 
+    public function actionTest(){
+
+      $orders = Order::find()
+                ->with(['deliveryZone','deliveryZone.country', 'pickupLocation', 'pickupLocation.country'])
+                ->all();
+
+
+      foreach ($orders as $key => $order) {
+        if(  $order->order_mode == Order::ORDER_MODE_DELIVERY ){
+
+            if($order->delivery_zone_id && $order->deliveryZone->business_location_id ){
+              $order->business_location_name = $order->deliveryZone->businessLocation->business_location_name;
+              $order->country_name =  $order->deliveryZone->country->country_name;
+              $order->country_name_ar =  $order->deliveryZone->country->country_name_ar;
+              $order->save(false);
+            }
+
+        } else {
+
+          if ($order->pickup_location_id){
+            $order->business_location_name = $order->pickupLocation->business_location_name;
+            $order->country_name = $order->pickupLocation->country->country_name;
+            $order->country_name_ar = $order->pickupLocation->country->country_name_ar;
+            $order->save(false);
+          }
+
+        }
+
+      }
+
+
+
+    }
+
+
+
     public function actionQatar(){
       $jsonString = file_get_contents('qatar.json');
       $data = json_decode($jsonString, true);
