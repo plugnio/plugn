@@ -74,13 +74,13 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                         <?= $model->area_id && $model->avenue ? 'Avenue: ' . $model->avenue : ''; ?>
                       </span>
                       <span style="display: block" >
-                        <?= $model->area_id && $model->floor && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? 'Floor: ' . $model->floor : ''?>
+                        <?= $model->area_id && $model->floor != null && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? 'Floor: ' . $model->floor : ''?>
                       </span>
                       <span style="display: block" >
-                        <?=  $model->area_id && $model->apartment && $model->unit_type == 'Apartment' ? 'Apartment No. ' . $model->apartment : ''?>
+                        <?=  $model->area_id && $model->apartment != null && $model->unit_type == 'Apartment' ? 'Apartment No. ' . $model->apartment : ''?>
                       </span>
                       <span style="display: block" >
-                        <?=  $model->area_id && $model->office && $model->unit_type == 'Office'  ? 'Office No. ' . $model->office : ''?>
+                        <?=  $model->area_id && $model->office != null && $model->unit_type == 'Office'  ? 'Office No. ' . $model->office : ''?>
                       </span>
                       <span style="display: block" >
                         <?= $model->area_id ? ($model->unit_type == 'House' ? 'House No. ' : 'Building: ') . $model->house_number :  ''  ?>
