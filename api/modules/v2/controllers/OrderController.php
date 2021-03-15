@@ -334,55 +334,6 @@ class OrderController extends Controller {
                           Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
 
 
-                          //Convert to BHD
-                          // if($order->currency->code != 'BHD' && $order->paymentMethod->source_id == TapPayments::GATEWAY_BENEFIT){
-                          //
-                          //   $convertAmountToBHDCurrency = Yii::$app->tapPayments->createDCC('KWD',$order->total_price);
-                          //
-                          //   if($convertAmountToBHDCurrency->isOk){
-                          //
-                          //       $totalPriceInBhd =  (float) $convertAmountToBHDCurrency->data['to'][0]['value'];
-                          //
-                          //       $response = Yii::$app->tapPayments->createCharge(
-                          //               'BHD',
-                          //               "Order placed from: " . $order->customer_name, // Description
-                          //                $order->restaurant->name, //Statement Desc.
-                          //                $payment->payment_uuid, // Reference
-                          //                $totalPriceInBhd,
-                          //                $order->customer_name,
-                          //                $order->customer_email,
-                          //                $order->customer_phone_country_code,
-                          //                $order->customer_phone_number,
-                          //                $order->restaurant->platform_fee,
-                          //                Url::to(['order/callback'], true),
-                          //               $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id,
-                          //               $order->restaurant->warehouse_fee
-                          //       );
-                          //
-                          //   } else {
-                          //     Yii::error('[Error when converting to BHD Currency]' . json_decode($convertAmountToBHDCurrency->data) . ' orderCurrency: '. $order->currency->code, __METHOD__);
-                          //     // Yii::error('[Error when converting to BHD Currency]' . json_encode($convertAmountToBHDCurrency->data) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
-                          //   }
-                          // } else {
-                          //   Yii::error('[Error when converting to BHD Currency]111' , __METHOD__);
-                          //
-                          //   $response = Yii::$app->tapPayments->createCharge(
-                          //           $order->currency->code,
-                          //           "Order placed from: " . $order->customer_name, // Description
-                          //           $order->restaurant->name, //Statement Desc.
-                          //           $payment->payment_uuid, // Reference
-                          //           $order->total_price,
-                          //            $order->customer_name,
-                          //            $order->customer_email,
-                          //            $order->customer_phone_country_code,
-                          //            $order->customer_phone_number,
-                          //            $order->restaurant->platform_fee,
-                          //            Url::to(['order/callback'], true),
-                          //           $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id,
-                          //           $order->restaurant->warehouse_fee
-                          //   );
-                          // }
-
 
                           $response = Yii::$app->tapPayments->createCharge(
                                   $order->currency->code,
@@ -539,7 +490,7 @@ class OrderController extends Controller {
      * @return type
      */
     public function actionOrderDetails($id, $restaurant_uuid) {
-        $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->with('restaurant', 'orderItems', 'restaurantBranch', 'payment')->asArray()->one();
+        $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->with('orderItems', 'payment')->asArray()->one();
 
 
         if (!$model) {
@@ -561,22 +512,22 @@ class OrderController extends Controller {
      * @param type $restaurant_uuid
      * @return type
      */
-    public function actionGetOrderDetails($id, $restaurant_uuid) {
-        $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->one();
-
-
-        if (!$model) {
-            return [
-                'operation' => 'error',
-                'message' => 'Invalid order uuid'
-            ];
-        }
-
-        return [
-            'operation' => 'success',
-            'body' => $model
-        ];
-    }
+    // public function actionGetOrderDetails($id, $restaurant_uuid) {
+    //     $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->one();
+    //
+    //
+    //     if (!$model) {
+    //         return [
+    //             'operation' => 'error',
+    //             'message' => 'Invalid order uuid'
+    //         ];
+    //     }
+    //
+    //     return [
+    //         'operation' => 'success',
+    //         'body' => $model
+    //     ];
+    // }
 
     /**
      * Whether is valid promo code or no

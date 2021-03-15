@@ -56,13 +56,13 @@ class PaymentController extends Controller {
     /**
      *  Return Payment details
      */
-    public function actionPaymentDetail($id) {
-
-        $model = Payment::find()->where(['payment_uuid' => $id])->with('order')->asArray()->one();
-
-        return $model;
-    }
-
+    // public function actionPaymentDetail($id) {
+    //
+    //     $model = Payment::find()->where(['payment_uuid' => $id])->with('order')->asArray()->one();
+    //
+    //     return $model;
+    // }
+    //
 
 
     /**

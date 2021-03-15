@@ -810,6 +810,9 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset($fields['operator_id']);
         unset($fields['live_api_key']);
         unset($fields['test_api_key']);
+        unset($fields['live_public_key']);
+        unset($fields['test_public_key']);
+        unset($fields['sitemap_require_update']);
         unset($fields['business_type']);
         unset($fields['restaurant_email']);
         unset($fields['license_number']);

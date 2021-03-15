@@ -239,6 +239,18 @@ class Payment extends \yii\db\ActiveRecord {
         return $paymentRecord;
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function fields() {
+        $fields = parent::fields();
+
+        // remove fields that contain sensitive information
+        unset($fields['payment_gateway_order_id']);
+        unset($fields['payment_gateway_transaction_id']);
+    }
+
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 

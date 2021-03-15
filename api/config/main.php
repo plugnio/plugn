@@ -54,12 +54,10 @@ return [
                     'patterns' => [
                         'GET detail' => 'item-data',
                         'GET' => 'restaurant-menu',
-                        'POST delete-item-image' => 'delete-item-image',
                         'GET <category_id>' => 'category-products',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
-                        'OPTIONS delete-item-image' => 'options',
                         'OPTIONS <category_id>' => 'options',
                     ]
                 ],
@@ -81,12 +79,10 @@ return [
                     'patterns' => [
                         'GET detail' => 'item-data',
                         'GET' => 'restaurant-menu',
-                        'POST delete-item-image' => 'delete-item-image',
                         'GET <category_id>' => 'category-products',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
-                        'OPTIONS delete-item-image' => 'options',
                         'OPTIONS <category_id>' => 'options',
                     ]
                 ],
@@ -188,7 +184,7 @@ return [
                         'GET apply-promo-code' => 'apply-promo-code',
                         'GET apply-bank-discount' => 'apply-bank-discount',
                         'GET <id>/<restaurant_uuid>' => 'order-details',
-                        'GET order-details/<id>/<restaurant_uuid>' => 'get-order-details',
+                        'GET order-details/<id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
@@ -213,7 +209,7 @@ return [
                         'GET apply-promo-code' => 'apply-promo-code',
                         'GET apply-bank-discount' => 'apply-bank-discount',
                         'GET <id>/<restaurant_uuid>' => 'order-details',
-                        'GET order-details/<id>/<restaurant_uuid>' => 'get-order-details',
+                        'GET order-details/<id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
