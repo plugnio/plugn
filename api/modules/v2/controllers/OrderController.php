@@ -500,6 +500,29 @@ class OrderController extends Controller {
             ];
         }
 
+          unset($model['armada_qr_code_link']);
+          unset($model['armada_delivery_code']);
+          unset($model['mashkor_order_number']);
+          unset($model['mashkor_tracking_link']);
+          unset($model['mashkor_driver_name']);
+          unset($model['mashkor_driver_phone']);
+          unset($model['mashkor_order_status']);
+          unset($model['armada_tracking_link']);
+          unset($model['reminder_sent']);
+          unset($model['sms_sent']);
+          unset($model['items_has_been_restocked']);
+          unset($model['subtotal_before_refund']);
+          unset($model['total_price_before_refund']);
+
+
+        if(isset($model['payment'])){
+          unset($model['payment']['payment_gateway_order_id']);
+          unset($model['payment']['payment_gateway_transaction_id']);
+          unset($model['payment']['payment_net_amount']);
+          unset($model['payment']['payment_gateway_fee']);
+          unset($model['payment']['plugn_fee']);
+        }
+
         return [
             'operation' => 'success',
             'body' => $model
