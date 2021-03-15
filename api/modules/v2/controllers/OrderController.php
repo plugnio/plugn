@@ -516,8 +516,6 @@ class OrderController extends Controller {
 
 
         if(isset($model['payment'])){
-          unset($model['payment']['payment_gateway_order_id']);
-          unset($model['payment']['payment_gateway_transaction_id']);
           unset($model['payment']['payment_net_amount']);
           unset($model['payment']['payment_gateway_fee']);
           unset($model['payment']['plugn_fee']);
