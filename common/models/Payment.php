@@ -249,6 +249,8 @@ class Payment extends \yii\db\ActiveRecord {
         // remove fields that contain sensitive information
         unset($fields['payment_gateway_order_id']);
         unset($fields['payment_gateway_transaction_id']);
+        unset($fields['payment_gateway_fee']);
+        unset($fields['plugn_fee']);
     }
 
     public function afterSave($insert, $changedAttributes) {
