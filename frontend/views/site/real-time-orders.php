@@ -119,14 +119,15 @@ var soundForNewOrders = new Audio("data:audio/wav;base64,//uQRAAAAWMSLwUIYAAsYkX
                         return date('d M - h:i A', strtotime($model->order_created_at));
                     }
                 ],
+
                 [
-                    'label' => 'Branch',
+                    'attribute' => 'business_location_name',
                     "format" => "raw",
                     "value" => function($model) {
-                        $businessLocationName =  $model->order_mode == Order::ORDER_MODE_DELIVERY ? ($model->delivery_zone_id ? $model->deliveryZone->businessLocation->business_location_name : '(not set)') : $model->pickupLocation->business_location_name;
-                        return $businessLocationName;
+                       return $model->business_location_name ? $model->business_location_name : '';
                     }
                 ],
+
                 [
                     'attribute' => 'customer_name',
                     'format' => 'raw',

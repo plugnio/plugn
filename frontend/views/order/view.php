@@ -859,14 +859,6 @@ DetailView::widget([
                             },
                             'visible' => $model->country_name != null
                         ],
-                        // [
-                        //     'label' => 'Pickup from',
-                        //     'format' => 'html',
-                        //     'value' => function ($data) {
-                        //       return  $data->pickupLocation ?  $data->pickupLocation->business_location_name : '(not set)';
-                        //     },
-                        //     'visible' => $model->order_mode == Order::ORDER_MODE_PICK_UP,
-                        // ],
                         [
                             'attribute' => 'special_directions',
                             'format' => 'html',

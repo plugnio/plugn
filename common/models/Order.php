@@ -887,14 +887,17 @@ class Order extends \yii\db\ActiveRecord {
 
             if($this->deliveryZone->business_location_id)
               $this->business_location_name = $this->deliveryZone->businessLocation->business_location_name;
-          } 
+
+          }
+
       } else if (!$insert && $this->order_mode == Order::ORDER_MODE_PICK_UP){
+        
         if ($this->pickup_location_id){
           $this->country_name = $this->pickupLocation->country->country_name;
           $this->country_name_ar = $this->pickupLocation->country->country_name_ar;
           $this->business_location_name = $this->pickupLocation->business_location_name;
-
         }
+
       }
 
 
