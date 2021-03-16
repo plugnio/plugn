@@ -53,14 +53,6 @@ $this->registerJs($js);
         </div>
     </div>
 
-
-    <?php
-    // echo $this->render('_h', ['model' => $searchModel, 'restaurant_uuid' => $restaurant_model->restaurant_uuid]);
-    ?>
-
-
-
-
     <!-- DataTable starts -->
     <div class="table-responsive">
 
@@ -91,12 +83,12 @@ $this->registerJs($js);
                         return date('d M - h:i A', strtotime($model->order_created_at));
                     }
                 ],
+                'country_name',
                 [
-                    'label' => 'Branch',
+                    'attribute' => 'business_location_name',
                     "format" => "raw",
                     "value" => function($model) {
-                        $businessLocationName =  $model->order_mode == Order::ORDER_MODE_DELIVERY ? ($model->delivery_zone_id ? $model->deliveryZone->businessLocation->business_location_name : '(not set)') : $model->pickupLocation->business_location_name;
-                        return $businessLocationName;
+                       return $model->business_location_name ? $model->business_location_name : '';
                     }
                 ],
                 [
@@ -116,14 +108,6 @@ $this->registerJs($js);
                         return '<a href="tel:'. $model->customer_phone_number .'"> '. str_replace(' ', '', $model->customer_phone_number) .' </a>';
                     }
                 ],
-
-                // [
-                //     'label' => 'When',
-                //     'format' => 'raw',
-                //     'value' => function ($data) {
-                //         return $data->is_order_scheduled ? 'Scheduled' : 'As soon as possible';
-                //     },
-                // ],
                 [
                     'attribute' => 'order_status',
                     "format" => "raw",
@@ -145,6 +129,7 @@ $this->registerJs($js);
                             return '<i class="fa fa-circle font-small-3 text-danger mr-50"></i> <span class="text-danger">' . $model->orderStatusInEnglish . '</span>';
                         else if ($model->order_status == Order::STATUS_REFUNDED)
                             return '<i class="fa fa-circle font-small-3 text-danger mr-50"></i> <span class="text-danger">' . $model->orderStatusInEnglish . '</span>';
+
                     }
                 ],
                 [
@@ -247,8 +232,6 @@ $this->registerJs($js);
 
   <?php } else {?>
 
-
-
     <div class="card">
       <div style="padding: 70px 0; text-align: center;">
 
@@ -264,7 +247,6 @@ $this->registerJs($js);
         <?= Html::a('Create order', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
       </div>
     </div>
-
 
   <?php } ?>
 

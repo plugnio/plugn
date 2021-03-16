@@ -136,14 +136,7 @@ $this->registerJs($js);
 
             if ($model->restaurant->mashkor_branch_id != null && $model->mashkor_order_number == null) {
 
-                if ($difference <= 1  &&
-                $model->restaurant->hide_request_driver_button
-                // $storeUuid != 'rest_1276d589-f41c-11ea-808a-0673128d0c9c' &&
-                // $storeUuid != 'rest_aa69124d-2346-11eb-b97d-0673128d0c9c' &&
-                // $storeUuid != 'rest_5d657108-c91f-11ea-808a-0673128d0c9c' &&
-                // $storeUuid != 'rest_f6bc4e4a-e7c6-11ea-808a-0673128d0c9c' &&
-                // $storeUuid != 'rest_6a55139f-f340-11ea-808a-0673128d0c9c'
-              ){
+                if ($difference <= 1  && $model->restaurant->hide_request_driver_button ){
                   echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
                       'class' => 'btn btn-dark mr-1 mb-1',
                       'style' => 'margin-right: 7px;',
@@ -155,14 +148,7 @@ $this->registerJs($js);
                 }
 
 
-                if (
-                        !$model->restaurant->hide_request_driver_button
-                        // $storeUuid == 'rest_1276d589-f41c-11ea-808a-0673128d0c9c' ||
-                        // $storeUuid == 'rest_5d657108-c91f-11ea-808a-0673128d0c9c' ||
-                        // $storeUuid == 'rest_aa69124d-2346-11eb-b97d-0673128d0c9c' ||
-                        // $storeUuid == 'rest_f6bc4e4a-e7c6-11ea-808a-0673128d0c9c' ||
-                        // $storeUuid == 'rest_6a55139f-f340-11ea-808a-0673128d0c9c'
-                      ){
+                if (!$model->restaurant->hide_request_driver_button){
                           echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
                               'class' => 'btn btn-dark mr-1 mb-1',
                               'style' => 'margin-right: 7px;',
@@ -279,11 +265,12 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                             },
                         ],
                         [
-                            'label' => 'Branch',
+                            'attribute' => 'business_location_name',
                             "format" => "raw",
                             "value" => function($model) {
-                                return $model->order_mode == Order::ORDER_MODE_DELIVERY ? ($model->delivery_zone_id ? $model->deliveryZone->businessLocation->business_location_name : '(not set)') : $model->pickupLocation->business_location_name;
-                            }
+                               return $model->business_location_name ? $model->business_location_name : '';
+                            },
+                            'visible' => $model->business_location_name != null
                         ],
                         [
                             'attribute' => 'order_mode',
@@ -868,18 +855,18 @@ DetailView::widget([
                             'label' => 'Country',
                             'format' => 'html',
                             'value' => function ($data) {
-                                return  $data->country_name ? $data->country_name  :
-                                 ( $data->order_mode == 1 ? ($data->delivery_zone_id && $data->deliveryZone->country ? $data->deliveryZone->country->country_name : '(not set)') : ($data->pickupLocation && $data->pickupLocation->country ? $data->pickupLocation->country->country_name : '(not set)'));
-                            }
-                        ],
-                        [
-                            'label' => 'Pickup from',
-                            'format' => 'html',
-                            'value' => function ($data) {
-                              return  $data->pickupLocation ?  $data->pickupLocation->business_location_name : '(not set)';
+                                return  $data->country_name ? $data->country_name  : ;
                             },
-                            'visible' => $model->order_mode == Order::ORDER_MODE_PICK_UP,
+                            'visible' => $model->country_name != null
                         ],
+                        // [
+                        //     'label' => 'Pickup from',
+                        //     'format' => 'html',
+                        //     'value' => function ($data) {
+                        //       return  $data->pickupLocation ?  $data->pickupLocation->business_location_name : '(not set)';
+                        //     },
+                        //     'visible' => $model->order_mode == Order::ORDER_MODE_PICK_UP,
+                        // ],
                         [
                             'attribute' => 'special_directions',
                             'format' => 'html',
@@ -892,7 +879,6 @@ DetailView::widget([
                     'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
                 ])
                 ?>
-
             </div>
         </div>
     </div>

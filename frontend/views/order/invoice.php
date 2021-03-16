@@ -89,12 +89,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                         <?= $model->area_id ?  $model->area->city->city_name :  '' ?>
                       </span>
                       <span style="display: block" >
-                        <?=  $model->country_name ?
-                        $model->country_name : ( $model->order_mode == 1 ?
-                        ($model->delivery_zone_id && $model->deliveryZone->country ?
-                        $model->deliveryZone->country->country_name  : '') : ($model->pickupLocation && $model->pickupLocation->country ?
-                        $model->pickupLocation->country->country_name : ''));
-                          ?>
+                        <?=  $model->country_name ? $model->country_name : ''; ?>
                       </span>
                       <span style="display: block" >
                         <?=  $model->customer_phone_number  ?>
