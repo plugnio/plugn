@@ -49,10 +49,71 @@ return [
                     'controller' => 'v1/order',
                     'pluralize' => false,
                     'patterns' => [
-                        'GET <store_uuid>' => 'get-all-pending-orders',
+                        'GET' => 'list-pending-orders',
+                        'GET active' => 'list-active-orders',
+                        'GET draft' => 'list-draft-orders',
+                        'GET abandoned' => 'list-abandoned-orders',
+                        'GET detail' => 'detail',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS <store_uuid>' => 'options'
+                        'OPTIONS active' => 'options',
+                        'OPTIONS draft' => 'options',
+                        'OPTIONS abandoned' => 'options',
+                        'OPTIONS detail' => 'options',
+                    ]
+                ],
+                [// CategoryController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/category',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
+                    ]
+                ],
+                [// VoucherController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/voucher',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
+                    ]
+                ],
+                [// ItemController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/item',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options'
+                    ]
+                ],
+                [// CustomerController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/customer',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options'
+                    ]
+                ],
+                [// StoreController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/store',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'detail',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
                     ]
                 ],
 
