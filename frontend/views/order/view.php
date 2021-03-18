@@ -855,7 +855,7 @@ DetailView::widget([
                             'label' => 'Country',
                             'format' => 'html',
                             'value' => function ($data) {
-                                return  $data->country_name ? $data->country_name  : ;
+                                return  $data->country_name ? $data->country_name  : '' ;
                             },
                             'visible' => $model->country_name != null
                         ],
