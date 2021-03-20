@@ -45,6 +45,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
   * @property string|null $operator_id
   * @property string|null $live_api_key
   * @property string|null $test_api_key
+  * @property string|null $supplierCode
   * @property string|null $business_type
   * @property string|null $vendor_sector
   * @property string|null $license_number
@@ -93,6 +94,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
   * @property string|null $site_id
   * @property string|null $company_name
   * @property int|null $is_tap_enable
+  * @property int|null $is_myfatoorah_enable
   * @property int|null $has_deployed
   * @property int|null $tap_queue_id
   * @property string|null $identification_file_back_side
@@ -145,6 +147,7 @@ class Restaurant extends \yii\db\ActiveRecord {
 
     const SCENARIO_CREATE_STORE_BY_AGENT = 'create-by-agent';
     const SCENARIO_CREATE_TAP_ACCOUNT = 'tap_account';
+    const SCENARIO_CREATE_MYFATOORAH_ACCOUNT = 'myfatoorah_account';
     const SCENARIO_UPLOAD_STORE_DOCUMENT = 'upload';
 
     public $restaurant_delivery_area;
@@ -170,14 +173,14 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['owner_first_name', 'owner_last_name', 'owner_email', 'owner_number'], 'required', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            [['owner_first_name', 'owner_last_name', 'owner_email', 'owner_number'], 'required', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
 
 
             [
                 [
                     'vendor_sector', 'iban', 'company_name', 'business_type'
                 ],
-                'required', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT
+                'required', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]
             ],
             [
                 [
@@ -191,10 +194,10 @@ class Restaurant extends \yii\db\ActiveRecord {
                 return $model->business_type == 'corp';
             }],
 
-            [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3, 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
-            [['identification_file_id_back_side','identification_file_id_front_side', 'authorized_signature_file_id', 'commercial_license_file_id'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3, 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
+            [['identification_file_id_back_side','identification_file_id_front_side', 'authorized_signature_file_id', 'commercial_license_file_id'], 'safe', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
             [['not_for_profit'], 'number'],
-            [['authorized_signature_issuing_date', 'authorized_signature_expiry_date', 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            [['authorized_signature_issuing_date', 'authorized_signature_expiry_date', 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
             ['owner_email', 'email'],
             ['iban', 'safe'],
             [
@@ -213,9 +216,9 @@ class Restaurant extends \yii\db\ActiveRecord {
                 ],
                 'string', 'max' => 255
             ],
-            ['iban', 'string', 'min'=>10, 'max'=>34 , 'message' => 'The IBAN must be at least 10 characters long.', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            ['iban', 'string', 'min'=>10, 'max'=>34 , 'message' => 'The IBAN must be at least 10 characters long.', 'on' =>[ self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
 
-            ['iban', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/', 'message' => 'Please check the IBAN, we might not support transfering to this bank.', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            ['iban', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/', 'message' => 'Please check the IBAN, we might not support transfering to this bank.', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
             [['restaurant_commercial_license_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
             [['restaurant_authorized_signature_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
             [['name', 'name_ar', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_domain', 'restaurant_email', 'store_branch_name', 'app_id'], 'required', 'on' => 'create'],
@@ -246,7 +249,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['phone_number' , 'owner_number'], 'string', 'min' => 6, 'max' => 20],
             [['phone_number' , 'owner_number'], 'number'],
 
-            [['owner_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_STORE_BY_AGENT]],
+            [['owner_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT ,self::SCENARIO_CREATE_STORE_BY_AGENT]],
             [['phone_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number'],
 
 
@@ -256,7 +259,7 @@ class Restaurant extends \yii\db\ActiveRecord {
            // }],
 
 
-            [['restaurant_email_notification', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable'], 'integer'],
+            [['restaurant_email_notification', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable', 'is_myfatoorah_enable','supplierCode'], 'integer'],
             ['restaurant_email', 'email'],
             [['restaurant_uuid', 'restaurant_domain', 'name'], 'unique'],
             [['tap_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => TapQueue::className(), 'targetAttribute' => ['tap_queue_id' => 'tap_queue_id']],
@@ -808,6 +811,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset($fields['wallet_id']);
         unset($fields['merchant_id']);
         unset($fields['operator_id']);
+        unset($fields['supplierCode']);
         unset($fields['live_api_key']);
         unset($fields['test_api_key']);
         unset($fields['live_public_key']);
@@ -839,6 +843,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset($fields['has_deployed']);
         unset($fields['tap_queue_id']);
         unset($fields['is_tap_enable']);
+        unset($fields['is_myfatoorah_enable']);
         unset($fields['company_name']);
         unset($fields['owner_phone_country_code']);
         unset($fields['identification_issuing_date']);
@@ -879,6 +884,12 @@ class Restaurant extends \yii\db\ActiveRecord {
             $this->is_tap_enable = 1;
         else
             $this->is_tap_enable = 0;
+
+      //TODO
+        if ($this->supplierCode)
+            $this->is_myfatoorah_enable = 1;
+        else
+            $this->is_myfatoorah_enable = 0;
 
 
         if ($this->scenario == self::SCENARIO_UPLOAD_STORE_DOCUMENT) {

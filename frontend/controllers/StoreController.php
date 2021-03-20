@@ -325,17 +325,23 @@ class StoreController extends Controller {
         ]);
     }
 
+
     /**
-     * Create tap account
+     * Create paymentGateway account
      * @param type $id
-     * @return type
+     * @return type $paymentGateway
      */
-    public function actionCreateTapAccount($id) {
+    public function actionCreatePaymentGatewayAccount($id, $paymentGateway) {
 
         $model = $this->findModel($id);
-        $model->setScenario(Restaurant::SCENARIO_CREATE_TAP_ACCOUNT);
 
-        if ($model->is_tap_enable)
+        if($paymentGateway == 'tap')
+          $model->setScenario(Restaurant::SCENARIO_CREATE_TAP_ACCOUNT);
+        else if ($paymentGateway == 'myfatoorah')
+          $model->setScenario(Restaurant::SCENARIO_CREATE_MYFATOORAH_ACCOUNT);
+
+    
+        if ($model->is_myfatoorah_enable || ($paymentGateway != 'tap' && $paymentGateway != 'myfatoorah'))
             return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
 
 
@@ -449,15 +455,17 @@ class StoreController extends Controller {
             if ($model->validate() && $model->save()) {
 
 
-                if (!$model->is_tap_enable) {
-                    $tap_queue_model = new TapQueue;
-                    $tap_queue_model->queue_status = TapQueue::QUEUE_STATUS_PENDING;
-                    $tap_queue_model->restaurant_uuid = $model->restaurant_uuid;
-                    if ($tap_queue_model->save()) {
-                        $model->tap_queue_id = $tap_queue_model->tap_queue_id;
+              // TODO
+              // if ($paymentGateway == 'tap ? !$model->is_myfatoorah_enable : ($paymentGateway == 'my')) {
+                    $payment_gateway_queue_model = new PaymentGatewayQueue;
+                    $payment_gateway_queue_model->queue_status = MyFatoorahQueue::QUEUE_STATUS_PENDING;
+                    $payment_gateway_queue_model->payment_gateway =  $paymentGateway;
+                    $payment_gateway_queue_model->restaurant_uuid = $model->restaurant_uuid;
+                    if ($payment_gateway_queue_model->save()) {
+                        $model->payment_gateway_queue_id = $payment_gateway_queue_model->tap_queue_id;
                         $model->save(false);
                     }
-                }
+                // }
 
                 return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
             } else {
@@ -465,9 +473,10 @@ class StoreController extends Controller {
             }
         }
 
-        return $this->render('create-tap-account', [
-                    'model' => $model
-        ]);
+
+          return $this->render($paymentGateway == 'tap' ? 'create-tap-account' : 'create-myfatoorah-account', [
+                      'model' => $model
+          ]);
     }
 
     /**
