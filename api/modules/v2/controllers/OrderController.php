@@ -251,11 +251,17 @@ class OrderController extends Controller {
                     // Create new payment record
                     $payment = new Payment;
                     $payment->restaurant_uuid = $restaurant_model->restaurant_uuid;
-                    $payment->payment_mode = $order->paymentMethod->source_id;
 
+                    $payment->customer_id = $order->customer->customer_id; //customer id
+                    $payment->order_uuid = $order->order_uuid;
+                    $payment->payment_amount_charged = $order->total_price;
+                    $payment->payment_current_status = "Redirected to payment gateway";
 
 
                     if($restaurant_model->is_tap_enable){
+
+                      $payment->payment_mode = $order->paymentMethod->source_id;
+                      $payment->payment_gateway_name = 'tap';
 
                       if ($payment->payment_mode == TapPayments::GATEWAY_VISA_MASTERCARD && Yii::$app->request->getBodyParam("payment_token") && Yii::$app->request->getBodyParam("bank_name")) {
 
@@ -314,10 +320,7 @@ class OrderController extends Controller {
                           }
                       }
 
-                      $payment->customer_id = $order->customer->customer_id; //customer id
-                      $payment->order_uuid = $order->order_uuid;
-                      $payment->payment_amount_charged = $order->total_price;
-                      $payment->payment_current_status = "Redirected to payment gateway";
+
 
                       if ($payment->save()) {
 
@@ -415,10 +418,8 @@ class OrderController extends Controller {
 
                     } else if ($restaurant_model->is_myfatoorah_enable){
 
-                        $payment->customer_id = $order->customer->customer_id; //customer id
-                        $payment->order_uuid = $order->order_uuid;
-                        $payment->payment_amount_charged = $order->total_price;
-                        $payment->payment_current_status = "Redirected to payment gateway";
+                        $payment->payment_gateway_name = 'myfatoorah';
+                        $payment->payment_mode = $order->paymentMethod->payment_method_name;
 
                         if ($payment->save()) {
 
@@ -570,7 +571,7 @@ class OrderController extends Controller {
               $paymentRecord->save(false);
 
               // Redirect back to app
-              if ($paymentRecord->payment_current_status != 'CAPTURED') {  //Failed Payment
+              if ($paymentRecord->payment_current_status != 'Paid') {  //Failed Payment
                   return $this->redirect($paymentRecord->restaurant->restaurant_domain . '/payment-failed/' . $paymentRecord->order_uuid);
               }
 

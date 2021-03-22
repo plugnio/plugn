@@ -530,6 +530,101 @@ class Restaurant extends \yii\db\ActiveRecord {
 
     }
 
+    public function uploadDocumentsToMyFatoorah() {
+
+
+        //Upload Authorized Signature file
+        if ($this->authorized_signature_file  && $this->authorized_signature_file_purpose && $this->authorized_signature_title) {
+
+          $tmpFile = sys_get_temp_dir() . '/' . $this->authorized_signature_file;
+
+          if(!file_put_contents($tmpFile, file_get_contents($this->getAuthorizedSignaturePhoto())))
+              return Yii::error('Error reading authorized signature document: ');
+
+            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($tmpFile, 2 ,$this->supplierCode); //Upload Signature file
+
+            $responseContent = json_decode($response->content);
+
+            @unlink($tmpFile);
+
+
+            if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
+                $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
+                return Yii::error('Error when uploading authorized signature document: ' . $errorMessage);
+            }
+
+        }
+
+        //Upload commercial_license file
+        if ($this->commercial_license_file  && $this->commercial_license_file_purpose && $this->commercial_license_title) {
+
+          $commercialLicenseTmpFile = sys_get_temp_dir() . '/' . $this->commercial_license_file;
+
+          if(!file_put_contents($commercialLicenseTmpFile, file_get_contents($this->getCommercialLicensePhoto())))
+              return Yii::error('Error reading commercial license document: ');
+
+
+            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($commercialLicenseTmpFile, 1 ,$this->supplierCode); //Upload commercial License
+
+            $responseContent = json_decode($response->content);
+
+            @unlink($commercialLicenseTmpFile);
+
+
+            if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
+                $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
+                return Yii::error('Error when uploading commercial license document: ' . $errorMessage);
+            }
+
+        }
+
+        //Upload Owner civil id front side
+        if ($this->identification_file_front_side  && $this->identification_file_purpose && $this->identification_title) {
+
+          $civilIdFrontSideTmpFile = sys_get_temp_dir() . '/' . $this->identification_file_front_side;
+
+          if(!file_put_contents($civilIdFrontSideTmpFile, file_get_contents($this->getCivilIdFrontSidePhoto())))
+              return Yii::error('Error reading civil id (front side): ');
+
+
+            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($civilIdFrontSideTmpFile, 4 ,$this->supplierCode); //Upload civil Id Front Side
+
+            $responseContent = json_decode($response->content);
+
+            @unlink($civilIdFrontSideTmpFile);
+
+
+            if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
+                $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
+                return Yii::error('Error when uploading civil id (front side): ' . $errorMessage);
+            }
+
+        }
+
+        //Upload Owner civil id back side
+        if ($this->identification_file_back_side  && $this->identification_file_purpose && $this->identification_title) {
+
+            $civilIdBackSideTmpFile = sys_get_temp_dir() . '/' . $this->identification_file_back_side;
+
+            if(!file_put_contents($civilIdBackSideTmpFile, file_get_contents($this->getCivilIdBackSidePhoto())))
+                return Yii::error('Error reading civil id (back side): ');
+
+            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($civilIdBackSideTmpFile, 5 ,$this->supplierCode); //Upload civil Id back Side
+
+            $responseContent = json_decode($response->content);
+
+
+            @unlink($civilIdBackSideTmpFile);
+
+            if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
+                $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
+                return Yii::error('Error when uploading civil id (back side): ' . $errorMessage);
+            }
+
+        }
+
+    }
+
     /**
      * Return Civil id front side url
      * @return string
@@ -611,17 +706,21 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function createAnAccountOnMyFatoorah() {
 
 
-        // //Upload documents file on our server before we create an account on tap we gonaa delete them
-        // $this->uploadDocumentsToTap();
 
 
         //Create  supplier for a vendor on My Fatoorah
         $supplierApiResponse = Yii::$app->myFatoorahPayment->createSupplier($this);
 
         if ($supplierApiResponse->isOk && $supplierApiResponse->data['IsSuccess']) {
+
             $this->supplierCode = $supplierApiResponse->data['Data']['SupplierCode'];
             \Yii::info($this->name . " has just created My Fatoorahs account", __METHOD__);
-            $this->save();
+
+            if($this->save()){
+                // //Upload documents file on our server before we create an account on my fatoorah we gonaa delete them
+                $this->uploadDocumentsToMyFatoorah();
+            }
+
             return true;
         } else {
           die(json_encode($supplierApiResponse->data));

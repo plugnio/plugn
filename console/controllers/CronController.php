@@ -350,8 +350,13 @@ class CronController extends \yii\console\Controller {
         if ($payments) {
             foreach ($payments as $payment) {
                 try {
-                    if ($payment->payment_gateway_transaction_id) {
-                        $payment = Payment::updatePaymentStatusFromTap($payment->payment_gateway_transaction_id);
+
+                    if (($payment->payment_gateway_transaction_id && $payment->payment_gateway_name == 'tap') || ($payment->payment_gateway_invoice_id && $payment->payment_gateway_name == 'myfatoorah') ) {
+                        if($payment->payment_gateway_name == 'tap' && $payment->payment_gateway_transaction_id)
+                          $payment = Payment::updatePaymentStatusFromTap($payment->payment_gateway_transaction_id);
+                        else if ($payment->payment_gateway_name == 'myfatoorah' && $payment->payment_gateway_invoice_id)
+                          $payment = Payment::updatePaymentStatusFromMyFatoorah($payment->payment_gateway_invoice_id);
+
                         $payment->received_callback = true;
                         $payment->save(false);
                     }

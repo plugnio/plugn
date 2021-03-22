@@ -201,22 +201,14 @@ class MyFatoorahPayment extends Component
      * @param type $title
      * @return type
      */
-    public function uploadSupplierDocument($file_path, $title)
+    public function uploadSupplierDocument($file_path, $fileType, $supplierCode)
     {
-        die(readfile($file_path));
-
 
         $fileEndpoint = $this->apiEndpoint . "/UploadSupplierDocument";
 
         $fileParams = [
-              "FileUpload" => [
-                "FileName" => $title,
-                "MediaType" => "string",
-                "Buffer" => "string"
-              ],
-              "FileType" => 1,
-              "SupplierCode" => 1
-
+              "FileType" => $fileType,
+              "SupplierCode" => $supplierCode
         ];
 
 
@@ -225,13 +217,13 @@ class MyFatoorahPayment extends Component
                 ->setMethod('PUT')
                 ->setUrl($fileEndpoint)
                 ->setData($fileParams)
-                ->addFile('file', $file_path)
+                ->addFile('FileUpload', $file_path)
                 ->addHeaders([
-                    'authorization' => 'Bearer ' . $this->plugnScretApiKey,
+                    'authorization' => 'Bearer ' . $this->apiKey,
                     'content-type' => 'application/json',
                 ])
                 ->send();
-
+                
         return $response;
     }
 

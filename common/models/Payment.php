@@ -32,6 +32,7 @@ use yii\web\NotFoundHttpException;
  * @property string $payment_created_at
  * @property string $payment_updated_at
  * @property boolean $received_callback
+ * @property string $payment_gateway_name
  *
  * @property Customer $customer
  * @property Order $order
@@ -57,7 +58,7 @@ class Payment extends \yii\db\ActiveRecord {
             [['payment_gateway_order_id', 'payment_current_status'], 'string'],
             [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee', 'plugn_fee'], 'number'],
             [['payment_uuid'], 'string', 'max' => 36],
-            [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'response_message','payment_token'], 'string', 'max' => 255],
+            [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'response_message','payment_token', 'payment_gateway_name'], 'string', 'max' => 255],
             [['payment_uuid'], 'unique'],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
@@ -106,6 +107,7 @@ class Payment extends \yii\db\ActiveRecord {
             'payment_amount_charged' => Yii::t('app', 'Amount Charged'),
             'payment_net_amount' => Yii::t('app', 'Net Amount'),
             'payment_gateway_fee' => Yii::t('app', 'Gateway Fee'),
+            'payment_gateway_name' => Yii::t('app', 'Gateway name'),
             'plugn_fee' => Yii::t('app', 'Plugn Fee'),
             'payment_token' => Yii::t('app', 'Payment Token'),
             'payment_udf1' => Yii::t('app', 'Udf1'),
@@ -347,6 +349,7 @@ class Payment extends \yii\db\ActiveRecord {
         // remove fields that contain sensitive information
         unset($fields['payment_net_amount']);
         unset($fields['payment_gateway_fee']);
+        unset($fields['payment_gateway_name']);
         unset($fields['plugn_fee']);
 
         return $fields;
@@ -357,7 +360,7 @@ class Payment extends \yii\db\ActiveRecord {
         parent::afterSave($insert, $changedAttributes);
 
 
-        if( !$insert  && (isset($changedAttributes['received_callback']) && $changedAttributes['received_callback'] == 0  && $this->payment_current_status == 'CAPTURED' && $this->received_callback) ) {
+        if( !$insert  && (isset($changedAttributes['received_callback']) && $changedAttributes['received_callback'] == 0  && ($this->payment_current_status == 'CAPTURED' || $this->payment_current_status == 'Paid') && $this->received_callback) ) {
 
             $this->order->changeOrderStatusToPending();
             $this->order->sendPaymentConfirmationEmail();
