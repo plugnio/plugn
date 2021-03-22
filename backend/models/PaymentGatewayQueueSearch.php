@@ -4,13 +4,14 @@ namespace backend\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\Queue;
+use common\models\PaymentGatewayQueue;
 
 /**
- * QueueSearch represents the model behind the search form of `common\models\Queue`.
+ * PaymentGatewayQueueSearch represents the model behind the search form of `common\models\PaymentGatewayQueue`.
  */
-class QueueSearch extends Queue
+class PaymentGatewayQueueSearch extends PaymentGatewayQueue
 {
+
 
     public $store_name;
 
@@ -20,8 +21,8 @@ class QueueSearch extends Queue
     public function rules()
     {
         return [
-            [['queue_id', 'queue_status'], 'integer'],
-            [['restaurant_uuid', 'store_name','queue_created_at', 'queue_updated_at', 'queue_start_at', 'queue_end_at'], 'safe'],
+            [['payment_gateway_queue_id', 'queue_status'], 'integer'],
+            [['restaurant_uuid', 'store_name','payment_gateway', 'queue_created_at', 'queue_updated_at', 'queue_start_at', 'queue_end_at'], 'safe'],
         ];
     }
 
@@ -43,7 +44,8 @@ class QueueSearch extends Queue
      */
     public function search($params)
     {
-        $query = Queue::find()->joinWith(['restaurant']);;
+        $query = PaymentGatewayQueue::find()
+        ->joinWith(['restaurant']);
 
         // add conditions that should always apply here
 
@@ -58,6 +60,7 @@ class QueueSearch extends Queue
             'desc' => ['restaurant.name' => SORT_DESC],
         ];
 
+
         $this->load($params);
 
         if (!$this->validate()) {
@@ -68,7 +71,7 @@ class QueueSearch extends Queue
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'queue_id' => $this->queue_id,
+            'payment_gateway_queue_id' => $this->payment_gateway_queue_id,
             'queue_status' => $this->queue_status,
             'queue_created_at' => $this->queue_created_at,
             'queue_updated_at' => $this->queue_updated_at,
@@ -77,7 +80,8 @@ class QueueSearch extends Queue
         ]);
 
         $query->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
-                  ->andFilterWhere(['like', 'restaurant.name', $this->store_name]);
+            ->andFilterWhere(['like', 'restaurant.name', $this->store_name])
+            ->andFilterWhere(['like', 'payment_gateway', $this->payment_gateway]);
 
         return $dataProvider;
     }

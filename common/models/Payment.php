@@ -241,6 +241,104 @@ class Payment extends \yii\db\ActiveRecord {
 
 
     /**
+     * Update Payment's Status from Myfatoorah Payments
+     * @param  [type]  $id                           [description]
+     * @param  boolean $showUpdatedFlashNotification [description]
+     * @return self                                [description]
+     */
+    public static function updatePaymentStatusFromMyFatoorah($invoiceId, $showUpdatedFlashNotification = false) {
+        // Look for payment with same Payment Gateway Transaction ID
+        $paymentRecord = \common\models\Payment::findOne(['payment_gateway_invoice_id' => $invoiceId]);
+        if (!$paymentRecord) {
+            throw new NotFoundHttpException('The requested payment does not exist in our database.');
+        }
+
+
+
+        $response = Yii::$app->myFatoorahPayment->retrieveCharge($invoiceId, 'InvoiceId');
+
+        $responseContent = json_decode($response->content);
+
+
+        // If there's an error from MYFATOORAH, exit and display error
+
+        if (!$responseContent->IsSuccess) {
+
+            $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
+            \Yii::error('[Payment Issue]' .$errorMessage, __METHOD__); // Log error faced by user
+            throw new NotFoundHttpException(json_encode($errorMessage));
+
+            \Yii::$app->getSession()->setFlash('error', $errorMessage);
+            return $paymentRecord;
+        }
+
+        $currentPaymentStatus = $paymentRecord->payment_current_status;
+
+        $paymentRecord->payment_current_status = $responseContent->Data->InvoiceStatus; // 'CAPTURED' ?
+
+        $isError = false;
+        $errorMessage = "";
+
+        // On Successful Payments
+        if ($responseContent->Data->InvoiceStatus == 'Paid') {
+
+
+            // KNET Gateway Fee Calculation
+            // if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
+            //
+            //     if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->knetGatewayFee) > Yii::$app->tapPayments->minKnetGatewayFee)
+            //         $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->knetGatewayFee;
+            //     else
+            //         $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minKnetGatewayFee;
+            // }
+            //
+            // // Creditcard Gateway Fee Calculation
+            // else if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_VISA_MASTERCARD) {
+            //
+            //     if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage) > Yii::$app->tapPayments->minCreditcardGatewayFee)
+            //         $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage;
+            //     else
+            //         $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minCreditcardGatewayFee;
+            // }
+            //
+            //
+
+            // if(isset($responseContent->destinations))
+            //     $paymentRecord->plugn_fee = $responseContent->destinations->amount;
+            // else
+            //     $paymentRecord->plugn_fee = 0;
+
+
+            // Update payment method used and the order id assigned to it
+            if( isset($responseContent->Data->InvoiceTransactions->PaymentGateway) && $responseContent->Data->InvoiceTransactions->PaymentGateway )
+              $paymentRecord->payment_mode = $responseContent->Data->InvoiceTransactions->PaymentGateway;
+            if( isset($responseContent->reference->payment) && $responseContent->reference->payment )
+              $paymentRecord->payment_gateway_order_id = $responseContent->Data->InvoiceTransactions->ReferenceId;
+
+            // Net amount after deducting gateway fee
+            // $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee;
+
+        }else {
+            Yii::info('[MyFatoorah Payment Issue > ' . $paymentRecord->customer->customer_name . ']'
+                    . $paymentRecord->customer->customer_name .
+                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) .
+                    ' and has failed at gateway. Maybe card issue.', __METHOD__);
+
+            Yii::info('[Response from MyFatoorah for Failed Payment] ' .
+                    print_r($responseContent, true), __METHOD__);
+        }
+
+        $paymentRecord->save();
+
+        if ($isError) {
+            throw new \Exception($errorMessage);
+        }
+
+        return $paymentRecord;
+    }
+
+
+    /**
      * @inheritdoc
      */
     public function fields() {

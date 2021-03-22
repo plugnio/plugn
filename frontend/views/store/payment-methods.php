@@ -526,10 +526,10 @@ $interval = $today->diff($expiry);
 
             <?php if (!$model->is_myfatoorah_enable) { ?>
             <?php
-            if (!$model->tap_queue_id)
+            if (!$model->payment_gateway_queue_id)
                 echo Html::a('Create My Fatoorah account', ['create-payment-gateway-account', 'id' => $model->restaurant_uuid,'paymentGateway' => 'myfatoorah'], ['class' => 'btn btn-success']);
             else
-                echo "<h5>Your TAP payments account will be ready within 24 hours. We'll email you once it's ready</h5>";
+                echo "<h5>Your My Fatoorah payments account will be ready within 24 hours. We'll email you once it's ready</h5>";
             ?>
             <?php } else { ?>
                 <div class="card-content">
@@ -547,8 +547,8 @@ $interval = $today->diff($expiry);
                                     </div>
 
                                     <div class="col-6">
-                                        <p style="margin-bottom: 1px;">Merchant ID</p>
-                                        <p style="color: black;"><?= $model->merchant_id ?></p>
+                                        <p style="margin-bottom: 1px;">IBAN</p>
+                                        <p style="color: black;"><?= $model->iban ?></p>
                                     </div>
 
                                 </div>
@@ -556,10 +556,6 @@ $interval = $today->diff($expiry);
 
                             <div class="col-12">
                                 <div class="row">
-                                    <div class="col-6">
-                                        <p style="margin-bottom: 1px;">IBAN</p>
-                                        <p style="color: black;"><?= $model->iban ?></p>
-                                    </div>
                                     <div class="col-6">
                                         <p style="margin-bottom: 1px;">	Email Address </p>
                                         <p style="color: black;"><?= $model->owner_email ?></p>

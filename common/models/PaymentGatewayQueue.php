@@ -77,8 +77,9 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
         if ($this->queue_status == self::QUEUE_STATUS_CREATING) {
           if ($this->payment_gateway == 'tap')
             $response =  $this->restaurant->createAnAccountOnTap();
-          else if ($this->payment_gateway == 'myfatoorah')
+          else if ($this->payment_gateway == 'myfatoorah'){
             $response =  $this->restaurant->createAnAccountOnMyFatoorah();
+          }
 
               if($response){
                 $this->queue_status = self::QUEUE_STATUS_COMPLETE;
@@ -87,11 +88,12 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
                          'html' => 'payment-gateway-created',
                              ], [
                          'store' => $this->restaurant,
+                         'paymentGateway' => $this->payment_gateway == 'tap' ? 'Tap' : 'My Fatoorah',
                      ])
                      ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                      ->setTo([$this->restaurant->restaurant_email])
                      ->setBcc(\Yii::$app->params['supportEmail'])
-                     ->setSubject('Your TAP Payments account has been approved')
+                     ->setSubject('Your '. $this->payment_gateway == 'tap' ? 'Tap' : 'My Fatoorah' .' Payments account has been approved')
                      ->send();
                 }
               }

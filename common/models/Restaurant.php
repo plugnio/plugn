@@ -606,6 +606,34 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Create an account for vendor on My Fatoorah
+     */
+    public function createAnAccountOnMyFatoorah() {
+
+
+        // //Upload documents file on our server before we create an account on tap we gonaa delete them
+        // $this->uploadDocumentsToTap();
+
+
+        //Create  supplier for a vendor on My Fatoorah
+        $supplierApiResponse = Yii::$app->myFatoorahPayment->createSupplier($this);
+
+        if ($supplierApiResponse->isOk && $supplierApiResponse->data['IsSuccess']) {
+            $this->supplierCode = $supplierApiResponse->data['Data']['SupplierCode'];
+            \Yii::info($this->name . " has just created My Fatoorahs account", __METHOD__);
+            $this->save();
+            return true;
+        } else {
+          die(json_encode($supplierApiResponse->data));
+
+            Yii::error('Error while create supplier [' . $this->name . '] ' . json_encode($supplierApiResponse->data));
+            return false;
+        }
+
+
+    }
+
+    /**
      * Create an account for vendor on tap
      */
     public function createAnAccountOnTap() {
