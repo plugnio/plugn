@@ -126,7 +126,43 @@ $this->registerJs($js);
 
 </script>
 
+<style>
+.input-group{
+  position: relative;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -ms-flex-align: stretch;
+  align-items: stretch;
+  width: 100%;
+}
 
+
+.input-group-prepend {
+    display: flex;
+    margin-right: -1px;
+}
+
+.input-group > .input-group-prepend > .btn{
+  border-top-right-radius: 0;
+border-bottom-right-radius: 0;
+position: relative;
+z-index: 2;
+}
+
+
+.input-group > .form-control:not(:first-child) {
+    border-top-left-radius: 0px !important;
+    border-bottom-left-radius: 0px !important;
+}
+
+.input-group > .form-control:not(:last-child) {
+   border-top-right-radius: 0px !important;
+   border-bottom-right-radius: 0px !important;
+}
+
+</style>
 <div class="refund-order">
 
 
@@ -140,7 +176,7 @@ $this->registerJs($js);
 
     <div class="card-body">
         <div class="row">
-            <div class=" col-12 col-lg-8 col-xl-8">
+            <div class=" col-12 col-lg-12 col-xl-8">
                 <div class="card">
 
                     <!-- Insert loop here -->
@@ -153,7 +189,7 @@ $this->registerJs($js);
                                     <div  class="summary-container">
                                         <div>
                                             <section class="item-img-section">
-                                                <img  class="item-img" src="<?= "https://res.cloudinary.com/plugn/image/upload/restaurants/". $refundedItem->restaurant->restaurant_uuid ."/items/" .   $itemItmage = $refundedItem->orderItem->getItemImages()->one()->product_file_name ?>" alt="Smart Short Sleeve Kimono Romper + Bib - Blue 0-3 M / Blue Whale" class="_3R2Os">
+                                                <img  class="item-img" src="<?= "https://res.cloudinary.com/plugn/image/upload/restaurants/". $refundedItem->store->restaurant_uuid ."/items/" .   $itemItmage = $refundedItem->orderItem->getItemImage()->one()->product_file_name ?>" alt="Smart Short Sleeve Kimono Romper + Bib - Blue 0-3 M / Blue Whale" class="_3R2Os">
                                             </section>
                                         </div>
                                         <div class="item-data">
@@ -192,11 +228,9 @@ $this->registerJs($js);
                                     </div>
                                 </div>
                                 <div class="col-12 col-sm-6 text-center">
-                                    <div class="test1">
+                                    <div>
 
-
-
-                                        <div class="card-body">
+                                        <div class="card-body" style="padding: 0px !important">
 
                                             <div class="form-group field-item-item_price required">
                                                 <div class="input-group">
@@ -266,7 +300,7 @@ $this->registerJs($js);
                   <div class="card-body">
 
                     <div>
-                      <!-- <h2 style="font-family: -apple-system,BlinkMacSystemFont,San Francisco,Segoe UI,Roboto,Helvetica Neue,sans-serif; font-weight: 600; line-height: 2.4rem; margin: 0; font-size: 1.6rem;">
+                      <!-- <h2 style="font-family: -apple-system,BlinkMacSystemFont,San Francisco,Segoe UI,Roboto,Helvetica Neue,sans-serif; font-weight: 600px !important; line-height: 2.4rem; margin: 0; font-size: 1.6rem;">
                         Reason for refund
                       </h2> -->
 
@@ -292,7 +326,7 @@ $this->registerJs($js);
                 </div>
             </div>
 
-            <div class="col-12  col-lg-4 col-xl-4">
+            <div class="col-12  col-lg-12 col-xl-4">
                 <div class="card">
                     <div  class="summary-section">
                         <h2 class="summary-txt">
@@ -359,11 +393,11 @@ $this->registerJs($js);
                                 ])->label(false)
                                 ?>
 
-                            <span class="avaliable-amount-to-refund">  <?= Yii::$app->formatter->asCurrency($refundedItem->orderItem->order->total_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3,]) ?> available for refund</span>
+                            <span class="avaliable-amount-to-refund">  <?= Yii::$app->formatter->asCurrency($refundedItem->orderItem->order->total_price, $refundedItem->currency->code , [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3,]) ?> available for refund</span>
 
                         </div>
                         <div class="form-group refund-btn">
-                        <?= Html::submitButton('Refund <span id="refund_amount_btn">0.000 KWD</span>', ['class' => 'btn btn-block bg-gradient-success btn-m']) ?>
+                        <?= Html::submitButton('Refund <span id="refund_amount_btn">0.000 '. $refundedItem->currency->code .'</span>', ['class' => 'btn btn-block bg-success btn-m', 'style' => 'color: white']) ?>
                                                 </div>
 
                                             </div>

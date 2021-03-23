@@ -19,7 +19,7 @@ use Yii;
  * @property Item $item
  * @property OrderItem $orderItem
  * @property Order $order
- * @property Restaurant $restaurant
+ * @property Store $restaurant
  * @property Refund $refund
  * @property ItemImage[] $itemImages
  */
@@ -122,10 +122,23 @@ class RefundedItem extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
+    public function getStore()
     {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('order');
     }
+
+
+    /**
+     * Gets query for [[Currency]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('store');
+    }
+
+
 
     /**
      * Gets query for [[OrderItem]].

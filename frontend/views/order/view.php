@@ -71,9 +71,9 @@ $this->registerJs($js);
         ?>
 
         <?php
-        // if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT ) {
-        //     echo Html::a('Refund', ['refund-order', 'order_uuid' => $model->order_uuid, 'storeUuid' => $storeUuid,], ['class' => 'btn btn-warning', 'style'=>'margin-left: 5px;']) ;
-        // }
+        if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT ) {
+            echo Html::a('Refund', ['refund-order', 'order_uuid' => $model->order_uuid, 'storeUuid' => $storeUuid,], ['class' => 'btn btn-warning  mr-1 mb-1', 'style'=>'margin-left: 7px;']) ;
+        }
         ?>
 
         <?php
