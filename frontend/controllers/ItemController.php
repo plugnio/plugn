@@ -186,6 +186,26 @@ class ItemController extends Controller
         ]);
     }
 
+
+
+    /**
+     * Update Stock Qty
+     * @param type $storeUuid
+     * @param type $itemUuid
+     * @return boolean
+     */
+    public function actionUpdateStockQty($itemUuid, $storeUuid){
+
+        $model = $this->findModel($itemUuid, $storeUuid);
+
+        if($model->load(Yii::$app->request->post()) && $model->save(false) ){
+          return $this->redirect(['inventory', 'storeUuid' => $storeUuid]);
+        }
+
+        return $this->redirect(['inventory', 'storeUuid' => $storeUuid]);
+
+    }
+
     /**
      * Delete item image
      * @param type $storeUuid
