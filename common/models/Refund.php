@@ -43,15 +43,17 @@ class Refund extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['restaurant_uuid', 'order_uuid', 'refund_amount'], 'required'],
+            [['restaurant_uuid', 'order_uuid', 'refund_amount', 'payment_uuid'], 'required'],
             [['refund_amount'], 'number','min' => 0.1 , 'max' => $this->order->total_price,
             'tooSmall' => '{attribute} must be greater than zero.',
             'tooBig' => '{attribute} cannot exceed amount available for refund'],
             [['refund_amount'], 'validateRefundAmount'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['order_uuid'], 'string', 'max' => 40],
+            [['payment_uuid'], 'string', 'max' => 36],
             [['refund_status', 'reason'], 'string', 'max' => 255],
             [['order_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_uuid' => 'order_uuid']],
+            [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
@@ -87,6 +89,7 @@ class Refund extends \yii\db\ActiveRecord
     {
         return [
             'refund_id' => 'Refund ID',
+            'payment_uuid' => 'Payment UUID',
             'restaurant_uuid' => 'Restaurant Uuid',
             'order_uuid' => 'Order Uuid',
             'refund_amount' => 'Refund amount',
@@ -173,7 +176,7 @@ class Refund extends \yii\db\ActiveRecord
      */
     public function getPayment()
     {
-        return $this->hasOne(Payment::className(), ['payment_uuid' => 'payment_uuid'])->via('order');
+        return $this->hasOne(Payment::className(), ['payment_uuid' => 'payment_uuid']);
     }
 
     /**
@@ -181,7 +184,7 @@ class Refund extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
+    public function getStore()
     {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }

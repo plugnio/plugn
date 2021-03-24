@@ -505,6 +505,7 @@ class OrderController extends Controller {
 
       $model = new Refund();
       $model->restaurant_uuid = $order_model->restaurant_uuid;
+      $model->payment_uuid = $order_model->payment_uuid;
       $model->order_uuid = $order_model->order_uuid;
 
       if(Model::loadMultiple($refunded_items_model, Yii::$app->request->post())  && $model->load(Yii::$app->request->post()) && $model->save()){
@@ -513,7 +514,9 @@ class OrderController extends Controller {
           foreach ($refunded_items_model as  $key => $refunded_item_model) {
             if($refunded_item_model->qty > 0){
               $refunded_item_model->refund_id = $model->refund_id;
-              $refunded_item_model->save();
+              if(!$refunded_item_model->save())
+              die('Error');
+
             }
 
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);

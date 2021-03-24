@@ -71,7 +71,7 @@ $this->registerJs($js);
         ?>
 
         <?php
-        if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT ) {
+        if ($model->payment_uuid && $model->restaurant->is_myfatoorah_enable &&  $model->order_status != Order::STATUS_REFUNDED && $model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT ) {
             echo Html::a('Refund', ['refund-order', 'order_uuid' => $model->order_uuid, 'storeUuid' => $storeUuid,], ['class' => 'btn btn-warning  mr-1 mb-1', 'style'=>'margin-left: 7px;']) ;
         }
         ?>
@@ -586,8 +586,8 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                         </tr>
                     </tbody>
     <?php
-    if ($model->order_status == Order::STATUS_REFUNDED || $model->order_status == Order::STATUS_PARTIALLY_REFUNDED && ($refunds->count() > 0)) {
-        foreach ($refunds->all() as $refund) {
+    if ($model->order_status == Order::STATUS_REFUNDED || $model->order_status == Order::STATUS_PARTIALLY_REFUNDED && ($model->refunds > 0)) {
+        foreach ($model->refunds as $refund) {
             ?>
                             <tbody class="order-details__summary__refund-lines">
                                 <tr class="order-details__summary__detail-line-row">

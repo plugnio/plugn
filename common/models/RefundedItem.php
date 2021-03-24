@@ -39,7 +39,7 @@ class RefundedItem extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['refund_id', 'order_item_id', 'order_uuid', 'qty'], 'required'],
+            [['refund_id', 'order_item_id', 'order_uuid', 'qty'], 'required', 'on' => 'create'],
             [['order_item_id', 'qty'], 'integer'],
             ['qty', 'validateQty'],
             [['item_price'], 'number'],
@@ -65,7 +65,7 @@ class RefundedItem extends \yii\db\ActiveRecord
     public function beforeSave($insert) {
 
         if($insert){
-          $this->order_uuid = $this->order->order_uuid;
+          // $this->order_uuid = $this->order->order_uuid;
           $this->item_uuid = $this->orderItem->item_uuid;
           $this->item_name = $this->orderItem->item_name;
           $this->item_price = $this->orderItem->item_price;
@@ -82,9 +82,9 @@ class RefundedItem extends \yii\db\ActiveRecord
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-        $this->orderItem->delete();
-        // foreach ($this->getOrderItem()->all() as   $orderItem)
-        //   $orderItem->delete();
+          //Update stock QTY
+          $this->item->decreaseStockQty($this->qty);
+
 
         return true;
     }
@@ -137,8 +137,6 @@ class RefundedItem extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('store');
     }
-
-
 
     /**
      * Gets query for [[OrderItem]].

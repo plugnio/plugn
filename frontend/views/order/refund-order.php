@@ -35,16 +35,6 @@ $this->registerJs($js);
     var itemsSubtotal = 0.000;
     var refundedQty = 0;
 
-    // $(function(){
-    //    $('.refund_total').change(function(){
-    //      conole.log('ttst');
-    //         getSalutationValue(this.value);
-    //           $('.refund_amount_btn').val(this.value);
-    //     });
-    //
-    //
-    //   });
-
 
     function inputHasBeenUpdated(event) {
         var userInput = document.getElementById("refund_amount").value;

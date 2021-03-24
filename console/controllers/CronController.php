@@ -13,6 +13,7 @@ use common\models\BankDiscount;
 use common\models\Payment;
 use common\models\Item;
 use common\models\City;
+use common\models\Refund;
 use common\models\Plan;
 use common\models\Area;
 use common\models\Order;
@@ -273,27 +274,52 @@ class CronController extends \yii\console\Controller {
 
 
     /**
-     * Update refund status  for all refunds record
+     * make the Refund Request from the API directly without the need of login into My Fatoorah dashboard
      */
-    public function actionUpdateRefundStatusMessage() {
+    public function actionMakeRefund() {
 
-        $restaurants = Restaurant::find()->all();
-        foreach ($restaurants as $restaurant) {
+        $refunds = Refund::find()
+                    ->joinWith(['restaurant'])
+                    ->where(['restaurant.is_myfatoorah_enable' => 1])
+                    ->all();
 
-            foreach ($restaurant->getRefunds()->all() as $refund) {
+        foreach ($refunds as $refund) {
 
-                Yii::$app->tapPayments->setApiKeys($restaurant->live_api_key, $restaurant->test_api_key);
-                $response = Yii::$app->tapPayments->retrieveRefund($refund->refund_id);
+                $response = Yii::$app->myFatoorahPayment->makeRefund($refund->payment_uuid, $refund->refund_amount, $refund->store->supplierCode);
 
-                if (!array_key_exists('errors', $response->data)) {
-                    if ($refund->refund_status != $response->data['status']) {
-                        $refund->refund_status = $response->data['status'];
-                        $refund->save(false);
-                    }
+                $responseContent = json_decode($response->content);
+
+                //TODO
+                if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
+                    $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
+                    return Yii::error('Error when uploading authorized signature document: ' . $errorMessage);
                 }
             }
-        }
     }
+
+
+    /**
+     * Update refund status  for all refunds record
+     */
+    // public function actionUpdateRefundStatusMessage() {
+    //
+    //     $restaurants = Restaurant::find()->all();
+    //     foreach ($restaurants as $restaurant) {
+    //
+    //         foreach ($restaurant->getRefunds()->all() as $refund) {
+    //
+    //             Yii::$app->tapPayments->setApiKeys($restaurant->live_api_key, $restaurant->test_api_key);
+    //             $response = Yii::$app->tapPayments->retrieveRefund($refund->refund_id);
+    //
+    //             if (!array_key_exists('errors', $response->data)) {
+    //                 if ($refund->refund_status != $response->data['status']) {
+    //                     $refund->refund_status = $response->data['status'];
+    //                     $refund->save(false);
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     /**
      * Update voucher status
