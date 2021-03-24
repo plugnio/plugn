@@ -891,7 +891,7 @@ class Order extends \yii\db\ActiveRecord {
           }
 
       } else if (!$insert && $this->order_mode == Order::ORDER_MODE_PICK_UP){
-        
+
         if ($this->pickup_location_id){
           $this->country_name = $this->pickupLocation->country->country_name;
           $this->country_name_ar = $this->pickupLocation->country->country_name_ar;
