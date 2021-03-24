@@ -12,6 +12,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 
 $this->title = 'Refund';
+$this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index', 'storeUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = ['label' => 'Order #' . $model->order_uuid, 'url' => ['index', 'storeUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -222,7 +223,7 @@ z-index: 2;
                                             </div>
                                             <!-- Product price -->
                                             <div>
-                                                <?= Yii::$app->formatter->asCurrency($refundedItem->orderItem->item_price, '', [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
+                                                <?= Yii::$app->formatter->asCurrency($refundedItem->orderItem->item_price, $refundedItem->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
                                             </div>
                                         </div>
                                     </div>
