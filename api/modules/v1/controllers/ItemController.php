@@ -82,25 +82,25 @@ class ItemController extends Controller {
 
     /**
      */
-    public function actionDeleteItemImage() {
-      $fullPath = Yii::$app->request->getBodyParam("file");
-      $file_name = Yii::$app->request->getBodyParam("name");
-
-
-      $restaurant_uuid = explode("restaurants/", $fullPath);
-      $restaurant_uuid = $restaurant_uuid[1];
-      $restaurant_uuid = explode("/items/" . $file_name, $restaurant_uuid);
-      $restaurant_uuid = $restaurant_uuid[0];
-
-
-      $item_image = ItemImage::find()->where(['product_file_name' => $file_name])->one();
-
-
-      if($item_image->item->restaurant_uuid == $restaurant_uuid && $item_image)
-        $item_image->delete();
-
-      return true;
-    }
+    // public function actionDeleteItemImage() {
+    //   $fullPath = Yii::$app->request->getBodyParam("file");
+    //   $file_name = Yii::$app->request->getBodyParam("name");
+    //
+    //
+    //   $restaurant_uuid = explode("restaurants/", $fullPath);
+    //   $restaurant_uuid = $restaurant_uuid[1];
+    //   $restaurant_uuid = explode("/items/" . $file_name, $restaurant_uuid);
+    //   $restaurant_uuid = $restaurant_uuid[0];
+    //
+    //
+    //   $item_image = ItemImage::find()->where(['product_file_name' => $file_name])->one();
+    //
+    //
+    //   if($item_image->item->restaurant_uuid == $restaurant_uuid && $item_image)
+    //     $item_image->delete();
+    //
+    //   return true;
+    // }
 
     /**
      * Return restaurant menu

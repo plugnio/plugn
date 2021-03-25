@@ -196,6 +196,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['not_for_profit'], 'number'],
             [['authorized_signature_issuing_date', 'authorized_signature_expiry_date', 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             ['owner_email', 'email'],
+            ['iban', 'safe'],
             [
                 [
                     'business_type', 'vendor_sector', 'license_number',
@@ -809,6 +810,9 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset($fields['operator_id']);
         unset($fields['live_api_key']);
         unset($fields['test_api_key']);
+        unset($fields['live_public_key']);
+        unset($fields['test_public_key']);
+        unset($fields['sitemap_require_update']);
         unset($fields['business_type']);
         unset($fields['restaurant_email']);
         unset($fields['license_number']);

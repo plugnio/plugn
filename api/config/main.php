@@ -54,12 +54,10 @@ return [
                     'patterns' => [
                         'GET detail' => 'item-data',
                         'GET' => 'restaurant-menu',
-                        'POST delete-item-image' => 'delete-item-image',
                         'GET <category_id>' => 'category-products',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
-                        'OPTIONS delete-item-image' => 'options',
                         'OPTIONS <category_id>' => 'options',
                     ]
                 ],
@@ -81,12 +79,10 @@ return [
                     'patterns' => [
                         'GET detail' => 'item-data',
                         'GET' => 'restaurant-menu',
-                        'POST delete-item-image' => 'delete-item-image',
                         'GET <category_id>' => 'category-products',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
-                        'OPTIONS delete-item-image' => 'options',
                         'OPTIONS <category_id>' => 'options',
                     ]
                 ],
@@ -132,12 +128,10 @@ return [
                     'patterns' => [
                         'GET get-opening-hours' => 'get-opening-hours',
                         'GET locations/<id>' => 'list-all-stores-locations',
-                        'GET branches/<id>' => 'list-all-restaurants-branches',
                         'GET get-restaurant-data/<branch_name>' => 'get-restaurant-data',
                         // OPTIONS VERBS
                         'OPTIONS get-opening-hours' => 'options',
                         'OPTIONS locations/<id>' => 'options',
-                        'OPTIONS branches/<id>' => 'options',
                         'OPTIONS get-restaurant-data/<branch_name>' => 'options',
                     ]
                 ],
@@ -188,7 +182,7 @@ return [
                         'GET apply-promo-code' => 'apply-promo-code',
                         'GET apply-bank-discount' => 'apply-bank-discount',
                         'GET <id>/<restaurant_uuid>' => 'order-details',
-                        'GET order-details/<id>/<restaurant_uuid>' => 'get-order-details',
+                        'GET order-details/<id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
@@ -212,8 +206,7 @@ return [
                         'GET callback' => 'callback',
                         'GET apply-promo-code' => 'apply-promo-code',
                         'GET apply-bank-discount' => 'apply-bank-discount',
-                        'GET <id>/<restaurant_uuid>' => 'order-details',
-                        'GET order-details/<id>/<restaurant_uuid>' => 'get-order-details',
+                        'GET order-details/<id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
@@ -222,7 +215,6 @@ return [
                         'OPTIONS callback' => 'options',
                         'OPTIONS apply-promo-code' => 'options',
                         'OPTIONS apply-bank-discount' => 'options',
-                        'OPTIONS <id>/<restaurant_uuid>' => 'options',
                         'OPTIONS order-details/<id>/<restaurant_uuid>' => 'options',
                     ]
                 ],

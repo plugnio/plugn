@@ -74,13 +74,13 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                         <?= $model->area_id && $model->avenue ? 'Avenue: ' . $model->avenue : ''; ?>
                       </span>
                       <span style="display: block" >
-                        <?= $model->area_id && $model->floor && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? 'Floor: ' . $model->floor : ''?>
+                        <?= $model->area_id && $model->floor != null && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? 'Floor: ' . $model->floor : ''?>
                       </span>
                       <span style="display: block" >
-                        <?=  $model->area_id && $model->apartment && $model->unit_type == 'Apartment' ? 'Apartment No. ' . $model->apartment : ''?>
+                        <?=  $model->area_id && $model->apartment != null && $model->unit_type == 'Apartment' ? 'Apartment No. ' . $model->apartment : ''?>
                       </span>
                       <span style="display: block" >
-                        <?=  $model->area_id && $model->office && $model->unit_type == 'Office'  ? 'Office No. ' . $model->office : ''?>
+                        <?=  $model->area_id && $model->office != null && $model->unit_type == 'Office'  ? 'Office No. ' . $model->office : ''?>
                       </span>
                       <span style="display: block" >
                         <?= $model->area_id ? ($model->unit_type == 'House' ? 'House No. ' : 'Building: ') . $model->house_number :  ''  ?>
@@ -89,12 +89,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                         <?= $model->area_id ?  $model->area->city->city_name :  '' ?>
                       </span>
                       <span style="display: block" >
-                        <?=  $model->country_name ?
-                        $model->country_name : ( $model->order_mode == 1 ?
-                        ($model->delivery_zone_id && $model->deliveryZone->country ?
-                        $model->deliveryZone->country->country_name  : '') : ($model->pickupLocation && $model->pickupLocation->country ?
-                        $model->pickupLocation->country->country_name : ''));
-                          ?>
+                        <?=  $model->country_name ? $model->country_name : ''; ?>
                       </span>
                       <span style="display: block" >
                         <?=  $model->customer_phone_number  ?>

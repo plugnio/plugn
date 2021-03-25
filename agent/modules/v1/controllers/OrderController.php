@@ -61,49 +61,189 @@ class OrderController extends Controller {
 
 
     /**
-     * Get All pending Orders
+     * Return a List pending Orders
      * @param type $id
-     * @param type $restaurant_uuid
+     * @param type $store_uuid
      * @return type
      */
-    public function actionGetAllPendingOrders($store_uuid) {
+    public function actionListPendingOrders($store_uuid) {
 
-        $pendingOrders =  Order::find()
-                  ->where(['order.restaurant_uuid' => $store_uuid])
-                  ->andWhere(['order.order_status' => Order::STATUS_PENDING])
-                  ->joinWith('restaurant',false)
-                  ->with([
-                          'deliveryZone' => function ($query) {
-                              $query
-                              ->with('businessLocation');
-                          }
-                  ])
-                  ->with(['pickupLocation'])
-                  ->select([
-                              'order.order_uuid' ,
-                              'order.customer_name',
-                              'order.customer_phone_number',
-                              'order.restaurant_uuid',
-                              'order.restaurant_uuid',
-                              'order.estimated_time_of_arrival',
-                              'delivery_zone_id',
-                              'pickup_location_id',
-                              'restaurant.name'
-                  ])
-                  ->asArray()
-                  ->all();
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+
+          $pendingOrders =  Order::find()
+                    ->where(['order.restaurant_uuid' => $store_uuid])
+                    ->andWhere(['order.order_status' => Order::STATUS_PENDING])
+                    ->joinWith('restaurant',false)
+                    ->with([
+                            'deliveryZone' => function ($query) {
+                                $query
+                                ->with('businessLocation');
+                            }
+                    ])
+                    ->with(['pickupLocation'])
+                    ->select([
+                                'order.order_uuid' ,
+                                'order.customer_name',
+                                'order.customer_phone_number',
+                                'order.restaurant_uuid',
+                                'order.restaurant_uuid',
+                                'order.estimated_time_of_arrival',
+                                'delivery_zone_id',
+                                'pickup_location_id',
+                                'restaurant.name'
+                    ])
+                    ->asArray()
+                    ->all();
 
 
-        if (!$pendingOrders) {
-            return [
-                'operation' => 'error',
-                'message' => 'No incoming orders'
-            ];
-        }
+          if (!$pendingOrders) {
+              return [
+                  'operation' => 'error',
+                  'message' => 'No incoming orders'
+              ];
+          }
 
-        return [
-            'operation' => 'success',
-            'body' => $pendingOrders
-        ];
+          return [
+              'operation' => 'success',
+              'body' => $pendingOrders
+          ];
+
+      }
+
     }
+
+
+    /**
+     * Return a List active Orders
+     * @param type $id
+     * @param type $store_uuid
+     * @return type
+     */
+    public function actionListActiveOrders($store_uuid) {
+
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+
+          $activeOrders =  Order::find()
+                    ->activeOrders($store_uuid)
+                    ->all();
+
+
+          if (!$activeOrders) {
+              return [
+                  'operation' => 'error',
+                  'message' => 'No results found.'
+              ];
+          }
+
+          return [
+              'operation' => 'success',
+              'body' => $activeOrders
+          ];
+
+      }
+
+    }
+
+
+    /**
+     * Return a List draft Orders
+     * @param type $id
+     * @param type $store_uuid
+     * @return type
+     */
+    public function actionListDraftOrders($store_uuid) {
+
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+
+          $draftOrders =  Order::find()
+                    ->where(['order.restaurant_uuid' => $store_uuid])
+                    ->andWhere(['order.order_status' => Order::STATUS_DRAFT])
+                    ->asArray()
+                    ->all();
+
+
+          if (!$draftOrders) {
+              return [
+                  'operation' => 'error',
+                  'message' => 'No results found.'
+              ];
+          }
+
+          return [
+              'operation' => 'success',
+              'body' => $draftOrders
+          ];
+
+      }
+
+    }
+
+
+    /**
+     * Return a List abandoned Orders
+     * @param type $id
+     * @param type $store_uuid
+     * @return type
+     */
+    public function actionListAbandonedOrders($store_uuid) {
+
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+
+          $abandonedOrders =  Order::find()
+                    ->where(['order.restaurant_uuid' => $store_uuid])
+                    ->andWhere(['order.order_status' => Order::STATUS_ABANDONED_CHECKOUT])
+                    ->asArray()
+                    ->all();
+
+
+          if (!$abandonedOrders) {
+              return [
+                  'operation' => 'error',
+                  'message' => 'No results found.'
+              ];
+          }
+
+          return [
+              'operation' => 'success',
+              'body' => $abandonedOrders
+          ];
+
+      }
+
+  }
+
+    /**
+    * Return order detail
+     * @param type $store_uuid
+     * @param type $order_uuid
+     * @return type
+     */
+    public function actionDetail($store_uuid, $order_uuid) {
+
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+
+          $order =  Order::find()
+                    ->where(['order.restaurant_uuid' => $store_uuid])
+                    ->andWhere(['order.order_uuid' => $order_uuid])
+                    ->asArray()
+                    ->one();
+
+
+          if (!$order) {
+
+              return [
+                  'operation' => 'error',
+                  'message' => 'No results found.'
+              ];
+          }
+
+          return [
+              'operation' => 'success',
+              'body' => $order
+          ];
+
+      }
+
+  }
+
 }

@@ -25,6 +25,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property int|null $shipping_country_id
  * @property string|null $country_name
  * @property string|null $country_name_ar
+ * @property string|null $business_location_name
  * @property string|null $floor
  * @property string|null $apartment
  * @property string|null $office
@@ -250,7 +251,7 @@ class Order extends \yii\db\ActiveRecord {
                  'customer_name', 'customer_email',
                  'payment_method_name', 'payment_method_name_ar',
                  'armada_tracking_link', 'armada_qr_code_link', 'armada_delivery_code',
-                 'country_name','country_name_ar',
+                 'country_name','country_name_ar', 'business_location_name',
                  'building', 'apartment', 'city',  'address_1' , 'address_2','postalcode', 'floor', 'office'
              ],
              'string', 'max' => 255],
@@ -322,6 +323,30 @@ class Order extends \yii\db\ActiveRecord {
         return $uuid;
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function fields() {
+        $fields = parent::fields();
+
+        // remove fields that contain sensitive information
+        unset($fields['armada_delivery_code']);
+        unset($fields['mashkor_order_number']);
+        unset($fields['mashkor_tracking_link']);
+        unset($fields['mashkor_driver_name']);
+        unset($fields['mashkor_driver_phone']);
+        unset($fields['mashkor_order_status']);
+        unset($fields['armada_tracking_link']);
+        unset($fields['reminder_sent']);
+        unset($fields['sms_sent']);
+        unset($fields['items_has_been_restocked']);
+        unset($fields['subtotal_before_refund']);
+        unset($fields['total_price_before_refund']);
+
+        return $fields;
+
+    }
 
     /**
      * @inheritdoc
@@ -496,6 +521,7 @@ class Order extends \yii\db\ActiveRecord {
             'delivery_zone_id' => 'Delivery Zone ID',
             'country_name' => 'Country Name',
             'country_name_ar' => 'Country Name Ar',
+            'business_location_name' => 'Branch',
             'floor' => 'Floor',
             'apartment' => 'Apartment',
             'office' => 'Office',
@@ -858,7 +884,19 @@ class Order extends \yii\db\ActiveRecord {
           if($this->delivery_zone_id){
             $this->country_name = $this->deliveryZone->country->country_name;
             $this->country_name_ar = $this->deliveryZone->country->country_name_ar;
+
+            if($this->deliveryZone->business_location_id)
+              $this->business_location_name = $this->deliveryZone->businessLocation->business_location_name;
+
           }
+
+      } else if (!$insert && $this->order_mode == Order::ORDER_MODE_PICK_UP){
+
+        if ($this->pickup_location_id){
+          $this->country_name = $this->pickupLocation->country->country_name;
+          $this->country_name_ar = $this->pickupLocation->country->country_name_ar;
+          $this->business_location_name = $this->pickupLocation->business_location_name;
+        }
 
       }
 

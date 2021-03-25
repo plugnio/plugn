@@ -76,7 +76,6 @@ class OrderController extends Controller {
 
         if ($restaurant_model) {
 
-
             $order = new Order();
             $order->setScenario(Order::SCENARIO_OLD_VERSION);
 
@@ -495,7 +494,7 @@ class OrderController extends Controller {
      * @return type
      */
     public function actionOrderDetails($id, $restaurant_uuid) {
-        $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->with('restaurant', 'orderItems', 'restaurantBranch', 'payment')->asArray()->one();
+      $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->with('orderItems', 'payment')->asArray()->one();
 
 
         if (!$model) {
@@ -517,22 +516,22 @@ class OrderController extends Controller {
      * @param type $restaurant_uuid
      * @return type
      */
-    public function actionGetOrderDetails($id, $restaurant_uuid) {
-        $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->one();
-
-
-        if (!$model) {
-            return [
-                'operation' => 'error',
-                'message' => 'Invalid order uuid'
-            ];
-        }
-
-        return [
-            'operation' => 'success',
-            'body' => $model
-        ];
-    }
+    // public function actionGetOrderDetails($id, $restaurant_uuid) {
+    //     $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->one();
+    //
+    //
+    //     if (!$model) {
+    //         return [
+    //             'operation' => 'error',
+    //             'message' => 'Invalid order uuid'
+    //         ];
+    //     }
+    //
+    //     return [
+    //         'operation' => 'success',
+    //         'body' => $model
+    //     ];
+    // }
 
     /**
      * Whether is valid promo code or no

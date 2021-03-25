@@ -158,74 +158,53 @@ class StoreController extends Controller {
         }
     }
 
-
     /**
-     * Return Restaurant's branches
+     * Return Restaurant's data
      */
-    public function actionListAllRestaurantsBranches($id) {
+    public function actionGetRestaurantData($branch_name) {
 
-        $restaurantBranches = RestaurantBranch::find()
-                        ->where(['restaurant_uuid' => $id])->all();
+      $store = Restaurant::find()
+              ->where(['store_branch_name' => $branch_name]);
 
-        if ($restaurantBranches) {
-            return $restaurantBranches;
+      if( $store->exists() ){
+
+        $restaurant = $store
+                ->select(['restaurant_uuid', 'name', 'logo', 'tagline', 'restaurant_domain', 'app_id', 'google_analytics_id', 'facebook_pixil_id', 'custom_css'])
+                ->one();
+
+
+        $themeColor = RestaurantTheme::find()
+                ->select(['primary'])
+                ->where(['restaurant_uuid' => $restaurant->restaurant_uuid])
+                ->one();
+
+        if ($restaurant && $themeColor) {
+            return [
+                'restaurant_uuid' => $restaurant->restaurant_uuid,
+                'name' => $restaurant->name,
+                'logo' => $restaurant->logo,
+                'tagline' => $restaurant->tagline,
+                'restaurant_domain' => $restaurant->restaurant_domain,
+                'app_id' => $restaurant->app_id,
+                'google_analytics_id' => $restaurant->google_analytics_id,
+                'facebook_pixil_id' => $restaurant->facebook_pixil_id,
+                'custom_css' => $restaurant->custom_css,
+                'theme_color' => $themeColor->primary,
+            ];
         } else {
             return [
                 'operation' => 'error',
-                'message' => 'Store Uuid is invalid'
+                'message' => 'Branch name is invalid'
+            ];
+        }
+
+
+      } else {
+            return [
+                'operation' => 'error',
+                'message' => 'Branch name is invalid'
             ];
         }
     }
-
-
-
-        /**
-         * Return Restaurant's data
-         */
-        public function actionGetRestaurantData($branch_name) {
-
-          $store = Restaurant::find()
-                  ->where(['store_branch_name' => $branch_name]);
-
-          if( $store->exists() ){
-
-            $restaurant = $store
-                    ->select(['restaurant_uuid', 'name', 'logo', 'tagline', 'restaurant_domain', 'app_id', 'google_analytics_id', 'facebook_pixil_id', 'custom_css'])
-                    ->one();
-
-
-            $themeColor = RestaurantTheme::find()
-                    ->select(['primary'])
-                    ->where(['restaurant_uuid' => $restaurant->restaurant_uuid])
-                    ->one();
-
-            if ($restaurant && $themeColor) {
-                return [
-                    'restaurant_uuid' => $restaurant->restaurant_uuid,
-                    'name' => $restaurant->name,
-                    'logo' => $restaurant->logo,
-                    'tagline' => $restaurant->tagline,
-                    'restaurant_domain' => $restaurant->restaurant_domain,
-                    'app_id' => $restaurant->app_id,
-                    'google_analytics_id' => $restaurant->google_analytics_id,
-                    'facebook_pixil_id' => $restaurant->facebook_pixil_id,
-                    'custom_css' => $restaurant->custom_css,
-                    'theme_color' => $themeColor->primary,
-                ];
-            } else {
-                return [
-                    'operation' => 'error',
-                    'message' => 'Branch name is invalid'
-                ];
-            }
-
-
-          } else {
-                return [
-                    'operation' => 'error',
-                    'message' => 'Branch name is invalid'
-                ];
-            }
-        }
 
 }

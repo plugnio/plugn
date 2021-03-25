@@ -37,6 +37,52 @@ use yii\db\Expression;
 class CronController extends \yii\console\Controller {
 
 
+    public function actionTest(){
+
+      $orders = Order::find()
+                ->with(['deliveryZone','deliveryZone.country', 'pickupLocation', 'pickupLocation.country', 'area', 'area.country'])
+                ->all();
+
+
+      foreach ($orders as $key => $order) {
+        if(  $order->order_mode == Order::ORDER_MODE_DELIVERY ){
+
+            if($order->delivery_zone_id && $order->deliveryZone->business_location_id ){
+              $order->business_location_name = $order->deliveryZone->businessLocation->business_location_name;
+              $order->country_name =  $order->deliveryZone->country->country_name;
+              $order->country_name_ar =  $order->deliveryZone->country->country_name_ar;
+              $order->save(false);
+            } else if( !$order->delivery_zone_id ){
+
+              if($order->area_id){
+                $order->country_name = $order->area->country->country_name;
+                $order->country_name_ar = $order->area->country->country_name_ar;
+                $order->save(false);
+              }
+
+            }
+
+
+        } else {
+
+          if ($order->pickup_location_id){
+            $order->business_location_name = $order->pickupLocation->business_location_name;
+            $order->country_name = $order->pickupLocation->country->country_name;
+            $order->country_name_ar = $order->pickupLocation->country->country_name_ar;
+            $order->save(false);
+          }
+
+        }
+
+      }
+
+      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
+      return self::EXIT_CODE_NORMAL;
+
+    }
+
+
+
     public function actionQatar(){
       $jsonString = file_get_contents('qatar.json');
       $data = json_decode($jsonString, true);

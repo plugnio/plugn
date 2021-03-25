@@ -84,19 +84,6 @@ $this->registerJs($js);
         </div>
 
 
-        <?php
-          // Html::a('Delete',
-          // ['delete', 'id' => $businessLocation->business_location_id, 'storeUuid' => $store->restaurant_uuid],
-          // [
-          //   'style' => ' position: absolute; top: 10px; right: 10px; color:#EA5455',
-          //   'data' => [
-          //       'confirm' => 'Are you sure you want to delete this location?',
-          //       'method' => 'post',
-          //   ]
-          // ],
-          // )
-        ?>
-
 
 
         </div>

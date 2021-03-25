@@ -1,16 +1,15 @@
 <?php
 
-namespace api\modules\v1\controllers;
+namespace agent\modules\v1\controllers;
 
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
-use common\models\RestaurantPaymentMethod;
-use common\models\PaymentMethod;
-use common\models\Payment;
-use common\models\Restaurant;
+use yii\helpers\Url;
+use yii\web\NotFoundHttpException;
+use common\models\Category;
 
-class PaymentController extends Controller {
+class CategoryController extends Controller {
 
     public function behaviors() {
         $behaviors = parent::behaviors();
@@ -36,7 +35,14 @@ class PaymentController extends Controller {
             ],
         ];
 
-        return $behaviors;
+        // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
+              $behaviors['authenticator'] = [
+                  'class' => \yii\filters\auth\HttpBearerAuth::className(),
+              ];
+              // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+              $behaviors['authenticator']['except'] = ['options'];
+
+              return $behaviors;
     }
 
     /**
@@ -53,29 +59,39 @@ class PaymentController extends Controller {
         return $actions;
     }
 
-    /**
-     *  Return Payment details
-     */
-    // public function actionPaymentDetail($id) {
-    //
-    //     $model = Payment::find()->where(['payment_uuid' => $id])->with('order')->asArray()->one();
-    //
-    //     return $model;
-    // }
-    //
-
 
     /**
-     * return a list of payments method that restaurant's owner added on agent dashboard
+    * Get all store's categories
+     * @param type $id
+     * @param type $store_uuid
+     * @return type
      */
-    public function actionListAllRestaurantsPaymentMethod($id) {
+    public function actionList($store_uuid) {
 
-        $model = Restaurant::findOne($id);
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
-        return new ActiveDataProvider([
-            'query' => $model->getPaymentMethods()->asArray(),
-            'pagination' => false
-        ]);
+          $categories =  Category::find()
+                    ->where(['restaurant_uuid' => $store_uuid])
+                    ->asArray()
+                    ->all();
+
+
+          if (!$categories) {
+              return [
+                  'operation' => 'error',
+                  'message' => 'No results found'
+              ];
+          }
+
+          return [
+              'operation' => 'success',
+              'body' => $categories
+          ];
+
+      }
+
     }
+
+
 
 }
