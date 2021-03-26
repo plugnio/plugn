@@ -8,7 +8,7 @@ $this->title = 'Admin dashboard';
 <div class="site-index">
 
     <div class="jumbotron">
-        <h1>Plugn Management!</h1>
+        <h1>Plugn Management!!!!</h1>
 
         <p class="lead">Dashboard with a summary of whats going on in the project</p>
 
