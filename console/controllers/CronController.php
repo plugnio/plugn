@@ -279,13 +279,14 @@ class CronController extends \yii\console\Controller {
     public function actionMakeRefund() {
 
         $refunds = Refund::find()
-                    ->joinWith(['restaurant'])
+                    ->joinWith(['store','payment'])
                     ->where(['restaurant.is_myfatoorah_enable' => 1])
+                    ->andWhere(['NOT', ['refund.payment_uuid' => null]])
                     ->all();
 
         foreach ($refunds as $refund) {
 
-                $response = Yii::$app->myFatoorahPayment->makeRefund($refund->payment_uuid, $refund->refund_amount, $refund->store->supplierCode);
+                $response = Yii::$app->myFatoorahPayment->makeRefund($refund->payment->payment_gateway_payment_id, $refund->refund_amount, $refund->reason, $refund->store->supplierCode);
 
                 $responseContent = json_decode($response->content);
 
@@ -293,8 +294,20 @@ class CronController extends \yii\console\Controller {
                 if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
                     $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
                     return Yii::error('Error when uploading authorized signature document: ' . $errorMessage);
+                } else {
+
+                  $refund->refund_reference = $responseContent->Data->RefundReference;
+                  $refund->refund_status = 'Pending';
+                  $refund->save(false);
+
+                  $this->stdout("Your refund request has been initiated successfully  \n", Console::FG_RED, Console::BOLD);
+                  return self::EXIT_CODE_NORMAL;
                 }
-            }
+        }
+
+        $this->stdout("No refund requests available \n", Console::FG_RED, Console::BOLD);
+        return self::EXIT_CODE_NORMAL;
+
     }
 
 
@@ -370,6 +383,7 @@ class CronController extends \yii\console\Controller {
         $now = new DateTime('now');
         $payments = Payment::find()
                 ->where("received_callback = 0")
+                ->andWhere(['payment_gateway_name' => 'tap'])
                 ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')])
                 ->all();
 
@@ -377,12 +391,8 @@ class CronController extends \yii\console\Controller {
             foreach ($payments as $payment) {
                 try {
 
-                    if (($payment->payment_gateway_transaction_id && $payment->payment_gateway_name == 'tap') || ($payment->payment_gateway_invoice_id && $payment->payment_gateway_name == 'myfatoorah') ) {
-                        if($payment->payment_gateway_name == 'tap' && $payment->payment_gateway_transaction_id)
-                          $payment = Payment::updatePaymentStatusFromTap($payment->payment_gateway_transaction_id);
-                        else if ($payment->payment_gateway_name == 'myfatoorah' && $payment->payment_gateway_invoice_id)
-                          $payment = Payment::updatePaymentStatusFromMyFatoorah($payment->payment_gateway_invoice_id);
-
+                    if ( $payment->payment_gateway_transaction_id ) {
+                        $payment = Payment::updatePaymentStatusFromTap($payment->payment_gateway_transaction_id);
                         $payment->received_callback = true;
                         $payment->save(false);
                     }

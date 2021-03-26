@@ -304,8 +304,15 @@ class OrderController extends Controller {
             $payment = Payment::findOne($id);
 
             if (($payment = Payment::find()->where(['payment_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->one()) !== null) {
-              $transaction_id = $payment->payment_gateway_transaction_id;
-              Payment::updatePaymentStatusFromTap($transaction_id, true);
+
+              if($payment->payment_gateway == 'tap'){
+                $transaction_id = $payment->payment_gateway_transaction_id;
+                Payment::updatePaymentStatusFromTap($transaction_id, true);
+              } else if ($payment->payment_gateway == 'myfatoorah'){
+                $invoice_id = $payment->payment_gateway_invoice_id;
+                Payment::updatePaymentStatusFromMyFatoorah($invoice_id, true);
+              }
+
               return $this->redirect(['view', 'id' => $payment->order_uuid, 'storeUuid' => $storeUuid]);
             }
 

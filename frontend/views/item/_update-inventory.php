@@ -1,5 +1,6 @@
 <?php
 
+use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use common\models\Category;
@@ -18,9 +19,11 @@ use common\components\FileUploader;
 /* @var $form yii\widgets\ActiveForm */
 
 
-$form = ActiveForm::begin([
-						'enableClientScript' => false,
-]);
+		$form = ActiveForm::begin([
+								'enableClientScript' => false,
+								'method' => 'post',
+								'action' => Url::to(['item/update-stock-qty', 'itemUuid' => $model->item_uuid, 'storeUuid' => $model->restaurant_uuid]),
+		]);
 		?>
 
 		<div class="row">
@@ -38,7 +41,7 @@ $form = ActiveForm::begin([
 		<div class="col-4" style="padding:0px">
 
 				<?=
-				Html::submitButton('Save', ['style' => 'margin-right: 20px; border-top-left-radius: unset;   border-bottom-left-radius: unset;height: calc(1.25em + 1.4rem + 0px);', 'class' => 'btn btn-success', 'name' => $model->item_uuid])
+				Html::submitButton('Save', ['style' => 'margin-right: 20px; border-top-left-radius: unset;   border-bottom-left-radius: unset;height: calc(1.25em + 1.4rem + 0px);', 'class' => 'btn btn-success'])
 				?>
 
 		</div>

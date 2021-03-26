@@ -444,7 +444,6 @@ class OrderController extends Controller {
                                     1
                             );
 
-
                             $responseContent = json_decode($response->content);
 
 

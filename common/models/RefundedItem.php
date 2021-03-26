@@ -19,7 +19,7 @@ use Yii;
  * @property Item $item
  * @property OrderItem $orderItem
  * @property Order $order
- * @property Store $restaurant
+ * @property Restaurant $restaurant
  * @property Refund $refund
  * @property ItemImage[] $itemImages
  */
@@ -39,7 +39,7 @@ class RefundedItem extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['refund_id', 'order_item_id', 'order_uuid', 'qty'], 'required', 'on' => 'create'],
+            [['refund_id', 'order_item_id', 'order_uuid', 'qty'], 'required'],
             [['order_item_id', 'qty'], 'integer'],
             ['qty', 'validateQty'],
             [['item_price'], 'number'],
@@ -65,7 +65,7 @@ class RefundedItem extends \yii\db\ActiveRecord
     public function beforeSave($insert) {
 
         if($insert){
-          // $this->order_uuid = $this->order->order_uuid;
+          $this->order_uuid = $this->order->order_uuid;
           $this->item_uuid = $this->orderItem->item_uuid;
           $this->item_name = $this->orderItem->item_name;
           $this->item_price = $this->orderItem->item_price;
@@ -82,9 +82,16 @@ class RefundedItem extends \yii\db\ActiveRecord
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-          //Update stock QTY
-          $this->item->decreaseStockQty($this->qty);
+        $order_item_model = $this->orderItem;
 
+        if($this->qty == $order_item_model->qty)
+          $order_item_model->delete();
+        else {
+          $order_item_model->qty -= $this->qty;
+          $order_item_model->save(false);
+        }
+        // foreach ($this->getOrderItem()->all() as   $orderItem)
+        //   $orderItem->delete();
 
         return true;
     }
@@ -127,17 +134,6 @@ class RefundedItem extends \yii\db\ActiveRecord
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('order');
     }
 
-
-    /**
-     * Gets query for [[Currency]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCurrency()
-    {
-        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('store');
-    }
-
     /**
      * Gets query for [[OrderItem]].
      *
@@ -167,6 +163,17 @@ class RefundedItem extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid']);
     }
+
+    /**
+     * Gets query for [[Currency]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('store');
+    }
+
 
     /**
      * Gets query for [[Refund]].

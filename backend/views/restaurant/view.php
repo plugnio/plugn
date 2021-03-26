@@ -60,6 +60,13 @@ $this->params['breadcrumbs'][] = $this->title;
               },
               'format' => 'raw'
           ],
+          [
+              'label' => 'is_myfatoorah_enable',
+              'value' => function ($data) {
+                  return $data->is_myfatoorah_enable ? 'Yes' : 'No';
+              },
+              'format' => 'raw'
+          ],
             'tap_queue_id',
             'version',
             'sitemap_require_update',

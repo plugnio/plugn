@@ -9,6 +9,7 @@ use common\models\Payment;
 use common\models\OrderItem;
 use common\models\Restaurant;
 use yii\helpers\Html;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "refund".
@@ -16,6 +17,7 @@ use yii\helpers\Html;
  * @property int $refund_id
  * @property string $restaurant_uuid
  * @property string $order_uuid
+ * @property string $refund_reference
  * @property float $refund_amount
 
  * @property string $refund_status
@@ -51,7 +53,7 @@ class Refund extends \yii\db\ActiveRecord
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['order_uuid'], 'string', 'max' => 40],
             [['payment_uuid'], 'string', 'max' => 36],
-            [['refund_status', 'reason'], 'string', 'max' => 255],
+            [['refund_status', 'reason', 'refund_reference'], 'string', 'max' => 255],
             [['order_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_uuid' => 'order_uuid']],
             [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
@@ -78,8 +80,41 @@ class Refund extends \yii\db\ActiveRecord
                     return $this->refund_id;
                 }
             ],
+            [
+                'class' => \yii\behaviors\TimestampBehavior::className(),
+                'createdAtAttribute' => 'refund_created_at',
+                'updatedAtAttribute' => 'refund_updated_at',
+                'value' => new Expression('NOW()'),
+            ],
         ];
     }
+
+
+
+
+    /**
+     * Update refund's Status from Myfatoorah Payments
+     * @param  [type]  $id                           [description]
+     * @param  string $responseContent [description]
+     * @return self                                [description]
+     */
+    public static function updateRefundStatus($refundReference, $responseContent) {
+
+        // Look for refund with same refund_reference
+        $refundRecord = \common\models\Refund::findOne(['refund_reference' => $refundReference]);
+        if (!$refundRecord) {
+            throw new NotFoundHttpException('The requested refund does not exist in our database.');
+        }
+
+        $refundRecord->refund_status = $responseContent['RefundStatus'];
+
+        $refundRecord->save();
+
+        return true;
+    }
+
+
+
 
 
     /**
@@ -92,6 +127,7 @@ class Refund extends \yii\db\ActiveRecord
             'payment_uuid' => 'Payment UUID',
             'restaurant_uuid' => 'Restaurant Uuid',
             'order_uuid' => 'Order Uuid',
+            'refund_reference' => 'Refund Reference',
             'refund_amount' => 'Refund amount',
             'refund_status' => 'Refund Status',
             'reason' => 'Reason for refund',

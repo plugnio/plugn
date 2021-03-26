@@ -165,8 +165,10 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET <id>' => 'list-all-restaurants-payment-method',
+                        'POST status-update-webhook' => 'my-fatoorah-webhook',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS status-update-webhook' => 'options',
                         'OPTIONS <id>' => 'options',
                     ]
                 ],

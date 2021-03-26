@@ -223,7 +223,7 @@ class MyFatoorahPayment extends Component
                     'content-type' => 'application/json',
                 ])
                 ->send();
-                
+
         return $response;
     }
 
@@ -239,7 +239,7 @@ class MyFatoorahPayment extends Component
         $store_phone_number =  str_replace(' ','',(str_replace('+', '00',$store->owner_number)));
 
         $supplierParams = [
-          "SupplierName" => $store->name,
+          "SupplierName" => $store->company_name,
           "Mobile" => $store_phone_number,
           "Email" =>  $store->owner_email,
           "CommissionPercentage" => "5",
@@ -247,7 +247,6 @@ class MyFatoorahPayment extends Component
           "iban" => $store->iban,
           "IsActive" => "true"
         ];
-
 
 
         $client = new Client();
@@ -316,7 +315,7 @@ class MyFatoorahPayment extends Component
     /**
    * Make a Refund
    */
-  public function makeRefund($paymentId, $amount , $supplierCode)
+  public function makeRefund($paymentId, $amount , $comment, $supplierCode)
   {
 
       $refundEndpoint = $this->apiEndpoint . "/MakeRefund";
@@ -325,11 +324,11 @@ class MyFatoorahPayment extends Component
       $refundParams = [
           "Key"=> $paymentId,
           "KeyType"=> "PaymentId",
-          "RefundChargeOnCustomer"=> false,
-          "ServiceChargeOnCustomer"=> false,
-          "Comment" => "",
+          "RefundChargeOnCustomer" => "false",
+          "ServiceChargeOnCustomer" => "false",
+          "Comment" => $comment,
           "Amount"=> $amount,
-          "AmountDeductedFromSupplier"=> $supplierCode
+          "AmountDeductedFromSupplier"=> $amount
         ];
 
       $client = new Client();

@@ -703,9 +703,7 @@ class Restaurant extends \yii\db\ActiveRecord {
     /**
      * Create an account for vendor on My Fatoorah
      */
-    public function createAnAccountOnMyFatoorah() {
-
-
+    public function createMyFatoorahAccount() {
 
 
         //Create  supplier for a vendor on My Fatoorah
@@ -715,6 +713,13 @@ class Restaurant extends \yii\db\ActiveRecord {
 
             $this->supplierCode = $supplierApiResponse->data['Data']['SupplierCode'];
             \Yii::info($this->name . " has just created My Fatoorahs account", __METHOD__);
+
+          if ($this->supplierCode){
+            $this->is_myfatoorah_enable = 1;
+            $this->is_tap_enable = 0;
+          }
+          else
+            $this->is_myfatoorah_enable = 0;
 
             if($this->save()){
                 // //Upload documents file on our server before we create an account on my fatoorah we gonaa delete them
@@ -735,7 +740,7 @@ class Restaurant extends \yii\db\ActiveRecord {
     /**
      * Create an account for vendor on tap
      */
-    public function createAnAccountOnTap() {
+    public function createTapAccount() {
 
 
         //Upload documents file on our server before we create an account on tap we gonaa delete them
@@ -751,12 +756,13 @@ class Restaurant extends \yii\db\ActiveRecord {
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
             $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
         } else {
+
             Yii::error('Error while create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
             return false;
         }
 
         //Create a merchant on Tap
-        $merchantApiResponse = Yii::$app->tapPayments->createMergentAccount($this->company_name, $this->currency->code ,$this->business_id, $this->business_entity_id, $this->iban);
+        $merchantApiResponse = Yii::$app->tapPayments->createMerchantAccount($this->company_name, $this->currency->code ,$this->business_id, $this->business_entity_id, $this->iban);
 
 
         if ($merchantApiResponse->isOk) {
@@ -765,15 +771,18 @@ class Restaurant extends \yii\db\ActiveRecord {
         }
 
         else {
-             Yii::error('Error while create Merchant #1 ' . json_encode($merchantApiResponse->data));
+             Yii::error('Error while create Merchant' . json_encode($merchantApiResponse->data));
              if($merchantApiResponse->data['message'] == 'Profile Name already exists') {
-               $merchantApiResponse = Yii::$app->tapPayments->createMergentAccount($this->company_name . '-' . $this->country->iso, $this->currency->code ,$this->business_id, $this->business_entity_id, $this->iban);
+               $merchantApiResponse = Yii::$app->tapPayments->createMerchantAccount($this->company_name . '-' . $this->country->iso, $this->currency->code ,$this->business_id, $this->business_entity_id, $this->iban);
 
                if ($merchantApiResponse->isOk) {
                    $this->merchant_id = $merchantApiResponse->data['id'];
                    $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
-               } else
-                return  Yii::error('Error while create Merchant [ ' . $this->name . '] ' . json_encode($merchantApiResponse->data));
+               } else{
+                   Yii::error('Error while create Merchant [ ' . $this->name . '] #2#' . json_encode($merchantApiResponse->data));
+                   $this->save();
+                   return false;
+               }
              }
         }
 
@@ -790,11 +799,20 @@ class Restaurant extends \yii\db\ActiveRecord {
               $this->live_public_key = $operatorApiResponse->data['api_credentials']['live']['public'];
             }
 
+            if ($this->live_api_key && $this->test_api_key){
+              $this->is_tap_enable = 1;
+              $this->is_myfatoorah_enable = 0;
+            }
+            else
+              $this->is_tap_enable = 0;
+
+
             \Yii::info($this->name . " has just created TAP account", __METHOD__);
             $this->save();
             return true;
         } else {
           Yii::error('Error while create Operator  [' . $this->name . '] ' . json_encode($operatorApiResponse->data));
+          $this->save();
           return false;
         }
     }
@@ -1006,17 +1024,6 @@ class Restaurant extends \yii\db\ActiveRecord {
         }
 
 
-
-        if ($this->live_api_key && $this->test_api_key)
-            $this->is_tap_enable = 1;
-        else
-            $this->is_tap_enable = 0;
-
-      //TODO
-        if ($this->supplierCode)
-            $this->is_myfatoorah_enable = 1;
-        else
-            $this->is_myfatoorah_enable = 0;
 
 
         if ($this->scenario == self::SCENARIO_UPLOAD_STORE_DOCUMENT) {

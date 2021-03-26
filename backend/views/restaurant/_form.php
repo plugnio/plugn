@@ -95,8 +95,30 @@ use borales\extensions\phoneInput\PhoneInput;
 
 
     <?=
+      $form->field($model, 'is_tap_enable')->dropDownList(
+              [
+                  1 => 'Yes',
+                  0 => 'No',
+              ]
+      );
+    ?>
+
+    <?=
+      $form->field($model, 'is_myfatoorah_enable')->dropDownList(
+              [
+                  1 => 'Yes',
+                  0 => 'No',
+              ]
+      );
+    ?>
+
+
+    <?=
       $form->field($model, 'country_id')->dropDownList(  $countryArray  );
     ?>
+
+
+
 
     <?=
     $form->field($model, 'restaurant_payments_method')->widget(Select2::classname(), [

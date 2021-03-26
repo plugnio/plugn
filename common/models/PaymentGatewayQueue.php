@@ -76,9 +76,9 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
 
         if ($this->queue_status == self::QUEUE_STATUS_CREATING) {
           if ($this->payment_gateway == 'tap')
-            $response =  $this->restaurant->createAnAccountOnTap();
+            $response =  $this->restaurant->createTapAccount();
           else if ($this->payment_gateway == 'myfatoorah'){
-            $response =  $this->restaurant->createAnAccountOnMyFatoorah();
+            $response =  $this->restaurant->createMyFatoorahAccount();
           }
 
               if($response){

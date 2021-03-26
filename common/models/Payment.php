@@ -282,9 +282,9 @@ class Payment extends \yii\db\ActiveRecord {
         $errorMessage = "";
 
         // On Successful Payments
-        if ($responseContent->Data->InvoiceStatus == 'Paid') {
+        if ($responseContent->Data->InvoiceTransactions->TransactionStatus == 'Succss') {
 
-
+          //todo
             // KNET Gateway Fee Calculation
             // if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
             //
@@ -339,6 +339,73 @@ class Payment extends \yii\db\ActiveRecord {
         return $paymentRecord;
     }
 
+    /**
+     * Update Payment's Status from Myfatoorah Payments
+     * @param  [type]  $id                           [description]
+     * @param  boolean $responseContent [description]
+     * @return self                                [description]
+     */
+
+    public static function updatePaymentStatusFromMyFatoorahWebhook($invoiceId, $responseContent) {
+        // Look for payment with same Payment Gateway Transaction ID
+        $paymentRecord = \common\models\Payment::findOne(['payment_gateway_invoice_id' => $invoiceId]);
+        if (!$paymentRecord) {
+            throw new NotFoundHttpException('The requested payment does not exist in our database.');
+        }
+
+        $currentPaymentStatus = $paymentRecord->payment_current_status;
+
+        $paymentRecord->payment_current_status = $responseContent['TransactionStatus']; // 'CAPTURED' ?
+
+
+        // On Successful Payments
+        if ($responseContent['TransactionStatus'] == 'Succss') {
+
+          //todo
+            // KNET Gateway Fee Calculation
+            // if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
+            //
+            //     if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->knetGatewayFee) > Yii::$app->tapPayments->minKnetGatewayFee)
+            //         $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->knetGatewayFee;
+            //     else
+            //         $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minKnetGatewayFee;
+            // }
+            //
+            // // Creditcard Gateway Fee Calculation
+            // else if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_VISA_MASTERCARD) {
+            //
+            //     if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage) > Yii::$app->tapPayments->minCreditcardGatewayFee)
+            //         $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage;
+            //     else
+            //         $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minCreditcardGatewayFee;
+            // }
+            //
+            //
+
+            // if(isset($responseContent->destinations))
+            //     $paymentRecord->plugn_fee = $responseContent->destinations->amount;
+            // else
+            //     $paymentRecord->plugn_fee = 0;
+
+
+
+            // Net amount after deducting gateway fee
+            // $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee;
+
+        }
+
+        // Update payment method used and the order id assigned to it
+        if($responseContent['PaymentMethod'] )
+          $paymentRecord->payment_mode = $responseContent['PaymentMethod'];
+        if( $responseContent['ReferenceId'] )
+          $paymentRecord->payment_gateway_order_id = $responseContent['ReferenceId'];
+
+
+        $paymentRecord->save();
+
+        return true;
+    }
+
 
     /**
      * @inheritdoc
@@ -360,7 +427,7 @@ class Payment extends \yii\db\ActiveRecord {
         parent::afterSave($insert, $changedAttributes);
 
 
-        if( !$insert  && (isset($changedAttributes['received_callback']) && $changedAttributes['received_callback'] == 0  && ($this->payment_current_status == 'CAPTURED' || $this->payment_current_status == 'Paid') && $this->received_callback) ) {
+        if( !$insert  && (isset($changedAttributes['received_callback']) && $changedAttributes['received_callback'] == 0  && ($this->payment_current_status == 'CAPTURED' || $this->payment_current_status == 'Succss') && $this->received_callback) ) {
 
             $this->order->changeOrderStatusToPending();
             $this->order->sendPaymentConfirmationEmail();

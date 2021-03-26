@@ -71,7 +71,7 @@ class TapQueue extends \yii\db\ActiveRecord
     public function afterSave($insert, $changedAttributes) {
 
         if ($this->queue_status == self::QUEUE_STATUS_CREATING) {
-          if($this->restaurant->createAnAccountOnTap()){
+          if($this->restaurant->createTapAccount()){
             $this->queue_status = self::QUEUE_STATUS_COMPLETE;
             if($this->save()){
               \Yii::$app->mailer->compose([

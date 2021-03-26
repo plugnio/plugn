@@ -656,8 +656,11 @@ if ($refundDataProvider->totalCount > 0 && $model->payment) {
 
             <?php
 
-            if($model->payment_uuid && $model->payment->payment_current_status  != 'CAPTURED')
+            if($model->restaurant->is_tap_enable && $model->payment_uuid && $model->payment->payment_current_status  != 'CAPTURED')
               echo Html::a('Request Payment Status Update from TAP', ['update-payment-status','id' => $model->payment_uuid, 'storeUuid' => $storeUuid], ['class'=>'btn btn-outline-primary']);
+
+            if($model->restaurant->is_myfatoorah_enable && $model->payment_uuid && $model->payment->payment_current_status  != 'Succss')
+              echo Html::a('Request Payment Status Update from My Fatoorah', ['update-payment-status','id' => $model->payment_uuid, 'storeUuid' => $storeUuid], ['class'=>'btn btn-outline-primary']);
 
             ?>
 
@@ -686,7 +689,7 @@ DetailView::widget([
             'format' => 'html',
             'value' => function ($data) {
                 if ($data->payment) {
-                    return $data->payment->payment_current_status == 'CAPTURED' ? '<span class="badge bg-success" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>' : '<span class="badge bg-danger" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>';
+                    return $data->payment->payment_current_status == 'CAPTURED' || $data->payment->payment_current_status == 'Paid' ? '<span class="badge bg-success" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>' : '<span class="badge bg-danger" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>';
                 }
             },
             'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
