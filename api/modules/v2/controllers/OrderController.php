@@ -618,7 +618,9 @@ class OrderController extends Controller {
      * @return type
      */
     public function actionOrderDetails($id, $restaurant_uuid) {
-        $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->with('orderItems', 'payment')->asArray()->one();
+        $model = Order::find()
+        ->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])
+        ->one();
 
 
         if (!$model) {
@@ -644,7 +646,9 @@ class OrderController extends Controller {
 
 
         if(isset($model['payment'])){
+          unset($model['payment']['payment_uuid']);
           unset($model['payment']['payment_net_amount']);
+          unset($model['payment']['restaurant_uuid']);
           unset($model['payment']['payment_gateway_fee']);
           unset($model['payment']['plugn_fee']);
         }

@@ -385,29 +385,38 @@ class OrderController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id, $storeUuid) {
+     public function actionView($id, $storeUuid) {
 
-        $order_model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->with(['currency','country','deliveryZone.country','pickupLocation','deliveryZone.businessLocation'])->one();
+         $order_model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->with(['currency','country','deliveryZone.country','pickupLocation','deliveryZone.businessLocation'])->one();
 
-        // Item
-        $orderItems = new \yii\data\ActiveDataProvider([
-            'query' => $order_model->getOrderItems()->with(['orderItemExtraOptions','item','currency']),
-            'sort' => false,
-            'pagination' => false
-        ]);
 
-        // Item extra optn
-        // $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
-        //     'query' => $order_model->getOrderItemExtraOptions(),
-        //     'pagination' => false
-        // ]);
+         if($order_model){
 
-        return $this->render('view', [
-                    'model' => $order_model,
-                    'storeUuid' => $storeUuid,
-                    'orderItems' => $orderItems
-        ]);
-    }
+           // Item
+           $orderItems = new \yii\data\ActiveDataProvider([
+               'query' => $order_model->getOrderItems()->with(['orderItemExtraOptions','item','currency']),
+               'sort' => false,
+               'pagination' => false
+           ]);
+
+           // Item extra optn
+           // $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
+           //     'query' => $order_model->getOrderItemExtraOptions(),
+           //     'pagination' => false
+           // ]);
+
+           return $this->render('view', [
+                       'model' => $order_model,
+                       'storeUuid' => $storeUuid,
+                       'orderItems' => $orderItems
+           ]);
+
+
+         } else {
+           throw new NotFoundHttpException('The requested page does not exist.');
+         }
+
+     }
 
     /**
      * Creates a new Order model.

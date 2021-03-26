@@ -172,12 +172,12 @@ class ItemController extends Controller
         $searchModel = new ItemSearch();
         $dataProvider = $searchModel->searchTrackQuantity(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
 
-        foreach ($dataProvider->query->all() as $key => $item) {
-            if (isset($_POST[$item->item_uuid])) {
-                $item->stock_qty = $_POST['Item']['stock_qty'];
-                $item->save(false);
-            }
-        }
+        // foreach ($dataProvider->query->all() as $key => $item) {
+        //     if (isset($_POST[$item->item_uuid])) {
+        //         $item->stock_qty = $_POST['Item']['stock_qty'];
+        //         $item->save(false);
+        //     }
+        // }
 
         return $this->render('inventory', [
                     'searchModel' => $searchModel,
@@ -185,6 +185,7 @@ class ItemController extends Controller
                     'restaurant_model' => $restaurant_model
         ]);
     }
+
 
 
     /**
@@ -204,8 +205,6 @@ class ItemController extends Controller
         return $this->redirect(['inventory', 'storeUuid' => $storeUuid]);
 
     }
-
-
 
     /**
      * Delete item image
