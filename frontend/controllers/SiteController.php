@@ -170,7 +170,7 @@ class SiteController extends Controller {
 
                    if( $managedRestaurant->save()){
                      Yii::$app->session->setFlash('successResponse', "Congratulations you have successfully changed your domain name");
-                     
+
                      \Yii::$app->mailer->compose([
                                  'html' => 'domain-update-request',
                                      ], [
@@ -275,7 +275,7 @@ class SiteController extends Controller {
                           ];
                       }
                   } else {
-                      \Yii::error('[Payment Issue > Charge id is missing ]' . $responseContent, __METHOD__); // Log error faced by user
+                      \Yii::error('[Payment Issue > Charge id is missing ]' . json_encode($responseContent), __METHOD__); // Log error faced by user
                   }
 
                   return $this->redirect($redirectUrl);
@@ -288,7 +288,7 @@ class SiteController extends Controller {
 
                   $response = [
                       'operation' => 'error',
-                      'message' => $responseContent
+                      'message' => json_encode($responseContent)
                   ];
               }
           }
