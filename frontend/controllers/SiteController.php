@@ -162,11 +162,15 @@ class SiteController extends Controller {
             if ($managedRestaurant->load(Yii::$app->request->post())) {
 
 
+
+
                 if ($old_domain != $managedRestaurant->restaurant_domain) {
 
                    $managedRestaurant->restaurant_domain = rtrim($managedRestaurant->restaurant_domain, '/');
 
                    if( $managedRestaurant->save()){
+                     Yii::$app->session->setFlash('successResponse', "Congratulations you have successfully changed your domain name");
+                     
                      \Yii::$app->mailer->compose([
                                  'html' => 'domain-update-request',
                                      ], [
