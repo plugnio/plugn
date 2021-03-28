@@ -83,6 +83,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
   * @property float|null $platform_fee
   * @property string|null $google_analytics_id
   * @property string|null $facebook_pixil_id
+  * @property string|null $snapchat_pixil_id
   * @property int|null $show_opening_hours
   * @property string|null $instagram_url
   * @property int|null $schedule_order
@@ -237,7 +238,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['custom_css'], 'string'],
             [['platform_fee', 'warehouse_fee'], 'number'],
             [['instagram_url'], 'url'],
-            [['export_orders_data_in_specific_date_range','export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'site_id'], 'safe'],
+            [['export_orders_data_in_specific_date_range','export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'snapchat_pixil_id', 'site_id'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'app_id', 'armada_api_key', 'mashkor_branch_id', 'store_branch_name', 'live_public_key', 'test_public_key', 'company_name'], 'string', 'max' => 255],
 
             [['live_public_key', 'test_public_key'], 'default', 'value' => null],
