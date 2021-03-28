@@ -169,7 +169,7 @@ class StoreController extends Controller {
       if( $store->exists() ){
 
         $restaurant = $store
-                ->select(['restaurant_uuid', 'name', 'logo', 'tagline', 'restaurant_domain', 'app_id', 'google_analytics_id', 'facebook_pixil_id', 'custom_css'])
+                ->select(['restaurant_uuid', 'name', 'logo', 'tagline', 'restaurant_domain', 'app_id', 'google_analytics_id', 'facebook_pixil_id','snapchat_pixil_id' , 'custom_css'])
                 ->one();
 
 
