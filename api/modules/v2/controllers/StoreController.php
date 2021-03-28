@@ -188,6 +188,7 @@ class StoreController extends Controller {
                 'app_id' => $restaurant->app_id,
                 'google_analytics_id' => $restaurant->google_analytics_id,
                 'facebook_pixil_id' => $restaurant->facebook_pixil_id,
+                'snapchat_pixil_id' => $restaurant->snapchat_pixil_id,
                 'custom_css' => $restaurant->custom_css,
                 'theme_color' => $themeColor->primary,
             ];
