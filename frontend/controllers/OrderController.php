@@ -117,6 +117,20 @@ class OrderController extends Controller {
                     ],
                     'customer_phone_number',
                     [
+                        'header' => 'Order Mode',
+                        'value' => function ($data) {
+                              return $data->order_mode == Order::ORDER_MODE_DELIVERY ? 'Delivery' : 'Pickup';
+                        }
+                    ],
+                    [
+                        'header' => 'Area',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                            if($data->area_id)
+                              return $data->area_name;
+                        }
+                    ],
+                    [
                         'attribute' => 'order_status',
                         "format" => "raw",
                         "value" => function($model) {
