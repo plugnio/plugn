@@ -66,7 +66,7 @@ class PaymentController extends Controller {
       $eventType = Yii::$app->request->getBodyParam("EventType");
       $data = Yii::$app->request->getBodyParam("Data");
 
-        if($token && $token === '2faf551b66377e6302190c8cfb8b12e6630dc37cc376e2acfbf28d60343d3c768e9a239bcb304dea1221852afce6fb581d0dd5a3eecf390eef2474f4f31c70fd52f7='){
+        if($token && $token === 'rIp9GnDBQ3kZzZ+hJRNZAEtttGfnIs7AKHDvHuera2+V2sZv/n/55USbF2GvBf2E4vBefzfQX/QgeyYBSAi1rA=='){
 
             if( $eventType && $data){
 
