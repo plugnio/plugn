@@ -97,6 +97,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
   * @property int|null $is_myfatoorah_enable
   * @property int|null $has_deployed
   * @property int|null $tap_queue_id
+  * @property int|null $payment_gateway_queue_id
   * @property string|null $identification_file_back_side
   * @property string|null $identification_file_id_back_side
   * @property string|null $default_language
@@ -234,7 +235,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             ['restaurant_status', 'in', 'range' => [self::RESTAURANT_STATUS_OPEN, self::RESTAURANT_STATUS_BUSY, self::RESTAURANT_STATUS_CLOSED]],
             ['store_layout', 'in', 'range' => [self::STORE_LAYOUT_LIST_FULLWIDTH, self::STORE_LAYOUT_GRID_FULLWIDTH, self::STORE_LAYOUT_CATEGORY_FULLWIDTH, self::STORE_LAYOUT_LIST_HALFWIDTH, self::STORE_LAYOUT_GRID_HALFWIDTH, self::STORE_LAYOUT_CATEGORY_HALFWIDTH]],
             ['phone_number_display', 'in', 'range' => [self::PHONE_NUMBER_DISPLAY_ICON, self::PHONE_NUMBER_DISPLAY_SHOW_PHONE_NUMBER, self::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER]],
-            [['restaurant_created_at', 'restaurant_updated_at', 'has_deployed','tap_queue_id'], 'safe'],
+            [['restaurant_created_at', 'restaurant_updated_at', 'has_deployed','tap_queue_id', 'payment_gateway_queue_id'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['default_language'], 'string', 'max' => 2],
             [['custom_css'], 'string'],
@@ -262,6 +263,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_email_notification', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable', 'is_myfatoorah_enable','supplierCode'], 'integer'],
             ['restaurant_email', 'email'],
             [['restaurant_uuid', 'restaurant_domain', 'name'], 'unique'],
+            [['payment_gateway_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentGatewayQueue::className(), 'targetAttribute' => ['payment_gateway_queue_id' => 'payment_gateway_queue_id']],
             [['tap_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => TapQueue::className(), 'targetAttribute' => ['tap_queue_id' => 'tap_queue_id']],
             [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country_id' => 'country_id']],
             [['currency_id'], 'exist', 'skipOnError' => true, 'targetClass' => Currency::className(), 'targetAttribute' => ['currency_id' => 'currency_id']],
@@ -707,11 +709,12 @@ class Restaurant extends \yii\db\ActiveRecord {
 
 
         //Create  supplier for a vendor on My Fatoorah
-        $supplierApiResponse = Yii::$app->myFatoorahPayment->createSupplier($this);
+        $response = Yii::$app->myFatoorahPayment->createSupplier($this);
+        $supplierApiResponse = json_decode($response->content);
 
-        if ($supplierApiResponse->isOk && $supplierApiResponse->data['IsSuccess']) {
+        if ($supplierApiResponse->IsSuccess) {
 
-            $this->supplierCode = $supplierApiResponse->data['Data']['SupplierCode'];
+            $this->supplierCode = $supplierApiResponse->Data->SupplierCode;
             \Yii::info($this->name . " has just created My Fatoorahs account", __METHOD__);
 
           if ($this->supplierCode){
@@ -728,9 +731,8 @@ class Restaurant extends \yii\db\ActiveRecord {
 
             return true;
         } else {
-          die(json_encode($supplierApiResponse->data));
 
-            Yii::error('Error while create supplier [' . $this->name . '] ' . json_encode($supplierApiResponse->data));
+            Yii::error('Error while create supplier [' . $this->name . '] ' . $supplierApiResponse);
             return false;
         }
 
@@ -986,6 +988,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset($fields['owner_email']);
         unset($fields['owner_number']);
         unset($fields['has_deployed']);
+        unset($fields['payment_gateway_queue_id']);
         unset($fields['tap_queue_id']);
         unset($fields['is_tap_enable']);
         unset($fields['is_myfatoorah_enable']);
@@ -1441,6 +1444,16 @@ class Restaurant extends \yii\db\ActiveRecord {
     public function getTapQueue()
     {
         return $this->hasOne(TapQueue::className(), ['tap_queue_id' => 'tap_queue_id']);
+    }
+
+    /**
+     * Gets query for [[TapQueue]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPaymentGatewayQueue()
+    {
+        return $this->hasOne(PaymentGatewayQueue::className(), ['payment_gateway_queue_id' => 'payment_gateway_queue_id']);
     }
 
 

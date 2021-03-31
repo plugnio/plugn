@@ -42,7 +42,6 @@ class CronController extends \yii\console\Controller {
 
     public function actionMigration(){
 
-
         foreach (TapQueue::find()->all() as $key => $queue) {
           $paymentGatewayQueueModel = new PaymentGatewayQueue();
           $paymentGatewayQueueModel->restaurant_uuid = $queue->restaurant_uuid;
@@ -54,6 +53,12 @@ class CronController extends \yii\console\Controller {
           $paymentGatewayQueueModel->queue_end_at = $queue->queue_end_at;
           $paymentGatewayQueueModel->save();
         }
+
+        foreach (Payment::find()->all() as $key => $payment) {
+          $payment->payment_gateway_name = 'tap';
+          $payment->save();
+        }
+
 
         $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
         return self::EXIT_CODE_NORMAL;
@@ -280,6 +285,7 @@ class CronController extends \yii\console\Controller {
 
         $refunds = Refund::find()
                     ->joinWith(['store','payment'])
+                    ->where(['refund.refund_reference' => null])
                     ->where(['restaurant.is_myfatoorah_enable' => 1])
                     ->andWhere(['NOT', ['refund.payment_uuid' => null]])
                     ->all();

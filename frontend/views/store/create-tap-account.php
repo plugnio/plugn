@@ -50,36 +50,33 @@ $( window ).on( 'load', function() {
   $('#legal_info').hide();
 
   if ('$model->business_type' == 'corp'){
-    companyName.placeholder = 'official business name if license available';
-    companyName.value = '';
     $('#legal_info').show();
   }
   else{
-    companyName.value = '$model->name';
 		$('#legal_info').hide();
   }
 });
 
 
 let businessTypeInput = $('#businessTypeInput');
-let companyName = $('#company_name')[0];
 businessTypeInput.change(function(e){
 	let selection = businessTypeInput.is(':checked');
 
 
 	if (e.target.defaultValue == 'corp'){
-    companyName.placeholder = 'official business name if license available';
-    companyName.value = '';
     $('#legal_info').show();
   }
 
 	else{
-    companyName.value = '$model->name';
 		$('#legal_info').hide();
   }
 
 });
 
+$('#submitBtn').click(function() {
+  $('#loading').show();
+  $('#submitBtn').hide();
+});
 
 
 ";
@@ -180,7 +177,7 @@ $this->registerJs($js);
 
             <div class="row">
               <div class="col-12">
-                  <?= $form->field($model, 'company_name')->textInput(['maxlength' => true, 'value' => $model->name, 'id' => 'company_name'])->label('Business name *') ?>
+                  <?= $form->field($model, 'company_name')->textInput(['maxlength' => true, 'placeholder' => 'official business name if license available'])->label('Business name *') ?>
               </div>
             </div>
 
@@ -326,7 +323,16 @@ $this->registerJs($js);
     </div>
 
     <div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px; padding-bottom: 15px; background:#f4f6f9 ">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
+        <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'id' =>'submitBtn', 'style' => 'width: 100%;height: 50px;']) ?>
+
+
+				<button class="btn btn-success" type="button" id="loading" disabled style="width: 100%;height: 50px; display:none">
+					<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+					<span class="ml-25 align-middle">Loading...</span>
+				</button>
+
+
+
     </div>
 
 </div>

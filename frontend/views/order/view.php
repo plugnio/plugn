@@ -659,8 +659,8 @@ if ($refundDataProvider->totalCount > 0 && $model->payment) {
             if($model->restaurant->is_tap_enable && $model->payment_uuid && $model->payment->payment_current_status  != 'CAPTURED')
               echo Html::a('Request Payment Status Update from TAP', ['update-payment-status','id' => $model->payment_uuid, 'storeUuid' => $storeUuid], ['class'=>'btn btn-outline-primary']);
 
-            if($model->restaurant->is_myfatoorah_enable && $model->payment_uuid && $model->payment->payment_current_status  != 'Succss')
-              echo Html::a('Request Payment Status Update from My Fatoorah', ['update-payment-status','id' => $model->payment_uuid, 'storeUuid' => $storeUuid], ['class'=>'btn btn-outline-primary']);
+            // if($model->restaurant->is_myfatoorah_enable && $model->payment_uuid && $model->payment->payment_current_status  != 'Succss')
+            //   echo Html::a('Request Payment Status Update from My Fatoorah', ['update-payment-status','id' => $model->payment_uuid, 'storeUuid' => $storeUuid], ['class'=>'btn btn-outline-primary']);
 
             ?>
 
@@ -689,7 +689,7 @@ DetailView::widget([
             'format' => 'html',
             'value' => function ($data) {
                 if ($data->payment) {
-                    return $data->payment->payment_current_status == 'CAPTURED' || $data->payment->payment_current_status == 'Paid' ? '<span class="badge bg-success" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>' : '<span class="badge bg-danger" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>';
+                    return $data->payment->payment_current_status == 'CAPTURED' || $data->payment->payment_current_status == 'SUCCESS' || $data->payment->payment_current_status == 'Paid' ? '<span class="badge bg-success" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>' : '<span class="badge bg-danger" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>';
                 }
             },
             'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
@@ -698,11 +698,21 @@ DetailView::widget([
             'label' => 'Gateway ID',
             'format' => 'html',
             'value' => function ($data) {
-                if ($data->payment) {
+                if ($data->payment_uuid) {
                     return $data->payment->payment_gateway_order_id;
                 }
             },
-            'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
+            'visible' => $model->payment_method_id != 3 && $model->payment_uuid && $model->payment->payment_gateway_name == 'tap',
+        ],
+        [
+            'label' => 'Invoice ID',
+            'format' => 'html',
+            'value' => function ($data) {
+                if ($data->payment_uuid) {
+                    return $data->payment->payment_gateway_invoice_id;
+                }
+            },
+            'visible' => $model->payment_method_id != 3 && $model->payment_uuid && $model->payment->payment_gateway_name == 'myfatoorah',
         ],
         [
             'label' => 'Received Callback',

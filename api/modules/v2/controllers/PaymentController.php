@@ -60,37 +60,38 @@ class PaymentController extends Controller {
      */
     public function actionMyFatoorahWebhook() {
 
-      // $headers = Yii::$app->request->headers;
-      //
-      // return $headers->get('Authorization');
+      $headers = Yii::$app->request->headers;
+      $token = $headers->get('MyFatoorah-Signature');
+
       $eventType = Yii::$app->request->getBodyParam("EventType");
       $data = Yii::$app->request->getBodyParam("Data");
 
-      // $token = Yii::$app->request->getBodyParam("webhook_token");
-      $token = '2faf551b66377e6302190c8cfb8b12e6630dc37cc376e2acfbf28d60343d3c768e9a239bcb304dea1221852afce6fb581d0dd5a3eecf390eef2474f4f31c70fd52f7=';
+        if($token && $token === '2faf551b66377e6302190c8cfb8b12e6630dc37cc376e2acfbf28d60343d3c768e9a239bcb304dea1221852afce6fb581d0dd5a3eecf390eef2474f4f31c70fd52f7='){
 
-      if($token === '2faf551b66377e6302190c8cfb8b12e6630dc37cc376e2acfbf28d60343d3c768e9a239bcb304dea1221852afce6fb581d0dd5a3eecf390eef2474f4f31c70fd52f7='){
+            if( $eventType && $data){
 
-        if( $eventType && $data){
+              switch ($eventType) {
+                case 1: //1 For Transaction Status Changed
+                  Payment::updatePaymentStatusFromMyFatoorahWebhook($data['InvoiceId'], $data);
+                  break;
 
-          switch ($eventType) {
-            case 1: //1 For Transaction Status Changed
-              Payment::updatePaymentStatusFromMyFatoorahWebhook($data['InvoiceId'], $data);
-              break;
+                case 2: //2 For Refund Status Changed
+                  Refund::updateRefundStatus($data['RefundReference'], $data);
+                  break;
 
-            case 2: //2 For Refund Status Changed
-              Refund::updateRefundStatus($data['RefundReference'], $data);
-              break;
+              }
 
-          }
+            }
 
-        }
+          return [
+              'message' => 'success'
+          ];
 
+      } else{
+        return [
+            'message' => 'Failed to authorize the request.'
+        ];
       }
-
-      return [
-          'operation' => 'success'
-      ];
 
     }
 

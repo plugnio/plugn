@@ -282,7 +282,7 @@ class Payment extends \yii\db\ActiveRecord {
         $errorMessage = "";
 
         // On Successful Payments
-        if ($responseContent->Data->InvoiceTransactions->TransactionStatus == 'Succss') {
+        if ($responseContent->Data->InvoiceTransactions[0]->TransactionStatus == 'Succss') {
 
           //todo
             // KNET Gateway Fee Calculation
@@ -312,10 +312,10 @@ class Payment extends \yii\db\ActiveRecord {
 
 
             // Update payment method used and the order id assigned to it
-            if( isset($responseContent->Data->InvoiceTransactions->PaymentGateway) && $responseContent->Data->InvoiceTransactions->PaymentGateway )
-              $paymentRecord->payment_mode = $responseContent->Data->InvoiceTransactions->PaymentGateway;
+            if( isset($responseContent->Data->InvoiceTransactions['PaymentGateway']) && $responseContent->Data->InvoiceTransactions['PaymentGateway'] )
+              $paymentRecord->payment_mode = $responseContent->Data->InvoiceTransactions['PaymentGateway'];
             if( isset($responseContent->reference->payment) && $responseContent->reference->payment )
-              $paymentRecord->payment_gateway_order_id = $responseContent->Data->InvoiceTransactions->ReferenceId;
+              $paymentRecord->payment_gateway_order_id = $responseContent->Data->InvoiceTransactions['ReferenceId'];
 
             // Net amount after deducting gateway fee
             // $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee;
@@ -348,18 +348,19 @@ class Payment extends \yii\db\ActiveRecord {
 
     public static function updatePaymentStatusFromMyFatoorahWebhook($invoiceId, $responseContent) {
         // Look for payment with same Payment Gateway Transaction ID
-        $paymentRecord = \common\models\Payment::findOne(['payment_gateway_invoice_id' => $invoiceId]);
+        $paymentRecord = \common\models\Payment::findOne(['payment_gateway_invoice_id' => $invoiceId, 'received_callback' => 0]);
         if (!$paymentRecord) {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
         $currentPaymentStatus = $paymentRecord->payment_current_status;
 
-        $paymentRecord->payment_current_status = $responseContent['TransactionStatus']; // 'CAPTURED' ?
 
+        $paymentRecord->payment_current_status = $responseContent['TransactionStatus']; // 'SUCCESS' ?
+        $paymentRecord->received_callback = 1;
 
         // On Successful Payments
-        if ($responseContent['TransactionStatus'] == 'Succss') {
+        if ($responseContent['TransactionStatus'] == 'SUCCESS') {
 
           //todo
             // KNET Gateway Fee Calculation
@@ -392,6 +393,8 @@ class Payment extends \yii\db\ActiveRecord {
             // Net amount after deducting gateway fee
             // $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee;
 
+        } else {
+            $paymentRecord->order->restockItems();
         }
 
         // Update payment method used and the order id assigned to it
@@ -399,7 +402,6 @@ class Payment extends \yii\db\ActiveRecord {
           $paymentRecord->payment_mode = $responseContent['PaymentMethod'];
         if( $responseContent['ReferenceId'] )
           $paymentRecord->payment_gateway_order_id = $responseContent['ReferenceId'];
-
 
         $paymentRecord->save();
 
@@ -427,7 +429,7 @@ class Payment extends \yii\db\ActiveRecord {
         parent::afterSave($insert, $changedAttributes);
 
 
-        if( !$insert  && (isset($changedAttributes['received_callback']) && $changedAttributes['received_callback'] == 0  && ($this->payment_current_status == 'CAPTURED' || $this->payment_current_status == 'Succss') && $this->received_callback) ) {
+        if( !$insert  && (isset($changedAttributes['received_callback']) && $changedAttributes['received_callback'] == 0  && ($this->payment_current_status == 'CAPTURED' || $this->payment_current_status == 'SUCCESS' || $this->payment_current_status == 'Succss') && $this->received_callback) ) {
 
             $this->order->changeOrderStatusToPending();
             $this->order->sendPaymentConfirmationEmail();

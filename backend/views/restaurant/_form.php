@@ -262,6 +262,8 @@ use borales\extensions\phoneInput\PhoneInput;
 
     <?= $form->field($model, 'identification_file_id_back_side')->textInput() ?>
 
+    <?= $form->field($model, 'supplierCode')->textInput() ?>
+
     <?= $form->field($model, 'business_id')->textInput() ?>
 
     <?= $form->field($model, 'business_entity_id')->textInput() ?>

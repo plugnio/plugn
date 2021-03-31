@@ -163,6 +163,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'owner_email',
             'owner_number',
             'vendor_sector',
+            'supplierCode',
             'business_id',
             'developer_id',
             'business_entity_id',
