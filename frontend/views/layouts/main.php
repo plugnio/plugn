@@ -77,12 +77,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
 
                if( Yii::$app->session->getFlash('storeCreated')){
 
-                 $storeConversionParams  = "analytics.track('Store Conversion', {
-                     store_name: '". $storeName ."',
-                     phone_number:'". $ownerPhoneNumber  ."',
-                     email: '".$agentEmail  ."',
-                     store_url:'". $restaurant_model->restaurant_domain  ."',
-                   });
+                 $storeConversionParams  = "analytics.track('Store Conversion');
                    ";
                }
 
