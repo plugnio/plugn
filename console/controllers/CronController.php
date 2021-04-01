@@ -167,15 +167,15 @@ class CronController extends \yii\console\Controller {
     // }
 
 
-    public function actionCreateTapAccount() {
+    public function actionCreatePaymentGatewayAccount() {
 
-      $queue = TapQueue::find()
+      $queue = PaymentGatewayQueue::find()
               ->where(['queue_status' => Queue::QUEUE_STATUS_PENDING])
               ->orderBy(['queue_created_at' => SORT_ASC])
               ->one();
 
       if($queue && $queue->restaurant_uuid){
-        $queue->queue_status = TapQueue::QUEUE_STATUS_CREATING;
+        $queue->queue_status = PaymentGatewayQueue::QUEUE_STATUS_CREATING;
         $queue->save();
       }
 

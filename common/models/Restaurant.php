@@ -715,7 +715,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         if ($supplierApiResponse->IsSuccess) {
 
             $this->supplierCode = $supplierApiResponse->Data->SupplierCode;
-            \Yii::info($this->name . " has just created My Fatoorahs account", __METHOD__);
+            \Yii::info($this->name . " has just created My Fatooraha account", __METHOD__);
 
           if ($this->supplierCode){
             $this->is_myfatoorah_enable = 1;
