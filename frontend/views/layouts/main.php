@@ -36,9 +36,15 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
         <?php
 
           $segmentScript = '';
+          $storeConversionParams = '';
 
           if(Yii::$app->user->identity && YII_ENV == 'prod'){
 
+            $full_name = explode(' ', Yii::$app->user->identity->agent_name);
+
+            $storeName = $restaurant_model->name;
+            $ownerPhoneNumber = $restaurant_model->owner_number;
+            $agentEmail = Yii::$app->user->identity->agent_email;
 
             $planName = $restaurant_model->plan->name;
 
@@ -51,10 +57,10 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
             $storeLogo = $restaurant_model->logo ? $restaurant_model->getRestaurantLogoUrl() : 'false';
 
             $segmentScript = "analytics.identify('". $restaurant_model->restaurant_uuid."', {
-                name: '". $restaurant_model->name ."',
+                name: '". $storeName ."',
                 domain:'". $restaurant_model->restaurant_domain  ."',
-                phone:'". $restaurant_model->owner_number  ."',
-                email: '".Yii::$app->user->identity->agent_email  ."',
+                phone:'". $ownerPhoneNumber  ."',
+                email: '".$agentEmail  ."',
                 plan: '". $planName ."',
                 logo: '". $storeLogo ."',
                 totalProducts: '". $restaurant_model->getItems()->count() ."',
@@ -67,8 +73,20 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                 deliveryMashkor: '".  $deliveryMashkor ."',
                 deliveryArmada: '".  $deliveryArmada ."',
               });
-
            ";
+
+               if( Yii::$app->session->getFlash('storeCreated')){
+
+                 $storeConversionParams  = "analytics.track('Store Conversion', {
+                     first_name: '". trim($full_name)."',
+                     last_name: '". trim($lastname)."',
+                     store_name: '". $storeName ."',
+                     phone_number:'". $ownerPhoneNumber  ."',
+                     email: '".$agentEmail  ."',
+                     store_url:'". $restaurant_model->restaurant_domain  ."',
+                   });
+                   ";
+               }
 
             } ?>
 
@@ -79,6 +97,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
           analytics.load("2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5");
           <?= $segmentScript ?>
           analytics.page();
+          <?=  $storeConversionParams ?>
           }}();
         </script>
 

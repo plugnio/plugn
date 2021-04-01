@@ -1290,6 +1290,9 @@ class SiteController extends Controller {
                                'store_url' => $store_model->restaurant_domain
                           ]
                       ]);
+
+                      Yii::$app->session->setFlash('storeCreated');
+
                     }
 
                         return $this->redirect(['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
