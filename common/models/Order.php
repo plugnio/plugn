@@ -809,24 +809,25 @@ class Order extends \yii\db\ActiveRecord {
           $this->order_status = self::STATUS_DRAFT;
         }
 
-        if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
-            //set ETA value
-            \Yii::$app->timeZone = 'Asia/Kuwait';
+        if ($this->scenario != self::SCENARIO_CREATE_ORDER_BY_ADMIN){
+          if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
+              //set ETA value
+              \Yii::$app->timeZone = 'Asia/Kuwait';
 
-            if ($this->is_order_scheduled)
-                $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($this->scheduled_time_start_from));
-            else{
+              if ($this->is_order_scheduled)
+                  $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($this->scheduled_time_start_from));
+              else{
+                if($this->delivery_zone_id){
+                  $this->estimated_time_of_arrival =
+                  date("Y-m-d H:i:s", strtotime('+' . $this->deliveryZone->delivery_time . ' ' . $this->deliveryZone->timeUnit, Yii::$app->formatter->asTimestamp( !$insert  ? date('Y-m-d H:i:s', strtotime($this->order_created_at)) : date('Y-m-d H:i:s')  )));
+                }
 
-              if($this->delivery_zone_id){
-                $this->estimated_time_of_arrival =
-                date("Y-m-d H:i:s", strtotime('+' . $this->deliveryZone->delivery_time . ' ' . $this->deliveryZone->timeUnit, Yii::$app->formatter->asTimestamp( !$insert  ? date('Y-m-d H:i:s', strtotime($this->order_created_at)) : date('Y-m-d H:i:s')  )));
               }
 
             }
-
-          } else {
-              $this->estimated_time_of_arrival =  !$insert ? date('Y-m-d H:i:s', strtotime($this->order_created_at)) : date('Y-m-d H:i:s');
-          }
+            else {
+                $this->estimated_time_of_arrival =  !$insert ? date('Y-m-d H:i:s', strtotime($this->order_created_at)) : date('Y-m-d H:i:s');
+            }
 
         if($this->orderItems){
           foreach ($this->orderItems as $key => $orderItem) {
@@ -836,8 +837,7 @@ class Order extends \yii\db\ActiveRecord {
             }
           }
         }
-
-
+      }
 
 
         return true;

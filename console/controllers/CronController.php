@@ -36,464 +36,79 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
+  public function actionPaymentMigration(){
 
-    public function actionTest(){
+     $payments = Payment::find()
+               ->joinWith(['restaurant'])
+               ->with('activeSubscription')
+               ->where(['payment.payment_current_status' => 'CAPTURED'])
+               ->andWhere(['payment.plugn_fee' => null])
+               ->all();
 
-      $orders = Order::find()
-                ->with(['deliveryZone','deliveryZone.country', 'pickupLocation', 'pickupLocation.country', 'area', 'area.country'])
-                ->all();
+     foreach ($payments as $key => $payment) {
+
+       $platform_fee = 0;
+       $amount = $payment->payment_amount_charged;
+       $minChargeAmount = 4;
+       $knetGatewayFee = 0.01;
+       $minKnetGatewayFee = 0.100;
+       $creditcardGatewayFeePercentage = 0.025;
+
+       if($payment->activeSubscription->plan_id == 1 || ($payment->activeSubscription->plan_id == 2 && $payment->payment_created_at <= $payment->activeSubscription->subscription_start_at) ){
+
+            $platform_fee = 0.05;
+
+            if($payment->payment_mode == 'KNET' || $payment->payment_mode == 'src_kw.knet'){
 
 
-      foreach ($orders as $key => $order) {
-        if(  $order->order_mode == Order::ORDER_MODE_DELIVERY ){
+              //if greater than 10KD
+             if (($amount * $knetGatewayFee) >= $minKnetGatewayFee){
+               $platform_fee = $amount *  ( $platform_fee  - $knetGatewayFee );
+             }
 
-            if($order->delivery_zone_id && $order->deliveryZone->business_location_id ){
-              $order->business_location_name = $order->deliveryZone->businessLocation->business_location_name;
-              $order->country_name =  $order->deliveryZone->country->country_name;
-              $order->country_name_ar =  $order->deliveryZone->country->country_name_ar;
-              $order->save(false);
-            } else if( !$order->delivery_zone_id ){
-
-              if($order->area_id){
-                $order->country_name = $order->area->country->country_name;
-                $order->country_name_ar = $order->area->country->country_name_ar;
-                $order->save(false);
+              // if amount greater than  4 and  equal 10
+              else if  ($amount > $minChargeAmount && ( ($amount * $knetGatewayFee) < $minKnetGatewayFee)){
+                $platform_fee = ($amount *  $platform_fee ) - $minKnetGatewayFee;
               }
 
+              //if amount less than or equal 4
+              else if ($minChargeAmount >= $amount) {
+                $platform_fee = 0.100;
+              }
+
+            } else if($payment->payment_mode == 'VISA' || $payment->payment_mode == 'MASTERCARD' || $payment->payment_mode = 'src_card'){
+                $platform_fee = $amount *  ($platform_fee  - $creditcardGatewayFeePercentage);
             }
 
-
-        } else {
-
-          if ($order->pickup_location_id){
-            $order->business_location_name = $order->pickupLocation->business_location_name;
-            $order->country_name = $order->pickupLocation->country->country_name;
-            $order->country_name_ar = $order->pickupLocation->country->country_name_ar;
-            $order->save(false);
-          }
-
-        }
-
-      }
-
-      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-      return self::EXIT_CODE_NORMAL;
-
-    }
-
-
-
-    public function actionQatar(){
-      $jsonString = file_get_contents('qatar.json');
-      $data = json_decode($jsonString, true);
-
-      foreach ($data as $key => $area) {
-
-          $area_name = str_replace(' (' . $area['cityTitleEn'] . ')', '', $area['titleEn']);
-
-          if( !$city_model = City::find()->where(['city_name' => $area['cityTitleEn']])->one() ) {
-
-            $city_model = new City();
-
-            $city_model->country_id = 125;//Qatar
-            $city_model->city_name = $area['cityTitleEn'];
-            $city_model->city_name_ar = $area['cityTitleAr'];
-            $city_model->save(false);
-          }
-
-          if( !Area::find()->where(['area_name' => $area['titleEn']])->exists() ){
-            $area_model = new Area();
-            $area_model->city_id = $city_model->city_id;
-            $area_model->area_name = $area_name;
-            $area_model->area_name_ar = $area['titleAr'];
-            $area_model->latitude = $area['lat'];
-            $area_model->longitude = $area['lng'];
-            $area_model->save(false);
-          }
-
-
-      }
-
-      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-      return self::EXIT_CODE_NORMAL;
-    }
-
-    public function actionKsa(){
-      $jsonString = file_get_contents('ksa.json');
-      $data = json_decode($jsonString, true);
-
-      foreach ($data as $key => $area) {
-
-          $area_name = str_replace(' (' . $area['cityTitleEn'] . ')', '', $area['titleEn']);
-
-          if( !$city_model = City::find()->where(['city_name' => $area['cityTitleEn']])->one() ) {
-
-            $city_model = new City();
-
-            $city_model->country_id = 129;//KSA
-            $city_model->city_name = $area['cityTitleEn'];
-            $city_model->city_name_ar = $area['cityTitleAr'];
-            $city_model->save(false);
-          }
-
-          if( !Area::find()->where(['area_name' => $area['titleEn']])->exists() ){
-            $area_model = new Area();
-            $area_model->city_id = $city_model->city_id;
-            $area_model->area_name = $area_name;
-            $area_model->area_name_ar = $area['titleAr'];
-            $area_model->latitude = $area['lat'];
-            $area_model->longitude = $area['lng'];
-            $area_model->save(false);
-          }
-
-
-      }
-
-      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-      return self::EXIT_CODE_NORMAL;
-    }
-
-    public function actionEgypt(){
-      $jsonString = file_get_contents('egypt.json');
-      $data = json_decode($jsonString, true);
-
-      foreach ($data as $key => $area) {
-
-          $area_name = str_replace(' (' . $area['cityTitleEn'] . ')', '', $area['titleEn']);
-          $area_name_ar = str_replace(' (' . $area['cityTitleAr'] . ')', '', $area['titleAr']);
-
-          if( !$city_model = City::find()->where(['city_name' => $area['cityTitleEn']])->one() ) {
-
-            $city_model = new City();
-
-            $city_model->country_id = 49;//Egypt
-            $city_model->city_name = $area['cityTitleEn'];
-            $city_model->city_name_ar = $area['cityTitleAr'];
-            $city_model->save(false);
-          }
-
-          if( !Area::find()->where(['area_name' => $area['titleEn']])->exists() ){
-            $area_model = new Area();
-            $area_model->city_id = $city_model->city_id;
-            $area_model->area_name = $area_name;
-            $area_model->area_name_ar = $area_name_ar;
-            $area_model->latitude = $area['lat'];
-            $area_model->longitude = $area['lng'];
-            $area_model->save(false);
-          }
-
-
-      }
-
-      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-      return self::EXIT_CODE_NORMAL;
-    }
-
-    public function actionBahrain(){
-      $jsonString = file_get_contents('bahrain.json');
-      $data = json_decode($jsonString, true);
-
-      foreach ($data as $key => $area) {
-
-          $area_name = str_replace(' (' . $area['cityTitleEn'] . ')', '', $area['titleEn']);
-
-          if( !$city_model = City::find()->where(['city_name' => $area['cityTitleEn']])->one() ) {
-
-            $city_model = new City();
-
-            $city_model->country_id = 12;//BH
-            $city_model->city_name = $area['cityTitleEn'];
-            $city_model->city_name_ar = $area['cityTitleAr'];
-            $city_model->save(false);
-          }
-
-          if( !Area::find()->where(['area_name' => $area['titleEn']])->exists() ){
-            $area_model = new Area();
-            $area_model->city_id = $city_model->city_id;
-            $area_model->area_name = $area_name;
-            $area_model->area_name_ar = $area['titleAr'];
-            $area_model->latitude = $area['lat'];
-            $area_model->longitude = $area['lng'];
-            $area_model->save(false);
-          }
-
-
-      }
-
-      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-      return self::EXIT_CODE_NORMAL;
-    }
-
-    public function actionUae(){
-      $jsonString = file_get_contents('uae.json');
-      $data = json_decode($jsonString, true);
-
-      foreach ($data as $key => $area) {
-
-          $area_name = str_replace(' (' . $area['cityTitleEn'] . ')', '', $area['titleEn']);
-
-          if( !$city_model = City::find()->where(['city_name' => $area['cityTitleEn']])->one() ) {
-
-            $city_model = new City();
-
-            $city_model->country_id = 162;//UAE
-            $city_model->city_name = $area['cityTitleEn'];
-            $city_model->city_name_ar = $area['cityTitleAr'];
-            $city_model->save(false);
-          }
-
-          if( !Area::find()->where(['area_name' => $area['titleEn']])->exists() ){
-            $area_model = new Area();
-            $area_model->city_id = $city_model->city_id;
-            $area_model->area_name = $area_name;
-            $area_model->area_name_ar = $area['titleAr'];
-            $area_model->latitude = $area['lat'];
-            $area_model->longitude = $area['lng'];
-            $area_model->save(false);
-          }
-
-
-      }
-
-      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-      return self::EXIT_CODE_NORMAL;
-    }
-
-    public function actionOman(){
-      $jsonString = file_get_contents('oman.json');
-      $data = json_decode($jsonString, true);
-
-      foreach ($data as $key => $area) {
-
-          $area_name = str_replace(' (' . $area['cityTitleEn'] . ')', '', $area['titleEn']);
-
-          if( !$city_model = City::find()->where(['city_name' => $area['cityTitleEn']])->one() ) {
-
-            $city_model = new City();
-
-            $city_model->country_id = 116;//Oman
-            $city_model->city_name = $area['cityTitleEn'];
-            $city_model->city_name_ar = $area['cityTitleAr'];
-            $city_model->save(false);
-          }
-
-          if( !Area::find()->where(['area_name' => $area['titleEn']])->exists() ){
-            $area_model = new Area();
-            $area_model->city_id = $city_model->city_id;
-            $area_model->area_name = $area_name;
-            $area_model->area_name_ar = $area['titleAr'];
-            $area_model->latitude = $area['lat'];
-            $area_model->longitude = $area['lng'];
-            $area_model->save(false);
-          }
-
-
-      }
-
-      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-      return self::EXIT_CODE_NORMAL;
-    }
-
-
-    public function actionIndex(){
-        $restaurants = Restaurant::find()->where(['IS NOT', 'phone_number', null])->all();
-
-        foreach ($restaurants as  $restaurant) {
-          if($restaurant){
-
-            if($restaurant->phone_number)
-              $restaurant->phone_number = str_replace(' ', '',"+965" . $restaurant->phone_number);
-
-            if($restaurant->owner_number)
-               $restaurant->owner_number = str_replace(' ', '',"+965" . $restaurant->owner_number);
-
-            $restaurant->save(false);
-          }
-
-        }
-
-        $customers = \common\models\Customer::find()->all();
-
-
-        foreach ($customers as  $customer) {
-          if($customer){
-
-            $customer->customer_phone_number = str_replace(' ', '',"+965" . $customer->customer_phone_number);
-
-            $customer->save(false);
-          }
-
         }
 
 
-        $countries = Country::find()->all();
-
-        foreach ($countries as $country) {
-          $country_payment_method = new CountryPaymentMethod();
-          $country_payment_method->country_id = $country->country_id;
-          $country_payment_method->payment_method_id = 2; //Credit card
-          $country_payment_method->save(false);
-        }
-
-        $country_payment_method = new CountryPaymentMethod();
-        $country_payment_method->country_id = 84; //kuwait
-        $country_payment_method->payment_method_id = 1; //knet
-        $country_payment_method->save(false);
-
-        $country_payment_method = new CountryPaymentMethod();
-        $country_payment_method->country_id = 129; //KSA
-        $country_payment_method->payment_method_id = 4; //Mada
-        $country_payment_method->save(false);
-
-        $country_payment_method = new CountryPaymentMethod();
-        $country_payment_method->country_id = 12; //Bahrain
-        $country_payment_method->payment_method_id = 5; //Benefit
-        $country_payment_method->save(false);
 
 
-        $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-        return self::EXIT_CODE_NORMAL;
-    }
+        $payment->plugn_fee = $platform_fee;
+        $payment->payment_net_amount = ($payment->payment_amount_charged - $payment->payment_gateway_fee - $payment->plugn_fee);
+        $payment->save(false);
+
+     }
 
 
-    public function actionMigration(){
+     $allPayments = Payment::find()
+               ->joinWith(['restaurant'])
+               ->with('activeSubscription')
+               ->all();
 
-        $restaurantBranches = RestaurantBranch::find()->all();
-        foreach ($restaurantBranches as $key => $branch) {
+     foreach ($allPayments as $key => $payment) {
 
-          $store = Restaurant::findOne($branch->restaurant_uuid);
+        $payment->payment_net_amount = ($payment->payment_amount_charged - $payment->payment_gateway_fee - $payment->plugn_fee);
+        $payment->save(false);
 
-          if(!BusinessLocation::find()->where(['restaurant_uuid' => $branch->restaurant_uuid, 'business_location_name' =>  $branch->branch_name_en , 'business_location_name_ar' =>  $branch->branch_name_ar])->exists()){
-            $businessLocation = new BusinessLocation;
-            $businessLocation->country_id = 84;
-            $businessLocation->restaurant_uuid = $branch->restaurant_uuid;
-            $businessLocation->business_location_name = $branch->branch_name_en;
-            $businessLocation->business_location_name_ar = $branch->branch_name_ar;
-            $businessLocation->support_pick_up = $store->support_pick_up ? 1 : 0;
-            $businessLocation->save();
-          }
+     }
 
-        }
+     $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
+     return self::EXIT_CODE_NORMAL;
 
+   }
 
-        $stores = Restaurant::find()->all();
-        foreach ($stores as $key => $store) {
-
-          if(
-            $store->restaurant_uuid == 'rest_6a55139f-f340-11ea-808a-0673128d0c9c' ||
-            $store->restaurant_uuid == 'rest_1276d589-f41c-11ea-808a-0673128d0c9c' ||
-            $store->restaurant_uuid == 'rest_aa69124d-2346-11eb-b97d-0673128d0c9c' ||
-            $store->restaurant_uuid == 'rest_f6bc4e4a-e7c6-11ea-808a-0673128d0c9c' ||
-            $store->restaurant_uuid == 'rest_5d657108-c91f-11ea-808a-0673128d0c9c'
-          ){
-            $store->hide_request_driver_button = 0;
-            $store->save(false);
-          }
-
-
-          if( $deliveryZones = $store->getRestaurantDeliveryAreas()->all()  ){
-
-
-            if(!$businessLocation = BusinessLocation::find()->where(['restaurant_uuid' => $store->restaurant_uuid])->one()){
-              $businessLocation = new BusinessLocation;
-              $businessLocation->restaurant_uuid = $store->restaurant_uuid;
-              $businessLocation->country_id = 84;
-              $businessLocation->business_location_name = 'Main branch';
-              $businessLocation->business_location_name_ar = 'الفرع الرئيسي';
-              $businessLocation->support_pick_up = 0;
-              $businessLocation->save();
-
-            }
-
-
-
-            foreach ($deliveryZones as $key => $deliveryZone) {
-
-                if(!$delivery_zone_model = $store->getDeliveryZones()->where(
-                  [
-                    'delivery_time' => $deliveryZone->delivery_time,
-                    'delivery_fee' => $deliveryZone->delivery_fee,
-                    'min_charge'   => $deliveryZone->min_charge
-                  ]
-                )->one()){
-                  $delivery_zone_model = new DeliveryZone;
-                  $delivery_zone_model->business_location_id = $businessLocation->business_location_id;
-                  $delivery_zone_model->restaurant_uuid = $store->restaurant_uuid;
-                  $delivery_zone_model->country_id = 84;
-                  $delivery_zone_model->delivery_time = $deliveryZone->delivery_time;
-                  $delivery_zone_model->delivery_fee = $deliveryZone->delivery_fee;
-                  $delivery_zone_model->min_charge = $deliveryZone->min_charge ? $deliveryZone->min_charge : 0 ;
-                  $delivery_zone_model->time_unit = 'min';
-
-                  if(!$delivery_zone_model->save()){
-                    die(var_dump($delivery_zone_model->errors) . var_dump($deliveryZone) );
-                  }
-                }
-
-
-                $area_model = Area::findOne($deliveryZone->area_id);
-
-                if($area_model){
-
-                  if(!$area_delivery_zone_model = $store->getAreaDeliveryZones()->where(
-                    [
-                      'restaurant_uuid' => $store->restaurant_uuid,
-                      'delivery_zone_id' => $delivery_zone_model->delivery_zone_id,
-                      'area_id'   => $area_model->area_id
-                    ]
-                  )->one()){
-                    $area_delivery_zone_model = new AreaDeliveryZone;
-                    $area_delivery_zone_model->restaurant_uuid = $store->restaurant_uuid;
-                    $area_delivery_zone_model->delivery_zone_id = $delivery_zone_model->delivery_zone_id;
-                    $area_delivery_zone_model->country_id = 84;
-                    $area_delivery_zone_model->city_id = $area_model->city_id;
-                    $area_delivery_zone_model->area_id = $area_model->area_id;
-
-
-                    if(!$area_delivery_zone_model->save()){
-                      die(var_dump($area_delivery_zone_model->errors) . var_dump($area_delivery_zone_model) );
-                    }
-                  }
-
-
-                }
-
-
-
-
-            }
-
-
-          }
-
-
-
-          foreach ($store->getOrders()->all() as $key => $order) {
-
-            if($order->order_mode == 1 && $areaDeliveryArea = $store->getAreaDeliveryZones()->where(['area_id' => $order->area_id])->one()){
-              $order->delivery_zone_id = $areaDeliveryArea->delivery_zone_id;
-            }
-
-
-            if($order->order_mode == 2 && $order->restaurant_branch_id && $businessLocation = $store->getBusinessLocations()->where(['business_location_name' => $order->restaurantBranch->branch_name_en])->one()){
-              $order->pickup_location_id = $businessLocation->business_location_id;
-            }
-
-            $order->customer_phone_number = '+965' . $order->customer_phone_number;
-
-
-            $order->save(false);
-
-
-          }
-
-
-        }
-
-        $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-        return self::EXIT_CODE_NORMAL;
-
-    }
 
     public function actionSiteStatus(){
 

@@ -157,18 +157,50 @@ class OrderController extends Controller {
                                 return '';
                         },
                     ],
-                    [
-                        'attribute' => 'total_price',
-                        "value" => function($data) {
-                          return \Yii::$app->formatter->asCurrency($data->total_price, 'KWD');
-                        },
-                    ],
+
                     [
                         'attribute' => 'delivery_fee',
                         "value" => function($data) {
                           return \Yii::$app->formatter->asCurrency($data->delivery_fee, 'KWD');
                         },
                     ],
+
+                    [
+                        'header' => 'Amount Charged',
+                        'attribute' => 'total_price',
+                        "value" => function($data) {
+                            return \Yii::$app->formatter->asCurrency($data->payment_uuid ? $data->payment->payment_amount_charged : $data->total_price, $data->currency->code);
+                        }
+                    ],
+
+                    [
+                        'header' => 'Net Amount',
+                        "value" => function($data) {
+                          if($data->payment_uuid )
+                            return \Yii::$app->formatter->asCurrency($data->payment->payment_net_amount, $data->currency->code);
+                          else
+                            return '';
+                        }
+                    ],
+                    [
+                        'header' => 'Plugn fee',
+                        "value" => function($data) {
+                              if($data->payment_uuid )
+                                  return \Yii::$app->formatter->asCurrency($data->payment->plugn_fee , $data->currency->code);
+                              else
+                                return '';
+                        }
+                    ],
+                    [
+                        'header' => 'Payment Gateway fee',
+                        "value" => function($data) {
+                            if($data->payment_uuid)
+                              return \Yii::$app->formatter->asCurrency($data->payment->payment_gateway_fee, $data->currency->code);
+                            else
+                              return '';
+                        }
+                    ],
+
                     'order_created_at'
                 ]
             ]);

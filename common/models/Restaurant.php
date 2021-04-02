@@ -220,6 +220,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_commercial_license_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
             [['restaurant_authorized_signature_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
             [['name', 'name_ar', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_domain', 'restaurant_email', 'store_branch_name', 'app_id'], 'required', 'on' => 'create'],
+            [['name', 'name_ar'], 'required', 'on' => 'default'],
             [['name', 'owner_number', 'restaurant_domain', 'currency_id', 'country_id'], 'required', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             ['name', 'match', 'pattern' => '/^[a-zA-Z0-9-\s]+$/', 'message' => 'Your store name can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             ['restaurant_domain', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/', 'message' => 'Your store url can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],

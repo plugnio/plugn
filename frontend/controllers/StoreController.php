@@ -569,6 +569,7 @@ class StoreController extends Controller {
 
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->save()) {
+
             return $this->render('update', [
                         'model' => $model
             ]);
