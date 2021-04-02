@@ -400,7 +400,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                     ?>
                                 </li>
 
-                              <?php if ($restaurant_model->has_deployed) { ?>
+                              <?php if ($restaurant_model->version == 2) { ?>
 
                                 <li class=" nav-item <?= $this->context->route == 'business-location/index'  ? 'active' : '' ?> ">
                                     <?=
@@ -413,7 +413,6 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                               <?php }  ?>
 
                               <?php if ($restaurant_model->has_deployed) { ?>
-
                                 <li class=" nav-item <?= $this->context->route == 'site/domains'  ? 'active' : '' ?> ">
                                     <?=
                                     Html::a(
