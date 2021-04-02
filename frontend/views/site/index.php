@@ -461,7 +461,7 @@ $this->registerJs($js);
     </div>
 
       <?php }
-    if(str_contains($restaurant_model->restaurant_domain, '.plugn.store') ){ ?>
+    if(str_contains($restaurant_model->restaurant_domain, '.plugn.store') &&   $restaurant_model->has_deployed == 1 ){ ?>
     <div class="card">
         <div class="card-body">
             <div class="row">
