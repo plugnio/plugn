@@ -179,7 +179,7 @@ class OrderController extends Controller {
                           if($data->payment_uuid )
                             return \Yii::$app->formatter->asCurrency($data->payment->payment_net_amount, $data->currency->code);
                           else
-                            return '';
+                            return \Yii::$app->formatter->asCurrency( $data->total_price, $data->currency->code);
                         }
                     ],
                     [
@@ -188,7 +188,7 @@ class OrderController extends Controller {
                               if($data->payment_uuid && $data->payment->plugn_fee)
                                   return \Yii::$app->formatter->asCurrency($data->payment->plugn_fee , $data->currency->code);
                               else
-                                return '';
+                                  return \Yii::$app->formatter->asCurrency(0 , $data->currency->code);
                         }
                     ],
                     [
@@ -197,7 +197,8 @@ class OrderController extends Controller {
                             if($data->payment_uuid)
                               return \Yii::$app->formatter->asCurrency($data->payment->payment_gateway_fee, $data->currency->code);
                             else
-                              return '';
+                              return \Yii::$app->formatter->asCurrency(0 , $data->currency->code);
+
                         }
                     ],
 
