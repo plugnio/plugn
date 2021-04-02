@@ -185,7 +185,7 @@ class OrderController extends Controller {
                     [
                         'header' => 'Plugn fee',
                         "value" => function($data) {
-                              if($data->payment_uuid )
+                              if($data->payment_uuid && $data->payment->plugn_fee)
                                   return \Yii::$app->formatter->asCurrency($data->payment->plugn_fee , $data->currency->code);
                               else
                                 return '';
