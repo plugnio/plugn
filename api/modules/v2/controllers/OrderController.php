@@ -445,6 +445,8 @@ class OrderController extends Controller {
 
 
             if (array_key_exists('operation', $response) && $response['operation'] == 'error') {
+              
+              \Yii::error(json_encode($response['message']), __METHOD__); // Log error faced by user
                 $order->delete();
             }
         } else {
