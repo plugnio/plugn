@@ -59,9 +59,11 @@ class PaymentController extends Controller {
      *  Return Payment details
      */
     public function actionMyFatoorahWebhook() {
-      \Yii::error('Enter MyFatoorah Webhook', __METHOD__); // Log error faced by user
 
       $headers = Yii::$app->request->headers;
+
+      \Yii::error(json_encode($headers->get('MyFatoorah-Signature')), __METHOD__);
+
       $token = $headers->get('MyFatoorah-Signature');
 
       $eventType = Yii::$app->request->getBodyParam("EventType");
