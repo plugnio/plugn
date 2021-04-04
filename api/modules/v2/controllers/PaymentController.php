@@ -62,39 +62,47 @@ class PaymentController extends Controller {
 
       $headers = Yii::$app->request->headers;
 
-      \Yii::error(json_encode($headers->get('MyFatoorah-Signature')), __METHOD__);
+      $myFatoorahSignature = $headers->get('MyFatoorah-Signature');
+      $webhookToken = 'rIp9GnDBQ3kZzZ+hJRNZAEtttGfnIs7AKHDvHuera2+V2sZv/n/55USbF2GvBf2E4vBefzfQX/QgeyYBSAi1rA==';
 
-      $token = $headers->get('MyFatoorah-Signature');
+
+      $hash = hash_hmac('sha256', $myFatoorahSignature, $webhookToken);
+
+      if($hash !== 'aa1506dc7ebc07a4c2b8af89e8b7c61fcb08fa0c4ae4e6dfd7671d63236ebb05'){
+        return [
+            'message' => 'Failed to authorize the request.'
+        ];
+
+           \Yii::error('Failed to authorize the request.', __METHOD__); // Log error faced by user
+
+      }
+
+      \Yii::error('authorized', __METHOD__); // Log error faced by user
+
 
       $eventType = Yii::$app->request->getBodyParam("EventType");
       $data = Yii::$app->request->getBodyParam("Data");
 
-        if($token && $token === 'rIp9GnDBQ3kZzZ+hJRNZAEtttGfnIs7AKHDvHuera2+V2sZv/n/55USbF2GvBf2E4vBefzfQX/QgeyYBSAi1rA=='){
+      if( $eventType && $data){
 
-            if( $eventType && $data){
+        switch ($eventType) {
+          case 1: //1 For Transaction Status Changed
+            Payment::updatePaymentStatusFromMyFatoorahWebhook($data['InvoiceId'], $data);
+            break;
 
-              switch ($eventType) {
-                case 1: //1 For Transaction Status Changed
-                  Payment::updatePaymentStatusFromMyFatoorahWebhook($data['InvoiceId'], $data);
-                  break;
+          case 2: //2 For Refund Status Changed
+            Refund::updateRefundStatus($data['RefundReference'], $data);
+            break;
 
-                case 2: //2 For Refund Status Changed
-                  Refund::updateRefundStatus($data['RefundReference'], $data);
-                  break;
+        }
 
-              }
-
-            }
-
-          return [
-              'message' => 'success'
-          ];
-
-      } else{
-        return [
-            'message' => 'Failed to authorize the request.'
-        ];
       }
+
+      return [
+          'message' => 'success'
+      ];
+
+
 
     }
 
