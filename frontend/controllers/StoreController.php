@@ -686,7 +686,8 @@ class StoreController extends Controller {
             if ($thumbnail_image)
                 $model->restaurant_thumbnail_image = $thumbnail_image[0]['file'];
 
-
+            $model->sitemap_require_update = 1;
+            
             if ($model->save() && $store_theme_model->save()) {
 
 
