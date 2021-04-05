@@ -66,8 +66,9 @@ class PaymentController extends Controller {
       $webhookToken = 'rIp9GnDBQ3kZzZ+hJRNZAEtttGfnIs7AKHDvHuera2+V2sZv/n/55USbF2GvBf2E4vBefzfQX/QgeyYBSAi1rA==';
 
 
-      $hash = hash_hmac('sha256', $myFatoorahSignature, $webhookToken);
-      \Yii::error('$hash=>' . $hash . '$myFatoorahSignature=>' . $myFatoorahSignature, __METHOD__); // Log error faced by user
+      $hash = hash_hmac('sha256', $webhookToken, $myFatoorahSignature);
+      \Yii::error('$hash=>' . $hash, __METHOD__); // Log error faced by user
+      \Yii::error('$myFatoorahSignature=>' . $myFatoorahSignature, __METHOD__); // Log error faced by user
 
       if($hash !== 'aa1506dc7ebc07a4c2b8af89e8b7c61fcb08fa0c4ae4e6dfd7671d63236ebb05'){
         return [
