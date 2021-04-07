@@ -62,47 +62,44 @@ class PaymentController extends Controller {
 
       $headers = Yii::$app->request->headers;
 
-      $myFatoorahSignature = $headers->get('MyFatoorah-Signature');
-      $webhookToken = 'rIp9GnDBQ3kZzZ+hJRNZAEtttGfnIs7AKHDvHuera2+V2sZv/n/55USbF2GvBf2E4vBefzfQX/QgeyYBSAi1rA==';
+      $headerSignature = $headers->get('MyFatoorah-Signature');
+      $secretKey = 'rIp9GnDBQ3kZzZ+hJRNZAEtttGfnIs7AKHDvHuera2+V2sZv/n/55USbF2GvBf2E4vBefzfQX/QgeyYBSAi1rA==';
 
+      $isValidSignature = true;
+      $secretKey = "";
 
-      $hash = hash_hmac('sha256', $webhookToken, $myFatoorahSignature);
-      \Yii::error('$hash=>' . $hash, __METHOD__); // Log error faced by user
-      \Yii::error('$myFatoorahSignature=>' . $myFatoorahSignature, __METHOD__); // Log error faced by user
+       //Check If Enabled Secret Key and If The header has request
+      if ($headerSignature != null)  {
+        $isValidSignature = false;
+        // $secretKey = "/Xp+v8r2dDmNlOTgFyuSRoASudhBm04AzJ6891UWz4k="; //From Your Portal.
 
-      if($hash !== 'aa1506dc7ebc07a4c2b8af89e8b7c61fcb08fa0c4ae4e6dfd7671d63236ebb05'){
-        return [
-            'message' => 'Failed to authorize the request.'
-        ];
+        $genericWebhookModel = Yii::$app->request->bodyParams;
+        $eventType = Yii::$app->request->getBodyParam("EventType");
+        $data = Yii::$app->request->getBodyParam("Data");
 
-           \Yii::error('Failed to authorize the request.', __METHOD__); // Log error faced by user
-
-      }
-
-      \Yii::error('authorized', __METHOD__); // Log error faced by user
-
-
-      $eventType = Yii::$app->request->getBodyParam("EventType");
-      $data = Yii::$app->request->getBodyParam("Data");
-
-      if( $eventType && $data){
+        if( $eventType && $data){
 
         switch ($eventType) {
           case 1: //1 For Transaction Status Changed
-            Payment::updatePaymentStatusFromMyFatoorahWebhook($data['InvoiceId'], $data);
+            // Payment::updatePaymentStatusFromMyFatoorahWebhook($data['InvoiceId'], $data);
+            if (!$isValidSignature) {
+                   $isValidSignature = Payment::checkMyFatoorahSignature($genericWebhookModel, $secretKey, $headerSignature);
+                   if (!$isValidSignature) return BadRequest("Invalid Signature");
+            }
             break;
 
           case 2: //2 For Refund Status Changed
             Refund::updateRefundStatus($data['RefundReference'], $data);
             break;
 
+          }
+
         }
 
-      }
-
-      return [
+        return [
           'message' => 'success'
-      ];
+        ];
+    }
 
 
 

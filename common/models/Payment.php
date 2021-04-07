@@ -243,6 +243,43 @@ class Payment extends \yii\db\ActiveRecord {
 
 
     /**
+     * checkMyFatoorahSignature
+     * @param  [type]  $id                           [description]
+     * @param  boolean $showUpdatedFlashNotification [description]
+     * @return self                                [description]
+     */
+     public static function checkMyFatoorahSignature($genericWebhookModel, $secretKey, $headerSignature ) {
+         //***Generate The Signature*** :
+         //1- Order all properties alphabetic
+         //2-Encrypt the data with the secret key
+         //3-Compare the signature
+
+            ksort ( $genericWebhookModel );
+            $sortedArray = "";
+            $counter = 0;
+
+            // unset($genericWebhookModel['Data']);
+
+            foreach($genericWebhookModel as $key => $model) {
+              $sortedArray .=  $key . "=" . $model .  ",";
+             }
+
+             die(json_encode( ( $sortedArray ) ));
+
+         // var properties = typeof(T).GetProperties().Select(p => p.Name).OrderBy(p => p).ToList();
+         // var type = model.Data.GetType();
+         // var parameters = new List<ItemTxt>();
+         // for (int i = 0; i < properties.Count; i++)
+         // {
+         //     var value = type.GetProperty(properties[i]).GetValue(model.Data);
+         //     value = value == null ? "" : value.ToString();
+         //     parameters.Add(new ItemTxt { Text = properties[i], Value = value.ToString() });
+         // }
+         // var signature = Sign(parameters, secretKey);
+         // return signature == headerSignature;
+     }
+
+    /**
      * Update Payment's Status from Myfatoorah Payments
      * @param  [type]  $id                           [description]
      * @param  boolean $showUpdatedFlashNotification [description]
