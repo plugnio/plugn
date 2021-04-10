@@ -258,15 +258,22 @@ class Payment extends \yii\db\ActiveRecord {
 
 
              $sortedArray = '';
+
+             $counter = 0;
+
              foreach($genericWebhookModel as $key => $model) {
-               if($key == 0)
+
+               if($counter == 0)
                 $sortedArray .=  $key . "=" . $model ;
                else
                 $sortedArray .=   "," . $key . "=" . $model ;
+
+               $counter++;
+
               }
 
              $signature = static::signMyfatoorahSignature($sortedArray, $secretKey);
-
+    
              return $signature == $headerSignature;
      }
 

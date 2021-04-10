@@ -88,12 +88,9 @@ class PaymentController extends Controller {
           case 1: //1 For Transaction Status Changed
             // Payment::updatePaymentStatusFromMyFatoorahWebhook($data['InvoiceId'], $data);
             if (!$isValidSignature) {
-              \Yii::error('Forbidden' , __METHOD__); // Log error faced by user
-
                    $isValidSignature = Payment::checkMyFatoorahSignature($data, $secretKey, $headerSignature);
                    if (!$isValidSignature)  throw new ForbiddenHttpException('Invalid Signature');
             }
-            
             \Yii::error('Success' , __METHOD__); // Log error faced by user
 
             Payment::updatePaymentStatusFromMyFatoorahWebhook($data['InvoiceId'], $data);
