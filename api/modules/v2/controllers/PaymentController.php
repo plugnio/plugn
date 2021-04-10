@@ -64,14 +64,13 @@ class PaymentController extends Controller {
       $headers = Yii::$app->request->headers;
 
       $headerSignature = $headers->get('MyFatoorah-Signature');
-      $secretKey = 'o0qHU+XgkApq/AzbTsuTQe2zc6mMNHUSGAh6B9G53c9Bw7EqqM6aAybv5K18Iy3YHfIqTaIesIBY+druf4jRmg=='; // from portal
+      $secretKey = 'rIp9GnDBQ3kZzZ+hJRNZAEtttGfnIs7AKHDvHuera2+V2sZv/n/55USbF2GvBf2E4vBefzfQX/QgeyYBSAi1rA=='; // from portal
 
       $isValidSignature = true;
 
        //Check If Enabled Secret Key and If The header has request
       if ($headerSignature != null)  {
         $isValidSignature = false;
-        // $secretKey = "/Xp+v8r2dDmNlOTgFyuSRoASudhBm04AzJ6891UWz4k="; //From Your Portal.
 
         $eventType = Yii::$app->request->getBodyParam("EventType");
         $data = Yii::$app->request->getBodyParam("Data");
