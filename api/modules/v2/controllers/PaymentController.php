@@ -67,7 +67,6 @@ class PaymentController extends Controller {
       $secretKey = 'rIp9GnDBQ3kZzZ+hJRNZAEtttGfnIs7AKHDvHuera2+V2sZv/n/55USbF2GvBf2E4vBefzfQX/QgeyYBSAi1rA=='; // from portal
 
       $isValidSignature = true;
-      $secretKey = "";
 
        //Check If Enabled Secret Key and If The header has request
       if ($headerSignature != null)  {

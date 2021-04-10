@@ -254,32 +254,31 @@ class Payment extends \yii\db\ActiveRecord {
          //2-Encrypt the data with the secret key
          //3-Compare the signature
 
-            ksort ( $genericWebhookModel );
+        ksort ( $genericWebhookModel );
 
 
-             $sortedArray = '';
+         $sortedArray = '';
 
-             $counter = 0;
+         $counter = 0;
 
-             foreach($genericWebhookModel as $key => $model) {
+         foreach($genericWebhookModel as $key => $model) {
 
-               if($counter == 0)
-                $sortedArray .=  $key . "=" . $model ;
-               else
-                $sortedArray .=   "," . $key . "=" . $model ;
+           if($counter == 0)
+            $sortedArray .=  $key . "=" . $model ;
+           else
+            $sortedArray .=   "," . $key . "=" . $model ;
 
-               $counter++;
+           $counter++;
 
-              }
+          }
 
-             $signature = static::signMyfatoorahSignature($sortedArray, $secretKey);
-    
-             return $signature == $headerSignature;
+         $signature = static::signMyfatoorahSignature($sortedArray, $secretKey);
+         return $signature == $headerSignature;
      }
 
 
      public static function signMyfatoorahSignature($paramsArray, $secretKey ) {
-          return hash_hmac('sha256', $paramsArray, $secretKey);
+          return base64_encode(hash_hmac('sha256', $paramsArray, $secretKey, true));
      }
 
 
@@ -291,12 +290,10 @@ class Payment extends \yii\db\ActiveRecord {
      */
     public static function updatePaymentStatusFromMyFatoorah($invoiceId, $showUpdatedFlashNotification = false) {
         // Look for payment with same Payment Gateway Transaction ID
-        $paymentRecord = \common\models\Payment::findOne(['payment_gateway_invoice_id' => $invoiceId]);
+        $paymentRecord = \common\models\Payment::find()->where(['payment_gateway_invoice_id' => $invoiceId])->one();
         if (!$paymentRecord) {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
-
-
 
         $response = Yii::$app->myFatoorahPayment->retrieveCharge($invoiceId, 'InvoiceId');
 
@@ -389,7 +386,7 @@ class Payment extends \yii\db\ActiveRecord {
 
     public static function updatePaymentStatusFromMyFatoorahWebhook($invoiceId, $responseContent) {
         // Look for payment with same Payment Gateway Transaction ID
-        $paymentRecord = \common\models\Payment::findOne(['payment_gateway_invoice_id' => $invoiceId, 'received_callback' => 0]);
+        $paymentRecord = \common\models\Payment::find()->where(['payment_gateway_invoice_id' => $invoiceId, 'received_callback' => 0])->one();
         if (!$paymentRecord) {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
