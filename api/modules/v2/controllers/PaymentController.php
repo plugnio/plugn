@@ -10,6 +10,7 @@ use common\models\PaymentMethod;
 use common\models\Payment;
 use common\models\Refund;
 use common\models\Restaurant;
+use yii\web\ForbiddenHttpException;
 
 class PaymentController extends Controller {
 
@@ -63,7 +64,7 @@ class PaymentController extends Controller {
       $headers = Yii::$app->request->headers;
 
       $headerSignature = $headers->get('MyFatoorah-Signature');
-      $secretKey = 'rIp9GnDBQ3kZzZ+hJRNZAEtttGfnIs7AKHDvHuera2+V2sZv/n/55USbF2GvBf2E4vBefzfQX/QgeyYBSAi1rA==';
+      $secretKey = 'rIp9GnDBQ3kZzZ+hJRNZAEtttGfnIs7AKHDvHuera2+V2sZv/n/55USbF2GvBf2E4vBefzfQX/QgeyYBSAi1rA=='; // from portal
 
       $isValidSignature = true;
       $secretKey = "";
@@ -73,9 +74,13 @@ class PaymentController extends Controller {
         $isValidSignature = false;
         // $secretKey = "/Xp+v8r2dDmNlOTgFyuSRoASudhBm04AzJ6891UWz4k="; //From Your Portal.
 
-        $genericWebhookModel = Yii::$app->request->bodyParams;
         $eventType = Yii::$app->request->getBodyParam("EventType");
         $data = Yii::$app->request->getBodyParam("Data");
+
+
+        \Yii::error('$data=>' .  json_encode($data), __METHOD__); // Log error faced by user
+        \Yii::error('$myFatoorahSignature=>' . json_encode($headerSignature), __METHOD__); // Log error faced by user
+
 
         if( $eventType && $data){
 
@@ -83,9 +88,16 @@ class PaymentController extends Controller {
           case 1: //1 For Transaction Status Changed
             // Payment::updatePaymentStatusFromMyFatoorahWebhook($data['InvoiceId'], $data);
             if (!$isValidSignature) {
-                   $isValidSignature = Payment::checkMyFatoorahSignature($genericWebhookModel, $secretKey, $headerSignature);
-                   if (!$isValidSignature) return BadRequest("Invalid Signature");
+              \Yii::error('Forbidden' , __METHOD__); // Log error faced by user
+
+                   $isValidSignature = Payment::checkMyFatoorahSignature($data, $secretKey, $headerSignature);
+                   if (!$isValidSignature)  throw new ForbiddenHttpException('Invalid Signature');
             }
+            
+            \Yii::error('Success' , __METHOD__); // Log error faced by user
+
+            Payment::updatePaymentStatusFromMyFatoorahWebhook($data['InvoiceId'], $data);
+
             break;
 
           case 2: //2 For Refund Status Changed

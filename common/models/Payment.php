@@ -255,29 +255,26 @@ class Payment extends \yii\db\ActiveRecord {
          //3-Compare the signature
 
             ksort ( $genericWebhookModel );
-            $sortedArray = "";
-            $counter = 0;
 
-            // unset($genericWebhookModel['Data']);
 
-            foreach($genericWebhookModel as $key => $model) {
-              $sortedArray .=  $key . "=" . $model .  ",";
-             }
+             $sortedArray = '';
+             foreach($genericWebhookModel as $key => $model) {
+               if($key == 0)
+                $sortedArray .=  $key . "=" . $model ;
+               else
+                $sortedArray .=   "," . $key . "=" . $model ;
+              }
 
-             die(json_encode( ( $sortedArray ) ));
+             $signature = static::signMyfatoorahSignature($sortedArray, $secretKey);
 
-         // var properties = typeof(T).GetProperties().Select(p => p.Name).OrderBy(p => p).ToList();
-         // var type = model.Data.GetType();
-         // var parameters = new List<ItemTxt>();
-         // for (int i = 0; i < properties.Count; i++)
-         // {
-         //     var value = type.GetProperty(properties[i]).GetValue(model.Data);
-         //     value = value == null ? "" : value.ToString();
-         //     parameters.Add(new ItemTxt { Text = properties[i], Value = value.ToString() });
-         // }
-         // var signature = Sign(parameters, secretKey);
-         // return signature == headerSignature;
+             return $signature == $headerSignature;
      }
+
+
+     public static function signMyfatoorahSignature($paramsArray, $secretKey ) {
+          return hash_hmac('sha256', $paramsArray, $secretKey);
+     }
+
 
     /**
      * Update Payment's Status from Myfatoorah Payments
