@@ -173,6 +173,8 @@ z-index: 2;
                     <!-- Insert loop here -->
                     <?php
                     foreach ($refunded_items_model as $refundedItemKey => $refundedItem) {
+                      $itemItmage = $refundedItem->orderItem->getItemImage()->one()->product_file_name;
+
                         ?>
                         <div class="card-body">
                             <div class="row">
@@ -180,7 +182,11 @@ z-index: 2;
                                     <div  class="summary-container">
                                         <div>
                                             <section class="item-img-section">
-                                                <img  class="item-img" src="<?= "https://res.cloudinary.com/plugn/image/upload/restaurants/". $refundedItem->store->restaurant_uuid ."/items/" .   $itemItmage = $refundedItem->orderItem->getItemImage()->one()->product_file_name ?>" alt="Smart Short Sleeve Kimono Romper + Bib - Blue 0-3 M / Blue Whale" class="_3R2Os">
+                                                <?php if($itemItmage){ ?>
+                                                  <img  class="item-img" src="<?= "https://res.cloudinary.com/plugn/image/upload/restaurants/". $refundedItem->store->restaurant_uuid ."/items/" .   $itemItmage ?>"  class="_3R2Os">
+                                                <?php } else { ?>
+                                                    <svg viewBox="0 0 20 20" class="_3vR36 _3DlKx"><path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v15A1.5 1.5 0 0 0 2.5 19h15a1.5 1.5 0 0 0 1.5-1.5v-15A1.5 1.5 0 0 0 17.5 1h-15zm5 3.5c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zM16.499 17H3.497c-.41 0-.64-.46-.4-.79l3.553-4.051c.19-.21.52-.21.72-.01L9 14l3.06-4.781a.5.5 0 0 1 .84.02l4.039 7.011c.18.34-.06.75-.44.75z"></path></svg>
+                                                <?php } ?>
                                             </section>
                                         </div>
                                         <div class="item-data">
