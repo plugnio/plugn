@@ -299,7 +299,7 @@ class CronController extends \yii\console\Controller {
                 //TODO
                 if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
                     $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
-                    return Yii::error('Refund Error ('. $refund->refund_uuid .'): ' . $errorMessage);
+                    return Yii::error('Refund Error ('. $refund->refund_id .'): ' . $errorMessage);
                 } else {
 
                   $refund->refund_reference = $responseContent->Data->RefundReference;
