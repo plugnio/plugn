@@ -137,7 +137,7 @@ class Refund extends \yii\db\ActiveRecord
     {
         if ($this->refund_amount < 0.1 ) {
             $this->addError($attribute, 'Refund amount must be greater than zero.');
-        } else if ($this->refun > $this->order->total_price)
+        } else if ($this->refund_amount > $this->order->total_price)
           $this->addError($attribute, 'Refund amount cannot exceed amount available for refund.');
     }
 
