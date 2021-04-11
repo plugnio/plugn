@@ -76,32 +76,25 @@ class PaymentController extends Controller {
         $data = Yii::$app->request->getBodyParam("Data");
 
 
-        \Yii::error('$data=>' .  json_encode($data), __METHOD__); // Log error faced by user
-        \Yii::error('$myFatoorahSignature=>' . json_encode($headerSignature), __METHOD__); // Log error faced by user
-
-
         if( $eventType && $data){
 
-        switch ($eventType) {
-          case 1: //1 For Transaction Status Changed
-            // Payment::updatePaymentStatusFromMyFatoorahWebhook($data['InvoiceId'], $data);
-            if (!$isValidSignature) {
-                   $isValidSignature = Payment::checkMyFatoorahSignature($data, $secretKey, $headerSignature);
-                   if (!$isValidSignature)  throw new ForbiddenHttpException('Invalid Signature');
-            }
-            \Yii::error('Success' , __METHOD__); // Log error faced by user
-
-            Payment::updatePaymentStatusFromMyFatoorahWebhook($data['InvoiceId'], $data);
-
-            break;
-
-          case 2: //2 For Refund Status Changed
-            Refund::updateRefundStatus($data['RefundReference'], $data);
-            break;
-
+          if (!$isValidSignature) {
+                 $isValidSignature = Yii::$app->myFatoorahPayment->checkMyFatoorahSignature($data, $secretKey, $headerSignature);
+                 if (!$isValidSignature)  throw new ForbiddenHttpException('Invalid Signature');
           }
 
-        }
+          switch ($eventType) {
+            case 1: //1 For Transaction Status Changed
+                Payment::updatePaymentStatusFromMyFatoorahWebhook($data['InvoiceId'], $data);
+            break;
+
+            case 2: //2 For Refund Status Changed
+                Refund::updateRefundStatus($data['RefundReference'], $data);
+            break;
+
+            }
+
+          }
 
         return [
           'message' => 'success'

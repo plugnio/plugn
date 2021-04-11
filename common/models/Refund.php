@@ -46,9 +46,6 @@ class Refund extends \yii\db\ActiveRecord
     {
         return [
             [['restaurant_uuid', 'order_uuid', 'refund_amount', 'payment_uuid'], 'required'],
-            [['refund_amount'], 'number','min' => 0.1 , 'max' => $this->order->total_price,
-            'tooSmall' => '{attribute} must be greater than zero.',
-            'tooBig' => '{attribute} cannot exceed amount available for refund'],
             [['refund_amount'], 'validateRefundAmount'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['order_uuid'], 'string', 'max' => 40],
@@ -138,9 +135,10 @@ class Refund extends \yii\db\ActiveRecord
 
     public function validateRefundAmount($attribute, $params, $validator)
     {
-        if ($this->refund_amount > $this->order->total_price) {
-            $this->addError($attribute, 'Can’t refund more than available');
-        }
+        if ($this->refund_amount < 0.1 ) {
+            $this->addError($attribute, 'Refund amount must be greater than zero.');
+        } else if ($this->refun > $this->order->total_price)
+          $this->addError($attribute, 'Refund amount cannot exceed amount available for refund.');
     }
 
 
@@ -223,6 +221,17 @@ class Refund extends \yii\db\ActiveRecord
     public function getStore()
     {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+
+    /**
+     * Gets query for [[Currency]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('store');
     }
 
 

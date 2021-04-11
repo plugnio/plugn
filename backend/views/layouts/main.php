@@ -56,6 +56,8 @@ AppAsset::register($this);
             [
             'label' => 'Other',
                 'items' => [
+                  ['label' => 'Refund', 'url' => ['/refund/index']],
+                  ['label' => 'Payment', 'url' => ['/payment/index']],
                   ['label' => 'Queue', 'url' => ['/queue/index']],
                   ['label' => 'Subscription', 'url' => ['/subscription/index']],
                   ['label' => 'Country', 'url' => ['/country/index']],

@@ -228,6 +228,48 @@ class MyFatoorahPayment extends Component
     }
 
     /**
+     * checkMyFatoorahSignature
+     * @param  [type]  $id                           [description]
+     * @param  boolean $showUpdatedFlashNotification [description]
+     * @return self                                [description]
+     */
+     public static function checkMyFatoorahSignature($genericWebhookModel, $secretKey, $headerSignature ) {
+         //***Generate The Signature*** :
+         //1- Order all properties alphabetic
+         //2-Encrypt the data with the secret key
+         //3-Compare the signature
+
+        ksort ( $genericWebhookModel );
+
+
+         $sortedArray = '';
+
+         $counter = 0;
+
+         if(isset($genericWebhookModel['GatewayReference']))
+            unset($genericWebhookModel['GatewayReference']);
+
+         foreach($genericWebhookModel as $key => $model) {
+
+           if($counter == 0)
+            $sortedArray .=  $key . "=" . $model ;
+           else
+            $sortedArray .=   "," . $key . "=" . $model ;
+
+           $counter++;
+
+          }
+
+         $signature = static::signMyfatoorahSignature($sortedArray, $secretKey);
+         return $signature == $headerSignature;
+     }
+
+
+     public static function signMyfatoorahSignature($paramsArray, $secretKey ) {
+          return base64_encode(hash_hmac('sha256', $paramsArray, $secretKey, true));
+     }
+
+    /**
      * Create  Supplier
      * @param type $restaurant
      * @return type
