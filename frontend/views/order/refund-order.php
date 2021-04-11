@@ -173,7 +173,10 @@ z-index: 2;
                     <!-- Insert loop here -->
                     <?php
                     foreach ($refunded_items_model as $refundedItemKey => $refundedItem) {
-                      $itemItmage = $refundedItem->orderItem->getItemImage()->one()->product_file_name;
+                      $itemItmage = null;
+
+                      if($refundedItem->orderItem->getItemImage()->one())
+                        $itemItmage = $refundedItem->orderItem->getItemImage()->one()->product_file_name;
 
                         ?>
                         <div class="card-body">
