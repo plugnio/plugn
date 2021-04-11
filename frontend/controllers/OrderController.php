@@ -407,8 +407,10 @@ class OrderController extends Controller {
 
            // order's Item
            $refundDataProvider = new \yii\data\ActiveDataProvider([
-               'query' => $order_model->getRefunds()
+               'query' => $order_model->getRefunds(),
+               'sort' =>false
           ]);
+
 
 
            return $this->render('view', [
@@ -538,7 +540,7 @@ class OrderController extends Controller {
             if($refunded_item_model->qty > 0){
               $refunded_item_model->refund_id = $model->refund_id;
               if(!$refunded_item_model->save())
-              die('Error');
+              die('Error'); //todo
 
             }
 

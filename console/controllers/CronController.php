@@ -299,7 +299,7 @@ class CronController extends \yii\console\Controller {
                 //TODO
                 if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
                     $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
-                    return Yii::error('Error when uploading authorized signature document: ' . $errorMessage);
+                    return Yii::error('Refund Error: ' . $errorMessage);
                 } else {
 
                   $refund->refund_reference = $responseContent->Data->RefundReference;

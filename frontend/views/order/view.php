@@ -625,18 +625,24 @@ if ($refundDataProvider->totalCount > 0 && $model->payment) {
 
                 <h3 style="margin-bottom: 20px;"> Refunds  </h3>
 
-                <?php
-                GridView::widget([
+                <?= GridView::widget([
                     'dataProvider' => $refundDataProvider,
-                    'sorter' => false,
                     'columns' => [
-                        'refund_amount:currency',
+                      ['class' => 'yii\grid\SerialColumn'],
+
+                      [
+                          'attribute' => 'refund_amount',
+                          "value" => function($data) {
+                                  return Yii::$app->formatter->asCurrency($data->refund_amount, $data->currency->code);
+                          },
+                      ],
                         'refund_status',
                     ],
                     'layout' => '{items}{pager} ',
                     'tableOptions' => ['class' => 'table table-bordered table-hover'],
-                ]);
-                ?>
+
+
+                ]); ?>
             </div>
         </div>
 
