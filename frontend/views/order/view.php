@@ -623,7 +623,14 @@ if ($refundDataProvider->totalCount > 0 && $model->payment) {
         <div class="card">
             <div class="card-body">
 
-                <h3 style="margin-bottom: 20px;"> Refunds  </h3>
+                <h3 style="margin-bottom: 20px;">
+                <?php
+                  if($refundDataProvider->totalCount == 1)
+                    echo 'Refund';
+                  else if($refundDataProvider->totalCount > 1)
+                    echo 'Refunds';
+                ?>
+                </h3>
 
                 <?= GridView::widget([
                     'dataProvider' => $refundDataProvider,
