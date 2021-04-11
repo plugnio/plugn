@@ -407,7 +407,7 @@ class OrderController extends Controller {
 
            // order's Item
            $refundDataProvider = new \yii\data\ActiveDataProvider([
-               'query' => $model->getRefunds()
+               'query' => $order_model->getRefunds()
           ]);
 
 
