@@ -616,10 +616,6 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                 <?php } ?>
 
 <?php
-// order's Item
-$refundDataProvider = new \yii\data\ActiveDataProvider([
-    'query' => $model->getRefunds()
-        ]);
 
 
 if ($refundDataProvider->totalCount > 0 && $model->payment) {
@@ -629,19 +625,17 @@ if ($refundDataProvider->totalCount > 0 && $model->payment) {
 
                 <h3 style="margin-bottom: 20px;"> Refunds  </h3>
 
-
                 <?php
-                // GridView::widget([
-                //     'dataProvider' => $refundDataProvider,
-                //     'sorter' => false,
-                //     'columns' => [
-                //         'refund_id',
-                //         'refund_amount:currency',
-                //         'refund_status',
-                //     ],
-                //     'layout' => '{items}{pager} ',
-                //     'tableOptions' => ['class' => 'table table-bordered table-hover'],
-                // ]);
+                GridView::widget([
+                    'dataProvider' => $refundDataProvider,
+                    'sorter' => false,
+                    'columns' => [
+                        'refund_amount:currency',
+                        'refund_status',
+                    ],
+                    'layout' => '{items}{pager} ',
+                    'tableOptions' => ['class' => 'table table-bordered table-hover'],
+                ]);
                 ?>
             </div>
         </div>

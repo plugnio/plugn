@@ -405,8 +405,15 @@ class OrderController extends Controller {
            //     'pagination' => false
            // ]);
 
+           // order's Item
+           $refundDataProvider = new \yii\data\ActiveDataProvider([
+               'query' => $model->getRefunds()
+          ]);
+
+
            return $this->render('view', [
                        'model' => $order_model,
+                       'refundDataProvider' => $refundDataProvider,
                        'storeUuid' => $storeUuid,
                        'orderItems' => $orderItems
            ]);
