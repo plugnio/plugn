@@ -286,12 +286,12 @@ class CronController extends \yii\console\Controller {
         $refunds = Refund::find()
                     ->joinWith(['store','payment'])
                     ->where(['refund.refund_reference' => null])
-                    ->where(['restaurant.is_myfatoorah_enable' => 1])
+                    ->andWhere(['restaurant.is_myfatoorah_enable' => 1])
                     ->andWhere(['NOT', ['refund.payment_uuid' => null]])
                     ->all();
 
         foreach ($refunds as $refund) {
-
+  
                 $response = Yii::$app->myFatoorahPayment->makeRefund($refund->payment->payment_gateway_payment_id, $refund->refund_amount, $refund->reason, $refund->store->supplierCode);
 
                 $responseContent = json_decode($response->content);
