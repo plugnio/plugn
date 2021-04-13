@@ -1000,13 +1000,24 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     public function isOpen() {
-        $opening_hours_model = OpeningHour::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])->one();
+        $opening_hour_model = OpeningHour::find()
+                                ->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])
+                                ->andWhere(['<=','open_at', date("H:i:s", strtotime("now"))])
+                                ->andWhere(['>=','close_at', date("H:i:s", strtotime("now"))])
+                                ->orderBy(['open_at' => SORT_ASC])
+                                ->one();
 
 
-        if ($opening_hours_model) {
-            if (!$opening_hours_model->is_closed && date("w", strtotime("now")) == $opening_hours_model->day_of_week && strtotime("now") > strtotime($opening_hours_model->open_at) && strtotime("now") < strtotime($opening_hours_model->close_at))
-                return true;
-        }
+
+                  if ($opening_hour_model) {
+                      if ( !$opening_hour_model->is_closed &&
+                           date("w", strtotime("now")) == $opening_hour_model->day_of_week &&
+                           strtotime("now") > strtotime($opening_hour_model->open_at) &&
+                           strtotime("now") < strtotime($opening_hour_model->close_at)
+                          )
+                          return true;
+                  }
+
 
 
         return false;

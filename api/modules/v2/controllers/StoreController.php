@@ -82,37 +82,48 @@ class StoreController extends Controller {
               for ($i = 0; $i <= OpeningHour::DAY_OF_WEEK_SATURDAY; $i++) {
 
                   $deliveryDate = strtotime(date('Y-m-d', strtotime("+ " . $i . " day" ,$startDate)));
-                  $opening_hrs = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => date('w' , $deliveryDate)])->one();
 
 
-                  if($opening_hrs->is_closed)
-                      continue;
+                  $opening_hrs = OpeningHour::find()
+                  ->where(['restaurant_uuid' => $restaurant_uuid])
+                  ->andWhere(['day_of_week' => date('w' , $deliveryDate)])
+                  ->andWhere(['<=','open_at', date("H:i:s", strtotime("now"))])
+                  ->andWhere(['>=','close_at', date("H:i:s", strtotime("now"))])
+                  ->orderBy(['open_at' => SORT_ASC])
+                  ->one();
 
-                  $selectedDay = 'next '  . date('l', $deliveryDate);
+                  if($opening_hrs){
+
+                    if($opening_hrs->is_closed)
+                        continue;
+
+                    $selectedDay = 'next '  . date('l', $deliveryDate);
 
 
-                  $startTime =   date('c',  mktime(
-                                            date('H', strtotime($opening_hrs->open_at)),
-                                            date('i', strtotime($opening_hrs->open_at)),
-                                            date('s', strtotime($opening_hrs->open_at)),
-                                            date('m', $deliveryDate),
-                                            date('d',$deliveryDate),
-                                            date('Y',$deliveryDate)
-                                          ));
+                    $startTime =   date('c',  mktime(
+                                              date('H', strtotime($opening_hrs->open_at)),
+                                              date('i', strtotime($opening_hrs->open_at)),
+                                              date('s', strtotime($opening_hrs->open_at)),
+                                              date('m', $deliveryDate),
+                                              date('d',$deliveryDate),
+                                              date('Y',$deliveryDate)
+                                            ));
 
 
-                  if($store_model->schedule_order){
+                    if($store_model->schedule_order){
 
-                    $scheduleOrder = $opening_hrs->getDeliveryTimes($deliveryZone->delivery_time, date("Y-m-d", strtotime($startTime)) , $startTime);
+                      $scheduleOrder = $opening_hrs->getDeliveryTimes($deliveryZone->delivery_time, date("Y-m-d", strtotime($startTime)) , $startTime);
 
-                    if(count($scheduleOrder) > 0) {
-                      array_push($schedule_time, [
-                          'date' => date("c", strtotime($startTime)),
-                          'dayOfWeek' => date("w", strtotime($startTime)),
-                          'scheduleTimeSlots' => $scheduleOrder
-                      ]);
+                      if(count($scheduleOrder) > 0) {
+                        array_push($schedule_time, [
+                            'date' => date("c", strtotime($startTime)),
+                            'dayOfWeek' => date("w", strtotime($startTime)),
+                            'scheduleTimeSlots' => $scheduleOrder
+                        ]);
+                      }
                     }
-                  }
+                    
+                }
 
               }
 
