@@ -25,6 +25,7 @@ use common\models\AreaDeliveryZone;
 use common\models\DeliveryZone;
 use common\models\RestaurantTheme;
 use common\models\BusinessLocation;
+use common\models\SubscriptionPayment;
 use common\models\RestaurantBranch;
 use \DateTime;
 use yii\helpers\Console;
@@ -35,6 +36,8 @@ use yii\db\Expression;
  * All Cron actions related to this project
  */
 class CronController extends \yii\console\Controller {
+
+
 
   public function actionPaymentMigration(){
 
@@ -152,25 +155,80 @@ class CronController extends \yii\console\Controller {
 
 
     /**
-     * Anything we can help with? Once either when 2 days passed no products added OR 5 days passed and no sales
+     * Anything we can help with?
+     * Once either when 2 days passed no products added
+     * OR 5 days passed and no sales
      */
-    // public function actionRetentionEmails(){
-    //
-    //   $stores = Restaurant::find()
-    //           ->joinWith(['items','orders'])
-    //           ->where(['<' ,'restaurant_created_at', NOW()])
-    //           ->asArray()
-    //           ->all();
-    //           die(json_encode($stores));
-    //
-    //   foreach ($stores as $key => $store) {
-    //     die(json_encode($store));
-    //   }
-    //
-    //   $this->stdout("Email sent to all agents of employer that have applicants will expire soon \n", Console::FG_RED, Console::NORMAL);
-    //   return self::EXIT_CODE_NORMAL;
-    //
-    // }
+    public function actionRetentionEmailsWhoPassedTwoDaysAndNoProducts(){
+
+      $stores = Restaurant::find()
+              ->joinWith(['items','ownerAgent'])
+              ->where(' DATE(restaurant_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')
+              ->all();
+
+
+
+      foreach ($stores as $key => $store) {
+
+        if(sizeof($store->items) == 0 ){
+
+          foreach ($store->ownerAgent as $agent) {
+
+            Yii::$app->mailer->compose([
+                        'html' => 'offer-assistance',
+                            ], [
+                        'store' => $store
+                    ])
+                    ->setFrom([\Yii::$app->params['supportEmail']])
+                    ->setTo($agent->agent_email)
+                    ->setBcc(\Yii::$app->params['supportEmail'])
+                    ->setSubject('Is there anything we can help with?')
+                    ->send();
+          }
+          
+        }
+
+      }
+
+    }
+
+
+    /**
+     * Anything we can help with?
+     * Once either when 2 days passed no products added
+     * OR 5 days passed and no sales
+     */
+    public function actionRetentionEmailsWhoPassedFiveDaysAndNoSales(){
+
+      $stores = Restaurant::find()
+              ->joinWith(['orders','ownerAgent'])
+              ->where(' DATE(restaurant_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')
+              ->all();
+
+
+      foreach ($stores as $key => $store) {
+
+        if(sizeof($store->orders) == 0 ){
+
+          foreach ($store->ownerAgent as $agent) {
+
+            Yii::$app->mailer->compose([
+                        'html' => 'offer-assistance',
+                            ], [
+                        'store' => $store
+                    ])
+                    ->setFrom([\Yii::$app->params['supportEmail']])
+                    ->setTo($agent->agent_email)
+                    ->setBcc(\Yii::$app->params['supportEmail'])
+                    ->setSubject('Is there anything we can help with?')
+                    ->send();
+          }
+
+        }
+
+      }
+
+    }
 
 
     // public function actionNotifyAgentsForSubscriptionThatWillExpireSoon(){
