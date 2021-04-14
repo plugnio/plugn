@@ -75,7 +75,7 @@ class TapQueue extends \yii\db\ActiveRecord
             $this->queue_status = self::QUEUE_STATUS_COMPLETE;
             if($this->save()){
 
-              foreach ($this->restaurant->getOwnerAgent() as $agent) {
+              foreach ($this->restaurant->getOwnerAgent()->all() as $agent) {
 
                 \Yii::$app->mailer->compose([
                        'html' => 'tap-created',
