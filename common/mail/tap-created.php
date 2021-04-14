@@ -319,7 +319,7 @@ $paymentSettingsUrl = Yii::$app->params['frontendUrl'] . '/store/view-payment-me
       <div
          style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;line-height:24px;text-align:left;color:#000000;"
       >
-        Your TAP Payments account for your store <a href='<?= $store->restaurant_domain ?>' style='color:#2F80ED; text-decoration:none;'><?= $store->name ?></a> has been approved.
+        Your TAP Payments account for your store <b><?= $store->name ?></b> has been approved.
       </div>
 
               </td>

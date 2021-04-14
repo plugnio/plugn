@@ -229,7 +229,7 @@ $customDomainUrl = Yii::$app->params['frontendUrl'] . '/site/connect-domain?id='
       <div
          style="font-family:Helvetica;font-size:21px;font-weight:900;line-height:24px;text-align:left;color:#ffffff;"
       >
-        Your Store is Ready
+        Your store is ready
       </div>
 
                       </td>
@@ -322,7 +322,7 @@ $customDomainUrl = Yii::$app->params['frontendUrl'] . '/site/connect-domain?id='
       <div
          style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;line-height:24px;text-align:left;color:#000000;"
       >
-        Your store <a href='<?= $store->restaurant_domain ?>' style='color:#2F80ED; text-decoration:none;'> <?= $store->name ?></a> is now ready. Check it out on
+        Your store <b><?= $store->name ?></b> is now ready. Check it out on
       </div>
 
               </td>
@@ -376,7 +376,7 @@ $customDomainUrl = Yii::$app->params['frontendUrl'] . '/site/connect-domain?id='
       <div
          style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;line-height:24px;text-align:left;color:#000000;"
       >
-        You are also able to replace the above url with your own <a href='<?= $customDomainUrl ?>' style='color:#2F80ED; text-decoration:none;'>custom domain</a>
+        You are also able to replace the above url with your own <a href='<?= $customDomainUrl ?>' style='color:#2B546A; text-decoration:none;'><b>custom domain</b></a>.
       </div>
 
               </td>
