@@ -179,13 +179,13 @@ class CronController extends \yii\console\Controller {
                             ], [
                         'store' => $store
                     ])
-                    ->setFrom([\Yii::$app->params['supportEmail']])
+                     ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                     ->setTo($agent->agent_email)
                     ->setBcc(\Yii::$app->params['supportEmail'])
                     ->setSubject('Is there anything we can help with?')
                     ->send();
           }
-          
+
         }
 
       }
@@ -217,7 +217,7 @@ class CronController extends \yii\console\Controller {
                             ], [
                         'store' => $store
                     ])
-                    ->setFrom([\Yii::$app->params['supportEmail']])
+                    ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                     ->setTo($agent->agent_email)
                     ->setBcc(\Yii::$app->params['supportEmail'])
                     ->setSubject('Is there anything we can help with?')
