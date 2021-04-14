@@ -107,8 +107,6 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
     public static function getAvailableTimeSlots($delivery_time, $store) {
 
-
-
       $schedule_time = [];
 
       $currentWeekDay = date('w');
@@ -119,10 +117,10 @@ class OpeningHour extends \yii\db\ActiveRecord {
          $currentDate =  date('c',strtotime($i . " day"));
 
           $getWorkingHours = OpeningHour::find()
-            ->where(['restaurant_uuid' => $store->restaurant_uuid])
-            ->andWhere(['day_of_week' => $currentWeekDay])
-            ->orderBy(['open_at' => SORT_ASC])
-            ->all();
+                              ->where(['restaurant_uuid' => $store->restaurant_uuid])
+                              ->andWhere(['day_of_week' => $currentWeekDay])
+                              ->orderBy(['open_at' => SORT_ASC])
+                              ->all();
 
             $timeSlots = [];
 

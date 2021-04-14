@@ -81,17 +81,6 @@ class StoreController extends Controller {
 
 
 
-
-                  // if($opening_hrs){
-                    //
-                    // if($opening_hrs->is_closed)
-                    //     continue;
-                    //
-                    // $selectedDay = 'next '  . date('l', $deliveryDate);
-                    //
-
-
-
                     if($store_model->schedule_order){
 
                       $schedule_time = OpeningHour::getAvailableTimeSlots($deliveryZone->delivery_time, $store_model);
