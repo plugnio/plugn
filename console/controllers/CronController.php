@@ -164,6 +164,7 @@ class CronController extends \yii\console\Controller {
       $stores = Restaurant::find()
               ->joinWith(['items','ownerAgent'])
               ->where(' DATE(restaurant_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')
+              ->andWhere(['retention_email_sent' => 0])
               ->all();
 
 
@@ -196,23 +197,6 @@ class CronController extends \yii\console\Controller {
     }
 
 
-    /**
-     * Anything we can help with?
-     * Once   5 days passed and no sales
-     */
-    public function actionIndex(){
-      $store = Restaurant::findOne('rest_00f54a5e-7c35-11ea-997e-4a682ca4b290');
-      \Yii::$app->mailer->compose([
-             'html' => 'store-ready',
-                 ], [
-             'store' => $store,
-         ])
-         ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-         ->setTo([$store->restaurant_email])
-         ->setBcc(\Yii::$app->params['supportEmail'])
-         ->setSubject('Your store ' . $store->name .' is now ready')
-         ->send();
-    }
     public function actionRetentionEmailsWhoPassedFiveDaysAndNoSales(){
 
       $stores = Restaurant::find()
