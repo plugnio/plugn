@@ -79,53 +79,28 @@ class StoreController extends Controller {
               $startDate = strtotime('+ ' . $deliveryZone->delivery_time . ' ' . $timeUnit );
 
 
-              for ($i = 0; $i <= OpeningHour::DAY_OF_WEEK_SATURDAY; $i++) {
-
-                  $deliveryDate = strtotime(date('Y-m-d', strtotime("+ " . $i . " day" ,$startDate)));
 
 
-                  $opening_hrs = OpeningHour::find()
-                  ->where(['restaurant_uuid' => $restaurant_uuid])
-                  ->andWhere(['day_of_week' => date('w' , $deliveryDate)])
-                  ->andWhere(['<=','open_at', date("H:i:s", strtotime("now"))])
-                  ->andWhere(['>=','close_at', date("H:i:s", strtotime("now"))])
-                  ->orderBy(['open_at' => SORT_ASC])
-                  ->one();
 
-                  if($opening_hrs){
+                  // if($opening_hrs){
+                    //
+                    // if($opening_hrs->is_closed)
+                    //     continue;
+                    //
+                    // $selectedDay = 'next '  . date('l', $deliveryDate);
+                    //
 
-                    if($opening_hrs->is_closed)
-                        continue;
-
-                    $selectedDay = 'next '  . date('l', $deliveryDate);
-
-
-                    $startTime =   date('c',  mktime(
-                                              date('H', strtotime($opening_hrs->open_at)),
-                                              date('i', strtotime($opening_hrs->open_at)),
-                                              date('s', strtotime($opening_hrs->open_at)),
-                                              date('m', $deliveryDate),
-                                              date('d',$deliveryDate),
-                                              date('Y',$deliveryDate)
-                                            ));
 
 
                     if($store_model->schedule_order){
 
-                      $scheduleOrder = $opening_hrs->getDeliveryTimes($deliveryZone->delivery_time, date("Y-m-d", strtotime($startTime)) , $startTime);
+                      $schedule_time = OpeningHour::getAvailableTimeSlots($deliveryZone->delivery_time, $store_model);
 
-                      if(count($scheduleOrder) > 0) {
-                        array_push($schedule_time, [
-                            'date' => date("c", strtotime($startTime)),
-                            'dayOfWeek' => date("w", strtotime($startTime)),
-                            'scheduleTimeSlots' => $scheduleOrder
-                        ]);
-                      }
+
                     }
-                    
-                }
 
-              }
+                // }
+
 
               $todayOpeningHours = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => date('w' , strtotime("now"))])->one();
               $asap = date("c", strtotime('+' . $deliveryZone->delivery_time . ' ' . $deliveryZone->timeUnit,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
