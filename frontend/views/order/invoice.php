@@ -62,28 +62,91 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                         <?=  $model->customer_name ?>
                       </span>
                       <span style="display: block" >
-                        <?= $model->area_id ? $model->area_name : $model->address_1  ?>
+                        <?php
+                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
+                              echo $model->area_id ? $model->area_name_ar : $model->address_1;
+                            }else {
+                              echo $model->area_id ? $model->area_name : $model->address_1;
+                            }
+                         ?>
                       </span>
                       <span style="display: block" >
-                        <?= $model->area_id ? 'Block: ' . $model->block : $model->address_2  ?>
+
+                        <?php
+                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
+                              echo $model->area_id ? 'قطعة: ' . $model->block : $model->address_2;
+                            }else {
+                              echo $model->area_id ? 'Block: ' . $model->block : $model->address_2;
+                            }
+                         ?>
+
                       </span>
                       <span style="display: block" >
-                        <?= $model->area_id ? 'St: ' . $model->street : $model->postalcode . ' ' . $model->city  ?>
+                        <?php
+                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
+                              echo $model->area_id ? 'شارع: ' . $model->street : $model->postalcode . ' ' . $model->city;
+                            }else {
+                              echo $model->area_id ? 'St: ' . $model->street : $model->postalcode . ' ' . $model->city;
+                            }
+                         ?>
                       </span>
                       <span style="display: block" >
-                        <?= $model->area_id && $model->avenue ? 'Avenue: ' . $model->avenue : ''; ?>
+
+                        <?php
+                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
+                              echo $model->area_id && $model->avenue ? 'جادة: ' . $model->avenue : '';;
+
+                            }else {
+                              echo $model->area_id && $model->avenue ? 'Avenue: ' . $model->avenue : '';;
+
+                            }
+                         ?>
+
                       </span>
                       <span style="display: block" >
-                        <?= $model->area_id && $model->floor != null && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? 'Floor: ' . $model->floor : ''?>
+
+                        <?php
+                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
+                              echo $model->area_id && $model->floor != null && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? 'الطابق: ' . $model->floor : '';
+                            }else {
+                              echo $model->area_id && $model->floor != null && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? 'Floor: ' . $model->floor : '';
+                            }
+                         ?>
+
                       </span>
                       <span style="display: block" >
-                        <?=  $model->area_id && $model->apartment != null && $model->unit_type == 'Apartment' ? 'Apartment No. ' . $model->apartment : ''?>
+
+                        <?php
+                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
+                              echo $model->area_id && $model->apartment != null && $model->unit_type == 'Apartment' ? 'رقم الشقة: ' . $model->apartment : '';
+                            }else {
+                              echo $model->area_id && $model->apartment != null && $model->unit_type == 'Apartment' ? 'Apartment No. ' . $model->apartment : '';
+                            }
+                         ?>
+
                       </span>
                       <span style="display: block" >
-                        <?=  $model->area_id && $model->office != null && $model->unit_type == 'Office'  ? 'Office No. ' . $model->office : ''?>
+
+                        <?php
+                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
+                              echo $model->area_id && $model->office != null && $model->unit_type == 'Office'  ? 'رقم المكتب: ' . $model->office : '';
+                            }else {
+                              echo $model->area_id && $model->office != null && $model->unit_type == 'Office'  ? 'Office No. ' . $model->office : '';
+                            }
+                         ?>
+
+
                       </span>
                       <span style="display: block" >
-                        <?= $model->area_id ? ($model->unit_type == 'House' ? 'House No. ' : 'Building: ') . $model->house_number :  ''  ?>
+                        <?php
+                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
+                              // echo $model->area_id ? (($model->unit_type == 'House' ? ' البناية': ' رقم المنزل ') . $model->house_number :  '');
+                              echo $model->area_id ? ($model->unit_type == 'House' ? 'رقم المنزل: ' : 'البناية: ') . $model->house_number :  '';
+
+                            }else {
+                              echo $model->area_id ? ($model->unit_type == 'House' ? 'House No. ' : 'Building: ') . $model->house_number :  '';
+                            }
+                         ?>
                       </span>
                       <span style="display: block" >
                         <?= $model->area_id ?  $model->area->city->city_name :  '' ?>
