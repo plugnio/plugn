@@ -1,4 +1,4 @@
-<?php
+  <?php
 
 namespace backend\models;
 
@@ -45,7 +45,7 @@ class PaymentGatewayQueueSearch extends PaymentGatewayQueue
     public function search($params)
     {
         $query = PaymentGatewayQueue::find()
-        ->joinWith(['restaurant']);
+        ->joinWith(['restaurant'])->orderBy(['queue_status' => SORT_ASC]);
 
         // add conditions that should always apply here
 
