@@ -42,7 +42,9 @@ class OpeningHourController extends Controller {
 
         $daily_hours = new OpeningHour();
 
-        $models = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
+        $models = OpeningHour::find()
+                      ->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
+
                       ->orderBy(['day_of_week' => SORT_ASC])
                       ->all();
 
@@ -63,5 +65,38 @@ class OpeningHourController extends Controller {
 
 
     }
+
+
+
+    public function actionCreate($storeUuid, $dayOfWeek)
+    {
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $model = new OpeningHour();
+        $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
+        $model->day_of_week = $dayOfWeek;
+        $model->save(false);
+        return $this->redirect(['index', 'storeUuid' => $storeUuid]);
+
+
+    }
+
+    public function actionDelete($storeUuid, $opening_hour_id, $dayOfWeek)
+    {
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $model =  OpeningHour::findOne($opening_hour_id);
+
+        if($isExist = OpeningHour::find()->where(['restaurant_uuid' =>$storeUuid,'day_of_week' => $dayOfWeek ])->count() > 1){
+          $model->delete();
+
+        }
+
+
+        return $this->redirect(['index', 'storeUuid' => $storeUuid]);
+
+
+    }
+
 
 }

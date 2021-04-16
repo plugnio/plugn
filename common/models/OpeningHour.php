@@ -105,7 +105,18 @@ class OpeningHour extends \yii\db\ActiveRecord {
         ];
     }
 
-    public static function getAvailableTimeSlots($delivery_time, $store) {
+    public static function roundToNextHour($dateString) {
+      $date = new \DateTime($dateString);
+      $minutes = $date->format('i');
+      if ($minutes > 0) {
+          $date->modify("+1 hour");
+          $date->modify('-'.$minutes.' minutes');
+      }
+          return $date->format('c');
+    }
+
+
+    public static function getAvailableTimeSlots($delivery_time, $store, $timeUnit) {
 
       $schedule_time = [];
 
@@ -115,8 +126,9 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
          $currentWeekDay =  date('w',strtotime($i . " day"));
          $currentDate =  date('c',strtotime($i . " day"));
+         $selectedDate =  date('c', strtotime('+ ' . $delivery_time . ' min'   ,strtotime($currentDate)));
 
-          $getWorkingHours = OpeningHour::find()
+         $getWorkingHours = OpeningHour::find()
                               ->where(['restaurant_uuid' => $store->restaurant_uuid])
                               ->andWhere(['day_of_week' => $currentWeekDay])
                               ->orderBy(['open_at' => SORT_ASC])
@@ -127,16 +139,24 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
             foreach ($getWorkingHours as $key => $workingHours) {
 
+              $startAt = date('c', strtotime($workingHours->open_at, strtotime($currentDate) ));
 
-              $startAt = date('c', strtotime($workingHours->open_at));
+              // if($key == 0 )
+              //     $startAt = date('c', strtotime("+". intval($store->schedule_interval)  . " min" ,strtotime($startAt)) );
+
+              $startAt =  date('c', strtotime('+ ' . $delivery_time . ' min'   ,strtotime($startAt)));
+
+              $startAt = static::roundToNextHour($startAt);
 
               $startAt = date('c', strtotime("+ " . $i . " day" ,strtotime($startAt)));
 
-              while (date('H:i:s', strtotime($startAt)) < $workingHours->close_at && date('H:i:s', strtotime($startAt)) >= $workingHours->open_at ) {
+
+              while (date('H:i:s', strtotime($startAt)) <= $workingHours->close_at && date('H:i:s', strtotime($startAt)) >= $workingHours->open_at ) {
 
                 $endAt = date('c', strtotime("+". intval($store->schedule_interval)  . " min" ,strtotime($startAt)) );
 
                 if ($workingHours->day_of_week == date('w', strtotime("today")) && date('c', strtotime("now")) < date('c', strtotime($startAt))) {
+
                   if( date('c',strtotime($startAt))  >  date('c', strtotime("now") + (intval($delivery_time) * 60)) ){
 
                   array_push($timeSlots, [
@@ -153,19 +173,15 @@ class OpeningHour extends \yii\db\ActiveRecord {
                   ]);
                 }
 
-
-                  // $startAt = date('c', strtotime("+ " . intval($store->schedule_interval) . " min" ,$startAt)) ;
-
                   $startAt = $endAt;
 
               }
-
 
             }
 
 
               array_push($schedule_time, [
-                  'date' => $currentDate,
+                  'date' => $selectedDate,
                   'dayOfWeek' => $currentWeekDay,
                   'scheduleTimeSlots' => $timeSlots
               ]);

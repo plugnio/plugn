@@ -12,6 +12,7 @@ use common\models\RestaurantTheme;
 use common\models\OpeningHour;
 use common\models\RestaurantDelivery;
 use common\models\BusinessLocation;
+use common\models\DeliveryZone;
 
 class StoreController extends Controller {
 
@@ -79,11 +80,16 @@ class StoreController extends Controller {
               $startDate = strtotime('+ ' . $deliveryZone->delivery_time . ' ' . $timeUnit );
 
 
-
+              if($deliveryZone->time_unit == DeliveryZone::TIME_UNIT_MIN)
+                $deliveryTime = intval($deliveryZone->delivery_time) ;
+              else if($deliveryZone->time_unit == DeliveryZone::TIME_UNIT_HRS)
+                $deliveryTime =  intval($deliveryZone->delivery_time) * 60;
+              else if($deliveryZone->time_unit == DeliveryZone::TIME_UNIT_DAY)
+                $deliveryTime =  intval($deliveryZone->delivery_time) * 24 * 60;
 
                     if($store_model->schedule_order){
 
-                      $schedule_time = OpeningHour::getAvailableTimeSlots($deliveryZone->delivery_time, $store_model);
+                      $schedule_time = OpeningHour::getAvailableTimeSlots($deliveryTime, $store_model, $timeUnit);
 
 
                     }

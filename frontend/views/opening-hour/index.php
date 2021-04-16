@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\ActiveForm;
+use common\models\OpeningHour;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -13,6 +14,15 @@ $this->params['breadcrumbs'][] = $this->title;
 $this->params['restaurant_uuid'] = $storeUuid;
 
 $js = "
+
+    $(function(){
+    $('#open_modal').click(function (){
+      console.log('test');
+      $.get($(this).attr('href'), function(data) {
+        $('#modal').modal('show').find('#modalContent').html(data)
+     });
+     return false;
+    });
 
 
     $( '.pickatime-open-at').pickatime({
@@ -121,6 +131,7 @@ $this->registerCss("
                 <td style="padding: 5px  15px" >
                     <?= $form->field($daily_hours, "close_at")->textInput(['class' => 'form-control pickatime-close-at', 'id'=>'dailyCloseTime','style'=>'position: initial;','value'=>'00:00'])->label('Closes at'); ?>
                 </td>
+
               </tr>
 
 
@@ -154,6 +165,28 @@ $this->registerCss("
                       <td style="padding: 5px  15px" >
                           <?= $form->field($model, "[$index]close_at")->textInput(['class' => 'form-control pickatime-close-at', 'style'=>'position: initial;','id' =>'CloseTime'.$index])->label('Closes at'); ?>
                       </td>
+
+                      <td class="text-center">
+
+
+                        <?php
+                          echo Html::a('<i class="fa fa-plus"></i>', ['/opening-hour/create', 'storeUuid' => $storeUuid, 'dayOfWeek' => $model->day_of_week], ['id' => 'open_modal', 'class' => 'btn btn-xs btn-success']);
+                        ?>
+
+                        <?php
+
+                          if(OpeningHour::find()->where(['restaurant_uuid' =>$storeUuid,'day_of_week' => $model->day_of_week ])->count() > 1){
+                            echo Html::a('<i class="fa fa-minus"></i>', ['/opening-hour/delete', 'storeUuid' => $storeUuid, 'opening_hour_id' => $model->opening_hour_id, 'dayOfWeek' => $model->day_of_week ], ['id' => 'open_modal', 'class' => 'btn btn-xs btn-danger','data' => [
+                                'method' => 'post',
+                            ]
+                            ]);
+                          }
+
+                        ?>
+
+
+                      </td>
+                      <td class="text-right" colspan="2"></td>
                     </tr>
 
           <?php } ?>
