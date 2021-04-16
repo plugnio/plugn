@@ -9,6 +9,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\base\Model;
+use yii\helpers\ArrayHelper;
 
 /**
  * OpeningHourController implements the CRUD actions for OpeningHour model.
@@ -44,10 +45,10 @@ class OpeningHourController extends Controller {
 
         $models = OpeningHour::find()
                       ->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
-
                       ->orderBy(['day_of_week' => SORT_ASC])
                       ->all();
 
+        // $models = ArrayHelper::index($models, null, 'day_of_week');
 
         if (Model::loadMultiple($models, Yii::$app->request->post()) && Model::validateMultiple($models)) {
             foreach ($models as $opening_hour) {
@@ -83,14 +84,11 @@ class OpeningHourController extends Controller {
 
     public function actionDelete($storeUuid, $opening_hour_id, $dayOfWeek)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+          $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        $model =  OpeningHour::findOne($opening_hour_id);
+          $model =  OpeningHour::findOne($opening_hour_id);
 
-        if($isExist = OpeningHour::find()->where(['restaurant_uuid' =>$storeUuid,'day_of_week' => $dayOfWeek ])->count() > 1){
           $model->delete();
-
-        }
 
 
         return $this->redirect(['index', 'storeUuid' => $storeUuid]);

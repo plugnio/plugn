@@ -99,113 +99,166 @@ $this->registerCss("
 
 
 <section id="data-list-view" class="data-list-view-header">
-  <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(); ?>
 
 
-<!-- DataTable starts -->
-<div class="card table-responsive">
+    <!-- DataTable starts -->
+    <div class="card table-responsive">
 
-  <div class="card-body">
+        <div class="card-body">
 
-    <table class="table ">
-        <tbody>
-          <tr>
-
-
-                <td style="padding: 5px  15px">
-                  <?=
-                  $form->field($daily_hours, "open_24_hrs", [
-                    'template' => "<span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Open 24 hours</span><div class='custom-control custom-switch custom-control-inline'>{input}<label class='custom-control-label' for='open24Hrs'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
-                  ])->checkbox([
-                      'id' => 'open24Hrs',
-                      'class' => 'custom-control-input'
-                          ], false)->label(false)
-                  ?>
-                </td>
-                <td style="padding: 5px  15px">
-                    Set Daily
-                </td>
-                <td style="padding: 5px  15px">
-                    <?= $form->field($daily_hours, "open_at" )->textInput(['class' => 'form-control pickatime-open-at','id'=>'dailyOpenTime', 'style'=>'position: initial;','value'=>'00:00'])->label('Opens at'); ?>
-                </td>
-                <td style="padding: 5px  15px" >
-                    <?= $form->field($daily_hours, "close_at")->textInput(['class' => 'form-control pickatime-close-at', 'id'=>'dailyCloseTime','style'=>'position: initial;','value'=>'00:00'])->label('Closes at'); ?>
-                </td>
-
-              </tr>
+            <table class="table ">
+                <tbody>
+                  <!-- <tr>
 
 
-              <?php foreach ($models as $index => $model) { ?>
-                <tr>
+                        <td style="padding: 5px  15px">
+                    <?php
+                    // $form->field($daily_hours, "open_24_hrs", [
+                    //   'template' => "<span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Open 24 hours</span><div class='custom-control custom-switch custom-control-inline'>{input}<label class='custom-control-label' for='open24Hrs'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
+                    // ])->checkbox([
+                    //     'id' => 'open24Hrs',
+                    //     'class' => 'custom-control-input'
+                    //         ], false)->label(false)
+                    ?>
+                        </td>
+                        <td style="padding: 5px  15px">
+                            Set Daily
+                        </td>
+                        <td style="padding: 5px  15px">
+                    <?php
+                    // $form->field($daily_hours, "open_at" )->textInput(['class' => 'form-control pickatime-open-at','id'=>'dailyOpenTime', 'style'=>'position: initial;','value'=>'00:00'])->label('Opens at');
+                    ?>
+                        </td>
+                        <td style="padding: 5px  15px" >
+                    <?php
+                    // $form->field($daily_hours, "close_at")->textInput(['class' => 'form-control pickatime-close-at', 'id'=>'dailyCloseTime','style'=>'position: initial;','value'=>'00:00'])->label('Closes at');
+                    ?>
+                        </td>
 
-                      <td style="padding: 5px  15px">
-                        <?=
-                        $form->field($model, "[$index]is_closed", [
-                          'template' => "
-                          <div class='custom-control custom-switch switch-lg custom-switch-success mr-2 mb-1'>
-                            {input}
-                            <label class='custom-control-label' for='customSwitch$index'> <span class='switch-text-left'>Closed</span> <span class='switch-text-right'>Open</span> </label>
-                            </div>
-                            \n
-                            <div class=\"col-lg-8\">{error}</div>",
-                        ])->checkbox([
-                            'checked' => $model->is_closed == 0 ? false : true,
-                            'id' => 'customSwitch'.$index,
-                            'class' => 'custom-control-input'
-                                ], false)->label(false)
+                      </tr> -->
+
+
+                    <?php for ($dayOfWeek = 0; $dayOfWeek < 7; $dayOfWeek++) { ?>
+                        <tr>
+
+                            <td style="padding: 5px  15px">
+                                <?php
+                                switch ($dayOfWeek) {
+                                    case OpeningHour::DAY_OF_WEEK_SATURDAY:
+                                        echo '<h4><b>Saturday</b></h4>';
+                                        break;
+                                    case OpeningHour::DAY_OF_WEEK_SUNDAY:
+                                        echo '<h4><b>Sunday</b></h4>';
+                                        break;
+                                    case OpeningHour::DAY_OF_WEEK_MONDAY:
+                                        echo '<h4><b>Monday</b></h4>';
+                                        break;
+                                    case OpeningHour::DAY_OF_WEEK_TUESDAY:
+                                        echo '<h4><b>Tuesday</b></h4>';
+                                        break;
+                                    case OpeningHour::DAY_OF_WEEK_WEDNESDAY:
+                                        echo '<h4><b>Wednesday</b></h4>';
+                                        break;
+                                    case OpeningHour::DAY_OF_WEEK_THURSDAY:
+                                        echo '<h4><b>Thursday</b></h4>';
+                                        break;
+                                    case OpeningHour::DAY_OF_WEEK_FRIDAY:
+                                        echo '<h4><b>Friday</b></h4>';
+                                        break;
+                                }
+                                ?>
+
+                                                                        <?php
+                                                                          echo Html::a('<i class="fa fa-plus"></i>', ['/opening-hour/create', 'storeUuid' => $storeUuid, 'dayOfWeek' => $dayOfWeek], ['id' => 'open_modal', 'class' => 'btn btn-xs btn-success']);
+                                                                        ?>
+
+                            </td>
+
+                    <table class="table">
+                        <tbody>
+
+
+
+                            <?php
+                            foreach ($models as $index => $model) {
+                                if ($model->day_of_week == $dayOfWeek) {
+                                    ?>
+                                    <tr>
+
+                                        <td style="padding: 5px  15px">
+                                            <?= $form->field($model, "[$index]open_at")->textInput(['class' => 'form-control pickatime-open-at', 'style' => 'position: initial;', 'id' => 'OpenTime' . $index])->label('Opens at'); ?>
+                                        </td>
+                                        <td style="padding: 5px  15px" >
+                                          <?= $form->field($model, "[$index]close_at")->textInput(['class' => 'form-control pickatime-close-at', 'style' => 'position: initial;', 'id' => 'CloseTime' . $dayOfWeek])->label('Closes at'); ?>
+                                        </td>
+
+                                        <td class="text-center">
+
+
+                                      <?php
+                                          echo Html::a('<i class="fa fa-minus"></i>', ['/opening-hour/delete', 'storeUuid' => $storeUuid, 'opening_hour_id' => $model->opening_hour_id, 'dayOfWeek' => $model->day_of_week], ['id' => 'open_modal', 'class' => 'btn btn-xs btn-danger', 'data' => [
+                                                  'method' => 'post',
+                                              ]
+                                          ]);
+                                      ?>
+
+
+                                        </td>
+                                        <td class="text-right" colspan="2"></td>
+                                    </tr>
+
+                            <?php
+                          } ?>
+
+                                <?php
+
+                            }
+
+                            $isClosed = array_search($dayOfWeek, array_column($models, 'day_of_week'));
+
+                            if(  !$isClosed && gettype( $isClosed) == 'boolean'){
+                            ?>
+
+                            <td class="text-center">
+                              <h5>
+                                Closed
+                              </h5>
+                            </td>
+
+                            <?php
+
+                        }
+
+
                         ?>
 
-                      </td>
-                      <td style="padding: 5px  15px">
-                        <?= $model->getDayOfWeek() ?>
-                      </td>
-                      <td style="padding: 5px  15px">
-                          <?= $form->field($model, "[$index]open_at" )->textInput(['class' => 'form-control pickatime-open-at', 'style'=>'position: initial;','id' =>'OpenTime'.$index])->label('Opens at'); ?>
-                      </td>
-                      <td style="padding: 5px  15px" >
-                          <?= $form->field($model, "[$index]close_at")->textInput(['class' => 'form-control pickatime-close-at', 'style'=>'position: initial;','id' =>'CloseTime'.$index])->label('Closes at'); ?>
-                      </td>
-
-                      <td class="text-center">
 
 
-                        <?php
-                          echo Html::a('<i class="fa fa-plus"></i>', ['/opening-hour/create', 'storeUuid' => $storeUuid, 'dayOfWeek' => $model->day_of_week], ['id' => 'open_modal', 'class' => 'btn btn-xs btn-success']);
-                        ?>
 
-                        <?php
-
-                          if(OpeningHour::find()->where(['restaurant_uuid' =>$storeUuid,'day_of_week' => $model->day_of_week ])->count() > 1){
-                            echo Html::a('<i class="fa fa-minus"></i>', ['/opening-hour/delete', 'storeUuid' => $storeUuid, 'opening_hour_id' => $model->opening_hour_id, 'dayOfWeek' => $model->day_of_week ], ['id' => 'open_modal', 'class' => 'btn btn-xs btn-danger','data' => [
-                                'method' => 'post',
-                            ]
-                            ]);
-                          }
-
-                        ?>
+                        </tbody>
+                    </table>
 
 
-                      </td>
-                      <td class="text-right" colspan="2"></td>
                     </tr>
-
-          <?php } ?>
-
-        </tbody>
-
-    </table>
+<?php } ?>
 
 
+                </tbody>
 
-</div>
+            </table>
 
 
-</div>
-<!-- DataTable ends -->
-<div class="form-group" style="background: #f4f6f9;  margin-bottom: 0px; background:#f4f6f9 ">
-    <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
-</div>
+
+        </div>
+
+
+    </div>
+    <!-- DataTable ends -->
+    <div class="form-group" style="background: #f4f6f9;  margin-bottom: 0px; background:#f4f6f9 ">
+<?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
+    </div>
 <?php ActiveForm::end(); ?>
 
-  </section>
+</section>
 <!-- Data list view end -->
