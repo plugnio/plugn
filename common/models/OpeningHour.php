@@ -139,7 +139,7 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
             foreach ($getWorkingHours as $key => $workingHours) {
 
-              $startAt = date('c', strtotime($workingHours->open_at, strtotime($currentDate) ));
+              $startAt = date('c', strtotime($workingHours->open_at, strtotime($selectedDate) ));
 
               // if($key == 0 )
               //     $startAt = date('c', strtotime("+". intval($store->schedule_interval)  . " min" ,strtotime($startAt)) );
@@ -148,12 +148,17 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
               $startAt = static::roundToNextHour($startAt);
 
-              $startAt = date('c', strtotime("+ " . $i . " day" ,strtotime($startAt)));
+              // $startAt = date('c', strtotime("+ " . $i . " day" ,strtotime($startAt)));
+
+              // if($workingHours->day_of_week ==  0)
+              // die(json_encode(   date('c', strtotime($startAt) ) ));
 
 
               while (date('H:i:s', strtotime($startAt)) <= $workingHours->close_at && date('H:i:s', strtotime($startAt)) >= $workingHours->open_at ) {
 
                 $endAt = date('c', strtotime("+". intval($store->schedule_interval)  . " min" ,strtotime($startAt)) );
+
+
 
                 if ($workingHours->day_of_week == date('w', strtotime("today")) && date('c', strtotime("now")) < date('c', strtotime($startAt))) {
 
@@ -166,12 +171,22 @@ class OpeningHour extends \yii\db\ActiveRecord {
                   ]);
                   }
                 } else if ($workingHours->day_of_week != date('w', strtotime("today")) ) {
+
                   array_push($timeSlots, [
                       'date' =>  date('Y-m-d', strtotime($startAt) ),
                       'start_time' =>  date('c', strtotime($startAt) ) ,
                       'end_time' =>   date('c' , strtotime( $endAt) )
                   ]);
+
+
+
                 }
+
+
+
+
+                if (date("Y/m/d", strtotime($endAt)) != date("Y/m/d", strtotime($startAt)) )
+                  break;
 
                   $startAt = $endAt;
 
