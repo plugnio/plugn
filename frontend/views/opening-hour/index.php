@@ -146,32 +146,36 @@ $this->registerCss("
                                 <?php
                                 switch ($dayOfWeek) {
                                     case OpeningHour::DAY_OF_WEEK_SATURDAY:
-                                        echo '<h4><b>Saturday</b></h4>';
+                                        echo '<h4 style="    display: contents;"><b>Saturday</b></h4>';
                                         break;
                                     case OpeningHour::DAY_OF_WEEK_SUNDAY:
-                                        echo '<h4><b>Sunday</b></h4>';
+                                        echo '<h4 style="    display: contents;"><b>Sunday</b></h4>';
                                         break;
                                     case OpeningHour::DAY_OF_WEEK_MONDAY:
-                                        echo '<h4><b>Monday</b></h4>';
+                                        echo '<h4 style="    display: contents;"><b>Monday</b></h4>';
                                         break;
                                     case OpeningHour::DAY_OF_WEEK_TUESDAY:
-                                        echo '<h4><b>Tuesday</b></h4>';
+                                        echo '<h4 style="    display: contents;"><b>Tuesday</b></h4>';
                                         break;
                                     case OpeningHour::DAY_OF_WEEK_WEDNESDAY:
-                                        echo '<h4><b>Wednesday</b></h4>';
+                                        echo '<h4 style="    display: contents;"><b>Wednesday</b></h4>';
                                         break;
                                     case OpeningHour::DAY_OF_WEEK_THURSDAY:
-                                        echo '<h4><b>Thursday</b></h4>';
+                                        echo '<h4 style="    display: contents;"><b>Thursday</b></h4>';
                                         break;
                                     case OpeningHour::DAY_OF_WEEK_FRIDAY:
-                                        echo '<h4><b>Friday</b></h4>';
+                                        echo '<h4 style="    display: contents;"><b>Friday</b></h4>';
                                         break;
                                 }
+                            echo  Html::a('Update', ['update', 'storeUuid' => $storeUuid, 'dayOfWeek' => $dayOfWeek], ['class' => 'btn btn-success','style' => 'float: right;'])
+
                                 ?>
 
-                                                                        <?php
-                                                                          echo Html::a('<i class="fa fa-plus"></i>', ['/opening-hour/create', 'storeUuid' => $storeUuid, 'dayOfWeek' => $dayOfWeek], ['id' => 'open_modal', 'class' => 'btn btn-xs btn-success']);
-                                                                        ?>
+                                <?php
+                                  // echo Html::a('<i class="fa fa-plus"></i>', ['/opening-hour/create', 'storeUuid' => $storeUuid, 'dayOfWeek' => $dayOfWeek], ['id' => 'open_modal', 'class' => 'btn btn-xs btn-success']);
+                                ?>
+
+
 
                             </td>
 
@@ -187,24 +191,12 @@ $this->registerCss("
                                     <tr>
 
                                         <td style="padding: 5px  15px">
-                                            <?= $form->field($model, "[$index]open_at")->textInput(['class' => 'form-control pickatime-open-at', 'style' => 'position: initial;', 'id' => 'OpenTime' . $index])->label('Opens at'); ?>
+                                            <?= $model->open_at ?>
                                         </td>
                                         <td style="padding: 5px  15px" >
-                                          <?= $form->field($model, "[$index]close_at")->textInput(['class' => 'form-control pickatime-close-at', 'style' => 'position: initial;', 'id' => 'CloseTime' . $dayOfWeek])->label('Closes at'); ?>
+                                          <?= $model->close_at ?>
                                         </td>
 
-                                        <td class="text-center">
-
-
-                                      <?php
-                                          echo Html::a('<i class="fa fa-minus"></i>', ['/opening-hour/delete', 'storeUuid' => $storeUuid, 'opening_hour_id' => $model->opening_hour_id, 'dayOfWeek' => $model->day_of_week], ['id' => 'open_modal', 'class' => 'btn btn-xs btn-danger', 'data' => [
-                                                  'method' => 'post',
-                                              ]
-                                          ]);
-                                      ?>
-
-
-                                        </td>
                                         <td class="text-right" colspan="2"></td>
                                     </tr>
 

@@ -29,6 +29,21 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
     public $open_24_hrs;
 
+
+    /**
+     * these are flags that are used by the form to dictate how the loop will handle each item
+     */
+    const UPDATE_TYPE_CREATE = 'create';
+    const UPDATE_TYPE_UPDATE = 'update';
+    const UPDATE_TYPE_DELETE = 'delete';
+
+    const SCENARIO_BATCH_UPDATE = 'batchUpdate';
+
+
+    private $_updateType;
+
+
+
     /**
      * {@inheritdoc}
      */
@@ -42,11 +57,36 @@ class OpeningHour extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['restaurant_uuid', 'day_of_week', 'open_at', 'close_at'], 'required'],
+            ['updateType', 'required', 'on' => self::SCENARIO_BATCH_UPDATE],
+            ['updateType',
+                'in',
+                'range' => [self::UPDATE_TYPE_CREATE, self::UPDATE_TYPE_UPDATE, self::UPDATE_TYPE_DELETE],
+                'on' => self::SCENARIO_BATCH_UPDATE
+            ],
             [['day_of_week', 'is_closed'], 'integer'],
             [['open_at', 'close_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
+    }
+
+
+    public function getUpdateType()
+    {
+        if (empty($this->_updateType)) {
+            if ($this->isNewRecord) {
+                $this->_updateType = self::UPDATE_TYPE_CREATE;
+            } else {
+                $this->_updateType = self::UPDATE_TYPE_UPDATE;
+            }
+        }
+
+        return $this->_updateType;
+    }
+
+    public function setUpdateType($value)
+    {
+        $this->_updateType = $value;
     }
 
     /**
