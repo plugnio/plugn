@@ -214,8 +214,8 @@ class OpeningHourController extends Controller
                         $modelDetail->day_of_week = $dayOfWeek;
                         $modelDetail->restaurant_uuid = $storeUuid;
 
-                        if(!$modelDetail->save())
-                          die(json_encode($modelDetail->errors));
+                        $modelDetail->save();
+
 
                     }
                 }

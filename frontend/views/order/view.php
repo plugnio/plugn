@@ -300,7 +300,10 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                             'attribute' => 'estimated_time_of_arrival',
                             "format" => "raw",
                             "value" => function($model) {
-                                return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival));
+                                if($model->is_order_scheduled)
+                                  return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival)) .  date(' - h:i A', strtotime($model->scheduled_time_to));
+                                else
+                                  return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival));
                             }
                         ],
                         [

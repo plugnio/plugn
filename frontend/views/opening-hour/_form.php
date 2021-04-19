@@ -51,15 +51,29 @@ $('.picker').css('position', 'inherit');
     });
 
 
-
         $('.delete-button').click(function() {
-      
+
         var detail = $(this).closest('.receipt-detail');
+
         var updateType = detail.find('.update-type');
         if (updateType.val() === " . json_encode(OpeningHour::UPDATE_TYPE_UPDATE) . ") {
             //marking the row for deletion
             updateType.val(" . json_encode(OpeningHour::UPDATE_TYPE_DELETE) . ");
             detail.hide();
+
+            var isClose = true;
+            $( '.receipt-detail' ).each(function() {
+              if($(this).css('display') == 'block'){
+                isClose = false;
+              }
+            });
+
+            if(isClose == true){
+              console.log(isClose);
+              $('.closeStore').show();
+            }
+
+
         } else {
             //if the row is a new row, delete the row
             detail.remove();
@@ -149,7 +163,7 @@ $this->registerCss("
       <div class="card">
         <div class="card-body">
 
-          <div class="input-wrapper">
+          <div class="input-wrapper" style="margin-bottom: 20px;">
       <?php foreach ($openingHours as $i => $modelDetail) { ?>
 
           <div class="receipt-detail receipt-detail-<?= $i ?>">
@@ -171,18 +185,29 @@ $this->registerCss("
         <?php }
 
         if(sizeof($openingHours) == 0 && !$openingHours){
-          echo '<span class="closeStore"> You are closed on this day </span>';
+          echo '
+                    <div  class="closeStore"  style="margin-bottom: 30px;">
+                      <spanstyle="font-size: 20px;">
+                            You are closed on this day
+                      </span>
+                    </div>
+                  ';
         }
         ?>
 
-        <span class="closeStore"> You are closed on this day </span>
+        <div  class="closeStore"  style="display:none; margin-bottom: 30px;">
+          <spanstyle="font-size: 20px;">
+                You are closed on this day
+          </span>
+        </div>
+
 
 
 
 
 
           </div>
-        <?= Html::submitButton('Add hours', ['name' => 'addRow', 'value' => 'true', 'class' => 'btn addRow','style'=>'    text-align: inherit;']) ?>
+        <?= Html::submitButton('Add hours', ['name' => 'addRow', 'value' => 'true', 'class' => 'btn btn-outline-primary addRow','style'=>'    text-align: inherit;']) ?>
         <div style="    margin-top: 20px;">
              <div class="form-group" style="margin-top: 100px !; background: #f4f6f9;  margin-bottom: 0px; background:#f4f6f9 ">
                  <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
