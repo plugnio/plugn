@@ -15,7 +15,7 @@ $this->params['restaurant_uuid'] = $storeUuid;
 <div class="opening-hour-update">
 
     <?= $this->render('_form', [
-      'modelDetails' => $modelDetails,
+      'openingHours' => $openingHours,
       'day' => $day,
       'storeUuid' => $storeUuid
     ]) ?>

@@ -53,6 +53,7 @@ $('.picker').css('position', 'inherit');
 
 
         $('.delete-button').click(function() {
+      
         var detail = $(this).closest('.receipt-detail');
         var updateType = detail.find('.update-type');
         if (updateType.val() === " . json_encode(OpeningHour::UPDATE_TYPE_UPDATE) . ") {
@@ -66,6 +67,7 @@ $('.picker').css('position', 'inherit');
 
 });
 ";
+$this->registerJs($js);
 
 $this->registerCss("
 .custom-switch.switch-lg .custom-control-label::before , .custom-control-input:checked ~ .custom-control-label::before{
@@ -148,7 +150,7 @@ $this->registerCss("
         <div class="card-body">
 
           <div class="input-wrapper">
-      <?php foreach ($modelDetails as $i => $modelDetail) { ?>
+      <?php foreach ($openingHours as $i => $modelDetail) { ?>
 
           <div class="receipt-detail receipt-detail-<?= $i ?>">
               <div style="display: flex;">
@@ -168,7 +170,7 @@ $this->registerCss("
             </div>
         <?php }
 
-        if(sizeof($modelDetails) == 0 && !$modelDetails){
+        if(sizeof($openingHours) == 0 && !$openingHours){
           echo '<span class="closeStore"> You are closed on this day </span>';
         }
         ?>

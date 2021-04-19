@@ -165,37 +165,38 @@ class OpeningHourController extends Controller
         // }
 
 
-        $formDetails = Yii::$app->request->post('OpeningHour', []);
-        foreach ($formDetails as $i => $formDetail) {
 
-            //loading the models if they are not new
-            if (isset($formDetail['opening_hour_id']) && isset($formDetail['updateType']) && $formDetail['updateType'] != OpeningHour::UPDATE_TYPE_CREATE) {
 
-                //making sure that it is actually a child of the main model
-                $modelDetail = OpeningHour::findOne(['restaurant_uuid' => $storeUuid ,'day_of_week' => $dayOfWeek]);
+            $formDetails = Yii::$app->request->post('OpeningHour', []);
+            foreach ($formDetails as $i => $formDetail) {
 
-                // $modelDetail->restaurant_uuid = $storeUuid;
-                $modelDetail->day_of_week = $dayOfWeek;
-                $modelDetail->restaurant_uuid = $storeUuid;
-                $modelDetail->setScenario(OpeningHour::SCENARIO_BATCH_UPDATE);
-                $modelDetail->setAttributes($formDetail);
-                $openingHours[$i] = $modelDetail;
-                //validate here if the modelDetail loaded is valid, and if it can be updated or deleted
-            } else {
+                //loading the models if they are not new
+                if (isset($formDetail['opening_hour_id']) && isset($formDetail['updateType']) && $formDetail['updateType'] != OpeningHour::UPDATE_TYPE_CREATE) {
 
-                $modelDetail = new OpeningHour(['scenario' => OpeningHour::SCENARIO_BATCH_UPDATE]);
-                // $modelDetail->restaurant_uuid = $storeUuid;
-                $modelDetail->setAttributes($formDetail);
-                $openingHours[] = $modelDetail;
+                    //making sure that it is actually a child of the main model
+                    $modelDetail = OpeningHour::findOne(['opening_hour_id' => $formDetail['opening_hour_id'] ,'restaurant_uuid' => $storeUuid ,'day_of_week' => $dayOfWeek]);
+
+                    $modelDetail->day_of_week = $dayOfWeek;
+                    $modelDetail->restaurant_uuid = $storeUuid;
+                    $modelDetail->setScenario(OpeningHour::SCENARIO_BATCH_UPDATE);
+                    $modelDetail->setAttributes($formDetail);
+                    $openingHours[$i] = $modelDetail;
+                    //validate here if the modelDetail loaded is valid, and if it can be updated or deleted
+                } else {
+                    $modelDetail = new OpeningHour(['scenario' => OpeningHour::SCENARIO_BATCH_UPDATE]);
+                    // $modelDetail->restaurant_uuid = $storeUuid;
+                    $modelDetail->setAttributes($formDetail);
+                    $openingHours[] = $modelDetail;
+                }
+
             }
 
-        }
 
         //handling if the addRow button has been pressed
         if (Yii::$app->request->post('addRow') == 'true') {
             $openingHours[] = new OpeningHour();
             return $this->render('update', [
-                'modelDetails' => $openingHours,
+                'openingHours' => $openingHours,
                 'day' => $day,
                 'storeUuid' => $storeUuid
             ]);
@@ -203,10 +204,8 @@ class OpeningHourController extends Controller
 
         if (Model::loadMultiple($openingHours, Yii::$app->request->post()) ) {
 
-            // if (Model::validateMultiple($openingHours)) {
-
+            // if (Model::validateMultiple($openingHours)) { //todo
                 foreach($openingHours as $modelDetail) {
-                  // die('enter');
                     //details that has been flagged for deletion will be deleted
                     if ($modelDetail->updateType == OpeningHour::UPDATE_TYPE_DELETE) {
                         $modelDetail->delete();
@@ -214,8 +213,10 @@ class OpeningHourController extends Controller
                         //new or updated records go here
                         $modelDetail->day_of_week = $dayOfWeek;
                         $modelDetail->restaurant_uuid = $storeUuid;
+
                         if(!$modelDetail->save())
-                          die('fuck');
+                          die(json_encode($modelDetail->errors));
+
                     }
                 }
                 return $this->redirect(['index', 'storeUuid' => $storeUuid]);
@@ -223,7 +224,7 @@ class OpeningHourController extends Controller
         }
 
         return $this->render('update', [
-          'modelDetails' => $openingHours,
+          'openingHours' => $openingHours,
           'day' => $day,
           'storeUuid' => $storeUuid
         ]);
