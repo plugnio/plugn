@@ -52,7 +52,7 @@ class OpeningHourController extends Controller
 
         $models = OpeningHour::find()
                       ->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
-                      ->orderBy(['day_of_week' => SORT_ASC])
+                      ->orderBy(['day_of_week' => SORT_ASC, 'open_at' => SORT_ASC])
                       ->all();
 
         return $this->render('index', [
@@ -131,6 +131,33 @@ class OpeningHourController extends Controller
 
 
         $openingHours = $this->findModel($storeUuid, $dayOfWeek);
+
+
+        switch ($dayOfWeek) {
+            case OpeningHour::DAY_OF_WEEK_SATURDAY:
+                 $day = 'Saturday';
+                break;
+            case OpeningHour::DAY_OF_WEEK_SUNDAY:
+                $day = 'Sunday';
+                break;
+            case OpeningHour::DAY_OF_WEEK_MONDAY:
+                $day = 'Monday';
+                break;
+            case OpeningHour::DAY_OF_WEEK_TUESDAY:
+                $day = 'Tuesday';
+                break;
+            case OpeningHour::DAY_OF_WEEK_WEDNESDAY:
+                $day = 'Wednesday';
+                break;
+            case OpeningHour::DAY_OF_WEEK_THURSDAY:
+                $day = 'Thursday';
+                break;
+            case OpeningHour::DAY_OF_WEEK_FRIDAY:
+                $day = 'Friday';
+                break;
+        }
+
+
         // if(!$openingHours){
         //   $openingHours = [new OpeningHour()];
         //   $openingHours[0]->restaurant_uuid = $storeUuid;
@@ -155,6 +182,7 @@ class OpeningHourController extends Controller
                 $openingHours[$i] = $modelDetail;
                 //validate here if the modelDetail loaded is valid, and if it can be updated or deleted
             } else {
+
                 $modelDetail = new OpeningHour(['scenario' => OpeningHour::SCENARIO_BATCH_UPDATE]);
                 // $modelDetail->restaurant_uuid = $storeUuid;
                 $modelDetail->setAttributes($formDetail);
@@ -168,6 +196,7 @@ class OpeningHourController extends Controller
             $openingHours[] = new OpeningHour();
             return $this->render('update', [
                 'modelDetails' => $openingHours,
+                'day' => $day,
                 'storeUuid' => $storeUuid
             ]);
         }
@@ -186,16 +215,16 @@ class OpeningHourController extends Controller
                         $modelDetail->day_of_week = $dayOfWeek;
                         $modelDetail->restaurant_uuid = $storeUuid;
                         if(!$modelDetail->save())
-                        die('error');
+                          die('fuck');
                     }
                 }
                 return $this->redirect(['index', 'storeUuid' => $storeUuid]);
             // }
         }
 
-
         return $this->render('update', [
           'modelDetails' => $openingHours,
+          'day' => $day,
           'storeUuid' => $storeUuid
         ]);
 

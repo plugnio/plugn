@@ -13,71 +13,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 $this->params['restaurant_uuid'] = $storeUuid;
 
-$js = "
-
-    $(function(){
-    $('#open_modal').click(function (){
-      console.log('test');
-      $.get($(this).attr('href'), function(data) {
-        $('#modal').modal('show').find('#modalContent').html(data)
-     });
-     return false;
-    });
-
-
-    $( '.pickatime-open-at').pickatime({
-        min: [00,00],
-        max: [23,00],
-        format: 'H:i',
-        formatLabel: 'H:i',
-        formatSubmit: 'H:i',
-        hiddenPrefix: 'prefix__',
-        hiddenSuffix: '__suffix'
-    });
-
-    $( '.pickatime-close-at').pickatime({
-        min: [00,30],
-        max: [23,30],
-        format: 'H:i',
-        formatLabel: 'H:i',
-        formatSubmit: 'H:i',
-        hiddenPrefix: 'prefix__',
-        hiddenSuffix: '__suffix'
-    });
-
-
-
-$('.picker').css('position', 'inherit');
-    $('thead').hide();
-    $('.top').hide();
-    $('.bottom').hide();
-    $('.form-group').css('margin', '0px');
-
-    $('#open24Hrs').change(function(e){
-      $.each([ 1,2,3,4,5,6,7], function( index, value ) {
-        document.getElementById('OpenTime'+index).value = '00:00';
-        document.getElementById('CloseTime'+index).value = '23:59';
-      });
-    });
-
-    $('#dailyOpenTime').change(function(e){
-      $.each([ 1,2,3,4,5,6,7], function( index, value ) {
-        document.getElementById('OpenTime'+index).value = e.target.value ;
-      });
-    });
-
-    $('#dailyCloseTime').change(function(e){
-      $.each([ 1,2,3,4,5,6,7], function( index, value ) {
-        document.getElementById('CloseTime'+index).value = e.target.value ;
-      });
-    });
-
-
-
-";
-$this->registerJs($js);
-
-
 
 $this->registerCss("
 .custom-switch.switch-lg .custom-control-label::before , .custom-control-input:checked ~ .custom-control-label::before{
@@ -93,13 +28,106 @@ $this->registerCss("
       background-color: #EA5455 !important;
   }
 
+
+
+  .qGcNVe {
+    list-style: none;
+    padding-left: 0;
+}
+
+.sM9Z9c {
+    align-items: center;
+    display: flex;
+}
+.lXfzDe {
+    font-family: Roboto,Arial,sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    letter-spacing: .02rem;
+    line-height: 1.25rem;
+    color: #3c4043;
+    flex: auto;
+    padding-left: 12px;
+}
+.lXfzDe, .VPQpCe {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.VPQpCe {
+    text-align: right;
+    font-family: Roboto,Arial,sans-serif;
+    font-size: 14px;
+
+    font-weight: 400;
+    letter-spacing: .02rem;
+    line-height: 1.25rem;
+    color: #3c4043;
+    flex: auto;
+    justify-content: flex-end;
+}
+
+.lXfzDe, .VPQpCe {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.eF1gIe, .eF1gIe .KHxj8b {
+    color: #70757a;
+    text-decoration: line-through;
+}
+.FzVg0e {
+    display: block;
+}
+.FsnbQ {
+    display: flex;
+    justify-content: flex-end;
+}
+.yHy1rc {
+    z-index: 0;
+}
+.VfPpkd-Bz112c-LgbsSe {
+    --mdc-ripple-fg-size: 0;
+    --mdc-ripple-left: 0;
+    --mdc-ripple-top: 0;
+    --mdc-ripple-fg-scale: 1;
+    --mdc-ripple-fg-translate-end: 0;
+    --mdc-ripple-fg-translate-start: 0;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    will-change: transform,opacity;
+    bottom: 10px;
+}
+
+.VfPpkd-Bz112c-LgbsSe {
+    display: inline-block;
+    position: relative;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    fill: currentColor;
+    color: inherit;
+    font-size: 24px;
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-user-select: none;
+    width: 48px;
+    height: 48px;
+    padding: 12px;
+}
+
+
+
+.UxKNpc {
+    color: #70757a;
+}
+
   ");
 ?>
 
 
 
 <section id="data-list-view" class="data-list-view-header">
-    <?php $form = ActiveForm::begin(); ?>
 
 
     <!-- DataTable starts -->
@@ -107,8 +135,8 @@ $this->registerCss("
 
         <div class="card-body">
 
-            <table class="table ">
-                <tbody>
+            <ul>
+                <!-- <tbody> -->
                   <!-- <tr>
 
 
@@ -139,118 +167,107 @@ $this->registerCss("
                       </tr> -->
 
 
-                    <?php for ($dayOfWeek = 0; $dayOfWeek < 7; $dayOfWeek++) { ?>
-                        <tr>
-
-                            <td style="padding: 5px  15px">
-                                <?php
-                                switch ($dayOfWeek) {
-                                    case OpeningHour::DAY_OF_WEEK_SATURDAY:
-                                        echo '<h4 style="    display: contents;"><b>Saturday</b></h4>';
-                                        break;
-                                    case OpeningHour::DAY_OF_WEEK_SUNDAY:
-                                        echo '<h4 style="    display: contents;"><b>Sunday</b></h4>';
-                                        break;
-                                    case OpeningHour::DAY_OF_WEEK_MONDAY:
-                                        echo '<h4 style="    display: contents;"><b>Monday</b></h4>';
-                                        break;
-                                    case OpeningHour::DAY_OF_WEEK_TUESDAY:
-                                        echo '<h4 style="    display: contents;"><b>Tuesday</b></h4>';
-                                        break;
-                                    case OpeningHour::DAY_OF_WEEK_WEDNESDAY:
-                                        echo '<h4 style="    display: contents;"><b>Wednesday</b></h4>';
-                                        break;
-                                    case OpeningHour::DAY_OF_WEEK_THURSDAY:
-                                        echo '<h4 style="    display: contents;"><b>Thursday</b></h4>';
-                                        break;
-                                    case OpeningHour::DAY_OF_WEEK_FRIDAY:
-                                        echo '<h4 style="    display: contents;"><b>Friday</b></h4>';
-                                        break;
-                                }
-                            echo  Html::a('Update', ['update', 'storeUuid' => $storeUuid, 'dayOfWeek' => $dayOfWeek], ['class' => 'btn btn-success','style' => 'float: right;'])
-
-                                ?>
-
-                                <?php
-                                  // echo Html::a('<i class="fa fa-plus"></i>', ['/opening-hour/create', 'storeUuid' => $storeUuid, 'dayOfWeek' => $dayOfWeek], ['id' => 'open_modal', 'class' => 'btn btn-xs btn-success']);
-                                ?>
 
 
+            </ul>
 
-                            </td>
-
-                    <table class="table">
-                        <tbody>
-
+            <div jsname="IVrI7b">
+               <ul class="qGcNVe">
 
 
-                            <?php
-                            foreach ($models as $index => $model) {
-                                if ($model->day_of_week == $dayOfWeek) {
-                                    ?>
-                                    <tr>
-
-                                        <td style="padding: 5px  15px">
-                                            <?= $model->open_at ?>
-                                        </td>
-                                        <td style="padding: 5px  15px" >
-                                          <?= $model->close_at ?>
-                                        </td>
-
-                                        <td class="text-right" colspan="2"></td>
-                                    </tr>
-
-                            <?php
-                          } ?>
-
-                                <?php
-
-                            }
-
-                            $isClosed = array_search($dayOfWeek, array_column($models, 'day_of_week'));
-
-                            if(  !$isClosed && gettype( $isClosed) == 'boolean'){
-                            ?>
-
-                            <td class="text-center">
-                              <h5>
-                                Closed
-                              </h5>
-                            </td>
-
-                            <?php
-
-                        }
+                                     <?php for ($dayOfWeek = 0; $dayOfWeek < 7; $dayOfWeek++) { ?>
+                                       <li data-attribute-type="8" data-day-index="0" class="sM9Z9c">
 
 
-                        ?>
+                                                 <?php
+                                                 switch ($dayOfWeek) {
+                                                     case OpeningHour::DAY_OF_WEEK_SATURDAY:
+                                                         echo '<span class="lXfzDe">Saturday</span>';
+                                                         break;
+                                                     case OpeningHour::DAY_OF_WEEK_SUNDAY:
+                                                         echo '<span class="lXfzDe">Sunday</span>';
+                                                         break;
+                                                     case OpeningHour::DAY_OF_WEEK_MONDAY:
+                                                         echo '<span class="lXfzDe">Monday</span>';
+                                                         break;
+                                                     case OpeningHour::DAY_OF_WEEK_TUESDAY:
+                                                         echo '<span class="lXfzDe">Tuesday</span>';
+                                                         break;
+                                                     case OpeningHour::DAY_OF_WEEK_WEDNESDAY:
+                                                         echo '<span class="lXfzDe">Wednesday</span>';
+                                                         break;
+                                                     case OpeningHour::DAY_OF_WEEK_THURSDAY:
+                                                         echo '<span class="lXfzDe">Thursday</span>';
+                                                         break;
+                                                     case OpeningHour::DAY_OF_WEEK_FRIDAY:
+                                                         echo '<span class="lXfzDe">Friday</span>';
+                                                         break;
+                                                 }
+
+                                                  $isClosed = array_search($dayOfWeek, array_column($models, 'day_of_week'));
+
+                                                 ?>
+                                                 <div class="VPQpCe">
+
+                                                   <div aria-label="Incorrect hours: Closed" class=<?= !$isClosed && gettype( $isClosed) == "boolean" ? "VPQpCe" : "eF1gIe" ?>>
+                                                       Closed
+                                                   </div>
+
+                                                    <div class="FzVg0e">
+
+                                                       <?php
+                                                         foreach ($models as $index => $model) {
+
+                                                             if ($model->day_of_week == $dayOfWeek) {
+                                                                 ?>
+
+                                                                     <div>
+                                                                         <?= date('h:i A', strtotime($model->open_at)) ?> -  <?= date('h:i A', strtotime($model->close_at)) ?>
+                                                                     </div>
+
+                                                         <?php
+                                                       }
+                                                     }
+                                                        ?>
+
+
+                                                    </div>
+                                                 </div>
+
+                                               <span class="FsnbQ" jsaction="JIbuQc:JAwLEe" data-day-index="0">
+
+
+                                                  <?=
+                                                    Html::a(
+                                                            '<span><svg height="24" width="24" class="ME7jKf UxKNpc" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                               <path fill-rule="evenodd" clip-rule="evenodd" d="M14.916 3.586a2 2 0 012.828 0l2.672 2.671a2 2 0 010 2.829l-.817.816-.013.014L8.5 21.002H3v-5.5l9.33-9.33 2.586-2.586zm-1.172 4L5 16.33v2.672h2.672l8.744-8.745-2.672-2.671z"></path>
+                                                            </svg></span>',
+                                                              ['update', 'storeUuid' => $storeUuid, 'dayOfWeek' => $dayOfWeek],
+                                                               ['class' => 'VfPpkd-Bz112c-LgbsSe yHy1rc eT1oJ']
+                                                        );
+                                                  ?>
+
+                                               </span>
+                                               </li>
+
+
+                     <?php } ?>
 
 
 
 
-                        </tbody>
-                    </table>
+               </ul>
 
-
-                    </tr>
-<?php } ?>
-
-
-                </tbody>
-
-            </table>
-
-
+               <!-- <div class="sFI1Df">
+                  <hr aria-hidden="true" class="KzUZ2b">
+               </div> -->
+            </div>
 
         </div>
 
 
     </div>
-    <!-- DataTable ends -->
-    <div class="form-group" style="background: #f4f6f9;  margin-bottom: 0px; background:#f4f6f9 ">
-<?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
-    </div>
-<?php ActiveForm::end(); ?>
+
 
 </section>
 <!-- Data list view end -->
