@@ -10,74 +10,33 @@ use common\models\OpeningHour;
 
 
 $js = "
-    $( '.pickatime-open-at').pickatime({
-        min: [00,00],
-        max: [23,00],
-        format: 'H:i A',
-        formatLabel: 'H:i',
-        formatSubmit: 'H:i',
-        hiddenPrefix: 'prefix__',
-        hiddenSuffix: '__suffix'
-    });
-    $( '.pickatime-close-at').pickatime({
-        min: [00,30],
-        max: [23,30],
-        format: 'H:i A',
-        formatLabel: 'H:i A',
-        formatSubmit: 'H:i',
-        hiddenPrefix: 'prefix__',
-        hiddenSuffix: '__suffix'
-    });
-$('.picker').css('position', 'inherit');
-    $('thead').hide();
-    $('.top').hide();
-    $('.bottom').hide();
-    $('.form-group').css('margin', '0px');
-    $('#open24Hrs').change(function(e){
-      $.each([ 1,2,3,4,5,6,7], function( index, value ) {
-        document.getElementById('OpenTime'+index).value = '00:00';
-        document.getElementById('CloseTime'+index).value = '23:59';
-      });
-    });
-    $('#dailyOpenTime').change(function(e){
-      $.each([ 1,2,3,4,5,6,7], function( index, value ) {
-        document.getElementById('OpenTime'+index).value = e.target.value ;
-      });
-    });
-    $('#dailyCloseTime').change(function(e){
-      $.each([ 1,2,3,4,5,6,7], function( index, value ) {
-        document.getElementById('CloseTime'+index).value = e.target.value ;
-      });
-    });
+    $('.delete-button').click(function() {
 
+    var detail = $(this).closest('.receipt-detail');
 
-        $('.delete-button').click(function() {
+    var updateType = detail.find('.update-type');
+    if (updateType.val() === " . json_encode(OpeningHour::UPDATE_TYPE_UPDATE) . ") {
+        //marking the row for deletion
+        updateType.val(" . json_encode(OpeningHour::UPDATE_TYPE_DELETE) . ");
+        detail.hide();
 
-        var detail = $(this).closest('.receipt-detail');
+        var isClose = true;
+        $( '.receipt-detail' ).each(function() {
+          if($(this).css('display') == 'block'){
+            isClose = false;
+          }
+        });
 
-        var updateType = detail.find('.update-type');
-        if (updateType.val() === " . json_encode(OpeningHour::UPDATE_TYPE_UPDATE) . ") {
-            //marking the row for deletion
-            updateType.val(" . json_encode(OpeningHour::UPDATE_TYPE_DELETE) . ");
-            detail.hide();
-
-            var isClose = true;
-            $( '.receipt-detail' ).each(function() {
-              if($(this).css('display') == 'block'){
-                isClose = false;
-              }
-            });
-
-            if(isClose == true){
-              console.log(isClose);
-              $('.closeStore').show();
-            }
-
-
-        } else {
-            //if the row is a new row, delete the row
-            detail.remove();
+        if(isClose == true){
+          console.log(isClose);
+          $('.closeStore').show();
         }
+
+
+    } else {
+        //if the row is a new row, delete the row
+        detail.remove();
+    }
 
 });
 ";
@@ -163,58 +122,64 @@ $this->registerCss("
       <div class="card">
         <div class="card-body">
 
-          <div class="input-wrapper" style="margin-bottom: 20px;">
-      <?php foreach ($openingHours as $i => $modelDetail) { ?>
 
-          <div class="receipt-detail receipt-detail-<?= $i ?>">
-              <div style="display: flex;">
-                  <?= Html::activeHiddenInput($modelDetail, "[$i]opening_hour_id") ?>
-                  <?= Html::activeHiddenInput($modelDetail, "[$i]updateType", ['class' => 'update-type']) ?>
-                  <div class="VHnWVc gEG0eb">
-                    <?= $form->field($modelDetail, "[$i]open_at" )->textInput(['type' => 'time','id'=>'dailyOpenTime', 'style'=>'position: initial;'])->label('Open time'); ?>
-                  </div>
-                  <div class="VHnWVc gEG0eb">
-                    <?= $form->field($modelDetail, "[$i]close_at" )->textInput(['type' => 'time','id'=>'dailyOpenTime', 'style'=>'position: initial;'])->label('Close time'); ?>
-                  </div>
-                  <span  class="KwjGFb gEG0eb">
-                    <?= Html::button('x', ['class' => 'delete-button VfPpkd-Bz112c-LgbsSe yHy1rc eT1oJ ', 'data-target' => "receipt-detail-$i"]) ?>
-                  </span>
+              <div class="input-wrapper" style="margin-bottom: 20px;">
+                  <?php foreach ($openingHours as $i => $modelDetail) { ?>
 
-              </div>
-            </div>
-        <?php }
 
-        if(sizeof($openingHours) == 0 && !$openingHours){
-          echo '
-                    <div  class="closeStore"  style="margin-bottom: 30px;">
+                      <div class="receipt-detail receipt-detail-<?= $i ?>">
+                          <div style="display: flex;">
+                              <?= Html::activeHiddenInput($modelDetail, "[$i]opening_hour_id") ?>
+                              <?= Html::activeHiddenInput($modelDetail, "[$i]updateType", ['class' => 'update-type']) ?>
+                              <div class="VHnWVc gEG0eb">
+                                <?= $form->field($modelDetail, "[$i]open_at" )->textInput([
+                                  'type' => 'time',
+                                  'id'=> 'openAt-' . $i,
+                                  'style'=>'position: initial;'
+                                  ])->label('Open time'); ?>
+                              </div>
+                              <div class="VHnWVc gEG0eb">
+                                <?= $form->field($modelDetail, "[$i]close_at" )->textInput([
+                                  'type' => 'time',
+                                  'id'=>'dailyOpenTime',
+                                  'style'=>'position: initial;'])->label('Close time'); ?>
+                              </div>
+                              <span  class="KwjGFb gEG0eb">
+                                <?= Html::button('x', ['class' => 'delete-button VfPpkd-Bz112c-LgbsSe yHy1rc eT1oJ ', 'data-target' => "receipt-detail-$i"]) ?>
+                              </span>
+
+                          </div>
+                        </div>
+                  <?php }
+
+                    if(sizeof($openingHours) == 0 && !$openingHours){
+                      echo '
+                                <div  class="closeStore"  style="margin-bottom: 30px;">
+                                  <spanstyle="font-size: 20px;">
+                                        You are closed on this day
+                                  </span>
+                                </div>
+                              ';
+                    }
+                    ?>
+
+                    <div  class="closeStore"  style="display:none; margin-bottom: 30px;">
                       <spanstyle="font-size: 20px;">
                             You are closed on this day
                       </span>
                     </div>
-                  ';
-        }
-        ?>
 
-        <div  class="closeStore"  style="display:none; margin-bottom: 30px;">
-          <spanstyle="font-size: 20px;">
-                You are closed on this day
-          </span>
-        </div>
+                  </div>
+                <?= Html::submitButton('Add hours', ['name' => 'addRow', 'value' => 'true', 'class' => 'btn btn-outline-primary addRow','style'=>'    text-align: inherit;']) ?>
+                <div style="    margin-top: 20px;">
+                     <div class="form-group" style="margin-top: 100px !; background: #f4f6f9;  margin-bottom: 0px; background:#f4f6f9 ">
+                         <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
 
-
-
-
-
+                     </div>
+                </div>
 
           </div>
-        <?= Html::submitButton('Add hours', ['name' => 'addRow', 'value' => 'true', 'class' => 'btn btn-outline-primary addRow','style'=>'    text-align: inherit;']) ?>
-        <div style="    margin-top: 20px;">
-             <div class="form-group" style="margin-top: 100px !; background: #f4f6f9;  margin-bottom: 0px; background:#f4f6f9 ">
-                 <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
-
-             </div>
         </div>
-    </div>
 
 
 

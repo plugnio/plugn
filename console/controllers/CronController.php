@@ -36,78 +36,19 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-  public function actionPaymentMigration(){
+  public function actionWorkingHoursMigration(){
 
-     $payments = Payment::find()
-               ->joinWith(['restaurant'])
-               ->with('activeSubscription')
-               ->where(['payment.payment_current_status' => 'CAPTURED'])
-               ->andWhere(['payment.plugn_fee' => null])
-               ->all();
-
-     foreach ($payments as $key => $payment) {
-
-       $platform_fee = 0;
-       $amount = $payment->payment_amount_charged;
-       $minChargeAmount = 4;
-       $knetGatewayFee = 0.01;
-       $minKnetGatewayFee = 0.100;
-       $creditcardGatewayFeePercentage = 0.025;
-
-       if($payment->activeSubscription->plan_id == 1 || ($payment->activeSubscription->plan_id == 2 && $payment->payment_created_at <= $payment->activeSubscription->subscription_start_at) ){
-
-            $platform_fee = 0.05;
-
-            if($payment->payment_mode == 'KNET' || $payment->payment_mode == 'src_kw.knet'){
+    $workingHours = OpeningHour::find()
+                  ->where(['is_closed' => 1])
+                  ->all();
 
 
-              //if greater than 10KD
-             if (($amount * $knetGatewayFee) >= $minKnetGatewayFee){
-               $platform_fee = $amount *  ( $platform_fee  - $knetGatewayFee );
-             }
+      foreach ($workingHours as $key => $workingHour) {
+        $workingHour->delete();
+      }
 
-              // if amount greater than  4 and  equal 10
-              else if  ($amount > $minChargeAmount && ( ($amount * $knetGatewayFee) < $minKnetGatewayFee)){
-                $platform_fee = ($amount *  $platform_fee ) - $minKnetGatewayFee;
-              }
+  }
 
-              //if amount less than or equal 4
-              else if ($minChargeAmount >= $amount) {
-                $platform_fee = 0.100;
-              }
-
-            } else if($payment->payment_mode == 'VISA' || $payment->payment_mode == 'MASTERCARD' || $payment->payment_mode = 'src_card'){
-                $platform_fee = $amount *  ($platform_fee  - $creditcardGatewayFeePercentage);
-            }
-
-        }
-
-
-
-
-        $payment->plugn_fee = $platform_fee;
-        $payment->payment_net_amount = ($payment->payment_amount_charged - $payment->payment_gateway_fee - $payment->plugn_fee);
-        $payment->save(false);
-
-     }
-
-
-     $allPayments = Payment::find()
-               ->joinWith(['restaurant'])
-               ->with('activeSubscription')
-               ->all();
-
-     foreach ($allPayments as $key => $payment) {
-
-        $payment->payment_net_amount = ($payment->payment_amount_charged - $payment->payment_gateway_fee - $payment->plugn_fee);
-        $payment->save(false);
-
-     }
-
-     $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-     return self::EXIT_CODE_NORMAL;
-
-   }
 
 
     public function actionSiteStatus(){
