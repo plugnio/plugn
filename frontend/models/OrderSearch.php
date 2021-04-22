@@ -221,18 +221,22 @@ class OrderSearch extends Order {
     public function search($params, $storeUuid) {
 
         $query = Order::find()
+
             ->with(['paymentMethod','currency','deliveryZone','deliveryZone.businessLocation', 'selectedItems'])
             ->where(['order.restaurant_uuid' => $storeUuid])
             ->andWhere(['!=' , 'order_status' , Order::STATUS_DRAFT])
             ->andWhere(['!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
             ->joinWith('pickupLocation', true)
+            ->joinWith('customer', true)
             ->orderBy(['order_created_at' => SORT_DESC]);
 
 
         // add conditions that should always apply here
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => false
+            'pagination' => [
+                'pageSize' => 100,
+             ],
         ]);
 
         $dataProvider->sort->attributes['business_location_id'] = [
@@ -277,11 +281,10 @@ class OrderSearch extends Order {
                 ->andFilterWhere(['like', 'house_number', $this->house_number])
                 ->andFilterWhere(['like', 'special_directions', $this->special_directions])
                 ->andFilterWhere(['like', 'customer_name', $this->customer_name])
-                ->andFilterWhere(['like', 'customer_phone_number', $this->customer_phone_number])
+                ->andFilterWhere(['like', 'customer.customer_phone_number', $this->customer_phone_number])
                 ->andFilterWhere(['like', 'customer_email', $this->customer_email])
                 ->andFilterWhere(['like', 'payment_method_name', $this->payment_method_name])
                 ->andFilterWhere(['like', 'payment_method_name_ar', $this->payment_method_name_ar]);
-
         return $dataProvider;
     }
 
