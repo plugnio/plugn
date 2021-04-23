@@ -68,6 +68,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
   * @property string|null $identification_title
   * @property string|null $identification_file_purpose
   * @property int|null $restaurant_email_notification
+  * @property int $retention_email_sent
   * @property string|null $developer_id
   * @property string|null $armada_api_key
   * @property int|null $phone_number_display
@@ -243,7 +244,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'app_id', 'armada_api_key', 'mashkor_branch_id', 'store_branch_name', 'live_public_key', 'test_public_key', 'company_name'], 'string', 'max' => 255],
 
             [['live_public_key', 'test_public_key'], 'default', 'value' => null],
-            [[ 'country_id', 'currency_id', 'owner_phone_country_code', 'phone_number_country_code'], 'integer'],
+            [[ 'country_id', 'currency_id', 'owner_phone_country_code', 'phone_number_country_code', 'retention_email_sent'], 'integer'],
 
             [['phone_number' , 'owner_number'], 'string', 'min' => 6, 'max' => 20],
             [['phone_number' , 'owner_number'], 'number'],
@@ -796,6 +797,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset($fields['restaurant_email_notification']);
         unset($fields['developer_id']);
         unset($fields['site_id']);
+        unset($fields['retention_email_sent']);
         unset($fields['hide_request_driver_button']);
         unset($fields['platform_fee']);
         unset($fields['warehouse_fee']);

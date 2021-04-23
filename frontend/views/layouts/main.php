@@ -33,66 +33,6 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
         </title>
         <link rel="shortcut icon" href="<?php echo Yii::$app->request->baseUrl; ?>/favicon.ico" type="image/x-icon" />
 
-        <?php
-
-          $segmentScript = '';
-          $storeConversionParams = '';
-
-          if(Yii::$app->user->identity && YII_ENV == 'prod'){
-
-            $full_name = explode(' ', Yii::$app->user->identity->agent_name);
-
-            $storeName = $restaurant_model->name;
-            $ownerPhoneNumber = $restaurant_model->owner_number;
-            $agentEmail = Yii::$app->user->identity->agent_email;
-
-            $planName = $restaurant_model->plan->name;
-
-            $tapAccountCreated = $restaurant_model->is_tap_enable ? 'yes' : 'no';
-            $paymentCash = $restaurant_model->getPaymentMethods()->where(['payment_method_id' => 3])->exists() ? 'yes' : 'no';
-            $paymentKNET = $restaurant_model->getPaymentMethods()->where(['payment_method_id' => 1])->exists() ? 'yes' : 'no';
-            $paymentCreditcard = $restaurant_model->getPaymentMethods()->where(['payment_method_id' => 2])->exists() ? 'yes' : 'no';
-            $deliveryMashkor = $restaurant_model->mashkor_branch_id ? 'yes' : 'no' ;
-            $deliveryArmada = $restaurant_model->armada_api_key ? 'yes' : 'no' ;
-            $storeLogo = $restaurant_model->logo ? $restaurant_model->getRestaurantLogoUrl() : 'false';
-
-            $segmentScript = "analytics.identify('". $restaurant_model->restaurant_uuid."', {
-                name: '". $storeName ."',
-                domain:'". $restaurant_model->restaurant_domain  ."',
-                phone:'". $ownerPhoneNumber  ."',
-                email: '".$agentEmail  ."',
-                plan: '". $planName ."',
-                logo: '". $storeLogo ."',
-                totalProducts: '". $restaurant_model->getItems()->count() ."',
-                totalOrders: '". $restaurant_model->getOrders()->count() ."',
-                tapAccountCreated: '". $tapAccountCreated ."',
-                paymentCash: '". $paymentCash ."',
-                paymentKNET: '". $paymentKNET ."',
-                paymentCreditcard: '". $paymentCreditcard ."',
-                paymentMada: 'no',
-                deliveryMashkor: '".  $deliveryMashkor ."',
-                deliveryArmada: '".  $deliveryArmada ."',
-              });
-           ";
-
-               if( Yii::$app->session->getFlash('storeCreated')){
-                 $storeConversionParams  = "analytics.track('Store Conversion',{});";
-               }
-
-            } ?>
-
-
-
-        <script>
-          !function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId","addDestinationMiddleware"];analytics.factory=function(e){return function(){var t=Array.prototype.slice.call(arguments);t.unshift(e);analytics.push(t);return analytics}};for(var e=0;e<analytics.methods.length;e++){var key=analytics.methods[e];analytics[key]=analytics.factory(key)}analytics.load=function(key,e){var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.src="https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);analytics._loadOptions=e};analytics.SNIPPET_VERSION="4.13.1";
-          analytics.load("2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5");
-          <?= $segmentScript ?>
-          analytics.page();
-          <?=  $storeConversionParams ?>
-          }}();
-        </script>
-
-
         <?php $this->head() ?>
     </head>
 
@@ -575,7 +515,65 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
     </footer>
     <!-- END: Footer-->
 
+    <?php
 
+      $segmentScript = '';
+      $storeConversionParams = '';
+
+      if(Yii::$app->user->identity && YII_ENV == 'prod'){
+
+        $full_name = explode(' ', Yii::$app->user->identity->agent_name);
+
+        $storeName = $restaurant_model->name;
+        $ownerPhoneNumber = $restaurant_model->owner_number;
+        $agentEmail = Yii::$app->user->identity->agent_email;
+
+        $planName = $restaurant_model->plan->name;
+
+        $tapAccountCreated = $restaurant_model->is_tap_enable ? 'yes' : 'no';
+        $paymentCash = $restaurant_model->getPaymentMethods()->where(['payment_method_id' => 3])->exists() ? 'yes' : 'no';
+        $paymentKNET = $restaurant_model->getPaymentMethods()->where(['payment_method_id' => 1])->exists() ? 'yes' : 'no';
+        $paymentCreditcard = $restaurant_model->getPaymentMethods()->where(['payment_method_id' => 2])->exists() ? 'yes' : 'no';
+        $deliveryMashkor = $restaurant_model->mashkor_branch_id ? 'yes' : 'no' ;
+        $deliveryArmada = $restaurant_model->armada_api_key ? 'yes' : 'no' ;
+        $storeLogo = $restaurant_model->logo ? $restaurant_model->getRestaurantLogoUrl() : 'false';
+
+        $segmentScript = "analytics.identify('". $restaurant_model->restaurant_uuid."', {
+            name: '". $storeName ."',
+            domain:'". $restaurant_model->restaurant_domain  ."',
+            phone:'". $ownerPhoneNumber  ."',
+            email: '".$agentEmail  ."',
+            plan: '". $planName ."',
+            logo: '". $storeLogo ."',
+            totalProducts: '". $restaurant_model->getItems()->count() ."',
+            totalOrders: '". $restaurant_model->getOrders()->count() ."',
+            tapAccountCreated: '". $tapAccountCreated ."',
+            paymentCash: '". $paymentCash ."',
+            paymentKNET: '". $paymentKNET ."',
+            paymentCreditcard: '". $paymentCreditcard ."',
+            paymentMada: 'no',
+            deliveryMashkor: '".  $deliveryMashkor ."',
+            deliveryArmada: '".  $deliveryArmada ."',
+          });
+       ";
+
+           if( Yii::$app->session->getFlash('storeCreated')){
+             $storeConversionParams  = "analytics.track('Store Conversion',{});";
+           }
+
+        } ?>
+
+
+
+    <script>
+      !function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId","addDestinationMiddleware"];analytics.factory=function(e){return function(){var t=Array.prototype.slice.call(arguments);t.unshift(e);analytics.push(t);return analytics}};for(var e=0;e<analytics.methods.length;e++){var key=analytics.methods[e];analytics[key]=analytics.factory(key)}analytics.load=function(key,e){var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.src="https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);analytics._loadOptions=e};analytics.SNIPPET_VERSION="4.13.1";
+      analytics.load("2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5");
+      <?= $segmentScript ?>
+      analytics.page();
+      <?=  $storeConversionParams ?>
+      }}();
+    </script>
+    
     <?php $this->endBody() ?>
 
 </body>

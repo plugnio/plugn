@@ -3447,7 +3447,7 @@ _:-ms-lang(x), .toast-bs-container {
   color : rgba(0, 0, 0, 0.6);
   background-color : #F0F0F0;
   margin-left : 0;
-  font-size : 1rem;
+  font-size : 0.85rem;
   font-weight : 700;
 }
 .pagination .page-item .page-link i {
@@ -3494,6 +3494,9 @@ _:-ms-lang(x), .toast-bs-container {
 .pagination .page-item:last-child:not(.next-item) .page-link {
   border-top-right-radius : 1.428rem;
   border-bottom-right-radius : 1.428rem;
+}
+.pagination  {
+justify-content: center !important;
 }
 
 .pagination.pagination-lg .page-item .page-link {

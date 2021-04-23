@@ -36,10 +36,17 @@ $(function () {
 });
 ";
 $this->registerJs($js);
+$this->registerCss("
+  #DataTables_Table_0_filter{
+    display:none !important
+  }
+  ");
 ?>
 
 <section id="data-list-view" class="data-list-view-header">
 
+
+      <?php  echo $this->render('_search', ['model' => $searchModel,'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
 
     <?php if ($dataProvider->getCount() > 0) { ?>
 
@@ -217,10 +224,18 @@ $this->registerJs($js);
                         ],
                     ],
                 ],
-                'layout' => '{summary}{items}{pager}',
-                'tableOptions' => ['class' => 'table data-list-view'],
-            ]);
-            ?>
+            ],
+            'layout' => '{summary}{items}{pager}',
+            'pager' => [
+              'maxButtonCount' => 7,
+              'prevPageLabel' => 'Previous',
+              'nextPageLabel' => 'Next',
+              'prevPageCssClass' => 'paginate_button page-item previous',
+              'nextPageCssClass' => 'paginate_button page-item next',
+          ],
+            'tableOptions' => ['class' => 'table data-list-view'],
+        ]);
+        ?>
 
         </div>
         <!-- DataTable ends -->

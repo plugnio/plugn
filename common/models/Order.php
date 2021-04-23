@@ -829,14 +829,41 @@ class Order extends \yii\db\ActiveRecord {
                 $this->estimated_time_of_arrival =  !$insert ? date('Y-m-d H:i:s', strtotime($this->order_created_at)) : date('Y-m-d H:i:s');
             }
 
-        if($this->orderItems){
-          foreach ($this->orderItems as $key => $orderItem) {
+        // if($this->orderItems){
+        //   foreach ($this->orderItems as $key => $orderItem) {
+        //
+        //     if($orderItem->item_uuid && $orderItem->item->prep_time){
+        //       $this->estimated_time_of_arrival = date("c", strtotime('+' . $orderItem->item->prep_time  . ' ' . $orderItem->item->timeUnit,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+        //     }
+        //   }
+        // }
 
-            if($orderItem->item_uuid && $orderItem->item->prep_time){
-              $this->estimated_time_of_arrival = date("c", strtotime('+' . ($orderItem->item->prep_time * $orderItem->qty) . ' ' . $orderItem->item->timeUnit,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+
+        if($this->orderItems){
+
+            $maxPrepTime = 0;
+
+            foreach ($this->orderItems as $key => $orderItem) {
+
+                if($orderItem->item_uuid && $orderItem->item->prep_time){
+
+                    if($orderItem->item->prep_time_unit == Item::TIME_UNIT_MIN)
+                      $prep_time  = intval($orderItem->item->prep_time) ;
+                    else if($orderItem->item->prep_time_unit == Item::TIME_UNIT_HRS)
+                      $prep_time =  intval($orderItem->item->prep_time) * 60;
+                    else if($orderItem->item->prep_time_unit == Item::TIME_UNIT_DAY)
+                      $prep_time =  intval($orderItem->item->prep_time) * 24 * 60;
+
+                      if($prep_time  >=  $maxPrepTime)
+                        $maxPrepTime = $prep_time;
+                }
+
             }
-          }
+
+            $this->estimated_time_of_arrival = date("c", strtotime('+' . $maxPrepTime  . ' min' ,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+
         }
+
       }
 
 
