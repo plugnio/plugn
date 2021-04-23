@@ -211,6 +211,11 @@ $this->registerCss("
     width: 1.125rem;
 }
 
+@media only screen and (min-width:750px) {
+  .card{
+    width:70%;
+  }
+}
   ");
 ?>
 
@@ -220,7 +225,7 @@ $this->registerCss("
 
 
     <!-- DataTable starts -->
-    <div class="card table-responsive" style="width:70%">
+    <div class="card table-responsive" >
 
         <div class="card-body" >
 
