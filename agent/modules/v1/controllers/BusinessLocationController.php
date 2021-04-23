@@ -7,9 +7,9 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use common\models\Voucher;
+use common\models\BusinessLocation;
 
-class VoucherController extends Controller {
+class BusinessLocationController extends Controller {
 
     public function behaviors() {
         $behaviors = parent::behaviors();
@@ -61,7 +61,7 @@ class VoucherController extends Controller {
 
 
     /**
-    * Get all store's Vouchers
+    * Get all store's branches
      * @param type $id
      * @param type $store_uuid
      * @return type
@@ -70,13 +70,13 @@ class VoucherController extends Controller {
 
       if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
-          $vouchers =  Voucher::find()
+          $businessLocations =  BusinessLocation::find()
                     ->where(['restaurant_uuid' => $store_uuid])
                     ->asArray()
                     ->all();
 
 
-          if (!$vouchers) {
+          if (!$businessLocations) {
               return [
                   'operation' => 'error',
                   'message' => 'No results found'
@@ -85,7 +85,7 @@ class VoucherController extends Controller {
 
           return [
               'operation' => 'success',
-              'body' => $vouchers
+              'body' => $businessLocations
           ];
 
       }
@@ -93,39 +93,39 @@ class VoucherController extends Controller {
     }
 
 
-      /**
-      * Return Voucher detail
-       * @param type $store_uuid
-       * @param type $order_uuid
-       * @return type
-       */
-      public function actionDetail($store_uuid, $voucher_id) {
+    /**
+    * Return Business Location detail
+     * @param type $store_uuid
+     * @param type $order_uuid
+     * @return type
+     */
+    public function actionDetail($store_uuid, $business_location_id) {
 
-        if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
-          $voucher =  Voucher::find()
-                    ->where(['restaurant_uuid' => $store_uuid])
-                    ->andWhere(['voucher_id' => $voucher_id])
-                    ->asArray()
-                    ->one();
+        $businessLocation =  BusinessLocation::find()
+                  ->where(['restaurant_uuid' => $store_uuid])
+                  ->andWhere(['business_location_id' => $business_location_id])
+                  ->with('deliveryZones')
+                  ->asArray()
+                  ->one();
 
 
-            if (!$voucher) {
+          if (!$businessLocation) {
 
-                return [
-                    'operation' => 'error',
-                    'message' => 'No results found.'
-                ];
-            }
+              return [
+                  'operation' => 'error',
+                  'message' => 'No results found.'
+              ];
+          }
 
-            return [
-                'operation' => 'success',
-                'body' => $voucher
-            ];
+          return [
+              'operation' => 'success',
+              'body' => $businessLocation
+          ];
 
-        }
+      }
 
-    }
-
+  }
 
 }
