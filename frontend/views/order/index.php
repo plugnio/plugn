@@ -36,9 +36,24 @@ $(function () {
 });
 ";
 $this->registerJs($js);
+
+
 $this->registerCss("
-  #DataTables_Table_0_filter{
+  #DataTables_Table_0_filter, #DataTables_Table_0_paginate{
     display:none !important
+  }
+  .pagination{
+    justify-content: center !important;
+    margin-top: 1rem !important;
+    padding-bottom: 7px !important;
+
+    margin: 2px 0 !important;
+white-space: nowrap !important;
+  }
+  .page-link{
+    font-size:0.85rem !important;
+    font-weight: 700;
+    padding: 0.65rem 0.911rem;
   }
   ");
 ?>
@@ -224,16 +239,16 @@ $this->registerCss("
                         ],
                     ],
                 ],
-            ],
-            'layout' => '{summary}{items}{pager}',
-            'pager' => [
-              'maxButtonCount' => 7,
-              'prevPageLabel' => 'Previous',
-              'nextPageLabel' => 'Next',
-              'prevPageCssClass' => 'paginate_button page-item previous',
-              'nextPageCssClass' => 'paginate_button page-item next',
-          ],
-            'tableOptions' => ['class' => 'table data-list-view'],
+                'layout' => '{summary}{items}{pager}',
+                'pager' => [
+                  'maxButtonCount' => 7,
+                  'prevPageLabel' => 'Previous',
+                  'nextPageLabel' => 'Next',
+                  'prevPageCssClass' => 'paginate_button page-item previous',
+                  'nextPageCssClass' => 'paginate_button page-item next',
+              ],
+                'tableOptions' => ['class' => 'table data-list-view'],
+
         ]);
         ?>
 

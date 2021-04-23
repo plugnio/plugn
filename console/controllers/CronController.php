@@ -47,7 +47,8 @@ class CronController extends \yii\console\Controller {
       foreach ($workingHours as $key => $workingHour) {
         $workingHour->delete();
       }
-
+      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
+      return self::EXIT_CODE_NORMAL;
   }
 
 

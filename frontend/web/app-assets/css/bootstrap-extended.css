@@ -3496,7 +3496,7 @@ _:-ms-lang(x), .toast-bs-container {
   border-bottom-right-radius : 1.428rem;
 }
 .pagination  {
-justify-content: center !important;
+  justify-content: center !important;
 }
 
 .pagination.pagination-lg .page-item .page-link {

@@ -239,70 +239,70 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
     }
 
-    public function getDeliveryTimes($delivery_time, $date, $startTime) {
-
-        $time_interval = [];
-
-
-        $opening_hrs = OpeningHour::find()
-          ->where(['restaurant_uuid' => $this->restaurant_uuid])
-          ->andWhere(['day_of_week' => date('w' , strtotime($startTime))])
-          ->orderBy(['open_at' => SORT_ASC])
-          ->all();
-
-
-
-          $i = 0;
-          foreach ($opening_hrs as $key => $model) {
-
-
-            while ( date('H:i A', strtotime($startTime)) >= date('H:i A', strtotime($model->open_at)) && date('H:i A', strtotime($startTime)) <= date('H:i A', strtotime($model->close_at)) ) {
-
-
-              echo  date('H:i A', strtotime($startTime))  .'Open =>>'.  date('H:i A', strtotime($model->open_at)) .'Close =>>'.  date('H:i A', strtotime($model->close_at)) . "\r\n";
-
-
-            $endTime = date('c', strtotime($startTime) + intval($this->restaurant->schedule_interval) * 60);
-
-
-            if ($this->day_of_week == date('w', strtotime("today")) && date('c', strtotime("now")) < date('c', strtotime($startTime))) {
-
-              if( date('c',strtotime($startTime))  >  date('c', strtotime("now") + (intval($delivery_time) * 60)) ){
-                array_push($time_interval, [
-                    'date' =>  $date,
-                    'start_time' =>  date('c', strtotime($startTime)) ,
-                    'end_time' =>   date('c' , strtotime($endTime))
-                ]);
-              }
-
-            } else if ($this->day_of_week != date('w', strtotime("today")) ) {
-
-
-                  $time_interval[$i] = [
-                    'date' =>  $date,
-                    'start_time' =>  date('c', strtotime($startTime)) ,
-                    'end_time' =>   date('c' , strtotime($endTime))
-                  ];
-
-
-            }
-
-
-
-            if (date("Y/m/d", strtotime($startTime) + intval($this->restaurant->schedule_interval) * 60) != date("Y/m/d", strtotime($startTime)))
-                break;
-
-
-            $startTime = date('c', strtotime($startTime) + intval($this->restaurant->schedule_interval) * 60);
-
-
-$i++;
-        }
-        }
-
-
-        return $time_interval;
-    }
+//     public function getDeliveryTimes($delivery_time, $date, $startTime) {
+//
+//         $time_interval = [];
+//
+//
+//         $opening_hrs = OpeningHour::find()
+//           ->where(['restaurant_uuid' => $this->restaurant_uuid])
+//           ->andWhere(['day_of_week' => date('w' , strtotime($startTime))])
+//           ->orderBy(['open_at' => SORT_ASC])
+//           ->all();
+//
+//
+//
+//           $i = 0;
+//           foreach ($opening_hrs as $key => $model) {
+//
+//
+//             while ( date('H:i A', strtotime($startTime)) >= date('H:i A', strtotime($model->open_at)) && date('H:i A', strtotime($startTime)) <= date('H:i A', strtotime($model->close_at)) ) {
+//
+//
+//               echo  date('H:i A', strtotime($startTime))  .'Open =>>'.  date('H:i A', strtotime($model->open_at)) .'Close =>>'.  date('H:i A', strtotime($model->close_at)) . "\r\n";
+//
+//
+//             $endTime = date('c', strtotime($startTime) + intval($this->restaurant->schedule_interval) * 60);
+//
+//
+//             if ($this->day_of_week == date('w', strtotime("today")) && date('c', strtotime("now")) < date('c', strtotime($startTime))) {
+//
+//               if( date('c',strtotime($startTime))  >  date('c', strtotime("now") + (intval($delivery_time) * 60)) ){
+//                 array_push($time_interval, [
+//                     'date' =>  $date,
+//                     'start_time' =>  date('c', strtotime($startTime)) ,
+//                     'end_time' =>   date('c' , strtotime($endTime))
+//                 ]);
+//               }
+//
+//             } else if ($this->day_of_week != date('w', strtotime("today")) ) {
+//
+//
+//                   $time_interval[$i] = [
+//                     'date' =>  $date,
+//                     'start_time' =>  date('c', strtotime($startTime)) ,
+//                     'end_time' =>   date('c' , strtotime($endTime))
+//                   ];
+//
+//
+//             }
+//
+//
+//
+//             if (date("Y/m/d", strtotime($startTime) + intval($this->restaurant->schedule_interval) * 60) != date("Y/m/d", strtotime($startTime)))
+//                 break;
+//
+//
+//             $startTime = date('c', strtotime($startTime) + intval($this->restaurant->schedule_interval) * 60);
+//
+//
+// $i++;
+//         }
+//         }
+//
+//
+//         return $time_interval;
+//     }
 
     /**
      * Gets query for [[RestaurantUu]].

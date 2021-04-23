@@ -24,12 +24,12 @@ $(document).ready(function() {
       sLengthMenu: "_MENU_",
       sSearch: ""
     },
-    aLengthMenu: [[5, 10, 15, 20, 50, 100], [5, 10, 15, 20, 50, 100]],
+    aLengthMenu: [[5, 10, 15, 20, 50], [5, 10, 15, 20, 50]],
     select: {
       style: "multi"
     },
     bInfo: false,
-    pageLength: 20,
+    pageLength: 50,
     buttons: [
       // {
       //   text: "<i class='feather icon-plus'></i> Add New",
