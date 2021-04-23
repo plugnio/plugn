@@ -10,6 +10,52 @@ use common\models\OpeningHour;
 
 
 $js = "
+
+
+
+    $( '.pickatime-open-at').pickatime({
+      min: [00,00],
+      max: [23,00],
+      format: 'H:i',
+      formatLabel: 'H:i',
+      formatSubmit: 'H:i',
+      hiddenPrefix: 'prefix__',
+      hiddenSuffix: '__suffix'
+    });
+    $( '.pickatime-close-at').pickatime({
+        min: [00,30],
+        max: [23,30],
+        format: 'H:i',
+        formatLabel: 'H:i',
+        formatSubmit: 'H:i',
+        hiddenPrefix: 'prefix__',
+        hiddenSuffix: '__suffix'
+      });
+      $('.picker').css('position', 'inherit');
+      $('thead').hide();
+      $('.top').hide();
+      $('.bottom').hide();
+      $('.form-group').css('margin', '0px');
+      $('#open24Hrs').change(function(e){
+      $.each([ 1,2,3,4,5,6,7], function( index, value ) {
+        document.getElementById('OpenTime'+index).value = '00:00';
+        document.getElementById('CloseTime'+index).value = '23:59';
+      });
+    });
+    $('#dailyOpenTime').change(function(e){
+      $.each([ 1,2,3,4,5,6,7], function( index, value ) {
+        document.getElementById('OpenTime'+index).value = e.target.value ;
+      });
+    });
+    $('#dailyCloseTime').change(function(e){
+      $.each([ 1,2,3,4,5,6,7], function( index, value ) {
+        document.getElementById('CloseTime'+index).value = e.target.value ;
+      });
+    });
+
+
+
+
     $('.delete-button').click(function() {
 
     var detail = $(this).closest('.receipt-detail');
@@ -43,6 +89,9 @@ $js = "
 $this->registerJs($js);
 
 $this->registerCss("
+.picker__holder{
+      z-index: 99999999;
+}
 .custom-switch.switch-lg .custom-control-label::before , .custom-control-input:checked ~ .custom-control-label::before{
       background-color: #28C76F !important;
   }
@@ -132,17 +181,19 @@ $this->registerCss("
                               <?= Html::activeHiddenInput($modelDetail, "[$i]opening_hour_id") ?>
                               <?= Html::activeHiddenInput($modelDetail, "[$i]updateType", ['class' => 'update-type']) ?>
                               <div class="VHnWVc gEG0eb">
-                                <?= $form->field($modelDetail, "[$i]open_at" )->textInput([
-                                  'type' => 'time',
-                                  'id'=> 'openAt-' . $i,
-                                  'style'=>'position: initial;'
-                                  ])->label('Open time'); ?>
+
+
+                                  <?= $form->field($modelDetail, "[$i]open_at" )
+                                  ->textInput(['class' => 'form-control pickatime-open-at', 'style'=>'position: initial;','id' =>'OpenTime'.$i])->label('Open time'); ?>
+
+
+
                               </div>
                               <div class="VHnWVc gEG0eb">
-                                <?= $form->field($modelDetail, "[$i]close_at" )->textInput([
-                                  'type' => 'time',
-                                  'id'=>'dailyOpenTime',
-                                  'style'=>'position: initial;'])->label('Close time'); ?>
+
+                                  <?= $form->field($modelDetail, "[$i]close_at" )
+                                  ->textInput(['class' => 'form-control pickatime-close-at', 'style'=>'position: initial;','id' =>'CloseTime'.$i])->label('Close time'); ?>
+
                               </div>
                               <span  class="KwjGFb gEG0eb">
                                 <?= Html::button('x', ['class' => 'delete-button VfPpkd-Bz112c-LgbsSe yHy1rc eT1oJ ', 'data-target' => "receipt-detail-$i"]) ?>

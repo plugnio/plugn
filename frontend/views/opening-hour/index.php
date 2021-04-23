@@ -348,33 +348,6 @@ $this->registerCss("
                </ul>
 
 
-               <div class="kydvwe">
-                  <div jsaction="JIbuQc:kjnbtb">
-                     <div class="VfPpkd-dgl2Hf-ppHlrf-sM5MNb" data-is-touch-wrapper="true">
-
-
-                        <?=
-                          Html::a(
-                                  '<div style="padding-top: 10px;">
-                                  <span class="VfPpkd-kBDsod" aria-hidden="true">
-                                        <svg height="18" width="18" class="ME7jKf " style="  vertical-align: inherit;
-                                          fill: white !important;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                           <path fill-rule="evenodd" clip-rule="evenodd" d="M14.916 3.586a2 2 0 012.828 0l2.672 2.671a2 2 0 010 2.829l-.817.816-.013.014L8.5 21.002H3v-5.5l9.33-9.33 2.586-2.586zm-1.172 4L5 16.33v2.672h2.672l8.744-8.745-2.672-2.671z"></path>
-                                        </svg>
-                                    </span>
-                                    <span >Edit Hours</span>
-                                  </div>',
-                                    ['edit-hours', 'storeUuid' => $storeUuid, 'dayOfWeek' => $dayOfWeek],
-                                    ['class' => 'VfPpkd-LgbsSe VfPpkd-LgbsSe-OWXEXe-k8QpJ VfPpkd-LgbsSe-OWXEXe-dgl2Hf  AjY5Oe']
-                              );
-                        ?>
-
-
-
-
-                      </div>
-                  </div>
-               </div>
                <!-- <div class="sFI1Df">
                   <hr aria-hidden="true" class="KzUZ2b">
                </div> -->

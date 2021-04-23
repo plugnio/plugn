@@ -179,8 +179,9 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
             foreach ($getWorkingHours as $key => $workingHours) {
 
-              $startAt = date('c', strtotime($workingHours->open_at, strtotime($selectedDate) ));
+              $startAt = date('c', strtotime($workingHours->open_at, strtotime($currentDate) ));
 
+              
               // if($key == 0 )
               //     $startAt = date('c', strtotime("+". intval($store->schedule_interval)  . " min" ,strtotime($startAt)) );
 
