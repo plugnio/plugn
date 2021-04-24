@@ -156,6 +156,12 @@ $this->registerCss("
     display: flex;
     flex: 1;
 }
+
+  .VHnWVc{
+    width:40% !important;
+}
+
+
   ");
 
 
@@ -168,7 +174,7 @@ $this->registerCss("
           'enableClientValidation' => false
       ]); ?>
 
-      <div class="card table-responsive">
+      <div class="card">
         <div class="card-body">
 
 
