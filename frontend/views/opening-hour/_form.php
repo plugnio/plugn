@@ -168,7 +168,7 @@ $this->registerCss("
           'enableClientValidation' => false
       ]); ?>
 
-      <div class="card">
+      <div class="card table-responsive">
         <div class="card-body">
 
 
