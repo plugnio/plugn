@@ -284,7 +284,7 @@ class MyFatoorahPayment extends Component
           "SupplierName" => $store->company_name,
           "Mobile" => $store_phone_number,
           "Email" =>  $store->owner_email,
-          "CommissionPercentage" => "5",
+          "CommissionPercentage" => $store->platform_fee,
           "DepositTerms" => "Daily",
           "iban" => $store->iban,
           "IsActive" => "true"
@@ -295,6 +295,41 @@ class MyFatoorahPayment extends Component
         $response = $client->createRequest()
                 ->setMethod('POST')
                 ->setUrl($createSupplierEndpoint)
+                ->setData($supplierParams)
+                ->addHeaders([
+                    'authorization' => 'Bearer ' . $this->apiKey,
+                    'content-type' => 'application/json',
+                ])
+                ->send();
+
+        return $response;
+    }
+
+    /**
+     * Edit  Supplier
+     * @param type $restaurant
+     * @return type
+     */
+    public function editSupplier($store)
+    {
+        $editSupplierEndpoint = $this->apiEndpoint . "/EditSupplier";
+
+        $store_phone_number =  str_replace(' ','',(str_replace('+', '00',$store->owner_number)));
+
+        $supplierParams = [
+          "SupplierCode" => $store->supplierCode,
+          "SupplierName" => $store->company_name,
+          "Mobile" => $store_phone_number,
+          "Email" =>  $store->owner_email,
+          "CommissionValue" => $store->platform_fee,
+          "IsActive" => "true"
+        ];
+
+
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setMethod('POST')
+                ->setUrl($editSupplierEndpoint)
                 ->setData($supplierParams)
                 ->addHeaders([
                     'authorization' => 'Bearer ' . $this->apiKey,

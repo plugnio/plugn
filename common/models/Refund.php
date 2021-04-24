@@ -100,7 +100,7 @@ class Refund extends \yii\db\ActiveRecord
         // Look for refund with same refund_reference
         $refundRecord = \common\models\Refund::findOne(['refund_reference' => $refundReference]);
         if (!$refundRecord) {
-            throw new NotFoundHttpException('The requested refund does not exist in our database.');
+            throw new yii\web\NotFoundHttpException('The requested refund does not exist in our database.');
         }
 
         $refundRecord->refund_status = $responseContent['RefundStatus'];
