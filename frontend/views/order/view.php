@@ -878,6 +878,60 @@ DetailView::widget([
         </div>
     </div>
 
+
+
+    <?php
+         if ($model->recipient_name || $model->recipient_phone_number || $model->gift_message) {
+       ?>
+           <div class="card">
+               <div class="card-body">
+                   <h3>Gift details</h3>
+
+                   <div class="box-body table-responsive no-padding">
+
+                       <?=
+                       DetailView::widget([
+                           'model' => $model,
+                           'attributes' => [
+
+                               [
+                                   'attribute' => 'recipient_name',
+                                   "format" => "raw",
+                                   "value" => function($model) {
+                                       return $model->recipient_name;
+                                   },
+                                   'visible' => $model->recipient_name != null && $model->recipient_name,
+                               ],
+                               [
+                                   'attribute' => 'recipient_phone_number',
+                                   "format" => "raw",
+                                   "value" => function($model) {
+                                       return $model->recipient_phone_number;
+                                   },
+                                   'visible' => $model->recipient_phone_number != null && $model->recipient_phone_number,
+                               ],
+                               [
+                                   'attribute' => 'gift_message',
+                                   "format" => "raw",
+                                   "value" => function($model) {
+                                       return $model->gift_message;
+                                   },
+                                   'visible' => $model->gift_message != null && $model->gift_message,
+                               ],
+
+                           ],
+                           'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
+                       ])
+                       ?>
+                   </div>
+               </div>
+           </div>
+         <?php } ?>
+
+
+
+
+
 </div>
 
 </div>
