@@ -914,7 +914,7 @@ DetailView::widget([
                                    'attribute' => 'gift_message',
                                    "format" => "raw",
                                    "value" => function($model) {
-                                       return $model->gift_message;
+                                     return '<span style="    white-space: normal;">' .$model->gift_message . '</span>';
                                    },
                                    'visible' => $model->gift_message != null && $model->gift_message,
                                ],
