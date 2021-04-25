@@ -72,6 +72,7 @@ class DeliveryZoneController extends Controller {
       if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
         $deliveryZone =  DeliveryZone::find()
+                  ->with('areas')
                   ->where(['restaurant_uuid' => $store_uuid])
                   ->andWhere(['business_location_id' => $business_location_id])
                   ->andWhere(['delivery_zone_id' => $delivery_zone_id])
