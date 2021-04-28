@@ -431,6 +431,35 @@ class OrderController extends Controller {
 
                             Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
 
+                            $initiatePayment = Yii::$app->myFatoorahPayment->initiatePayment($order->total_price, $order->currency->code);
+                            $initiatePaymentResponse = json_decode($initiatePayment->content);
+
+                            if (!$initiatePaymentResponse->IsSuccess) {
+                                $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
+                                \Yii::error($errorMessage, __METHOD__); // Log error faced by user
+
+
+                                return [
+                                    'operation' => 'error',
+                                    'message' =>  $errorMessage
+                                ];
+                            }
+
+                            $paymentMethodId = null;
+                            foreach ($initiatePaymentResponse->Data->PaymentMethods as $key => $paymentMethod) {
+
+                              if($order->paymentMethod->payment_method_code == $paymentMethod->PaymentMethodCode)
+                                $paymentMethodId = $paymentMethod->PaymentMethodId;
+                                
+                            }
+
+                            if($paymentMethodId == null){
+                              return [
+                                  'operation' => 'error',
+                                  'message' =>  'This payment method is not supported'
+                              ];
+                            }
+
                             $response = Yii::$app->myFatoorahPayment->createCharge(
                                     $order->currency->code,
                                     $order->total_price,
@@ -441,14 +470,13 @@ class OrderController extends Controller {
                                     Url::to(['order/my-fatoorah-callback'], true),   // TODO
                                     $order->order_uuid,
                                     $restaurant_model->supplierCode,
-                                    1
+                                    $paymentMethodId
                             );
 
-                            $responseContent = json_decode($response->content);
-
+                              $responseContent = json_decode($response->content);
 
                                 if (!$responseContent->IsSuccess) {
-                                    $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
+                                    $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors[0]->Error) :  $responseContent->Message;
                                     \Yii::error($errorMessage, __METHOD__); // Log error faced by user
 
 

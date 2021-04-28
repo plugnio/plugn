@@ -28,6 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'payment_method_name',
             'payment_method_name_ar',
+            'payment_method_code',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

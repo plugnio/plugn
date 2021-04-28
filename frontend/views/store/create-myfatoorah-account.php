@@ -322,7 +322,11 @@ $this->registerJs($js);
         </div>
     </div>
 
-    <div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px; padding-bottom: 15px; background:#f4f6f9 ">
+    <span>
+      By signing up you agree with MyFatoorah's <a href="https://portal.myfatoorah.com/En/KWT/Home/TermsAndConditions" target="_blank">Terms And Conditions</a>
+    </span>
+
+    <div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px;  margin-top: 20px; padding-bottom: 15px; background:#f4f6f9 ">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'id' =>'submitBtn', 'style' => 'width: 100%;height: 50px;']) ?>
 
 

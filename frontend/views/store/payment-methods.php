@@ -291,7 +291,7 @@ $interval = $today->diff($expiry);
             <?php if (!$model->is_tap_enable && !$model->is_myfatoorah_enable) { ?>
             <?php
             if (!$model->tap_queue_id)
-                echo Html::a('Create Tap account', ['create-tap-account', 'id' => $model->restaurant_uuid,'paymentGateway' => 'tap'], ['class' => 'btn btn-success']);
+                echo Html::a('Create Tap account', ['create-payment-gateway-account', 'id' => $model->restaurant_uuid,'paymentGateway' => 'tap'], ['class' => 'btn btn-success']);
             else
                 echo "<h5>Your TAP payments account will be ready within 24 hours. We'll email you once it's ready</h5>";
             ?>

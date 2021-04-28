@@ -389,6 +389,35 @@ class MyFatoorahPayment extends Component
   }
 
 
+      /**
+       * retrieve all available and enabled Payment Methods spplier your portal account
+       * with the commission charge that the customer may pay on the gateway.
+       * @param  string $chargeId
+       */
+      public function initiatePayment($amount, $currencyCode)
+      {
+
+          $initiatePaymentParams = [
+            "InvoiceAmount" => $amount,
+            "CurrencyIso" => $currencyCode
+          ];
+
+          $client = new Client();
+          $response = $client->createRequest()
+                  ->setMethod('POST')
+                  ->setUrl($this->apiEndpoint . "/InitiatePayment")
+                  ->setData($initiatePaymentParams)
+                  ->addHeaders([
+                      'authorization' => 'Bearer ' . $this->apiKey,
+                      'content-type' => 'application/json',
+                  ])
+                  ->send();
+
+          return $response;
+      }
+
+
+
     /**
    * Make a Refund
    */

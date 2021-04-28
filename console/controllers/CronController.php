@@ -13,6 +13,7 @@ use common\models\BankDiscount;
 use common\models\Payment;
 use common\models\Item;
 use common\models\City;
+use common\models\PaymentMethod;
 use common\models\Refund;
 use common\models\Plan;
 use common\models\Area;
@@ -46,7 +47,7 @@ class CronController extends \yii\console\Controller {
           $paymentGatewayQueueModel = new PaymentGatewayQueue();
           $paymentGatewayQueueModel->restaurant_uuid = $queue->restaurant_uuid;
           $paymentGatewayQueueModel->payment_gateway = 'tap';
-          $paymentGatewayQueueModel->queue_status = $queue->queue_status;
+          $paymentGatewayQueueModel->queue_status = 3;
           $paymentGatewayQueueModel->queue_created_at = $queue->queue_created_at;
           $paymentGatewayQueueModel->queue_updated_at = $queue->queue_updated_at;
           $paymentGatewayQueueModel->queue_start_at = $queue->queue_start_at;
@@ -57,6 +58,27 @@ class CronController extends \yii\console\Controller {
         foreach (Payment::find()->all() as $key => $payment) {
           $payment->payment_gateway_name = 'tap';
           $payment->save();
+        }
+
+        foreach (PaymentMethod::find()->all() as $key => $paymentMethod) {
+
+          if($paymentMethod->payment_method_id == 1){
+            $paymentMethod->payment_method_code = 'kn';
+          }
+          else if($paymentMethod->payment_method_id == 2){
+            $paymentMethod->payment_method_code = 'vm';
+          }
+          else if($paymentMethod->payment_method_id == 4){
+            $paymentMethod->payment_method_code = 'md';
+          }
+          else if($paymentMethod->payment_method_id == 5){
+            $paymentMethod->payment_method_code = 'b';
+          }
+
+
+          $paymentMethod->save();
+
+
         }
 
 
@@ -291,7 +313,7 @@ class CronController extends \yii\console\Controller {
                     ->all();
 
         foreach ($refunds as $refund) {
-  
+
                 $response = Yii::$app->myFatoorahPayment->makeRefund($refund->payment->payment_gateway_payment_id, $refund->refund_amount, $refund->reason, $refund->store->supplierCode);
 
                 $responseContent = json_decode($response->content);
