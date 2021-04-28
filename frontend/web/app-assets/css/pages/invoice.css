@@ -17,6 +17,12 @@
   border : 2px solid #F8F8F8;
 }
 
+
+.item th {
+  background-color : #333333 !important;
+  color: white !important;
+}
+
 @media print {
   body {
     font-size: 14pt;

@@ -23,20 +23,131 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 <!-- invoice functionality end -->
 <!-- invoice page -->
 <section class="card invoice-page">
+
+
     <div id="invoice-template" class="card-body">
         <!-- Invoice Company Details -->
         <div id="invoice-company-details" class="row">
-            <div class="col-12  ">
-                <div class="media " style="margin-bttom: 20px">
+            <div class="col-sm-6 col-12 text-left">
+                <div class="media " style="margin-bttom: 20px;     display: block;">
                     <?php if ($model->armada_qr_code_link) { ?>
                         <img src="<?= $model->armada_qr_code_link ?>" width="100" height="100" />
                     <?php } ?>
-                    <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: auto; margin-right: auto; display:block" />
+                    <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" />
+
+                </div>
+
+                <div style="margin-top:30px">
+                  <h3 class="invoice-logo"><?= $model->restaurant->name ?></h3>
+                  <!-- <p class="card-text mb-25">Office 149, 450 South Brand Brooklyn</p>
+                  <p class="card-text mb-25">San Diego County, CA 91905, USA</p>
+                  <p class="card-text mb-0">+1 (123) 456 7891, +44 (876) 543 2198</p> -->
+
+                  <?php
+                if($model->order_mode == Order::ORDER_MODE_DELIVERY){
+              ?>
+
+                <!-- <p class="card-text mb-25"> -->
+                  <?php
+                  // echo $model->customer_name
+                  ?>
+                <!-- </p> -->
+
+                <p class="card-text mb-25"  style="display: contents">
+                  <?= $model->area_id ? 'Block ' . $model->block : $model->address_2  ?>
+                </p>
+                <p class="card-text mb-25"  style="display: contents">
+                  <?= $model->area_id ? 'Street ' . $model->street : $model->postalcode . ' ' . $model->city  ?>
+                </p>
+
+                <?php
+              if($model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office'){
+            ?>
+
+                <div  style="display: block">
+                  <p class="card-text mb-25"  style="display: contents">
+                    <?= $model->area_id && $model->avenue ? 'Avenue ' . $model->avenue : ''; ?>
+                  </p>
+
+                  <p class="card-text mb-25"  style="display: contents">
+                    <?= $model->area_id && $model->floor != null && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? 'Floor: ' . $model->floor : ''?>
+                  </p>
+                  <p class="card-text mb-25"  style="display: contents">
+                    <?=  $model->area_id && $model->apartment != null && $model->unit_type == 'Apartment' ? 'Apartment No. ' . $model->apartment : ''?>
+                  </p>
+                  <p class="card-text mb-25"  style="display: contents">
+                    <?=  $model->area_id && $model->office != null && $model->unit_type == 'Office'  ? 'Office No. ' . $model->office : ''?>
+                  </p>
+                  <p class="card-text mb-25"  style="display: contents">
+                    <?= $model->area_id ? ($model->unit_type == 'House' ? 'House No. ' : 'Building: ') . $model->house_number :  ''  ?>
+                  </p>
+
+                </div>
+                <?php } else { ?>
+                  <div  style="display: block">
+
+                    <p class="card-text mb-25"  style="display: contents">
+                      <?= $model->area_id && $model->avenue ? 'Avenue ' . $model->avenue : ''; ?>
+                    </p>
+                    <p class="card-text mb-25"  style="display: contents">
+                      <?= $model->area_id ? ($model->unit_type == 'House' ? 'House No. ' : 'Building: ') . $model->house_number :  ''  ?>
+                    </p>
+                    <p class="card-text mb-25" style="display: contents">
+                      <?= $model->address_1 ? $model->address_1 : ''  ?>
+                    </p>
+                    <p class="card-text mb-25" style="display: contents">
+                      <?= $model->address_2 ? $model->address_2 : ''  ?>
+                    </p>
+
+                  </div>
+              <?php } ?>
+
+                <div  style="display: block">
+                  <p class="card-text mb-25" style="display: contents">
+                    <?= $model->area_id ? $model->area_name .', ' : $model->address_1  ?>
+                  </p>
+                    <p class="card-text mb-25"  style="display: contents">
+                      <?= $model->area_id ?  $model->area->city->city_name  :  '' ?>
+                    </p>
+                    <p class="card-text mb-25"  style="display: block">
+                       <?=  $model->country_name ? $model->country_name : ''; ?>
+                    </p>
+                    <p class="card-text mb-25"  style="display: block">
+                      <?=  $model->customer_phone_number  ?>
+                    </p>
+                </div>
+
+
+
+                <?php
+              } else {
+                ?>
+                <h6 class="mt-2">Customer</h6>
+                  <p class="card-text mb-25">
+                    <?=  $model->customer_name ?>
+                  </p>
+                  <span style="display: block" >
+                    <?=  $model->customer_phone_number ?>
+                  </p>
+              <?php } ?>
+
+
 
                 </div>
             </div>
             <div class="col-sm-6 col-12 text-right">
-
+              <h4 class="invoice-title">
+                  Invoice
+                  <span class="invoice-number">#3492</span>
+              </h4>
+              <div class="invoice-date-wrapper">
+                  <p class="invoice-date-title">Date Issued:</p>
+                  <p class="invoice-date">25/08/2020</p>
+              </div>
+              <div class="invoice-date-wrapper">
+                  <p class="invoice-date-title">Due Date:</p>
+                  <p class="invoice-date">29/08/2020</p>
+              </div>
             </div>
         </div>
         <!--/ Invoice Company Details -->
@@ -249,7 +360,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                             ],
                         ],
                         'layout' => '{items}',
-                        'tableOptions' => ['class' => 'table table-bordered table-hover'],
+                        'tableOptions' => ['class' => 'table table-bordered table-hover item'],
                     ]);
                     ?>
                 </div>
