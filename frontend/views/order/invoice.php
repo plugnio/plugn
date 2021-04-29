@@ -136,180 +136,96 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                 </div>
             </div>
             <div class="col-sm-6 col-12 text-right">
-              <h4 class="invoice-title">
-                  Invoice
-                  <span class="invoice-number">#3492</span>
-              </h4>
+              <h2 class="invoice-title">
+                  <b>INVOCE</b>
+              </h2>
               <div class="invoice-date-wrapper">
-                  <p class="invoice-date-title">Date Issued:</p>
-                  <p class="invoice-date">25/08/2020</p>
+                  <p class="invoice-date-title"><b># INV-<?= $model->order_uuid  ?></b></p>
               </div>
               <div class="invoice-date-wrapper">
-                  <p class="invoice-date-title">Due Date:</p>
-                  <p class="invoice-date">29/08/2020</p>
+                  <p class="invoice-date-title">Balance Due</p>
+                  <h5 class="invoice-date">
+                    <b>
+                     <?= Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
+                   </b>
+                 </h5>
               </div>
             </div>
         </div>
         <!--/ Invoice Company Details -->
 
         <!-- Invoice Recipient Details -->
-        <div id="invoice-customer-details" class="row pt-2">
+        <div id="invoice-company-details" class="row">
             <div class="col-sm-6 col-12 text-left">
+              <h3>Bill To</h3>
+            </div>
+            <div class="col-sm-6 col-12 text-right">
 
                 <div class="invoice-details my-2">
-                    <h6 class="mt-2">INVOICE NO.</h6>
-                    <p> <?= '#' . $model->order_uuid ?></p>
-                    <h6 class="mt-2">Payment Method</h6>
-                    <p>
-                        <?= $model->payment_method_name ?>
-                    </p>
+                    <div class="row">
+                      <div class="col-sm-4 col-12 text-left">
+                      </div>
+                      <div class="col-sm-4 col-12 text-left">
+                        <h6>Invoice Date</h6>
 
-                    <?php
-                      if($model->order_mode == Order::ORDER_MODE_DELIVERY){
-                    ?>
+                      </div>
+                      <div class="col-sm-4 col-12 text-right">
+                        <p>
+                          <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy h:mm a') ?>
+                        </p>
 
-                    <h6 class="mt-2">Shipping Address</h6>
-                      <span style="display: block; margin-bottom:3px" >
-                        <?=  $model->customer_name ?>
-                      </span>
-                      <span style="display: block" >
-                        <?php
-                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
-                              echo $model->area_id ? $model->area_name_ar : $model->address_1;
-                            }else {
-                              echo $model->area_id ? $model->area_name : $model->address_1;
-                            }
-                         ?>
-                      </span>
-                      <span style="display: block" >
-
-                        <?php
-                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
-                              echo $model->area_id ? 'قطعة: ' . $model->block : $model->address_2;
-                            }else {
-                              echo $model->area_id ? 'Block: ' . $model->block : $model->address_2;
-                            }
-                         ?>
-
-                      </span>
-                      <span style="display: block" >
-                        <?php
-                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
-                              echo $model->area_id ? 'شارع: ' . $model->street : $model->postalcode . ' ' . $model->city;
-                            }else {
-                              echo $model->area_id ? 'St: ' . $model->street : $model->postalcode . ' ' . $model->city;
-                            }
-                         ?>
-                      </span>
-                      <span style="display: block" >
-
-                        <?php
-                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
-                              echo $model->area_id && $model->avenue ? 'جادة: ' . $model->avenue : '';;
-
-                            }else {
-                              echo $model->area_id && $model->avenue ? 'Avenue: ' . $model->avenue : '';;
-
-                            }
-                         ?>
-
-                      </span>
-                      <span style="display: block" >
-
-                        <?php
-                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
-                              echo $model->area_id && $model->floor != null && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? 'الطابق: ' . $model->floor : '';
-                            }else {
-                              echo $model->area_id && $model->floor != null && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? 'Floor: ' . $model->floor : '';
-                            }
-                         ?>
-
-                      </span>
-                      <span style="display: block" >
-
-                        <?php
-                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
-                              echo $model->area_id && $model->apartment != null && $model->unit_type == 'Apartment' ? 'رقم الشقة: ' . $model->apartment : '';
-                            }else {
-                              echo $model->area_id && $model->apartment != null && $model->unit_type == 'Apartment' ? 'Apartment No. ' . $model->apartment : '';
-                            }
-                         ?>
-
-                      </span>
-                      <span style="display: block" >
-
-                        <?php
-                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
-                              echo $model->area_id && $model->office != null && $model->unit_type == 'Office'  ? 'رقم المكتب: ' . $model->office : '';
-                            }else {
-                              echo $model->area_id && $model->office != null && $model->unit_type == 'Office'  ? 'Office No. ' . $model->office : '';
-                            }
-                         ?>
+                      </div>
+                    </div>
 
 
-                      </span>
-                      <span style="display: block" >
-                        <?php
-                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
-                              // echo $model->area_id ? (($model->unit_type == 'House' ? ' البناية': ' رقم المنزل ') . $model->house_number :  '');
-                              echo $model->area_id ? ($model->unit_type == 'House' ? 'رقم المنزل: ' : 'البناية: ') . $model->house_number :  '';
+                </div>
+                <div class="invoice-details my-2">
+                    <div class="row">
+                      <div class="col-sm-4 col-12 text-left">
+                      </div>
+                      <div class="col-sm-4 col-12 text-left">
+                        <h6>Expected At</h6>
 
-                            }else {
-                              echo $model->area_id ? ($model->unit_type == 'House' ? 'House No. ' : 'Building: ') . $model->house_number :  '';
-                            }
-                         ?>
-                      </span>
-                      <span style="display: block" >
-                        <?= $model->area_id ?  $model->area->city->city_name :  '' ?>
-                      </span>
-                      <span style="display: block" >
-                        <?=  $model->country_name ? $model->country_name : ''; ?>
-                      </span>
-                      <span style="display: block" >
-                        <?=  $model->customer_phone_number  ?>
-                      </span>
-                      <?php
-                    } else {
-                      ?>
-                      <h6 class="mt-2">Customer</h6>
-                        <span style="display: block; margin-bottom:3px" >
-                          <?=  $model->customer_name ?>
-                        </span>
-                        <span style="display: block" >
-                          <?=  $model->customer_phone_number ?>
-                        </span>
-                    <?php } ?>
+                      </div>
+                      <div class="col-sm-4 col-12 text-right">
+                        <p>
+                          <?= \Yii::$app->formatter->asDatetime($model->estimated_time_of_arrival, 'MMM dd, yyyy h:mm a') ?>
+                        </p>
+
+                      </div>
+                    </div>
+
+
+                </div>
+                <div class="invoice-details my-2">
+                    <div class="row">
+                      <div class="col-sm-4 col-12 text-left">
+                      </div>
+                      <div class="col-sm-4 col-12 text-left">
+                        <h6>When</h6>
+
+                      </div>
+                      <div class="col-sm-4 col-12 text-right">
+                        <p>
+                          <p>  <?= $model->is_order_scheduled ? 'Scheduled' : 'As soon as possible'; ?> </p>
+                        </p>
+
+                      </div>
+                    </div>
+
+
                 </div>
 
             </div>
+        </div>
+
+
+        <div id="invoice-customer-details" class="row pt-2">
+
 
             <div class="col-sm-6 col-12 text-left">
-
-
-                <div class="invoice-details my-2">
-
-                    <h6 class="mt-2">Invoice Date</h6>
-                    <p>
-                        <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy h:mm a') ?>
-                    </p>
-
-                </div>
-                <div class="invoice-details my-2">
-
-                    <h6 class="mt-2">Expected At</h6>
-                    <p>
-                      <?= \Yii::$app->formatter->asDatetime($model->estimated_time_of_arrival, 'MMM dd, yyyy h:mm a') ?>
-                    </p>
-
-                </div>
-
-                <div class="invoice-details my-2">
-
-                    <h6 class="mt-2">When</h6>
-                      <p>  <?= $model->is_order_scheduled ? 'Scheduled' : 'As soon as possible'; ?> </p>
-
-                </div>
-
+            </div>
+            <div class="col-sm-6 col-12 text-left">
 
             </div>
 
