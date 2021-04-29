@@ -54,10 +54,10 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                 <!-- </p> -->
 
                 <p class="card-text mb-25"  style="display: contents">
-                  <?= $model->area_id ? 'Block ' . $model->block : $model->address_2  ?>
+                  <?= $model->area_id ? 'Block ' . $model->block : ''  ?>
                 </p>
                 <p class="card-text mb-25"  style="display: contents">
-                  <?= $model->area_id ? 'Street ' . $model->street : $model->postalcode . ' ' . $model->city  ?>
+                  <?= $model->area_id ? 'Street ' . $model->street : '' ?>
                 </p>
 
                 <?php
@@ -70,7 +70,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                   </p>
 
                   <p class="card-text mb-25"  style="display: contents">
-                    <?= $model->area_id && $model->floor != null && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? 'Floor: ' . $model->floor : ''?>
+                    <?= $model->area_id && $model->floor != null && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? 'Floor ' . $model->floor : ''?>
                   </p>
                   <p class="card-text mb-25"  style="display: contents">
                     <?=  $model->area_id && $model->apartment != null && $model->unit_type == 'Apartment' ? 'Apartment No. ' . $model->apartment : ''?>
@@ -78,8 +78,8 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                   <p class="card-text mb-25"  style="display: contents">
                     <?=  $model->area_id && $model->office != null && $model->unit_type == 'Office'  ? 'Office No. ' . $model->office : ''?>
                   </p>
-                  <p class="card-text mb-25"  style="display: contents">
-                    <?= $model->area_id ? ($model->unit_type == 'House' ? 'House No. ' : 'Building: ') . $model->house_number :  ''  ?>
+                  <p class="card-text mb-25"  style="display: block">
+                    <?= $model->area_id ? ($model->unit_type == 'House' ? 'House No. ' : 'Building ') . $model->house_number :  ''  ?>
                   </p>
 
                 </div>
@@ -104,10 +104,10 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
                 <div  style="display: block">
                   <p class="card-text mb-25" style="display: contents">
-                    <?= $model->area_id ? $model->area_name .', ' : $model->address_1  ?>
+                    <?= $model->area_id ? $model->area_name .', ' : '' ?>
                   </p>
                     <p class="card-text mb-25"  style="display: contents">
-                      <?= $model->area_id ?  $model->area->city->city_name  :  '' ?>
+                      <?= $model->area_id ?  $model->area->city->city_name  :  $model->city . ' ' . $model->postalcode  ?>
                     </p>
                     <p class="card-text mb-25"  style="display: block">
                        <?=  $model->country_name ? $model->country_name : ''; ?>
@@ -137,19 +137,12 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
             </div>
             <div class="col-sm-6 col-12 text-right">
               <h2 class="invoice-title">
-                  <b>INVOCE</b>
+                  <b>INVOICE</b>
               </h2>
               <div class="invoice-date-wrapper">
                   <p class="invoice-date-title"><b># INV-<?= $model->order_uuid  ?></b></p>
               </div>
-              <div class="invoice-date-wrapper">
-                  <p class="invoice-date-title">Balance Due</p>
-                  <h5 class="invoice-date">
-                    <b>
-                     <?= Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
-                   </b>
-                 </h5>
-              </div>
+
             </div>
         </div>
         <!--/ Invoice Company Details -->
@@ -157,22 +150,60 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
         <!-- Invoice Recipient Details -->
         <div id="invoice-company-details" class="row">
             <div class="col-sm-6 col-12 text-left">
-              <h3>Bill To</h3>
+
+
+
+              <div class="invoice-details my-2">
+                  <div class="row">
+
+                    <div class="col-sm-4 col-12 text-left">
+                      <span>
+                        <!-- <b>Bill To: </b> -->
+                        <span style="    padding-left: 10px;">
+                        </span>
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+              </div>
+
+              <div class="invoice-details my-2">
+                  <div class="row">
+
+                    <div class=" col-12 text-left">
+                      <span>
+                        <b>Customer: </b>
+                        <span style="    padding-left: 10px;">
+                          <?=  $model->customer_name ?>
+                        </span>
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+              </div>
+
+
             </div>
             <div class="col-sm-6 col-12 text-right">
 
                 <div class="invoice-details my-2">
                     <div class="row">
-                      <div class="col-sm-4 col-12 text-left">
+                      <div class="col-sm-1 col-12 text-left">
                       </div>
-                      <div class="col-sm-4 col-12 text-left">
-                        <h6>Invoice Date</h6>
+                      <div class="col-sm-5 col-12 text-left">
+                        <span><b>Invoice Date</b></span>
 
                       </div>
-                      <div class="col-sm-4 col-12 text-right">
-                        <p>
+                      <div class="col-sm-6 col-12 text-right">
+                        <span>
                           <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy h:mm a') ?>
-                        </p>
+                        </span>
 
                       </div>
                     </div>
@@ -181,34 +212,16 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                 </div>
                 <div class="invoice-details my-2">
                     <div class="row">
-                      <div class="col-sm-4 col-12 text-left">
+                      <div class="col-sm-1 col-12 text-left">
                       </div>
-                      <div class="col-sm-4 col-12 text-left">
-                        <h6>Expected At</h6>
+                      <div class="col-sm-5 col-12 text-left">
+                        <span><b>Estimated Delivery</b></span>
 
                       </div>
-                      <div class="col-sm-4 col-12 text-right">
-                        <p>
+                      <div class="col-sm-6 col-12 text-right">
+                        <span>
                           <?= \Yii::$app->formatter->asDatetime($model->estimated_time_of_arrival, 'MMM dd, yyyy h:mm a') ?>
-                        </p>
-
-                      </div>
-                    </div>
-
-
-                </div>
-                <div class="invoice-details my-2">
-                    <div class="row">
-                      <div class="col-sm-4 col-12 text-left">
-                      </div>
-                      <div class="col-sm-4 col-12 text-left">
-                        <h6>When</h6>
-
-                      </div>
-                      <div class="col-sm-4 col-12 text-right">
-                        <p>
-                          <p>  <?= $model->is_order_scheduled ? 'Scheduled' : 'As soon as possible'; ?> </p>
-                        </p>
+                        </span>
 
                       </div>
                     </div>
@@ -276,17 +289,20 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                             ],
                         ],
                         'layout' => '{items}',
-                        'tableOptions' => ['class' => 'table table-bordered table-hover item'],
+                        'tableOptions' => ['class' => 'table  table-hover item'],
                     ]);
                     ?>
+                    <hr>
                 </div>
             </div>
         </div>
-        <div id="invoice-total-details" class="invoice-total-table">
-            <div class="row">
-                <div class="col-12">
+        <div id="invoice-total-details  invoice-sales-total-wrapper" class="invoice-total-table">
+          <!-- <div class="row invoice-sales-total-wrapper"> -->
+              <div>
+            <!-- <div class="row"> -->
+                <!-- <div class="col-12"> -->
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
+                        <table class="table summary" style="  width: 30%; float: right;">
                             <tbody>
                                 <tr>
                                     <th>Subtotal</th>
@@ -360,7 +376,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                             </tr>
                           <?php } ?>
                             <tr>
-                                <th>Total Price</th>
+                                <th><b>Total Price</b></th>
                                 <td><?= Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
                             </tr>
                             </tbody>
