@@ -349,14 +349,6 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                             'visible' => $model->mashkor_tracking_link != null,
                         ],
                         [
-                            'attribute' => 'mashkor_driver_name',
-                            'format' => 'raw',
-                            'value' => function ($data) {
-                                return $data->mashkor_driver_name ? $data->mashkor_driver_name : null;
-                            },
-                            'visible' => $model->mashkor_driver_name != null,
-                        ],
-                        [
                             'attribute' => 'mashkor_driver_phone',
                             'format' => 'raw',
                             'value' => function ($data) {
