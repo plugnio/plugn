@@ -67,6 +67,7 @@ $this->params['breadcrumbs'][] = $this->title;
               },
               'format' => 'raw'
           ],
+          'retention_email_sent',
             'tap_queue_id',
             'version',
             'sitemap_require_update',

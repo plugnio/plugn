@@ -61,7 +61,6 @@ class OrderController extends Controller {
         $searchModel = new OrderSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
 
-
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
@@ -117,6 +116,20 @@ class OrderController extends Controller {
                     ],
                     'customer_phone_number',
                     [
+                        'header' => 'Order Mode',
+                        'value' => function ($data) {
+                              return $data->order_mode == Order::ORDER_MODE_DELIVERY ? 'Delivery' : 'Pickup';
+                        }
+                    ],
+                    [
+                        'header' => 'Area',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                            if($data->area_id)
+                              return $data->area_name;
+                        }
+                    ],
+                    [
                         'attribute' => 'order_status',
                         "format" => "raw",
                         "value" => function($model) {
@@ -143,18 +156,51 @@ class OrderController extends Controller {
                                 return '';
                         },
                     ],
-                    [
-                        'attribute' => 'total_price',
-                        "value" => function($data) {
-                          return \Yii::$app->formatter->asCurrency($data->total_price, 'KWD');
-                        },
-                    ],
+
                     [
                         'attribute' => 'delivery_fee',
                         "value" => function($data) {
                           return \Yii::$app->formatter->asCurrency($data->delivery_fee, 'KWD');
                         },
                     ],
+
+                    [
+                        'header' => 'Amount Charged',
+                        'attribute' => 'total_price',
+                        "value" => function($data) {
+                            return \Yii::$app->formatter->asCurrency($data->payment_uuid ? $data->payment->payment_amount_charged : $data->total_price, $data->currency->code);
+                        }
+                    ],
+
+                    [
+                        'header' => 'Net Amount',
+                        "value" => function($data) {
+                          if($data->payment_uuid )
+                            return \Yii::$app->formatter->asCurrency($data->payment->payment_net_amount, $data->currency->code);
+                          else
+                            return \Yii::$app->formatter->asCurrency( $data->total_price, $data->currency->code);
+                        }
+                    ],
+                    [
+                        'header' => 'Plugn fee',
+                        "value" => function($data) {
+                              if($data->payment_uuid && $data->payment->plugn_fee)
+                                  return \Yii::$app->formatter->asCurrency($data->payment->plugn_fee , $data->currency->code);
+                              else
+                                  return \Yii::$app->formatter->asCurrency(0 , $data->currency->code);
+                        }
+                    ],
+                    [
+                        'header' => 'Payment Gateway fee',
+                        "value" => function($data) {
+                            if($data->payment_uuid)
+                              return \Yii::$app->formatter->asCurrency($data->payment->payment_gateway_fee, $data->currency->code);
+                            else
+                              return \Yii::$app->formatter->asCurrency(0 , $data->currency->code);
+
+                        }
+                    ],
+
                     'order_created_at'
                 ]
             ]);
@@ -240,8 +286,6 @@ class OrderController extends Controller {
             else
                Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
 
-            Yii::error('Error while requesting driver from Mashkor  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->data));
-
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
         }
 
@@ -276,12 +320,10 @@ class OrderController extends Controller {
 
 
               Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->content));
-              Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->content));
 
             } else {
 
               Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
-              Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
 
             }
 

@@ -7,9 +7,9 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use common\models\Voucher;
+use common\models\WebLink;
 
-class VoucherController extends Controller {
+class WebLinkController extends Controller {
 
     public function behaviors() {
         $behaviors = parent::behaviors();
@@ -61,7 +61,7 @@ class VoucherController extends Controller {
 
 
     /**
-    * Get all store's Vouchers
+    * Get all web links
      * @param type $id
      * @param type $store_uuid
      * @return type
@@ -70,13 +70,13 @@ class VoucherController extends Controller {
 
       if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
-          $vouchers =  Voucher::find()
+          $webLinks =  WebLink::find()
                     ->where(['restaurant_uuid' => $store_uuid])
                     ->asArray()
                     ->all();
 
 
-          if (!$vouchers) {
+          if (!$webLinks) {
               return [
                   'operation' => 'error',
                   'message' => 'No results found'
@@ -85,7 +85,7 @@ class VoucherController extends Controller {
 
           return [
               'operation' => 'success',
-              'body' => $vouchers
+              'body' => $webLinks
           ];
 
       }
@@ -93,39 +93,39 @@ class VoucherController extends Controller {
     }
 
 
-      /**
-      * Return Voucher detail
-       * @param type $store_uuid
-       * @param type $order_uuid
-       * @return type
-       */
-      public function actionDetail($store_uuid, $voucher_id) {
+    /**
+    * Return web link detail
+     * @param type $store_uuid
+     * @param type $order_uuid
+     * @return type
+     */
+    public function actionDetail($store_uuid, $web_link_id) {
 
-        if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
-          $voucher =  Voucher::find()
-                    ->where(['restaurant_uuid' => $store_uuid])
-                    ->andWhere(['voucher_id' => $voucher_id])
-                    ->asArray()
-                    ->one();
+        $webLink =  WebLink::find()
+                  ->where(['restaurant_uuid' => $store_uuid])
+                  ->andWhere(['web_link_id' => $web_link_id])
+                  ->asArray()
+                  ->one();
 
 
-            if (!$voucher) {
+          if (!$webLink) {
 
-                return [
-                    'operation' => 'error',
-                    'message' => 'No results found.'
-                ];
-            }
+              return [
+                  'operation' => 'error',
+                  'message' => 'No results found.'
+              ];
+          }
 
-            return [
-                'operation' => 'success',
-                'body' => $voucher
-            ];
+          return [
+              'operation' => 'success',
+              'body' => $webLink
+          ];
 
-        }
+      }
 
-    }
+  }
 
 
 }

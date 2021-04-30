@@ -158,6 +158,16 @@ class OrderController extends Controller {
             $response = [];
 
             if ($order->save()) {
+
+                if($order->restaurant->enable_gift_message){
+
+                  //save gift message
+                  $order->recipient_name = Yii::$app->request->getBodyParam("recipient_name");
+                  $order->recipient_phone_number = Yii::$app->request->getBodyParam("recipient_phone_number");
+                  $order->gift_message = Yii::$app->request->getBodyParam("gift_message");
+                  
+                }
+
                 $items = Yii::$app->request->getBodyParam("items");
 
 
@@ -565,6 +575,9 @@ class OrderController extends Controller {
 
 
             if (array_key_exists('operation', $response) && $response['operation'] == 'error') {
+              if(!isset($response['message']['qty']))
+                 \Yii::error(json_encode($response['message']), __METHOD__); // Log error faced by user
+
                 $order->delete();
             }
         } else {

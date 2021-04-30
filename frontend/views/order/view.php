@@ -77,7 +77,7 @@ $this->registerJs($js);
         ?>
 
         <?php
-        if ($model->delivery_zone_id || $model->pickup_location_id) {
+        if (  Yii::$app->user->identity->isOwner($model->restaurant_uuid)  && ($model->delivery_zone_id || $model->pickup_location_id)) {
             echo Html::a('Delete', ['delete', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid], [
                 'class' => 'btn btn-danger mr-1 mb-1',
                 'data' => [
@@ -300,7 +300,10 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                             'attribute' => 'estimated_time_of_arrival',
                             "format" => "raw",
                             "value" => function($model) {
-                                return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival));
+                                if($model->is_order_scheduled)
+                                  return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival)) .  date(' - h:i A', strtotime($model->scheduled_time_to));
+                                else
+                                  return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival));
                             }
                         ],
                         [
@@ -894,6 +897,60 @@ DetailView::widget([
             </div>
         </div>
     </div>
+
+
+
+    <?php
+         if ($model->recipient_name || $model->recipient_phone_number || $model->gift_message) {
+       ?>
+           <div class="card">
+               <div class="card-body">
+                   <h3>Gift details</h3>
+
+                   <div class="box-body table-responsive no-padding">
+
+                       <?=
+                       DetailView::widget([
+                           'model' => $model,
+                           'attributes' => [
+
+                               [
+                                   'attribute' => 'recipient_name',
+                                   "format" => "raw",
+                                   "value" => function($model) {
+                                       return $model->recipient_name;
+                                   },
+                                   'visible' => $model->recipient_name != null && $model->recipient_name,
+                               ],
+                               [
+                                   'attribute' => 'recipient_phone_number',
+                                   "format" => "raw",
+                                   "value" => function($model) {
+                                       return $model->recipient_phone_number;
+                                   },
+                                   'visible' => $model->recipient_phone_number != null && $model->recipient_phone_number,
+                               ],
+                               [
+                                   'attribute' => 'gift_message',
+                                   "format" => "raw",
+                                   "value" => function($model) {
+                                     return '<span style="    white-space: normal;">' .$model->gift_message . '</span>';
+                                   },
+                                   'visible' => $model->gift_message != null && $model->gift_message,
+                               ],
+
+                           ],
+                           'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
+                       ])
+                       ?>
+                   </div>
+               </div>
+           </div>
+         <?php } ?>
+
+
+
+
 
 </div>
 

@@ -579,6 +579,7 @@ class StoreController extends Controller {
 
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->save()) {
+
             return $this->render('update', [
                         'model' => $model
             ]);
@@ -600,8 +601,12 @@ class StoreController extends Controller {
 
         $model = $this->findModel($id);
 
-        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['update-analytics-integration', 'id' => $id]);
+        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) ) {
+
+            $model->sitemap_require_update = 1;
+            
+            if($model->save())
+              return $this->redirect(['update-analytics-integration', 'id' => $id]);
         }
 
         return $this->render('integration/analytics/update-analytics-integration', [
@@ -695,6 +700,7 @@ class StoreController extends Controller {
             if ($thumbnail_image)
                 $model->restaurant_thumbnail_image = $thumbnail_image[0]['file'];
 
+            $model->sitemap_require_update = 1;
 
             if ($model->save() && $store_theme_model->save()) {
 

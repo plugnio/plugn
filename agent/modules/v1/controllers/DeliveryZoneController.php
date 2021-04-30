@@ -7,9 +7,9 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use common\models\Voucher;
+use common\models\DeliveryZone;
 
-class VoucherController extends Controller {
+class DeliveryZoneController extends Controller {
 
     public function behaviors() {
         $behaviors = parent::behaviors();
@@ -60,72 +60,41 @@ class VoucherController extends Controller {
     }
 
 
+
     /**
-    * Get all store's Vouchers
-     * @param type $id
+    * Return Business Location detail
      * @param type $store_uuid
+     * @param type $order_uuid
      * @return type
      */
-    public function actionList($store_uuid) {
+    public function actionDetail($store_uuid, $delivery_zone_id, $business_location_id) {
 
       if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
-          $vouchers =  Voucher::find()
-                    ->where(['restaurant_uuid' => $store_uuid])
-                    ->asArray()
-                    ->all();
+        $deliveryZone =  DeliveryZone::find()
+                  ->with('areas')
+                  ->where(['restaurant_uuid' => $store_uuid])
+                  ->andWhere(['business_location_id' => $business_location_id])
+                  ->andWhere(['delivery_zone_id' => $delivery_zone_id])
+                  ->asArray()
+                  ->one();
 
 
-          if (!$vouchers) {
+          if (!$deliveryZone) {
+
               return [
                   'operation' => 'error',
-                  'message' => 'No results found'
+                  'message' => 'No results found.'
               ];
           }
 
           return [
               'operation' => 'success',
-              'body' => $vouchers
+              'body' => $deliveryZone
           ];
 
       }
 
-    }
-
-
-      /**
-      * Return Voucher detail
-       * @param type $store_uuid
-       * @param type $order_uuid
-       * @return type
-       */
-      public function actionDetail($store_uuid, $voucher_id) {
-
-        if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
-
-          $voucher =  Voucher::find()
-                    ->where(['restaurant_uuid' => $store_uuid])
-                    ->andWhere(['voucher_id' => $voucher_id])
-                    ->asArray()
-                    ->one();
-
-
-            if (!$voucher) {
-
-                return [
-                    'operation' => 'error',
-                    'message' => 'No results found.'
-                ];
-            }
-
-            return [
-                'operation' => 'success',
-                'body' => $voucher
-            ];
-
-        }
-
-    }
-
+  }
 
 }

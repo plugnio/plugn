@@ -73,6 +73,9 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property string $mashkor_driver_name
  * @property string $mashkor_driver_phone
  * @property string $mashkor_order_status
+ * @property string $recipient_name
+ * @property string $recipient_phone_number
+ * @property string $gift_message
  * @property boolean $reminder_sent
  *
  * @property Area
@@ -252,7 +255,8 @@ class Order extends \yii\db\ActiveRecord {
                  'payment_method_name', 'payment_method_name_ar',
                  'armada_tracking_link', 'armada_qr_code_link', 'armada_delivery_code',
                  'country_name','country_name_ar', 'business_location_name',
-                 'building', 'apartment', 'city',  'address_1' , 'address_2','postalcode', 'floor', 'office'
+                 'building', 'apartment', 'city',  'address_1' , 'address_2','postalcode', 'floor', 'office',
+                 'recipient_name', 'recipient_phone_number', 'gift_message'
              ],
              'string', 'max' => 255],
              [['postalcode'], 'string', 'max' => 10],
@@ -560,6 +564,9 @@ class Order extends \yii\db\ActiveRecord {
             'is_order_scheduled' => 'Is order scheduled',
             'voucher_id' => 'Voucher ID',
             'tax' => 'Tax',
+            'recipient_name' => 'Recipient name',
+            'recipient_phone_number' => 'Recipient phone number',
+            'gift_message' => 'Gift Message',
             'bank_discount_id' => 'Bank discount ID',
             'mashkor_order_number' => 'Mashkor order number',
             'mashkor_tracking_link' => 'Mashkor order tracking link',
@@ -809,35 +816,62 @@ class Order extends \yii\db\ActiveRecord {
           $this->order_status = self::STATUS_DRAFT;
         }
 
-        if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
-            //set ETA value
-            \Yii::$app->timeZone = 'Asia/Kuwait';
+        if ($this->scenario != self::SCENARIO_CREATE_ORDER_BY_ADMIN){
+          if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
+              //set ETA value
+              \Yii::$app->timeZone = 'Asia/Kuwait';
 
-            if ($this->is_order_scheduled)
-                $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($this->scheduled_time_start_from));
-            else{
+              if ($this->is_order_scheduled)
+                  $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($this->scheduled_time_start_from));
+              else{
+                if($this->delivery_zone_id){
+                  $this->estimated_time_of_arrival =
+                  date("Y-m-d H:i:s", strtotime('+' . $this->deliveryZone->delivery_time . ' ' . $this->deliveryZone->timeUnit, Yii::$app->formatter->asTimestamp( !$insert  ? date('Y-m-d H:i:s', strtotime($this->order_created_at)) : date('Y-m-d H:i:s')  )));
+                }
 
-              if($this->delivery_zone_id){
-                $this->estimated_time_of_arrival =
-                date("Y-m-d H:i:s", strtotime('+' . $this->deliveryZone->delivery_time . ' ' . $this->deliveryZone->timeUnit, Yii::$app->formatter->asTimestamp( !$insert  ? date('Y-m-d H:i:s', strtotime($this->order_created_at)) : date('Y-m-d H:i:s')  )));
               }
 
             }
+            else {
+                $this->estimated_time_of_arrival =  !$insert ? date('Y-m-d H:i:s', strtotime($this->order_created_at)) : date('Y-m-d H:i:s');
+            }
 
-          } else {
-              $this->estimated_time_of_arrival =  !$insert ? date('Y-m-d H:i:s', strtotime($this->order_created_at)) : date('Y-m-d H:i:s');
-          }
+        // if($this->orderItems){
+        //   foreach ($this->orderItems as $key => $orderItem) {
+        //
+        //     if($orderItem->item_uuid && $orderItem->item->prep_time){
+        //       $this->estimated_time_of_arrival = date("c", strtotime('+' . $orderItem->item->prep_time  . ' ' . $orderItem->item->timeUnit,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+        //     }
+        //   }
+        // }
+
 
         if($this->orderItems){
-          foreach ($this->orderItems as $key => $orderItem) {
 
-            if($orderItem->item_uuid && $orderItem->item->prep_time){
-              $this->estimated_time_of_arrival = date("c", strtotime('+' . ($orderItem->item->prep_time * $orderItem->qty) . ' ' . $orderItem->item->timeUnit,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+            $maxPrepTime = 0;
+
+            foreach ($this->orderItems as $key => $orderItem) {
+
+                if($orderItem->item_uuid && $orderItem->item->prep_time){
+
+                    if($orderItem->item->prep_time_unit == Item::TIME_UNIT_MIN)
+                      $prep_time  = intval($orderItem->item->prep_time) ;
+                    else if($orderItem->item->prep_time_unit == Item::TIME_UNIT_HRS)
+                      $prep_time =  intval($orderItem->item->prep_time) * 60;
+                    else if($orderItem->item->prep_time_unit == Item::TIME_UNIT_DAY)
+                      $prep_time =  intval($orderItem->item->prep_time) * 24 * 60;
+
+                      if($prep_time  >=  $maxPrepTime)
+                        $maxPrepTime = $prep_time;
+                }
+
             }
-          }
+
+            $this->estimated_time_of_arrival = date("c", strtotime('+' . $maxPrepTime  . ' min' ,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+
         }
 
-
+      }
 
 
         return true;

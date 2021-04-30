@@ -1,23 +1,18 @@
 <?php
 
 use yii\helpers\Html;
-use common\models\Subscription;
 use common\models\Restaurant;
-
-
-$paymentSettingsUrl = Yii::$app->params['frontendUrl'] . '/store/view-payment-methods?storeUuid=' . $store->restaurant_uuid;
 
 /* @var $this yii\web\View */
 /* @var $store common\models\Restaurant */
 ?>
 
 
-
     <!doctype html>
     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
       <head>
         <title>
-          Your TAP Payments account has been approved
+          Is there anything we can help with?
         </title>
         <!--[if !mso]><!-- -->
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -135,7 +130,7 @@ $paymentSettingsUrl = Yii::$app->params['frontendUrl'] . '/store/view-payment-me
             <td  style="width:100px;">
 
       <img
-         height="auto" src="https://res.cloudinary.com/plugn/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max/restaurants/rest_1d40a718-beac-11ea-808a-0673128d0c9c/logo/R1wBpdQU4GBF_eT0FL89A0bNUFr_ZOJJ.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;" width="100"
+         height="auto" src="https://res.cloudinary.com/plugn/image/upload/v1618273444/logo-plugn_q9sopu.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;" width="100"
       />
 
             </td>
@@ -212,7 +207,7 @@ $paymentSettingsUrl = Yii::$app->params['frontendUrl'] . '/store/view-payment-me
           <tbody>
             <tr>
               <td
-                 style="direction:ltr;font-size:0px;padding:0px;text-align:center;vertical-align:top;"
+                 style="direction:ltr;font-size:0px;padding:0px;padding-bottom:5px;text-align:center;vertical-align:top;"
               >
                 <!--[if mso | IE]>
                   <table role="presentation" border="0" cellpadding="0" cellspacing="0">
@@ -234,11 +229,25 @@ $paymentSettingsUrl = Yii::$app->params['frontendUrl'] . '/store/view-payment-me
 
             <tr>
               <td
-                 align="center" style="font-size:0px;padding:10px 25px;padding-top:25px;padding-bottom:10px;word-break:break-word;"
+                 align="center" style="font-size:0px;padding:10px 25px;padding-top:23px;padding-bottom:6px;word-break:break-word;"
               >
 
       <div
-         style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:center;color:#000000;"
+         style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:23px;font-weight:bold;line-height:24px;text-align:center;color:#000000;"
+      >
+        Let’s see what we can do to help
+      </div>
+
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                 align="left" style="font-size:0px;padding:10px 25px;padding-top:25px;padding-bottom:10px;word-break:break-word;"
+              >
+
+      <div
+         style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#000000;"
       >
         Hello <?= $store->owner_first_name ? $store->owner_first_name : $store->name ?>,
       </div>
@@ -248,13 +257,13 @@ $paymentSettingsUrl = Yii::$app->params['frontendUrl'] . '/store/view-payment-me
 
             <tr>
               <td
-                 align="center" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-bottom:6px;word-break:break-word;"
+                 align="left" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-bottom:10px;word-break:break-word;"
               >
 
       <div
-         style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:21px;font-weight:bold;line-height:24px;text-align:center;color:#000000;"
+         style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#000000;"
       >
-        Your TAP Payments account for your store <?= $store->name ?> has been approved
+        We noticed that you recently created a store on Plugn but haven't started selling yet.
       </div>
 
               </td>
@@ -262,13 +271,13 @@ $paymentSettingsUrl = Yii::$app->params['frontendUrl'] . '/store/view-payment-me
 
             <tr>
               <td
-                 align="center" style="font-size:0px;padding:10px 25px;padding-top:15px;padding-bottom:6px;word-break:break-word;"
+                 align="left" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-bottom:10px;word-break:break-word;"
               >
 
       <div
-         style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:center;color:#000000;"
+         style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#000000;"
       >
-        You can now start collecting online payments
+        Whether it's data entry, sales, marketing, or missing features. We like to extend a helping hand to all of our customers.
       </div>
 
               </td>
@@ -276,7 +285,21 @@ $paymentSettingsUrl = Yii::$app->params['frontendUrl'] . '/store/view-payment-me
 
             <tr>
               <td
-                 align="center" vertical-align="middle" style="font-size:0px;padding:10px 25px;padding-top:8px;padding-right:5px;padding-bottom:23px;padding-left:0px;word-break:break-word;"
+                 align="left" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-bottom:10px;word-break:break-word;"
+              >
+
+      <div
+         style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#000000;"
+      >
+        Members of our friendly support team are standing by to find a solution to make Plugn work for you.
+      </div>
+
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                 align="center" vertical-align="middle" style="font-size:0px;padding:10px 25px;padding-top:18px;padding-right:5px;padding-bottom:23px;padding-left:0px;word-break:break-word;"
               >
 
       <table
@@ -286,11 +309,11 @@ $paymentSettingsUrl = Yii::$app->params['frontendUrl'] . '/store/view-payment-me
           <td
              align="center" bgcolor="#ffffff" role="presentation" style="border:1px solid black;border-radius:5px;cursor:auto;padding:10px 25px;background:#ffffff;" valign="middle"
           >
-
-            <?=
-              Html::a('View Payment Settings', $paymentSettingsUrl , ['style' => 'background:#ffffff;color:#000000;font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;font-weight:bold;line-height:120%;Margin:0;text-decoration:none;text-transform:none;' ,'target' => '_blank'])
-            ?>
-
+            <a
+               href="mailto:contact@plugn.io?subject=Is there anything we can help with?&body=I'm replying to an email I received regarding my store and I would like to talk to customer support for assistance." style="background:#ffffff;color:#000000;font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;font-weight:bold;line-height:120%;Margin:0;text-decoration:none;text-transform:none;" target="_blank"
+            >
+              Let's talk
+            </a>
           </td>
         </tr>
       </table>

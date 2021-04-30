@@ -69,6 +69,8 @@ use borales\extensions\phoneInput\PhoneInputValidator;
   * @property string|null $identification_title
   * @property string|null $identification_file_purpose
   * @property int|null $restaurant_email_notification
+  * @property int $retention_email_sent
+  * @property int $enable_gift_message
   * @property string|null $developer_id
   * @property string|null $armada_api_key
   * @property int|null $phone_number_display
@@ -84,6 +86,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
   * @property float|null $platform_fee
   * @property string|null $google_analytics_id
   * @property string|null $facebook_pixil_id
+  * @property string|null $snapchat_pixil_id
   * @property int|null $show_opening_hours
   * @property string|null $instagram_url
   * @property int|null $schedule_order
@@ -223,6 +226,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['restaurant_commercial_license_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
             [['restaurant_authorized_signature_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
             [['name', 'name_ar', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_domain', 'restaurant_email', 'store_branch_name', 'app_id'], 'required', 'on' => 'create'],
+            [['name', 'name_ar'], 'required', 'on' => 'default'],
             [['name', 'owner_number', 'restaurant_domain', 'currency_id', 'country_id'], 'required', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             ['name', 'match', 'pattern' => '/^[a-zA-Z0-9-\s]+$/', 'message' => 'Your store name can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             ['restaurant_domain', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/', 'message' => 'Your store url can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
@@ -241,11 +245,11 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['custom_css'], 'string'],
             [['platform_fee', 'warehouse_fee'], 'number'],
             [['instagram_url'], 'url'],
-            [['export_orders_data_in_specific_date_range','export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'site_id'], 'safe'],
+            [['export_orders_data_in_specific_date_range','export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'snapchat_pixil_id', 'site_id'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'app_id', 'armada_api_key', 'mashkor_branch_id', 'store_branch_name', 'live_public_key', 'test_public_key', 'company_name'], 'string', 'max' => 255],
 
             [['live_public_key', 'test_public_key'], 'default', 'value' => null],
-            [[ 'country_id', 'currency_id', 'owner_phone_country_code', 'phone_number_country_code'], 'integer'],
+            [[ 'country_id', 'currency_id', 'owner_phone_country_code', 'phone_number_country_code', 'retention_email_sent','enable_gift_message'], 'integer'],
 
             [['phone_number' , 'owner_number'], 'string', 'min' => 6, 'max' => 20],
             [['phone_number' , 'owner_number'], 'number'],
@@ -944,6 +948,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset($fields['restaurant_email_notification']);
         unset($fields['developer_id']);
         unset($fields['site_id']);
+        unset($fields['retention_email_sent']);
         unset($fields['hide_request_driver_button']);
         unset($fields['platform_fee']);
         unset($fields['warehouse_fee']);
@@ -961,7 +966,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         unset($fields['supplierCode']);
         unset($fields['live_api_key']);
         unset($fields['test_api_key']);
-        unset($fields['live_public_key']);
+        // unset($fields['live_public_key']);
         unset($fields['test_public_key']);
         unset($fields['sitemap_require_update']);
         unset($fields['business_type']);
@@ -1146,13 +1151,24 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     public function isOpen() {
-        $opening_hours_model = OpeningHour::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])->one();
+        $opening_hour_model = OpeningHour::find()
+                                ->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])
+                                ->andWhere(['<=','open_at', date("H:i:s", strtotime("now"))])
+                                ->andWhere(['>=','close_at', date("H:i:s", strtotime("now"))])
+                                ->orderBy(['open_at' => SORT_ASC])
+                                ->one();
 
 
-        if ($opening_hours_model) {
-            if (!$opening_hours_model->is_closed && date("w", strtotime("now")) == $opening_hours_model->day_of_week && strtotime("now") > strtotime($opening_hours_model->open_at) && strtotime("now") < strtotime($opening_hours_model->close_at))
-                return true;
-        }
+
+                  if ($opening_hour_model) {
+                      if ( !$opening_hour_model->is_closed &&
+                           date("w", strtotime("now")) == $opening_hour_model->day_of_week &&
+                           strtotime("now") > strtotime($opening_hour_model->open_at) &&
+                           strtotime("now") < strtotime($opening_hour_model->close_at)
+                          )
+                          return true;
+                  }
+
 
 
         return false;

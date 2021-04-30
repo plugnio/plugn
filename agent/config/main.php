@@ -78,8 +78,45 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',
+                        'GET detail' => 'detail',
                         // OPTIONS VERBS
-                        'OPTIONS' => 'options'
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options'
+                    ]
+                ],
+                [// BankDiscountController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/bank-discount',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options'
+                    ]
+                ],
+                [// DeliveryZoneController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/delivery-zone',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET detail' => 'detail',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options'
+                    ]
+                ],
+                [// WebLinkController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/web-link',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options'
                     ]
                 ],
                 [// ItemController
@@ -97,6 +134,18 @@ return [
                 [// CustomerController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/customer',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options'
+                    ]
+                ],
+                [// BusinessLocationController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/business-location',
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',

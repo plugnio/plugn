@@ -467,6 +467,16 @@ class Payment extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Gets query for [[Subscriptions]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getActiveSubscription() {
+        return $this->hasOne(Subscription::className(), ['restaurant_uuid' => 'restaurant_uuid'])->where(['subscription_status' => Subscription::STATUS_ACTIVE])->via('restaurant');
+    }
+
+
+    /**
      * Gets query for [[Currency]].
      *
      * @return \yii\db\ActiveQuery
