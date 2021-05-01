@@ -40,9 +40,6 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-  public function actionWorkingHoursMigration(){
-
-
     public function actionMigration(){
 
         foreach (TapQueue::find()->all() as $key => $queue) {

@@ -165,7 +165,7 @@ class OrderController extends Controller {
                   $order->recipient_name = Yii::$app->request->getBodyParam("recipient_name");
                   $order->recipient_phone_number = Yii::$app->request->getBodyParam("recipient_phone_number");
                   $order->gift_message = Yii::$app->request->getBodyParam("gift_message");
-                  
+
                 }
 
                 $items = Yii::$app->request->getBodyParam("items");
@@ -460,7 +460,7 @@ class OrderController extends Controller {
 
                               if($order->paymentMethod->payment_method_code == $paymentMethod->PaymentMethodCode)
                                 $paymentMethodId = $paymentMethod->PaymentMethodId;
-                                
+
                             }
 
                             if($paymentMethodId == null){
@@ -480,6 +480,7 @@ class OrderController extends Controller {
                                     Url::to(['order/my-fatoorah-callback'], true),   // TODO
                                     $order->order_uuid,
                                     $restaurant_model->supplierCode,
+                                     $order->restaurant->platform_fee,
                                     $paymentMethodId
                             );
 

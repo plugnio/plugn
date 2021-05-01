@@ -143,13 +143,13 @@ $interval = $today->diff($expiry);
                             <td>
                                 5 working days
                             </td>
-                            <td class="<?= $model->plan->plan_id == 2  ? (
-                              (
-                              $model->country->iso !=  'BH' && $model->country->iso !=  'SA' && $model->country->iso !=  'KW')
+                            <td class="<?= $model->plan->plan_id == 2   ? (
+                              ( $model->country->iso !=  'BH' && $model->country->iso !=  'SA' && $model->country->iso !=  'KW')
                               || ($model->country->iso ==  'SA' && $model->plan->plan_id == 1 )
                               || ($model->country->iso == 'SA' && ($model->currency->code == 'BHD' ||  $model->currency->code == 'KWD' ))
                               || ($model->country->iso == 'KW' && ($model->currency->code == 'BHD' ||  $model->currency->code == 'SAR' ))
                               || ($model->country->iso == 'BH' && ($model->currency->code == 'KWD' ||  $model->currency->code == 'SAR' ))
+                              || ($model->business_type == 'ind' && ($model->country->iso == 'SA' && $model->currency->code == 'SAR') || ($model->country->iso == 'BH' && $model->currency->code == 'BHD')  )
                               ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
                                 2.5% per transaction, no minimum.
                             </td>
@@ -246,7 +246,7 @@ $interval = $today->diff($expiry);
 
 
                       <!-- SA -->
-                        <?php if ($model->country->iso == 'SA' && $model->plan->plan_id == 2 && $model->currency->code == 'SAR' ) { ?>
+                        <?php if ($model->country->iso == 'SA' && $model->plan->plan_id == 2 && $model->business_type == 'corp' && $model->currency->code == 'SAR' ) { ?>
 
                         <tr>
                             <th scope="row">
@@ -268,7 +268,7 @@ $interval = $today->diff($expiry);
                             </td>
                             <td >
                               <?php
-                              if($model->is_tap_enable && $model->business_type == 'corp'){
+                              if($model->is_myfatoorah_enable){
 
                                   if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 4])->exists())
                                     echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 4], ['class' => 'btn btn-danger']);
@@ -423,13 +423,13 @@ $interval = $today->diff($expiry);
                             <td>
                                 5 working days
                             </td>
-                            <td class="<?= $model->plan->plan_id == 2  ? (
-                              (
-                              $model->country->iso !=  'BH' && $model->country->iso !=  'SA' && $model->country->iso !=  'KW')
+                            <td class="<?= $model->plan->plan_id == 2   ? (
+                              ( $model->country->iso !=  'BH' && $model->country->iso !=  'SA' && $model->country->iso !=  'KW')
                               || ($model->country->iso ==  'SA' && $model->plan->plan_id == 1 )
                               || ($model->country->iso == 'SA' && ($model->currency->code == 'BHD' ||  $model->currency->code == 'KWD' ))
                               || ($model->country->iso == 'KW' && ($model->currency->code == 'BHD' ||  $model->currency->code == 'SAR' ))
                               || ($model->country->iso == 'BH' && ($model->currency->code == 'KWD' ||  $model->currency->code == 'SAR' ))
+                              || ($model->business_type == 'ind' && ($model->country->iso == 'SA' && $model->currency->code == 'SAR') || ($model->country->iso == 'BH' && $model->currency->code == 'BHD')  )
                               ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
                                 2.5% per transaction, no minimum.
                             </td>
@@ -439,7 +439,7 @@ $interval = $today->diff($expiry);
                             <td>
                               <?php
 
-                              if($model->is_myfatoorah_enable){
+                              if($model->is_tap_enable){
                                 if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 2])->exists())
                                   echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 2], ['class' => 'btn btn-danger']);
                                 else
@@ -452,6 +452,7 @@ $interval = $today->diff($expiry);
                         </tr>
 
                         <!-- KNET -->
+                        <?php if ($model->country->iso == 'KW' && $model->currency->code == 'KWD') { ?>
 
                         <tr>
                             <th scope="row">
@@ -465,12 +466,12 @@ $interval = $today->diff($expiry);
 
                             </th>
                             <td>  3 working days</td>
-                               <td class="<?= $model->plan->plan_id == 2 ? 'current-plan-body-row' : '' ?>">
-                                   1% per transaction, a minimum of 100 fills.
-                               </td>
-                               <td class="<?= $model->plan->plan_id == 1 ? 'current-plan-body-row' : '' ?>">
-                                   5% per transaction, a minimum of 200 fills.
-                               </td>
+                            <td class="<?= $model->plan->plan_id == 2  ? (($model->country->iso ==  'KW') ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
+                                1% per transaction, a minimum of 100 fills.
+                            </td>
+                            <td class="<?= $model->plan->plan_id == 1  ? (($model->country->iso ==  'KW') ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
+                                5% per transaction, a minimum of 200 fills.
+                            </td>
                             <td >
                               <?php
                               if($model->is_myfatoorah_enable){
@@ -484,73 +485,78 @@ $interval = $today->diff($expiry);
                               ?>
                             </td>
                         </tr>
-
-                        <!-- BH -->
-                          <tr>
-                              <th scope="row">
-                                <div style="text-align: center; display:block">
-
-                                  <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/benefit.png' ?>" style="max-width:50px">
-
-                                </div>
-                                <span style="text-align: center; display:block">Benefit</span>
+                      <?php  }  ?>
 
 
-                              </th>
-                                <td>  3 working days</td>
-                               <td class="<?= $model->plan->plan_id == 2 ? 'current-plan-body-row' : '' ?>">
-                                   1% per transaction, a minimum of 100 fills.
-                               </td>
-                               <td class="<?= $model->plan->plan_id == 1 ? 'current-plan-body-row' : '' ?>">
-                                   5% per transaction, a minimum of 200 fills.
-                               </td>
-                              <td >
-                                <?php
-                                if($model->is_myfatoorah_enable){
+                      <!-- BH -->
+                      <?php if ($model->country->iso == 'BH' && $model->currency->code == 'BHD') { ?>
 
-                                    if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 5])->exists())
-                                      echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-danger']);
-                                    else
-                                      echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-success']);
-                                  }
-
-                                ?>
-                              </td>
-                          </tr>
-
-
-                      <!-- SA -->
                         <tr>
                             <th scope="row">
                               <div style="text-align: center; display:block">
 
-                                <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/mada.svg' ?>" style=" width: 30px; ">
+                                <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/benefit.png' ?>" style="max-width:50px">
 
                               </div>
-                              <span style="margin-top:5px;text-align: center; display:block">Mada</span>
+                              <span style="text-align: center; display:block">Benefit</span>
 
 
                             </th>
                             <td>  3 working days</td>
-                                  <td class="<?= $model->plan->plan_id == 2 ? 'current-plan-body-row current-plan-bottom-row' : '' ?>">
-                                      1% per transaction, a minimum of 100 fills.
-                                  </td>
-                                  <td class="<?= $model->plan->plan_id == 1 ? 'current-plan-body-row current-plan-bottom-row' : '' ?>">
-                                      5% per transaction, a minimum of 200 fills.
-                                  </td>
+                              <td class="<?= $model->plan->plan_id == 2  ? (($model->country->iso ==  'BH') ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
+
+                                1.5% per transaction, no minimum.
+                            </td>
+                            <td class="<?= $model->plan->plan_id == 1  ? (($model->country->iso ==  'BH') ? 'current-plan-body-row current-plan-bottom-row' : 'current-plan-body-row') : ''   ?>">
+                                5% per transaction, no minimum.
+                            </td>
                             <td >
                               <?php
-                              if($model->is_myfatoorah_enable && $model->business_type == 'corp'){
+                              if($model->is_myfatoorah_enable){
 
-                                  if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 4])->exists())
-                                    echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 4], ['class' => 'btn btn-danger']);
+                                  if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 5])->exists())
+                                    echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-danger']);
                                   else
-                                    echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 4], ['class' => 'btn btn-success']);
+                                    echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-success']);
                                 }
+
                               ?>
                             </td>
                         </tr>
+                      <?php  }  ?>
 
+
+                    <!-- SA -->
+                      <?php if ($model->country->iso == 'SA'  && $model->business_type == 'corp' && $model->currency->code == 'SAR' ) { ?>
+
+                      <tr>
+                          <th scope="row">
+                            <div style="text-align: center; display:block">
+
+                              <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/mada.svg' ?>" style=" width: 30px; ">
+
+                            </div>
+                            <span style="margin-top:5px;text-align: center; display:block">Mada</span>
+
+
+                          </th>
+                          <td>  3 working days</td>
+                          <td class="<?= $model->plan->plan_id == 2 ? 'current-plan-body-row current-plan-bottom-row' : '' ?>">
+                              1.5% per transaction, no minimum.
+                          </td>
+                          <td class="<?= $model->plan->plan_id == 1 ? 'current-plan-body-row current-plan-bottom-row' : '' ?>">
+                              5% per transaction, no minimum.
+                          </td>
+                          <td >
+                            <?php
+                                if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 4])->exists())
+                                  echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 4], ['class' => 'btn btn-danger']);
+                                else
+                                  echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 4], ['class' => 'btn btn-success']);
+                            ?>
+                          </td>
+                      </tr>
+                    <?php  }  ?>
 
 
                     </tbody>

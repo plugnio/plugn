@@ -94,12 +94,7 @@ class MyFatoorahPayment extends Component
     /**
      * @var float gateway fee charged by portal
      */
-    public $knetGatewayFee = 0.01; // How much is charged per KNET transaction
-
-    /**
-     * @var float gateway fee charged by portal
-     */
-    public $minKnetGatewayFee = 0.100; // How much is charged per KNET transaction
+    public $knetGatewayFee = 0.15; // How much is charged per KNET transaction
 
     /**
      * @var float gateway fee charged by portal
@@ -344,7 +339,7 @@ class MyFatoorahPayment extends Component
     /**
    * Create a charge for redirect
    */
-  public function createCharge($currency, $amount ,$firstName, $email, $country_code ,$phone, $redirectUrl, $orderUuid, $supplierCode , $gateway)
+  public function createCharge($currency, $amount ,$firstName, $email, $country_code ,$phone, $redirectUrl, $orderUuid, $supplierCode , $platform_fee , $gateway)
   {
 
       $chargeEndpoint = $this->apiEndpoint . "/ExecutePayment";
@@ -352,6 +347,35 @@ class MyFatoorahPayment extends Component
 
       $phone =  str_replace(' ', '', $phone);
       $phone =  str_replace("+". $country_code, '', $phone);
+
+
+
+      //Amount = 10
+      // if knet
+      //10 - myfatorah fees - platform fee
+
+
+      //KNET (0.15) e7na 5%
+
+      //Benefit 1.25%
+      //CD 2.5%
+      //Mada 2.5%
+      //UAE debit & credit 2.5%
+
+
+      //Naps 1.25% + 1 riyal
+
+      $proposedShare = null;
+
+      if($platform_fee > 0){
+        if($gateway == static::GATEWAY_VISA_MASTERCARD  || $gateway == static::GATEWAY_SADAD || $gateway == static::GATEWAY_UAE){
+            $proposedShare = $amount - ($amount *  (($platform_fee - $this->creditcardGatewayFeePercentage) + $this->creditcardGatewayFeePercentage));
+        } else if($gateway == static::GATEWAY_BENEFIT) {
+            $proposedShare = $amount - ($amount *  ($platform_fee  - $this->benefitGatewayFee));
+        }
+        //  else if($gateway == static::GATEWAY_KNET) {
+        // }
+      }
 
       $chargeParams = [
             "PaymentMethodId" => $gateway,
@@ -368,11 +392,12 @@ class MyFatoorahPayment extends Component
             "Suppliers" => [
               [
                 "SupplierCode" => $supplierCode,
-                "ProposedShare" => null,
+                "ProposedShare" => $proposedShare,
                 "InvoiceShare" => $amount
               ]
             ]
         ];
+
 
       $client = new Client();
       $response = $client->createRequest()
