@@ -96,10 +96,17 @@ class MyFatoorahPayment extends Component
      */
     public $knetGatewayFee = 0.15; // How much is charged per KNET transaction
 
+
     /**
      * @var float gateway fee charged by portal
      */
-    public $minChargeAmount = 4; // How much is charged per KNET transaction
+    public $minPlugnFee = 0.100;
+
+
+    /**
+     * @var float gateway fee charged by portal
+     */
+    public $minChargeAmount = 5; // How much is charged per KNET transaction
 
     /**
      * @var float gateway fee charged by portal
@@ -355,7 +362,8 @@ class MyFatoorahPayment extends Component
       //10 - myfatorah fees - platform fee
 
 
-      //KNET (0.15) e7na 5%
+      //KNET (0.15) e7na 5% min 250FILS
+      //5kd w agl 250 fils fixed
 
       //Benefit 1.25%
       //CD 2.5%
@@ -368,13 +376,24 @@ class MyFatoorahPayment extends Component
       $proposedShare = null;
 
       if($platform_fee > 0){
-        if($gateway == static::GATEWAY_VISA_MASTERCARD  || $gateway == static::GATEWAY_SADAD || $gateway == static::GATEWAY_UAE){
-            $proposedShare = $amount - ($amount *  (($platform_fee - $this->creditcardGatewayFeePercentage) + $this->creditcardGatewayFeePercentage));
-        } else if($gateway == static::GATEWAY_BENEFIT) {
-            $proposedShare = $amount - ($amount *  ($platform_fee  - $this->benefitGatewayFee));
+
+        if($gateway == static::GATEWAY_KNET){
+
+           // if amount greater than 5
+          if  ($amount <= $this->minChargeAmount){
+              $proposedShare = $amount - ( $this->minPlugnFee + $this->knetGatewayFee ) ;
+           }
+
+           //if amount greater than 5kd
+           else if ($amount > $this->minChargeAmount ) {
+             $proposedShare = $amount - ($amount *  $platform_fee);
+           }
+
+
         }
-        //  else if($gateway == static::GATEWAY_KNET) {
-        // }
+        else
+          $proposedShare = $amount - ($amount *  $platform_fee);
+
       }
 
       $chargeParams = [
