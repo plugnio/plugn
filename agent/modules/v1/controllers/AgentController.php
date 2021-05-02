@@ -7,9 +7,9 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use common\models\BusinessLocation;
+use common\models\BankDiscount;
 
-class BusinessLocationController extends Controller {
+class AgentController extends Controller {
 
     public function behaviors() {
         $behaviors = parent::behaviors();
@@ -60,72 +60,30 @@ class BusinessLocationController extends Controller {
     }
 
 
-    /**
-    * Get all store's branches
-     * @param type $id
-     * @param type $store_uuid
-     * @return type
-     */
-    public function actionList($store_uuid) {
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
-
-          $businessLocations =  BusinessLocation::find()
-                    ->where(['restaurant_uuid' => $store_uuid])
-                    ->asArray()
-                    ->all();
-
-
-          if (!$businessLocations) {
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found'
-              ];
-          }
+    public function actionDetail() {
+        $agent = Yii::$app->user->identity;
+        if($agent){
+          $accessToken = $agent->accessToken->token_value;
 
           return [
-              'operation' => 'success',
-              'body' => $businessLocations
+              "operation" => "success",
+              "body" => [
+                "id" => $agent->agent_id,
+                "agent_name" => $agent->agent_name,
+                "agent_email" => $agent->agent_email
+              ]
           ];
+        } else {
+          return [
+              'operation' => 'error',
+              'message' => 'No results found'
+          ];
+        }
 
-      }
 
     }
 
 
-    /**
-    * Return Business Location detail
-     * @param type $store_uuid
-     * @param type $order_uuid
-     * @return type
-     */
-    public function actionDetail($store_uuid, $business_location_id) {
-
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
-
-        $businessLocation =  BusinessLocation::find()
-                  ->where(['restaurant_uuid' => $store_uuid])
-                  ->andWhere(['business_location_id' => $business_location_id])
-                  ->with(['deliveryZones','deliveryZones.country'])
-                  ->asArray()
-                  ->one();
-
-
-          if (!$businessLocation) {
-
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found.'
-              ];
-          }
-
-          return [
-              'operation' => 'success',
-              'body' => $businessLocation
-          ];
-
-      }
-
-  }
 
 }
