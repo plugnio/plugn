@@ -83,6 +83,16 @@ return [
                         'OPTIONS' => 'options'
                     ]
                 ],
+                [// AgentController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/agent',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'detail',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
+                    ]
+                ],
                 [// VoucherController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/voucher',
