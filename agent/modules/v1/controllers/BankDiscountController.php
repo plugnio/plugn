@@ -71,6 +71,7 @@ class BankDiscountController extends Controller {
       if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
           $bankDiscounts =  BankDiscount::find()
+                    ->with('bank')
                     ->where(['restaurant_uuid' => $store_uuid])
                     ->asArray()
                     ->all();
