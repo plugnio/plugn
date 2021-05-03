@@ -155,6 +155,21 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
               <?php if($model->special_directions) { ?>
 
+                <div class="invoice-details my-2">
+                    <div class="row">
+
+                      <div class=" col-12 text-left">
+                        <span>
+                          <span style="    padding-left: 10px;">
+                          </span>
+                        </span>
+
+                      </div>
+
+                    </div>
+
+
+                </div>
               <div class="invoice-details my-2">
                   <div class="row">
 
@@ -191,6 +206,22 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
               </div>
 
             <?php  } else { ?>
+
+              <div class="invoice-details my-2">
+                  <div class="row">
+
+                    <div class=" col-12 text-left">
+                      <span>
+                        <span style="    padding-left: 10px;">
+                        </span>
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+              </div>
 
               <div class="invoice-details my-2">
                   <div class="row">
@@ -262,6 +293,24 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                       <div class="col-sm-6 col-12 text-right">
                         <span>
                           <?= \Yii::$app->formatter->asDatetime($model->estimated_time_of_arrival, 'MMM dd, yyyy h:mm a') ?>
+                        </span>
+
+                      </div>
+                    </div>
+
+
+                </div>
+                <div class="invoice-details my-2">
+                    <div class="row">
+                      <div class="col-sm-1 col-12 text-left">
+                      </div>
+                      <div class="col-sm-5 col-12 text-left">
+                        <span><b>Payment Method</b></span>
+
+                      </div>
+                      <div class="col-sm-6 col-12 text-right">
+                        <span>
+                          <?= $model->payment_method_name ?>
                         </span>
 
                       </div>
