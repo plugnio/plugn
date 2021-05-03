@@ -153,7 +153,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 
 
-
+              <?php if($model->special_directions) { ?>
 
               <div class="invoice-details my-2">
                   <div class="row">
@@ -189,6 +189,46 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 
               </div>
+
+            <?php  } else { ?>
+
+              <div class="invoice-details my-2">
+                  <div class="row">
+
+                    <div class=" col-12 text-left">
+                      <span>
+                        <span style="    padding-left: 10px;">
+                        </span>
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+              </div>
+
+
+              <div class="invoice-details my-2">
+                  <div class="row">
+
+                    <div class=" col-12 text-left">
+                      <span>
+                        <b>Customer: </b>
+                        <span style="    padding-left: 10px;">
+                          <?=  $model->customer_name ?>
+                        </span>
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+              </div>
+
+            <?php  } ?>
+
 
             </div>
             <div class="col-sm-6 col-12 text-right">
