@@ -365,10 +365,8 @@ class SiteController extends Controller {
         if ($managedRestaurant = $this->findModel($id)) {
             if (Yii::$app->user->identity->isOwner($managedRestaurant->restaurant_uuid)) {
 
-                $incoming_orders = Order::find()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
-                        ->orderBy(['order_created_at' => SORT_DESC])
-                        ->limit(5)
-                        ->all();
+                $numberOfOrders = Order::find()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                        ->count();
 
                 //Orders Recevied
                 $orders_received_chart_data_this_week = [];
@@ -1086,7 +1084,7 @@ class SiteController extends Controller {
 
                 return $this->render('index', [
                             'restaurant_model' => $managedRestaurant,
-                            'incoming_orders' => $incoming_orders,
+                            'numberOfOrders' => $numberOfOrders,
                             //customer gained
                             'today_customer_gained' => $today_customer_gained ? $today_customer_gained : 0,
                             'number_of_all_customer_gained_last_three_months' => $number_of_all_customer_gained_last_three_months,

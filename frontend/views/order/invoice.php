@@ -54,7 +54,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                 <!-- </p> -->
 
                 <p class="card-text mb-25"  style="display: contents">
-                  <?= $model->area_id ? 'Block ' . $model->block : ''  ?>
+                  <?= $model->area_id && $model->block ? 'Block ' . $model->block : ''  ?>
                 </p>
                 <p class="card-text mb-25"  style="display: contents">
                   <?= $model->area_id ? 'Street ' . $model->street : '' ?>
@@ -92,7 +92,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                     <p class="card-text mb-25"  style="display: contents">
                       <?= $model->area_id ? ($model->unit_type == 'House' ? 'House No. ' : 'Building: ') . $model->house_number :  ''  ?>
                     </p>
-                    <p class="card-text mb-25" style="display: contents">
+                    <p class="card-text mb-25" style="display: block">
                       <?= $model->address_1 ? $model->address_1 : ''  ?>
                     </p>
                     <p class="card-text mb-25" style="display: contents">
@@ -153,22 +153,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 
 
-              <div class="invoice-details my-2">
-                  <div class="row">
 
-                    <div class="col-sm-4 col-12 text-left">
-                      <span>
-                        <!-- <b>Bill To: </b> -->
-                        <span style="    padding-left: 10px;">
-                        </span>
-                      </span>
-
-                    </div>
-
-                  </div>
-
-
-              </div>
 
               <div class="invoice-details my-2">
                   <div class="row">
@@ -187,7 +172,23 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 
               </div>
+              <div class="invoice-details my-2">
+                  <div class="row">
 
+                    <div class="col-12 text-left">
+                      <span>
+                        <b>Special Directions: </b>
+                        <span style="    padding-left: 10px;">
+                          <?=  $model->special_directions ?>
+                        </span>
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+              </div>
 
             </div>
             <div class="col-sm-6 col-12 text-right">

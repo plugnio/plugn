@@ -298,6 +298,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                         ],
                         [
                             'attribute' => 'estimated_time_of_arrival',
+                            'label' => 'Estimated Delivery',
                             "format" => "raw",
                             "value" => function($model) {
                                 if($model->is_order_scheduled)
