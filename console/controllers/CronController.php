@@ -59,6 +59,12 @@ class CronController extends \yii\console\Controller {
           $payment->save();
         }
 
+        $payment_method = new PaymentMethod();
+        $payment_method->payment_method_name = 'Sadad';
+        $payment_method->payment_method_name_ar = 'سداد';
+        $payment_method->payment_method_code = 's';
+        $payment_method->save();
+
         foreach (PaymentMethod::find()->all() as $key => $paymentMethod) {
 
           if($paymentMethod->payment_method_id == 1){

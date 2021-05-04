@@ -590,6 +590,26 @@ class StoreController extends Controller {
         ]);
     }
 
+
+    public function actionSetupOnlinePayments($storeUuid) {
+
+        $model = $this->findModel($storeUuid);
+
+        return $this->render('setup-online-payments', [
+                    'model' => $model
+        ]);
+    }
+
+
+    public function actionViewTapRates($storeUuid) {
+
+        $model = $this->findModel($storeUuid);
+
+        return $this->render('view-tap-rates', [
+                    'model' => $model
+        ]);
+    }
+
     /**
      * Updates an existing Analytics integration.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -604,7 +624,7 @@ class StoreController extends Controller {
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) ) {
 
             $model->sitemap_require_update = 1;
-            
+
             if($model->save())
               return $this->redirect(['update-analytics-integration', 'id' => $id]);
         }

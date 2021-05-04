@@ -61,8 +61,14 @@ $this->registerJs($js);
                 'errorSummaryCssClass' => 'alert alert-danger'
     ]);
 
-    $countryQuery = Country::find()->asArray()->all();
+    $countryQuery = Country::find()
+                    ->where(['iso' => 'KW'])
+                    ->orWhere(['iso' => 'BH'])
+                    ->orWhere(['iso' => 'SA'])
+                    ->asArray()->all();
+
     $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
+
 
     $currencyQuery = Currency::find()->asArray()->all();
     $currencyArray = ArrayHelper::map($currencyQuery, 'currency_id', 'title');
