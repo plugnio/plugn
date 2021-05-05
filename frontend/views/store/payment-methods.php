@@ -192,7 +192,7 @@ $this->params['breadcrumbs'][] = $this->title;
                       </div>
 
                       <!-- Knet -->
-                      <?php if ($model->country->iso == 'KW' && $model->currency->code == 'KWD') { ?>
+
                           <div class="card" style="margin-top:20px;box-shadow: 0px 5px 20px #88888854 !important;" id="paymentMethodCard">
                             <div class="card-header">
                                 <h3>
@@ -206,6 +206,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <div class="card-body">
                               <!-- Settlement window -->
                               <?php
+                              if ($model->country->iso == 'KW' && $model->currency->code == 'KWD') {
                                   if($model->is_myfatoorah_enable || $model->is_tap_enable){
 
                                       if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 1])->exists())
@@ -213,15 +214,17 @@ $this->params['breadcrumbs'][] = $this->title;
                                       else
                                         echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 1], ['class' => 'btn btn-success']);
                                     }
-                            ?>
+                              } else if ($model->country->iso != 'KW' && $model->currency->code != 'KWD') { ?>
+                                        <span>
+                                          Contact us if you want to enable this option
+                                        </span>
+                            <?php } ?>
 
                             </div>
                           </div>
 
-                        <?php } ?>
 
                       <!-- Benefit -->
-                      <?php if ($model->country->iso == 'BH' && $model->currency->code == 'BHD') { ?>
                           <div class="card" style="margin-top:20px;box-shadow: 0px 5px 20px #88888854 !important;" id="paymentMethodCard">
                             <div class="card-header">
                                 <h3>
@@ -232,33 +235,39 @@ $this->params['breadcrumbs'][] = $this->title;
                                 </div>
                             </div>
 
-                            <div class="card-body">
-                              <!-- Settlement window -->
-                              <?php
-                                  if($model->business_type == 'corp' && ($model->is_myfatoorah_enable || $model->is_tap_enable)){
 
-                                      if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 5])->exists())
-                                        echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-danger']);
-                                      else
-                                        echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-success']);
-                                    }
+                                <div class="card-body">
+                                    <!-- Settlement window -->
+                                    <?php
+                                    if ($model->country->iso == 'BH' && $model->currency->code == 'BHD') {
+                                      if($model->business_type == 'corp' && ($model->is_myfatoorah_enable || $model->is_tap_enable)){
 
-                                  if($model->business_type == 'ind'){ ?>
+                                          if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 5])->exists())
+                                            echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-danger']);
+                                          else
+                                            echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-success']);
+                                        }
 
-                                      <span>
-                                          This option is not allowed for home businesses. Contact us if you have a business license.
-                                      </span>
 
+                                         if($model->business_type == 'ind'){ ?>
+
+                                            <span>
+                                                This option is not allowed for home businesses. Contact us if you have a business license.
+                                            </span>
+
+                                        <?php }
+                                    } else if ($model->country->iso != 'BH' && $model->currency->code != 'BHD') { ?>
+                                              <span>
+                                                Contact us if you want to enable this option
+                                              </span>
                                   <?php } ?>
 
+                                </div>
 
-                            </div>
+
+
                           </div>
 
-                        <?php } ?>
-
-
-                      <?php if ($model->country->iso == 'SA' && $model->currency->code == 'SAR') { ?>
 
                           <!-- Mada  -->
                           <div class="card" style="margin-top:20px;box-shadow: 0px 5px 20px #88888854 !important;" id="paymentMethodCard">
@@ -272,8 +281,9 @@ $this->params['breadcrumbs'][] = $this->title;
                             </div>
 
                             <div class="card-body">
-                              <!-- Settlement window -->
-                              <?php
+                                <!-- Settlement window -->
+                                <?php
+                                if ($model->country->iso == 'SA' && $model->currency->code == 'SAR') {
                                   if($model->business_type == 'corp' && ($model->is_myfatoorah_enable || ($model->is_tap_enable && $model->plan->plan_id == 2))){
 
                                       if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 4])->exists())
@@ -282,7 +292,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                         echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 4], ['class' => 'btn btn-success']);
                                     }
 
-                                    if($model->business_type == 'ind' || ($model->is_tap_enable && $model->plan->plan_id == 1)){ ?>
+
+                                     if($model->business_type == 'ind'){ ?>
 
                                         <span>
                                             This option is not allowed for home businesses. Contact us if you have a business license.
@@ -290,10 +301,23 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                     <?php }
 
-                                    ?>
+                                    else if($model->is_tap_enable && $model->plan->plan_id == 1) { ?>
+                                      <span>
+                                          This option is only available on premium plan
+                                      </span>
 
+                                    <?php  }
+                                } else if ($model->country->iso != 'SA' && $model->currency->code != 'SAR') { ?>
+                                          <span>
+                                            Contact us if you want to enable this option
+                                          </span>
+                              <?php } ?>
 
                             </div>
+
+
+
+
                           </div>
 
                           <?php if ( $model->is_myfatoorah_enable && !$model->is_tap_enable) { ?>
@@ -309,9 +333,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             </div>
 
                             <div class="card-body">
-                              <!-- Settlement window -->
-                              <?php
-                                  if($model->business_type  == 'corp'  && $model->is_myfatoorah_enable){
+                                <!-- Settlement window -->
+                                <?php
+                                if ($model->country->iso == 'SA' && $model->currency->code == 'SAR') {
+                                  if($model->business_type == 'corp' && ($model->is_myfatoorah_enable || ($model->is_tap_enable && $model->plan->plan_id == 2))){
 
                                       if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 6])->exists())
                                         echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 6], ['class' => 'btn btn-danger']);
@@ -319,21 +344,32 @@ $this->params['breadcrumbs'][] = $this->title;
                                         echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 6], ['class' => 'btn btn-success']);
                                     }
 
-                                    if($model->business_type == 'ind'){ ?>
+
+                                     if($model->business_type == 'ind'){ ?>
 
                                         <span>
                                             This option is not allowed for home businesses. Contact us if you have a business license.
                                         </span>
 
-                                    <?php } ?>
+                                    <?php }
 
+                                    else if($model->is_tap_enable && $model->plan->plan_id == 1) { ?>
+                                      <span>
+                                          This option is only available on premium plan
+                                      </span>
+
+                                    <?php  }
+                                } else if ($model->country->iso != 'SA' && $model->currency->code != 'SAR') { ?>
+                                          <span>
+                                            Contact us if you want to enable this option
+                                          </span>
+                              <?php } ?>
 
                             </div>
                           </div>
                         <?php } ?>
 
 
-                        <?php } ?>
 
 
 

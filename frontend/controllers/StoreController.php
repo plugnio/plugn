@@ -612,7 +612,7 @@ class StoreController extends Controller {
 
         }
 
-        return $this->redirect(['create-payment-gateway-account',  'paymentGateway' =>'myfatoorah','storeUuid' => $model->restaurant_uuid]);
+        return $this->redirect(['create-payment-gateway-account',  'paymentGateway' =>'myfatoorah','id' => $model->restaurant_uuid]);
 
     }
 
@@ -628,7 +628,7 @@ class StoreController extends Controller {
 
         }
 
-        return $this->redirect(['create-payment-gateway-account',  'paymentGateway' =>'tap','storeUuid' => $model->restaurant_uuid]);
+        return $this->redirect(['create-payment-gateway-account',  'paymentGateway' =>'myfatoorah','id' => $model->restaurant_uuid]);
 
     }
 
