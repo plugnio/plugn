@@ -600,12 +600,54 @@ class StoreController extends Controller {
         ]);
     }
 
+    public function actionSwitchToMyfatoorah($storeUuid) {
+
+        $model = $this->findModel($storeUuid);
+
+        if($model->supplierCode){
+          $model->is_tap_enable = 0;
+          $model->is_myfatoorah_enable = 1;
+          $model->save(false);
+          return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
+
+        }
+
+        return $this->redirect(['create-payment-gateway-account',  'paymentGateway' =>'myfatoorah','storeUuid' => $model->restaurant_uuid]);
+
+    }
+
+    public function actionSwitchToTap($storeUuid) {
+
+        $model = $this->findModel($storeUuid);
+
+        if($model->supplierCode){
+          $model->is_tap_enable = 1;
+          $model->is_myfatoorah_enable = 0;
+          $model->save(false);
+          return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
+
+        }
+
+        return $this->redirect(['create-payment-gateway-account',  'paymentGateway' =>'tap','storeUuid' => $model->restaurant_uuid]);
+
+    }
+
 
     public function actionViewTapRates($storeUuid) {
 
         $model = $this->findModel($storeUuid);
 
         return $this->render('view-tap-rates', [
+                    'model' => $model
+        ]);
+    }
+
+
+    public function actionViewMyfatoorahRates($storeUuid) {
+
+        $model = $this->findModel($storeUuid);
+
+        return $this->render('view-myfatoorah-rates', [
                     'model' => $model
         ]);
     }

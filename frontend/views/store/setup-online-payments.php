@@ -74,7 +74,7 @@ You can only connect one of the two. Choose wisely.
 
   <div style="display:block">
     <?php
-      echo Html::a('View rates', ['setup-online-payments', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'margin-top:10px']);
+      echo Html::a('View rates', ['view-myfatoorah-rates', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'margin-top:10px']);
     ?>
   </div>
 
@@ -86,7 +86,6 @@ You can only connect one of the two. Choose wisely.
               if (!$model->payment_gateway_queue_id)
                   echo Html::a('Create My Fatoorah account', ['create-payment-gateway-account', 'id' => $model->restaurant_uuid,'paymentGateway' => 'myfatoorah'], ['class' => 'btn btn-success','style'=>'margin-top:10px']);
           }
-
 
     ?>
   </div>
