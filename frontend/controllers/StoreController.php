@@ -608,6 +608,13 @@ class StoreController extends Controller {
           $model->is_tap_enable = 0;
           $model->is_myfatoorah_enable = 1;
           $model->save(false);
+
+
+          foreach ($model->getRestaurantPaymentMethods()->all() as $restaurant_payment_method) {
+            if($restaurant_payment_method->payment_method_id != 3)
+              $restaurant_payment_method->delete();
+          }
+
           return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
 
         }
@@ -624,6 +631,12 @@ class StoreController extends Controller {
           $model->is_tap_enable = 1;
           $model->is_myfatoorah_enable = 0;
           $model->save(false);
+
+          foreach ($model->getRestaurantPaymentMethods()->all() as $restaurant_payment_method) {
+            if($restaurant_payment_method->payment_method_id != 3)
+              $restaurant_payment_method->delete();
+          }
+          
           return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
 
         }

@@ -736,7 +736,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             return true;
         } else {
 
-            Yii::error('Error while create supplier [' . $this->name . '] ' . $supplierApiResponse);
+            Yii::error('Error while create supplier [' . $this->name . '] ' . json_encode($supplierApiResponse));
             return false;
         }
 

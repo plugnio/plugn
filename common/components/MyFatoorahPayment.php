@@ -292,7 +292,6 @@ class MyFatoorahPayment extends Component
           "IsActive" => "true"
         ];
 
-
         $client = new Client();
         $response = $client->createRequest()
                 ->setMethod('POST')
@@ -372,6 +371,10 @@ class MyFatoorahPayment extends Component
 
 
       //Naps 1.25% + 1 riyal
+
+      //  6KD => will deposit 5.70
+      //  5KD => will deposit 4.75
+      //  4KD => will deposit 4.75
 
       $proposedShare = null;
 

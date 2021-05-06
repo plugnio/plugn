@@ -83,7 +83,8 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
 
               if($response){
                 $this->queue_status = self::QUEUE_STATUS_COMPLETE;
-                if($this->save()){
+                if($this->save() && $this->restaurant->restaurant_email){
+
                   \Yii::$app->mailer->compose([
                          'html' => 'payment-gateway-created',
                              ], [
