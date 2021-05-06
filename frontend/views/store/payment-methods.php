@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
     $expiry = new DateTime($model->activeSubscription->subscription_end_at);
 
     $interval = $today->diff($expiry);
-
+    
 ?>
 
 
