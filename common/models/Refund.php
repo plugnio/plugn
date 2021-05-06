@@ -136,7 +136,6 @@ class Refund extends \yii\db\ActiveRecord
     public function validateRefundAmount($attribute, $params, $validator)
     {
 
-
       $totalAwaitingBalanceResponse = Yii::$app->myFatoorahPayment->getSupplierDashboard($this->store->supplierCode);
 
       $responseContent = json_decode($totalAwaitingBalanceResponse->content);
