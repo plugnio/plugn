@@ -135,6 +135,8 @@ use borales\extensions\phoneInput\PhoneInput;
     ]);
     ?>
 
+    <?= $form->field($model, 'payment_gateway_queue_id')->textInput(['maxlength' => true]) ?>
+    
     <?= $form->field($model, 'version')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>

@@ -53,6 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
     DetailView::widget([
         'model' => $model,
         'attributes' => [
+          'payment_gateway_queue_id',
           [
               'label' => 'is_tap_enable',
               'value' => function ($data) {

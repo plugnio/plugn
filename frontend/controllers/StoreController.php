@@ -636,7 +636,7 @@ class StoreController extends Controller {
             if($restaurant_payment_method->payment_method_id != 3)
               $restaurant_payment_method->delete();
           }
-          
+
           return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
 
         }
