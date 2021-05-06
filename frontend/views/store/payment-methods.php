@@ -683,6 +683,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
   <?php }   ?>
 
+<?php if($model->is_myfatoorah_enable || $model->is_tap_enable) { ?>
   <div class="card">
     <div class="card-header">
       <h3>
@@ -702,6 +703,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
     </div>
   </div>
+<?php }   ?>
+
+
     <!-- Cash on Delivery -->
     <div class="card">
         <div class="card-header">
