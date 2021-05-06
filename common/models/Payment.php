@@ -282,30 +282,11 @@ class Payment extends \yii\db\ActiveRecord {
         if ($responseContent->Data->InvoiceTransactions[0]->TransactionStatus == 'Succss') {
 
           //todo
-            // KNET Gateway Fee Calculation
-            // if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
-            //
-            //     if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->knetGatewayFee) > Yii::$app->tapPayments->minKnetGatewayFee)
-            //         $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->knetGatewayFee;
-            //     else
-            //         $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minKnetGatewayFee;
-            // }
-            //
-            // // Creditcard Gateway Fee Calculation
-            // else if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_VISA_MASTERCARD) {
-            //
-            //     if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage) > Yii::$app->tapPayments->minCreditcardGatewayFee)
-            //         $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage;
-            //     else
-            //         $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minCreditcardGatewayFee;
-            // }
-            //
-            //
+            // payment_gateway_fee
+            $paymentRecord->payment_gateway_fee  = (float) $responseContent->Data->InvoiceDisplayValue - (float) $responseContent->Data->Suppliers[0]->InvoiceShare;
 
-            // if(isset($responseContent->destinations))
-            //     $paymentRecord->plugn_fee = $responseContent->destinations->amount;
-            // else
-            //     $paymentRecord->plugn_fee = 0;
+            //platform fee
+            $paymentRecord->plugn_fee = (float) $responseContent->Data->Suppliers[0]->InvoiceShare - (float) $responseContent->Data->Suppliers[0]->ProposedShare;
 
 
             // Update payment method used and the order id assigned to it
