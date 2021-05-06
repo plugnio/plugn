@@ -342,7 +342,7 @@ class StoreController extends Controller {
           $model->setScenario(Restaurant::SCENARIO_CREATE_MYFATOORAH_ACCOUNT);
 
 
-        if ($model->is_myfatoorah_enable || ($paymentGateway != 'tap' && $paymentGateway != 'myfatoorah') || $model->payment_gateway_queue_id)
+        if (($model->is_myfatoorah_enable && $paymentGateway == 'myfatoorah') || ($model->is_tap_enable && $paymentGateway == 'tap') )
             return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
 
 
@@ -641,7 +641,7 @@ class StoreController extends Controller {
 
         }
 
-        return $this->redirect(['create-payment-gateway-account',  'paymentGateway' =>'myfatoorah','id' => $model->restaurant_uuid]);
+        return $this->redirect(['create-payment-gateway-account',  'paymentGateway' =>'tap','id' => $model->restaurant_uuid]);
 
     }
 
