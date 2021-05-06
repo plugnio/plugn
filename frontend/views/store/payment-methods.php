@@ -24,14 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 ?>
 
-<style>
-@media only screen and (min-width:980px) {
-  #paymentMethodCard{
-    width: 50%;
-  }
-}
 
-</style>
 
 <div class="restaurant-view">
     <?php if (Yii::$app->session->getFlash('error') != null) { ?>
@@ -178,6 +171,40 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         <div class="card-body">
                           <!-- Settlement window -->
+                          <div class="row" style="margin-bottom:15px">
+                            <div class="col-12 col-sm-4 col-lg-4">
+                              <!-- Settlement window -->
+                              <span style="display:block">
+                                <h5><b>Settlement window</b></h5>
+                                <span>
+                                  Within 5 working days
+                                </span>
+                              </span>
+                            </div>
+
+
+                            <div class="col-12 col-sm-4 col-lg-4">
+                              <!-- Fees (on premium plan) -->
+                              <span >
+                                <h5><b>Fees (on premium plan)</b></h5>
+                                <span>
+                                    2.5% per transaction, no minimum
+                                </span>
+                              </span>
+                            </div>
+
+                            <div class="col-12 col-sm-4 col-lg-4">
+                              <!-- Fees (on free plan) -->
+                              <span >
+                                <h5><b>Fees (on free plan)</b></h5>
+                                <span>
+                                  5% per transaction, no minimum
+                                </span>
+                              </span>
+                            </div>
+
+                          </div>
+
                           <?php
                               if($model->is_myfatoorah_enable || $model->is_tap_enable){
 
@@ -204,9 +231,79 @@ $this->params['breadcrumbs'][] = $this->title;
                             </div>
 
                             <div class="card-body">
-                              <!-- Settlement window -->
-                              <?php
-                              if ($model->country->iso == 'KW' && $model->currency->code == 'KWD') {
+                              <?php if($model->is_tap_enable){ ?>
+                                <!-- Settlement window -->
+                                <div class="row" style="margin-bottom:15px">
+                                  <div class="col-12 col-sm-4 col-lg-4">
+                                    <!-- Settlement window -->
+                                    <span style="display:block">
+                                      <h5><b>Settlement window</b></h5>
+                                      <span>
+                                        Within 3 working days
+                                      </span>
+                                    </span>
+                                  </div>
+
+
+                                  <div class="col-12 col-sm-4 col-lg-4">
+                                    <!-- Fees (on premium plan) -->
+                                    <span >
+                                      <h5><b>Fees (on premium plan)</b></h5>
+                                      <span>
+                                        1% per transaction, a minimum of 100 fils
+                                      </span>
+                                    </span>
+                                  </div>
+
+                                  <div class="col-12 col-sm-4 col-lg-4">
+                                    <!-- Fees (on free plan) -->
+                                    <span >
+                                      <h5><b>Fees (on free plan)</b></h5>
+                                      <span>
+                                        5% per transaction, a minimum of 200 fils
+                                      </span>
+                                    </span>
+                                  </div>
+
+                                </div>
+
+                              <?php  } else if ($model->is_myfatoorah_enable) { ?>
+                                <!-- Settlement window -->
+                                <div class="row" style="margin-bottom:15px">
+                                  <div class="col-12 col-sm-4 col-lg-4">
+                                    <!-- Settlement window -->
+                                    <span style="display:block">
+                                      <h5><b>Settlement window</b></h5>
+                                      <span>
+                                        Within 3 working days
+                                      </span>
+                                    </span>
+                                  </div>
+
+
+                                  <div class="col-12 col-sm-4 col-lg-4">
+                                    <!-- Fees (on premium plan) -->
+                                    <span >
+                                      <h5><b>Fees (on premium plan)</b></h5>
+                                      <span>
+                                        150 fils per transaction, no minimum
+                                      </span>
+                                    </span>
+                                  </div>
+
+                                  <div class="col-12 col-sm-4 col-lg-4">
+                                    <!-- Fees (on free plan) -->
+                                    <span >
+                                      <h5><b>Fees (on free plan)</b></h5>
+                                      <span>
+                                        5% per transaction, a minimum of 250 fils
+                                      </span>
+                                    </span>
+                                  </div>
+
+                                </div>
+
+                              <?php } if ($model->country->iso == 'KW' && $model->currency->code == 'KWD') {
                                   if($model->is_myfatoorah_enable || $model->is_tap_enable){
 
                                       if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 1])->exists())
@@ -215,9 +312,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                         echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 1], ['class' => 'btn btn-success']);
                                     }
                               } else if ($model->country->iso != 'KW' && $model->currency->code != 'KWD') { ?>
-                                        <span>
-                                          Contact us if you want to enable this option
-                                        </span>
+                                    <div style="background-color:#e0e0e0; padding:16px">
+                                      <span>
+                                        Contact us if you want to enable this option
+                                      </span>
+                                     </div>
                             <?php } ?>
 
                             </div>
@@ -238,8 +337,79 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                 <div class="card-body">
                                     <!-- Settlement window -->
-                                    <?php
-                                    if ($model->country->iso == 'BH' && $model->currency->code == 'BHD') {
+                                    <?php if($model->is_tap_enable){ ?>
+                                      <!-- Settlement window -->
+                                      <div class="row" style="margin-bottom:15px">
+                                        <div class="col-12 col-sm-4 col-lg-4">
+                                          <!-- Settlement window -->
+                                          <span style="display:block">
+                                            <h5><b>Settlement window</b></h5>
+                                            <span>
+                                              Within 3 working days
+                                            </span>
+                                          </span>
+                                        </div>
+
+
+                                        <div class="col-12 col-sm-4 col-lg-4">
+                                          <!-- Fees (on premium plan) -->
+                                          <span >
+                                            <h5><b>Fees (on premium plan)</b></h5>
+                                            <span>
+                                              1% per transaction, no minimum
+                                            </span>
+                                          </span>
+                                        </div>
+
+                                        <div class="col-12 col-sm-4 col-lg-4">
+                                          <!-- Fees (on free plan) -->
+                                          <span >
+                                            <h5><b>Fees (on free plan)</b></h5>
+                                            <span>
+                                              5% per transaction, no minimum
+                                            </span>
+                                          </span>
+                                        </div>
+
+                                      </div>
+
+                                    <?php  } else if ($model->is_myfatoorah_enable) { ?>
+                                      <!-- Settlement window -->
+                                      <div class="row" style="margin-bottom:15px">
+                                        <div class="col-12 col-sm-4 col-lg-4">
+                                          <!-- Settlement window -->
+                                          <span style="display:block">
+                                            <h5><b>Settlement window</b></h5>
+                                            <span>
+                                              Within 3 working days
+                                            </span>
+                                          </span>
+                                        </div>
+
+
+                                        <div class="col-12 col-sm-4 col-lg-4">
+                                          <!-- Fees (on premium plan) -->
+                                          <span >
+                                            <h5><b>Fees (on premium plan)</b></h5>
+                                            <span>
+                                              1.25%  per transaction, no minimum
+                                            </span>
+                                          </span>
+                                        </div>
+
+                                        <div class="col-12 col-sm-4 col-lg-4">
+                                          <!-- Fees (on free plan) -->
+                                          <span >
+                                            <h5><b>Fees (on free plan)</b></h5>
+                                            <span>
+                                              5% per transaction, no minimum
+                                            </span>
+                                          </span>
+                                        </div>
+
+                                      </div>
+
+                                    <?php } if ($model->country->iso == 'BH' && $model->currency->code == 'BHD') {
                                       if($model->business_type == 'corp' && ($model->is_myfatoorah_enable || $model->is_tap_enable)){
 
                                           if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 5])->exists())
@@ -251,15 +421,19 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                          if($model->business_type == 'ind'){ ?>
 
-                                            <span>
+                                            <div style="background-color:#e0e0e0; padding:16px">
+                                              <span>
                                                 This option is not allowed for home businesses. Contact us if you have a business license.
-                                            </span>
-
+                                              </span>
+                                             </div>
                                         <?php }
                                     } else if ($model->country->iso != 'BH' && $model->currency->code != 'BHD') { ?>
-                                              <span>
-                                                Contact us if you want to enable this option
-                                              </span>
+
+                                              <div style="background-color:#e0e0e0; padding:16px">
+                                                <span>
+                                                  Contact us if you want to enable this option
+                                                </span>
+                                               </div>
                                   <?php } ?>
 
                                 </div>
@@ -281,9 +455,79 @@ $this->params['breadcrumbs'][] = $this->title;
                             </div>
 
                             <div class="card-body">
-                                <!-- Settlement window -->
-                                <?php
-                                if ($model->country->iso == 'SA' && $model->currency->code == 'SAR') {
+                                <?php if($model->is_tap_enable){ ?>
+                                  <!-- Settlement window -->
+                                  <div class="row" style="margin-bottom:15px">
+                                    <div class="col-12 col-sm-4 col-lg-4">
+                                      <!-- Settlement window -->
+                                      <span style="display:block">
+                                        <h5><b>Settlement window</b></h5>
+                                        <span>
+                                          Within 3 working days
+                                        </span>
+                                      </span>
+                                    </div>
+
+
+                                    <div class="col-12 col-sm-4 col-lg-4">
+                                      <!-- Fees (on premium plan) -->
+                                      <span >
+                                        <h5><b>Fees (on premium plan)</b></h5>
+                                        <span>
+                                          1.5% per transaction, no minimum
+                                        </span>
+                                      </span>
+                                    </div>
+
+                                    <div class="col-12 col-sm-4 col-lg-4">
+                                      <!-- Fees (on free plan) -->
+                                      <span >
+                                        <h5><b>Fees (on free plan)</b></h5>
+                                        <span>
+                                          5% per transaction, no minimum
+                                        </span>
+                                      </span>
+                                    </div>
+
+                                  </div>
+
+                                <?php  } else if ($model->is_myfatoorah_enable) { ?>
+                                  <!-- Settlement window -->
+                                  <div class="row" style="margin-bottom:15px">
+                                    <div class="col-12 col-sm-4 col-lg-4">
+                                      <!-- Settlement window -->
+                                      <span style="display:block">
+                                        <h5><b>Settlement window</b></h5>
+                                        <span>
+                                          Within 3 working days
+                                        </span>
+                                      </span>
+                                    </div>
+
+
+                                    <div class="col-12 col-sm-4 col-lg-4">
+                                      <!-- Fees (on premium plan) -->
+                                      <span >
+                                        <h5><b>Fees (on premium plan)</b></h5>
+                                        <span>
+                                          1.5%  per transaction, no minimum
+                                        </span>
+                                      </span>
+                                    </div>
+
+                                    <div class="col-12 col-sm-4 col-lg-4">
+                                      <!-- Fees (on free plan) -->
+                                      <span >
+                                        <h5><b>Fees (on free plan)</b></h5>
+                                        <span>
+                                          5% per transaction, no minimum
+                                        </span>
+                                      </span>
+                                    </div>
+
+                                  </div>
+
+                                <?php } if ($model->country->iso == 'SA' && $model->currency->code == 'SAR') {
                                   if($model->business_type == 'corp' && ($model->is_myfatoorah_enable || ($model->is_tap_enable && $model->plan->plan_id == 2))){
 
                                       if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 4])->exists())
@@ -302,15 +546,20 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <?php }
 
                                     else if($model->is_tap_enable && $model->plan->plan_id == 1) { ?>
-                                      <span>
+                                      <div style="background-color:#e0e0e0; padding:16px">
+                                        <span>
                                           This option is only available on premium plan
-                                      </span>
+                                        </span>
+                                       </div>
 
                                     <?php  }
                                 } else if ($model->country->iso != 'SA' && $model->currency->code != 'SAR') { ?>
-                                          <span>
-                                            Contact us if you want to enable this option
-                                          </span>
+                                          <div style="background-color:#e0e0e0; padding:16px">
+                                            <span>
+                                              Contact us if you want to enable this option
+                                            </span>
+                                           </div>
+
                               <?php } ?>
 
                             </div>
@@ -334,8 +583,43 @@ $this->params['breadcrumbs'][] = $this->title;
 
                             <div class="card-body">
                                 <!-- Settlement window -->
-                                <?php
-                                if ($model->country->iso == 'SA' && $model->currency->code == 'SAR') {
+                                <?php if ($model->is_myfatoorah_enable) { ?>
+                                  <!-- Settlement window -->
+                                  <div class="row" style="margin-bottom:15px">
+                                    <div class="col-12 col-sm-4 col-lg-4">
+                                      <!-- Settlement window -->
+                                      <span style="display:block">
+                                        <h5><b>Settlement window</b></h5>
+                                        <span>
+                                          Within 5 working days
+                                        </span>
+                                      </span>
+                                    </div>
+
+
+                                    <div class="col-12 col-sm-4 col-lg-4">
+                                      <!-- Fees (on premium plan) -->
+                                      <span >
+                                        <h5><b>Fees (on premium plan)</b></h5>
+                                        <span>
+                                          2.5%  per transaction, no minimum
+                                        </span>
+                                      </span>
+                                    </div>
+
+                                    <div class="col-12 col-sm-4 col-lg-4">
+                                      <!-- Fees (on free plan) -->
+                                      <span >
+                                        <h5><b>Fees (on free plan)</b></h5>
+                                        <span>
+                                          5% per transaction, no minimum
+                                        </span>
+                                      </span>
+                                    </div>
+
+                                  </div>
+
+                                <?php } if ($model->country->iso == 'SA' && $model->currency->code == 'SAR') {
                                   if($model->business_type == 'corp' && ($model->is_myfatoorah_enable || ($model->is_tap_enable && $model->plan->plan_id == 2))){
 
                                       if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 6])->exists())
@@ -347,22 +631,26 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                      if($model->business_type == 'ind'){ ?>
 
-                                        <span>
+                                        <div style="background-color:#e0e0e0; padding:16px">
+                                          <span>
                                             This option is not allowed for home businesses. Contact us if you have a business license.
-                                        </span>
-
+                                          </span>
+                                         </div>
                                     <?php }
 
                                     else if($model->is_tap_enable && $model->plan->plan_id == 1) { ?>
-                                      <span>
+                                      <div style="background-color:#e0e0e0; padding:16px">
+                                        <span>
                                           This option is only available on premium plan
-                                      </span>
-
+                                        </span>
+                                       </div>
                                     <?php  }
                                 } else if ($model->country->iso != 'SA' && $model->currency->code != 'SAR') { ?>
-                                          <span>
-                                            Contact us if you want to enable this option
-                                          </span>
+                                          <div style="background-color:#e0e0e0; padding:16px">
+                                            <span>
+                                              Contact us if you want to enable this option
+                                            </span>
+                                           </div>
                               <?php } ?>
 
                             </div>
@@ -375,10 +663,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     </div>
 
-                    <?php
-                      echo Html::a($model->is_myfatoorah_enable ? 'Switch to Tap' : 'Switch to My Fatoorah', [$model->is_myfatoorah_enable ?  'switch-to-tap' : 'switch-to-myfatoorah', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=> 'margin-left: auto; margin-right: auto; display: block; width: 40%;']);
-                    ?>
-
 
             <?php   } ?>
         </div>
@@ -388,7 +672,25 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
   <?php }   ?>
 
+  <div class="card">
+    <div class="card-header">
+      <h3>
+        <?php
+        echo $model->is_myfatoorah_enable ? 'Tap gateway' : 'MyFatoorah gateway' ;
+        ?>
 
+      </h3>
+    </div>
+    <div class="card-body">
+
+        <?php
+          echo $model->is_myfatoorah_enable ?   'You can switch from MyFatoorah to TAP payments  if you’d like.' : 'You can switch from TAP payments to MyFatoorah if you’d like.';
+          echo Html::a('View rates', [$model->is_myfatoorah_enable ? 'view-tap-rates' : 'view-myfatoorah-rates', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=> 'margin-left: auto; margin-right: auto; display: block; width: 100%; margin-top:10px;']);
+          echo Html::a($model->is_myfatoorah_enable ? 'Switch to Tap' : 'Switch to My Fatoorah', [$model->is_myfatoorah_enable ?  'switch-to-tap' : 'switch-to-myfatoorah', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=> 'margin-left: auto; margin-right: auto; display: block; width: 100%; margin-top:10px;']);
+        ?>
+
+    </div>
+  </div>
     <!-- Cash on Delivery -->
     <div class="card">
         <div class="card-header">
