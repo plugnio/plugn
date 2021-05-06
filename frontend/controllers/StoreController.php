@@ -627,7 +627,7 @@ class StoreController extends Controller {
 
         $model = $this->findModel($storeUuid);
 
-        if($model->supplierCode){
+        if($model->live_api_key && $model->test_api_key){
           $model->is_tap_enable = 1;
           $model->is_myfatoorah_enable = 0;
           $model->save(false);
