@@ -480,8 +480,7 @@ class MyFatoorahPayment extends Component
           "RefundChargeOnCustomer" => "false",
           "ServiceChargeOnCustomer" => "false",
           "Comment" => $comment,
-          "Amount"=> $amount,
-          "AmountDeductedFromSupplier"=> $amount
+          "Amount"=> $amount
         ];
 
       $client = new Client();
