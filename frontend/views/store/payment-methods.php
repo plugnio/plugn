@@ -21,6 +21,11 @@ $this->params['breadcrumbs'][] = $this->title;
   else if ( $model->is_tap_enable )
     $paymentGateway = 'Tap';
 
+    $today = new DateTime();
+
+    $expiry = new DateTime($model->activeSubscription->subscription_end_at);
+
+    $interval = $today->diff($expiry);
 
 ?>
 
@@ -150,11 +155,17 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
                     </div>
 
-                    <?php
-                    echo Html::a('View my rates', [$model->is_myfatoorah_enable ? 'view-myfatoorah-rates' : 'view-tap-rates', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'margin-top:10px']);
 
-                    ?>
+                    <?php  if($model->plan->plan_id == 1){ ?>
+                      Want better rates?<br/>
+                      <?php
+                      echo Html::a('Upgrade to our premium plan', ['site/confirm-plan', 'id' => $model->restaurant_uuid, 'selectedPlanId' => 2 ], ['style' => 'color: #4CAF50;']);
+                    } else {?>
 
+                      <span>
+                        You are on the premium plan, <?=  $interval->days ?> days left on it
+                      </span>
+                    <?php } ?>
 
 
                       <!-- Credit Card -->
