@@ -499,6 +499,25 @@ class MyFatoorahPayment extends Component
   }
 
     /**
+     * get the supplier dashboard
+     * @param  string $chargeId
+     */
+    public function getSupplierDashboard($supplierCode)
+    {
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setMethod('GET')
+                ->setUrl($this->apiEndpoint . "/GetSupplierDashboard?SupplierCode=" . $supplierCode)
+                ->addHeaders([
+                    'authorization' => 'Bearer ' . $this->apiKey,
+                    'content-type' => 'application/json',
+                ])
+                ->send();
+
+        return $response;
+    }
+
+    /**
      * Check charge object for status updates
      * @param  string $chargeId
      */
