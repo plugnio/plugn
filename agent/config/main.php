@@ -72,6 +72,16 @@ return [
                         'OPTIONS' => 'options'
                     ]
                 ],
+                [// bankController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/bank',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
+                    ]
+                ],
                 [// CountryController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/country',
