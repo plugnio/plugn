@@ -451,6 +451,8 @@ class StoreController extends Controller {
             if (sizeof($owner_identification_file_back_side) > 0)
                 $model->identification_file_back_side = str_replace('uploads/', '', $owner_identification_file_back_side[0]['file']); //Owner's civil id back side
 
+            $model->is_myfatoorah_enable = 0;
+            $model->is_tap_enable = 0;
 
 
             if ($model->validate() && $model->save()) {
