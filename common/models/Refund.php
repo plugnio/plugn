@@ -147,7 +147,7 @@ class Refund extends \yii\db\ActiveRecord
 
         }else if ($totalAwaitingBalanceResponse->isOk){
           if($responseContent->TotalAwaitingBalance < $this->refund_amount)
-            $this->addError($attribute, 'Insufficient Balance for vendor.');
+            $this->addError($attribute, 'Insufficcent Balance');
 
           if ($this->refund_amount < 0.1 )
               $this->addError($attribute, 'Refund amount must be greater than zero.');
