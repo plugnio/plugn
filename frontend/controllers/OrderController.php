@@ -160,7 +160,7 @@ class OrderController extends Controller {
                     [
                         'attribute' => 'delivery_fee',
                         "value" => function($data) {
-                          return \Yii::$app->formatter->asCurrency($data->delivery_fee, 'KWD');
+                          return \Yii::$app->formatter->asCurrency($data->delivery_fee, $data->currency->code);
                         },
                     ],
 

@@ -19,9 +19,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="customer-view">
 
-  <p>
-    <?= Html::a('Update', ['update', 'id' => $model->customer_id, 'storeUuid' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
-  </p>
 
   <div class="card">
         <div class="card-body">

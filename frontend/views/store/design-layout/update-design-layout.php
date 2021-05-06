@@ -285,34 +285,34 @@ $this->registerJs($js);
                 ?>
             </div>
         </div>
-        <!-- <div class="row"> -->
+        <div class="row">
 
-            <!-- <div class="col-12 col-sm-6 col-lg-6"> -->
+            <div class="col-12 col-sm-6 col-lg-6">
 
                 <?php
 
-                  // echo  $form->field($model, 'default_language')->radioList([
-                  //              'en' =>     'English',
-                  //              'ar' => 'عربي'
-                  //           ], [
-                  //               'item' => function($index, $label, $name, $checked, $value) {
-                  //
-                  //                   $return = '<label class="vs-radio-con">';
-                  //                   /* -----> */ if ($checked)
-                  //                       $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                  //                   /* -----> */
-                  //                   else
-                  //                       $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                  //                   $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
-                  //                   $return .= '<span>' . ucwords($label) . '</span>';
-                  //                   $return .= '</label>';
-                  //
-                  //                   return $return;
-                  //               },
-                  //           ])->label("Choose your store's default language for your customers");
+                  echo  $form->field($model, 'default_language')->radioList([
+                               'en' =>     'English',
+                               'ar' => 'عربي'
+                            ], [
+                                'item' => function($index, $label, $name, $checked, $value) {
+
+                                    $return = '<label class="vs-radio-con">';
+                                    /* -----> */ if ($checked)
+                                        $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                                    /* -----> */
+                                    else
+                                        $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                                    $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
+                                    $return .= '<span>' . ucwords($label) . '</span>';
+                                    $return .= '</label>';
+
+                                    return $return;
+                                },
+                            ])->label("Choose your store's default language for your customers");
                 ?>
-            <!-- </div> -->
-        <!-- </div> -->
+            </div>
+        </div>
 
 
       </div>

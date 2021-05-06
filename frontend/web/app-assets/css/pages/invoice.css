@@ -17,7 +17,23 @@
   border : 2px solid #F8F8F8;
 }
 
+
+.item th {
+  background-color : #333333 !important;
+  color: white !important;
+}
+
+table, .summary  th, .summary td{
+  border: none !important;
+
+}
+
+
 @media print {
+  .invoice-page {
+    height: 100%;
+    background-color: white;
+  }
   body {
     font-size: 14pt;
   }

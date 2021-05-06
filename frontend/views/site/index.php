@@ -374,7 +374,34 @@ $this->registerJs($js);
 <section id="tutorial-card">
 
 
-  <?php if( !$restaurant_model->tap_queue_id && !$restaurant_model->is_tap_enable ){ ?>
+  <?php
+  if($numberOfOrders == 0){ ?>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-12 col-md-9 col-lg-9">
+                    <div>
+                        <h3><span>Learn how to use Plugn</span></h3>
+                    </div>
+                    <p> Check out our introductory course on how to design, build, and launch your online store.</p>
+                    <div>
+                        <div>
+                            <div>
+                                <?= Html::a('Learn', 'https://www.plugn.io/learn', ['class' => 'btn btn-primary']) ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <?php
+    }
+
+
+   if( !$restaurant_model->tap_queue_id && !$restaurant_model->is_tap_enable ){ ?>
 
   <div class="card">
       <div class="card-body">
@@ -398,9 +425,16 @@ $this->registerJs($js);
       </div>
   </div>
 
-<?php } ?>
+<?php }
 
-  <?php
+?>
+
+
+
+
+<?php
+
+
   if($restaurant_model->getItems()->count() == 0){ ?>
 
     <div class="card">
@@ -488,9 +522,13 @@ $this->registerJs($js);
         </div>
     </div>
 
-      <?php } ?>
+      <?php
+      }
 
-    <div class="card">
+      // if($numberOfOrders > 0){
+      ?>
+
+    <!-- <div class="card">
         <div class="card-body">
             <div class="row">
                 <div class="col-sm-12 col-md-9 col-lg-9">
@@ -501,7 +539,9 @@ $this->registerJs($js);
                     <div>
                         <div>
                             <div>
-                                <?= Html::a('View orders', ['site/real-time-orders', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                                <?php
+                                // Html::a('View orders', ['site/real-time-orders', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) 
+                                ?>
                             </div>
                         </div>
                     </div>
@@ -514,9 +554,11 @@ $this->registerJs($js);
             </div>
 
         </div>
-    </div>
+    </div> -->
 
-
+    <?php
+    // }
+    ?>
 
 
 

@@ -23,182 +23,312 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 <!-- invoice functionality end -->
 <!-- invoice page -->
 <section class="card invoice-page">
+
+
     <div id="invoice-template" class="card-body">
         <!-- Invoice Company Details -->
         <div id="invoice-company-details" class="row">
-            <div class="col-12  ">
-                <div class="media " style="margin-bttom: 20px">
+            <div class="col-sm-6 col-12 text-left">
+                <div class="media " style="margin-bttom: 20px;     display: block;">
                     <?php if ($model->armada_qr_code_link) { ?>
                         <img src="<?= $model->armada_qr_code_link ?>" width="100" height="100" />
                     <?php } ?>
-                    <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" style="margin-left: auto; margin-right: auto; display:block" />
+                    <img src="<?= $model->restaurant->getRestaurantLogoUrl() ?>" />
+
+                </div>
+
+                <div style="margin-top:30px">
+                  <h3 class="invoice-logo"><?= $model->restaurant->name ?></h3>
+                  <!-- <p class="card-text mb-25">Office 149, 450 South Brand Brooklyn</p>
+                  <p class="card-text mb-25">San Diego County, CA 91905, USA</p>
+                  <p class="card-text mb-0">+1 (123) 456 7891, +44 (876) 543 2198</p> -->
+
+                  <?php
+                if($model->order_mode == Order::ORDER_MODE_DELIVERY){
+              ?>
+
+                <!-- <p class="card-text mb-25"> -->
+                  <?php
+                  // echo $model->customer_name
+                  ?>
+                <!-- </p> -->
+
+                <p class="card-text mb-25"  style="display: contents">
+                  <?= $model->area_id && $model->block ? 'Block ' . $model->block : ''  ?>
+                </p>
+                <p class="card-text mb-25"  style="display: contents">
+                  <?= $model->area_id ? 'Street ' . $model->street : '' ?>
+                </p>
+
+                <?php
+              if($model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office'){
+            ?>
+
+                <div  style="display: block">
+                  <p class="card-text mb-25"  style="display: contents">
+                    <?= $model->area_id && $model->avenue ? 'Avenue ' . $model->avenue : ''; ?>
+                  </p>
+
+                  <p class="card-text mb-25"  style="display: contents">
+                    <?= $model->area_id && $model->floor != null && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? 'Floor ' . $model->floor : ''?>
+                  </p>
+                  <p class="card-text mb-25"  style="display: contents">
+                    <?=  $model->area_id && $model->apartment != null && $model->unit_type == 'Apartment' ? 'Apartment No. ' . $model->apartment : ''?>
+                  </p>
+                  <p class="card-text mb-25"  style="display: contents">
+                    <?=  $model->area_id && $model->office != null && $model->unit_type == 'Office'  ? 'Office No. ' . $model->office : ''?>
+                  </p>
+                  <p class="card-text mb-25"  style="display: block">
+                    <?= $model->area_id ? ($model->unit_type == 'House' ? 'House No. ' : 'Building ') . $model->house_number :  ''  ?>
+                  </p>
+
+                </div>
+                <?php } else { ?>
+                  <div  style="display: block">
+
+                    <p class="card-text mb-25"  style="display: contents">
+                      <?= $model->area_id && $model->avenue ? 'Avenue ' . $model->avenue : ''; ?>
+                    </p>
+                    <p class="card-text mb-25"  style="display: contents">
+                      <?= $model->area_id ? ($model->unit_type == 'House' ? 'House No. ' : 'Building: ') . $model->house_number :  ''  ?>
+                    </p>
+                    <p class="card-text mb-25" style="display: block">
+                      <?= $model->address_1 ? $model->address_1 : ''  ?>
+                    </p>
+                    <p class="card-text mb-25" style="display: contents">
+                      <?= $model->address_2 ? $model->address_2 : ''  ?>
+                    </p>
+
+                  </div>
+              <?php } ?>
+
+                <div  style="display: block">
+                  <p class="card-text mb-25" style="display: contents">
+                    <?= $model->area_id ? $model->area_name .', ' : '' ?>
+                  </p>
+                    <p class="card-text mb-25"  style="display: contents">
+                      <?= $model->area_id ?  $model->area->city->city_name  :  $model->city . ' ' . $model->postalcode  ?>
+                    </p>
+                    <p class="card-text mb-25"  style="display: block">
+                       <?=  $model->country_name ? $model->country_name : ''; ?>
+                    </p>
+                    <p class="card-text mb-25"  style="display: block">
+                      <?=  $model->customer_phone_number  ?>
+                    </p>
+                </div>
+
+
+
+                <?php
+              } else {
+                ?>
+                <h6 class="mt-2">Customer</h6>
+                  <p class="card-text mb-25">
+                    <?=  $model->customer_name ?>
+                  </p>
+                  <span style="display: block" >
+                    <?=  $model->customer_phone_number ?>
+                  </p>
+              <?php } ?>
+
+
 
                 </div>
             </div>
             <div class="col-sm-6 col-12 text-right">
+              <h2 class="invoice-title">
+                  <b>INVOICE</b>
+              </h2>
+              <div class="invoice-date-wrapper">
+                  <p class="invoice-date-title"><b># INV-<?= $model->order_uuid  ?></b></p>
+              </div>
 
             </div>
         </div>
         <!--/ Invoice Company Details -->
 
         <!-- Invoice Recipient Details -->
-        <div id="invoice-customer-details" class="row pt-2">
+        <div id="invoice-company-details" class="row">
             <div class="col-sm-6 col-12 text-left">
 
+
+
+              <?php if($model->special_directions) { ?>
+
                 <div class="invoice-details my-2">
-                    <h6 class="mt-2">INVOICE NO.</h6>
-                    <p> <?= '#' . $model->order_uuid ?></p>
-                    <h6 class="mt-2">Payment Method</h6>
-                    <p>
-                        <?= $model->payment_method_name ?>
-                    </p>
+                    <div class="row">
 
-                    <?php
-                      if($model->order_mode == Order::ORDER_MODE_DELIVERY){
-                    ?>
+                      <div class=" col-12 text-left">
+                        <span>
+                          <span style="    padding-left: 10px;">
+                          </span>
+                        </span>
 
-                    <h6 class="mt-2">Shipping Address</h6>
-                      <span style="display: block; margin-bottom:3px" >
-                        <?=  $model->customer_name ?>
-                      </span>
-                      <span style="display: block" >
-                        <?php
-                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
-                              echo $model->area_id ? $model->area_name_ar : $model->address_1;
-                            }else {
-                              echo $model->area_id ? $model->area_name : $model->address_1;
-                            }
-                         ?>
-                      </span>
-                      <span style="display: block" >
+                      </div>
 
-                        <?php
-                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
-                              echo $model->area_id ? 'قطعة: ' . $model->block : $model->address_2;
-                            }else {
-                              echo $model->area_id ? 'Block: ' . $model->block : $model->address_2;
-                            }
-                         ?>
-
-                      </span>
-                      <span style="display: block" >
-                        <?php
-                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
-                              echo $model->area_id ? 'شارع: ' . $model->street : $model->postalcode . ' ' . $model->city;
-                            }else {
-                              echo $model->area_id ? 'St: ' . $model->street : $model->postalcode . ' ' . $model->city;
-                            }
-                         ?>
-                      </span>
-                      <span style="display: block" >
-
-                        <?php
-                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
-                              echo $model->area_id && $model->avenue ? 'جادة: ' . $model->avenue : '';;
-
-                            }else {
-                              echo $model->area_id && $model->avenue ? 'Avenue: ' . $model->avenue : '';;
-
-                            }
-                         ?>
-
-                      </span>
-                      <span style="display: block" >
-
-                        <?php
-                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
-                              echo $model->area_id && $model->floor != null && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? 'الطابق: ' . $model->floor : '';
-                            }else {
-                              echo $model->area_id && $model->floor != null && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? 'Floor: ' . $model->floor : '';
-                            }
-                         ?>
-
-                      </span>
-                      <span style="display: block" >
-
-                        <?php
-                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
-                              echo $model->area_id && $model->apartment != null && $model->unit_type == 'Apartment' ? 'رقم الشقة: ' . $model->apartment : '';
-                            }else {
-                              echo $model->area_id && $model->apartment != null && $model->unit_type == 'Apartment' ? 'Apartment No. ' . $model->apartment : '';
-                            }
-                         ?>
-
-                      </span>
-                      <span style="display: block" >
-
-                        <?php
-                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
-                              echo $model->area_id && $model->office != null && $model->unit_type == 'Office'  ? 'رقم المكتب: ' . $model->office : '';
-                            }else {
-                              echo $model->area_id && $model->office != null && $model->unit_type == 'Office'  ? 'Office No. ' . $model->office : '';
-                            }
-                         ?>
+                    </div>
 
 
-                      </span>
-                      <span style="display: block" >
-                        <?php
-                            if($model->restaurant_uuid == 'rest_1d0d9657-6623-11eb-b97d-0673128d0c9c'){
-                              // echo $model->area_id ? (($model->unit_type == 'House' ? ' البناية': ' رقم المنزل ') . $model->house_number :  '');
-                              echo $model->area_id ? ($model->unit_type == 'House' ? 'رقم المنزل: ' : 'البناية: ') . $model->house_number :  '';
+                </div>
+              <div class="invoice-details my-2">
+                  <div class="row">
 
-                            }else {
-                              echo $model->area_id ? ($model->unit_type == 'House' ? 'House No. ' : 'Building: ') . $model->house_number :  '';
-                            }
-                         ?>
-                      </span>
-                      <span style="display: block" >
-                        <?= $model->area_id ?  $model->area->city->city_name :  '' ?>
-                      </span>
-                      <span style="display: block" >
-                        <?=  $model->country_name ? $model->country_name : ''; ?>
-                      </span>
-                      <span style="display: block" >
-                        <?=  $model->customer_phone_number  ?>
-                      </span>
-                      <?php
-                    } else {
-                      ?>
-                      <h6 class="mt-2">Customer</h6>
-                        <span style="display: block; margin-bottom:3px" >
+                    <div class=" col-12 text-left">
+                      <span>
+                        <b>Customer: </b>
+                        <span style="    padding-left: 10px;">
                           <?=  $model->customer_name ?>
                         </span>
-                        <span style="display: block" >
-                          <?=  $model->customer_phone_number ?>
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+              </div>
+              <div class="invoice-details my-2">
+                  <div class="row">
+
+                    <div class="col-12 text-left">
+                      <span>
+                        <b>Special Directions: </b>
+                        <span style="    padding-left: 10px;">
+                          <?=  $model->special_directions ?>
                         </span>
-                    <?php } ?>
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+              </div>
+
+            <?php  } else { ?>
+
+              <div class="invoice-details my-2">
+                  <div class="row">
+
+                    <div class=" col-12 text-left">
+                      <span>
+                        <span style="    padding-left: 10px;">
+                        </span>
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+              </div>
+
+              <div class="invoice-details my-2">
+                  <div class="row">
+
+                    <div class=" col-12 text-left">
+                      <span>
+                        <span style="    padding-left: 10px;">
+                        </span>
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+              </div>
+
+
+              <div class="invoice-details my-2">
+                  <div class="row">
+
+                    <div class=" col-12 text-left">
+                      <span>
+                        <b>Customer: </b>
+                        <span style="    padding-left: 10px;">
+                          <?=  $model->customer_name ?>
+                        </span>
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+              </div>
+
+            <?php  } ?>
+
+
+            </div>
+            <div class="col-sm-6 col-12 text-right">
+
+                <div class="invoice-details my-2">
+                    <div class="row">
+                      <div class="col-sm-1 col-12 text-left">
+                      </div>
+                      <div class="col-sm-5 col-12 text-left">
+                        <span><b>Invoice Date</b></span>
+
+                      </div>
+                      <div class="col-sm-6 col-12 text-right">
+                        <span>
+                          <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy h:mm a') ?>
+                        </span>
+
+                      </div>
+                    </div>
+
+
+                </div>
+                <div class="invoice-details my-2">
+                    <div class="row">
+                      <div class="col-sm-1 col-12 text-left">
+                      </div>
+                      <div class="col-sm-5 col-12 text-left">
+                        <span><b>Estimated Delivery</b></span>
+
+                      </div>
+                      <div class="col-sm-6 col-12 text-right">
+                        <span>
+                          <?= \Yii::$app->formatter->asDatetime($model->estimated_time_of_arrival, 'MMM dd, yyyy h:mm a') ?>
+                        </span>
+
+                      </div>
+                    </div>
+
+
+                </div>
+                <div class="invoice-details my-2">
+                    <div class="row">
+                      <div class="col-sm-1 col-12 text-left">
+                      </div>
+                      <div class="col-sm-5 col-12 text-left">
+                        <span><b>Payment Method</b></span>
+
+                      </div>
+                      <div class="col-sm-6 col-12 text-right">
+                        <span>
+                          <?= $model->payment_method_name ?>
+                        </span>
+
+                      </div>
+                    </div>
+
+
                 </div>
 
             </div>
+        </div>
+
+
+        <div id="invoice-customer-details" class="row pt-2">
+
 
             <div class="col-sm-6 col-12 text-left">
-
-
-                <div class="invoice-details my-2">
-
-                    <h6 class="mt-2">Invoice Date</h6>
-                    <p>
-                        <?= \Yii::$app->formatter->asDatetime($model->order_created_at, 'MMM dd, yyyy h:mm a') ?>
-                    </p>
-
-                </div>
-                <div class="invoice-details my-2">
-
-                    <h6 class="mt-2">Expected At</h6>
-                    <p>
-                      <?= \Yii::$app->formatter->asDatetime($model->estimated_time_of_arrival, 'MMM dd, yyyy h:mm a') ?>
-                    </p>
-
-                </div>
-
-                <div class="invoice-details my-2">
-
-                    <h6 class="mt-2">When</h6>
-                      <p>  <?= $model->is_order_scheduled ? 'Scheduled' : 'As soon as possible'; ?> </p>
-
-                </div>
-
+            </div>
+            <div class="col-sm-6 col-12 text-left">
 
             </div>
 
@@ -249,17 +379,20 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                             ],
                         ],
                         'layout' => '{items}',
-                        'tableOptions' => ['class' => 'table table-bordered table-hover'],
+                        'tableOptions' => ['class' => 'table  table-hover item'],
                     ]);
                     ?>
+                    <hr>
                 </div>
             </div>
         </div>
-        <div id="invoice-total-details" class="invoice-total-table">
-            <div class="row">
-                <div class="col-12">
+        <div id="invoice-total-details  invoice-sales-total-wrapper" class="invoice-total-table">
+          <!-- <div class="row invoice-sales-total-wrapper"> -->
+              <div>
+            <!-- <div class="row"> -->
+                <!-- <div class="col-12"> -->
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
+                        <table class="table summary" style="  width: 30%; float: right;">
                             <tbody>
                                 <tr>
                                     <th>Subtotal</th>
@@ -333,7 +466,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                             </tr>
                           <?php } ?>
                             <tr>
-                                <th>Total Price</th>
+                                <th><b>Total Price</b></th>
                                 <td><?= Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
                             </tr>
                             </tbody>

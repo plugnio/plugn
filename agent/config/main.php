@@ -72,6 +72,27 @@ return [
                         'OPTIONS' => 'options'
                     ]
                 ],
+                [// CountryController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/country',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
+                    ]
+                ],
+                [// AgentController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/agent',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'detail',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
+                    ]
+                ],
                 [// VoucherController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/voucher',

@@ -298,6 +298,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                         ],
                         [
                             'attribute' => 'estimated_time_of_arrival',
+                            'label' => 'Estimated Delivery',
                             "format" => "raw",
                             "value" => function($model) {
                                 if($model->is_order_scheduled)
@@ -347,14 +348,6 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                                 return Html::a($data->mashkor_tracking_link, \yii\helpers\Url::to($data->mashkor_tracking_link, true), ['target' => '_blank']);
                             },
                             'visible' => $model->mashkor_tracking_link != null,
-                        ],
-                        [
-                            'attribute' => 'mashkor_driver_name',
-                            'format' => 'raw',
-                            'value' => function ($data) {
-                                return $data->mashkor_driver_name ? $data->mashkor_driver_name : null;
-                            },
-                            'visible' => $model->mashkor_driver_name != null,
                         ],
                         [
                             'attribute' => 'mashkor_driver_phone',
