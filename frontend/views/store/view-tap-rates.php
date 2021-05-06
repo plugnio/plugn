@@ -31,11 +31,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 </div>
 
-Want better rates?<br/>
-<?php
-echo Html::a('Upgrade to our premium plan', ['site/confirm-plan', 'id' => $model->restaurant_uuid, 'selectedPlanId' => 2 ], ['style' => 'color: #4CAF50;'])
- ?>
-
 
 <!-- Credit Card -->
 <div class="card">

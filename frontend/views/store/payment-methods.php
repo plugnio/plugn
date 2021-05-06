@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
     $expiry = new DateTime($model->activeSubscription->subscription_end_at);
 
     $interval = $today->diff($expiry);
-    
+
 ?>
 
 
@@ -74,17 +74,23 @@ $this->params['breadcrumbs'][] = $this->title;
               </h3>
 
           </div>
-          <div class="card-body">
+            <div class="card-body">
+              <?php if (!$model->payment_gateway_queue_id){ ?>
 
-              <p style="color: black;">You can allow customers to make payments online to receive your money in your bank account.</p>
+                <p style="color: black;">You can allow customers to make payments online to receive your money in your bank account.</p>
 
 
-              <?php
-                echo Html::a('Set up online payments', ['setup-online-payments', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-success']);
-               ?>
+                <?php
+                  echo Html::a('Set up online payments', ['setup-online-payments', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-success']);
+                 ?>
+               <?php } else if($model->payment_gateway_queue_id) { ?>
+                 <p style="color: black;">
+                   We are currently getting approvals for your account from <?= $model->paymentGatewayQueue->payment_gateway == 'tap' ? 'Tap' : 'Myfatoorah' ?>. This could take up to 24 hours. We'll email you when it's ready.
+                 </p>
 
-          </div>
+               <?php } ?>
 
+            </div>
 
 
       </div>
