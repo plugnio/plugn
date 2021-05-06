@@ -234,7 +234,7 @@ $this->params['breadcrumbs'][] = $this->title;
                           <div class="card" style="margin-top:20px;box-shadow: 0px 5px 20px #88888854 !important;" id="paymentMethodCard">
                             <div class="card-header">
                                 <h3>
-                                  K-net
+                                  KNET
                                 </h3>
                                 <div style="text-align: center; display:block">
                                   <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/knet.svg' ?>" style="width: 50px;">
