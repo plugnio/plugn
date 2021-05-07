@@ -85,7 +85,7 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
                 $this->queue_status = self::QUEUE_STATUS_COMPLETE;
                 if($this->save() && $this->restaurant->restaurant_email){
 
-                  $paymentGateway = $queue->payment_gateway == 'tap' ? 'Tap Payments' : 'MyFatoorah';
+                  $paymentGateway = $this->payment_gateway == 'tap' ? 'Tap Payments' : 'MyFatoorah';
                   $subject = 'Your '. $paymentGateway .' account has been approved';
 
                   \Yii::$app->mailer->compose([
