@@ -28,6 +28,13 @@ $this->params['breadcrumbs'][] = $this->title;
     $interval = $today->diff($expiry);
 
 ?>
+<style>
+  @media only screen and (min-width:700px) {
+    .switch-btn {
+        width: 30% !important;
+    }
+}
+</style>
 
 
 
@@ -703,9 +710,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?php
           echo $model->is_myfatoorah_enable ?   'You can switch from MyFatoorah to TAP payments  if you’d like.' : 'You can switch from TAP payments to MyFatoorah if you’d like.';
+          ?>
+          <div class="switch-btn">
+          <?php
           echo Html::a('View rates', [$model->is_myfatoorah_enable ? 'view-tap-rates' : 'view-myfatoorah-rates', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=> 'margin-left: auto; margin-right: auto; display: block; width: 100%; margin-top:10px;']);
           echo Html::a($model->is_myfatoorah_enable ? 'Switch to Tap' : 'Switch to My Fatoorah', [$model->is_myfatoorah_enable ?  'switch-to-tap' : 'switch-to-myfatoorah', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=> 'margin-left: auto; margin-right: auto; display: block; width: 100%; margin-top:10px;']);
         ?>
+      </div>
 
     </div>
   </div>
