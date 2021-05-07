@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
  $paymentGateway = '';
 
   if( $model->is_myfatoorah_enable )
-    $paymentGateway = 'My Fatoorah';
+    $paymentGateway = 'MyFatoorah';
   else if ( $model->is_tap_enable )
     $paymentGateway = 'Tap';
 
@@ -103,7 +103,7 @@ $this->params['breadcrumbs'][] = $this->title;
       </div>
     <?php }  else { ?>
 
-    <!-- My fatoorah - tap Online Payment  -->
+    <!-- MyFatoorah - tap Online Payment  -->
     <div class="card">
         <div class="card-header">
           <h3>
@@ -714,7 +714,7 @@ $this->params['breadcrumbs'][] = $this->title;
           <div class="switch-btn">
           <?php
           echo Html::a('View rates', [$model->is_myfatoorah_enable ? 'view-tap-rates' : 'view-myfatoorah-rates', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=> 'margin-left: auto; margin-right: auto; display: block; width: 100%; margin-top:10px;']);
-          echo Html::a($model->is_myfatoorah_enable ? 'Switch to Tap' : 'Switch to My Fatoorah', [$model->is_myfatoorah_enable ?  'switch-to-tap' : 'switch-to-myfatoorah', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=> 'margin-left: auto; margin-right: auto; display: block; width: 100%; margin-top:10px;']);
+          echo Html::a($model->is_myfatoorah_enable ? 'Switch to Tap' : 'Switch to MyFatoorah', [$model->is_myfatoorah_enable ?  'switch-to-tap' : 'switch-to-myfatoorah', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=> 'margin-left: auto; margin-right: auto; display: block; width: 100%; margin-top:10px;']);
         ?>
       </div>
 

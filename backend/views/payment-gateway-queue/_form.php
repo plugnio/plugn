@@ -33,7 +33,7 @@ use kartik\select2\Select2;
 
     <?= $form->field($model, 'payment_gateway')->dropDownList(
         [
-          'myfatoorah' => 'My Fatoorah',
+          'myfatoorah' => 'MyFatoorah',
           'tap' => 'Tap',
         ]);
    ?>

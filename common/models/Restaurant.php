@@ -707,19 +707,19 @@ class Restaurant extends \yii\db\ActiveRecord {
     }
 
     /**
-     * Create an account for vendor on My Fatoorah
+     * Create an account for vendor on MyFatoorah
      */
     public function createMyFatoorahAccount() {
 
 
-        //Create  supplier for a vendor on My Fatoorah
+        //Create  supplier for a vendor on MyFatoorah
         $response = Yii::$app->myFatoorahPayment->createSupplier($this);
         $supplierApiResponse = json_decode($response->content);
 
         if ($supplierApiResponse->IsSuccess) {
 
             $this->supplierCode = $supplierApiResponse->Data->SupplierCode;
-            \Yii::info($this->name . " has just created My Fatooraha account", __METHOD__);
+            \Yii::info($this->name . " has just created MyFatooraha account", __METHOD__);
 
           if ($this->supplierCode){
             $this->is_myfatoorah_enable = 1;
@@ -729,7 +729,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             $this->is_myfatoorah_enable = 0;
 
             if($this->save()){
-                // //Upload documents file on our server before we create an account on my fatoorah we gonaa delete them
+                // //Upload documents file on our server before we create an account on MyFatoorah we gonaa delete them
                 $this->uploadDocumentsToMyFatoorah();
             }
 

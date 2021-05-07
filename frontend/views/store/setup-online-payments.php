@@ -59,7 +59,7 @@ You can only connect one of the two. Choose wisely.
 <div class="card">
   <div class="card-header">
       <h3>
-        My Fatoorah
+        MyFatoorah
       </h3>
   </div>
 
@@ -82,7 +82,7 @@ You can only connect one of the two. Choose wisely.
 
           if (!$model->is_tap_enable && !$model->is_myfatoorah_enable) {
               if (!$model->payment_gateway_queue_id)
-                  echo Html::a('Create My Fatoorah account', ['create-payment-gateway-account', 'id' => $model->restaurant_uuid,'paymentGateway' => 'myfatoorah'], ['class' => 'btn btn-success','style'=>'margin-top:10px']);
+                  echo Html::a('Create MyFatoorah account', ['create-payment-gateway-account', 'id' => $model->restaurant_uuid,'paymentGateway' => 'myfatoorah'], ['class' => 'btn btn-success','style'=>'margin-top:10px']);
           }
 
     ?>

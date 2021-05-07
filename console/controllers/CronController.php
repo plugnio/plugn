@@ -364,7 +364,7 @@ class CronController extends \yii\console\Controller {
 
 
     /**
-     * make the Refund Request from the API directly without the need of login into My Fatoorah dashboard
+     * make the Refund Request from the API directly without the need of login into MyFatoorah dashboard
      */
     public function actionMakeRefund() {
 

@@ -20,7 +20,7 @@ use borales\extensions\phoneInput\PhoneInput;
 
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
-$this->title = 'Create My Fatoorah account';
+$this->title = 'Create MyFatoorah account';
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 

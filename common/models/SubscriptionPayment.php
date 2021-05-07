@@ -231,7 +231,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
 
 
-                 //edit  supplier for a vendor on My Fatoorah
+                 //edit  supplier for a vendor on MyFatoorah
                  if($paymentRecord->restaurant->is_myfatoorah_enable){
 
                    $response = Yii::$app->myFatoorahPayment->editSupplier($paymentRecord->restaurant);
@@ -239,7 +239,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
                    if ($supplierApiResponse->IsSuccess) {
 
-                       \Yii::info($paymentRecord->restaurant->name . " has just updated My Fatooraha account", __METHOD__);
+                       \Yii::info($paymentRecord->restaurant->name . " has just updated MyFatooraha account", __METHOD__);
 
                    } else {
                       $storeName = $paymentRecord->restaurant->name;
