@@ -160,12 +160,15 @@ z-index: 2;
     <?php
     $form = ActiveForm::begin([
                 'enableClientValidation' => false,
+                'errorSummaryCssClass' => 'alert alert-danger'
+
     ]);
     ?>
 
-    <?= $form->errorSummary($model); ?>
 
     <div class="card-body">
+      <?= $form->errorSummary([$model], ['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
+      
         <div class="row">
             <div class=" col-12 col-lg-12 col-xl-8">
                 <div class="card">
@@ -175,7 +178,7 @@ z-index: 2;
                     foreach ($refunded_items_model as $refundedItemKey => $refundedItem) {
                       $itemItmage = null;
 
-                      if($refundedItem->orderItem->getItemImage()->one())
+                      if($refundedItem->orderItem && $refundedItem->orderItem->getItemImage()->one())
                         $itemItmage = $refundedItem->orderItem->getItemImage()->one()->product_file_name;
 
                         ?>
@@ -196,39 +199,42 @@ z-index: 2;
                                                 <?php } ?>
                                             </section>
                                         </div>
-                                        <div class="item-data">
-                                            <!-- Product name -->
-                                            <div>
-                                                <span>
-                                                    <?= $refundedItem->orderItem->item_name ?>
-                                                </span>
-                                            </div>
-                                            <!-- Product description -->
-                                            <div>
-                                                <?php
-                                                if (!empty($refundedItem->orderItem->getOrderItemExtraOptions()->all())) {
-                                                    $extraOptions = '';
+                                        <?php if ($refundedItem && $refundedItem->orderItem) {  ?>
+                                              <div class="item-data">
+                                                  <!-- Product name -->
+                                                  <div>
+                                                      <span>
+                                                          <?= $refundedItem->orderItem->item_name ?>
+                                                      </span>
+                                                  </div>
+                                                  <!-- Product description -->
+                                                  <div>
+                                                      <?php
+                                                      if (!empty($refundedItem->orderItem->getOrderItemExtraOptions()->all())) {
+                                                          $extraOptions = '';
 
-                                                    foreach ($refundedItem->orderItem->getOrderItemExtraOptions()->all() as $key => $extraOption) {
-                                                        if ($key == 0) {
-                                                            $extraOptions .= '<span>' . $extraOption->extra_option_name . '</span>';
-                                                        } else {
-                                                            $extraOptions .= '<span> / ' . $extraOption->extra_option_name . '</span>';
-                                                        }
-                                                    }
+                                                          foreach ($refundedItem->orderItem->getOrderItemExtraOptions()->all() as $key => $extraOption) {
+                                                              if ($key == 0) {
+                                                                  $extraOptions .= '<span>' . $extraOption->extra_option_name . '</span>';
+                                                              } else {
+                                                                  $extraOptions .= '<span> / ' . $extraOption->extra_option_name . '</span>';
+                                                              }
+                                                          }
 
-                                                    echo $extraOptions;
-                                                }
-                                                ?>
-                                                <span>
+                                                          echo $extraOptions;
+                                                      }
+                                                      ?>
+                                                      <span>
 
-                                                </span>
-                                            </div>
-                                            <!-- Product price -->
-                                            <div>
-                                                <?= Yii::$app->formatter->asCurrency($refundedItem->orderItem->item_price, $refundedItem->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
-                                            </div>
-                                        </div>
+                                                      </span>
+                                                  </div>
+                                                  <!-- Product price -->
+                                                  <div>
+                                                      <?= Yii::$app->formatter->asCurrency($refundedItem->orderItem->item_price, $refundedItem->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
+                                                  </div>
+                                              </div>
+                                          <?php } ?>
+
                                     </div>
                                 </div>
                                 <div class="col-12 col-sm-6 text-center">
@@ -238,8 +244,8 @@ z-index: 2;
 
                                             <div class="form-group field-item-item_price required">
                                                 <div class="input-group">
+                                                  <?php if ($refundedItem && $refundedItem->orderItem) {
 
-                                                      <?php
                                                           $order_item_qty = $refundedItem->orderItem->qty;
                                                           $order_item_price = $refundedItem->orderItem->item_price / $order_item_qty;
 
@@ -278,6 +284,7 @@ z-index: 2;
                                                               'max'=> $order_item_qty,
                                                               'step' => "1"
                                                           ])->label(false);
+                                                        }
                                                         ?>
 
                                                 </div>
@@ -377,7 +384,11 @@ z-index: 2;
 
                         <div style="margin-top: 1.6rem;">
                             <span>
-                              <?= $refundedItem->orderItem->order->payment_method_name ?>
+                              <?php
+
+                                if($refundedItem->orderItem)
+                                  echo $refundedItem->orderItem->order->payment_method_name;
+                               ?>
                             </span>
 
 
@@ -397,13 +408,25 @@ z-index: 2;
                                 ])->label(false)
                                 ?>
 
-                            <span class="avaliable-amount-to-refund">  <?= Yii::$app->formatter->asCurrency($refundedItem->orderItem->order->total_price, $refundedItem->currency->code , [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3,]) ?> available for refund</span>
+                            <span class="avaliable-amount-to-refund">
+                              <?php
+
+                                if($refundedItem->orderItem){
+
+                                  echo Yii::$app->formatter->asCurrency($refundedItem->orderItem->order->total_price, $refundedItem->currency->code , [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]);
+                                }
+                               ?>
+                               available for refund
+                            </span>
 
                         </div>
-                        <div class="form-group refund-btn">
-                        <?= Html::submitButton('Refund <span id="refund_amount_btn">0.000 '. $refundedItem->currency->code .'</span>', ['class' => 'btn btn-block bg-success btn-m', 'style' => 'color: white']) ?>
-                                                </div>
+                        <?php
 
+                          if($refundedItem->orderItem){ ?>
+                        <div class="form-group refund-btn">
+                          <?= Html::submitButton('Refund <span id="refund_amount_btn">0.000 '. $refundedItem->currency->code .'</span>', ['class' => 'btn btn-block bg-success btn-m', 'style' => 'color: white']) ?>
+                        </div>
+                      <?php } ?>
                                             </div>
 
                                         </div>

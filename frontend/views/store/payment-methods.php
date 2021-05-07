@@ -21,8 +21,20 @@ $this->params['breadcrumbs'][] = $this->title;
   else if ( $model->is_tap_enable )
     $paymentGateway = 'Tap';
 
+    $today = new DateTime();
+
+    $expiry = new DateTime($model->activeSubscription->subscription_end_at);
+
+    $interval = $today->diff($expiry);
 
 ?>
+<style>
+  @media only screen and (min-width:700px) {
+    .switch-btn {
+        width: 30% !important;
+    }
+}
+</style>
 
 
 
@@ -69,17 +81,23 @@ $this->params['breadcrumbs'][] = $this->title;
               </h3>
 
           </div>
-          <div class="card-body">
+            <div class="card-body">
+              <?php if (!$model->payment_gateway_queue_id){ ?>
 
-              <p style="color: black;">You can allow customers to make payments online to receive your money in your bank account.</p>
+                <p style="color: black;">You can allow customers to make payments online to receive your money in your bank account.</p>
 
 
-              <?php
-                echo Html::a('Set up online payments', ['setup-online-payments', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-success']);
-               ?>
+                <?php
+                  echo Html::a('Set up online payments', ['setup-online-payments', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-success']);
+                 ?>
+               <?php } else if($model->payment_gateway_queue_id) { ?>
+                 <p style="color: black;">
+                   We are currently getting approvals for your account from <?= $model->paymentGatewayQueue->payment_gateway == 'tap' ? 'Tap' : 'Myfatoorah' ?>. This could take up to 24 hours. We'll email you when it's ready.
+                 </p>
 
-          </div>
+               <?php } ?>
 
+            </div>
 
 
       </div>
@@ -150,11 +168,17 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
                     </div>
 
-                    <?php
-                    echo Html::a('View my rates', [$model->is_myfatoorah_enable ? 'view-myfatoorah-rates' : 'view-tap-rates', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'margin-top:10px']);
 
-                    ?>
+                    <?php  if($model->plan->plan_id == 1){ ?>
+                      Want better rates?<br/>
+                      <?php
+                      echo Html::a('Upgrade to our premium plan', ['site/confirm-plan', 'id' => $model->restaurant_uuid, 'selectedPlanId' => 2 ], ['style' => 'color: #4CAF50;']);
+                    } else {?>
 
+                      <span>
+                        You are on the premium plan, <?=  $interval->days ?> days left on it
+                      </span>
+                    <?php } ?>
 
 
                       <!-- Credit Card -->
@@ -223,7 +247,7 @@ $this->params['breadcrumbs'][] = $this->title;
                           <div class="card" style="margin-top:20px;box-shadow: 0px 5px 20px #88888854 !important;" id="paymentMethodCard">
                             <div class="card-header">
                                 <h3>
-                                  K-net
+                                  KNET
                                 </h3>
                                 <div style="text-align: center; display:block">
                                   <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/knet.svg' ?>" style="width: 50px;">
@@ -672,6 +696,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
   <?php }   ?>
 
+<?php if($model->is_myfatoorah_enable || $model->is_tap_enable) { ?>
   <div class="card">
     <div class="card-header">
       <h3>
@@ -685,12 +710,19 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?php
           echo $model->is_myfatoorah_enable ?   'You can switch from MyFatoorah to TAP payments  if you’d like.' : 'You can switch from TAP payments to MyFatoorah if you’d like.';
+          ?>
+          <div class="switch-btn">
+          <?php
           echo Html::a('View rates', [$model->is_myfatoorah_enable ? 'view-tap-rates' : 'view-myfatoorah-rates', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=> 'margin-left: auto; margin-right: auto; display: block; width: 100%; margin-top:10px;']);
           echo Html::a($model->is_myfatoorah_enable ? 'Switch to Tap' : 'Switch to My Fatoorah', [$model->is_myfatoorah_enable ?  'switch-to-tap' : 'switch-to-myfatoorah', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=> 'margin-left: auto; margin-right: auto; display: block; width: 100%; margin-top:10px;']);
         ?>
+      </div>
 
     </div>
   </div>
+<?php }   ?>
+
+
     <!-- Cash on Delivery -->
     <div class="card">
         <div class="card-header">

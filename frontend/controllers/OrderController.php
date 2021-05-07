@@ -584,8 +584,7 @@ class OrderController extends Controller {
           foreach ($refunded_items_model as  $key => $refunded_item_model) {
             if($refunded_item_model->qty > 0){
               $refunded_item_model->refund_id = $model->refund_id;
-              if(!$refunded_item_model->save())
-              die('Error'); //todo
+              $refunded_item_model->save();
 
             }
 

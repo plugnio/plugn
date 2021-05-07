@@ -47,10 +47,8 @@ You can only connect one of the two. Choose wisely.
   <div style="display:block">
     <?php
 
-
-          if (!$model->is_tap_enable && !$model->is_myfatoorah_enable) {
-                      if (!$model->tap_queue_id && !$model->payment_gateway_queue_id)
-                          echo Html::a('Create Tap account', ['create-payment-gateway-account', 'id' => $model->restaurant_uuid,'paymentGateway' => 'tap'], ['class' => 'btn btn-success','style'=>'margin-top:10px']);
+          if (!$model->is_tap_enable && !$model->is_myfatoorah_enable && !$model->payment_gateway_queue_id) {
+                echo Html::a('Create Tap account', ['create-payment-gateway-account', 'id' => $model->restaurant_uuid,'paymentGateway' => 'tap'], ['class' => 'btn btn-success','style'=>'margin-top:10px']);
           }
     ?>
   </div>

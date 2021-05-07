@@ -480,8 +480,7 @@ class MyFatoorahPayment extends Component
           "RefundChargeOnCustomer" => "false",
           "ServiceChargeOnCustomer" => "false",
           "Comment" => $comment,
-          "Amount"=> $amount,
-          "AmountDeductedFromSupplier"=> $amount
+          "Amount"=> $amount
         ];
 
       $client = new Client();
@@ -497,6 +496,25 @@ class MyFatoorahPayment extends Component
 
       return $response;
   }
+
+    /**
+     * get the supplier dashboard
+     * @param  string $chargeId
+     */
+    public function getSupplierDashboard($supplierCode)
+    {
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setMethod('GET')
+                ->setUrl($this->apiEndpoint . "/GetSupplierDashboard?SupplierCode=" . $supplierCode)
+                ->addHeaders([
+                    'authorization' => 'Bearer ' . $this->apiKey,
+                    'content-type' => 'application/json',
+                ])
+                ->send();
+
+        return $response;
+    }
 
     /**
      * Check charge object for status updates

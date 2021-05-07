@@ -342,7 +342,7 @@ class StoreController extends Controller {
           $model->setScenario(Restaurant::SCENARIO_CREATE_MYFATOORAH_ACCOUNT);
 
 
-        if ($model->is_myfatoorah_enable || ($paymentGateway != 'tap' && $paymentGateway != 'myfatoorah') || $model->payment_gateway_queue_id)
+        if (($model->is_myfatoorah_enable && $paymentGateway == 'myfatoorah') || ($model->is_tap_enable && $paymentGateway == 'tap') )
             return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
 
 
@@ -451,6 +451,8 @@ class StoreController extends Controller {
             if (sizeof($owner_identification_file_back_side) > 0)
                 $model->identification_file_back_side = str_replace('uploads/', '', $owner_identification_file_back_side[0]['file']); //Owner's civil id back side
 
+            $model->is_myfatoorah_enable = 0;
+            $model->is_tap_enable = 0;
 
 
             if ($model->validate() && $model->save()) {
@@ -627,7 +629,7 @@ class StoreController extends Controller {
 
         $model = $this->findModel($storeUuid);
 
-        if($model->supplierCode){
+        if($model->live_api_key && $model->test_api_key){
           $model->is_tap_enable = 1;
           $model->is_myfatoorah_enable = 0;
           $model->save(false);
@@ -636,12 +638,12 @@ class StoreController extends Controller {
             if($restaurant_payment_method->payment_method_id != 3)
               $restaurant_payment_method->delete();
           }
-          
+
           return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
 
         }
 
-        return $this->redirect(['create-payment-gateway-account',  'paymentGateway' =>'myfatoorah','id' => $model->restaurant_uuid]);
+        return $this->redirect(['create-payment-gateway-account',  'paymentGateway' =>'tap','id' => $model->restaurant_uuid]);
 
     }
 
