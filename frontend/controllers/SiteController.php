@@ -25,6 +25,7 @@ use common\models\PaymentMethod;
 use common\models\Subscription;
 use common\models\AgentAssignment;
 use common\models\Item;
+use common\models\RestaurantPaymentMethod;
 use common\models\Customer;
 use common\models\SubscriptionPayment;
 use yii\db\Expression;
