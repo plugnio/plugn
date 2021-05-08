@@ -106,7 +106,7 @@ class BusinessLocationController extends Controller {
         $businessLocation =  BusinessLocation::find()
                   ->where(['restaurant_uuid' => $store_uuid])
                   ->andWhere(['business_location_id' => $business_location_id])
-                  ->with(['country','deliveryZones','deliveryZones.country'])
+                  ->with(['country','deliveryZones','deliveryZones.country','deliveryZones.areas'])
                   ->asArray()
                   ->one();
 
