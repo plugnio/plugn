@@ -455,6 +455,14 @@ class StoreController extends Controller {
             $model->is_tap_enable = 0;
 
 
+            //make sure we delete all payment methods
+            foreach ($model->getRestaurantPaymentMethods()->all() as $restaurant_payment_method) {
+              if($restaurant_payment_method->payment_method_id != 3)
+                $restaurant_payment_method->delete();
+            }
+
+
+
             if ($model->validate() && $model->save()) {
 
 

@@ -336,7 +336,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 1], ['class' => 'btn btn-success']);
                                     }
                               } else if ($model->country->iso != 'KW' && $model->currency->code != 'KWD') { ?>
-                                    <div style="background-color:#e0e0e0; padding:16px">
+                                    <div style="background-color:#fff5f5; padding:16px">
                                       <span>
                                         Contact us if you want to enable this option
                                       </span>
@@ -380,7 +380,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                           <span >
                                             <h5><b>Fees (on premium plan)</b></h5>
                                             <span>
-                                              1% per transaction, no minimum
+                                              1.5% per transaction, no minimum
                                             </span>
                                           </span>
                                         </div>
@@ -445,7 +445,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                          if($model->business_type == 'ind'){ ?>
 
-                                            <div style="background-color:#e0e0e0; padding:16px">
+                                            <div style="background-color:#fff5f5; padding:16px">
                                               <span>
                                                 This option is not allowed for home businesses. Contact us if you have a business license.
                                               </span>
@@ -453,7 +453,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         <?php }
                                     } else if ($model->country->iso != 'BH' && $model->currency->code != 'BHD') { ?>
 
-                                              <div style="background-color:#e0e0e0; padding:16px">
+                                              <div style="background-color:#fff5f5; padding:16px">
                                                 <span>
                                                   Contact us if you want to enable this option
                                                 </span>
@@ -570,7 +570,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <?php }
 
                                     else if($model->is_tap_enable && $model->plan->plan_id == 1) { ?>
-                                      <div style="background-color:#e0e0e0; padding:16px">
+                                      <div style="background-color:#fff5f5; padding:16px">
                                         <span>
                                           This option is only available on premium plan
                                         </span>
@@ -578,7 +578,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                     <?php  }
                                 } else if ($model->country->iso != 'SA' && $model->currency->code != 'SAR') { ?>
-                                          <div style="background-color:#e0e0e0; padding:16px">
+                                          <div style="background-color:#fff5f5; padding:16px">
                                             <span>
                                               Contact us if you want to enable this option
                                             </span>
@@ -655,7 +655,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                      if($model->business_type == 'ind'){ ?>
 
-                                        <div style="background-color:#e0e0e0; padding:16px">
+                                        <div style="background-color:#fff5f5; padding:16px">
                                           <span>
                                             This option is not allowed for home businesses. Contact us if you have a business license.
                                           </span>
@@ -663,14 +663,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <?php }
 
                                     else if($model->is_tap_enable && $model->plan->plan_id == 1) { ?>
-                                      <div style="background-color:#e0e0e0; padding:16px">
+                                      <div style="background-color:#fff5f5; padding:16px">
                                         <span>
                                           This option is only available on premium plan
                                         </span>
                                        </div>
                                     <?php  }
                                 } else if ($model->country->iso != 'SA' && $model->currency->code != 'SAR') { ?>
-                                          <div style="background-color:#e0e0e0; padding:16px">
+                                          <div style="background-color:#fff5f5; padding:16px">
                                             <span>
                                               Contact us if you want to enable this option
                                             </span>
