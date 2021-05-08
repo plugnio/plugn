@@ -562,9 +562,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                  if($model->business_type == 'ind'){ ?>
 
-                                    <span>
-                                        This option is not allowed for home businesses. Contact us if you have a business license.
-                                    </span>
+                                   <div style="background-color:#fff5f5; padding:16px">
+                                     <span>
+                                       This option is not allowed for home businesses. Contact us if you have a business license.
+                                     </span>
+                                    </div>
 
                                 <?php }
 
