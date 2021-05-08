@@ -278,27 +278,30 @@ class Payment extends \yii\db\ActiveRecord {
         $isError = false;
         $errorMessage = "";
 
-        // On Successful Payments
-        if ($responseContent->Data->InvoiceTransactions[0]->TransactionStatus == 'Succss') {
 
-          //todo
-            // payment_gateway_fee
-            $paymentRecord->payment_gateway_fee  = (float) $responseContent->Data->InvoiceDisplayValue - (float) $responseContent->Data->Suppliers[0]->InvoiceShare;
+        // payment_gateway_fee
+        $paymentRecord->payment_gateway_fee  = (float) $responseContent->Data->InvoiceDisplayValue - (float) $responseContent->Data->Suppliers[0]->InvoiceShare;
 
-            //platform fee
-            $paymentRecord->plugn_fee = (float) $responseContent->Data->Suppliers[0]->InvoiceShare - (float) $responseContent->Data->Suppliers[0]->ProposedShare;
+        //platform fee
+        if($paymentRecord->restaurant->plugn_fee > 0)
+          $paymentRecord->plugn_fee = (float) $responseContent->Data->Suppliers[0]->InvoiceShare - (float) $responseContent->Data->Suppliers[0]->ProposedShare;
+        else
+          $paymentRecord->plugn_fee
 
 
-            // Update payment method used and the order id assigned to it
-            if( isset($responseContent->Data->InvoiceTransactions['PaymentGateway']) && $responseContent->Data->InvoiceTransactions['PaymentGateway'] )
-              $paymentRecord->payment_mode = $responseContent->Data->InvoiceTransactions['PaymentGateway'];
-            if( isset($responseContent->reference->payment) && $responseContent->reference->payment )
-              $paymentRecord->payment_gateway_order_id = $responseContent->Data->InvoiceTransactions['ReferenceId'];
 
-            // Net amount after deducting gateway fee
-            // $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee;
+        // Update payment method used and the order id assigned to it
+        if( isset($responseContent->Data->InvoiceTransactions['PaymentGateway']) && $responseContent->Data->InvoiceTransactions['PaymentGateway'] )
+          $paymentRecord->payment_mode = $responseContent->Data->InvoiceTransactions['PaymentGateway'];
+        if( isset($responseContent->reference->payment) && $responseContent->reference->payment )
+          $paymentRecord->payment_gateway_order_id = $responseContent->Data->InvoiceTransactions['ReferenceId'];
 
-        }else {
+          // Net amount after deducting gateway fee
+          $paymentRecord->payment_net_amount = (float) $responseContent->Data->Suppliers[0]->DepositShare;
+
+        // Failed Payments
+        if ($responseContent->Data->InvoiceTransactions[0]->TransactionStatus != 'Succss') {
+
             Yii::info('[MyFatoorah Payment Issue > ' . $paymentRecord->customer->customer_name . ']'
                     . $paymentRecord->customer->customer_name .
                     ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) .
@@ -338,40 +341,8 @@ class Payment extends \yii\db\ActiveRecord {
         $paymentRecord->received_callback = 1;
 
         // On Successful Payments
-        if ($responseContent['TransactionStatus'] == 'SUCCESS') {
+        if ($responseContent['TransactionStatus'] != 'SUCCESS') {
 
-          //todo
-            // KNET Gateway Fee Calculation
-            // if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
-            //
-            //     if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->knetGatewayFee) > Yii::$app->tapPayments->minKnetGatewayFee)
-            //         $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->knetGatewayFee;
-            //     else
-            //         $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minKnetGatewayFee;
-            // }
-            //
-            // // Creditcard Gateway Fee Calculation
-            // else if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_VISA_MASTERCARD) {
-            //
-            //     if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage) > Yii::$app->tapPayments->minCreditcardGatewayFee)
-            //         $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage;
-            //     else
-            //         $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minCreditcardGatewayFee;
-            // }
-            //
-            //
-
-            // if(isset($responseContent->destinations))
-            //     $paymentRecord->plugn_fee = $responseContent->destinations->amount;
-            // else
-            //     $paymentRecord->plugn_fee = 0;
-
-
-
-            // Net amount after deducting gateway fee
-            // $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee;
-
-        } else {
             $paymentRecord->order->restockItems();
         }
 

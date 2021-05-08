@@ -138,7 +138,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     Your <?= $paymentGateway ?> account
                   </h5>
 
-                    <div>
+                    <div class="business-info">
                         <div class="row">
 
                             <div class="col-12">
@@ -243,8 +243,7 @@ $this->params['breadcrumbs'][] = $this->title;
                       </div>
 
                       <!-- Knet -->
-
-                          <div class="card" style="margin-top:20px;box-shadow: 0px 5px 20px #88888854 !important;" id="paymentMethodCard">
+                      <div class="card" style="margin-top:20px;box-shadow: 0px 5px 20px #88888854 !important;" id="paymentMethodCard">
                             <div class="card-header">
                                 <h3>
                                   KNET
@@ -348,7 +347,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                       <!-- Benefit -->
-                          <div class="card" style="margin-top:20px;box-shadow: 0px 5px 20px #88888854 !important;" id="paymentMethodCard">
+                      <div class="card" style="margin-top:20px;box-shadow: 0px 5px 20px #88888854 !important;" id="paymentMethodCard">
                             <div class="card-header">
                                 <h3>
                                   Benefit
@@ -467,222 +466,220 @@ $this->params['breadcrumbs'][] = $this->title;
                           </div>
 
 
-                          <!-- Mada  -->
-                          <div class="card" style="margin-top:20px;box-shadow: 0px 5px 20px #88888854 !important;" id="paymentMethodCard">
-                            <div class="card-header">
-                                <h3>
-                                  Mada
-                                </h3>
-                                <div style="text-align: center; display:block">
-                                  <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/mada.svg' ?>" style="width: 50px;">
-                                </div>
+                      <!-- Mada  -->
+                      <div class="card" style="margin-top:20px;box-shadow: 0px 5px 20px #88888854 !important;" id="paymentMethodCard">
+                        <div class="card-header">
+                            <h3>
+                              Mada
+                            </h3>
+                            <div style="text-align: center; display:block">
+                              <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/mada.svg' ?>" style="width: 50px;">
                             </div>
+                        </div>
 
-                            <div class="card-body">
-                                <?php if($model->is_tap_enable){ ?>
+                        <div class="card-body">
+                            <?php if($model->is_tap_enable){ ?>
+                              <!-- Settlement window -->
+                              <div class="row" style="margin-bottom:15px">
+                                <div class="col-12 col-sm-4 col-lg-4">
                                   <!-- Settlement window -->
-                                  <div class="row" style="margin-bottom:15px">
-                                    <div class="col-12 col-sm-4 col-lg-4">
-                                      <!-- Settlement window -->
-                                      <span style="display:block">
-                                        <h5><b>Settlement window</b></h5>
-                                        <span>
-                                          Within 3 working days
-                                        </span>
-                                      </span>
-                                    </div>
+                                  <span style="display:block">
+                                    <h5><b>Settlement window</b></h5>
+                                    <span>
+                                      Within 3 working days
+                                    </span>
+                                  </span>
+                                </div>
 
 
-                                    <div class="col-12 col-sm-4 col-lg-4">
-                                      <!-- Fees (on premium plan) -->
-                                      <span >
-                                        <h5><b>Fees (on premium plan)</b></h5>
-                                        <span>
-                                          1.5% per transaction, no minimum
-                                        </span>
-                                      </span>
-                                    </div>
+                                <div class="col-12 col-sm-4 col-lg-4">
+                                  <!-- Fees (on premium plan) -->
+                                  <span >
+                                    <h5><b>Fees (on premium plan)</b></h5>
+                                    <span>
+                                      1.5% per transaction, no minimum
+                                    </span>
+                                  </span>
+                                </div>
 
-                                    <div class="col-12 col-sm-4 col-lg-4">
-                                      <!-- Fees (on free plan) -->
-                                      <span >
-                                        <h5><b>Fees (on free plan)</b></h5>
-                                        <span>
-                                          5% per transaction, no minimum
-                                        </span>
-                                      </span>
-                                    </div>
+                                <div class="col-12 col-sm-4 col-lg-4">
+                                  <!-- Fees (on free plan) -->
+                                  <span >
+                                    <h5><b>Fees (on free plan)</b></h5>
+                                    <span>
+                                      5% per transaction, no minimum
+                                    </span>
+                                  </span>
+                                </div>
 
-                                  </div>
+                              </div>
 
-                                <?php  } else if ($model->is_myfatoorah_enable) { ?>
+                            <?php  } else if ($model->is_myfatoorah_enable) { ?>
+                              <!-- Settlement window -->
+                              <div class="row" style="margin-bottom:15px">
+                                <div class="col-12 col-sm-4 col-lg-4">
                                   <!-- Settlement window -->
-                                  <div class="row" style="margin-bottom:15px">
-                                    <div class="col-12 col-sm-4 col-lg-4">
-                                      <!-- Settlement window -->
-                                      <span style="display:block">
-                                        <h5><b>Settlement window</b></h5>
-                                        <span>
-                                          Within 3 working days
-                                        </span>
-                                      </span>
-                                    </div>
+                                  <span style="display:block">
+                                    <h5><b>Settlement window</b></h5>
+                                    <span>
+                                      Within 3 working days
+                                    </span>
+                                  </span>
+                                </div>
 
 
-                                    <div class="col-12 col-sm-4 col-lg-4">
-                                      <!-- Fees (on premium plan) -->
-                                      <span >
-                                        <h5><b>Fees (on premium plan)</b></h5>
-                                        <span>
-                                          1.5%  per transaction, no minimum
-                                        </span>
-                                      </span>
-                                    </div>
+                                <div class="col-12 col-sm-4 col-lg-4">
+                                  <!-- Fees (on premium plan) -->
+                                  <span >
+                                    <h5><b>Fees (on premium plan)</b></h5>
+                                    <span>
+                                      1.5%  per transaction, no minimum
+                                    </span>
+                                  </span>
+                                </div>
 
-                                    <div class="col-12 col-sm-4 col-lg-4">
-                                      <!-- Fees (on free plan) -->
-                                      <span >
-                                        <h5><b>Fees (on free plan)</b></h5>
-                                        <span>
-                                          5% per transaction, no minimum
-                                        </span>
-                                      </span>
-                                    </div>
+                                <div class="col-12 col-sm-4 col-lg-4">
+                                  <!-- Fees (on free plan) -->
+                                  <span >
+                                    <h5><b>Fees (on free plan)</b></h5>
+                                    <span>
+                                      5% per transaction, no minimum
+                                    </span>
+                                  </span>
+                                </div>
 
-                                  </div>
+                              </div>
 
-                                <?php } if ($model->country->iso == 'SA' && $model->currency->code == 'SAR') {
-                                  if($model->business_type == 'corp' && ($model->is_myfatoorah_enable || ($model->is_tap_enable && $model->plan->plan_id == 2))){
+                            <?php } if ($model->country->iso == 'SA' && $model->currency->code == 'SAR') {
+                              if($model->business_type == 'corp' && ($model->is_myfatoorah_enable || ($model->is_tap_enable && $model->plan->plan_id == 2))){
 
-                                      if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 4])->exists())
-                                        echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 4], ['class' => 'btn btn-danger']);
-                                      else
-                                        echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 4], ['class' => 'btn btn-success']);
-                                    }
+                                  if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 4])->exists())
+                                    echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 4], ['class' => 'btn btn-danger']);
+                                  else
+                                    echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 4], ['class' => 'btn btn-success']);
+                                }
 
 
-                                     if($model->business_type == 'ind'){ ?>
+                                 if($model->business_type == 'ind'){ ?>
 
-                                        <span>
-                                            This option is not allowed for home businesses. Contact us if you have a business license.
-                                        </span>
+                                    <span>
+                                        This option is not allowed for home businesses. Contact us if you have a business license.
+                                    </span>
 
-                                    <?php }
+                                <?php }
 
-                                    else if($model->is_tap_enable && $model->plan->plan_id == 1) { ?>
+                                else if($model->is_tap_enable && $model->plan->plan_id == 1) { ?>
+                                  <div style="background-color:#fff5f5; padding:16px">
+                                    <span>
+                                      This option is only available on premium plan
+                                    </span>
+                                   </div>
+
+                                <?php  }
+                            } else if ($model->country->iso != 'SA' && $model->currency->code != 'SAR') { ?>
                                       <div style="background-color:#fff5f5; padding:16px">
                                         <span>
-                                          This option is only available on premium plan
+                                          Contact us if you want to enable this option
                                         </span>
                                        </div>
 
-                                    <?php  }
-                                } else if ($model->country->iso != 'SA' && $model->currency->code != 'SAR') { ?>
-                                          <div style="background-color:#fff5f5; padding:16px">
-                                            <span>
-                                              Contact us if you want to enable this option
-                                            </span>
-                                           </div>
+                          <?php } ?>
 
-                              <?php } ?>
-
-                            </div>
+                        </div>
 
 
 
 
+                      </div>
+
+                      <!-- Sadad  -->
+                      <?php if ( $model->is_myfatoorah_enable && !$model->is_tap_enable) { ?>
+
+                        <div class="card" style="margin-top:20px;box-shadow: 0px 5px 20px #88888854 !important;" id="paymentMethodCard">
+                          <div class="card-header">
+                              <h3>
+                                Sadad
+                              </h3>
+                              <div style="text-align: center; display:block">
+                                <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/sadad.png' ?>" style="width: 50px;">
+                              </div>
                           </div>
 
-                          <?php if ( $model->is_myfatoorah_enable && !$model->is_tap_enable) { ?>
-                          <!-- Sadad  -->
-                          <div class="card" style="margin-top:20px;box-shadow: 0px 5px 20px #88888854 !important;" id="paymentMethodCard">
-                            <div class="card-header">
-                                <h3>
-                                  Sadad
-                                </h3>
-                                <div style="text-align: center; display:block">
-                                  <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/sadad.png' ?>" style="width: 50px;">
-                                </div>
-                            </div>
-
-                            <div class="card-body">
+                          <div class="card-body">
+                              <!-- Settlement window -->
+                              <?php if ($model->is_myfatoorah_enable) { ?>
                                 <!-- Settlement window -->
-                                <?php if ($model->is_myfatoorah_enable) { ?>
-                                  <!-- Settlement window -->
-                                  <div class="row" style="margin-bottom:15px">
-                                    <div class="col-12 col-sm-4 col-lg-4">
-                                      <!-- Settlement window -->
-                                      <span style="display:block">
-                                        <h5><b>Settlement window</b></h5>
-                                        <span>
-                                          Within 5 working days
-                                        </span>
+                                <div class="row" style="margin-bottom:15px">
+                                  <div class="col-12 col-sm-4 col-lg-4">
+                                    <!-- Settlement window -->
+                                    <span style="display:block">
+                                      <h5><b>Settlement window</b></h5>
+                                      <span>
+                                        Within 5 working days
                                       </span>
-                                    </div>
-
-
-                                    <div class="col-12 col-sm-4 col-lg-4">
-                                      <!-- Fees (on premium plan) -->
-                                      <span >
-                                        <h5><b>Fees (on premium plan)</b></h5>
-                                        <span>
-                                          2.5%  per transaction, no minimum
-                                        </span>
-                                      </span>
-                                    </div>
-
-                                    <div class="col-12 col-sm-4 col-lg-4">
-                                      <!-- Fees (on free plan) -->
-                                      <span >
-                                        <h5><b>Fees (on free plan)</b></h5>
-                                        <span>
-                                          5% per transaction, no minimum
-                                        </span>
-                                      </span>
-                                    </div>
-
+                                    </span>
                                   </div>
 
-                                <?php } if ($model->country->iso == 'SA' && $model->currency->code == 'SAR') {
-                                  if($model->business_type == 'corp' && ($model->is_myfatoorah_enable || ($model->is_tap_enable && $model->plan->plan_id == 2))){
 
-                                      if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 6])->exists())
-                                        echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 6], ['class' => 'btn btn-danger']);
-                                      else
-                                        echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 6], ['class' => 'btn btn-success']);
-                                    }
+                                  <div class="col-12 col-sm-4 col-lg-4">
+                                    <!-- Fees (on premium plan) -->
+                                    <span >
+                                      <h5><b>Fees (on premium plan)</b></h5>
+                                      <span>
+                                        2.5%  per transaction, no minimum
+                                      </span>
+                                    </span>
+                                  </div>
+
+                                  <div class="col-12 col-sm-4 col-lg-4">
+                                    <!-- Fees (on free plan) -->
+                                    <span >
+                                      <h5><b>Fees (on free plan)</b></h5>
+                                      <span>
+                                        5% per transaction, no minimum
+                                      </span>
+                                    </span>
+                                  </div>
+
+                                </div>
+
+                              <?php } if ($model->country->iso == 'SA' && $model->currency->code == 'SAR') {
+                                if($model->business_type == 'corp' && ($model->is_myfatoorah_enable || ($model->is_tap_enable && $model->plan->plan_id == 2))){
+
+                                    if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 6])->exists())
+                                      echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 6], ['class' => 'btn btn-danger']);
+                                    else
+                                      echo Html::a('Enable', ['enable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 6], ['class' => 'btn btn-success']);
+                                  }
 
 
-                                     if($model->business_type == 'ind'){ ?>
+                                   if($model->business_type == 'ind'){ ?>
 
+                                      <div style="background-color:#fff5f5; padding:16px">
+                                        <span>
+                                          This option is not allowed for home businesses. Contact us if you have a business license.
+                                        </span>
+                                       </div>
+                                  <?php }
+
+                                  else if($model->is_tap_enable && $model->plan->plan_id == 1) { ?>
+                                    <div style="background-color:#fff5f5; padding:16px">
+                                      <span>
+                                        This option is only available on premium plan
+                                      </span>
+                                     </div>
+                                  <?php  }
+                              } else if ($model->country->iso != 'SA' && $model->currency->code != 'SAR') { ?>
                                         <div style="background-color:#fff5f5; padding:16px">
                                           <span>
-                                            This option is not allowed for home businesses. Contact us if you have a business license.
+                                            Contact us if you want to enable this option
                                           </span>
                                          </div>
-                                    <?php }
+                            <?php } ?>
 
-                                    else if($model->is_tap_enable && $model->plan->plan_id == 1) { ?>
-                                      <div style="background-color:#fff5f5; padding:16px">
-                                        <span>
-                                          This option is only available on premium plan
-                                        </span>
-                                       </div>
-                                    <?php  }
-                                } else if ($model->country->iso != 'SA' && $model->currency->code != 'SAR') { ?>
-                                          <div style="background-color:#fff5f5; padding:16px">
-                                            <span>
-                                              Contact us if you want to enable this option
-                                            </span>
-                                           </div>
-                              <?php } ?>
-
-                            </div>
                           </div>
-                        <?php } ?>
-
-
-
+                        </div>
+                      <?php } ?>
 
 
                     </div>
