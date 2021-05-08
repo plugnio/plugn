@@ -286,7 +286,7 @@ class Payment extends \yii\db\ActiveRecord {
         if($paymentRecord->restaurant->plugn_fee > 0)
           $paymentRecord->plugn_fee = (float) $responseContent->Data->Suppliers[0]->InvoiceShare - (float) $responseContent->Data->Suppliers[0]->ProposedShare;
         else
-          $paymentRecord->plugn_fee
+          $paymentRecord->plugn_fee = 0;
 
 
 
