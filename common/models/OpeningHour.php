@@ -166,7 +166,7 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
          $currentWeekDay =  date('w',strtotime($i . " day"));
          $currentDate =  date('c',strtotime($i . " day"));
-         $selectedDate =  date('c', strtotime('+ ' . $delivery_time . ' min'   ,strtotime($currentDate)));
+         // $selectedDate =  date('c', strtotime('+ ' . $delivery_time . ' min'   ,strtotime($currentDate)));
 
          $getWorkingHours = OpeningHour::find()
                               ->where(['restaurant_uuid' => $store->restaurant_uuid])
@@ -181,7 +181,9 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
               $startAt = date('c', strtotime($workingHours->open_at, strtotime($currentDate) ));
 
-              $startAt =  date('c', strtotime('+ ' . $delivery_time . ' min'   ,strtotime($startAt)));
+              if($delivery_time < 180)
+                $startAt =  date('c', strtotime('+ ' . $delivery_time . ' min'   ,strtotime($startAt)));
+
 
               $startAt = static::roundToNextHour($startAt);
 
@@ -225,7 +227,7 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
               if($timeSlots){
                 array_push($schedule_time, [
-                    'date' => $selectedDate,
+                    'date' => $currentDate,
                     'dayOfWeek' => $currentWeekDay,
                     'scheduleTimeSlots' => $timeSlots
                 ]);
