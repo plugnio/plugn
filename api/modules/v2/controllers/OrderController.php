@@ -444,8 +444,8 @@ class OrderController extends Controller {
                             $initiatePayment = Yii::$app->myFatoorahPayment->initiatePayment($order->total_price, $order->currency->code);
                             $initiatePaymentResponse = json_decode($initiatePayment->content);
 
-                            die(json_encode($initiatePaymentResponse));
-                            if (!$initiatePaymentResponse->IsSuccess) {
+
+                            if (!isset($initiatePaymentResponse->IsSuccess)) {
                                 $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
                                 \Yii::error($errorMessage, __METHOD__); // Log error faced by user
 
