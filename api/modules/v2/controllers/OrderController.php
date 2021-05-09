@@ -446,7 +446,7 @@ class OrderController extends Controller {
 
 
                             if (!isset($initiatePaymentResponse->IsSuccess)) {
-                                $errorMessage = "Error: " . $initiatePaymentResponse->Message . " - " . isset($initiatePaymentResponse->ValidationErrors) ?  json_encode($initiatePaymentResponse->ValidationErrors) :  $initiatePaymentResponse->Message;
+                                // $errorMessage = "Error: " . $initiatePaymentResponse->Message . " - " . isset($initiatePaymentResponse->ValidationErrors) ?  json_encode($initiatePaymentResponse->ValidationErrors) :  $initiatePaymentResponse->Message;
                                 \Yii::error(json_encode($initiatePayment), __METHOD__); // Log error faced by user
 
 
