@@ -449,6 +449,8 @@ class MyFatoorahPayment extends Component
             "CurrencyIso" => $currencyCode
           ];
 
+
+
           $client = new Client();
           $response = $client->createRequest()
                   ->setMethod('POST')
@@ -460,6 +462,7 @@ class MyFatoorahPayment extends Component
                   ])
                   ->send();
 
+  \Yii::error(json_encode($this->apiKey), __METHOD__); 
           return $response;
       }
 
