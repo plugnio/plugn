@@ -188,7 +188,7 @@ class MyFatoorahPayment extends Component
         // Set the API key we're going to use
         if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
             $this->apiEndpoint = $this->liveApiEndpoint;
-            $this->apiKey = $this->liveApiEndpoint;
+            $this->apiKey = $this->liveApiKey;
         } else {
             $this->apiEndpoint = $this->testApiEndpoint;
             $this->apiKey = $this->testApiKey;
@@ -462,7 +462,6 @@ class MyFatoorahPayment extends Component
                   ])
                   ->send();
 
-          die(json_encode($this->apiKey));
           return $response;
       }
 
