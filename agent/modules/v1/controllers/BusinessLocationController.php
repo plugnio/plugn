@@ -71,6 +71,7 @@ class BusinessLocationController extends Controller {
       if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
           $businessLocations =  BusinessLocation::find()
+                    ->with(['country'])
                     ->where(['restaurant_uuid' => $store_uuid])
                     ->asArray()
                     ->all();
