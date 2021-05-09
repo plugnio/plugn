@@ -232,22 +232,22 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
 
                  //edit  supplier for a vendor on MyFatoorah
-                 if($paymentRecord->restaurant->is_myfatoorah_enable){
-
-                   $response = Yii::$app->myFatoorahPayment->editSupplier($paymentRecord->restaurant);
-                   $supplierApiResponse = json_decode($response->content);
-
-                   if ($supplierApiResponse->IsSuccess) {
-
-                       \Yii::info($paymentRecord->restaurant->name . " has just updated MyFatooraha account", __METHOD__);
-
-                   } else {
-                      $storeName = $paymentRecord->restaurant->name;
-                       Yii::error('Error while updating supplier [' . $storeName . '] ' . $supplierApiResponse);
-                       return false;
-                   }
-
-                 }
+                 // if($paymentRecord->restaurant->is_myfatoorah_enable){
+                 //
+                 //   $response = Yii::$app->myFatoorahPayment->editSupplier($paymentRecord->restaurant);
+                 //   $supplierApiResponse = json_decode($response->content);
+                 //
+                 //   if ($supplierApiResponse->IsSuccess) {
+                 //
+                 //       \Yii::info($paymentRecord->restaurant->name . " has just updated MyFatooraha account", __METHOD__);
+                 //
+                 //   } else {
+                 //      $storeName = $paymentRecord->restaurant->name;
+                 //       Yii::error('Error while updating supplier [' . $storeName . '] ' . $supplierApiResponse);
+                 //       return false;
+                 //   }
+                 //
+                 // }
 
 
         }

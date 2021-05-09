@@ -286,7 +286,7 @@ class MyFatoorahPayment extends Component
           "SupplierName" => $store->company_name,
           "Mobile" => $store_phone_number,
           "Email" =>  $store->owner_email,
-          "CommissionPercentage" => $store->platform_fee,
+          "CommissionPercentage" => 0,
           "DepositTerms" => "Daily",
           "iban" => $store->iban,
           "IsActive" => "true"
