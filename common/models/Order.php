@@ -643,7 +643,7 @@ class Order extends \yii\db\ActiveRecord {
 
                     if ($orderItemExtraOptions->count() > 0) {
                         foreach ($orderItemExtraOptions->all() as $orderItemExtraOption){
-                          if ($orderItemExtraOption->order_item_extra_option_id)
+                          if ($orderItemExtraOption->order_item_extra_option_id && $orderItemExtraOption->order_item_extra_option_id && $orderItemExtraOption->extra_option_id)
                               $orderItemExtraOption->extraOption->increaseStockQty($orderItem->qty);
                         }
                     }
