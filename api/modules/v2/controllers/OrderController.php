@@ -446,13 +446,13 @@ class OrderController extends Controller {
 
 
                             if (!isset($initiatePaymentResponse->IsSuccess)) {
-                                // $errorMessage = "Error: " . $initiatePaymentResponse->Message . " - " . isset($initiatePaymentResponse->ValidationErrors) ?  json_encode($initiatePaymentResponse->ValidationErrors) :  $initiatePaymentResponse->Message;
-                                \Yii::error(json_encode($initiatePaymentResponse), __METHOD__); // Log error faced by user
+                                $errorMessage = "Error: " . $initiatePaymentResponse->Message . " - " . isset($initiatePaymentResponse->ValidationErrors) ?  json_encode($initiatePaymentResponse->ValidationErrors) :  $initiatePaymentResponse->Message;
+                                \Yii::error(json_encode($initiatePayment), __METHOD__); // Log error faced by user
 
 
                                 return [
                                     'operation' => 'error',
-                                    'message' =>  $errorMessage
+                                    'message' =>  json_encode($initiatePayment)
                                 ];
                             }
 
