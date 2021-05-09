@@ -462,7 +462,7 @@ class MyFatoorahPayment extends Component
                   ])
                   ->send();
 
-        
+          die(json_encode($this->apiKey));
           return $response;
       }
 
