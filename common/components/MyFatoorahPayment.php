@@ -473,16 +473,19 @@ class MyFatoorahPayment extends Component
   public function makeRefund($paymentId, $amount , $comment, $supplierCode)
   {
 
-      $refundEndpoint = $this->apiEndpoint . "/MakeRefund";
+      $refundEndpoint = $this->apiEndpoint . "/MakeSupplierRefund";
 
 
       $refundParams = [
           "Key"=> $paymentId,
           "KeyType"=> "PaymentId",
-          "RefundChargeOnCustomer" => "false",
-          "ServiceChargeOnCustomer" => "false",
           "Comment" => $comment,
-          "Amount"=> $amount
+          "Suppliers" => [
+            [
+              "SupplierCode" => $supplierCode,
+              "SupplierDeductedAmount" => $amount
+            ]
+          ]
         ];
 
       $client = new Client();
