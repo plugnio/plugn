@@ -147,10 +147,10 @@ $this->registerJs($js);
 
               <?=
               $form->field($model, 'enable_gift_message', [
-                  'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Enable gift message</span>{input}<label class='custom-control-label' for='customSwitch1'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
+                  'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Enable gift message</span>{input}<label class='custom-control-label' for='customSwitch2'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
               ])->checkbox([
                   'checked' => $model->enable_gift_message == 0 ? false : true,
-                  'id' => 'customSwitch1',
+                  'id' => 'customSwitch2',
                   'class' => 'custom-control-input'
                       ], false)->label(false)
               ?>
