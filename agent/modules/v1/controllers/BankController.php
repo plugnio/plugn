@@ -7,9 +7,9 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use common\models\BusinessLocation;
+use common\models\Bank;
 
-class BusinessLocationController extends Controller {
+class BankController extends Controller {
 
     public function behaviors() {
         $behaviors = parent::behaviors();
@@ -61,7 +61,7 @@ class BusinessLocationController extends Controller {
 
 
     /**
-    * Get all store's branches
+    * Get all store's banks
      * @param type $id
      * @param type $store_uuid
      * @return type
@@ -70,13 +70,12 @@ class BusinessLocationController extends Controller {
 
       if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
-          $businessLocations =  BusinessLocation::find()
-                    ->where(['restaurant_uuid' => $store_uuid])
+          $banks =  Bank::find()
                     ->asArray()
                     ->all();
 
 
-          if (!$businessLocations) {
+          if (!$banks) {
               return [
                   'operation' => 'error',
                   'message' => 'No results found'
@@ -85,47 +84,12 @@ class BusinessLocationController extends Controller {
 
           return [
               'operation' => 'success',
-              'body' => $businessLocations
+              'body' => $banks
           ];
 
       }
 
     }
 
-
-    /**
-    * Return Business Location detail
-     * @param type $store_uuid
-     * @param type $order_uuid
-     * @return type
-     */
-    public function actionDetail($store_uuid, $business_location_id) {
-
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
-
-        $businessLocation =  BusinessLocation::find()
-                  ->where(['restaurant_uuid' => $store_uuid])
-                  ->andWhere(['business_location_id' => $business_location_id])
-                  ->with(['country','deliveryZones','deliveryZones.country','deliveryZones.areas'])
-                  ->asArray()
-                  ->one();
-
-
-          if (!$businessLocation) {
-
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found.'
-              ];
-          }
-
-          return [
-              'operation' => 'success',
-              'body' => $businessLocation
-          ];
-
-      }
-
-  }
 
 }

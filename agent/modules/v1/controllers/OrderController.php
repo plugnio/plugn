@@ -92,6 +92,7 @@ class OrderController extends Controller {
                                 'pickup_location_id',
                                 'restaurant.name'
                     ])
+                    ->orderBy(['order.order_created_at' => SORT_DESC])
                     ->asArray()
                     ->all();
 
@@ -125,6 +126,7 @@ class OrderController extends Controller {
 
           $activeOrders =  Order::find()
                     ->activeOrders($store_uuid)
+                    ->orderBy(['order_created_at' => SORT_DESC])
                     ->all();
 
 
@@ -158,6 +160,7 @@ class OrderController extends Controller {
           $draftOrders =  Order::find()
                     ->where(['order.restaurant_uuid' => $store_uuid])
                     ->andWhere(['order.order_status' => Order::STATUS_DRAFT])
+                    ->orderBy(['order.order_created_at' => SORT_DESC])
                     ->asArray()
                     ->all();
 
@@ -192,6 +195,7 @@ class OrderController extends Controller {
           $abandonedOrders =  Order::find()
                     ->where(['order.restaurant_uuid' => $store_uuid])
                     ->andWhere(['order.order_status' => Order::STATUS_ABANDONED_CHECKOUT])
+                    ->orderBy(['order.order_created_at' => SORT_DESC])
                     ->asArray()
                     ->all();
 

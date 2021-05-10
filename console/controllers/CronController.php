@@ -92,6 +92,134 @@ class CronController extends \yii\console\Controller {
 
     }
 
+
+
+    /**
+     * Weekly Store Summary
+     */
+    public function actionWeeklyReport(){
+
+        // $stores = Restaurant::find()
+        //         ->joinWith(['orders'])
+        //         ->where(['order.restaurant_uuid' => 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])
+        //         ->andWhere([ '!=' , 'order.order_status' , Order::STATUS_DRAFT])
+        //         ->andWhere([ '!=' , 'order.order_status' , Order::STATUS_ABANDONED_CHECKOUT])
+        //         ->andWhere(['!=', 'order.order_status', Order::STATUS_REFUNDED])
+        //         ->andWhere(['!=', 'order.order_status', Order::STATUS_PARTIALLY_REFUNDED])
+        //         ->andWhere(['!=', 'order.order_status', Order::STATUS_CANCELED])
+        //         ->andWhere(['between', 'order.order_created_at', $start_date, $end_date])
+        //         ->andWhere(['restaurant.restaurant_uuid' => 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])
+        //         ->select(['restaurant.restaurant_uuid','order.order_uuid','order.order_status','order.order_created_at','order.restaurant_uuid','order.total_price','SUM(`order`.`total_price`) as lastWeekRevenue'])
+        //         ->asArray()
+        //         ->one();
+
+
+          $stores = Restaurant::findOne('rest_00f54a5e-7c35-11ea-997e-4a682ca4b290')->with('currency');
+
+
+          //Revenue generated
+          $lastWeekRevenue =  $stores
+              ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") - 14 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d") -8)) );
+
+          $thisWeekRevenue =  $stores
+              ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") - 7 )), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d"))) );
+
+          //Orders received
+          $lastWeekOrdersReceived =  $stores
+              ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") - 14 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d") -8)) );
+
+          $thisWeekOrdersReceived =  $stores
+              ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") - 7 )), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d"))) );
+
+          //customer gained
+          $lastWeekCustomerGained =  $stores
+              ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") - 14 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d") -8)) );
+
+          $thisWeekCustomerGained =  $stores
+              ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") - 7 )), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d"))) );
+
+          // Revenue Generated
+          $revenuePercentage = 0;
+
+
+          if($thisWeekRevenue > $lastWeekRevenue) { //inc
+               if($lastWeekRevenue > 0){
+                 $increase = $thisWeekRevenue - $lastWeekRevenue;
+
+                 $revenuePercentage = $increase / $lastWeekRevenue * 100;
+               } else {
+                 $revenuePercentage = 100;
+               }
+
+             }
+             else if($thisWeekRevenue < $lastWeekRevenue) { //dec
+               $decrease = $lastWeekRevenue - $thisWeekRevenue;
+               $revenuePercentage = $decrease / $lastWeekRevenue * -100;
+             }
+
+          // Orders received
+          $ordersReceivedPercentage = 0;
+
+
+          if($thisWeekOrdersReceived > $lastWeekOrdersReceived) { //inc
+               if($lastWeekOrdersReceived > 0){
+                 $increase = $thisWeekOrdersReceived - $lastWeekOrdersReceived;
+
+                 $ordersReceivedPercentage = $increase / $lastWeekOrdersReceived * 100;
+               } else {
+                 $ordersReceivedPercentage = 100;
+               }
+
+             }
+             else if($thisWeekOrdersReceived < $lastWeekOrdersReceived) { //dec
+               $decrease = $lastWeekOrdersReceived - $thisWeekOrdersReceived;
+               $ordersReceivedPercentage = $decrease / $lastWeekOrdersReceived * -100;
+             }
+
+
+             //Customer gained
+             $customerGainedPercentage = 0;
+
+             if($thisWeekCustomerGained > $lastWeekCustomerGained) { // inc
+                  if($lastWeekCustomerGained > 0){
+                    $increase = $thisWeekCustomerGained - $lastWeekCustomerGained;
+
+                    $customerGainedPercentage = $increase / $lastWeekCustomerGained * 100;
+                  } else {
+                    $customerGainedPercentage = 100;
+                  }
+
+                }
+                else if($thisWeekCustomerGained < $lastWeekCustomerGained) { //dec
+                  $decrease = $lastWeekCustomerGained - $thisWeekCustomerGained;
+                  $customerGainedPercentage = $decrease / $lastWeekCustomerGained * -100;
+                }
+
+
+                foreach ($store->getOwnerAgent()->all() as $agent) {
+
+                  if($agent->receive_weekly_stats){
+                    \Yii::$app->mailer->compose([
+                           'html' => 'weekly-summary',
+                               ], [
+                           'store' => $store,
+                           'agent_name' => $agent->agent_name,
+                           'revenuePercentage' => $revenuePercentage,
+                           'ordersReceivedPercentage' => $ordersReceivedPercentage,
+                           'customerGainedPercentage' => $customerGainedPercentage,
+                           'thisWeekRevenue' => $thisWeekRevenue,
+
+                       ])
+                       ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                       ->setTo([$agent->agent_email])
+                       ->setSubject('Weekly Store Summary')
+                       ->send();
+                  }
+
+
+                }
+    }
+
     public function actionSiteStatus(){
 
             $restaurants = Restaurant::find()

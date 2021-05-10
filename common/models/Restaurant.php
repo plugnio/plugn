@@ -1406,6 +1406,33 @@ class Restaurant extends \yii\db\ActiveRecord {
         return $this->hasMany(Order::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+
+    /**
+     * Gets query for [[Orders]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStoreRevenue($start_date,$end_date) {
+
+        return $this->hasMany(Order::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+          ->activeOrders($this->restaurant_uuid)
+         ->andWhere(['between', 'order.order_created_at', $start_date, $end_date])
+         ->sum('total_price');
+    }
+
+
+    /**
+     * Gets query for [[Orders]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrdersReceived($start_date,$end_date) {
+
+        return $this->hasMany(Order::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+          ->ordersReceived($this->restaurant_uuid, $start_date, $end_date);
+    }
+
+
     /**
      * Gets query for [[Vouchers]].
      *
@@ -1422,6 +1449,18 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getCustomers() {
         return $this->hasMany(Customer::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+
+    /**
+     * Gets query for [[Customers]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCustomerGained($start_date,$end_date) {
+
+        return $this->hasMany(Customer::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+          ->customerGained($this->restaurant_uuid,$start_date, $end_date);
     }
 
     /**
