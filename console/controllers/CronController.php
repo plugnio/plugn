@@ -387,7 +387,7 @@ class CronController extends \yii\console\Controller {
                 } else {
 
                   $refund->refund_reference = $responseContent->Data->RefundReference;
-                  $refund->refund_status = $responseContent->Data->RefundStatus;
+                  $refund->refund_status = 'Pending';
                   $refund->save(false);
 
                   $this->stdout("Your refund request has been initiated successfully  \n", Console::FG_RED, Console::BOLD);
