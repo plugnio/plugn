@@ -401,7 +401,7 @@ z-index: 2;
                                 ])->textInput([
                                     'type' => 'number',
                                     'oninput' => 'inputHasBeenUpdated(event)',
-                                    'step' => '0.001',
+                                    'step' => '0.050',
                                     'id' => 'refund_amount',
                                     'value' => \Yii::$app->formatter->asDecimal(0, 3),
                                     'class' => 'form-control'

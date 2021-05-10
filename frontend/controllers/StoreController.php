@@ -466,7 +466,6 @@ class StoreController extends Controller {
             if ($model->validate() && $model->save()) {
 
 
-              // TODO
               // if ($paymentGateway == 'tap ? !$model->is_myfatoorah_enable : ($paymentGateway == 'my')) {
                     $payment_gateway_queue_model = new PaymentGatewayQueue;
                     $payment_gateway_queue_model->queue_status = PaymentGatewayQueue::QUEUE_STATUS_PENDING;
