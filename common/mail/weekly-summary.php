@@ -431,9 +431,17 @@ $agentProfileUrl = Yii::$app->params['frontendUrl'] . '/agent/update?storeUuid='
       <div
          style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;line-height:24px;text-align:center;color:#000000;"
       >
+      <?php if($revenuePercentage > 0) {  ?>
+        <span style='background-color:#d8eacc; display:inline-block; border:5px solid #d8eacc; border-left:10px solid #d8eacc; border-right:10px solid #d8eacc; border-radius:2px;'>
+                          +<?=\Yii::$app->formatter->asDecimal($revenuePercentage, 2)?>%
+        </span>
+      <?php } else {  ?>
         <span style='background-color:#fbcfbd; display:inline-block; border:5px solid #fbcfbd; border-left:10px solid #fbcfbd; border-right:10px solid #fbcfbd; border-radius:2px;'>
-                          <?=\Yii::$app->formatter->asDecimal($ordersReceivedPercentage, 2)?>%
-                          </span>
+                    <?= $revenuePercentage < 0 ? '-' : '';?>
+                    <?= \Yii::$app->formatter->asDecimal($revenuePercentage, 2)?>%
+        </span>
+      <?php } ?>
+
       </div>
 
               </td>
@@ -512,9 +520,17 @@ $agentProfileUrl = Yii::$app->params['frontendUrl'] . '/agent/update?storeUuid='
       <div
          style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;line-height:24px;text-align:center;color:#000000;"
       >
-        <span style='background-color:#fbcfbd; display:inline-block; border:5px solid #fbcfbd; border-left:10px solid #fbcfbd; border-right:10px solid #fbcfbd; border-radius:2px;'>
-                          <?=\Yii::$app->formatter->asDecimal($ordersReceivedPercentage, 2)?>%
-                          </span>
+  
+        <?php if($ordersReceivedPercentage > 0) {  ?>
+          <span style='background-color:#d8eacc; display:inline-block; border:5px solid #d8eacc; border-left:10px solid #d8eacc; border-right:10px solid #d8eacc; border-radius:2px;'>
+                            +<?=\Yii::$app->formatter->asDecimal($ordersReceivedPercentage, 2)?>%
+          </span>
+        <?php } else {  ?>
+          <span style='background-color:#fbcfbd; display:inline-block; border:5px solid #fbcfbd; border-left:10px solid #fbcfbd; border-right:10px solid #fbcfbd; border-radius:2px;'>
+                      <?= $ordersReceivedPercentage < 0 ? '-' : '';?>
+                      <?= \Yii::$app->formatter->asDecimal($ordersReceivedPercentage, 2)?>%
+          </span>
+        <?php } ?>
       </div>
 
               </td>
@@ -531,9 +547,9 @@ $agentProfileUrl = Yii::$app->params['frontendUrl'] . '/agent/update?storeUuid='
 
         <?php
           if($thisWeekOrdersReceived > 0)
-            echo  '+' . \Yii::$app->formatter->asCurrency($thisWeekOrdersReceived, $store->currency->code);
+            echo  '+' . $thisWeekOrdersReceived;
           else
-            \Yii::$app->formatter->asCurrency($thisWeekOrdersReceived, $store->currency->code);
+            $thisWeekOrdersReceived;
          ?>
       </div>
 
@@ -594,9 +610,18 @@ $agentProfileUrl = Yii::$app->params['frontendUrl'] . '/agent/update?storeUuid='
       <div
          style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;line-height:24px;text-align:center;color:#000000;"
       >
-        <span style='background-color:#d8eacc; display:inline-block; border:5px solid #d8eacc; border-left:10px solid #d8eacc; border-right:10px solid #d8eacc; border-radius:2px;'>
-                          <?=\Yii::$app->formatter->asDecimal($customerGainedPercentage, 2)?>5%
-                          </span>
+        <?php if($customerGainedPercentage > 0) {  ?>
+          <span style='background-color:#d8eacc; display:inline-block; border:5px solid #d8eacc; border-left:10px solid #d8eacc; border-right:10px solid #d8eacc; border-radius:2px;'>
+                            +<?=\Yii::$app->formatter->asDecimal($customerGainedPercentage, 2)?>%
+          </span>
+        <?php } else {  ?>
+          <span style='background-color:#fbcfbd; display:inline-block; border:5px solid #fbcfbd; border-left:10px solid #fbcfbd; border-right:10px solid #fbcfbd; border-radius:2px;'>
+                      <?= $customerGainedPercentage < 0 ? '-' : '';?>
+                      <?= \Yii::$app->formatter->asDecimal($customerGainedPercentage, 2)?>%
+          </span>
+        <?php } ?>
+
+
       </div>
 
               </td>
@@ -612,9 +637,9 @@ $agentProfileUrl = Yii::$app->params['frontendUrl'] . '/agent/update?storeUuid='
       >
         <?php
           if($thisWeekCustomerGained > 0)
-            echo  '+' . \Yii::$app->formatter->asCurrency($thisWeekCustomerGained, $store->currency->code);
+            echo  '+' . $thisWeekCustomerGained;
           else
-            \Yii::$app->formatter->asCurrency($thisWeekCustomerGained, $store->currency->code);
+            $thisWeekCustomerGained;
          ?>
       </div>
 

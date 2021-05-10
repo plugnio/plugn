@@ -58,28 +58,28 @@ class CronController extends \yii\console\Controller {
         //         ->one();
 
 
-          $stores = Restaurant::findOne('rest_00f54a5e-7c35-11ea-997e-4a682ca4b290')->with('currency');
+          $store = Restaurant::findOne('rest_00f54a5e-7c35-11ea-997e-4a682ca4b290');
 
 
           //Revenue generated
-          $lastWeekRevenue =  $stores
+          $lastWeekRevenue =  $store
               ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") - 14 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d") -8)) );
 
-          $thisWeekRevenue =  $stores
+          $thisWeekRevenue =  $store
               ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") - 7 )), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d"))) );
 
           //Orders received
-          $lastWeekOrdersReceived =  $stores
+          $lastWeekOrdersReceived =  $store
               ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") - 14 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d") -8)) );
 
-          $thisWeekOrdersReceived =  $stores
+          $thisWeekOrdersReceived =  $store
               ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") - 7 )), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d"))) );
 
           //customer gained
-          $lastWeekCustomerGained =  $stores
+          $lastWeekCustomerGained =  $store
               ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") - 14 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d") -8)) );
 
-          $thisWeekCustomerGained =  $stores
+          $thisWeekCustomerGained =  $store
               ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") - 7 )), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d"))) );
 
           // Revenue Generated
@@ -152,6 +152,8 @@ class CronController extends \yii\console\Controller {
                            'ordersReceivedPercentage' => $ordersReceivedPercentage,
                            'customerGainedPercentage' => $customerGainedPercentage,
                            'thisWeekRevenue' => $thisWeekRevenue,
+                           'thisWeekOrdersReceived' => $thisWeekOrdersReceived,
+                           'thisWeekCustomerGained' => $thisWeekCustomerGained,
 
                        ])
                        ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
