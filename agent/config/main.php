@@ -90,7 +90,8 @@ return [
                         'GET' => 'list',
                         'GET detail' => 'detail',
                         // OPTIONS VERBS
-                        'OPTIONS' => 'options'
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options'
                     ]
                 ],
                 [// AgentController

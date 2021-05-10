@@ -91,6 +91,39 @@ class CountryController extends Controller {
 
     }
 
+    /**
+    * Return Country detail
+     * @param type $store_uuid
+     * @param type $order_uuid
+     * @return type
+     */
+    public function actionDetail($store_uuid, $country_id) {
+
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+
+        $country =  Country::find()
+                  ->where(['country_id' => $country_id])
+                  ->with('cities','cities.areas')
+                  ->asArray()
+                  ->one();
+
+
+          if (!$country) {
+
+              return [
+                  'operation' => 'error',
+                  'message' => 'No results found.'
+              ];
+          }
+
+          return [
+              'operation' => 'success',
+              'body' => $country
+          ];
+
+      }
+
+  }
 
 
 
