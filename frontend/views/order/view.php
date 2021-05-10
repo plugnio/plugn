@@ -71,7 +71,7 @@ $this->registerJs($js);
         ?>
 
         <?php
-        if ($model->payment_uuid && $model->restaurant->is_myfatoorah_enable  && $model->payment->payment_gateway_invoice_id &&  $model->order_status != Order::STATUS_REFUNDED && $model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT ) {
+        if ($orderItems->totalCount > 0 && $model->payment_uuid && $model->restaurant->is_myfatoorah_enable  && $model->payment->payment_gateway_invoice_id &&  $model->order_status != Order::STATUS_REFUNDED && $model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT ) {
             echo Html::a('Refund', ['refund-order', 'order_uuid' => $model->order_uuid, 'storeUuid' => $storeUuid,], ['class' => 'btn btn-warning  mr-1 mb-1', 'style'=>'margin-left: 7px;']) ;
         }
         ?>
@@ -182,7 +182,7 @@ $this->registerJs($js);
             <p style="margin-top: 1rem">
 
 <?php
-if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Order::STATUS_ABANDONED_CHECKOUT || $model->order_status == Order::STATUS_CANCELED ) && $model->getOrderItems()->count()) {
+if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Order::STATUS_ABANDONED_CHECKOUT || $model->order_status == Order::STATUS_CANCELED ) && $orderItems->totalCount) {
     echo Html::a('Mark as pending', [
         'change-order-status',
         'order_uuid' => $model->order_uuid,
@@ -373,7 +373,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
             </div>
         </div>
     </div>
-    <?php if ($orderItems->totalCount > 0) { ?>
+    <?php if ($orderItems->totalCount) { ?>
         <section id="data-list-view" class="data-list-view-header">
 
             <div class="card">

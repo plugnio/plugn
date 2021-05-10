@@ -477,7 +477,7 @@ class OrderController extends Controller {
                                     $order->customer_email,
                                     $order->customer_phone_country_code,
                                     $order->customer_phone_number,
-                                    Url::to(['order/my-fatoorah-callback'], true),   // TODO
+                                    Url::to(['order/my-fatoorah-callback'], true),
                                     $order->order_uuid,
                                     $restaurant_model->supplierCode,
                                      $order->restaurant->platform_fee,

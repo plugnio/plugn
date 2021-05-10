@@ -381,14 +381,13 @@ class CronController extends \yii\console\Controller {
 
                 $responseContent = json_decode($response->content);
 
-                //TODO
                 if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
                     $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
                     return Yii::error('Refund Error ('. $refund->refund_id .'): ' . $errorMessage);
                 } else {
 
                   $refund->refund_reference = $responseContent->Data->RefundReference;
-                  $refund->refund_status = 'Pending';
+                  $refund->refund_status = $responseContent->Data->RefundStatus;
                   $refund->save(false);
 
                   $this->stdout("Your refund request has been initiated successfully  \n", Console::FG_RED, Console::BOLD);
