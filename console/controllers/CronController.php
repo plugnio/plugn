@@ -500,7 +500,7 @@ class CronController extends \yii\console\Controller {
                 ->andWhere(['<', 'payment.payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')]);
 
         foreach ($payments->all() as $payment) {
-            Yii::error(json_encode($payment->payment_uuid));
+            Yii::error(json_encode($payment->payment_uuid .'=>>' . $payment->order_uuid));
             $payment->order->restockItems();
         }
     }
