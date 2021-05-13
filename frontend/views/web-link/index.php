@@ -82,8 +82,9 @@ $this->registerJs($js);
                         return '<a href="https://www.snapchat.com/add/' .$model->url . '" >@' . $model->url .'</a>';
                       break;
 
+
                       case WebLink::WEB_LINK_TYPE_WHATSAPP:
-                        return '<a href="https://wa.me/965' .$model->url . '" >+965' . $model->url .'</a>';
+                        return '<a href="https://wa.me/' . $model->restaurant->country->country_code . $model->url . '" >+' .$model->restaurant->country->country_code . $model->url .'</a>';
                       break;
 
                       case WebLink::WEB_LINK_TYPE_EMAIL:
