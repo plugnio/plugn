@@ -24,3 +24,6 @@
 * * * * * sleep 30 && php ~/www/yii  cron/create-build-js-file > /dev/null 2>&1
 * * * * * sleep 40 && php ~/www/yii  cron/create-build-js-file > /dev/null 2>&1
 * * * * * sleep 50 && php ~/www/yii  cron/create-build-js-file > /dev/null 2>&1
+
+# Every Sunday
+0 0 * * SAT php ~/www/yii cron/weekly-report  > /dev/null 2>&1

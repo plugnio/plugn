@@ -138,24 +138,24 @@ $this->registerJs($js);
 
     <?php
 
-      // if(Yii::$app->user->identity->isOwner($storeUuid)) {
-      //   echo $form->field($model, 'receive_weekly_stats', [
-      //       'template' => '
-      //       <div class="vs-checkbox-con vs-checkbox-primary">
-      //           {input}
-      //           <span class="vs-checkbox">
-      //               <span class="vs-checkbox--check">
-      //                   <i class="vs-icon feather icon-check"></i>
-      //               </span>
-      //           </span>
-      //           <span class="">Receive weekly stats emails</span>
-      //       </div>
-      //       <div class=\"col-lg-8\">{error}</div>
-      //       ',
-      //   ])->checkbox([
-      //       'checked' => $model->receive_weekly_stats ? true : false
-      //     ], false);
-      // }
+      if(Yii::$app->user->identity->isOwner($storeUuid)) {
+        echo $form->field($model, 'receive_weekly_stats', [
+            'template' => '
+            <div class="vs-checkbox-con vs-checkbox-primary">
+                {input}
+                <span class="vs-checkbox">
+                    <span class="vs-checkbox--check">
+                        <i class="vs-icon feather icon-check"></i>
+                    </span>
+                </span>
+                <span class="">Receive weekly stats emails</span>
+            </div>
+            <div class=\"col-lg-8\">{error}</div>
+            ',
+        ])->checkbox([
+            'checked' => $model->receive_weekly_stats ? true : false
+          ], false);
+      }
 
     ?>
 

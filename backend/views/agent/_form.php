@@ -22,6 +22,14 @@ use kartik\select2\Select2;
 
     <?= $form->field($model, 'agent_email')->textInput(['maxlength' => true]) ?>
     <?=
+    $form->field($model, 'receive_weekly_stats')->dropDownList(
+            [
+        1 => 'Yes',
+        0 => 'No',
+            ]
+    );
+    ?>
+    <?=
     $form->field($model, 'email_notification')->dropDownList(
             [
         1 => 'Yes',

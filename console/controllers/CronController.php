@@ -11,6 +11,7 @@ use common\models\Voucher;
 use common\models\BankDiscount;
 use common\models\Payment;
 use common\models\Item;
+use common\models\Customer;
 use common\models\City;
 use common\models\Plan;
 use common\models\Area;
@@ -37,28 +38,16 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-
     /**
      * Weekly Store Summary
      */
     public function actionWeeklyReport(){
 
-        // $stores = Restaurant::find()
-        //         ->joinWith(['orders'])
-        //         ->where(['order.restaurant_uuid' => 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])
-        //         ->andWhere([ '!=' , 'order.order_status' , Order::STATUS_DRAFT])
-        //         ->andWhere([ '!=' , 'order.order_status' , Order::STATUS_ABANDONED_CHECKOUT])
-        //         ->andWhere(['!=', 'order.order_status', Order::STATUS_REFUNDED])
-        //         ->andWhere(['!=', 'order.order_status', Order::STATUS_PARTIALLY_REFUNDED])
-        //         ->andWhere(['!=', 'order.order_status', Order::STATUS_CANCELED])
-        //         ->andWhere(['between', 'order.order_created_at', $start_date, $end_date])
-        //         ->andWhere(['restaurant.restaurant_uuid' => 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])
-        //         ->select(['restaurant.restaurant_uuid','order.order_uuid','order.order_status','order.order_created_at','order.restaurant_uuid','order.total_price','SUM(`order`.`total_price`) as lastWeekRevenue'])
-        //         ->asArray()
-        //         ->one();
+        $stores = Restaurant::find()
+                ->all();
 
 
-          $store = Restaurant::findOne('rest_00f54a5e-7c35-11ea-997e-4a682ca4b290');
+          foreach ($stores as $key => $store) {
 
 
           //Revenue generated
@@ -140,30 +129,37 @@ class CronController extends \yii\console\Controller {
                 }
 
 
-                foreach ($store->getOwnerAgent()->all() as $agent) {
+                if($lastWeekOrdersReceived > 0 || $thisWeekOrdersReceived > 0) {
 
-                  if($agent->receive_weekly_stats){
-                    \Yii::$app->mailer->compose([
-                           'html' => 'weekly-summary',
-                               ], [
-                           'store' => $store,
-                           'agent_name' => $agent->agent_name,
-                           'revenuePercentage' => $revenuePercentage,
-                           'ordersReceivedPercentage' => $ordersReceivedPercentage,
-                           'customerGainedPercentage' => $customerGainedPercentage,
-                           'thisWeekRevenue' => $thisWeekRevenue,
-                           'thisWeekOrdersReceived' => $thisWeekOrdersReceived,
-                           'thisWeekCustomerGained' => $thisWeekCustomerGained,
+                  foreach ($store->getOwnerAgent()->where(['receive_weekly_stats' => 1])->all() as $agent) {
 
-                       ])
-                       ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-                       ->setTo([$agent->agent_email])
-                       ->setSubject('Weekly Store Summary')
-                       ->send();
+                    if($agent->receive_weekly_stats){
+                      \Yii::$app->mailer->compose([
+                             'html' => 'weekly-summary',
+                                 ], [
+                             'store' => $store,
+                             'agent_name' => $agent->agent_name,
+                             'revenuePercentage' => $revenuePercentage,
+                             'ordersReceivedPercentage' => $ordersReceivedPercentage,
+                             'customerGainedPercentage' => $customerGainedPercentage,
+                             'thisWeekRevenue' => $thisWeekRevenue,
+                             'thisWeekOrdersReceived' => $thisWeekOrdersReceived,
+                             'thisWeekCustomerGained' => $thisWeekCustomerGained,
+
+                         ])
+                         ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                         ->setTo([$agent->agent_email])
+                         ->setSubject('Weekly Store Summary')
+                         ->setBcc(\Yii::$app->params['supportEmail'])
+                         ->send();
+                    }
+
                   }
 
-
                 }
+
+        }
+
     }
 
 

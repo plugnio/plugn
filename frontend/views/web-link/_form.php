@@ -41,7 +41,7 @@ webLinkTypeInput.change(function(){
 
      // whatsApp
      else if (selection == 6){
-      document.getElementById('group-text').innerHTML='+965';
+      document.getElementById('group-text').innerHTML='$countryCode';
       document.getElementById('weblink-url_txt').innerHTML='Phone Number';
 
     }
@@ -82,7 +82,7 @@ webLinkTypeInput.change(function(){
 
      // whatsApp
      else if (selection == 6){
-      document.getElementById('group-text').innerHTML='+965';
+      document.getElementById('group-text').innerHTML='$countryCode';
       document.getElementById('weblink-url_txt').innerHTML='Phone Number';
     }
 
