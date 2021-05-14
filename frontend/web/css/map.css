@@ -1,0 +1,122 @@
+#map {
+    width: 50% !important;
+    height: 60% !important;
+    position: absolute !important;
+    overflow: hidden !important;
+}
+
+#infowindow-content .title {
+font-weight: bold;
+}
+
+#infowindow-content {
+display: none;
+}
+
+#map #infowindow-content {
+display: inline;
+}
+
+.searchGrp {
+margin: 10px 10px 0 0;
+border-radius: 2px 0 0 2px;
+box-sizing: border-box;
+-moz-box-sizing: border-box;
+outline: none;
+box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+background-color: #fff;
+font-family: Roboto;
+width: 50% !important;
+
+}
+
+#pac-container {
+padding-bottom: 12px;
+margin-right: 12px;
+}
+
+.pac-controls {
+display: inline-block;
+padding: 5px 11px;
+}
+
+.pac-controls label {
+font-family: Roboto;
+font-size: 13px;
+font-weight: 300;
+}
+
+.map-first .map-search-box {
+  margin-top: 16px;
+}
+.map-first .map-search-box {
+  left: 20px;
+  right: 20px;
+  border-radius: 3px;
+  box-shadow: 0 0 8px 0 rgb(0 0 0 / 12%);
+}
+
+.map-search-box {
+position: absolute;
+top: 0;
+z-index: 10;
+left: 0px;
+right: 0px;
+width: 100% !important;
+
+width: 80% !important;
+margin-left: auto;
+margin-right: auto;
+display: block;
+
+
+}
+
+.marshmallow-theme .searchGrp.map-search-box:before {
+  content: '';
+  display: block;
+  height: 20px;
+  width: 10px;
+  background: url(/images/Talabat/search-marshmallow.svg);
+  position: absolute;
+  left: 16px;
+  top: 12px;
+}
+
+.marshmallow-theme .searchGrp.map-search-box input {
+  height: 44px!important;
+  border-radius: 8px!important;
+  border: solid 1px var(--mapFirst-border);
+  background-color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.43;
+  color: var(--neutral-grey);
+  box-shadow: none!important;
+  padding-left: 44px;
+}
+#title {
+color: #fff;
+background-color: #4d90fe;
+font-size: 25px;
+font-weight: 500;
+padding: 6px 12px;
+}
+
+.custom-map-control-button {
+  appearance: button;
+  background-color: #fff;
+      width: 40px;
+  border: 0;
+  border-radius: 2px;
+  box-shadow: 0 1px 4px -1px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  margin: 10px;
+  padding: 0 0.5em;
+  height: 40px;
+  font: 400 18px Roboto, Arial, sans-serif;
+  overflow: hidden;
+}
+.custom-map-control-button:hover {
+  background: #ebebeb;
+}
