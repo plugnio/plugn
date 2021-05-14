@@ -47,6 +47,16 @@ return [
             'enableStrictParsing' => false,
             'showScriptName' => false,
             'rules' => [
+                [// LocationController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/location',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'reverse-geocodeing',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
+                    ]
+                ],
                 [// ItemController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/item',

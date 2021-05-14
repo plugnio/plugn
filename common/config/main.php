@@ -72,6 +72,10 @@ return [
             'class' => 'common\components\MashkorDelivery',
             'keyToUse' => \common\components\MashkorDelivery::USE_LIVE_KEY
         ],
+        'googleMapComponent' => [
+            'class' => 'common\components\GoogleMapComponent',
+            'token' => 'AIzaSyCFeQ-wuP5iWVRTwMn5nZZeOE8yjGESFa8'
+        ],
         'netlifyComponent' => [
             'class' => 'common\components\NetlifyComponent',
             'token' => 'dIaf1ZOTSo-XWIaf7OHy8AgZGMkg9l90E1RWPenKxCs'

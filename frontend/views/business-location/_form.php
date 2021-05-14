@@ -102,8 +102,13 @@ function initMap() {
             map.setCenter(this.position);
             map.setZoom(17);
             document.getElementById('start').innerHTML = "Lat start : " + positionStartLat + ", " + "Lng start : " + positionStartLng;
+
             });
        }
+       
+       document.getElementById("businesslocation-latitude").value =  this.position.lat();
+       document.getElementById("businesslocation-longitude").value =  this.position.lng();
+
 
 
   });
@@ -120,15 +125,63 @@ function initMap() {
 }
 </script>
 
-<p><span id="start"></span></p>
-<p><span id="end"></span></p>
 
-  <div class="searchGrp map-search-box" id="searchGrp">
-        <input type="text" class="form-control pac-target-input" placeholder="Search for area, block, street name..." style="padding-right:25px;height:40px;" id="placeSearch" autocomplete="off">
-  </div>
+  <div class="card">
+      <div class="business-location-form card-body">
 
-<div id="map"></div>
-<div id="infowindow-content">
-  <span id="place-name" class="title"></span><br />
-  <span id="place-address"></span>
+        <?php
+
+              $countryQuery = Country::find()->asArray()->all();
+              $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
+
+
+              $form = ActiveForm::begin();
+          ?>
+
+
+          <?= $form->field($model, 'business_location_name')->textInput(['maxlength' => true, 'placeholder' => "الفرع الرئيسي"])->label('Location name in Arabic *') ?>
+          <?= $form->field($model, 'business_location_name_ar')->textInput(['maxlength' => true, 'placeholder' => "الفرع الرئيسي"])->label('Location name in Arabic *') ?>
+
+
+
+          <?=
+            $form->field($model, 'country_id')->dropDownList($countryArray, [
+                'prompt' => 'Choose country name...',
+                'class' => 'form-control select2',
+                'multiple' => false
+            ])->label('Located in *');
+          ?>
+
+
+
+
+          <?= $form->field($model, 'address')->textInput(['maxlength' => true,'style' => 'display:none'])->label(false) ?>
+          <?= $form->field($model, 'latitude')->textInput(['maxlength' => true,'style' => 'display:none'])->label(false) ?>
+          <?= $form->field($model, 'longitude')->textInput(['maxlength' => true,'style' => 'display:none'])->label(false) ?>
+
+
+
+          <div class="form-group">
+              <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+
+
+          </div>
+<?php ActiveForm::end(); ?>
+      </div>
+
 </div>
+
+
+
+      <p><span id="start"></span></p>
+      <p><span id="end"></span></p>
+
+        <div class="searchGrp map-search-box" id="searchGrp">
+              <input type="text" class="form-control pac-target-input" placeholder="Search for area, block, street name..." style="padding-right:25px;height:40px;" id="placeSearch" autocomplete="off">
+        </div>
+
+      <div id="map"></div>
+      <div id="infowindow-content">
+        <span id="place-name" class="title"></span><br />
+        <span id="place-address"></span>
+      </div>
