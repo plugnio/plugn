@@ -1139,7 +1139,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      * @return \yii\db\ActiveQuery
      */
     public function getAgentAssignments() {
-        return $this->hasMany(AgentAssignment::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany(AgentAssignment::className(), ['restaurant_uuid' => 'restaurant_uuid'])->with('agent');
     }
 
     /**

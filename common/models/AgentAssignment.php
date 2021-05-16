@@ -16,6 +16,9 @@ use yii\behaviors\TimestampBehavior;
  * @property string $assignment_agent_email
  * @property string $assignment_created_at
  * @property string $assignment_updated_at
+ * @property int $email_notification
+ * @property int $receive_weekly_stats
+ * @property int $reminder_email
  *
  * @property Agent $agent
  * @property Restaurant $restaurant
@@ -44,7 +47,7 @@ class AgentAssignment extends \yii\db\ActiveRecord {
             [['assignment_agent_email'], 'email'],
             ['role', 'in', 'range' => [self::AGENT_ROLE_OWNER, self::AGENT_ROLE_STAFF]],
             [['restaurant_uuid'], 'string', 'max' => 60],
-            [['agent_id'], 'integer'],
+            [['agent_id','email_notification', 'reminder_email','receive_weekly_stats'], 'integer'],
             //Only allow one record of each email per account
 //            ['assignment_agent_email', 'unique', 'filter' => function($query) {
 //                    $query->where(['agent_id' => $this->agent_id, 'restaurant_uuid' => $this->restaurant_uuid]);
@@ -90,6 +93,7 @@ class AgentAssignment extends \yii\db\ActiveRecord {
             'restaurant_uuid' => 'Restaurant UUID',
             'agent_id' => 'Agent ID',
             'role' => "Role",
+            'email_notification' => 'Email Notification',
             'assignment_agent_email' => 'Email',
             'assignment_created_at' => 'Date Assigned',
             'assignment_updated_at' => 'Assignment Updated At',

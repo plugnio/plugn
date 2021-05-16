@@ -43,6 +43,18 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $data->role == AgentAssignment::AGENT_ROLE_OWNER ? 'Owner' : 'Staff';
                 },
             ],
+            [
+                'attribute' => 'email_notification',
+                'value' => $model->email_notification ? 'Yes' : 'No',
+            ],
+            [
+                'attribute' => 'receive_weekly_stats',
+                'value' => $model->receive_weekly_stats ? 'Yes' : 'No',
+            ],
+            [
+                'attribute' => 'reminder_email',
+                'value' => $model->reminder_email ? 'Yes' : 'No',
+            ],
             'assignment_agent_email:email',
             'assignment_created_at',
             'assignment_updated_at',

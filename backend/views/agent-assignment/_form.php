@@ -90,6 +90,34 @@ $this->registerJs($js);
     ?>
 
 
+    <?=
+      $form->field($model, 'receive_weekly_stats')->dropDownList(
+              [
+          1 => 'Yes',
+          0 => 'No',
+              ]
+      );
+    ?>
+    <?=
+      $form->field($model, 'email_notification')->dropDownList(
+              [
+          1 => 'Yes',
+          0 => 'No',
+              ]
+      );
+    ?>
+
+    <?=
+      $form->field($model, 'reminder_email')->dropDownList(
+              [
+          1 => 'Yes',
+          0 => 'No',
+              ]
+      );
+    ?>
+
+
+
     <div class="form-group">
     <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>

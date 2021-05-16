@@ -592,10 +592,10 @@ class Order extends \yii\db\ActiveRecord {
                     ->send();
         }
 
-        foreach ($this->restaurant->getAgents()->all() as $agent) {
+        foreach ($this->restaurant->getAgentAssignments()->all() as $agentAssignment) {
 
 
-            if ($agent->email_notification) {
+            if ($agentAssignment->email_notification) {
 
                 \Yii::$app->mailer->compose([
                             'html' => 'payment-confirm-html',
@@ -603,7 +603,7 @@ class Order extends \yii\db\ActiveRecord {
                             'order' => $this
                         ])
                         ->setFrom([\Yii::$app->params['supportEmail'] => $this->restaurant->name])
-                        ->setTo($agent->agent_email)
+                        ->setTo($agentAssignment->agent->agent_email)
                         ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)
                         ->setReplyTo([$this->restaurant->restaurant_email => $this->restaurant->name])
                         ->send();
