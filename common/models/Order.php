@@ -578,6 +578,14 @@ class Order extends \yii\db\ActiveRecord {
 
     public function sendPaymentConfirmationEmail() {
 
+      $replyTo = [];
+      if($this->restaurant->restaurant_email){
+        $replyTo = [
+          $this->restaurant->restaurant_email => $this->restaurant->name
+        ];
+      }
+
+
         if ($this->customer_email) {
 
             \Yii::$app->mailer->compose([
@@ -588,7 +596,7 @@ class Order extends \yii\db\ActiveRecord {
                     ->setFrom([\Yii::$app->params['supportEmail'] => $this->restaurant->name])
                     ->setTo($this->customer_email)
                     ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)
-                    ->setReplyTo([$this->restaurant->restaurant_email => $this->restaurant->name])
+                    ->setReplyTo($replyTo)
                     ->send();
         }
 
@@ -605,7 +613,7 @@ class Order extends \yii\db\ActiveRecord {
                         ->setFrom([\Yii::$app->params['supportEmail'] => $this->restaurant->name])
                         ->setTo($agentAssignment->agent->agent_email)
                         ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)
-                        ->setReplyTo([$this->restaurant->restaurant_email => $this->restaurant->name])
+                        ->setReplyTo($replyTo)
                         ->send();
             }
         }
@@ -621,7 +629,7 @@ class Order extends \yii\db\ActiveRecord {
                     ->setFrom([\Yii::$app->params['supportEmail'] => $this->restaurant->name])
                     ->setTo($this->restaurant->restaurant_email)
                     ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)
-                    ->setReplyTo([$this->restaurant->restaurant_email => $this->restaurant->name])
+                    ->setReplyTo($replyTo)
                     ->send();
         }
 

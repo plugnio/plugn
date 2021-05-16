@@ -7,6 +7,7 @@ use common\models\Restaurant;
 use common\models\OrderItem;
 use common\models\Queue;
 use common\models\TapQueue;
+use common\models\AgentAssignment;
 use common\models\Voucher;
 use common\models\BankDiscount;
 use common\models\Payment;
@@ -65,6 +66,7 @@ class CronController extends \yii\console\Controller {
     public function actionWeeklyReport(){
 
         $stores = Restaurant::find()
+        ->where(['restaurant_uuid' => 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])
                 ->all();
 
 
@@ -152,14 +154,21 @@ class CronController extends \yii\console\Controller {
 
                 if($lastWeekOrdersReceived > 0 || $thisWeekOrdersReceived > 0) {
 
-                  foreach ($store->getOwnerAgent()->where(['receive_weekly_stats' => 1])->all() as $agent) {
+                  $agentAssignments = $store->getAgentAssignments()
+                              ->where([
+                                          'role' => AgentAssignment::AGENT_ROLE_OWNER,
+                                          'receive_weekly_stats' => 1
+                                      ])
+                              ->all();
 
-                    if($agent->receive_weekly_stats){
+                  foreach ($agentAssignments as $agentAssignment) {
+
+                    if($agentAssignment->receive_weekly_stats){
                       \Yii::$app->mailer->compose([
                              'html' => 'weekly-summary',
                                  ], [
                              'store' => $store,
-                             'agent_name' => $agent->agent_name,
+                             'agent_name' => $agentAssignment->agent->agent_name,
                              'revenuePercentage' => $revenuePercentage,
                              'ordersReceivedPercentage' => $ordersReceivedPercentage,
                              'customerGainedPercentage' => $customerGainedPercentage,
@@ -169,7 +178,7 @@ class CronController extends \yii\console\Controller {
 
                          ])
                          ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-                         ->setTo([$agent->agent_email])
+                         ->setTo([$agentAssignment->agent->agent_email])
                          ->setSubject('Weekly Store Summary')
                          ->setBcc(\Yii::$app->params['supportEmail'])
                          ->send();
@@ -562,8 +571,9 @@ class CronController extends \yii\console\Controller {
         $orders = Order::find()
                 ->where(['order_status' => Order::STATUS_PENDING])
                 ->andWhere(['reminder_sent' => 0])
-                ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 MINUTE)')])
+                ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')])
                 ->all();
+
 
         if ($orders) {
 
