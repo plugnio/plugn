@@ -20,6 +20,7 @@ use common\models\Subscription;
 use common\models\OpeningHour;
 use common\models\CountryPaymentMethod;
 use common\models\Country;
+use common\models\Agent;
 use common\models\ExtraOption;
 use common\models\ItemImage;
 use common\models\AreaDeliveryZone;
@@ -37,6 +38,26 @@ use yii\db\Expression;
  * All Cron actions related to this project
  */
 class CronController extends \yii\console\Controller {
+
+  /**
+   *
+   */
+  public function actionMigration(){
+    $agents = Agent::find()->all();
+    foreach ($agents as $key => $agent) {
+      if($agentAssignments = $agent->getAgentAssignments()->all()){
+        foreach ($agentAssignments as  $agentAssignment) {
+          $agentAssignment->email_notification = $agent->email_notification;
+          $agentAssignment->reminder_email = $agent->reminder_email;
+          $agentAssignment->receive_weekly_stats = $agent->receive_weekly_stats;
+          $agentAssignment->save();
+        }
+      }
+    }
+
+    $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
+    return self::EXIT_CODE_NORMAL;
+  }
 
     /**
      * Weekly Store Summary
@@ -548,18 +569,18 @@ class CronController extends \yii\console\Controller {
 
             foreach ($orders as $order) {
 
-                foreach ($order->restaurant->getAgents()->where(['reminder_email' => 1])->all() as $agent) {
+                foreach ($order->restaurant->getAgentAssignments()->where(['reminder_email' => 1])->all() as $agentAssignment) {
 
 
-                    if ($agent) {
+                    if ($agentAssignment && $agentAssignment->agent) {
                         $result = \Yii::$app->mailer->compose([
                                     'html' => 'order-reminder-html',
                                         ], [
                                     'order' => $order,
-                                    'agent_name' => $agent->agent_name
+                                    'agent_name' => $agentAssignment->agent->agent_name
                                 ])
                                 ->setFrom([\Yii::$app->params['supportEmail'] => $order->restaurant->name])
-                                ->setTo($agent->agent_email)
+                                ->setTo($agentAssignment->agent->agent_email)
                                 ->setSubject('Order #' . $order->order_uuid . ' from ' . $order->restaurant->name)
                                 ->send();
                     }

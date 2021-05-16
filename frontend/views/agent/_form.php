@@ -93,7 +93,7 @@ $this->registerJs($js);
 
 
     <?=
-      $form->field($model, 'email_notification', [
+      $form->field($agentAssignment, 'email_notification', [
           'template' => '
           <div class="vs-checkbox-con vs-checkbox-primary">
               {input}
@@ -107,7 +107,7 @@ $this->registerJs($js);
           <div class=\"col-lg-8\">{error}</div>
           ',
       ])->checkbox([
-          'checked' => $model->email_notification ? true : false,
+          'checked' => $agentAssignment->email_notification ? true : false,
           'id' => 'trackQuantityInput',
               ], false)
     ?>
@@ -116,7 +116,7 @@ $this->registerJs($js);
     <?php
 
       if(Yii::$app->user->identity->isOwner($storeUuid)) {
-        echo $form->field($model, 'reminder_email', [
+        echo $form->field($agentAssignment, 'reminder_email', [
             'template' => '
             <div class="vs-checkbox-con vs-checkbox-primary">
                 {input}
@@ -130,7 +130,7 @@ $this->registerJs($js);
             <div class=\"col-lg-8\">{error}</div>
             ',
         ])->checkbox([
-            'checked' => $model->reminder_email ? true : false
+            'checked' => $agentAssignment->reminder_email ? true : false
           ], false);
       }
 
@@ -139,7 +139,7 @@ $this->registerJs($js);
     <?php
 
       if(Yii::$app->user->identity->isOwner($storeUuid)) {
-        echo $form->field($model, 'receive_weekly_stats', [
+        echo $form->field($agentAssignment, 'receive_weekly_stats', [
             'template' => '
             <div class="vs-checkbox-con vs-checkbox-primary">
                 {input}
@@ -153,7 +153,7 @@ $this->registerJs($js);
             <div class=\"col-lg-8\">{error}</div>
             ',
         ])->checkbox([
-            'checked' => $model->receive_weekly_stats ? true : false
+            'checked' => $agentAssignment->receive_weekly_stats ? true : false
           ], false);
       }
 
