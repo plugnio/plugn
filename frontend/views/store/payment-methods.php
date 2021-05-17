@@ -200,9 +200,28 @@ $this->params['breadcrumbs'][] = $this->title;
                               <!-- Settlement window -->
                               <span style="display:block">
                                 <h5><b>Settlement window</b></h5>
-                                <span>
-                                  Within 5 working days
-                                </span>
+                                <?php
+                                  if($model->is_myfatoorah_enable) {
+                                    if ( $model->country->iso == 'KW' && $model->currency->code == 'KWD'  ) { ?>
+                                      <span>
+                                        24 working hours
+                                      </span>
+                                    <?php } else  if($model->country->iso == 'SA' && $model->currency->code == 'SAR') { ?>
+                                      <span>
+                                        Sunday-Tuesday-Thursday
+                                      </span>
+                                    <?php } else  if($model->country->iso == 'BH' && $model->currency->code == 'BHD') { ?>
+                                      <span>
+                                        24 working hours
+                                      </span>
+                                    <?php
+                                        }
+                                      }
+                                 else if($model->is_tap_enable) {?>
+                                  <span>
+                                    Within 5 working days
+                                  </span>
+                                <?php }?>
                               </span>
                             </div>
 
@@ -297,9 +316,23 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <!-- Settlement window -->
                                     <span style="display:block">
                                       <h5><b>Settlement window</b></h5>
-                                      <span>
-                                        Within 3 working days
-                                      </span>
+
+                                      <?php  if( $model->country->iso == 'KW' && $model->currency->code == 'KWD'  ) { ?>
+                                          <span>
+                                            24 working hours
+                                          </span>
+                                        <?php } else  if($model->country->iso == 'SA' && $model->currency->code == 'SAR') { ?>
+                                          <span>
+                                            Sunday-Tuesday-Thursday
+                                          </span>
+                                        <?php } else  if($model->country->iso == 'BH' && $model->currency->code == 'BHD') { ?>
+                                          <span>
+                                            24 working hours
+                                          </span>
+                                        <?php
+                                            }
+                                        ?>
+
                                     </span>
                                   </div>
 
@@ -403,9 +436,23 @@ $this->params['breadcrumbs'][] = $this->title;
                                           <!-- Settlement window -->
                                           <span style="display:block">
                                             <h5><b>Settlement window</b></h5>
-                                            <span>
-                                              Within 3 working days
-                                            </span>
+
+                                            <?php  if( $model->country->iso == 'KW' && $model->currency->code == 'KWD'  ) { ?>
+                                                <span>
+                                                  24 working hours
+                                                </span>
+                                              <?php } else  if($model->country->iso == 'SA' && $model->currency->code == 'SAR') { ?>
+                                                <span>
+                                                  Sunday-Tuesday-Thursday
+                                                </span>
+                                              <?php } else  if($model->country->iso == 'BH' && $model->currency->code == 'BHD') { ?>
+                                                <span>
+                                                  24 working hours
+                                                </span>
+                                              <?php
+                                                  }
+                                              ?>
+
                                           </span>
                                         </div>
 
@@ -521,9 +568,23 @@ $this->params['breadcrumbs'][] = $this->title;
                                   <!-- Settlement window -->
                                   <span style="display:block">
                                     <h5><b>Settlement window</b></h5>
-                                    <span>
-                                      Within 3 working days
-                                    </span>
+
+                                    <?php  if( $model->country->iso == 'KW' && $model->currency->code == 'KWD'  ) { ?>
+                                        <span>
+                                          24 working hours
+                                        </span>
+                                      <?php } else  if($model->country->iso == 'SA' && $model->currency->code == 'SAR') { ?>
+                                        <span>
+                                          Sunday-Tuesday-Thursday
+                                        </span>
+                                      <?php } else  if($model->country->iso == 'BH' && $model->currency->code == 'BHD') { ?>
+                                        <span>
+                                          24 working hours
+                                        </span>
+                                      <?php
+                                          }
+                                      ?>
+
                                   </span>
                                 </div>
 
@@ -616,9 +677,23 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <!-- Settlement window -->
                                     <span style="display:block">
                                       <h5><b>Settlement window</b></h5>
-                                      <span>
-                                        Within 5 working days
-                                      </span>
+
+                                      <?php  if( $model->country->iso == 'KW' && $model->currency->code == 'KWD'  ) { ?>
+                                          <span>
+                                            24 working hours
+                                          </span>
+                                        <?php } else  if($model->country->iso == 'SA' && $model->currency->code == 'SAR') { ?>
+                                          <span>
+                                            Sunday-Tuesday-Thursday
+                                          </span>
+                                        <?php } else  if($model->country->iso == 'BH' && $model->currency->code == 'BHD') { ?>
+                                          <span>
+                                            24 working hours
+                                          </span>
+                                        <?php
+                                            }
+                                        ?>
+
                                     </span>
                                   </div>
 
