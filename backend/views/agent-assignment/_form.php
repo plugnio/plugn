@@ -53,6 +53,11 @@ $this->registerJs($js);
     $restaurantQuery = Restaurant::find()->asArray()->all();
     $restaurantArray = ArrayHelper::map($restaurantQuery, 'restaurant_uuid', 'name');
 
+    if(!$model->isNewRecord && $model->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
+      $businessLocationsQuery = $model->restaurant->getBusinessLocations()->asArray()->all();
+      $businessLocationsList = ArrayHelper::map($businessLocationsQuery, 'business_location_id', 'business_location_name');
+    }
+
     $form = ActiveForm::begin();
     ?>
 
@@ -76,11 +81,14 @@ $this->registerJs($js);
         ])->label('Restaurant');
     ?>
 
+
+
     <?=
         $form->field($model, 'role')->widget(Select2::classname(), [
             'data' => [
                 AgentAssignment::AGENT_ROLE_OWNER => "Owner",
-                AgentAssignment::AGENT_ROLE_STAFF => "Staff"
+                AgentAssignment::AGENT_ROLE_STAFF => "Staff",
+                AgentAssignment::AGENT_ROLE_BRANCH_MANAGER => "Branch Manager"
             ],
             'options' => ['placeholder' => 'Select agents role ...'],
             'pluginOptions' => [
@@ -89,6 +97,19 @@ $this->registerJs($js);
         ])->label('Role');
     ?>
 
+    <?php
+
+      if($model->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
+        echo $form->field($model, 'business_location_id')->widget(Select2::classname(), [
+            'data' => $businessLocationsList,
+            'options' => ['placeholder' => 'Select a branch ...'],
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+        ])->label('Managed branch');
+      }
+
+    ?>
 
     <?=
       $form->field($model, 'receive_weekly_stats')->dropDownList(

@@ -5,6 +5,7 @@ namespace frontend\models;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Order;
+use common\models\AgentAssignment;
 
 /**
  * OrderSearch represents the model behind the search form of `common\models\Order`.
@@ -41,14 +42,29 @@ class OrderSearch extends Order {
      *
      * @return ActiveDataProvider
      */
-    public function searchAbandonedCheckoutOrders($params, $storeUuid) {
+    public function searchAbandonedCheckoutOrders($params, $storeUuid, $agentAssignment) {
 
 
         $query = Order::find()
             ->with(['restaurant','country', 'pickupLocation', 'payment','paymentMethod','currency','deliveryZone','deliveryZone.businessLocation','customer'])
-            ->where(['order.restaurant_uuid' => $storeUuid])
-            ->andWhere(['order_status' => Order::STATUS_ABANDONED_CHECKOUT])
+            ->joinWith('deliveryZone', true)
+            ->joinWith('pickupLocation', true)
             ->orderBy(['order_created_at' => SORT_DESC]);
+
+
+
+        if($agentAssignment && $agentAssignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
+            $query
+                ->andWhere([ 'delivery_zone.business_location_id' => $agentAssignment->business_location_id])
+                ->orWhere([ 'pickup_location_id' => $agentAssignment->business_location_id]);
+        }
+
+
+
+        $query
+            ->andWhere(['order.restaurant_uuid' => $storeUuid])
+            ->andWhere(['order_status' => Order::STATUS_ABANDONED_CHECKOUT]);
+
 
 
         // add conditions that should always apply here
@@ -100,14 +116,27 @@ class OrderSearch extends Order {
      *
      * @return ActiveDataProvider
      */
-    public function searchDraftOrders($params, $storeUuid) {
+    public function searchDraftOrders($params, $storeUuid, $agentAssignment) {
 
         $query = Order::find()
         ->with(['restaurant','country', 'pickupLocation', 'payment','paymentMethod','currency','deliveryZone','deliveryZone.businessLocation','customer'])
-            ->where(['restaurant_uuid' => $storeUuid])
-            ->andWhere(['order_status' => Order::STATUS_DRAFT])
-            ->orderBy(['order_created_at' => SORT_DESC]);
+            ->joinWith('deliveryZone', true)
+            ->joinWith('pickupLocation', true)
+            ->orderBy(['order.order_created_at' => SORT_DESC]);
 
+
+
+        if($agentAssignment && $agentAssignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
+            $query
+                ->andWhere([ 'delivery_zone.business_location_id' => $agentAssignment->business_location_id])
+                ->orWhere([ 'pickup_location_id' => $agentAssignment->business_location_id]);
+        }
+
+
+
+        $query
+            ->andWhere(['order.restaurant_uuid' => $storeUuid])
+            ->andWhere(['order.order_status' => Order::STATUS_DRAFT]);
 
         // add conditions that should always apply here
         $dataProvider = new ActiveDataProvider([
@@ -218,18 +247,24 @@ class OrderSearch extends Order {
      *
      * @return ActiveDataProvider
      */
-    public function search($params, $storeUuid) {
+    public function search($params, $storeUuid, $agentAssignment = null) {
 
         $query = Order::find()
-
-            ->with(['paymentMethod','currency','deliveryZone','deliveryZone.businessLocation', 'selectedItems'])
-            ->where(['order.restaurant_uuid' => $storeUuid])
-            ->andWhere(['!=' , 'order_status' , Order::STATUS_DRAFT])
-            ->andWhere(['!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
+            ->with(['paymentMethod','currency','deliveryZone.businessLocation', 'selectedItems'])
+            ->joinWith('deliveryZone', true)
             ->joinWith('pickupLocation', true)
             ->joinWith('customer', true)
             ->orderBy(['order_created_at' => SORT_DESC]);
 
+        if($agentAssignment && $agentAssignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
+            $query
+                ->andWhere([ 'delivery_zone.business_location_id' => $agentAssignment->business_location_id])
+                ->orWhere([ 'pickup_location_id' => $agentAssignment->business_location_id]);
+        }
+
+        $query->andWhere(['order.restaurant_uuid' => $storeUuid])
+                    ->andWhere(['!=' , 'order_status' , Order::STATUS_DRAFT])
+                    ->andWhere(['!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT]);
 
         // add conditions that should always apply here
         $dataProvider = new ActiveDataProvider([
