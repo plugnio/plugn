@@ -339,10 +339,10 @@ class CronController extends \yii\console\Controller {
                      ->setSubject('Your Subscription is Expiring')
                      ->send();
 
-               // if($result){
-               //   $subscription->notified_email = 1;
-               //   $subscription->save(false);
-               // }
+               if($result){
+                 $subscription->notified_email = 1;
+                 $subscription->save(false);
+               }
            }
          }
 
