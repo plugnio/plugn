@@ -16,6 +16,8 @@
 0 0 * * * php ~/www/yii  cron/update-sitemap  > /dev/null 2>&1
 0 0 * * * php ~/www/yii  cron/retention-emails-who-passed-five-days-and-no-sales  > /dev/null 2>&1
 0 0 * * * php ~/www/yii  cron/retention-emails-who-passed-two-days-and-no-products > /dev/null 2>&1
+0 0 * * * php ~/www/yii  cron/notify-agents-for-subscription-that-will-expire-soon > /dev/null 2>&1
+0 0 * * * php ~/www/yii  cron/downgraded-store-subscription    > /dev/null 2>&1
 
 # Build every 10 sec
 * * * * * php ~/www/yii  cron/update-voucher-status > /dev/null 2>&1
