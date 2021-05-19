@@ -11,6 +11,8 @@ use common\models\RestaurantPaymentMethod;
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 $this->title = 'TAP Payments Gateways and rates';
+$this->params['breadcrumbs'][] = ['label' => 'Payment Settings', 'url' => ['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]];
+$this->params['breadcrumbs'][] = ['label' => 'Online Payments', 'url' => ['setup-online-payments', 'storeUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>

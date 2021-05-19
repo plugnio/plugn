@@ -336,6 +336,9 @@ class StoreController extends Controller {
 
         $model = $this->findModel($id);
 
+        if($model->country->iso != 'KW' && $paymentGateway == 'myfatoorah')
+          return $this->redirect(['setup-online-payments', 'storeUuid' => $model->restaurant_uuid]);
+
         if($paymentGateway == 'tap')
           $model->setScenario(Restaurant::SCENARIO_CREATE_TAP_ACCOUNT);
         else if ($paymentGateway == 'myfatoorah')
@@ -668,10 +671,15 @@ class StoreController extends Controller {
     public function actionViewMyfatoorahRates($storeUuid) {
 
         $model = $this->findModel($storeUuid);
+        if ($model->country->iso == 'KW'){
+          return $this->render('view-myfatoorah-rates', [
+                      'model' => $model
+          ]);
+        }
 
-        return $this->render('view-myfatoorah-rates', [
-                    'model' => $model
-        ]);
+
+        return $this->redirect(['setup-online-payments', 'storeUuid' => $model->restaurant_uuid]);
+
     }
 
     /**

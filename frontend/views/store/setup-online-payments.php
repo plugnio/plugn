@@ -11,7 +11,9 @@ use common\models\RestaurantPaymentMethod;
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 $this->title = 'Online Payments';
+$this->params['breadcrumbs'][] = ['label' => 'Payment Settings', 'url' => ['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
+
 \yii\web\YiiAsset::register($this);
 ?>
 
@@ -56,37 +58,39 @@ You can only connect one of the two. Choose wisely.
   </div>
 </div>
 
-<div class="card">
-  <div class="card-header">
-      <h3>
-        MyFatoorah
-      </h3>
-  </div>
+<?php if ($model->country->iso == 'KW'){ ?>
+    <div class="card">
+      <div class="card-header">
+          <h3>
+            MyFatoorah
+          </h3>
+      </div>
 
-  <div class="card-body">
-    <span style="display:block">
-      Supported Payment Options
-      <br/>
-      KNET, Credit Card, Mada, Sadad and Benefit
-    </span>
+      <div class="card-body">
+        <span style="display:block">
+          Supported Payment Options
+          <br/>
+          KNET, Credit Card, Mada, Sadad and Benefit
+        </span>
 
-  <div style="display:block">
-    <?php
-      echo Html::a('View rates', ['view-myfatoorah-rates', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'margin-top:10px']);
-    ?>
-  </div>
+      <div style="display:block">
+        <?php
+          echo Html::a('View rates', ['view-myfatoorah-rates', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'margin-top:10px']);
+        ?>
+      </div>
 
-  <div style="display:block">
-    <?php
+      <div style="display:block">
+        <?php
 
 
-          if (!$model->is_tap_enable && !$model->is_myfatoorah_enable) {
-              if (!$model->payment_gateway_queue_id)
-                  echo Html::a('Create MyFatoorah account', ['create-payment-gateway-account', 'id' => $model->restaurant_uuid,'paymentGateway' => 'myfatoorah'], ['class' => 'btn btn-success','style'=>'margin-top:10px']);
-          }
+              if (!$model->is_tap_enable && !$model->is_myfatoorah_enable) {
+                  if (!$model->payment_gateway_queue_id)
+                      echo Html::a('Create MyFatoorah account', ['create-payment-gateway-account', 'id' => $model->restaurant_uuid,'paymentGateway' => 'myfatoorah'], ['class' => 'btn btn-success','style'=>'margin-top:10px']);
+              }
 
-    ?>
-  </div>
+        ?>
+      </div>
 
-  </div>
-</div>
+      </div>
+    </div>
+<?php } ?>
