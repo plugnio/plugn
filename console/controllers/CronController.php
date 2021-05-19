@@ -323,7 +323,6 @@ class CronController extends \yii\console\Controller {
                  ->all();
 
 
-
          foreach ($subscriptions as $subscription) {
 
            foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {

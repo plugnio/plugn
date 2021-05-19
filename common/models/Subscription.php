@@ -117,7 +117,7 @@ class Subscription extends \yii\db\ActiveRecord {
 
 
           //downgrade store Subscription
-          if($this->payment_uuid && date('Y-m-d', strtotime($this->subscription_end_at)) == date('Y-m-d')){
+          if(date('Y-m-d', strtotime($this->subscription_end_at)) == date('Y-m-d')){
 
 
             Subscription::updateAll(['subscription_status' => self::STATUS_INACTIVE], ['and',  ['subscription_status' => self::STATUS_ACTIVE ] , ['restaurant_uuid' => $this->restaurant_uuid  ]]);
