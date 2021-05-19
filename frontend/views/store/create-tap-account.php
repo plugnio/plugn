@@ -50,12 +50,9 @@ $( window ).on( 'load', function() {
   $('#legal_info').hide();
 
   if ('$model->business_type' == 'corp'){
-    companyName.placeholder = 'official business name if license available';
-    companyName.value = '';
     $('#legal_info').show();
   }
   else{
-    companyName.value = '$model->name';
 		$('#legal_info').hide();
   }
 });
@@ -74,7 +71,6 @@ businessTypeInput.change(function(e){
   }
 
 	else{
-    companyName.value = '$model->name';
 		$('#legal_info').hide();
   }
 
@@ -180,7 +176,7 @@ $this->registerJs($js);
 
             <div class="row">
               <div class="col-12">
-                  <?= $form->field($model, 'company_name')->textInput(['maxlength' => true, 'value' => $model->name, 'id' => 'company_name'])->label('Business name *') ?>
+                  <?= $form->field($model, 'company_name')->textInput(['maxlength' => true, 'id' => 'company_name','placeholder'=>'official business name if license available'])->label('Business name *') ?>
               </div>
             </div>
 
@@ -206,55 +202,58 @@ $this->registerJs($js);
             </div>
             <div class="row">
 
+              <div class="col-12 col-sm-6 col-lg-6">
 
-                <div class="col-12 col-sm-6 col-lg-6">
+                <?=
+                $form->field($model, 'vendor_sector')->radioList(['Shopping & Retail' => 'Shopping & Retail', 'F&B' => 'F&B', 'Other' => 'Other'], [
+                    'style' => 'display:grid',
+                    'item' => function($index, $label, $name, $checked, $value) {
 
-                                      <?=
-                                      $form->field($model, 'business_type')->radioList(['ind' => 'Individual', 'corp' => 'Company',], [
-                                          'style' => 'display:grid',
-                                          'id' => 'businessTypeInput',
-                                          'item' => function($index, $label, $name, $checked, $value) {
+                        $return = '<label class="vs-radio-con">';
+                        /* -----> */ if ($checked)
+                            $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                        /* -----> */
+                        else
+                            $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                        $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
+                        $return .= '<span>' . ucwords($label) . '</span>';
+                        $return .= '</label>';
 
-                                              $return = '<label class="vs-radio-con">';
-                                              /* -----> */ if ($checked)
-                                                  $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                                              /* -----> */
-                                              else
-                                                  $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                                              $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
-                                              $return .= '<span>' . ucwords($label) . '</span>';
-                                              $return .= '</label>';
+                        return $return;
+                    }
+                ])->label('Vendor Sector *');
+                ?>
 
-                                              return $return;
-                                          }
-                                      ])->label('Account type *');
-                                      ?>
+              </div>
 
-                </div>
+              <div class="col-12 col-sm-6 col-lg-6">
 
-                <div class="col-12 col-sm-6 col-lg-6">
+                  <?php
+                      if($model->country->iso == 'KW'){
+                        echo  $form->field($model, 'business_type')->radioList(['ind' => 'Individual', 'corp' => 'Company',], [
+                              'style' => 'display:grid',
+                              'id' => 'businessTypeInput',
+                              'item' => function($index, $label, $name, $checked, $value) {
 
-                  <?=
-                  $form->field($model, 'vendor_sector')->radioList(['Shopping & Retail' => 'Shopping & Retail', 'F&B' => 'F&B', 'Other' => 'Other'], [
-                      'style' => 'display:grid',
-                      'item' => function($index, $label, $name, $checked, $value) {
+                                  $return = '<label class="vs-radio-con">';
+                                  /* -----> */ if ($checked)
+                                      $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                                  /* -----> */
+                                  else
+                                      $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                                  $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
+                                  $return .= '<span>' . ucwords($label) . '</span>';
+                                  $return .= '</label>';
 
-                          $return = '<label class="vs-radio-con">';
-                          /* -----> */ if ($checked)
-                              $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                          /* -----> */
-                          else
-                              $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                          $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
-                          $return .= '<span>' . ucwords($label) . '</span>';
-                          $return .= '</label>';
-
-                          return $return;
+                                  return $return;
+                              }
+                          ])->label('Account type *');
                       }
-                  ])->label('Vendor Sector *');
                   ?>
 
-                </div>
+              </div>
+
+
 
             </div>
         </div>
