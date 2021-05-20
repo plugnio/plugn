@@ -187,13 +187,28 @@ class OrderSearch extends Order {
      *
      * @return ActiveDataProvider
      */
-    public function searchPendingOrders($params, $storeUuid) {
+    public function searchPendingOrders($params, $storeUuid, $agentAssignment) {
 
         $query = Order::find()
             ->with(['country', 'pickupLocation', 'payment','paymentMethod','currency','deliveryZone','deliveryZone.businessLocation','customer'])
-            ->where(['restaurant_uuid' => $storeUuid])
-            ->andWhere(['order_status' => Order::STATUS_PENDING])
+            ->joinWith('deliveryZone', true)
+            ->joinWith('pickupLocation', true)
             ->orderBy(['order_created_at' => SORT_DESC]);
+
+
+
+
+          if($agentAssignment && $agentAssignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
+              $query
+                  ->andWhere([ 'delivery_zone.business_location_id' => $agentAssignment->business_location_id])
+                  ->orWhere([ 'pickup_location_id' => $agentAssignment->business_location_id]);
+          }
+
+
+
+          $query
+              ->andWhere(['order.restaurant_uuid' => $storeUuid])
+              ->andWhere(['order.order_status' => Order::STATUS_PENDING]);
 
         // add conditions that should always apply here
         $dataProvider = new ActiveDataProvider([

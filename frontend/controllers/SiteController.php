@@ -115,9 +115,10 @@ class SiteController extends Controller {
 
         $this->layout = false;
         $managedRestaurant = $this->findModel($storeUuid);
+        $agentAssignment = $managedRestaurant->getAgentAssignments()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])->one();
 
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid);
+        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid,$agentAssignment);
 
         return $this->render('incoming-orders-table', [
                     'searchModel' => $searchModel,
@@ -345,8 +346,12 @@ class SiteController extends Controller {
      */
     public function actionRealTimeOrders($storeUuid) {
 
+        $managedRestaurant = $this->findModel($storeUuid);
+        $agentAssignment = $managedRestaurant->getAgentAssignments()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])->one();
+
+
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid);
+        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid, $agentAssignment);
 
         return $this->render('real-time-orders', [
                     'searchModel' => $searchModel,

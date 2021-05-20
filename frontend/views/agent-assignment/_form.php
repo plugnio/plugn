@@ -90,7 +90,7 @@ $this->registerJs($js);
 
     <?php
 
-      if($model->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
+      if(!$model->isNewRecord &&  $model->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
       echo $form->field($model, 'business_location_id')->dropDownList(
             $businessLocationsList, [
             'class' => 'form-control select2 select2',
