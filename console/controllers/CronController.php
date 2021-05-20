@@ -66,7 +66,6 @@ class CronController extends \yii\console\Controller {
     public function actionWeeklyReport(){
 
         $stores = Restaurant::find()
-        ->where(['restaurant_uuid' => 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])
                 ->all();
 
 

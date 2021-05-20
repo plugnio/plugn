@@ -1466,15 +1466,15 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getShippingCountries()
-    {
-        return $this->hasMany(Country::className(), ['country_id' => 'country_id'])
-        ->joinWith([
-            'deliveryZones' => function ($query) {
-                $query->onCondition(['delivery_zone.restaurant_uuid' => 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290']);
-            },
-        ]);
-    }
+    // public function getShippingCountries()
+    // {
+    //     return $this->hasMany(Country::className(), ['country_id' => 'country_id'])
+    //     ->joinWith([
+    //         'deliveryZones' => function ($query) {
+    //             $query->onCondition(['delivery_zone.restaurant_uuid' => 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290']);
+    //         },
+    //     ]);
+    // }
 
 
     /**
