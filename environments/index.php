@@ -1,5 +1,35 @@
 <?php
 return [
+    'Development [Krushn-PC]' => [
+        'path' => 'dev-krushn-pc',
+        'setWritable' => [
+            'backend/runtime',
+            'backend/web/assets',
+            'backend/web/uploads/project-files',
+            'console/runtime',
+            'frontend/runtime',
+            'frontend/web/assets',
+            'frontend/web/uploads/',
+            'api/runtime',
+            'api/web/assets',
+            'vendors/runtime',
+            'vendors/web/assets',
+            'shortner/runtime'
+        ],
+        'setExecutable' => [
+            'yii',
+            'yii_test',
+            'fixture-generate-and-load'
+        ],
+        'setCookieValidationKey' => [
+            'backend/config/main-local.php',
+            'common/config/codeception-local.php',
+            'frontend/config/main-local.php',
+            'api/config/main-local.php',
+            'vendors/config/main-local.php',
+            'shortner/config/main-local.php',
+        ],
+    ],
     'Development [Saoud]' => [
         'path' => 'dev-saoud',
         'setWritable' => [
