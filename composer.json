@@ -49,7 +49,8 @@
         "maksyutin/yii2-dual-list-box": "dev-master",
         "ssimpson/yii2-dual-list-box": "dev-master",
         "borales/yii2-phone-input": "*",
-        "segmentio/analytics-php": "^1.5"
+        "segmentio/analytics-php": "^1.5",
+        "yiisoft/yii2-redis": "~2.0.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
