@@ -68,7 +68,6 @@ class CronController extends \yii\console\Controller {
         $stores = Restaurant::find()
                 ->all();
 
-
           foreach ($stores as $key => $store) {
 
 
@@ -160,10 +159,11 @@ class CronController extends \yii\console\Controller {
                                       ])
                               ->all();
 
-                  foreach ($agentAssignments as $agentAssignment) {
+                  foreach ($agentAssignments as $key => $agentAssignment) {
 
                     if($agentAssignment->receive_weekly_stats){
-                      \Yii::$app->mailer->compose([
+
+                      $weeklyStoreSummaryEmail = \Yii::$app->mailer->compose([
                              'html' => 'weekly-summary',
                                  ], [
                              'store' => $store,
@@ -178,9 +178,13 @@ class CronController extends \yii\console\Controller {
                          ])
                          ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                          ->setTo([$agentAssignment->agent->agent_email])
-                         ->setSubject('Weekly Store Summary')
-                         ->setBcc(\Yii::$app->params['supportEmail'])
-                         ->send();
+                         ->setSubject('Weekly Store Summary');
+
+                         if($key == 0)
+                           $weeklyStoreSummaryEmail->setBcc(\Yii::$app->params['supportEmail']);
+
+                         $weeklyStoreSummaryEmail->send();
+
                     }
 
                   }
