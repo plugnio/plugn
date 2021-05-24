@@ -101,9 +101,11 @@ return [
                     'patterns' => [
                         'GET' => 'detail',
                         'PUT update' => 'update-agent-profile',
+                        'POST change-password' => 'change-password',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS update' => 'options',
+                        'OPTIONS change-password' => 'options',
                     ]
                 ],
                 [// VoucherController
@@ -208,9 +210,11 @@ return [
                    'pluralize' => false,
                    'patterns' => [
                        'GET login' => 'login',
+                       'POST request-reset-password' => 'request-reset-password',
 
                        // OPTIONS VERBS
-                       'OPTIONS login' => 'options'
+                       'OPTIONS login' => 'options',
+                       'OPTIONS request-reset-password' => 'options',
                    ]
                ],
             ],

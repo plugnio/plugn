@@ -6,6 +6,7 @@ use Yii;
 use yii\rest\Controller;
 use yii\filters\auth\HttpBasicAuth;
 use common\models\Agent;
+use agent\models\PasswordResetRequestForm;
 
 /**
  * Auth controller provides the initial access token that is required for further requests
@@ -55,7 +56,9 @@ class AuthController extends Controller {
         // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
         // also avoid for public actions like registration and password reset
         $behaviors['authenticator']['except'] = [
-            'options'
+            'options',
+            'request-reset-password',
+            'update-password'
         ];
 
         return $behaviors;
@@ -91,12 +94,117 @@ class AuthController extends Controller {
         return $this->_loginResponse($agent);
     }
 
+
+
+
+    /**
+     * Sends password reset email to user
+     * @return array
+     */
+    public function actionRequestResetPassword() {
+        $emailInput = Yii::$app->request->getBodyParam("email");
+
+        $model = new PasswordResetRequestForm();
+        $model->email = $emailInput;
+
+        $errors = false;
+
+        if ($model->validate()) {
+
+            $agent = Agent::findOne([
+               'agent_email' => $model->email,
+            ]);
+
+            if ($agent) {
+
+
+                if (!$model->sendEmail($agent)) {
+                    $errors = 'Sorry, we are unable to reset a password for email provided.';
+                }
+            }
+        } else if (isset($model->errors['agent_email'])) {
+            $errors = $model->errors['agent_email'];
+        }
+
+        // If errors exist show them
+        if ($errors) {
+            return [
+                'operation' => 'error',
+                'message' => $errors
+            ];
+        }
+
+        // Otherwise return success
+        return [
+            'operation' => 'success',
+            'message' => 'Please check the link sent to you on your email to set new password.'
+        ];
+    }
+
+
+
+    /**
+     * Updates password based on passed token
+     * @return array
+     */
+    public function actionUpdatePassword() {
+        $token = Yii::$app->request->getBodyParam("token");
+        $newPassword = Yii::$app->request->getBodyParam("newPassword");
+        $cPassword = Yii::$app->request->getBodyParam("cPassword");
+
+        $agent = Agent::findByPasswordResetToken($token);
+
+        if (!$agent) {
+            return [
+                'operation' => 'error',
+                'message' => 'Invalid password reset token.'
+            ];
+        }
+        if (!$newPassword) {
+            return [
+                'operation' => 'error',
+                'message' => 'Password field required'
+            ];
+        }
+        if (!$cPassword) {
+            return [
+                'operation' => 'error',
+                'message' => 'Confirm Password field required'
+            ];
+        }
+
+        if ($cPassword != $newPassword) {
+            return [
+                'operation' => 'error',
+                'message' => 'Password & Confirm Password does not match'
+            ];
+        }
+
+        $agent->setPassword($newPassword);
+        $agent->removePasswordResetToken();
+        $agent->save(false);
+
+        //Whenever a user changes his password using any method (password reset email / profile page), we need to send out the following email to confirm that his password was set
+        // \Yii::$app->mailer->htmlLayout = "layouts/text";
+        //
+        // \Yii::$app->mailer->compose([
+        //                     'html' => 'employer/password-reset-confirmed'
+        //                         ])
+        //                 ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
+        //                 ->setTo($agent->email)
+        //                 ->setSubject(Yii::t('employer', 'Your password reset was a success'))
+        //                 ->send();
+
+        return $this->_loginResponse($agent);
+    }
+
+
     /**
      * Return agent data after successful login
      * @param type $agent
      * @return type
      */
-    private function _loginResponse($agent, $new_user = 0) {
+    private function _loginResponse($agent) {
 
         // Return Agent access token if everything valid
 
