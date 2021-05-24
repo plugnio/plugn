@@ -7,7 +7,7 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use common\models\BankDiscount;
+use common\models\Agent;
 
 class AgentController extends Controller {
 
@@ -83,6 +83,81 @@ class AgentController extends Controller {
 
 
     }
+
+
+
+        public function actionUpdateAgentProfile($store_uuid) {
+
+            $model = Yii::$app->user->identity;
+
+            if (!isset($model->agent_id)) {
+                return [
+                    "operation" => "error",
+                    "message" => 'Invalid Agent ID'
+                ];
+            }
+
+            $agentAssignment  = $model->getAgentAssignments()->where(['restaurant_uuid' => $store_uuid])->one();
+
+            if (!isset($agentAssignment->restaurant_uuid)) {
+              return [
+                  "operation" => "error",
+                  "message" => 'You do not own this store.'
+              ];
+          }
+
+
+            $model->agent_name = Yii::$app->request->getBodyParam("agent_name");
+            $model->agent_email = Yii::$app->request->getBodyParam("agent_email");
+
+            if (!$model->save()) {
+                  return [
+                      "operation" => "error",
+                      "message" => $model->errors
+                  ];
+              } else {
+
+                $agentAssignment->assignment_agent_email = Yii::$app->request->getBodyParam("agent_email");
+
+
+                if(Yii::$app->request->getBodyParam("email_notification") != null )
+                  $agentAssignment->email_notification = Yii::$app->request->getBodyParam("email_notification");
+
+                if(Yii::$app->request->getBodyParam("reminder_email") != null )
+                  $agentAssignment->reminder_email = Yii::$app->request->getBodyParam("reminder_email");
+
+                if(Yii::$app->request->getBodyParam("receive_weekly_stats") != null )
+                  $agentAssignment->receive_weekly_stats = Yii::$app->request->getBodyParam("receive_weekly_stats");
+
+                $agentAssignment->save(false);
+
+            }
+
+            return [
+              'model' => $model,
+              "operation" => "success",
+              "message" => "Agent profile updated successfully"
+            ];
+
+        }
+
+
+
+          /**
+          * Return agent model
+          * @param type $employer_uuid
+          * @return \common\models\Agent
+          */
+         private function findModel($agent_id) {
+             $model = Agent::findIdentity($agent_id);
+
+             if (!$model) {
+                 return false;
+             }
+
+             return $model;
+         }
+
 
 
 

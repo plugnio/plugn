@@ -100,8 +100,10 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'detail',
+                        'PUT update' => 'update-agent-profile',
                         // OPTIONS VERBS
-                        'OPTIONS' => 'options'
+                        'OPTIONS' => 'options',
+                        'OPTIONS update' => 'options',
                     ]
                 ],
                 [// VoucherController

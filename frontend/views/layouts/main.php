@@ -340,7 +340,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                     ?>
                                 </li>
 
-                              <?php if ($restaurant_model->version == 2) { ?>
+                              <?php if ($restaurant_model->version == 2 || $model->restaurant->version == 3) { ?>
 
                                 <li class=" nav-item <?= $this->context->route == 'business-location/index'  ? 'active' : '' ?> ">
                                     <?=
@@ -573,7 +573,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
       <?=  $storeConversionParams ?>
       }}();
     </script>
-    
+
     <?php $this->endBody() ?>
 
 </body>

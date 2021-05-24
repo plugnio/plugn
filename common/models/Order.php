@@ -219,15 +219,15 @@ class Order extends \yii\db\ActiveRecord {
                 }
             ],
             [['floor'], 'required', 'when' => function($model) {
-                    return ($model->unit_type == 'Office' ||  $model->unit_type == 'Apartment') && $model->restaurant->version == 2;
+                    return ($model->unit_type == 'Office' ||  $model->unit_type == 'Apartment') && ($model->restaurant->version == 2 || $model->restaurant->version == 3);
                 }
             ],
             [['office'], 'required', 'when' => function($model) {
-                    return $model->unit_type == 'Office' && $model->restaurant->version == 2;
+                    return $model->unit_type == 'Office' && ($model->restaurant->version == 2 || $model->restaurant->version == 3);
                 }
             ],
             [['apartment'], 'required', 'when' => function($model) {
-                    return $model->unit_type == 'Apartment' && $model->restaurant->version == 2;
+                    return $model->unit_type == 'Apartment' && ($model->restaurant->version == 2 || $model->restaurant->version == 3);
                 }
             ],
             [['postalcode', 'city', 'address_1' , 'address_2'], 'required', 'when' => function($model) {
