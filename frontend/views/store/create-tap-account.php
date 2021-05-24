@@ -76,6 +76,10 @@ businessTypeInput.change(function(e){
 
 });
 
+$('#submitBtn').click(function() {
+  $('#loading').show();
+  $('#submitBtn').hide();
+});
 
 
 ";
@@ -324,10 +328,18 @@ $this->registerJs($js);
         </div>
     </div>
 
-    <div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px; padding-bottom: 15px; background:#f4f6f9 ">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
-    </div>
+    <div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px;  margin-top: 20px; padding-bottom: 15px; background:#f4f6f9 ">
+        <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'id' =>'submitBtn', 'style' => 'width: 100%;height: 50px;']) ?>
 
+
+				<button class="btn btn-success" type="button" id="loading" disabled style="width: 100%;height: 50px; display:none">
+					<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+					<span class="ml-25 align-middle">Loading...</span>
+				</button>
+
+
+
+    </div>
 </div>
 
 

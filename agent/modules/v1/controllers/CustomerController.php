@@ -8,6 +8,7 @@ use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use common\models\Customer;
+use common\models\Order;
 
 class CustomerController extends Controller {
 
@@ -126,5 +127,40 @@ class CustomerController extends Controller {
       }
 
   }
+
+
+  /**
+   * Return a List of all customers Orders
+   * @param type $store_uuid
+   * @param type $customer_id
+   * @return type
+   */
+  public function actionListAllCustomerOrders($store_uuid, $customer_id) {
+
+    if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+
+        $orders =  Order::find()
+                  ->where(['restaurant_uuid' => $store_uuid,'customer_id' => $customer_id])
+                  ->orderBy(['order_created_at' => SORT_DESC])
+                  ->all();
+
+
+        if (!$orders) {
+            return [
+                'operation' => 'error',
+                'message' => 'No results found.'
+            ];
+        }
+
+        return [
+            'operation' => 'success',
+            'body' => $orders
+        ];
+
+    }
+
+  }
+
+
 
 }

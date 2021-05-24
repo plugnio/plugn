@@ -1255,9 +1255,17 @@ class SiteController extends Controller {
                 $business_location_model = new BusinessLocation();
                 $business_location_model->restaurant_uuid = $store_model->restaurant_uuid;
                 $business_location_model->country_id = $store_model->country_id;
+                $business_location_model->support_pick_up = 1;
                 $business_location_model->business_location_name = 'Main Branch';
                 $business_location_model->business_location_name_ar = 'الفرع الرئيسي';
                 $business_location_model->save();
+
+
+                //Enable cash by default
+                $payments_method = new RestaurantPaymentMethod();
+                $payments_method->payment_method_id = 3; //Cash
+                $payments_method->restaurant_uuid = $store_model->restaurant_uuid;
+                $payments_method->save();
 
 
                 $assignment_agent_model = new AgentAssignment();
