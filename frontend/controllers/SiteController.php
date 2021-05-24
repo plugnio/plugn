@@ -19,6 +19,7 @@ use common\models\BusinessLocation;
 use common\models\Restaurant;
 use common\models\OrderItem;
 use common\models\Category;
+use common\models\RestaurantPaymentMethod;
 use common\models\Order;
 use common\models\Plan;
 use common\models\PaymentMethod;
