@@ -27,11 +27,11 @@ function initMap() {
 
   });
 
-  let marker  = new google.maps.Marker({
-       position: myLatlng,
-       map: map,
-       draggable: true
-  });
+  // let marker  = new google.maps.Marker({
+  //      position: myLatlng,
+  //      map: map,
+  //      draggable: true
+  // });
 
 
   const card = document.getElementById("searchGrp");
@@ -53,14 +53,14 @@ function initMap() {
   const infowindow = new google.maps.InfoWindow();
   const infowindowContent = document.getElementById("infowindow-content");
   infowindow.setContent(infowindowContent);
-   new google.maps.Marker({
-    map,
-    anchorPoint: new google.maps.Point(0, -29),
-       draggable: true
-  });
+  //  new google.maps.Marker({
+  //   map,
+  //   anchorPoint: new google.maps.Point(0, -29),
+  //      draggable: true
+  // });
   autocomplete.addListener("place_changed", () => {
     infowindow.close();
-    marker.setVisible(false);
+    // marker.setVisible(false);
     const place = autocomplete.getPlace();
 
     if (!place.geometry || !place.geometry.location) {
@@ -77,12 +77,12 @@ function initMap() {
       map.setCenter(place.geometry.location);
       map.setZoom(17);
     }
-    marker.setPosition(place.geometry.location);
-    marker.setVisible(true);
+    // marker.setPosition(place.geometry.location);
+    // marker.setVisible(true);
     infowindowContent.children["place-name"].textContent = place.name;
     infowindowContent.children["place-address"].textContent =
       place.formatted_address;
-    infowindow.open(map, marker);
+    // infowindow.open(map, marker);
   });
 
 
@@ -105,7 +105,7 @@ function initMap() {
 
             });
        }
-       
+
        document.getElementById("businesslocation-latitude").value =  this.position.lat();
        document.getElementById("businesslocation-longitude").value =  this.position.lng();
 
@@ -124,6 +124,37 @@ function initMap() {
  }
 }
 </script>
+
+<style>
+  .modal-body{
+    padding: 0;
+    height: 475px;
+  }
+
+  @media (min-width: 576px){
+    .modal-dialog {
+        max-width: 600px !important;
+        margin: 1.75rem auto !important;
+    }
+  }
+
+  .modal-header{
+    padding: 16px !important;
+  }
+
+  .map-marker-img{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 5;
+    width: 30px;
+    height: 45px;
+    z-index: 5;
+    transform: translate(-50%,-100%);
+    width: 27px !important;
+    height: 43px !important;
+  }
+</style>
 
 
   <div class="card">
@@ -171,9 +202,39 @@ function initMap() {
 
 </div>
 
+<!-- Vertical modal -->
+<div class="vertical-modal-ex">
+    <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#exampleModalCenter">
+        Vertically Centered
+    </button>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="height:100%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Business Address</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
 
 
-      <p><span id="start"></span></p>
+                <div class="modal-body">
+                    <img alt="" class="map-marker-img" src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/marker-icon.png' ?>" draggable="false" usemap="#gmimap0" style="user-select: none;border: 0px;padding: 0px;margin: 0px;max-width: none;">
+                  <div id="map">
+                  </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close">Accept</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+      <!-- <p><span id="start"></span></p>
       <p><span id="end"></span></p>
 
         <div class="searchGrp map-search-box" id="searchGrp">
@@ -184,4 +245,4 @@ function initMap() {
       <div id="infowindow-content">
         <span id="place-name" class="title"></span><br />
         <span id="place-address"></span>
-      </div>
+      </div> -->
