@@ -63,23 +63,16 @@ class AgentController extends Controller {
 
     public function actionDetail() {
         $agent = Yii::$app->user->identity;
-        if($agent){
-          $accessToken = $agent->accessToken->token_value;
 
-          return [
-              "operation" => "success",
-              "body" => [
-                "id" => $agent->agent_id,
-                "agent_name" => $agent->agent_name,
-                "agent_email" => $agent->agent_email
-              ]
-          ];
-        } else {
+        if(!$agent){
           return [
               'operation' => 'error',
-              'message' => 'No results found'
+              'message' => 'No result found'
           ];
         }
+
+        $accessToken = $agent->accessToken->token_value;
+        return $agent;
 
 
     }

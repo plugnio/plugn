@@ -72,25 +72,44 @@ class BankDiscountController extends Controller {
 
           $bankDiscounts =  BankDiscount::find()
                     ->with('bank')
-                    ->where(['restaurant_uuid' => $store_uuid])
-                    ->asArray()
-                    ->all();
+                    ->where(['restaurant_uuid' => $store_uuid]);
 
-
-          if (!$bankDiscounts) {
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found'
-              ];
-          }
-
-          return [
-              'operation' => 'success',
-              'body' => $bankDiscounts
-          ];
+          return new ActiveDataProvider([
+            'query' => $bankDiscounts
+          ]);
 
       }
 
+    }
+
+
+    /**
+    * Return a List of bank discount by keyword
+   */
+    public function actionFilter($store_uuid)
+    {
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+
+        $keyword = Yii::$app->request->get('keyword');
+
+        $query =  BankDiscount::find()->joinWith('bank');
+
+        if($keyword) {
+              $query->andWhere(['like', 'discount_amount', $keyword]);
+              $query->orWhere(['like', 'bank.bank_name', $keyword]);
+              $query->orWhere(['like', 'max_redemption', $keyword]);
+              $query->orWhere(['like', 'discount_type', $keyword]);
+              $query->orWhere(['like', 'max_redemption', $keyword]);
+              $query->orWhere(['like', 'limit_per_customer', $keyword]);
+          }
+
+        $query->andWhere(['restaurant_uuid' => $store_uuid]);
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+
+      }
     }
 
 
@@ -104,25 +123,12 @@ class BankDiscountController extends Controller {
 
       if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
-        $bankDiscount =  BankDiscount::find()
+        $bank_discount_model =  BankDiscount::find()
                   ->where(['restaurant_uuid' => $store_uuid])
-                  ->andWhere(['bank_discount_id' => $bank_discount_id])
-                  ->asArray()
-                  ->one();
+                  ->andWhere(['bank_discount_id' => $bank_discount_id])->one();
 
+          return $bank_discount_model;
 
-          if (!$bankDiscount) {
-
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found.'
-              ];
-          }
-
-          return [
-              'operation' => 'success',
-              'body' => $bankDiscount
-          ];
 
       }
 

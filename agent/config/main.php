@@ -54,12 +54,21 @@ return [
                         'GET draft' => 'list-draft-orders',
                         'GET abandoned' => 'list-abandoned-orders',
                         'GET detail' => 'detail',
+                        'POST filter-pending' => 'filter-pending',
+                        'POST filter-abandoned' => 'filter-abandoned',
+                        'POST filter-draft' => 'filter-draft',
+                        'POST filter-active' => 'filter-active',
+
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS active' => 'options',
                         'OPTIONS draft' => 'options',
                         'OPTIONS abandoned' => 'options',
                         'OPTIONS detail' => 'options',
+                        'OPTIONS filter-pending' => 'options',
+                        'OPTIONS filter-active' => 'options',
+                        'OPTIONS filter-draft' => 'options',
+                        'OPTIONS filter-abandoned' => 'options',
                     ]
                 ],
                 [// CategoryController
@@ -68,8 +77,11 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',
+                        'GET detail' => 'detail',
+                        'POST' => 'filter',
                         // OPTIONS VERBS
-                        'OPTIONS' => 'options'
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options',
                     ]
                 ],
                 [// bankController
@@ -89,6 +101,7 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST' => 'filter',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options'
@@ -115,6 +128,8 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST' => 'filter',
+
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options'
@@ -127,6 +142,7 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST' => 'filter',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options'
@@ -137,6 +153,7 @@ return [
                     'controller' => 'v1/delivery-zone',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET' => 'list',
                         'GET detail' => 'detail',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
@@ -150,6 +167,7 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST' => 'filter',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options'
@@ -162,6 +180,7 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST' => 'filter',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options'
@@ -174,6 +193,7 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST' => 'filter',
                         'GET orders' => 'list-all-customer-orders',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
@@ -188,6 +208,7 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST' => 'filter',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options'

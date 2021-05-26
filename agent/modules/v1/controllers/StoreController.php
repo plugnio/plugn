@@ -68,10 +68,7 @@ class StoreController extends Controller {
 
       if ($store = Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
-          return [
-              'operation' => 'success',
-              'body' => $store
-          ];
+          return $store;
 
       }
 

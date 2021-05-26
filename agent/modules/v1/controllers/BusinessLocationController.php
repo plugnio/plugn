@@ -72,25 +72,41 @@ class BusinessLocationController extends Controller {
 
           $businessLocations =  BusinessLocation::find()
                     ->with(['country'])
-                    ->where(['restaurant_uuid' => $store_uuid])
-                    ->asArray()
-                    ->all();
+                    ->where(['restaurant_uuid' => $store_uuid]);
 
-
-          if (!$businessLocations) {
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found'
-              ];
-          }
-
-          return [
-              'operation' => 'success',
-              'body' => $businessLocations
-          ];
+          return new ActiveDataProvider([
+            'query' => $businessLocations
+          ]);
 
       }
 
+    }
+
+    /**
+    * Return a List of business location by keyword
+   */
+    public function actionFilter($store_uuid)
+    {
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+
+        $keyword = Yii::$app->request->get('keyword');
+
+        $query =  BusinessLocation::find()->joinWith('country');
+
+        if($keyword) {
+              $query->where(['like', 'business_location_name', $keyword]);
+              $query->orWhere(['like', 'business_location_name_ar', $keyword]);
+              $query->orWhere(['like', 'country.country_name', $keyword]);
+              $query->orWhere(['like', 'country.country_name_ar', $keyword]);
+          }
+
+        $query->andWhere(['restaurant_uuid' => $store_uuid]);
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+
+      }
     }
 
 
@@ -111,19 +127,7 @@ class BusinessLocationController extends Controller {
                   ->asArray()
                   ->one();
 
-
-          if (!$businessLocation) {
-
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found.'
-              ];
-          }
-
-          return [
-              'operation' => 'success',
-              'body' => $businessLocation
-          ];
+          return $businessLocation;
 
       }
 

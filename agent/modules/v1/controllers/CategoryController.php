@@ -70,28 +70,67 @@ class CategoryController extends Controller {
 
       if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
-          $categories =  Category::find()
-                    ->where(['restaurant_uuid' => $store_uuid])
-                    ->asArray()
-                    ->all();
+          $query =  Category::find()
+                    ->where(['restaurant_uuid' => $store_uuid]);
 
 
-          if (!$categories) {
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found'
-              ];
-          }
-
-          return [
-              'operation' => 'success',
-              'body' => $categories
-          ];
+          return new ActiveDataProvider([
+              'query' => $query
+          ]);
 
       }
 
     }
 
+
+    /**
+    * Return a List of Category by keyword
+   */
+    public function actionFilter($store_uuid)
+    {
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+
+        $keyword = Yii::$app->request->get('keyword');
+
+        $query =  Category::find();
+
+        if($keyword) {
+              $query->where(['like', 'title', $keyword]);
+              $query->orWhere(['like', 'title_ar', $keyword]);
+              $query->orWhere(['like', 'subtitle', $keyword]);
+              $query->orWhere(['like', 'subtitle_ar', $keyword]);
+          }
+
+       $query =  $query->andWhere(['restaurant_uuid' => $store_uuid ]);
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+
+      }
+    }
+
+
+    /**
+    * Return Category detail
+     * @param type $store_uuid
+     * @param type $category_id
+     * @return type
+     */
+    public function actionDetail($store_uuid, $category_id) {
+
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+
+        $category_model =  Category::find()
+                  ->where(['restaurant_uuid' => $store_uuid])
+                  ->andWhere(['category_id' => $category_id])
+                  ->one();
+
+        return $category_model;
+
+      }
+
+  }
 
 
 }
