@@ -239,6 +239,22 @@ class Payment extends \yii\db\ActiveRecord {
         return $paymentRecord;
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function fields() {
+        $fields = parent::fields();
+
+        // remove fields that contain sensitive information
+        unset($fields['payment_net_amount']);
+        unset($fields['payment_gateway_fee']);
+        unset($fields['plugn_fee']);
+
+        return $fields;
+
+    }
+
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
@@ -282,6 +298,16 @@ class Payment extends \yii\db\ActiveRecord {
     public function getRestaurant() {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
+    /**
+     * Gets query for [[Subscriptions]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getActiveSubscription() {
+        return $this->hasOne(Subscription::className(), ['restaurant_uuid' => 'restaurant_uuid'])->where(['subscription_status' => Subscription::STATUS_ACTIVE])->via('restaurant');
+    }
+
 
     /**
      * Gets query for [[Currency]].

@@ -53,19 +53,15 @@ $this->registerJs($js);
                     'label' => 'Redeemed',
                     "format" => "raw",
                     "value" => function($model) {
-                        return $model->getCustomerVouchers()->count();
+                        return sizeof($model->activeOrders);
                     }
                 ],
                 [
                     'label' => 'Total spent',
                     "format" => "raw",
                     "value" => function($model) {
-                        $totalSpent = $model
-                        ->getOrders()
-                        ->where(['restaurant_uuid' => $model->restaurant_uuid])
-                        ->sum('total_price');
+                        $totalSpent = $model->getOrders()->where(['restaurant_uuid' => $model->restaurant_uuid])->sum('total_price');
 
-                        $totalSpent = \Yii::$app->formatter->asDecimal($totalSpent ? $totalSpent : 0 , 3);
                         return  Yii::$app->formatter->asCurrency($totalSpent ? $totalSpent : 0, $model->restaurant->currency->code) ;
 
                     }

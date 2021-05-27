@@ -116,9 +116,23 @@ class ZapierController extends Controller {
 
             foreach ($orders as $key => $order) {
                 $orders[$key]['id'] = $order['order_uuid'];
+
+                $customer_phone_number =  str_replace('+', '', $order['customer_phone_number']);
+                $customer_phone_number =  str_replace(' ', '', $customer_phone_number);
+
+
+                $orders[$key]['id'] = $order['order_uuid'];
+
                 $orders[$key]['estimated_time_of_arrival'] = date('c', strtotime($order['estimated_time_of_arrival']));
                 $orders[$key]['order_created_at'] = date('c', strtotime($order['order_created_at']));
-                $orders[$key]['order_updated_at'] = date('c', strtotime($order['order_updated_at']));
+                $orders[$key]['order_updated_at'] =  date('c', strtotime($order['order_updated_at']));
+
+                $orders[$key]['scheduled_time_to'] =  date('c', strtotime($order['scheduled_time_to']));
+                $orders[$key]['scheduled_time_start_from'] =  date('c', strtotime($order['scheduled_time_start_from']));
+
+
+
+                $orders[$key]['customer_phone_number'] =   $customer_phone_number ;
 
 
                 foreach ($order['orderItems'] as $orderItemKey => $orderItem) {
@@ -127,6 +141,7 @@ class ZapierController extends Controller {
                   unset($orders[$key]['orderItems'][$orderItemKey]['order_item_id']);
                   unset($orders[$key]['orderItems'][$orderItemKey]['item_uuid']);
                 }
+
 
                 unset($orders[$key]['restaurant_uuid']);
                 unset($orders[$key]['restaurant_branch_id']);

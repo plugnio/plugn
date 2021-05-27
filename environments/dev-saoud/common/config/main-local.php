@@ -8,6 +8,12 @@ return [
             'username' => 'vendor',
             'password' => '',
             'charset' => 'utf8mb4',
+            // Enable Caching of Schema to Reduce SQL Queries
+            'enableSchemaCache' => true,
+            // Duration of schema cache.
+            'schemaCacheDuration' => 60, // 1 minute
+            // Name of the cache component used to store schema information
+            'schemaCache' => 'cache',
         ],
         // 'log' => [
         //     'targets' => [
@@ -70,7 +76,7 @@ return [
         ],
         'mashkorDelivery' => [
             'class' => 'common\components\MashkorDelivery',
-            'keyToUse' => \common\components\MashkorDelivery::USE_LIVE_KEY,
+            'keyToUse' => \common\components\MashkorDelivery::USE_TEST_KEY,
         ],
         'githubComponent' => [
             'class' => 'common\components\GithubComponent',

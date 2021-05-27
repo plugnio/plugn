@@ -1,6 +1,6 @@
 <?php
 
-namespace vendors\models;
+namespace agent\models;
 
 use Yii;
 

@@ -41,10 +41,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                             <td><?= $model->agent_email ?></td>
                                         </tr>
 
-                                        <tr>
+                                        <!-- <tr>
                                             <td class="font-weight-bold">Reminder Email</td>
-                                            <td><?= $model->reminder_email ? 'True' : 'False'  ?></td>
-                                        </tr>
+                                            <td>
+                                            <?php
+                                              // echo $model->reminder_email ? 'True' : 'False'
+                                            ?>
+                                          </td>
+                                        </tr> -->
                                     </table>
                                 </div>
                                 <div class="col-12 col-md-12 col-lg-5">
@@ -53,10 +57,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                             <td class="font-weight-bold">Status</td>
                                             <td>active</td>
                                         </tr>
-                                        <tr>
+                                        <!-- <tr>
                                             <td class="font-weight-bold">Email Notification</td>
-                                            <td><?= $model->email_notification ? 'True' : 'False'  ?></td>
-                                        </tr>
+                                            <td>
+                                            <?php
+                                              // echo $model->email_notification ? 'True' : 'False'
+                                             ?></td>
+                                        </tr> -->
                                     </table>
                                 </div>
                                 <div class="col-12" style="margin-top:20px">

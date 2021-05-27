@@ -7,14 +7,13 @@ use yii\helpers\Html;
 $this->params['restaurant_uuid'] = $storeUuid;
 
 $this->title = 'Edit Profile';
-// $this->params['breadcrumbs'][] = ['label' => 'Agents', 'url' => ['index', 'storeUuid' => $storeUuid]];
-// $this->params['breadcrumbs'][] = ['label' => $model->agent_name, 'url' => ['index','storeUuid' => $storeUuid]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="agent-update">
 
     <?= $this->render('_form', [
         'model' => $model,
+        'agentAssignment' => $agentAssignment,
         'storeUuid' => $storeUuid,
     ]) ?>
 

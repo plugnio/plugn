@@ -22,9 +22,9 @@ class RestaurantSearch extends Restaurant
      public function rules()
      {
          return [
-             [['restaurant_uuid', 'name', 'name_ar' ,'app_id',  'restaurant_email', 'restaurant_created_at', 'restaurant_updated_at','restaurant_domain', 'country_name', 'currency_title'], 'safe'],
+             [['restaurant_uuid', 'name', 'name_ar' ,'app_id', 'restaurant_email', 'restaurant_created_at', 'restaurant_updated_at','restaurant_domain', 'country_name', 'currency_title'], 'safe'],
              [['restaurant_status'], 'integer'],
-             [['platform_fee'], 'number'],
+             [['platform_fee','version'], 'number'],
          ];
      }
 
@@ -87,6 +87,7 @@ class RestaurantSearch extends Restaurant
         $query->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
             ->andFilterWhere(['like', 'restaurant_domain', $this->restaurant_domain])
             ->andFilterWhere(['like', 'name', $this->name])
+            ->andFilterWhere(['like', 'version', $this->version])
             ->andFilterWhere(['like', 'currency.title', $this->currency_title])
             ->andFilterWhere(['like', 'country.country_name', $this->country_name])
             ->andFilterWhere(['like', 'name_ar', $this->name_ar]);

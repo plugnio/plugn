@@ -78,7 +78,7 @@ class GithubComponent extends Component {
         if($branch == null)
           $branch = $this->branch;
 
-        $lastCommitEndpoint = $this->apiEndpoint . "/contents/src/" . $path . "?ref=" . $branch;
+        $lastCommitEndpoint = $this->apiEndpoint . "/contents/" . $path . "?ref=" . $branch;
 
         $client = new Client();
         $response = $client->createRequest()
@@ -100,6 +100,7 @@ class GithubComponent extends Component {
      * @return type
      */
     public function createBranch($sha, $branch_name) {
+
         $createBranchEndpoint = $this->apiEndpoint . "/git/refs";
 
         $branchParams = [
@@ -113,6 +114,69 @@ class GithubComponent extends Component {
                 ->setUrl($createBranchEndpoint)
                 ->setFormat(Client::FORMAT_JSON)
                 ->setData($branchParams)
+                ->addHeaders([
+                    'Authorization' => 'token ' . $this->token,
+                    'User-Agent' => 'request',
+                ])
+                ->send();
+
+        return $response;
+    }
+
+    /**
+     * Delete a file in a repository.
+     * @param type $sha The SHA1 value for the last commit.
+     * @param type $branch_name name of branch
+     * @return type
+     */
+    public function deleteFile($filePath, $sha, $branch) {
+
+        $deleteFileEndpoint = $this->apiEndpoint . "/contents/" . $filePath;
+
+        $deleteFileParams = [
+            "message" => "Delete " . $filePath,
+            "sha" => $sha,
+            "branch" => $branch
+
+        ];
+
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setMethod('DELETE')
+                ->setUrl($deleteFileEndpoint)
+                ->setFormat(Client::FORMAT_JSON)
+                ->setData($deleteFileParams)
+                ->addHeaders([
+                    'Authorization' => 'token ' . $this->token,
+                    'User-Agent' => 'request',
+                ])
+                ->send();
+
+        return $response;
+    }
+
+    /**
+     * The Repo Merging API supports merging branches in a repository.
+     * @param type $sha The SHA1 value for the last commit.
+     * @param type $branch_name name of branch
+     * @return type
+     */
+    public function mergeABranch($commitMessage, $base, $head) {
+
+        $mergeABranchEndpoint = $this->apiEndpoint . "/merges";
+
+        $mergeABranchParams = [
+            "commit_message" =>  $commitMessage,
+            "base" => $base,
+            "head" => $head
+        ];
+
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setMethod('POST')
+                ->setUrl($mergeABranchEndpoint)
+                ->setFormat(Client::FORMAT_JSON)
+                ->setData($mergeABranchParams)
                 ->addHeaders([
                     'Authorization' => 'token ' . $this->token,
                     'User-Agent' => 'request',

@@ -374,7 +374,34 @@ $this->registerJs($js);
 <section id="tutorial-card">
 
 
-  <?php if( !$restaurant_model->tap_queue_id && !$restaurant_model->is_tap_enable ){ ?>
+  <?php
+  if($numberOfOrders == 0){ ?>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-12 col-md-9 col-lg-9">
+                    <div>
+                        <h3><span>Learn how to use Plugn</span></h3>
+                    </div>
+                    <p> Check out our introductory course on how to design, build, and launch your online store.</p>
+                    <div>
+                        <div>
+                            <div>
+                                <?= Html::a('Learn', 'https://www.plugn.io/learn', ['class' => 'btn btn-primary']) ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <?php
+    }
+
+
+   if( !$restaurant_model->tap_queue_id && !$restaurant_model->is_tap_enable ){ ?>
 
   <div class="card">
       <div class="card-body">
@@ -398,9 +425,16 @@ $this->registerJs($js);
       </div>
   </div>
 
-<?php } ?>
+<?php }
 
-  <?php
+?>
+
+
+
+
+<?php
+
+
   if($restaurant_model->getItems()->count() == 0){ ?>
 
     <div class="card">
@@ -461,7 +495,7 @@ $this->registerJs($js);
     </div>
 
       <?php }
-    if(str_contains($restaurant_model->restaurant_domain, '.plugn.store') ){ ?>
+    if(str_contains($restaurant_model->restaurant_domain, '.plugn.store') &&   $restaurant_model->has_deployed == 1 ){ ?>
     <div class="card">
         <div class="card-body">
             <div class="row">
@@ -488,9 +522,13 @@ $this->registerJs($js);
         </div>
     </div>
 
-      <?php } ?>
+      <?php
+      }
 
-    <div class="card">
+      // if($numberOfOrders > 0){
+      ?>
+
+    <!-- <div class="card">
         <div class="card-body">
             <div class="row">
                 <div class="col-sm-12 col-md-9 col-lg-9">
@@ -501,7 +539,9 @@ $this->registerJs($js);
                     <div>
                         <div>
                             <div>
-                                <?= Html::a('View orders', ['site/real-time-orders', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                                <?php
+                                // Html::a('View orders', ['site/real-time-orders', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) 
+                                ?>
                             </div>
                         </div>
                     </div>
@@ -514,9 +554,11 @@ $this->registerJs($js);
             </div>
 
         </div>
-    </div>
+    </div> -->
 
-
+    <?php
+    // }
+    ?>
 
 
 
@@ -577,7 +619,7 @@ $this->registerJs($js);
                     </div>
                     <div style="  margin-bottom: 0.5rem;  margin-top: 1rem !important;">
                         <h2 style="  display: contents;" class="text-bold-700 mt-1 number-of-revenue-generated">
-                            <?= Yii::$app->formatter->asCurrency($number_of_all_revenue_generated_this_week, $restaurant_model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
+                            <?= Yii::$app->formatter->asCurrency($number_of_all_revenue_generated_this_week, $currencyCode, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
                         </h2>
                     </div>
                     <p class="mb-0">Revenue Generated</p>
@@ -684,7 +726,7 @@ $this->registerJs($js);
                             </div>
                         </div>
                         <h2 class="text-bold-700">
-                          <?= Yii::$app->formatter->asCurrency($today_revenue_generated, $restaurant_model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
+                          <?= Yii::$app->formatter->asCurrency($today_revenue_generated, $currencyCode, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
                         </h2>
                         <p class="mb-0 line-ellipsis">Today's Revenue Generated</p>
                     </div>

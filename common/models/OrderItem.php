@@ -68,10 +68,13 @@ class OrderItem extends \yii\db\ActiveRecord {
      * @param type $attribute
      */
     public function checkIfItemBelongToRestaurant($attribute) {
-        $isItemBelongToRestaurant = Item::find()->where(['restaurant_uuid' => $this->order->restaurant_uuid, 'item_uuid' => $this->item_uuid])->exists();
+        $isItemBelongToRestaurant = Item::find()->where(['restaurant_uuid' => $this->order->restaurant_uuid, 'item_uuid' => $this->item_uuid])->one();
 
         if (!$isItemBelongToRestaurant)
             $this->addError($attribute, 'Item Uuid is invalid');
+        else if ($isItemBelongToRestaurant->item_status == Item::ITEM_STATUS_UNPUBLISH)
+            $this->addError($attribute, 'Sorry, the selected item is no longer available.');
+
     }
 
     /**
@@ -205,9 +208,9 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItemImages()
+    public function getItemImage()
     {
-        return $this->hasMany(ItemImage::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasOne(ItemImage::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -237,7 +240,7 @@ class OrderItem extends \yii\db\ActiveRecord {
     {
         return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
     }
-    
+
     /**
      * Gets query for [[OrderItemExtraOptions]].
      *

@@ -20,6 +20,7 @@ use common\models\AgentToken;
  * @property string|null $agent_password_reset_token
  * @property int $agent_status
  * @property int $email_notification
+ * @property int $receive_weekly_stats
  * @property int $reminder_email
  * @property string $agent_created_at
  * @property string $agent_updated_at
@@ -44,6 +45,12 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     public $tempPassword;
 
     /**
+     * Field for temporary password. If set, it will overwrite the old password on save
+     * @var string
+     */
+     public $isOwner = null;
+
+    /**
      * {@inheritdoc}
      */
     public static function tableName() {
@@ -57,7 +64,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
         return [
             [['agent_name', 'agent_email'], 'required'],
             ['tempPassword', 'required', 'on' => [self::SCENARIO_CHANGE_PASSWORD, self::SCENARIO_CREATE_NEW_AGENT]],
-            [['agent_status','email_notification', 'reminder_email'], 'integer'],
+            [['agent_status','email_notification', 'reminder_email','receive_weekly_stats'], 'integer'],
             [['agent_created_at', 'agent_updated_at'], 'safe'],
             [['agent_name', 'agent_email', 'agent_password_hash', 'agent_password_reset_token'], 'string', 'max' => 255],
             [['agent_auth_key'], 'string', 'max' => 32],
@@ -304,14 +311,20 @@ public function getAccessToken() {
         $this->agent_password_reset_token = null;
     }
 
-
     /**
-     * Get all Restaurant accounts this agent owns
-     * @return \yii\db\ActiveQuery
+     *
+     * @param type $restaurant_uuid
+     * @return type
      */
-    public function getAccountsOwned()
-    {
-        return $this->hasMany(Restaurant::className(), ['agent_id' => 'agent_id']);
+    public function isOwner($storeUuid) {
+
+      if($this->isOwner == null){
+
+          $this->isOwner = AgentAssignment::find()
+                            ->where(['agent_id' => Yii::$app->user->identity->agent_id, 'restaurant_uuid' => $storeUuid, 'role' => AgentAssignment::AGENT_ROLE_OWNER])
+                            ->exists();
+      }
+        return $this->isOwner;
     }
 
     /**

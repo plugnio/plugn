@@ -69,18 +69,9 @@ class OrderController extends Controller {
      */
     public function actionPlaceAnOrder($id) {
 
-      //TEMP
-
-      // return [
-      //     'operation' => 'error',
-      //     'message' => 'Sorry we are not able to process your request Please try again later ',
-      // ];
-
         $restaurant_model = Restaurant::findOne($id);
 
-
         if ($restaurant_model) {
-
 
             $order = new Order();
             $order->setScenario(Order::SCENARIO_OLD_VERSION);
@@ -248,7 +239,7 @@ class OrderController extends Controller {
                 if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->restaurantDelivery->min_charge) {
                     $response = [
                         'operation' => 'error',
-                        'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->restaurantDelivery->min_charge,  '', [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
+                        'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->restaurantDelivery->min_charge,  $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
                     ];
                 }
 
@@ -446,7 +437,7 @@ class OrderController extends Controller {
                         $response = [
                             'operation' => 'success',
                             'order_uuid' => $order->order_uuid,
-                            'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
+                            // 'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
                             'message' => 'Order created successfully',
                         ];
                     }
@@ -500,7 +491,7 @@ class OrderController extends Controller {
      * @return type
      */
     public function actionOrderDetails($id, $restaurant_uuid) {
-        $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->with('restaurant', 'orderItems', 'restaurantBranch', 'payment')->asArray()->one();
+      $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->with('orderItems', 'payment')->asArray()->one();
 
 
         if (!$model) {
@@ -522,22 +513,22 @@ class OrderController extends Controller {
      * @param type $restaurant_uuid
      * @return type
      */
-    public function actionGetOrderDetails($id, $restaurant_uuid) {
-        $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->one();
-
-
-        if (!$model) {
-            return [
-                'operation' => 'error',
-                'message' => 'Invalid order uuid'
-            ];
-        }
-
-        return [
-            'operation' => 'success',
-            'body' => $model
-        ];
-    }
+    // public function actionGetOrderDetails($id, $restaurant_uuid) {
+    //     $model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])->one();
+    //
+    //
+    //     if (!$model) {
+    //         return [
+    //             'operation' => 'error',
+    //             'message' => 'Invalid order uuid'
+    //         ];
+    //     }
+    //
+    //     return [
+    //         'operation' => 'success',
+    //         'body' => $model
+    //     ];
+    // }
 
     /**
      * Whether is valid promo code or no
@@ -634,11 +625,14 @@ class OrderController extends Controller {
 
 
 
-            if ($order_model->save()) {
+            if ($order_model->save(false)) {
                 return [
                     'operation' => 'success'
                 ];
             } else {
+
+             Yii::error('[Mashkor (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
+
               return [
                   'operation' => 'error',
                   'message' => $order_model->getErrors(),

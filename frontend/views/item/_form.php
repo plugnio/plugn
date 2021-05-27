@@ -175,7 +175,7 @@ $this->registerJs($js);
             // add files to our array with
             // made to use the correct structure of a file
             foreach ($uploadsFiles as $file_name) {
-                $file_location = "https://res.cloudinary.com/plugn/image/upload/restaurants/" . $modelItem->restaurant->restaurant_uuid . "/items/" . $file_name;
+                $file_location = "https://res.cloudinary.com/plugn/image/upload/restaurants/" . $modelItem->restaurant_uuid . "/items/" . $file_name;
 
                 // add file to our array
                 // !important please follow the structure below

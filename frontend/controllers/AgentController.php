@@ -8,6 +8,7 @@ use frontend\models\AgentSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\base\Model;
 
 /**
  * AgentController implements the CRUD actions for Agent model.
@@ -60,12 +61,19 @@ class AgentController extends Controller {
     public function actionUpdate($storeUuid) {
         $model = $this->findModel($storeUuid);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        $agentAssignment = $model->getAgentAssignments()
+                            ->where(['restaurant_uuid' => $storeUuid, 'agent_id' =>Yii::$app->user->identity->agent_id])
+                            ->one();
+
+        if(  $agentAssignment->load(Yii::$app->request->post()) && $model->load(Yii::$app->request->post()) ){
+
+          if($agentAssignment->save() && $model->save())
             return $this->redirect(['update', 'storeUuid' => $storeUuid]);
         }
 
         return $this->render('update', [
                     'model' => $model,
+                    'agentAssignment' => $agentAssignment,
                     'storeUuid' => $storeUuid
         ]);
     }

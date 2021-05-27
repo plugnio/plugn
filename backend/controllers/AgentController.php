@@ -56,6 +56,7 @@ class AgentController extends Controller
        ]);
     }
 
+
     /**
      * Displays a single Agent model.
      * @param integer $id

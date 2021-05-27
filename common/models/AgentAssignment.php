@@ -12,12 +12,17 @@ use yii\behaviors\TimestampBehavior;
  * @property integer $assignment_id
  * @property integer $restaurant_uuid
  * @property integer $agent_id
+ * @property int $business_location_id
  * @property integer $role
  * @property string $assignment_agent_email
  * @property string $assignment_created_at
  * @property string $assignment_updated_at
+ * @property int $email_notification
+ * @property int $receive_weekly_stats
+ * @property int $reminder_email
  *
  * @property Agent $agent
+ * @property BusinessLocation $businessLocation
  * @property Restaurant $restaurant
  */
 class AgentAssignment extends \yii\db\ActiveRecord {
@@ -25,6 +30,7 @@ class AgentAssignment extends \yii\db\ActiveRecord {
     //Values for `role`
     const AGENT_ROLE_OWNER = 1;
     const AGENT_ROLE_STAFF = 2;
+    const AGENT_ROLE_BRANCH_MANAGER = 3;
 
     /**
      * @inheritdoc
@@ -40,18 +46,23 @@ class AgentAssignment extends \yii\db\ActiveRecord {
         return [
 //            [['assignment_agent_email'], 'required'],
             [['role'], 'required'],
+            [['business_location_id'], 'required', 'on'=>'update', 'when' => function($model) {
+                    return ($model->role == self::AGENT_ROLE_BRANCH_MANAGER);
+                }
+            ],
             [['assignment_agent_email'], 'string', 'max' => 255],
             [['assignment_agent_email'], 'email'],
-            ['role', 'in', 'range' => [self::AGENT_ROLE_OWNER, self::AGENT_ROLE_STAFF]],
+            ['role', 'in', 'range' => [self::AGENT_ROLE_OWNER, self::AGENT_ROLE_STAFF, self::AGENT_ROLE_BRANCH_MANAGER]],
             [['restaurant_uuid'], 'string', 'max' => 60],
-            [['agent_id'], 'integer'],
+            [['agent_id','email_notification', 'reminder_email','receive_weekly_stats','business_location_id'], 'integer'],
             //Only allow one record of each email per account
 //            ['assignment_agent_email', 'unique', 'filter' => function($query) {
 //                    $query->where(['agent_id' => $this->agent_id, 'restaurant_uuid' => $this->restaurant_uuid]);
 //                }, 'message' => 'This person has already been added as an agent.'],
-//       
+//
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
             [['agent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Agent::className(), 'targetAttribute' => ['agent_id' => 'agent_id']],
+            [['business_location_id'], 'exist', 'skipOnError' => true, 'targetClass' => BusinessLocation::className(), 'targetAttribute' => ['business_location_id' => 'business_location_id']],
         ];
     }
 
@@ -78,6 +89,11 @@ class AgentAssignment extends \yii\db\ActiveRecord {
                 return $this->addError('assignment_agent_email', 'This person has already been added as an agent.' . $this->assignment_agent_email);
         }
 
+
+        if($this->role != self::AGENT_ROLE_BRANCH_MANAGER){
+          $this->business_location_id = null;
+        }
+
         return parent::beforeSave($insert);
     }
 
@@ -89,7 +105,9 @@ class AgentAssignment extends \yii\db\ActiveRecord {
             'assignment_id' => 'Assignment ID',
             'restaurant_uuid' => 'Restaurant UUID',
             'agent_id' => 'Agent ID',
+            'business_location_id' => 'Business Location',
             'role' => "Role",
+            'email_notification' => 'Email Notification',
             'assignment_agent_email' => 'Email',
             'assignment_created_at' => 'Date Assigned',
             'assignment_updated_at' => 'Assignment Updated At',
@@ -97,20 +115,15 @@ class AgentAssignment extends \yii\db\ActiveRecord {
     }
 
     /**
-     * 
-     * @param type $restaurant_uuid
-     * @param type $agent_id
-     * @return type
+     * Gets query for [[BusinessLocation]].
+     *
+     * @return \yii\db\ActiveQuery
      */
-    public static function isOwner($restaurant_uuid, $agent_id = null) {
-
-        if (!$agent_id)
-            $agent_id = Yii::$app->user->identity->agent_id;
-
-        return AgentAssignment::find()
-                        ->where(['agent_id' => $agent_id, 'restaurant_uuid' => $restaurant_uuid, 'role' => static::AGENT_ROLE_OWNER])
-                        ->exists();
+    public function getBusinessLocation()
+    {
+        return $this->hasOne(BusinessLocation::className(), ['business_location_id' => 'business_location_id']);
     }
+
 
     /**
      * @return \yii\db\ActiveQuery

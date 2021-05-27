@@ -62,7 +62,7 @@ class Queue extends \yii\db\ActiveRecord {
 
     public function beforeSave($insert) {
 
-        if ($this->queue_status == self::QUEUE_STATUS_PENDING) {
+        if (!$insert && $this->queue_status == self::QUEUE_STATUS_CREATING) {
 
             $store_model = $this->restaurant;
 
@@ -78,8 +78,8 @@ class Queue extends \yii\db\ActiveRecord {
 
                 if ($createBranchResponse->isOk) {
 
-
-                   $url = parse_url($store_model->restaurant_domain);
+                    sleep(1);
+                    $url = parse_url($store_model->restaurant_domain);
                     $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
 
                         if ($createNewSiteResponse->isOk) {
@@ -108,6 +108,8 @@ class Queue extends \yii\db\ActiveRecord {
         }
         return parent::beforeSave($insert);
     }
+
+
 
 
     /**

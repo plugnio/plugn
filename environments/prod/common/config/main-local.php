@@ -4,7 +4,7 @@ return [
     'components' => [
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=plugn-production-restored-v2-cluster.cluster-c8mekjvvbygf.eu-west-2.rds.amazonaws.com;dbname=yo3an',
+            'dsn' => 'mysql:host=plugn-main-cluster.cluster-c8mekjvvbygf.eu-west-2.rds.amazonaws.com;dbname=yo3an',
             'username' => 'yo3an',
             'password' => 'iamyo3an',
             'charset' => 'utf8mb4',
@@ -19,7 +19,7 @@ return [
             ],
             // list of slave configurations for Read-write splitting
             'slaves' => [
-                ['dsn' => 'mysql:host=plugn-production-restored-v2-cluster.cluster-ro-c8mekjvvbygf.eu-west-2.rds.amazonaws.com;dbname=yo3an']
+                ['dsn' => 'mysql:host=plugn-main-cluster.cluster-ro-c8mekjvvbygf.eu-west-2.rds.amazonaws.com;dbname=yo3an']
             ],
             // Enable Caching of Schema to Reduce SQL Queries
             'enableSchemaCache' => true,
@@ -56,6 +56,15 @@ return [
                 ],
             ],
         ],
+        'cache' => [
+            // Use Redis as a cache
+            'class' => 'yii\redis\Cache',
+            'redis' => [
+                'hostname' => 'plugn-redis.0x1cgp.0001.euw2.cache.amazonaws.com',
+                'port' => 6379,
+                'database' => 1,
+            ]
+        ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             'viewPath' => '@common/mail',
@@ -66,11 +75,11 @@ return [
                 'password' => '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',
                 'port' => '587',
                 'encryption' => 'tls',
-                'plugins' => [
-                    [
-                        'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
-                    ],
-                ],
+                // 'plugins' => [
+                //     [
+                //         'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
+                //     ],
+                // ],
             ],
         ],
         'tapPayments' => [

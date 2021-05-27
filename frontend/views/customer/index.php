@@ -24,21 +24,43 @@ $(function () {
 $this->registerJs($js);
 
 
+$this->registerCss("
+  #DataTables_Table_0_filter, #DataTables_Table_0_paginate{
+    display:none !important
+  }
+  .pagination{
+    justify-content: center !important;
+    margin-top: 1rem !important;
+    padding-bottom: 7px !important;
+
+    margin: 2px 0 !important;
+white-space: nowrap !important;
+  }
+  .page-link{
+    font-size:0.85rem !important;
+    font-weight: 700;
+    padding: 0.65rem 0.911rem;
+  }
+  ");
 ?>
 
 
 <section id="data-list-view" class="data-list-view-header">
 
+  <?php  echo $this->render('_search', ['model' => $searchModel,'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
+
   <?php if ($dataProvider->getCount() > 0) { ?>
 
   <!-- Data list view starts -->
-  <div class="action-btns d-none">
+  <!-- <div class="action-btns d-none">
       <div class="btn-dropdown mr-1 mb-1">
-          <div class="btn-group dropdown actions-dropodown">
-            <?= Html::a('Add customer', ['create', 'storeUuid' => $storeUuid], ['class' => 'btn btn-primary']) ?>
-          </div>
+          <div class="btn-group dropdown actions-dropodown"> -->
+            <?php
+            // Html::a('Add customer', ['create', 'storeUuid' => $storeUuid], ['class' => 'btn btn-primary']);
+             ?>
+          <!-- </div>
       </div>
-  </div>
+  </div> -->
 
     <!-- DataTable starts -->
     <div class="table-responsive">
@@ -69,32 +91,20 @@ $this->registerJs($js);
                       'label' => 'Number of orders',
                       "format" => "raw",
                       "value" => function($model) {
-                        return  $model->getOrders()
-                               ->where(['order.order_status' => Order::STATUS_PENDING])
-                               ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-                               ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                               ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-                               ->orWhere(['order.order_status' => Order::STATUS_ACCEPTED])
-                               ->count();
+                        return  sizeof($model->activeOrders);
                       }
                   ],
-                  [
-                      'attribute' => 'Total spent',
-                      "format" => "raw",
-                      "value" => function($model) {
-                        $total_spent = $model->getOrders()
-                                              ->where(['order.order_status' => Order::STATUS_PENDING])
-                                              ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-                                              ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                                              ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-                                              ->orWhere(['order.order_status' => Order::STATUS_ACCEPTED])
-                                              ->sum('total_price');
-
-                          $total_spent = \Yii::$app->formatter->asDecimal($total_spent ? $total_spent : 0 , 3);
-                          return  Yii::$app->formatter->asCurrency($total_spent ? $total_spent : 0, $model->currency->code) ;
-
-                      }
-                  ],
+                  // [
+                  //     'attribute' => 'Total spent',
+                  //     "format" => "raw",
+                  //     "value" => function($model) {
+                  //       return $model->totalSpent;
+                  //
+                  //         $total_spent = \Yii::$app->formatter->asDecimal($total_spent ? $total_spent : 0 , 3);
+                  //         return  Yii::$app->formatter->asCurrency($total_spent ? $total_spent : 0, $model->currency->code) ;
+                  //
+                  //     }
+                  // ],
                   [
                       'attribute' => 'customer_created_at',
                       "format" => "raw",
@@ -103,8 +113,15 @@ $this->registerJs($js);
                       }
                   ],
               ],
-            'layout' => '{summary}{items}{pager}',
-            'tableOptions' => ['class' => 'table data-list-view'],
+              'layout' => '{summary}{items}{pager}',
+              'pager' => [
+                'maxButtonCount' => 7,
+                'prevPageLabel' => 'Previous',
+                'nextPageLabel' => 'Next',
+                'prevPageCssClass' => 'paginate_button page-item previous',
+                'nextPageCssClass' => 'paginate_button page-item next',
+            ],
+              'tableOptions' => ['class' => 'table data-list-view'],
         ]);
         ?>
 

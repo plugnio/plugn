@@ -17,7 +17,7 @@ class m200327_171548_create_agent_assignment extends Migration
             // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
         }
-        
+
         $this->createTable('agent_assignment', [
             'assignment_id' => $this->primaryKey()->unsigned(),
             'restaurant_uuid' => $this->char(60)->notNull(),

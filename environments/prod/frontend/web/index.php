@@ -14,4 +14,20 @@ $config = yii\helpers\ArrayHelper::merge(
     require __DIR__ . '/../config/main-local.php'
 );
 
+// Set LinkPager defaults
+\Yii::$container->set('yii\widgets\LinkPager', [
+    'options' => [
+        'class' => 'pagination pagination-sm m-0',
+    ],
+    'disabledListItemSubTagOptions' => [
+        'class' => 'page-link',
+    ],
+    'linkOptions' => [
+        'class' => 'page-link',
+    ],
+        'linkContainerOptions' => [
+        'class' => 'page-item',
+    ],
+]);
+
 (new yii\web\Application($config))->run();

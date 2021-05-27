@@ -114,7 +114,7 @@ use borales\extensions\phoneInput\PhoneInput;
     ?>
 
     <?= $form->field($model, 'version')->textInput(['maxlength' => true]) ?>
-    
+
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'name_ar')->textInput(['maxlength' => true]) ?>
@@ -197,6 +197,7 @@ use borales\extensions\phoneInput\PhoneInput;
        $form->field($model, 'phone_number')->widget(PhoneInput::className(), [
           'jsOptions' => [
               'preferredCountries' => ['kw', 'sa', 'aed','qa','bh','om'],
+              'initialCountry' => 'kw'
           ]
       ]);
     ?>
@@ -232,6 +233,8 @@ use borales\extensions\phoneInput\PhoneInput;
     <?= $form->field($model, 'google_analytics_id')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'facebook_pixil_id')->textInput(['maxlength' => true]) ?>
+    
+    <?= $form->field($model, 'snapchat_pixil_id')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'custom_css')->textarea(['rows' => '12']) ?>
 

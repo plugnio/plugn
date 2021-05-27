@@ -61,16 +61,16 @@ $this->registerJs($js);
       </div>
 </div>
 <?php
-  if(!$model->isNewRecord){
-    echo Html::a('<i class="feather icon-trash"></i> Delete this business location', ['delete' ,'id' => $model->business_location_id, 'storeUuid' => $storeUuid], [
-       'class' => 'mr-1',
-       'data' => [
-           'confirm' => 'Are you sure you want to delete this location?',
-           'method' => 'post',
-       ],
-       'style' => 'margin-left: 7px; color: red'
-   ]);
-  }
+  // if(!$model->isNewRecord){
+   //  echo Html::a('<i class="feather icon-trash"></i> Delete this business location', ['delete' ,'id' => $model->business_location_id, 'storeUuid' => $storeUuid], [
+   //     'class' => 'mr-1',
+   //     'data' => [
+   //         'confirm' => 'Are you sure you want to delete this location?',
+   //         'method' => 'post',
+   //     ],
+   //     'style' => 'margin-left: 7px; color: red'
+   // ]);
+  // }
 ?>
 
 <?php ActiveForm::end(); ?>

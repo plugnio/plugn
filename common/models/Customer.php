@@ -86,6 +86,26 @@ class Customer extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Gets query for [[Orders]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getActiveOrders() {
+        return $this->hasMany(Order::className(), ['customer_id' => 'customer_id'])
+        ->activeOrders($this->restaurant_uuid);
+    }
+
+    public function getTotalSpent() {
+        return $this->hasMany(Order::className(), ['customer_id' => 'customer_id'])
+        ->activeOrders($this->restaurant_uuid)
+        ->sum('total_price');
+    }
+
+    public static function find() {
+      return new query\CustomerQuery(get_called_class());
+    }
+
+    /**
      * Gets query for [[CustomerVouchers]].
      *
      * @return \yii\db\ActiveQuery

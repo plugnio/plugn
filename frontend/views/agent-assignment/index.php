@@ -45,7 +45,7 @@ $this->registerJs($js);
             'dataProvider' => $dataProvider,
             'rowOptions' => function($model) {
                   if ($model->agent_id != Yii::$app->user->identity->agent_id) {
-                $url = Url::to(['update', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'storeUuid' => $model->restaurant_uuid]);
+                $url = Url::to(['view', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'storeUuid' => $model->restaurant_uuid]);
 
                 return [
                     'onclick' => "window.location.href='{$url}'"

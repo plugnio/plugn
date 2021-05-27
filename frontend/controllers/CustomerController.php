@@ -46,6 +46,8 @@ class CustomerController extends Controller {
      */
     public function actionIndex($storeUuid) {
 
+      // add conditions that should always apply here
+
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new CustomerSearch();
@@ -54,6 +56,7 @@ class CustomerController extends Controller {
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
+                    'restaurant_model' => $restaurant_model,
                     'storeUuid' => $storeUuid
         ]);
     }
@@ -64,21 +67,22 @@ class CustomerController extends Controller {
        * If creation is successful, the browser will be redirected to the 'view' page.
        * @return mixed
        */
-      public function actionCreate($storeUuid)
-      {
-          $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
-
-          $model = new Customer();
-          $model->restaurant_uuid = $storeUuid;
-
-          if ($model->load(Yii::$app->request->post()) && $model->save()) {
-              return $this->redirect(['view', 'id' => $model->customer_id,'storeUuid' => $storeUuid]);
-          }
-
-          return $this->render('create', [
-              'model' => $model,
-          ]);
-      }
+      // public function actionCreate($storeUuid)
+      // {
+          // $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+          //
+          // $model = new Customer();
+          // $model->setScenario(Customer::SCENARIO_CREATE_ORDER_BY_AGENT);
+          // $model->restaurant_uuid = $storeUuid;
+          //
+          // if ($model->load(Yii::$app->request->post()) && $model->save()) {
+          //     return $this->redirect(['view', 'id' => $model->customer_id,'storeUuid' => $storeUuid]);
+          // }
+          //
+          // return $this->render('create', [
+          //     'model' => $model,
+          // ]);
+      // }
 
 
       /**
@@ -116,7 +120,7 @@ class CustomerController extends Controller {
 
         // Customer's Orders Data
         $customersOrdersData = new \yii\data\ActiveDataProvider([
-            'query' => $model->getOrders()->orderBy(['order_created_at' => SORT_ASC]),
+            'query' => $model->getOrders()->with(['currency'])->orderBy(['order_created_at' => SORT_ASC]),
             'pagination' => false
         ]);
 
@@ -161,9 +165,10 @@ class CustomerController extends Controller {
                        "format" => "raw",
                        "value" => function($data) {
                          $total_spent = $data->getOrders()
-                                         ->where(['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
-                                         ->andWhere(['!=', 'order_status', Order::STATUS_DRAFT])
+                                         ->where([ '!=' , 'order_status' , Order::STATUS_DRAFT])
+                                         ->andWhere([ '!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
                                          ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                                         ->andWhere(['!=', 'order_status', Order::STATUS_PARTIALLY_REFUNDED])
                                          ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
                                          ->sum('total_price');
 
@@ -178,11 +183,11 @@ class CustomerController extends Controller {
                        "format" => "raw",
                        "value" => function($model) {
                            return  $model->getOrders()
-                           ->where(['order.order_status' => Order::STATUS_PENDING])
-                           ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-                           ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                           ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-                           ->orWhere(['order.order_status' => Order::STATUS_ACCEPTED])
+                           ->where([ '!=' , 'order_status' , Order::STATUS_DRAFT])
+                           ->andWhere([ '!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
+                           ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
+                           ->andWhere(['!=', 'order_status', Order::STATUS_PARTIALLY_REFUNDED])
+                           ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
                            ->count();
                        }
                    ],

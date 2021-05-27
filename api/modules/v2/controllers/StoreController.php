@@ -12,6 +12,7 @@ use common\models\RestaurantTheme;
 use common\models\OpeningHour;
 use common\models\RestaurantDelivery;
 use common\models\BusinessLocation;
+use common\models\DeliveryZone;
 
 class StoreController extends Controller {
 
@@ -75,36 +76,26 @@ class StoreController extends Controller {
 
             if($deliveryZone){
 
-              for ($i = 0; $i <= OpeningHour::DAY_OF_WEEK_SATURDAY; $i++) {
-
-                  $deliveryDate = strtotime("+$i day");
-
-                  $opening_hrs = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => date('w' , $deliveryDate)])->one();
-
-                  if($opening_hrs->is_closed)
-                      continue;
-
-                  $selectedDay = 'next '  . date('l', $deliveryDate);
+              $timeUnit = $deliveryZone->time_unit == 'hrs' ? 'hour' : $deliveryZone->time_unit;
+              $startDate = strtotime('+ ' . $deliveryZone->delivery_time . ' ' . $timeUnit );
 
 
+              if($deliveryZone->time_unit == DeliveryZone::TIME_UNIT_MIN)
+                $deliveryTime = intval($deliveryZone->delivery_time) ;
+              else if($deliveryZone->time_unit == DeliveryZone::TIME_UNIT_HRS)
+                $deliveryTime =  intval($deliveryZone->delivery_time) * 60;
+              else if($deliveryZone->time_unit == DeliveryZone::TIME_UNIT_DAY)
+                $deliveryTime =  intval($deliveryZone->delivery_time) * 24 * 60;
+
+                    if($store_model->schedule_order){
+
+                      $schedule_time = OpeningHour::getAvailableTimeSlots($deliveryTime, $store_model, $timeUnit);
 
 
-                  $startTime =   date('c',strtotime( date('Y-m-d', strtotime($i == 0 ? "now" : $selectedDay)) . ' ' . $opening_hrs->open_at));
-
-                  if($store_model->schedule_order){
-
-                    $scheduleOrder = $opening_hrs->getDeliveryTimes($deliveryZone->delivery_time, date("Y-m-d", strtotime($startTime)) , $startTime);
-
-                    if(count($scheduleOrder) > 0) {
-                      array_push($schedule_time, [
-                          'date' => date("c", strtotime($startTime)),
-                          'dayOfWeek' => date("w", strtotime($startTime)),
-                          'scheduleTimeSlots' => $scheduleOrder
-                      ]);
                     }
-                  }
 
-              }
+                // }
+
 
               $todayOpeningHours = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => date('w' , strtotime("now"))])->one();
               $asap = date("c", strtotime('+' . $deliveryZone->delivery_time . ' ' . $deliveryZone->timeUnit,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
@@ -148,74 +139,54 @@ class StoreController extends Controller {
         }
     }
 
-
     /**
-     * Return Restaurant's branches
+     * Return Restaurant's data
      */
-    public function actionListAllRestaurantsBranches($id) {
+    public function actionGetRestaurantData($branch_name) {
 
-        $restaurantBranches = RestaurantBranch::find()
-                        ->where(['restaurant_uuid' => $id])->all();
+      $store = Restaurant::find()
+              ->where(['store_branch_name' => $branch_name]);
 
-        if ($restaurantBranches) {
-            return $restaurantBranches;
+      if( $store->exists() ){
+
+        $restaurant = $store
+                ->select(['restaurant_uuid', 'name', 'logo', 'tagline', 'restaurant_domain', 'app_id', 'google_analytics_id', 'facebook_pixil_id','snapchat_pixil_id' , 'custom_css'])
+                ->one();
+
+
+        $themeColor = RestaurantTheme::find()
+                ->select(['primary'])
+                ->where(['restaurant_uuid' => $restaurant->restaurant_uuid])
+                ->one();
+
+        if ($restaurant && $themeColor) {
+            return [
+                'restaurant_uuid' => $restaurant->restaurant_uuid,
+                'name' => $restaurant->name,
+                'logo' => $restaurant->logo,
+                'tagline' => $restaurant->tagline,
+                'restaurant_domain' => $restaurant->restaurant_domain,
+                'app_id' => $restaurant->app_id,
+                'google_analytics_id' => $restaurant->google_analytics_id,
+                'facebook_pixil_id' => $restaurant->facebook_pixil_id,
+                'snapchat_pixil_id' => $restaurant->snapchat_pixil_id,
+                'custom_css' => $restaurant->custom_css,
+                'theme_color' => $themeColor->primary,
+            ];
         } else {
             return [
                 'operation' => 'error',
-                'message' => 'Store Uuid is invalid'
+                'message' => 'Branch name is invalid'
+            ];
+        }
+
+
+      } else {
+            return [
+                'operation' => 'error',
+                'message' => 'Branch name is invalid'
             ];
         }
     }
-
-
-
-        /**
-         * Return Restaurant's data
-         */
-        public function actionGetRestaurantData($branch_name) {
-
-          $store = Restaurant::find()
-                  ->where(['store_branch_name' => $branch_name]);
-
-          if( $store->exists() ){
-
-            $restaurant = $store
-                    ->select(['restaurant_uuid', 'name', 'logo', 'tagline', 'restaurant_domain', 'app_id', 'google_analytics_id', 'facebook_pixil_id', 'custom_css'])
-                    ->one();
-
-
-            $themeColor = RestaurantTheme::find()
-                    ->select(['primary'])
-                    ->where(['restaurant_uuid' => $restaurant->restaurant_uuid])
-                    ->one();
-
-            if ($restaurant && $themeColor) {
-                return [
-                    'restaurant_uuid' => $restaurant->restaurant_uuid,
-                    'name' => $restaurant->name,
-                    'logo' => $restaurant->logo,
-                    'tagline' => $restaurant->tagline,
-                    'restaurant_domain' => $restaurant->restaurant_domain,
-                    'app_id' => $restaurant->app_id,
-                    'google_analytics_id' => $restaurant->google_analytics_id,
-                    'facebook_pixil_id' => $restaurant->facebook_pixil_id,
-                    'custom_css' => $restaurant->custom_css,
-                    'theme_color' => $themeColor->primary,
-                ];
-            } else {
-                return [
-                    'operation' => 'error',
-                    'message' => 'Branch name is invalid'
-                ];
-            }
-
-
-          } else {
-                return [
-                    'operation' => 'error',
-                    'message' => 'Branch name is invalid'
-                ];
-            }
-        }
 
 }

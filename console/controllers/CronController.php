@@ -7,10 +7,12 @@ use common\models\Restaurant;
 use common\models\OrderItem;
 use common\models\Queue;
 use common\models\TapQueue;
+use common\models\AgentAssignment;
 use common\models\Voucher;
 use common\models\BankDiscount;
 use common\models\Payment;
 use common\models\Item;
+use common\models\Customer;
 use common\models\City;
 use common\models\Plan;
 use common\models\Area;
@@ -19,12 +21,14 @@ use common\models\Subscription;
 use common\models\OpeningHour;
 use common\models\CountryPaymentMethod;
 use common\models\Country;
+use common\models\Agent;
 use common\models\ExtraOption;
 use common\models\ItemImage;
 use common\models\AreaDeliveryZone;
 use common\models\DeliveryZone;
 use common\models\RestaurantTheme;
 use common\models\BusinessLocation;
+use common\models\SubscriptionPayment;
 use common\models\RestaurantBranch;
 use \DateTime;
 use yii\helpers\Console;
@@ -36,418 +40,163 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-
-    public function actionQatar(){
-      $jsonString = file_get_contents('qatar.json');
-      $data = json_decode($jsonString, true);
-
-      foreach ($data as $key => $area) {
-
-          $area_name = str_replace(' (' . $area['cityTitleEn'] . ')', '', $area['titleEn']);
-
-          if( !$city_model = City::find()->where(['city_name' => $area['cityTitleEn']])->one() ) {
-
-            $city_model = new City();
-
-            $city_model->country_id = 125;//Qatar
-            $city_model->city_name = $area['cityTitleEn'];
-            $city_model->city_name_ar = $area['cityTitleAr'];
-            $city_model->save(false);
-          }
-
-          if( !Area::find()->where(['area_name' => $area['titleEn']])->exists() ){
-            $area_model = new Area();
-            $area_model->city_id = $city_model->city_id;
-            $area_model->area_name = $area_name;
-            $area_model->area_name_ar = $area['titleAr'];
-            $area_model->latitude = $area['lat'];
-            $area_model->longitude = $area['lng'];
-            $area_model->save(false);
-          }
-
-
-      }
-
-      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-      return self::EXIT_CODE_NORMAL;
-    }
-
-    public function actionKsa(){
-      $jsonString = file_get_contents('ksa.json');
-      $data = json_decode($jsonString, true);
-
-      foreach ($data as $key => $area) {
-
-          $area_name = str_replace(' (' . $area['cityTitleEn'] . ')', '', $area['titleEn']);
-
-          if( !$city_model = City::find()->where(['city_name' => $area['cityTitleEn']])->one() ) {
-
-            $city_model = new City();
-
-            $city_model->country_id = 129;//KSA
-            $city_model->city_name = $area['cityTitleEn'];
-            $city_model->city_name_ar = $area['cityTitleAr'];
-            $city_model->save(false);
-          }
-
-          if( !Area::find()->where(['area_name' => $area['titleEn']])->exists() ){
-            $area_model = new Area();
-            $area_model->city_id = $city_model->city_id;
-            $area_model->area_name = $area_name;
-            $area_model->area_name_ar = $area['titleAr'];
-            $area_model->latitude = $area['lat'];
-            $area_model->longitude = $area['lng'];
-            $area_model->save(false);
-          }
-
-
-      }
-
-      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-      return self::EXIT_CODE_NORMAL;
-    }
-
-    public function actionEgypt(){
-      $jsonString = file_get_contents('egypt.json');
-      $data = json_decode($jsonString, true);
-
-      foreach ($data as $key => $area) {
-
-          $area_name = str_replace(' (' . $area['cityTitleEn'] . ')', '', $area['titleEn']);
-          $area_name_ar = str_replace(' (' . $area['cityTitleAr'] . ')', '', $area['titleAr']);
-
-          if( !$city_model = City::find()->where(['city_name' => $area['cityTitleEn']])->one() ) {
-
-            $city_model = new City();
-
-            $city_model->country_id = 49;//Egypt
-            $city_model->city_name = $area['cityTitleEn'];
-            $city_model->city_name_ar = $area['cityTitleAr'];
-            $city_model->save(false);
-          }
-
-          if( !Area::find()->where(['area_name' => $area['titleEn']])->exists() ){
-            $area_model = new Area();
-            $area_model->city_id = $city_model->city_id;
-            $area_model->area_name = $area_name;
-            $area_model->area_name_ar = $area_name_ar;
-            $area_model->latitude = $area['lat'];
-            $area_model->longitude = $area['lng'];
-            $area_model->save(false);
-          }
-
-
-      }
-
-      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-      return self::EXIT_CODE_NORMAL;
-    }
-
-    public function actionBahrain(){
-      $jsonString = file_get_contents('bahrain.json');
-      $data = json_decode($jsonString, true);
-
-      foreach ($data as $key => $area) {
-
-          $area_name = str_replace(' (' . $area['cityTitleEn'] . ')', '', $area['titleEn']);
-
-          if( !$city_model = City::find()->where(['city_name' => $area['cityTitleEn']])->one() ) {
-
-            $city_model = new City();
-
-            $city_model->country_id = 12;//BH
-            $city_model->city_name = $area['cityTitleEn'];
-            $city_model->city_name_ar = $area['cityTitleAr'];
-            $city_model->save(false);
-          }
-
-          if( !Area::find()->where(['area_name' => $area['titleEn']])->exists() ){
-            $area_model = new Area();
-            $area_model->city_id = $city_model->city_id;
-            $area_model->area_name = $area_name;
-            $area_model->area_name_ar = $area['titleAr'];
-            $area_model->latitude = $area['lat'];
-            $area_model->longitude = $area['lng'];
-            $area_model->save(false);
-          }
-
-
-      }
-
-      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-      return self::EXIT_CODE_NORMAL;
-    }
-
-    public function actionUae(){
-      $jsonString = file_get_contents('uae.json');
-      $data = json_decode($jsonString, true);
-
-      foreach ($data as $key => $area) {
-
-          $area_name = str_replace(' (' . $area['cityTitleEn'] . ')', '', $area['titleEn']);
-
-          if( !$city_model = City::find()->where(['city_name' => $area['cityTitleEn']])->one() ) {
-
-            $city_model = new City();
-
-            $city_model->country_id = 162;//UAE
-            $city_model->city_name = $area['cityTitleEn'];
-            $city_model->city_name_ar = $area['cityTitleAr'];
-            $city_model->save(false);
-          }
-
-          if( !Area::find()->where(['area_name' => $area['titleEn']])->exists() ){
-            $area_model = new Area();
-            $area_model->city_id = $city_model->city_id;
-            $area_model->area_name = $area_name;
-            $area_model->area_name_ar = $area['titleAr'];
-            $area_model->latitude = $area['lat'];
-            $area_model->longitude = $area['lng'];
-            $area_model->save(false);
-          }
-
-
-      }
-
-      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-      return self::EXIT_CODE_NORMAL;
-    }
-
-    public function actionOman(){
-      $jsonString = file_get_contents('oman.json');
-      $data = json_decode($jsonString, true);
-
-      foreach ($data as $key => $area) {
-
-          $area_name = str_replace(' (' . $area['cityTitleEn'] . ')', '', $area['titleEn']);
-
-          if( !$city_model = City::find()->where(['city_name' => $area['cityTitleEn']])->one() ) {
-
-            $city_model = new City();
-
-            $city_model->country_id = 116;//Oman
-            $city_model->city_name = $area['cityTitleEn'];
-            $city_model->city_name_ar = $area['cityTitleAr'];
-            $city_model->save(false);
-          }
-
-          if( !Area::find()->where(['area_name' => $area['titleEn']])->exists() ){
-            $area_model = new Area();
-            $area_model->city_id = $city_model->city_id;
-            $area_model->area_name = $area_name;
-            $area_model->area_name_ar = $area['titleAr'];
-            $area_model->latitude = $area['lat'];
-            $area_model->longitude = $area['lng'];
-            $area_model->save(false);
-          }
-
-
-      }
-
-      $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-      return self::EXIT_CODE_NORMAL;
-    }
-
-
-    public function actionIndex(){
-        $restaurants = Restaurant::find()->where(['IS NOT', 'phone_number', null])->all();
-
-        foreach ($restaurants as  $restaurant) {
-          if($restaurant){
-
-            if($restaurant->phone_number)
-              $restaurant->phone_number = str_replace(' ', '',"+965" . $restaurant->phone_number);
-
-            if($restaurant->owner_number)
-               $restaurant->owner_number = str_replace(' ', '',"+965" . $restaurant->owner_number);
-
-            $restaurant->save(false);
-          }
-
+  /**
+   *
+   */
+  public function actionMigration(){
+    $agents = Agent::find()->all();
+    foreach ($agents as $key => $agent) {
+      if($agentAssignments = $agent->getAgentAssignments()->all()){
+        foreach ($agentAssignments as  $agentAssignment) {
+          $agentAssignment->email_notification = $agent->email_notification;
+          $agentAssignment->reminder_email = $agent->reminder_email;
+          $agentAssignment->receive_weekly_stats = $agent->receive_weekly_stats;
+          $agentAssignment->save();
         }
-
-        $customers = \common\models\Customer::find()->all();
-
-
-        foreach ($customers as  $customer) {
-          if($customer){
-
-            $customer->customer_phone_number = str_replace(' ', '',"+965" . $customer->customer_phone_number);
-
-            $customer->save(false);
-          }
-
-        }
-
-
-        $countries = Country::find()->all();
-
-        foreach ($countries as $country) {
-          $country_payment_method = new CountryPaymentMethod();
-          $country_payment_method->country_id = $country->country_id;
-          $country_payment_method->payment_method_id = 2; //Credit card
-          $country_payment_method->save(false);
-        }
-
-        $country_payment_method = new CountryPaymentMethod();
-        $country_payment_method->country_id = 84; //kuwait
-        $country_payment_method->payment_method_id = 1; //knet
-        $country_payment_method->save(false);
-
-        $country_payment_method = new CountryPaymentMethod();
-        $country_payment_method->country_id = 129; //KSA
-        $country_payment_method->payment_method_id = 4; //Mada
-        $country_payment_method->save(false);
-
-        $country_payment_method = new CountryPaymentMethod();
-        $country_payment_method->country_id = 12; //Bahrain
-        $country_payment_method->payment_method_id = 5; //Benefit
-        $country_payment_method->save(false);
-
-
-        $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-        return self::EXIT_CODE_NORMAL;
+      }
     }
 
+    $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
+    return self::EXIT_CODE_NORMAL;
+  }
 
-    public function actionMigration(){
+    /**
+     * Weekly Store Summary
+     */
+    public function actionWeeklyReport(){
 
-        $restaurantBranches = RestaurantBranch::find()->all();
-        foreach ($restaurantBranches as $key => $branch) {
+        $stores = Restaurant::find()
+                ->all();
 
-          $store = Restaurant::findOne($branch->restaurant_uuid);
-
-          if(!BusinessLocation::find()->where(['restaurant_uuid' => $branch->restaurant_uuid, 'business_location_name' =>  $branch->branch_name_en , 'business_location_name_ar' =>  $branch->branch_name_ar])->exists()){
-            $businessLocation = new BusinessLocation;
-            $businessLocation->country_id = 84;
-            $businessLocation->restaurant_uuid = $branch->restaurant_uuid;
-            $businessLocation->business_location_name = $branch->branch_name_en;
-            $businessLocation->business_location_name_ar = $branch->branch_name_ar;
-            $businessLocation->support_pick_up = $store->support_pick_up ? 1 : 0;
-            $businessLocation->save();
-          }
-
-        }
+          foreach ($stores as $key => $store) {
 
 
-        $stores = Restaurant::find()->all();
-        foreach ($stores as $key => $store) {
+          //Revenue generated
+          $lastWeekRevenue =  $store
+              ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") - 14 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d") -8)) );
 
-          if(
-            $store->restaurant_uuid == 'rest_6a55139f-f340-11ea-808a-0673128d0c9c' ||
-            $store->restaurant_uuid == 'rest_1276d589-f41c-11ea-808a-0673128d0c9c' ||
-            $store->restaurant_uuid == 'rest_aa69124d-2346-11eb-b97d-0673128d0c9c' ||
-            $store->restaurant_uuid == 'rest_f6bc4e4a-e7c6-11ea-808a-0673128d0c9c' ||
-            $store->restaurant_uuid == 'rest_5d657108-c91f-11ea-808a-0673128d0c9c'
-          ){
-            $store->hide_request_driver_button = 0;
-            $store->save(false);
-          }
+          $thisWeekRevenue =  $store
+              ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") - 7 )), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d"))) );
 
+          //Orders received
+          $lastWeekOrdersReceived =  $store
+              ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") - 14 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d") -8)) );
 
-          if( $deliveryZones = $store->getRestaurantDeliveryAreas()->all()  ){
+          $thisWeekOrdersReceived =  $store
+              ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") - 7 )), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d"))) );
 
+          //customer gained
+          $lastWeekCustomerGained =  $store
+              ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") - 14 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d") -8)) );
 
-            if(!$businessLocation = BusinessLocation::find()->where(['restaurant_uuid' => $store->restaurant_uuid])->one()){
-              $businessLocation = new BusinessLocation;
-              $businessLocation->restaurant_uuid = $store->restaurant_uuid;
-              $businessLocation->country_id = 84;
-              $businessLocation->business_location_name = 'Main branch';
-              $businessLocation->business_location_name_ar = 'الفرع الرئيسي';
-              $businessLocation->support_pick_up = $store->support_pick_up ? 1 : 0;
-              $businessLocation->save();
+          $thisWeekCustomerGained =  $store
+              ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") - 7 )), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d"))) );
 
-            }
+          // Revenue Generated
+          $revenuePercentage = 0;
 
 
+          if($thisWeekRevenue > $lastWeekRevenue) { //inc
+               if($lastWeekRevenue > 0){
+                 $increase = $thisWeekRevenue - $lastWeekRevenue;
 
-            foreach ($deliveryZones as $key => $deliveryZone) {
+                 $revenuePercentage = $increase / $lastWeekRevenue * 100;
+               } else {
+                 $revenuePercentage = 100;
+               }
 
-                if(!$delivery_zone_model = $store->getDeliveryZones()->where(
-                  [
-                    'delivery_time' => $deliveryZone->delivery_time,
-                    'delivery_fee' => $deliveryZone->delivery_fee,
-                    'min_charge'   => $deliveryZone->min_charge
-                  ]
-                )->one()){
-                  $delivery_zone_model = new DeliveryZone;
-                  $delivery_zone_model->business_location_id = $businessLocation->business_location_id;
-                  $delivery_zone_model->restaurant_uuid = $store->restaurant_uuid;
-                  $delivery_zone_model->country_id = 84;
-                  $delivery_zone_model->delivery_time = $deliveryZone->delivery_time;
-                  $delivery_zone_model->delivery_fee = $deliveryZone->delivery_fee;
-                  $delivery_zone_model->min_charge = $deliveryZone->min_charge ? $deliveryZone->min_charge : 0 ;
-                  $delivery_zone_model->time_unit = 'min';
+             }
+             else if($thisWeekRevenue < $lastWeekRevenue) { //dec
+               $decrease = $lastWeekRevenue - $thisWeekRevenue;
+               $revenuePercentage = $decrease / $lastWeekRevenue * -100;
+             }
 
-                  if(!$delivery_zone_model->save()){
-                    die(var_dump($delivery_zone_model->errors) . var_dump($deliveryZone) );
+          // Orders received
+          $ordersReceivedPercentage = 0;
+
+
+          if($thisWeekOrdersReceived > $lastWeekOrdersReceived) { //inc
+               if($lastWeekOrdersReceived > 0){
+                 $increase = $thisWeekOrdersReceived - $lastWeekOrdersReceived;
+
+                 $ordersReceivedPercentage = $increase / $lastWeekOrdersReceived * 100;
+               } else {
+                 $ordersReceivedPercentage = 100;
+               }
+
+             }
+             else if($thisWeekOrdersReceived < $lastWeekOrdersReceived) { //dec
+               $decrease = $lastWeekOrdersReceived - $thisWeekOrdersReceived;
+               $ordersReceivedPercentage = $decrease / $lastWeekOrdersReceived * -100;
+             }
+
+
+             //Customer gained
+             $customerGainedPercentage = 0;
+
+             if($thisWeekCustomerGained > $lastWeekCustomerGained) { // inc
+                  if($lastWeekCustomerGained > 0){
+                    $increase = $thisWeekCustomerGained - $lastWeekCustomerGained;
+
+                    $customerGainedPercentage = $increase / $lastWeekCustomerGained * 100;
+                  } else {
+                    $customerGainedPercentage = 100;
                   }
+
+                }
+                else if($thisWeekCustomerGained < $lastWeekCustomerGained) { //dec
+                  $decrease = $lastWeekCustomerGained - $thisWeekCustomerGained;
+                  $customerGainedPercentage = $decrease / $lastWeekCustomerGained * -100;
                 }
 
 
-                $area_model = Area::findOne($deliveryZone->area_id);
+                if($lastWeekOrdersReceived > 0 || $thisWeekOrdersReceived > 0) {
 
-                if($area_model){
+                  $agentAssignments = $store->getAgentAssignments()
+                              ->where([
+                                          'role' => AgentAssignment::AGENT_ROLE_OWNER,
+                                          'receive_weekly_stats' => 1
+                                      ])
+                              ->all();
 
-                  if(!$area_delivery_zone_model = $store->getAreaDeliveryZones()->where(
-                    [
-                      'restaurant_uuid' => $store->restaurant_uuid,
-                      'delivery_zone_id' => $delivery_zone_model->delivery_zone_id,
-                      'area_id'   => $area_model->area_id
-                    ]
-                  )->one()){
-                    $area_delivery_zone_model = new AreaDeliveryZone;
-                    $area_delivery_zone_model->restaurant_uuid = $store->restaurant_uuid;
-                    $area_delivery_zone_model->delivery_zone_id = $delivery_zone_model->delivery_zone_id;
-                    $area_delivery_zone_model->country_id = 84;
-                    $area_delivery_zone_model->city_id = $area_model->city_id;
-                    $area_delivery_zone_model->area_id = $area_model->area_id;
+                  foreach ($agentAssignments as $key => $agentAssignment) {
 
+                    if($agentAssignment->receive_weekly_stats){
 
-                    if(!$area_delivery_zone_model->save()){
-                      die(var_dump($area_delivery_zone_model->errors) . var_dump($area_delivery_zone_model) );
+                      $weeklyStoreSummaryEmail = \Yii::$app->mailer->compose([
+                             'html' => 'weekly-summary',
+                                 ], [
+                             'store' => $store,
+                             'agent_name' => $agentAssignment->agent->agent_name,
+                             'revenuePercentage' => $revenuePercentage,
+                             'ordersReceivedPercentage' => $ordersReceivedPercentage,
+                             'customerGainedPercentage' => $customerGainedPercentage,
+                             'thisWeekRevenue' => $thisWeekRevenue,
+                             'thisWeekOrdersReceived' => $thisWeekOrdersReceived,
+                             'thisWeekCustomerGained' => $thisWeekCustomerGained,
+
+                         ])
+                         ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                         ->setTo([$agentAssignment->agent->agent_email])
+                         ->setSubject('Weekly Store Summary');
+
+                         if($key == 0)
+                           $weeklyStoreSummaryEmail->setBcc(\Yii::$app->params['supportEmail']);
+
+                         $weeklyStoreSummaryEmail->send();
+
                     }
-                  }
 
+                  }
 
                 }
 
-
-
-
-            }
-
-
-          }
-
-
-
-          foreach ($store->getOrders()->all() as $key => $order) {
-
-            if($order->order_mode == 1 && $areaDeliveryArea = $store->getAreaDeliveryZones()->where(['area_id' => $order->area_id])->one()){
-              $order->delivery_zone_id = $areaDeliveryArea->delivery_zone_id;
-            }
-
-
-            if($order->order_mode == 2 && $order->restaurant_branch_id && $businessLocation = $store->getBusinessLocations()->where(['business_location_name' => $order->restaurantBranch->branch_name_en])->one()){
-              $order->pickup_location_id = $businessLocation->business_location_id;
-            }
-
-            $order->customer_phone_number = '+965' . $order->customer_phone_number;
-
-
-            $order->save(false);
-
-
-          }
-
-
         }
 
-        $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-        return self::EXIT_CODE_NORMAL;
-
     }
+
+
+
 
     public function actionSiteStatus(){
 
@@ -490,52 +239,150 @@ class CronController extends \yii\console\Controller {
         }
 
 
+    /**
+     * Anything we can help with?
+     * Once either when 2 days passed no products added
+     * OR 5 days passed and no sales
+     */
+    public function actionRetentionEmailsWhoPassedTwoDaysAndNoProducts(){
 
-    // public function actionNotifyAgentsForSubscriptionThatWillExpireSoon(){
-
-      // $now = new DateTime('now');
-      // $subscriptions = Subscription::find()
-      //         ->where(['subscription_status' => Subscription::STATUS_ACTIVE])
-      //         ->andWhere(['notified_email' => 0])
-      //         ->andWhere(['not', ['subscription_end_at' => null]])
-      //
-      //         ->andWhere(['<=' ,'subscription_end_at', date('Y-m-d H:i:s', strtotime('+5 days'))])
-      //
-      //         ->all();
-
-
-      // foreach ($subscriptions as $subscription) {
-      //   echo (json_encode(($subscription->subscription_end_at)) . "\r\n");
+      $stores = Restaurant::find()
+              ->joinWith(['items','ownerAgent'])
+              ->where(' DATE(restaurant_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')
+              ->andWhere(['retention_email_sent' => 0])
+              ->all();
 
 
-        // foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
-        //   $result = \Yii::$app->mailer->compose([
-        //               'html' => 'subscription-will-expire-soon-html',
-        //                   ], [
-        //               'subscription' => $subscription,
-        //               'agent_name' => $agent->agent_name,
-        //           ])
-        //           ->setFrom([\Yii::$app->params['supportEmail']])
-        //           ->setTo($agent->agent_email)
-        //           ->setSubject('Your Subscription is Expiring')
-        //           ->send();
-        //
-        //     if($result){
-        //       $subscription->notified_email = 1;
-        //       $subscription->save(false);
-        //     }
-        // }
-      // }
 
-      // $this->stdout("Email sent to all agents of employer that have applicants will expire soon \n", Console::FG_RED, Console::NORMAL);
-      // return self::EXIT_CODE_NORMAL;
+      foreach ($stores as $key => $store) {
 
-       // $origin =  new DateTime(date('Y-m-d'));
-       // $target =  new DateTime(date('Y-m-d', strtotime($sub->subscription_end_at)));
-       // $interval = $origin->diff($target);
-       // echo $interval->format('%a');
+        if(sizeof($store->items) == 0 ){
 
-    // }
+          foreach ($store->ownerAgent as $agent) {
+
+            Yii::$app->mailer->compose([
+                        'html' => 'offer-assistance',
+                            ], [
+                        'store' => $store
+                    ])
+                     ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                    ->setTo($agent->agent_email)
+                    ->setBcc(\Yii::$app->params['supportEmail'])
+                    ->setSubject('Is there anything we can help with?')
+                    ->send();
+          }
+
+          $store->retention_email_sent = 1;
+          $store->save(false);
+
+        }
+
+      }
+
+    }
+
+
+    public function actionRetentionEmailsWhoPassedFiveDaysAndNoSales(){
+
+      $stores = Restaurant::find()
+              ->joinWith(['orders','ownerAgent'])
+              ->where(' DATE(restaurant_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')
+              ->andWhere(['retention_email_sent' => 0])
+              ->all();
+
+
+      foreach ($stores as $key => $store) {
+
+        if(sizeof($store->orders) == 0 ){
+
+          foreach ($store->ownerAgent as $agent) {
+
+            Yii::$app->mailer->compose([
+                        'html' => 'offer-assistance',
+                            ], [
+                        'store' => $store
+                    ])
+                    ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                    ->setTo($agent->agent_email)
+                    ->setBcc(\Yii::$app->params['supportEmail'])
+                    ->setSubject('Is there anything we can help with?')
+                    ->send();
+          }
+
+          $store->retention_email_sent = 1;
+          $store->save(false);
+
+        }
+
+      }
+
+    }
+
+
+    public function actionDowngradedStoreSubscription(){
+
+         $start_date = date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d")  ));
+         $end_date =  date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d") ));
+
+         $subscriptions = Subscription::find()
+                 ->where(['subscription_status' => Subscription::STATUS_ACTIVE])
+                 // ->andWhere(['notified_email' => 1])
+                 ->andWhere(['not', ['subscription_end_at' => null]])
+                 ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])
+                 ->with(['plan','restaurant'])
+                 ->all();
+
+
+
+         foreach ($subscriptions as $subscription) {
+           if(date('Y-m-d',strtotime($subscription->subscription_end_at)) == date('Y-m-d')){
+             $subscription->subscription_status =  Subscription::STATUS_INACTIVE;
+             $subscription->save();
+           }
+         }
+       }
+
+       public function actionNotifyAgentsForSubscriptionThatWillExpireSoon(){
+
+         $start_date = date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") + 5 ));
+         $end_date =  date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d") + 5));
+
+         $subscriptions = Subscription::find()
+                 ->where(['subscription_status' => Subscription::STATUS_ACTIVE])
+                 ->andWhere(['notified_email' => 0])
+                 ->andWhere(['not', ['subscription_end_at' => null]])
+                 ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])
+                 ->with(['plan','restaurant'])
+                 ->all();
+
+
+         foreach ($subscriptions as $subscription) {
+
+           foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
+             $result = \Yii::$app->mailer->compose([
+                         'html' => 'subscription-will-expire-soon-html',
+                             ], [
+                         'subscription' => $subscription,
+                         'store' => $subscription->restaurant,
+                         'plan' => $subscription->plan->name,
+                         'agent_name' => $agent->agent_name,
+                     ])
+                     ->setFrom([\Yii::$app->params['supportEmail']])
+                     ->setTo($agent->agent_email)
+                     ->setSubject('Your Subscription is Expiring')
+                     ->send();
+
+               if($result){
+                 $subscription->notified_email = 1;
+                 $subscription->save(false);
+               }
+           }
+         }
+
+         $this->stdout("Email sent to all agents of employer that have applicants will expire soon \n", Console::FG_RED, Console::NORMAL);
+         return self::EXIT_CODE_NORMAL;
+
+    }
 
     public function actionCreateTapAccount() {
 
@@ -554,7 +401,6 @@ class CronController extends \yii\console\Controller {
 
     public function actionCreateBuildJsFile() {
 
-      $now = new DateTime('now');
             $queue = Queue::find()
                     ->joinWith('restaurant')
                     ->andWhere(['queue_status' => Queue::QUEUE_STATUS_PENDING])
@@ -575,12 +421,14 @@ class CronController extends \yii\console\Controller {
           $stores = Restaurant::find()
                   ->where(['sitemap_require_update' => 1])
                   ->andWhere(['version' => 2])
+                  ->andWhere(['!=', 'restaurant_uuid', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])
                   ->all();
+
 
             if($stores){
               foreach ($stores as $key => $store) {
 
-                if($store){
+                if($store && $store->getItems()->count() > 0){
 
                   $dirName = "store";
                   if(!file_exists($dirName))
@@ -602,7 +450,7 @@ class CronController extends \yii\console\Controller {
                 // Encode the image string data into base64
                 $data = base64_encode($fileToBeUploaded);
 
-                $getSitemapXmlSHA = Yii::$app->githubComponent->getFileSHA('sitemap.xml', $store->store_branch_name,);
+                $getSitemapXmlSHA = Yii::$app->githubComponent->getFileSHA('src/sitemap.xml', $store->store_branch_name,);
 
                 if ($getSitemapXmlSHA->isOk && $getSitemapXmlSHA->data) {
 
@@ -638,8 +486,6 @@ class CronController extends \yii\console\Controller {
                   Yii::error('[Github > Error while getting file sha]' . json_encode($getSitemapXmlSHA->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
                   return false;
                 }
-
-
 
               }
             }
@@ -706,7 +552,7 @@ class CronController extends \yii\console\Controller {
                 ->where(['!=', 'payment.payment_current_status', 'CAPTURED'])
                 ->andWhere(['order.order_status' => Order::STATUS_ABANDONED_CHECKOUT])
                 ->andWhere(['order.items_has_been_restocked' => 0]) // if items hasnt been restocked
-                ->andWhere(['<', 'payment.payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 15 MINUTE)')]);
+                ->andWhere(['<', 'payment.payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')]);
 
         foreach ($payments->all() as $payment) {
             $payment->order->restockItems();
@@ -733,7 +579,7 @@ class CronController extends \yii\console\Controller {
                         $payment->save(false);
                     }
                 } catch (\Exception $e) {
-                    \Yii::error("[Issue checking status] " . $e->getMessage(), __METHOD__);
+                  \Yii::error("[Issue checking status (". $payment->restaurant_uuid .") Order Uuid: ". $payment->order_uuid ."] " . $e->getMessage(), __METHOD__);
                 }
             }
         } else {
@@ -754,25 +600,26 @@ class CronController extends \yii\console\Controller {
         $orders = Order::find()
                 ->where(['order_status' => Order::STATUS_PENDING])
                 ->andWhere(['reminder_sent' => 0])
-                ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 MINUTE)')])
+                ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')])
                 ->all();
+
 
         if ($orders) {
 
             foreach ($orders as $order) {
 
-                foreach ($order->restaurant->getAgents()->where(['reminder_email' => 1])->all() as $agent) {
+                foreach ($order->restaurant->getAgentAssignments()->where(['reminder_email' => 1])->all() as $agentAssignment) {
 
 
-                    if ($agent) {
+                    if ($agentAssignment && $agentAssignment->agent) {
                         $result = \Yii::$app->mailer->compose([
                                     'html' => 'order-reminder-html',
                                         ], [
                                     'order' => $order,
-                                    'agent_name' => $agent->agent_name
+                                    'agent_name' => $agentAssignment->agent->agent_name
                                 ])
                                 ->setFrom([\Yii::$app->params['supportEmail'] => $order->restaurant->name])
-                                ->setTo($agent->agent_email)
+                                ->setTo($agentAssignment->agent->agent_email)
                                 ->setSubject('Order #' . $order->order_uuid . ' from ' . $order->restaurant->name)
                                 ->send();
                     }

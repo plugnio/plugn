@@ -74,16 +74,21 @@ class TapQueue extends \yii\db\ActiveRecord
           if($this->restaurant->createAnAccountOnTap()){
             $this->queue_status = self::QUEUE_STATUS_COMPLETE;
             if($this->save()){
-              \Yii::$app->mailer->compose([
-                     'html' => 'tap-created',
-                         ], [
-                     'store' => $this->restaurant,
-                 ])
-                 ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-                 ->setTo([$this->restaurant->restaurant_email])
-                 ->setBcc(\Yii::$app->params['supportEmail'])
-                 ->setSubject('Your TAP Payments account has been approved')
-                 ->send();
+
+              foreach ($this->restaurant->getOwnerAgent()->all() as $agent) {
+
+                \Yii::$app->mailer->compose([
+                       'html' => 'tap-created',
+                           ], [
+                       'store' => $this->restaurant,
+                   ])
+                   ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                   ->setTo([$agent->agent_email])
+                   ->setBcc(\Yii::$app->params['supportEmail'])
+                   ->setSubject('Your TAP Payments account has been approved')
+                   ->send();
+
+              }
             }
           }
         }

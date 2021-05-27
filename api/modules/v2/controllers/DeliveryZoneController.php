@@ -60,27 +60,27 @@ class DeliveryZoneController extends Controller {
     /**
      * Return Delivery zones
      */
-    public function actionDeliveryZone($restaurant_uuid) {
-
-        if ($store_model = Restaurant::findOne($restaurant_uuid)) {
-
-            $shipping_countries = $store_model->getShippingCountries()->asArray()->all();
-
-            foreach ($shipping_countries as $key => $shippingCountry) {
-              $deliveryZones = $store_model->getCountryDeliveryZones($shippingCountry['country_id'])->asArray()->all();
-              $shippingCountry['businessLocations'] = $deliveryZones;
-            }
-
-            return $shipping_countries;
-
-
-        } else {
-            return [
-                'operation' => 'error',
-                'message' => 'Store Uuid is invalid'
-            ];
-        }
-    }
+    // public function actionDeliveryZone($restaurant_uuid) {
+    //
+    //     if ($store_model = Restaurant::findOne($restaurant_uuid)) {
+    //
+    //         $shipping_countries = $store_model->getShippingCountries()->asArray()->all();
+    //
+    //         foreach ($shipping_countries as $key => $shippingCountry) {
+    //           $deliveryZones = $store_model->getCountryDeliveryZones($shippingCountry['country_id'])->asArray()->all();
+    //           $shippingCountry['businessLocations'] = $deliveryZones;
+    //         }
+    //
+    //         return $shipping_countries;
+    //
+    //
+    //     } else {
+    //         return [
+    //             'operation' => 'error',
+    //             'message' => 'Store Uuid is invalid'
+    //         ];
+    //     }
+    // }
 
     /**
      * Return List of countries available for delivery
@@ -113,12 +113,16 @@ class DeliveryZoneController extends Controller {
                 if($areaDeliveryZone = $store_model->getAreaDeliveryZonesForSpecificCountry($shippingCountry['country_id'])->one()){
                   $shipping_countries[$key]['areas'] =
                   !isset($areaDeliveryZone['area_id']) &&  $areaDeliveryZone->area_id  == null ? 0 : $store_model->getAreaDeliveryZonesForSpecificCountry($shippingCountry['country_id'])->count();
-                }
+
 
                 if($shipping_countries[$key]['areas'] == 0){
                   $countryDeliveryZone = $store_model->getCountryDeliveryZones($shippingCountry['country_id'])->one();
                   $shipping_countries[$key]['delivery_zone_id'] = strval($countryDeliveryZone['delivery_zone_id']);
                 }
+
+              }  else {
+                unset($shipping_countries[$key]);
+              }
 
             }
 
@@ -266,9 +270,7 @@ class DeliveryZoneController extends Controller {
                             }
                       }
                   }
-              } else
-                    return $store_model->getDeliveryZonesForSpecificCountry($country_id)->asArray()->all();
-
+              }
 
           $citiesData = [];
           foreach ($countryCities as $key => $city) {
@@ -279,9 +281,6 @@ class DeliveryZoneController extends Controller {
 
           if(!empty($citiesData))
             return $citiesData ;
-          else
-          return $store_model->getDeliveryZonesForSpecificCountry($country_id)->asArray()->all();
-
 
 
         } else {

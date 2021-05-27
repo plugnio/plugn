@@ -16,6 +16,7 @@ use Yii;
  * @property float|null $delivery_fee
  * @property float|null $min_charge
  * @property float|null $delivery_zone_tax
+ * @property string $time_unit
  *
  * @property AreaDeliveryZone[] $areaDeliveryZones
  * @property Area[] $areas

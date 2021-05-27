@@ -252,7 +252,7 @@ $interval = $today->diff($expiry);
                             </td>
                             <td >
                               <?php
-                              if($model->is_tap_enable){
+                              if($model->is_tap_enable && $model->business_type == 'corp'){
 
                                   if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 4])->exists())
                                     echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 4], ['class' => 'btn btn-danger']);

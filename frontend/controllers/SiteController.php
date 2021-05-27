@@ -95,7 +95,7 @@ class SiteController extends Controller {
         else {
             foreach (Yii::$app->accountManager->getManagedAccounts() as $managedRestaurant) {
 
-                if (AgentAssignment::isOwner($managedRestaurant->restaurant_uuid)) {
+                if (Yii::$app->user->identity->isOwner($managedRestaurant->restaurant_uuid)) {
                     return $this->redirect(['vendor-dashboard',
                                 'id' => $managedRestaurant->restaurant_uuid
                     ]);
@@ -114,10 +114,11 @@ class SiteController extends Controller {
     public function actionCheckForNewOrders($storeUuid) {
 
         $this->layout = false;
-        $managedRestaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $managedRestaurant = $this->findModel($storeUuid);
+        $agentAssignment = $managedRestaurant->getAgentAssignments()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])->one();
 
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid);
+        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid,$agentAssignment);
 
         return $this->render('incoming-orders-table', [
                     'searchModel' => $searchModel,
@@ -132,7 +133,7 @@ class SiteController extends Controller {
      * @return mixed
      */
     public function actionRedirectToStoreDomain($storeUuid) {
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($storeUuid)) {
+        if ($managedRestaurant = $this->findModel($storeUuid)) {
 
             if($managedRestaurant->has_deployed)
             return $this->redirect($managedRestaurant->restaurant_domain);
@@ -155,11 +156,13 @@ class SiteController extends Controller {
      * @return mixed
      */
     public function actionConnectDomain($id) {
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
+        if ($managedRestaurant = $this->findModel($id)) {
 
             $old_domain = $managedRestaurant->restaurant_domain;
 
             if ($managedRestaurant->load(Yii::$app->request->post())) {
+
+
 
 
                 if ($old_domain != $managedRestaurant->restaurant_domain) {
@@ -167,6 +170,8 @@ class SiteController extends Controller {
                    $managedRestaurant->restaurant_domain = rtrim($managedRestaurant->restaurant_domain, '/');
 
                    if( $managedRestaurant->save()){
+                     Yii::$app->session->setFlash('successResponse', "Congratulations you have successfully changed your domain name");
+
                      \Yii::$app->mailer->compose([
                                  'html' => 'domain-update-request',
                                      ], [
@@ -191,7 +196,7 @@ class SiteController extends Controller {
 
 
     public function actionConfirmPlan($id, $selectedPlanId) {
-      if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
+      if ($managedRestaurant = $this->findModel($id)) {
 
 
 
@@ -223,7 +228,6 @@ class SiteController extends Controller {
               // Redirect to payment gateway
               Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
 
-
               $response = Yii::$app->tapPayments->createCharge(
                       "KWD",
                       "Upgrade $managedRestaurant->name's plan to " . $subscription_model->plan->name, // Description
@@ -232,11 +236,12 @@ class SiteController extends Controller {
                        $subscription_model->plan->price,
                        $managedRestaurant->name,
                        $managedRestaurant->getAgents()->one()->agent_email,
+                       $managedRestaurant->country->country_code,
                        $managedRestaurant->owner_number ? $managedRestaurant->owner_number : null,
                        0, //Comission
                       Url::to(['site/callback'], true),
                       $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET :  TapPayments::GATEWAY_VISA_MASTERCARD,
-                      0 
+                      0
               );
 
               $responseContent = json_decode($response->content);
@@ -271,7 +276,7 @@ class SiteController extends Controller {
                           ];
                       }
                   } else {
-                      \Yii::error('[Payment Issue > Charge id is missing ]' . $responseContent, __METHOD__); // Log error faced by user
+                      \Yii::error('[Payment Issue > Charge id is missing ]' . json_encode($responseContent), __METHOD__); // Log error faced by user
                   }
 
                   return $this->redirect($redirectUrl);
@@ -284,7 +289,7 @@ class SiteController extends Controller {
 
                   $response = [
                       'operation' => 'error',
-                      'message' => $responseContent
+                      'message' => json_encode($responseContent)
                   ];
               }
           }
@@ -341,8 +346,12 @@ class SiteController extends Controller {
      */
     public function actionRealTimeOrders($storeUuid) {
 
+        $managedRestaurant = $this->findModel($storeUuid);
+        $agentAssignment = $managedRestaurant->getAgentAssignments()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])->one();
+
+
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid);
+        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid, $agentAssignment);
 
         return $this->render('real-time-orders', [
                     'searchModel' => $searchModel,
@@ -358,13 +367,11 @@ class SiteController extends Controller {
      */
     public function actionVendorDashboard($id) {
 
-        if ($managedRestaurant = Yii::$app->accountManager->getManagedAccount($id)) {
-            if (AgentAssignment::isOwner($managedRestaurant->restaurant_uuid)) {
+        if ($managedRestaurant = $this->findModel($id)) {
+            if (Yii::$app->user->identity->isOwner($managedRestaurant->restaurant_uuid)) {
 
-                $incoming_orders = Order::find()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid, 'order_status' => Order::STATUS_PENDING])
-                        ->orderBy(['order_created_at' => SORT_DESC])
-                        ->limit(5)
-                        ->all();
+                $numberOfOrders = Order::find()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                        ->count();
 
                 //Orders Recevied
                 $orders_received_chart_data_this_week = [];
@@ -1082,7 +1089,7 @@ class SiteController extends Controller {
 
                 return $this->render('index', [
                             'restaurant_model' => $managedRestaurant,
-                            'incoming_orders' => $incoming_orders,
+                            'numberOfOrders' => $numberOfOrders,
                             //customer gained
                             'today_customer_gained' => $today_customer_gained ? $today_customer_gained : 0,
                             'number_of_all_customer_gained_last_three_months' => $number_of_all_customer_gained_last_three_months,
@@ -1217,7 +1224,7 @@ class SiteController extends Controller {
         $this->layout = 'login';
 
         $store_model = new Restaurant();
-        $store_model->version = 2;
+        $store_model->version = 3;
         $store_model->setScenario(Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
 
         $agent_model = new Agent();
@@ -1286,6 +1293,9 @@ class SiteController extends Controller {
                                'store_url' => $store_model->restaurant_domain
                           ]
                       ]);
+
+                      Yii::$app->session->setFlash('storeCreated');
+
                     }
 
                         return $this->redirect(['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
@@ -1375,7 +1385,7 @@ class SiteController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id) {
-        if (($model = Yii::$app->accountManager->getManagedAccount($id))) {
+        if (($model = Yii::$app->accountManager->getManagedAccount($id)) ) {
             return $model;
         }
 

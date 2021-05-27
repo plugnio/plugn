@@ -5,7 +5,7 @@ Yii::setAlias('@shortner', dirname(dirname(__DIR__)) . '/shortner');
 Yii::setAlias('@backend', dirname(dirname(__DIR__)) . '/backend');
 Yii::setAlias('@console', dirname(dirname(__DIR__)) . '/console');
 Yii::setAlias('@api', dirname(dirname(__DIR__)) . '/api');
-Yii::setAlias('@vendors', dirname(dirname(__DIR__)) . '/vendors');
+Yii::setAlias('@agent', dirname(dirname(__DIR__)) . '/agent');
 
 //Image Upload Paths
 Yii::setAlias('projectFiles','@backend/web/uploads/project-files');

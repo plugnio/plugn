@@ -19,23 +19,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="customer-view">
 
-  <p>
-    <?= Html::a('Update', ['update', 'id' => $model->customer_id, 'storeUuid' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
-
-    <?php
-
-      if(AgentAssignment::isOwner($model->restaurant_uuid)){
-         echo Html::a('Delete', ['delete', 'id' => $model->customer_id, 'restaurantUuid' => $model->restaurant_uuid], [
-             'class' => 'btn btn-danger',
-             'data' => [
-                 'confirm' => 'Are you sure you want to delete this customer?',
-                 'method' => 'post',
-             ],
-         ]);
-       }
-   ?>
-
-  </p>
 
   <div class="card">
         <div class="card-body">
@@ -110,6 +93,8 @@ $this->params['breadcrumbs'][] = $this->title;
                           'value' => function($model) {
                               if ($model->order_status == Order::STATUS_PENDING)
                                   return '<span class="badge bg-warning" >' . $model->orderStatusInEnglish . '</span>';
+                              else if ($model->order_status == Order::STATUS_ACCEPTED)
+                                  return '<span class="badge" style="background-color:#2898C8;" >' . $model->orderStatusInEnglish . '</span>';
                               else if ($model->order_status == Order::STATUS_DRAFT)
                                   return '<span class="badge bg-info" >' . $model->orderStatusInEnglish . '</span>';
                               else if ($model->order_status == Order::STATUS_OUT_FOR_DELIVERY)

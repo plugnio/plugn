@@ -80,6 +80,138 @@ class RestaurantController extends Controller {
     }
 
     /**
+     * Delete build js
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionDeleteSpecificFile($filePath, $id) {
+
+        $store = $this->findModel($id);
+
+
+        //Replace test with store branch name
+        $getBuildJsSHA = Yii::$app->githubComponent->getFileSHA($filePath, $store->store_branch_name);
+
+        if ($getBuildJsSHA->isOk && $getBuildJsSHA->data) {
+
+            $deleteBuildJs = Yii::$app->githubComponent->deleteFile($filePath, $getBuildJsSHA->data['sha'],  $store->store_branch_name);
+
+            if (!$deleteBuildJs->isOk) {
+              Yii::error('[Github > Error While deleting'. $filePath . ']' . json_encode($deleteBuildJs->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+              Yii::$app->session->setFlash('errorResponse', json_encode($deleteBuildJs->data['message']));
+              return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+            }
+      } else {
+        Yii::error('[Github > Error while getting file sha]' . json_encode($getBuildJsSHA->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+        Yii::$app->session->setFlash('errorResponse', json_encode($getBuildJsSHA->data['message']));
+        return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+      }
+
+      return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+
+    }
+
+    /**
+     * Merge
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionMergeToMasterBranch($id) {
+
+        $store = $this->findModel($id);
+
+        //Delete src/environments/environment.develop.ts file
+        $getDevEnvFile = Yii::$app->githubComponent->getFileSHA('src/environments/environment.develop.ts', $store->store_branch_name);
+        if ($getDevEnvFile->isOk && $getDevEnvFile->data) {
+            $deleteDevEnvFile = Yii::$app->githubComponent->deleteFile('src/environments/environment.develop.ts', $getDevEnvFile->data['sha'],  $store->store_branch_name);
+            if (!$deleteDevEnvFile->isOk){
+              Yii::error('[Github > Error While deleting environment.develop.ts]' . json_encode($deleteDevEnvFile->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+              Yii::$app->session->setFlash('errorResponse', json_encode($deleteDevEnvFile->data['message']));
+              return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+            }
+        }
+
+        //Delete branch-name.txt file
+        $getBranchNameFile = Yii::$app->githubComponent->getFileSHA('branch-name.txt', $store->store_branch_name);
+        if ($getBranchNameFile->isOk && $getBranchNameFile->data) {
+            $deleteBranchNameFile = Yii::$app->githubComponent->deleteFile('branch-name.txt', $getBranchNameFile->data['sha'],  $store->store_branch_name);
+            if (!$deleteBranchNameFile->isOk){
+              Yii::error('[Github > Error While deleting branch-name.txt]' . json_encode($deleteDevEnvFile->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+              Yii::$app->session->setFlash('errorResponse', json_encode($deleteDevEnvFile->data['message']));
+              return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+            }
+        }
+
+
+        //Delete Build.js file
+        $getBuildJsSHA = Yii::$app->githubComponent->getFileSHA('build.js', $store->store_branch_name);
+        if ($getBuildJsSHA->isOk && $getBuildJsSHA->data) {
+            $deleteBuildJs = Yii::$app->githubComponent->deleteFile('build.js', $getBuildJsSHA->data['sha'],  $store->store_branch_name);
+            if (!$deleteBuildJs->isOk){
+              Yii::error('[Github > Error While deleting build.js]' . json_encode($deleteDevEnvFile->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+              Yii::$app->session->setFlash('errorResponse', json_encode($deleteDevEnvFile->data['message']));
+              return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+            }
+        } else {
+          Yii::error('[Github > Error while getting file sha]' . json_encode($getBuildJsSHA->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+          Yii::$app->session->setFlash('errorResponse', json_encode($getBuildJsSHA->data['message']));
+          return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
+
+
+        $mergeToMasterResponse = Yii::$app->githubComponent->mergeABranch('Merge branch master-temp into ' . $store->store_branch_name, $store->store_branch_name,  'master-temp');
+
+        if ($mergeToMasterResponse->isOk) {
+
+          $mergeToDevelopResponse = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
+
+          if ($mergeToDevelopResponse->isOk) {
+              $store->sitemap_require_update = 1;
+              $store->version = 2;
+              $store->save(false);
+          } else {
+            Yii::error('[Github > Error While merging with master]' . json_encode($mergeToDevelopResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+            Yii::$app->session->setFlash('errorResponse', json_encode($mergeToMasterResponse->data['message']));
+            return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+          }
+
+
+        } else {
+          Yii::error('[Github > Error While merging with Master-staging]' . json_encode($mergeToMasterResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+          Yii::$app->session->setFlash('errorResponse', json_encode($mergeToMasterResponse->data['message']));
+          return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
+
+
+      return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+    }
+
+
+    /**
+     * Merge
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionMergeBranch($id, $head) {
+
+        $store = $this->findModel($id);
+
+        $mergeDevelopResponse = Yii::$app->githubComponent->mergeABranch('Merge branch develop into' . $store->store_branch_name, $store->store_branch_name,  $head);
+
+        if (!$mergeDevelopResponse->isOk) {
+          Yii::error('[Github > Error While merging with develop]' . json_encode($mergeDevelopResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+          Yii::$app->session->setFlash('errorResponse', json_encode($mergeDevelopResponse->data['message']));
+          return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
+
+      return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+
+    }
+
+    /**
      * Update sitemap
      * @param integer $id
      * @return mixed
@@ -110,7 +242,7 @@ class RestaurantController extends Controller {
 
 
       //Replace test with store branch name
-      $getSitemapXmlSHA = Yii::$app->githubComponent->getFileSHA('sitemap.xml', $store->store_branch_name);
+      $getSitemapXmlSHA = Yii::$app->githubComponent->getFileSHA('src/sitemap.xml', $store->store_branch_name);
 
       if ($getSitemapXmlSHA->isOk && $getSitemapXmlSHA->data) {
 
@@ -147,32 +279,6 @@ class RestaurantController extends Controller {
       return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
 
     }
-
-
-    // public function actionCreateBuildJsFile($id) {
-    //
-    //     $store = $this->findModel($id);
-    //
-    //     $dirName = "../runtime/store";
-    //     if(!file_exists($dirName)){
-    //       $createStoreFolder = mkdir($dirName);
-    //     }
-    //
-    //
-    //     if (!file_exists( $dirName . "/" . $store->store_branch_name )) {
-    //       $myFolder = mkdir( $dirName . "/" . $store->store_branch_name);
-    //     }
-    //
-    //
-    //     $myfile =  fopen($dirName . "/" .   $store->store_branch_name . "/build.js", "w") or die("Unable to open file!");
-    //
-    //     $buildJsFile =  fopen($dirName . "/" .   $store->store_branch_name . "/build.js", "w") or die("Unable to open file!");
-    //     fwrite($buildJsFile, Yii::$app->fileGeneratorComponent->createBuildJsFile(Yii::$app->params['apiEndpoint'] . '/v2'));
-    //     fclose($buildJsFile);
-    //
-    //     return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
-    //
-    // }
 
 
     /**

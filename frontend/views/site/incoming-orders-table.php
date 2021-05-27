@@ -5,7 +5,7 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
-
+use common\models\Order;
 
 echo GridView::widget([
     'dataProvider' => $dataProvider,
@@ -32,14 +32,16 @@ echo GridView::widget([
                 return date('d M - h:i A', strtotime($model->order_created_at));
             }
         ],
+
+
         [
-              'label' => 'Branch',
-              "format" => "raw",
-              "value" => function($model) {
-                  $businessLocationName =  $model->order_mode == Order::ORDER_MODE_DELIVERY ? ($model->delivery_zone_id ? $model->deliveryZone->businessLocation->business_location_name : '(not set)') : $model->pickupLocation->business_location_name;
-                  return $businessLocationName;
-              }
-          ],
+            'attribute' => 'business_location_name',
+            "format" => "raw",
+            "value" => function($model) {
+               return $model->business_location_name ? $model->business_location_name : '';
+            }
+        ],
+
         [
             'attribute' => 'customer_name',
             'format' => 'raw',

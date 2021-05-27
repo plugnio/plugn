@@ -46,11 +46,33 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'warehouse_fee',
             'version',
+
             // [
             //   'attribute' => 'currency_title',
             //   'value' =>     'currency.title'
             // ],
-            ['class' => 'yii\grid\ActionColumn','template' => '{view}{update}'],
+
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'controller' => 'restaurant',
+                'template' => ' {view} {update} {merge}',
+                'buttons' => [
+                    'merge' => function ($url, $model) {
+                        return Html::a(
+                            '<span style="margin-right: 20px; color: red;" class="glyphicon glyphicon-transfer"></span>',
+                            ['merge-to-master-branch', 'id' => $model->restaurant_uuid ]
+
+                        );
+
+
+
+
+                    },
+                ],
+            ],
+
+
+            // ['class' => 'yii\grid\ActionColumn','template' => '{view}{update}'],
         ],
     ]); ?>
 

@@ -1,15 +1,15 @@
 <?php
 
-namespace vendors\modules\v1\controllers;
+namespace agent\modules\v1\controllers;
 
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use common\models\Order;
+use common\models\Customer;
 
-class OrderController extends Controller {
+class CustomerController extends Controller {
 
     public function behaviors() {
         $behaviors = parent::behaviors();
@@ -61,30 +61,70 @@ class OrderController extends Controller {
 
 
     /**
-     * Get All pending Orders
+    * Get all store's Customers
      * @param type $id
-     * @param type $restaurant_uuid
+     * @param type $store_uuid
      * @return type
      */
-    public function actionGetAllPendingOrders($store_uuid) {
+    public function actionList($store_uuid) {
 
-        $model =  Order::find()
-                  ->select(['order.order_uuid' , 'order.customer_name', 'order.customer_phone_number'])
-                  ->where(['order.restaurant_uuid' => $store_uuid])
-                  ->andWhere(['order.order_status' => Order::STATUS_PENDING])
-                  ->asArray()
-                  ->all();
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
-        if (!$model) {
-            return [
-                'operation' => 'error',
-                'message' => 'No incoming orders'
-            ];
-        }
+          $customers =  Customer::find()
+                    ->where(['restaurant_uuid' => $store_uuid])
+                    ->asArray()
+                    ->all();
 
-        return [
-            'operation' => 'success',
-            'body' => $model
-        ];
+
+          if (!$customers) {
+              return [
+                  'operation' => 'error',
+                  'message' => 'No results found'
+              ];
+          }
+
+          return [
+              'operation' => 'success',
+              'body' => $customers
+          ];
+
+      }
+
     }
+
+
+    /**
+    * Return customer detail
+     * @param type $store_uuid
+     * @param type $order_uuid
+     * @return type
+     */
+    public function actionDetail($store_uuid, $customer_id) {
+
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+
+          $customer =  Customer::find()
+                    ->where(['restaurant_uuid' => $store_uuid])
+                    ->andWhere(['customer_id' => $customer_id])
+                    ->asArray()
+                    ->one();
+
+
+          if (!$customer) {
+
+              return [
+                  'operation' => 'error',
+                  'message' => 'No results found.'
+              ];
+          }
+
+          return [
+              'operation' => 'success',
+              'body' => $customer
+          ];
+
+      }
+
+  }
+
 }

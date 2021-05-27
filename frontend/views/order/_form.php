@@ -39,6 +39,7 @@ $js = "
         }
     });
 
+
     $(document).on('wheel', 'input[type=number]', function (e) {
         $(this).blur();
     });
@@ -89,7 +90,7 @@ $this->registerJs($js);
 
                 <div class="col-12 col-sm-4  col-md-4 col-lg-4">
 
-                    <?= $form->field($model, 'block')->input('number') ?>
+                    <?= $form->field($model, 'block')->textInput(['maxlength' => true]) ?>
                 </div>
             </div>
             <div class="row">
@@ -98,19 +99,30 @@ $this->registerJs($js);
                 </div>
 
                 <div class="col-12 col-sm-4  col-md-4 col-lg-4">
-                    <?= $form->field($model, 'avenue')->input('number') ?>
+                    <?= $form->field($model, 'avenue')->textInput(['maxlength' => true]) ?>
                 </div>
 
                 <div class="col-12 col-sm-4  col-md-4 col-lg-4">
 
-                    <?= $form->field($model, 'house_number')->input('number') ?>
+                    <?= $form->field($model, 'house_number')->textInput(['maxlength' => true])->label('Building No. ') ?>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-sm-4  col-md-4 col-lg-4">
+                    <?= $form->field($model, 'floor')->textInput(['maxlength' => true]) ?>
+                </div>
+                <div class="col-12 col-sm-4  col-md-4 col-lg-4">
+                  <?= $form->field($model, 'apartment')->textInput(['maxlength' => true]) ?>
+                </div>
+
+                <div class="col-12 col-sm-4  col-md-4 col-lg-4">
+                  <?= $form->field($model, 'office')->textInput(['maxlength' => true]) ?>
                 </div>
             </div>
 
         </div>
 
-
-        <div id='pickup-branch' style='display:none; <?= $model->order_mode != null && $model->order_mode == Order::ORDER_MODE_DELIVERY ? "display:none" : "" ?>'>
+        <div id='pickup-branch' style='<?= $model->order_mode != null && $model->order_mode == Order::ORDER_MODE_DELIVERY ? "display:none" : "" ?>'>
             <?= $form->field($model, 'pickup_location_id')->dropDownList($businessLocationArray, ['prompt' => 'Choose pickup location...', 'class' => 'select2'])->label('Pickup from'); ?>
         </div>
 

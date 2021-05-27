@@ -85,7 +85,7 @@ class Item extends \yii\db\ActiveRecord
             [['item_uuid'], 'string', 'max' => 300],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['item_name', 'item_name_ar', 'item_image','barcode', 'sku'], 'string', 'max' => 255],
-            [['item_description', 'item_description_ar'], 'string', 'max' => 2000],
+            [['item_description', 'item_description_ar'], 'string', 'max' => 2500],
             [['item_uuid'], 'unique'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
@@ -194,14 +194,18 @@ class Item extends \yii\db\ActiveRecord
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-        $store = $this->restaurant;
+        if($insert || isset($changedAttributes['item_name']) ) {
 
-        if($store->sitemap_require_update == 0){
-          $store->sitemap_require_update = 1;
-          $store->save(false);
+          $store = $this->restaurant;
+
+          if($store->sitemap_require_update == 0){
+            $store->sitemap_require_update = 1;
+            $store->save(false);
+          }
+
         }
 
-      return true;
+        return true;
     }
 
     /**
@@ -373,6 +377,11 @@ class Item extends \yii\db\ActiveRecord
     public function getItemImages()
     {
         return $this->hasMany(ItemImage::className(), ['item_uuid' => 'item_uuid']);
+    }
+
+
+    public function getItemImage(){
+      return $this->hasOne(ItemImage::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**

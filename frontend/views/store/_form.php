@@ -125,60 +125,13 @@ $this->registerJs($js);
         </div>
 
 
-        <!-- <div class="row"> -->
-            <!-- <div class="col-12 col-sm-6 col-lg-6"> -->
-                <?php
-                // echo $form->field($model, 'support_delivery')->radioList([1 => 'Yes', 0 => 'No',], [
-                //     'style' => 'display:grid',
-                //     'item' => function($index, $label, $name, $checked, $value) {
-                //
-                //         $return = '<label class="vs-radio-con">';
-                //         /* -----> */ if ($checked)
-                //             $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                //         /* -----> */
-                //         else
-                //             $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                //         $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
-                //         $return .= '<span>' . ucwords($label) . '</span>';
-                //         $return .= '</label>';
-                //
-                //         return $return;
-                //     }
-                // ]);
-                ?>
-            <!-- </div> -->
-
-            <!-- <div class="col-12 col-sm-6 col-lg-6"> -->
-
-                <?php
-                // echo $form->field($model, 'support_pick_up')->radioList([1 => 'Yes', 0 => 'No',], [
-                //     'style' => 'display:grid',
-                //     'item' => function($index, $label, $name, $checked, $value) {
-                //
-                //         $return = '<label class="vs-radio-con">';
-                //         /* -----> */ if ($checked)
-                //             $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                //         /* -----> */
-                //         else
-                //             $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                //         $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
-                //         $return .= '<span>' . ucwords($label) . '</span>';
-                //         $return .= '</label>';
-                //
-                //         return $return;
-                //     }
-                // ]);
-                ?>
-
-            <!-- </div> -->
-        <!-- </div> -->
-
         <div class="row">
             <div class="col-12 col-sm-6 col-lg-6">
                 <?=
                    $form->field($model, 'phone_number')->widget(PhoneInput::className(), [
                       'jsOptions' => [
                           'preferredCountries' => ['kw', 'sa', 'aed','qa','bh','om'],
+                          'initialCountry' => $model->country->iso
                       ]
                   ]);
                 ?>
@@ -190,7 +143,20 @@ $this->registerJs($js);
         </div>
 
         <div class="row">
-            <div class="col-12 col-sm-6 col-lg-6">
+          <div class="col-12 col-sm-4 col-lg-4">
+
+              <?=
+              $form->field($model, 'enable_gift_message', [
+                  'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Enable gift message</span>{input}<label class='custom-control-label' for='customSwitch2'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
+              ])->checkbox([
+                  'checked' => $model->enable_gift_message == 0 ? false : true,
+                  'id' => 'customSwitch2',
+                  'class' => 'custom-control-input'
+                      ], false)->label(false)
+              ?>
+
+            </div>
+            <div class="col-12 col-sm-4 col-lg-4">
               <?= $form->field($model, 'schedule_order', [
                   'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Schedule Order</span>{input}<label class='custom-control-label' for='scheduleOrder'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
               ])->checkbox([
@@ -201,7 +167,7 @@ $this->registerJs($js);
               ?>
             </div>
 
-            <div class="col-12 col-sm-6 col-lg-6">
+            <div class="col-12 col-sm-4 col-lg-4">
 
                   <?=
                   $form->field($model, 'restaurant_email_notification', [
