@@ -101,6 +101,15 @@ class BankDiscount extends \yii\db\ActiveRecord
     }
 
 
+    public function extraFields()
+    {
+        return [
+          'restaurant',
+          'currency',
+          'bank',
+          'customerBankDiscounts'
+        ];
+    }
 
     public function isValid($phone_number) {
         $isValid = true;

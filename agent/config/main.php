@@ -129,10 +129,14 @@ return [
                         'GET' => 'list',
                         'GET detail' => 'detail',
                         'POST' => 'filter',
-
+                        'POST create' => 'create',
+                        'PATCH <voucher_id>/<store_uuid>' => 'update',
+                        'DELETE <voucher_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS <voucher_id>/<store_uuid>' => 'options',
+                        'OPTIONS create' => 'options'
                     ]
                 ],
                 [// BankDiscountController
@@ -143,9 +147,14 @@ return [
                         'GET' => 'list',
                         'GET detail' => 'detail',
                         'POST' => 'filter',
+                        'POST create' => 'create',
+                        'PATCH <bank_discount_id>/<store_uuid>' => 'update',
+                        'DELETE <id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS <bank_discount_id>/<store_uuid>' => 'options',
+                        'OPTIONS create' => 'options'
                     ]
                 ],
                 [// DeliveryZoneController

@@ -300,22 +300,9 @@ class OrderController extends Controller {
           $order =  Order::find()
                     ->where(['order.restaurant_uuid' => $store_uuid])
                     ->andWhere(['order.order_uuid' => $order_uuid])
-                    ->asArray()
                     ->one();
 
-
-          if (!$order) {
-
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found.'
-              ];
-          }
-
-          return [
-              'operation' => 'success',
-              'body' => $order
-          ];
+         return $order;
 
       }
 
