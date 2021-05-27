@@ -149,7 +149,7 @@ return [
                         'POST' => 'filter',
                         'POST create' => 'create',
                         'PATCH <bank_discount_id>/<store_uuid>' => 'update',
-                        'DELETE <id>/<store_uuid>' => 'delete',
+                        'DELETE <bank_discount_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
