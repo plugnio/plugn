@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use Yii;
+use common\models\Restaurant;
 use common\models\BusinessLocation;
 use frontend\models\BusinessLocationSearch;
 use yii\web\Controller;
@@ -65,6 +66,7 @@ class BusinessLocationController extends Controller
      */
     public function actionCreate($storeUuid)
     {
+        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
         $model = new BusinessLocation();
         $model->restaurant_uuid = $storeUuid;
 
@@ -150,7 +152,7 @@ class BusinessLocationController extends Controller
 
         return $this->render('create', [
             'model' => $model,
-            'storeUuid' => $storeUuid
+            'store_model' => $store_model
         ]);
     }
 
@@ -219,7 +221,7 @@ class BusinessLocationController extends Controller
 
         return $this->render('update', [
             'model' => $model,
-            'storeUuid' => $storeUuid
+            'store_model' => Restaurant::findOne($storeUuid)
         ]);
     }
 

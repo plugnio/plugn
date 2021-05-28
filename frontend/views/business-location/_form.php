@@ -9,6 +9,7 @@ use common\models\Country;
 /* @var $model common\models\BusinessLocation */
 /* @var $form yii\widgets\ActiveForm */
 $locateImgUrl = Yii::$app->urlManager->getBaseUrl() . '/img/locate-mp.svg';
+
 ?>
 <script type='text/javascript'>
 
@@ -36,6 +37,10 @@ function initMap() {
 
   const card = document.getElementById("searchGrp");
   const input = document.getElementById("placeSearch");
+
+
+
+
   const options = {
     componentRestrictions: { country: ["kw", "sa", "bh"]},
     fields: ["formatted_address", "geometry", "name"],
@@ -86,32 +91,24 @@ function initMap() {
   });
 
 
-    google.maps.event.addListener(marker, 'dragend', function() {
+  map.addListener('dragend', function() {
 
-       if (confirm("Are You Sure You Want To Move this marker?")) {
-            var positionStartLatNew = this.position.lat();
-            var positionStartLngNew = this.position.lng();
+        var positionStartLatNew = this.center.lat();
+        var positionStartLngNew = this.center.lng();
 
-            map.setCenter(this.position);
-            map.setZoom(17);
-            document.getElementById('end').innerHTML = "Lat end : " + positionStartLatNew + ", " + "Lng end : " + positionStartLngNew;
-       } else {
-            google.maps.event.addListener(marker, 'dragstart', function() {
-            var positionStartLat = this.position.lat();
-            var positionStartLng = this.position.lng();
-            map.setCenter(this.position);
-            map.setZoom(17);
-            document.getElementById('start').innerHTML = "Lat start : " + positionStartLat + ", " + "Lng start : " + positionStartLng;
+        map.setCenter(this.center);
+        // map.setZoom(17);
+        document.getElementById('end').innerHTML = "Lat end : " + positionStartLatNew + ", " + "Lng end : " + positionStartLngNew;
 
-            });
-       }
-
-       document.getElementById("businesslocation-latitude").value =  this.position.lat();
-       document.getElementById("businesslocation-longitude").value =  this.position.lng();
+   document.getElementById("businesslocation-latitude").value =  this.center.lat();
+   document.getElementById("businesslocation-longitude").value =  this.center.lng();
 
 
 
-  });
+});
+
+
+
 
   function handleLocationError(browserHasGeolocation, infoWindow, pos) {
   infoWindow.setPosition(pos);
@@ -154,10 +151,25 @@ function initMap() {
     width: 27px !important;
     height: 43px !important;
   }
+
+  .pac-container{
+    z-index: 999999 !important;
+  }
 </style>
 
+  <?php
+
+
+      $form = ActiveForm::begin();
+
+  ?>
 
   <div class="card">
+
+      <div class="card-header">
+        <h3>Business location Info </h3>
+      </div>
+
       <div class="business-location-form card-body">
 
         <?php
@@ -166,7 +178,25 @@ function initMap() {
               $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
 
 
-              $form = ActiveForm::begin();
+              $location = 'Kuwait,City';
+
+              if ($model->business_location_id) {
+                if($model->latitude && $model->longitude)
+                  $location = $model->latitude . ',' . $model->longitude;
+                else {
+                  if($model->country_id == 12) // Bahrain
+                    $location = 'Manama';
+                  else if($model->country_id == 129) // KSA
+                    $location = 'Riyadh';
+                }
+              }else {
+                if($store_model->country_id == 12) // Bahrain
+                  $location = 'Manama';
+                else if($store_model->country_id == 129) // KSA
+                  $location = 'Riyadh';
+              }
+
+
           ?>
 
 
@@ -185,54 +215,142 @@ function initMap() {
 
 
 
+<label class="control-label" for="businesslocation-country_id">Business Address</label>
+
+          <!-- Vertical modal -->
+          <div class="vertical-modal-ex">
+              <!-- <button type="button" class="btn btn-outline-primary"> -->
+                <img  data-toggle="modal" data-target="#exampleModalCenter"
+                style="width: 100%;cursor: pointer;"
+                src=<?= "http://maps.googleapis.com/maps/api/staticmap?center=" .  $location ."&scale=2&zoom=17&size=430x50&key=AIzaSyCFeQ-wuP5iWVRTwMn5nZZeOE8yjGESFa8" ?> >
+
+              <!-- </button> -->
+              <!-- Modal -->
+              <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered" role="document" style="height:100%">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalCenterTitle">Business Address</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">×</span>
+                              </button>
+                          </div>
+
+
+                          <div class="modal-body">
+                              <img alt="" class="map-marker-img" src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/marker-icon.png' ?>" draggable="false" usemap="#gmimap0" style="user-select: none;border: 0px;padding: 0px;margin: 0px;max-width: none;">
+
+                              <div class="searchGrp map-search-box" id="searchGrp">
+                                    <input type="text" class="form-control pac-target-input" placeholder="Search for area, block, street name..." style="padding-right:25px;height:40px;" id="placeSearch" autocomplete="off" autocorrect="off">
+                              </div>
+
+                            <div id="map">
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close">Accept</button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
 
           <?= $form->field($model, 'address')->textInput(['maxlength' => true,'style' => 'display:none'])->label(false) ?>
           <?= $form->field($model, 'latitude')->textInput(['maxlength' => true,'style' => 'display:none'])->label(false) ?>
           <?= $form->field($model, 'longitude')->textInput(['maxlength' => true,'style' => 'display:none'])->label(false) ?>
 
 
-
-          <div class="form-group">
-              <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
-
-
-          </div>
-<?php ActiveForm::end(); ?>
       </div>
 
 </div>
 
-<!-- Vertical modal -->
-<div class="vertical-modal-ex">
-    <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#exampleModalCenter">
-        Vertically Centered
-    </button>
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document" style="height:100%">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalCenterTitle">Business Address</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
+<div class="card">
+  <div class="card-header">
+    <h3>Delivery Integration Info </h3>
+  </div>
 
+  <div class="row">
+    <div class="col-12 col-sm-6 col-lg-6">
 
-                <div class="modal-body">
-                    <img alt="" class="map-marker-img" src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/marker-icon.png' ?>" draggable="false" usemap="#gmimap0" style="user-select: none;border: 0px;padding: 0px;margin: 0px;max-width: none;">
-                  <div id="map">
-                  </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close">Accept</button>
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-body" style="padding-bottom: 0px;">
+                        <h4 class="card-title">Mashkor Delivery</h4>
+                        <a class="mb-4 text-primary-base hover:text-primary-700" rel="noopener noreferrer" target="_blank" href="https://www.plugn.io/local-delivery/kuwait/mashkor">
+                          <span>Learn more about Mashkor Delivery
+                            <svg width="24" height="24" viewBox="0 0 24 24" class="inline"><g fill="none" fill-rule="evenodd"><path d="M0 0h24v24H0z"></path><path fill="#3852CA" fill-rule="nonzero" d="M7.333 7.2h4a.8.8 0 0 1 .1 1.594l-.1.006h-4a.488.488 0 0 0-.377.156.481.481 0 0 0-.15.289l-.006.088v7.334c0 .412.074.518.436.531l.097.002h7.334c.412 0 .518-.074.531-.436l.002-.097v-4a.8.8 0 0 1 1.594-.1l.006.1v4c0 1.273-.734 2.062-1.963 2.128l-.17.005H7.333c-1.273 0-2.062-.734-2.128-1.963l-.005-.17V9.333c0-.58.214-1.098.625-1.508a2.077 2.077 0 0 1 1.317-.617l.191-.008h4-4zM14 5.2h4.029l.052.004L18 5.2a.805.805 0 0 1 .566.234l-.077-.067a.804.804 0 0 1 .305.533l.002.017a.805.805 0 0 1 .004.065V10a.8.8 0 0 1-1.594.1L17.2 10l-.001-2.069-5.967 5.968a.8.8 0 0 1-1.041.077l-.09-.077a.8.8 0 0 1 0-1.131l5.968-5.969L14 6.8a.8.8 0 0 1-.1-1.594L14 5.2h4-4z"></path></g>
+                            </svg>
+                          </span>
+
+                        </a>
+
+                    </div>
+
+                    <div class="card-body">
+                        <form class="form">
+                            <div class="form-body">
+                              <?= $form->field($model, 'mashkor_branch_id',[
+                                'labelOptions' => [ 'style' => 'font-size: 0.875rem; '],
+                                'options' => ['style' => 'margin-bottom:  0px;'],
+                              ]
+                            )->textInput(['maxlength' => true, 'style' => 'margin-bottom:  0px;','placeholder' => 'Mashkor Branch id']) ?>
+                            </div>
+                    </div>
+
                 </div>
             </div>
+
+      </div>
+
+      <div class="col-12 col-sm-6 col-lg-6">
+
+              <div class="card">
+                  <div class="card-content">
+                      <div class="card-body" style="padding-bottom: 0px;">
+                          <h4 class="card-title">Armada Delivery</h4>
+                          <a class="mb-4 text-primary-base hover:text-primary-700" rel="noopener noreferrer" target="_blank" href="https://www.plugn.io/local-delivery/kuwait/armada">
+                            <span class="block w-full inline" style="direction: ltr;">Learn more about Armada Delivery
+                              <svg width="24" height="24" viewBox="0 0 24 24" class="inline"><g fill="none" fill-rule="evenodd"><path d="M0 0h24v24H0z"></path><path fill="#3852CA" fill-rule="nonzero" d="M7.333 7.2h4a.8.8 0 0 1 .1 1.594l-.1.006h-4a.488.488 0 0 0-.377.156.481.481 0 0 0-.15.289l-.006.088v7.334c0 .412.074.518.436.531l.097.002h7.334c.412 0 .518-.074.531-.436l.002-.097v-4a.8.8 0 0 1 1.594-.1l.006.1v4c0 1.273-.734 2.062-1.963 2.128l-.17.005H7.333c-1.273 0-2.062-.734-2.128-1.963l-.005-.17V9.333c0-.58.214-1.098.625-1.508a2.077 2.077 0 0 1 1.317-.617l.191-.008h4-4zM14 5.2h4.029l.052.004L18 5.2a.805.805 0 0 1 .566.234l-.077-.067a.804.804 0 0 1 .305.533l.002.017a.805.805 0 0 1 .004.065V10a.8.8 0 0 1-1.594.1L17.2 10l-.001-2.069-5.967 5.968a.8.8 0 0 1-1.041.077l-.09-.077a.8.8 0 0 1 0-1.131l5.968-5.969L14 6.8a.8.8 0 0 1-.1-1.594L14 5.2h4-4z"></path></g>
+                              </svg>
+                            </span>
+
+                          </a>
+
+                      </div>
+                      <div class="card-body">
+                          <form class="form">
+                              <div class="form-body">
+                                <?= $form->field($model, 'armada_api_key',[
+                                  'labelOptions' => [ 'style' => 'font-size: 0.875rem; '],
+                                  'options' => ['style' => 'margin-bottom:  0px;'],
+                                ]
+                              )->textInput(['maxlength' => true, 'style' => 'margin-bottom:  0px;','placeholder' => 'Armada Api Key']) ?>
+                              </div>
+                      </div>
+                  </div>
+              </div>
+
         </div>
+
     </div>
+
 </div>
 
 
+
+
+<div class="form-group">
+    <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+</div>
+
+<p><span id="start"></span></p>
+<p><span id="end"></span></p>
+
+<?php ActiveForm::end(); ?>
+
+
+
+<!-- <img src="https://maps.googleapis.com/maps/api/staticmap?center=Bahrain+Manamah&zoom=13&size=600x300&maptype=roadmap&markers=color:blue%7Clabel:S%7C40.702147,-74.015794&markers=color:green%7Clabel:G%7C40.711614,-74.012318&markers=color:red%7Clabel:C%7C40.718217,-73.998284&key=AIzaSyCFeQ-wuP5iWVRTwMn5nZZeOE8yjGESFa8" /> -->
 
       <!-- <p><span id="start"></span></p>
       <p><span id="end"></span></p>
