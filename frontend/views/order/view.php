@@ -98,7 +98,9 @@ $this->registerJs($js);
 
         if ($model->order_mode == Order::ORDER_MODE_DELIVERY) {
 
-            if ( ( ($model->area_id && ($model->area->country->country_name == 'Kuwait' || $model->area->country->country_name == 'Bahrain')) || ($model->shipping_country_id && ($model->country->country_name == 'Kuwait' || $model->country->country_name == 'Bahrain'))    )  && $model->restaurant->armada_api_key != null && $model->armada_tracking_link == null) {
+            if ( ( ($model->area_id && ($model->area->country->country_name == 'Kuwait' || $model->area->country->country_name == 'Bahrain')) || ($model->shipping_country_id && ($model->country->country_name == 'Kuwait' || $model->country->country_name == 'Bahrain'))    )  &&
+             ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $model->deliveryZone->businessLocation->armada_api_key != null) && $model->armada_tracking_link == null
+           ) {
 
                 if ( $difference <= 1  && $model->restaurant->hide_request_driver_button ){
                           echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
@@ -124,7 +126,8 @@ $this->registerJs($js);
 
             }
 
-            if (( ($model->area_id && $model->area->country->country_name == 'Kuwait') || ($model->shipping_country_id && $model->country->country_name == 'Kuwait' )    ) &&   $model->restaurant->mashkor_branch_id != null && $model->mashkor_order_number == null) {
+            if (( ($model->area_id && $model->area->country->country_name == 'Kuwait') || ($model->shipping_country_id && $model->country->country_name == 'Kuwait' )    ) &&
+              ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $model->deliveryZone->businessLocation->mashkor_branch_id != null) && $model->mashkor_order_number == null) {
 
                 if ($difference <= 1  && $model->restaurant->hide_request_driver_button ){
                   echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [

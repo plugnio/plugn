@@ -45,7 +45,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
             [['business_location_tax'], 'default', 'value' => 0],
             [['business_location_tax'], 'number', 'min' => 0, 'max' => 100],
             [['restaurant_uuid'], 'string', 'max' => 60],
-            [['business_location_name', 'business_location_name_ar','address'], 'string', 'max' => 255],
+            [['business_location_name', 'business_location_name_ar','address','armada_api_key', 'mashkor_branch_id'], 'string', 'max' => 255],
             [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country_id' => 'country_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
