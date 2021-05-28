@@ -68,7 +68,7 @@ class BusinessLocationController extends Controller {
      */
     public function actionList($store_uuid) {
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+      Yii::$app->accountManager->getManagedAccount($store_uuid);
 
           $businessLocations =  BusinessLocation::find()
                     ->with(['country'])
@@ -78,7 +78,6 @@ class BusinessLocationController extends Controller {
             'query' => $businessLocations
           ]);
 
-      }
 
     }
 

@@ -327,8 +327,25 @@ public function getAccessToken() {
         return $this->isOwner;
     }
 
+
     /**
-     * Get all RestauranZ accounts this agent is assigned to manage
+     * @inheritdoc
+     */
+    public function fields() {
+        $fields = parent::fields();
+
+        // remove fields that contain sensitive information
+        unset($fields['agent_auth_key']);
+        unset($fields['agent_password_hash']);
+        unset($fields['agent_password_reset_token']);
+
+        return $fields;
+    }
+
+
+
+    /**
+     * Get all Restaurant accounts this agent is assigned to manage
      * @return \yii\db\ActiveQuery
      */
     public function getAccountsManaged()

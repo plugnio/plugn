@@ -89,6 +89,24 @@ return [
                         'OPTIONS <category_id>/<store_uuid>' => 'options',
                     ]
                 ],
+                [// StaffController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/staff',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        'POST' => 'filter',
+                        'POST create' => 'create',
+                        'PATCH <assignment_id>/<store_uuid>' => 'update',
+                        'DELETE <assignment_id>/<store_uuid>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS <agent_assignment_id>/<store_uuid>' => 'options',
+                    ]
+                ],
                 [// bankController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/bank',

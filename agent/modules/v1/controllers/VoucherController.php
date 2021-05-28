@@ -68,7 +68,7 @@ class VoucherController extends Controller {
      */
     public function actionList($store_uuid) {
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+      Yii::$app->accountManager->getManagedAccount($store_uuid);
 
           $vouchers =  Voucher::find()
                     ->where(['restaurant_uuid' => $store_uuid]);
@@ -78,7 +78,6 @@ class VoucherController extends Controller {
               'query' => $vouchers
           ]);
 
-      }
 
     }
 
@@ -88,7 +87,7 @@ class VoucherController extends Controller {
       */
       public function actionFilter($store_uuid)
       {
-        if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+         Yii::$app->accountManager->getManagedAccount($store_uuid);
 
           $keyword = Yii::$app->request->get('keyword');
 
@@ -106,7 +105,7 @@ class VoucherController extends Controller {
               'query' => $query
           ]);
 
-        }
+        
       }
 
 
@@ -286,7 +285,7 @@ class VoucherController extends Controller {
    protected function findModel($voucher_id, $store_uuid)
    {
        $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
-       
+
        if (($model = Voucher::find()->where(['voucher_id' => $voucher_id, 'restaurant_uuid' => $store_model->restaurant_uuid])->one()) !== null) {
            return $model;
        } else {
