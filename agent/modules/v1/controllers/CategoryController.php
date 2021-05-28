@@ -88,7 +88,7 @@ class CategoryController extends Controller {
    */
     public function actionFilter($store_uuid)
     {
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+      Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $keyword = Yii::$app->request->get('keyword');
 
@@ -107,30 +107,189 @@ class CategoryController extends Controller {
             'query' => $query
         ]);
 
-      }
     }
 
 
     /**
-    * Return Category detail
-     * @param type $store_uuid
-     * @param type $category_id
-     * @return type
+     * Create category
+     * @return array
      */
-    public function actionDetail($store_uuid, $category_id) {
+    public function actionCreate() {
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+        $store_uuid = Yii::$app->request->getBodyParam("store_uuid");
+        Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-        $category_model =  Category::find()
-                  ->where(['restaurant_uuid' => $store_uuid])
-                  ->andWhere(['category_id' => $category_id])
-                  ->one();
+        $model = new Category();
+        $model->restaurant_uuid = $store_uuid;
+        $model->title = Yii::$app->request->getBodyParam("title");
+        $model->title_ar = Yii::$app->request->getBodyParam("title_ar");
+        $model->subtitle = Yii::$app->request->getBodyParam("subtitle");
+        $model->subtitle_ar = Yii::$app->request->getBodyParam("subtitle_ar");
+        $model->sort_number = Yii::$app->request->getBodyParam("sort_number");
 
-        return $category_model;
+
+        if (!$model->save()) {
+            return [
+                "operation" => "error",
+                "message" => $model->errors
+            ];
+        }
+
+        return [
+            "operation" => "success",
+            "message" => "Category created successfully",
+            "model" => Category::findOne($model->category_id)
+        ];
+
+    }
+
+
+     /**
+      * Update category
+      */
+     public function actionUpdate($category_id, $store_uuid)
+     {
+
+         $model = $this->findModel($category_id, $store_uuid);
+
+         $model->title = Yii::$app->request->getBodyParam("title");
+         $model->title_ar = Yii::$app->request->getBodyParam("title_ar");
+         $model->subtitle = Yii::$app->request->getBodyParam("subtitle");
+         $model->subtitle_ar = Yii::$app->request->getBodyParam("subtitle_ar");
+         $model->sort_number = Yii::$app->request->getBodyParam("sort_number");
+
+
+         if (!$model->save())
+         {
+             if (isset($model->errors)) {
+                 return [
+                     "operation" => "error",
+                     "message" => $model->errors
+                 ];
+             } else {
+                 return [
+                     "operation" => "error",
+                     "message" => "We've faced a problem updating the category"
+                 ];
+             }
+         }
+
+         return [
+             "operation" => "success",
+             "message" => "Category updated successfully",
+             "model" => $model
+         ];
+     }
+
+
+
+    /**
+     * Allows agent to upload category image
+     */
+    // public function actionUploadCategoryImage() {
+    //
+    //     $category_image = urldecode(Yii::$app->request->getBodyParam('category_image'));
+    //     $store_uuid = Yii::$app->request->getBodyParam('store_uuid');
+    //
+    //     $model = $this->findModel($category_id, $store_uuid);
+    //
+    //     if (!isset($model->category_id)) {
+    //         return [
+    //             "operation" => "error",
+    //             "message" => 'Invalid Category ID'
+    //         ];
+    //     }
+    //
+    //
+    //     //Delete old category image
+    //     if ($model->category_image) {
+    //         $model->deleteCategoryImage();
+    //     }
+    //
+    //     $model->category_image = basename($category_image);
+    //
+    //     $result = $model->uploadImage();
+    //
+    //     if ($result) {
+    //         return [
+    //             'operation' => 'success',
+    //             'url' => Url::to("@categoty-image/" . 'restaurants/' . $model->restaurant_uuid . "/category/" . $model->category_image),
+    //             'logo' => $model->category_image,
+    //             'message' => Yii::t('app', 'Category Image Uploaded Successfully')
+    //         ];
+    //     } else {
+    //         return [
+    //             'operation' => 'error',
+    //             'message' => $model->errors
+    //         ];
+    //     }
+    // }
+
+
+
+      /**
+       * Delete Category
+       */
+      public function actionDelete($category_id, $store_uuid)
+      {
+          Yii::$app->accountManager->getManagedAccount($store_uuid);
+          $model =  $this->findModel($category_id, $store_uuid);
+
+          if (!$model->delete())
+          {
+              if (isset($model->errors)) {
+                  return [
+                      "operation" => "error",
+                      "message" => $model->errors
+                  ];
+              } else {
+                  return [
+                      "operation" => "error",
+                      "message" => "We've faced a problem deleting the category"
+                  ];
+              }
+          }
+
+          return [
+              "operation" => "success",
+              "message" => "Category deleted successfully"
+          ];
+      }
+
+
+        /**
+        * Return Category detail
+         * @param type $store_uuid
+         * @param type $category_id
+         * @return type
+         */
+        public function actionDetail($store_uuid, $category_id) {
+
+            $model =  $this->findModel($category_id, $store_uuid);
+
+            return $model;
 
       }
 
-  }
+
+      /**
+       * Finds the Category model based on its primary key value.
+       * If the model is not found, a 404 HTTP exception will be thrown.
+       * @param integer $id
+       * @return Country the loaded model
+       * @throws NotFoundHttpException if the model cannot be found
+       */
+      protected function findModel($category_id, $store_uuid)
+      {
+          $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
+
+          if (($model = Category::find()->where(['category_id' => $category_id, 'restaurant_uuid' => $store_model->restaurant_uuid])->one()) !== null) {
+              return $model;
+          } else {
+              throw new NotFoundHttpException('The requested record does not exist.');
+          }
+      }
+
 
 
 }

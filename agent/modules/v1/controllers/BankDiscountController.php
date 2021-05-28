@@ -68,7 +68,7 @@ class BankDiscountController extends Controller {
      */
     public function actionList($store_uuid) {
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+          Yii::$app->accountManager->getManagedAccount($store_uuid);
 
           $bankDiscounts =  BankDiscount::find()
                     ->where(['restaurant_uuid' => $store_uuid]);
@@ -77,7 +77,6 @@ class BankDiscountController extends Controller {
             'query' => $bankDiscounts
           ]);
 
-      }
 
     }
 
@@ -87,7 +86,7 @@ class BankDiscountController extends Controller {
    */
     public function actionFilter($store_uuid)
     {
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+        Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $keyword = Yii::$app->request->get('keyword');
 
@@ -108,7 +107,6 @@ class BankDiscountController extends Controller {
             'query' => $query
         ]);
 
-      }
     }
 
 
@@ -145,7 +143,7 @@ class BankDiscountController extends Controller {
         return [
             "operation" => "success",
             "message" => "Bank Discount created successfully",
-            "data" => BankDiscount::findOne($model->bank_discount_id)
+            "model" => BankDiscount::findOne($model->bank_discount_id)
         ];
 
     }
@@ -188,8 +186,42 @@ class BankDiscountController extends Controller {
 
          return [
              "operation" => "success",
-             "message" => "Bank Discount updated successfully"
+             "message" => "Bank Discount updated successfully",
+             "model" => $model
          ];
+     }
+
+
+     /**
+      * Ability to update bank discount status
+      */
+     public function actionUpdateBankDiscountStatus() {
+
+
+         $store_uuid =  Yii::$app->request->getBodyParam('store_uuid');
+         $bank_discount_id =  Yii::$app->request->getBodyParam('bank_discount_id');
+         $bankDiscountStatus = (int) Yii::$app->request->getBodyParam('bankDiscountStatus');
+
+
+         $bank_discount_model = $this->findModel($bank_discount_id, $store_uuid);
+
+         if ($bankDiscountStatus) {
+              $bank_discount_model->bank_discount_status = $bankDiscountStatus;
+
+             if (!$bank_discount_model->save()) {
+                 return [
+                     "operation" => "error",
+                     "message" => $bank_discount_model->errors
+                 ];
+             }
+
+             return [
+                 "operation" => "success",
+                 "message" => "Bank Discount Status updated successfully",
+                 "model" => $model
+             ];
+         }
+
      }
 
 
@@ -202,8 +234,6 @@ class BankDiscountController extends Controller {
      * @return type
      */
     public function actionDetail($store_uuid, $bank_discount_id) {
-
-        Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $bank_discount_model =  $this->findModel($bank_discount_id, $store_uuid);
 
@@ -251,7 +281,9 @@ class BankDiscountController extends Controller {
      */
     protected function findModel($bank_discount_id, $store_uuid)
     {
-        if (($model = BankDiscount::find()->where(['bank_discount_id' => $bank_discount_id, 'restaurant_uuid' => $store_uuid])->one()) !== null) {
+        $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
+
+        if (($model = BankDiscount::find()->where(['bank_discount_id' => $bank_discount_id, 'restaurant_uuid' => $store_model->restaurant_uuid])->one()) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested record does not exist.');

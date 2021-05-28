@@ -68,7 +68,7 @@ class BankController extends Controller {
      */
     public function actionList($store_uuid) {
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+          Yii::$app->accountManager->getManagedAccount($store_uuid);
 
           $banks =  Bank::find();
 
@@ -78,7 +78,7 @@ class BankController extends Controller {
           ]);
 
 
-      }
+
 
     }
 

@@ -79,9 +79,14 @@ return [
                         'GET' => 'list',
                         'GET detail' => 'detail',
                         'POST' => 'filter',
+                        'POST create' => 'create',
+                        'PATCH <category_id>/<store_uuid>' => 'update',
+                        'DELETE <category_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS <category_id>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// bankController
@@ -131,10 +136,12 @@ return [
                         'POST' => 'filter',
                         'POST create' => 'create',
                         'PATCH <voucher_id>/<store_uuid>' => 'update',
+                        'PATCH update-status' => 'update-voucher-status',
                         'DELETE <voucher_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
+                        'OPTIONS update-status' => 'options',
                         'OPTIONS <voucher_id>/<store_uuid>' => 'options',
                         'OPTIONS create' => 'options'
                     ]
@@ -149,10 +156,12 @@ return [
                         'POST' => 'filter',
                         'POST create' => 'create',
                         'PATCH <bank_discount_id>/<store_uuid>' => 'update',
+                        'PATCH update-status' => 'update-bank-discount-status',
                         'DELETE <bank_discount_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
+                        'OPTIONS update-status' => 'options',
                         'OPTIONS <bank_discount_id>/<store_uuid>' => 'options',
                         'OPTIONS create' => 'options'
                     ]

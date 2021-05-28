@@ -36,6 +36,10 @@ class Category extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['title', 'title_ar'], 'required'],
+            //Upload Category Image
+            // ['category_image', 'file', 'extensions' => 'jpg, png, gif', 'maxSize' => 10000000,
+            //     'wrongExtension' => Yii::t('app', 'Only files with these extensions are allowed for your Image: {extensions}')
+            // ],
             [['image'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['sort_number'], 'integer', 'min' => 0],
             [['restaurant_uuid'], 'string', 'max' => 60],
@@ -59,6 +63,19 @@ class Category extends \yii\db\ActiveRecord {
             'restaurant_uuid' => 'Restaurant UUID',
         ];
     }
+
+
+
+    /**
+     * Scenarios for validation and massive assignment
+     */
+    // public function scenarios() {
+    //     $scenarios = parent::scenarios();
+    //
+    //     $scenarios['updateImage'] = ['employer_logo'];
+    //
+    //     return $scenarios;
+    // }
 
     /**
      *
@@ -109,7 +126,7 @@ class Category extends \yii\db\ActiveRecord {
 
 
     /**
-     * Upload category image  to cloudinary
+     * Upload category image to cloudinary
      * @param type $imageURL
      */
     public function uploadCategoryImage($imageURL) {
@@ -142,6 +159,54 @@ class Category extends \yii\db\ActiveRecord {
             Yii::error("Error when uploading category image to Cloudinry: ImageUrl Value " . json_encode($imageURL));
         }
     }
+
+
+
+
+  /**
+   * Upload category image to cloudinary
+   */
+  // public function uploadImage() {
+  //
+  //     if (!$this->category_image) {
+  //         $this->addError('category image', Yii::t('app', 'Image not available to save.'));
+  //         return false;
+  //     }
+  //
+  //     try {
+  //         $url = Yii::$app->temporaryBucketResourceManager->getUrl($this->category_image);
+  //
+  //         $filename = Yii::$app->security->generateRandomString();
+  //
+  //         $result = Yii::$app->cloudinaryManager->upload(
+  //             $url, [
+  //               'public_id' => "restaurants/" . $this->restaurant_uuid . "/category/" . $filename
+  //             ]
+  //         );
+  //
+  //         if ($result) {
+  //             $this->category_image = basename($result['url']);
+  //             // $this->scenario = 'updateLogo';
+  //             return $this->save();
+  //         }
+  //     } catch (\Cloudinary\Error  $e) {
+  //
+  //         Yii::error($e->getMessage(), 'category');
+  //
+  //         $this->addError('category_image', Yii::t('app', 'Please try again.'));
+  //
+  //         return false;
+  //
+  //     } catch (Exception  $e) {
+  //
+  //         Yii::error($e->getMessage(), 'cateogry');
+  //
+  //         $this->addError('category_image', Yii::t('app', 'Image not available to save.'));
+  //
+  //         return false;
+  //     }
+  // }
+
 
     /**
      * @return \yii\db\ActiveQuery

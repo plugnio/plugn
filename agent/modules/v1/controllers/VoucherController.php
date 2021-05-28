@@ -189,11 +189,45 @@ class VoucherController extends Controller {
 
          return [
              "operation" => "success",
-             "message" => "Voucher updated successfully"
+             "message" => "Voucher updated successfully",
+             "data" => $model
          ];
      }
 
 
+
+      /**
+       * Ability to update voucher status
+       */
+      public function actionUpdateVoucherStatus() {
+
+
+          $store_uuid =  Yii::$app->request->getBodyParam('store_uuid');
+          $voucher_id =  Yii::$app->request->getBodyParam('voucher_id');
+          $voucherStatus = (int) Yii::$app->request->getBodyParam('voucherStatus');
+
+          $voucher_model = $this->findModel($voucher_id, $store_uuid);
+
+
+          if ($voucherStatus) {
+
+              $voucher_model->voucher_status = $voucherStatus;
+
+              if (!$voucher_model->save()) {
+                  return [
+                      "operation" => "error",
+                      "message" => $voucher_model->errors
+                  ];
+              }
+
+              return [
+                  "operation" => "success",
+                  "message" => "Voucher Status updated successfully"
+              ];
+
+          }
+
+      }
 
 
 
@@ -204,8 +238,6 @@ class VoucherController extends Controller {
        * @return type
        */
       public function actionDetail($store_uuid, $voucher_id) {
-
-          Yii::$app->accountManager->getManagedAccount($store_uuid);
 
           $voucher =  $this->findModel($voucher_id, $store_uuid);
 
@@ -253,7 +285,9 @@ class VoucherController extends Controller {
     */
    protected function findModel($voucher_id, $store_uuid)
    {
-       if (($model = Voucher::find()->where(['voucher_id' => $voucher_id, 'restaurant_uuid' => $store_uuid])->one()) !== null) {
+       $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
+       
+       if (($model = Voucher::find()->where(['voucher_id' => $voucher_id, 'restaurant_uuid' => $store_model->restaurant_uuid])->one()) !== null) {
            return $model;
        } else {
            throw new NotFoundHttpException('The requested record does not exist.');
