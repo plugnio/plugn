@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 use common\models\Country;
+use yii\web\View;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\BusinessLocation */
@@ -32,8 +33,8 @@ if ($model->business_location_id) {
     $location = 'Riyadh';
 }
 
-
 ?>
+
 <script type='text/javascript'>
 
 function initMap() {
@@ -42,33 +43,40 @@ function initMap() {
   var theLng      = '<?= $longitude ?>';
 
 
-
+  var zoom = 13;
 
 
   if(!theLat && !theLng){
+
     if (navigator.geolocation) {
+
       navigator.geolocation.getCurrentPosition(
         (position) => {
+
           const pos = {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           };
 
           map.setCenter(pos);
+        }, function(error) {
+
+
+          getLatAndLng();
         }
       );
     } else {
-      if('<?= $location ?>' == 'Kuwait,City'){
-        theLat      = '29.375859';
-        theLng      = '47.9774052';
-      } else if ('<?= $location ?>' == 'Manama'){
-        theLat      = '26.2235305';
-        theLng      = '50.5875935';
-      } else if ('<?= $location ?>' == 'Riyadh'){
-        theLat      = '24.7135517';
-        theLng      = '46.6752957';
-      }
+
+      getLatAndLng();
+
     }
+  } else {
+    zoom = 20;
+  }
+
+
+  if(!theLat && !theLng){
+    getLatAndLng();
   }
 
   var myLatlng = new google.maps.LatLng(theLat,theLng);
@@ -76,7 +84,7 @@ function initMap() {
 
   const map = new google.maps.Map(document.getElementById("map"), {
     center: myLatlng,
-    zoom: 13,
+    zoom: zoom,
     zoomControl: true, // a way to quickly hide all controls
     disableDefaultUI: true, // a way to quickly hide all controls
 
@@ -125,41 +133,39 @@ function initMap() {
       map.setZoom(17);
     }
 
-    infowindowContent.children["place-name"].textContent = place.name;
-    infowindowContent.children["place-address"].textContent =
-      place.formatted_address;
+    // infowindowContent.children["place-name"].textContent = place.name;
+    // infowindowContent.children["place-address"].textContent =
+    //   place.formatted_address;
   });
 
 
   map.addListener('dragend', function() {
 
-        var positionStartLatNew = this.center.lat();
-        var positionStartLngNew = this.center.lng();
-
         map.setCenter(this.center);
-        // map.setZoom(17);
-        document.getElementById('end').innerHTML = "Lat end : " + positionStartLatNew + ", " + "Lng end : " + positionStartLngNew;
 
-   document.getElementById("businesslocation-latitude").value =  this.center.lat();
-   document.getElementById("businesslocation-longitude").value =  this.center.lng();
-
-
+       document.getElementById("businesslocation-latitude").value =  this.center.lat();
+       document.getElementById("businesslocation-longitude").value =  this.center.lng();
 
 });
 
-
-
-
- //  function handleLocationError(browserHasGeolocation, infoWindow, pos) {
- //  infoWindow.setPosition(pos);
- //  infoWindow.setContent(
- //    browserHasGeolocation
- //      ? "Error: The Geolocation service failed."
- //      : "Error: Your browser doesn't support geolocation."
- //  );
- //  infoWindow.open(map);
- // }
 }
+
+
+function getLatAndLng() {
+
+  if('<?= $location ?>' == 'Kuwait,City'){
+    theLat      = '29.375859';
+    theLng      = '47.9774052';
+  } else if ('<?= $location ?>' == 'Manama'){
+    theLat      = '26.2235305';
+    theLng      = '50.5875935';
+  } else if ('<?= $location ?>' == 'Riyadh'){
+    theLat      = '24.7135517';
+    theLng      = '46.6752957';
+  }
+}
+
+
 </script>
 
 <style>
@@ -360,29 +366,13 @@ function initMap() {
 
 
 
-
 <div class="form-group">
     <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
 </div>
 
-<p><span id="start"></span></p>
-<p><span id="end"></span></p>
 
 <?php ActiveForm::end(); ?>
 
 
-
-<!-- <img src="https://maps.googleapis.com/maps/api/staticmap?center=Bahrain+Manamah&zoom=13&size=600x300&maptype=roadmap&markers=color:blue%7Clabel:S%7C40.702147,-74.015794&markers=color:green%7Clabel:G%7C40.711614,-74.012318&markers=color:red%7Clabel:C%7C40.718217,-73.998284&key=AIzaSyCFeQ-wuP5iWVRTwMn5nZZeOE8yjGESFa8" /> -->
-
-      <!-- <p><span id="start"></span></p>
-      <p><span id="end"></span></p>
-
-        <div class="searchGrp map-search-box" id="searchGrp">
-              <input type="text" class="form-control pac-target-input" placeholder="Search for area, block, street name..." style="padding-right:25px;height:40px;" id="placeSearch" autocomplete="off">
-        </div>
-
-      <div id="map"></div>
-      <div id="infowindow-content">
-        <span id="place-name" class="title"></span><br />
-        <span id="place-address"></span>
-      </div> -->
+<!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFeQ-wuP5iWVRTwMn5nZZeOE8yjGESFa8&callback=initMap&libraries=places&v=weekly" async></script>

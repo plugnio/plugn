@@ -576,8 +576,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
 
     <?php $this->endBody() ?>
 
-    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFeQ-wuP5iWVRTwMn5nZZeOE8yjGESFa8&callback=initMap&libraries=places&v=weekly" async></script>
+
 </body>
 <!-- END: Body-->
 

@@ -38,6 +38,35 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
+
+  /**
+   *
+   */
+  public function actionMigrateDeliveryApiKey(){
+
+    $stores = Restaurant::find()
+    ->where(['not', ['armada_api_key' => null]])
+    ->orWhere(['not', ['mashkor_branch_id' => null]])
+    ->all();
+
+    foreach ($stores as $key => $store) {
+
+      foreach ($store->getBusinessLocations()->all() as $key => $branch) {
+        // code...
+        $branch->armada_api_key = $store->armada_api_key;
+        $branch->mashkor_branch_id = $store->mashkor_branch_id;
+
+        if(!$branch->save())
+          die('fuck');
+      }
+
+    }
+
+    $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
+    return self::EXIT_CODE_NORMAL;
+  }
+
+
     /**
      * Weekly Store Summary
      */

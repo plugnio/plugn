@@ -253,11 +253,11 @@ class OrderController extends Controller {
      * @param type $order_uuid
      * @param type $storeUuid
      */
-    public function actionRequestDriverFromMashkor($order_uuid, $storeUuid) {
+    public function actionRequestDriverFromMashkor($order_uuid, $storeUuid, $mashkorBranchId) {
 
         $order_model = $this->findModel($order_uuid, $storeUuid);
 
-        $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($order_model);
+        $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($order_model,$mashkorBranchId);
 
 
         if ($createDeliveryApiResponse->isOk) {
@@ -299,11 +299,11 @@ class OrderController extends Controller {
      * @param type $order_uuid
      * @param type $storeUuid
      */
-    public function actionRequestDriverFromArmada($order_uuid, $storeUuid) {
+    public function actionRequestDriverFromArmada($order_uuid, $storeUuid, $armadaApiKey) {
 
         $order_model = $this->findModel($order_uuid, $storeUuid);
 
-        $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($order_model);
+        $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($order_model, $armadaApiKey);
 
 
         if ($createDeliveryApiResponse->isOk) {
