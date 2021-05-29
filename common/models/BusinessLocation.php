@@ -50,7 +50,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
-
+  
     /**
      * {@inheritdoc}
      */
