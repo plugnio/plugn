@@ -62,7 +62,31 @@ class DeliveryZoneController extends Controller {
 
 
     /**
-    * Return Business Location detail
+    * Get all delivery zones
+     * @param type $id
+     * @param type $store_uuid
+     * @return type
+     */
+    public function actionList($store_uuid,$business_location_id) {
+
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+
+        $query =  DeliveryZone::find()
+                  ->where(['restaurant_uuid' => $store_uuid])
+                  ->andWhere(['business_location_id' => $business_location_id]);
+
+          return new ActiveDataProvider([
+            'query' => $query
+          ]);
+
+      }
+
+    }
+
+
+
+    /**
+    * Return Delivery zone detail
      * @param type $store_uuid
      * @param type $order_uuid
      * @return type
@@ -72,26 +96,13 @@ class DeliveryZoneController extends Controller {
       if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
         $deliveryZone =  DeliveryZone::find()
-                  ->with(['areas','country'])
                   ->where(['restaurant_uuid' => $store_uuid])
                   ->andWhere(['business_location_id' => $business_location_id])
                   ->andWhere(['delivery_zone_id' => $delivery_zone_id])
-                  ->asArray()
                   ->one();
 
 
-          if (!$deliveryZone) {
-
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found.'
-              ];
-          }
-
-          return [
-              'operation' => 'success',
-              'body' => $deliveryZone
-          ];
+         return $deliveryZone;
 
       }
 

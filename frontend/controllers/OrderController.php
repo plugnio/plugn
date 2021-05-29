@@ -57,9 +57,10 @@ class OrderController extends Controller {
     public function actionIndex($storeUuid) {
 
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $agentAssignment = $restaurant_model->getAgentAssignments()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->one();
 
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid, $agentAssignment );
 
         return $this->render('index', [
                     'searchModel' => $searchModel,
@@ -217,9 +218,10 @@ class OrderController extends Controller {
     public function actionDraft($storeUuid) {
 
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $agentAssignment = $restaurant_model->getAgentAssignments()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->one();
 
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->searchDraftOrders(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
+        $dataProvider = $searchModel->searchDraftOrders(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid, $agentAssignment);
 
         return $this->render('draft', [
                     'searchModel' => $searchModel,
@@ -235,9 +237,10 @@ class OrderController extends Controller {
     public function actionAbandonedCheckout($storeUuid) {
 
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $agentAssignment = $restaurant_model->getAgentAssignments()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->one();
 
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->searchAbandonedCheckoutOrders(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
+        $dataProvider = $searchModel->searchAbandonedCheckoutOrders(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid, $agentAssignment);
 
 
 

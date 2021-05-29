@@ -71,25 +71,43 @@ class ItemController extends Controller {
       if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
           $items =  Item::find()
-                    ->where(['restaurant_uuid' => $store_uuid])
-                    ->asArray()
-                    ->all();
+                    ->where(['restaurant_uuid' => $store_uuid]);
 
-
-          if (!$items) {
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found'
-              ];
-          }
-
-          return [
-              'operation' => 'success',
-              'body' => $items
-          ];
+            return new ActiveDataProvider([
+                'query' => $items
+            ]);
 
       }
 
+    }
+
+
+
+    /**
+    * Return a List of Item by keyword
+    */
+    public function actionFilter($store_uuid)
+    {
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+
+        $keyword = Yii::$app->request->get('keyword');
+
+        $query =  Item::find();
+
+        if($keyword) {
+              $query->where(['like', 'item_name', $keyword]);
+              $query->orWhere(['like', 'item_name_ar', $keyword]);
+              $query->orWhere(['like', 'item_description', $keyword]);
+              $query->orWhere(['like', 'item_description_ar', $keyword]);
+        }
+
+        $query->andWhere(['restaurant_uuid' => $store_uuid]);
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+
+      }
     }
 
 
@@ -106,22 +124,10 @@ class ItemController extends Controller {
           $item =  Item::find()
                     ->where(['restaurant_uuid' => $store_uuid])
                     ->andWhere(['item_uuid' => $item_uuid])
-                    ->asArray()
                     ->one();
 
 
-          if (!$item) {
-
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found.'
-              ];
-          }
-
-          return [
-              'operation' => 'success',
-              'body' => $item
-          ];
+          return $item;
 
       }
 

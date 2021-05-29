@@ -70,26 +70,40 @@ class CountryController extends Controller {
 
       if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
-          $countries =  Country::find()
-                    ->asArray()
-                    ->all();
+          $query =  Country::find();
 
-
-          if (!$countries) {
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found'
-              ];
-          }
-
-          return [
-              'operation' => 'success',
-              'body' => $countries
-          ];
-
+          return new ActiveDataProvider([
+              'query' => $query
+          ]);
       }
 
     }
+
+
+    /**
+    * Return a List of Country by keyword
+   */
+    public function actionFilter($store_uuid)
+    {
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+
+        $keyword = Yii::$app->request->get('keyword');
+
+        $query =  Country::find();
+
+        if($keyword) {
+              $query->where(['like', 'country_name', $keyword]);
+              $query->orWhere(['like', 'country_name_ar', $keyword]);
+        }
+
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+
+      }
+    }
+
 
     /**
     * Return Country detail
@@ -107,19 +121,7 @@ class CountryController extends Controller {
                   ->asArray()
                   ->one();
 
-
-          if (!$country) {
-
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found.'
-              ];
-          }
-
-          return [
-              'operation' => 'success',
-              'body' => $country
-          ];
+          return $country;
 
       }
 

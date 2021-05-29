@@ -155,27 +155,13 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
               <?php if($model->special_directions) { ?>
 
-                <div class="invoice-details my-2">
-                    <div class="row">
 
-                      <div class=" col-12 text-left">
-                        <span>
-                          <span style="    padding-left: 10px;">
-                          </span>
-                        </span>
-
-                      </div>
-
-                    </div>
-
-
-                </div>
               <div class="invoice-details my-2">
                   <div class="row">
 
                     <div class=" col-12 text-left">
                       <span>
-                        <b>Customer: </b>
+                        <b>Customer </b>
                         <span style="    padding-left: 10px;">
                           <?=  $model->customer_name ?>
                         </span>
@@ -190,9 +176,26 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
               <div class="invoice-details my-2">
                   <div class="row">
 
+                    <div class=" col-12 text-left">
+                      <span>
+                        <b>Payment Method</b>
+                        <span style="    padding-left: 10px;">
+                          <?=  $model->payment_method_name ?>
+                        </span>
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+              </div>
+              <div class="invoice-details my-2">
+                  <div class="row">
+
                     <div class="col-12 text-left">
                       <span>
-                        <b>Special Directions: </b>
+                        <b>Special Directions </b>
                         <span style="    padding-left: 10px;">
                           <?=  $model->special_directions ?>
                         </span>
@@ -223,12 +226,16 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
               </div>
 
+
+
               <div class="invoice-details my-2">
                   <div class="row">
 
                     <div class=" col-12 text-left">
                       <span>
+                        <b>Customer </b>
                         <span style="    padding-left: 10px;">
+                          <?=  $model->customer_name ?>
                         </span>
                       </span>
 
@@ -245,9 +252,9 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
                     <div class=" col-12 text-left">
                       <span>
-                        <b>Customer: </b>
+                        <b>Payment Method</b>
                         <span style="    padding-left: 10px;">
-                          <?=  $model->customer_name ?>
+                          <?=  $model->payment_method_name ?>
                         </span>
                       </span>
 
@@ -305,12 +312,12 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                       <div class="col-sm-1 col-12 text-left">
                       </div>
                       <div class="col-sm-5 col-12 text-left">
-                        <span><b>Payment Method</b></span>
+                        <span><b>When</b></span>
 
                       </div>
                       <div class="col-sm-6 col-12 text-right">
                         <span>
-                          <?= $model->payment_method_name ?>
+                          <?=  $model->is_order_scheduled ? 'Scheduled' : 'As soon as possible'; ?>
                         </span>
 
                       </div>

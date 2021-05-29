@@ -32,11 +32,19 @@ $this->params['breadcrumbs'][] = $this->title;
               'attribute' => 'agent_name',
               'value' =>     'agent.agent_name'
             ],
+        
             [
                 'attribute' => 'role',
                 'format' => 'html',
                 'value' => function ($data) {
-                    return $data->role == AgentAssignment::AGENT_ROLE_OWNER ? 'Owner' : 'Staff';
+                    if($data->role == AgentAssignment::AGENT_ROLE_OWNER)
+                      $role = 'Owner';
+                    else  if($data->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER)
+                      $role = 'Branch Manager';
+                    else
+                      $role = 'Staff';
+
+                    return $role;
                 },
             ],
             'assignment_agent_email:email',

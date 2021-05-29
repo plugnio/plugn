@@ -54,12 +54,21 @@ return [
                         'GET draft' => 'list-draft-orders',
                         'GET abandoned' => 'list-abandoned-orders',
                         'GET detail' => 'detail',
+                        'POST filter-pending' => 'filter-pending',
+                        'POST filter-abandoned' => 'filter-abandoned',
+                        'POST filter-draft' => 'filter-draft',
+                        'POST filter-active' => 'filter-active',
+
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS active' => 'options',
                         'OPTIONS draft' => 'options',
                         'OPTIONS abandoned' => 'options',
                         'OPTIONS detail' => 'options',
+                        'OPTIONS filter-pending' => 'options',
+                        'OPTIONS filter-active' => 'options',
+                        'OPTIONS filter-draft' => 'options',
+                        'OPTIONS filter-abandoned' => 'options',
                     ]
                 ],
                 [// CategoryController
@@ -68,8 +77,34 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',
+                        'GET detail' => 'detail',
+                        'POST' => 'filter',
+                        'POST create' => 'create',
+                        'PATCH <category_id>/<store_uuid>' => 'update',
+                        'DELETE <category_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
-                        'OPTIONS' => 'options'
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS <category_id>/<store_uuid>' => 'options',
+                    ]
+                ],
+                [// StaffController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/staff',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        'POST' => 'filter',
+                        'POST create' => 'create',
+                        'PATCH <assignment_id>/<store_uuid>' => 'update',
+                        'DELETE <assignment_id>/<store_uuid>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS <agent_assignment_id>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// bankController
@@ -89,6 +124,7 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST' => 'filter',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options'
@@ -100,8 +136,12 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'detail',
+                        'PUT update' => 'update-agent-profile',
+                        'POST change-password' => 'change-password',
                         // OPTIONS VERBS
-                        'OPTIONS' => 'options'
+                        'OPTIONS' => 'options',
+                        'OPTIONS update' => 'options',
+                        'OPTIONS change-password' => 'options',
                     ]
                 ],
                 [// VoucherController
@@ -111,9 +151,17 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST' => 'filter',
+                        'POST create' => 'create',
+                        'PATCH <voucher_id>/<store_uuid>' => 'update',
+                        'PATCH update-status' => 'update-voucher-status',
+                        'DELETE <voucher_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS update-status' => 'options',
+                        'OPTIONS <voucher_id>/<store_uuid>' => 'options',
+                        'OPTIONS create' => 'options'
                     ]
                 ],
                 [// BankDiscountController
@@ -123,9 +171,17 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST' => 'filter',
+                        'POST create' => 'create',
+                        'PATCH <bank_discount_id>/<store_uuid>' => 'update',
+                        'PATCH update-status' => 'update-bank-discount-status',
+                        'DELETE <bank_discount_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS update-status' => 'options',
+                        'OPTIONS <bank_discount_id>/<store_uuid>' => 'options',
+                        'OPTIONS create' => 'options'
                     ]
                 ],
                 [// DeliveryZoneController
@@ -133,6 +189,7 @@ return [
                     'controller' => 'v1/delivery-zone',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET' => 'list',
                         'GET detail' => 'detail',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
@@ -146,6 +203,7 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST' => 'filter',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options'
@@ -158,6 +216,7 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST' => 'filter',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options'
@@ -170,9 +229,12 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST' => 'filter',
+                        'GET orders' => 'list-all-customer-orders',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS orders' => 'options'
                     ]
                 ],
                 [// BusinessLocationController
@@ -182,6 +244,7 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST' => 'filter',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options'
@@ -204,9 +267,11 @@ return [
                    'pluralize' => false,
                    'patterns' => [
                        'GET login' => 'login',
+                       'POST request-reset-password' => 'request-reset-password',
 
                        // OPTIONS VERBS
-                       'OPTIONS login' => 'options'
+                       'OPTIONS login' => 'options',
+                       'OPTIONS request-reset-password' => 'options',
                    ]
                ],
             ],

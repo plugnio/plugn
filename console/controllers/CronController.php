@@ -7,6 +7,7 @@ use common\models\Restaurant;
 use common\models\OrderItem;
 use common\models\Queue;
 use common\models\TapQueue;
+use common\models\AgentAssignment;
 use common\models\Voucher;
 use common\models\BankDiscount;
 use common\models\Payment;
@@ -20,6 +21,7 @@ use common\models\Subscription;
 use common\models\OpeningHour;
 use common\models\CountryPaymentMethod;
 use common\models\Country;
+use common\models\Agent;
 use common\models\ExtraOption;
 use common\models\ItemImage;
 use common\models\AreaDeliveryZone;
@@ -74,7 +76,6 @@ class CronController extends \yii\console\Controller {
 
         $stores = Restaurant::find()
                 ->all();
-
 
           foreach ($stores as $key => $store) {
 
@@ -160,14 +161,22 @@ class CronController extends \yii\console\Controller {
 
                 if($lastWeekOrdersReceived > 0 || $thisWeekOrdersReceived > 0) {
 
-                  foreach ($store->getOwnerAgent()->where(['receive_weekly_stats' => 1])->all() as $agent) {
+                  $agentAssignments = $store->getAgentAssignments()
+                              ->where([
+                                          'role' => AgentAssignment::AGENT_ROLE_OWNER,
+                                          'receive_weekly_stats' => 1
+                                      ])
+                              ->all();
 
-                    if($agent->receive_weekly_stats){
-                      \Yii::$app->mailer->compose([
+                  foreach ($agentAssignments as $key => $agentAssignment) {
+
+                    if($agentAssignment->receive_weekly_stats){
+
+                      $weeklyStoreSummaryEmail = \Yii::$app->mailer->compose([
                              'html' => 'weekly-summary',
                                  ], [
                              'store' => $store,
-                             'agent_name' => $agent->agent_name,
+                             'agent_name' => $agentAssignment->agent->agent_name,
                              'revenuePercentage' => $revenuePercentage,
                              'ordersReceivedPercentage' => $ordersReceivedPercentage,
                              'customerGainedPercentage' => $customerGainedPercentage,
@@ -177,10 +186,14 @@ class CronController extends \yii\console\Controller {
 
                          ])
                          ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-                         ->setTo([$agent->agent_email])
-                         ->setSubject('Weekly Store Summary')
-                         ->setBcc(\Yii::$app->params['supportEmail'])
-                         ->send();
+                         ->setTo([$agentAssignment->agent->agent_email])
+                         ->setSubject('Weekly Store Summary');
+
+                         if($key == 0)
+                           $weeklyStoreSummaryEmail->setBcc(\Yii::$app->params['supportEmail']);
+
+                         $weeklyStoreSummaryEmail->send();
+
                     }
 
                   }
@@ -315,44 +328,70 @@ class CronController extends \yii\console\Controller {
     }
 
 
-    // public function actionNotifyAgentsForSubscriptionThatWillExpireSoon(){
-    //
-    //   $subscriptions = Subscription::find()
-    //           ->where(['subscription_status' => Subscription::STATUS_ACTIVE])
-    //           ->andWhere(['notified_email' => 0])
-    //           ->andWhere(['not', ['subscription_end_at' => null]])
-    //           ->andWhere(['<=' ,'subscription_end_at', date('Y-m-d H:i:s', strtotime('+5 days'))])
-    //           ->with(['plan'])
-    //           ->all();
-    //
-    //
-    //   foreach ($subscriptions as $subscription) {
-    //
-    //     foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
-    //       $result = \Yii::$app->mailer->compose([
-    //                   'html' => 'subscription-will-expire-soon-html',
-    //                       ], [
-    //                   'subscription' => $subscription,
-    //                   'plan' => $subscription->plan->name,
-    //                   'agent_name' => $agent->agent_name,
-    //               ])
-    //               ->setFrom([\Yii::$app->params['supportEmail']])
-    //               ->setTo($agent->agent_email)
-    //               ->setSubject('Your Subscription is Expiring')
-    //               ->send();
-    //
-    //         if($result){
-    //           $subscription->notified_email = 1;
-    //           $subscription->save(false);
-    //         }
-    //     }
-    //   }
-    //
-    //   $this->stdout("Email sent to all agents of employer that have applicants will expire soon \n", Console::FG_RED, Console::NORMAL);
-    //   return self::EXIT_CODE_NORMAL;
-    //
-    // }
+    public function actionDowngradedStoreSubscription(){
 
+         $start_date = date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d")  ));
+         $end_date =  date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d") ));
+
+         $subscriptions = Subscription::find()
+                 ->where(['subscription_status' => Subscription::STATUS_ACTIVE])
+                 // ->andWhere(['notified_email' => 1])
+                 ->andWhere(['not', ['subscription_end_at' => null]])
+                 ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])
+                 ->with(['plan','restaurant'])
+                 ->all();
+
+
+
+         foreach ($subscriptions as $subscription) {
+           if(date('Y-m-d',strtotime($subscription->subscription_end_at)) == date('Y-m-d')){
+             $subscription->subscription_status =  Subscription::STATUS_INACTIVE;
+             $subscription->save();
+           }
+         }
+       }
+
+       public function actionNotifyAgentsForSubscriptionThatWillExpireSoon(){
+
+         $start_date = date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d") + 5 ));
+         $end_date =  date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d") + 5));
+
+         $subscriptions = Subscription::find()
+                 ->where(['subscription_status' => Subscription::STATUS_ACTIVE])
+                 ->andWhere(['notified_email' => 0])
+                 ->andWhere(['not', ['subscription_end_at' => null]])
+                 ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])
+                 ->with(['plan','restaurant'])
+                 ->all();
+
+
+         foreach ($subscriptions as $subscription) {
+
+           foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
+             $result = \Yii::$app->mailer->compose([
+                         'html' => 'subscription-will-expire-soon-html',
+                             ], [
+                         'subscription' => $subscription,
+                         'store' => $subscription->restaurant,
+                         'plan' => $subscription->plan->name,
+                         'agent_name' => $agent->agent_name,
+                     ])
+                     ->setFrom([\Yii::$app->params['supportEmail']])
+                     ->setTo($agent->agent_email)
+                     ->setSubject('Your Subscription is Expiring')
+                     ->send();
+
+               if($result){
+                 $subscription->notified_email = 1;
+                 $subscription->save(false);
+               }
+           }
+         }
+
+         $this->stdout("Email sent to all agents of employer that have applicants will expire soon \n", Console::FG_RED, Console::NORMAL);
+         return self::EXIT_CODE_NORMAL;
+
+    }
 
     public function actionCreateTapAccount() {
 
@@ -549,7 +588,7 @@ class CronController extends \yii\console\Controller {
                         $payment->save(false);
                     }
                 } catch (\Exception $e) {
-                    \Yii::error("[Issue checking status] " . $e->getMessage(), __METHOD__);
+                  \Yii::error("[Issue checking status (". $payment->restaurant_uuid .") Order Uuid: ". $payment->order_uuid ."] " . $e->getMessage(), __METHOD__);
                 }
             }
         } else {
@@ -570,25 +609,26 @@ class CronController extends \yii\console\Controller {
         $orders = Order::find()
                 ->where(['order_status' => Order::STATUS_PENDING])
                 ->andWhere(['reminder_sent' => 0])
-                ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 MINUTE)')])
+                ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')])
                 ->all();
+
 
         if ($orders) {
 
             foreach ($orders as $order) {
 
-                foreach ($order->restaurant->getAgents()->where(['reminder_email' => 1])->all() as $agent) {
+                foreach ($order->restaurant->getAgentAssignments()->where(['reminder_email' => 1])->all() as $agentAssignment) {
 
 
-                    if ($agent) {
+                    if ($agentAssignment && $agentAssignment->agent) {
                         $result = \Yii::$app->mailer->compose([
                                     'html' => 'order-reminder-html',
                                         ], [
                                     'order' => $order,
-                                    'agent_name' => $agent->agent_name
+                                    'agent_name' => $agentAssignment->agent->agent_name
                                 ])
                                 ->setFrom([\Yii::$app->params['supportEmail'] => $order->restaurant->name])
-                                ->setTo($agent->agent_email)
+                                ->setTo($agentAssignment->agent->agent_email)
                                 ->setSubject('Order #' . $order->order_uuid . ' from ' . $order->restaurant->name)
                                 ->send();
                     }

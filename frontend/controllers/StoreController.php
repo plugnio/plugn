@@ -338,6 +338,8 @@ class StoreController extends Controller {
         if ($model->is_tap_enable)
             return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
 
+          if($model->country->iso != 'KW')
+                $model->business_type = 'corp';
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->save()) {
 
@@ -594,7 +596,7 @@ class StoreController extends Controller {
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) ) {
 
             $model->sitemap_require_update = 1;
-            
+
             if($model->save())
               return $this->redirect(['update-analytics-integration', 'id' => $id]);
         }

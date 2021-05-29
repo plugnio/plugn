@@ -61,12 +61,21 @@ return [
                 'password' => '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',
                 'port' => '587',
                 'encryption' => 'tls',
-                'plugins' => [
-                    [
-                        'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
-                    ],
-                ],
+                // 'plugins' => [
+                //     [
+                //         'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
+                //     ],
+                // ],
             ],
+        ],
+        'cache' => [
+            // Use Redis as a cache
+            'class' => 'yii\redis\Cache',
+            'redis' => [
+                'hostname' => 'plugn-redis.0x1cgp.0001.euw2.cache.amazonaws.com',
+                'port' => 6379,
+                'database' => 2,
+            ]
         ],
         'tapPayments' => [
             'gatewayToUse' => \common\components\TapPayments::USE_LIVE_GATEWAY,

@@ -76,7 +76,7 @@ class WebLink extends \yii\db\ActiveRecord
     public function getWebLinkType() {
         switch ($this->web_link_type) {
             case self::WEB_LINK_TYPE_WEBSITE_URL:
-                return "Webist Url";
+                return "Website Url";
                 break;
             case self::WEB_LINK_TYPE_FACEBOOK:
                 return "Facebook";

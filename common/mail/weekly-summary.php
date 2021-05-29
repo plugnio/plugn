@@ -456,10 +456,10 @@ $agentProfileUrl = Yii::$app->params['frontendUrl'] . '/agent/update?storeUuid='
       >
         <?php
           if($thisWeekRevenue > 0)
-            echo  '+' . \Yii::$app->formatter->asCurrency($thisWeekRevenue, $store->currency->code);
+            echo  '+' . \Yii::$app->formatter->asDecimal($thisWeekRevenue ? $thisWeekRevenue : 0, 3);
           else
-            echo \Yii::$app->formatter->asCurrency(0, $store->currency->code);
-      
+            echo   \Yii::$app->formatter->asDecimal($thisWeekRevenue ? $thisWeekRevenue : 0, 3);
+
          ?>
       </div>
 

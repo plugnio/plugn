@@ -60,27 +60,27 @@ class DeliveryZoneController extends Controller {
     /**
      * Return Delivery zones
      */
-    public function actionDeliveryZone($restaurant_uuid) {
-
-        if ($store_model = Restaurant::findOne($restaurant_uuid)) {
-
-            $shipping_countries = $store_model->getShippingCountries()->asArray()->all();
-
-            foreach ($shipping_countries as $key => $shippingCountry) {
-              $deliveryZones = $store_model->getCountryDeliveryZones($shippingCountry['country_id'])->asArray()->all();
-              $shippingCountry['businessLocations'] = $deliveryZones;
-            }
-
-            return $shipping_countries;
-
-
-        } else {
-            return [
-                'operation' => 'error',
-                'message' => 'Store Uuid is invalid'
-            ];
-        }
-    }
+    // public function actionDeliveryZone($restaurant_uuid) {
+    //
+    //     if ($store_model = Restaurant::findOne($restaurant_uuid)) {
+    //
+    //         $shipping_countries = $store_model->getShippingCountries()->asArray()->all();
+    //
+    //         foreach ($shipping_countries as $key => $shippingCountry) {
+    //           $deliveryZones = $store_model->getCountryDeliveryZones($shippingCountry['country_id'])->asArray()->all();
+    //           $shippingCountry['businessLocations'] = $deliveryZones;
+    //         }
+    //
+    //         return $shipping_countries;
+    //
+    //
+    //     } else {
+    //         return [
+    //             'operation' => 'error',
+    //             'message' => 'Store Uuid is invalid'
+    //         ];
+    //     }
+    // }
 
     /**
      * Return List of countries available for delivery
