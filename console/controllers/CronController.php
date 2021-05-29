@@ -57,7 +57,7 @@ class CronController extends \yii\console\Controller {
         $branch->mashkor_branch_id = $store->mashkor_branch_id;
 
         if(!$branch->save())
-          die('fuck');
+          die('error');
       }
 
     }
