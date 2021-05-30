@@ -14,7 +14,6 @@ $locateImgUrl = Yii::$app->urlManager->getBaseUrl() . '/img/locate-mp.svg';
 $latitude = $model->latitude;
 $longitude = $model->longitude;
 
-
 $location = 'Kuwait,City';
 
 if ($model->business_location_id) {
@@ -90,6 +89,9 @@ function initMap() {
 
   });
 
+  document.getElementById("businesslocation-latitude").value = theLat;
+  document.getElementById("businesslocation-longitude").value = theLng;
+
 
   const card = document.getElementById("searchGrp");
   const input = document.getElementById("placeSearch");
@@ -132,6 +134,9 @@ function initMap() {
       map.setCenter(place.geometry.location);
       map.setZoom(17);
     }
+
+    document.getElementById("businesslocation-latitude").value = place.geometry.location.lat();
+    document.getElementById("businesslocation-longitude").value = place.geometry.location.lng();
 
     // infowindowContent.children["place-name"].textContent = place.name;
     // infowindowContent.children["place-address"].textContent =
@@ -243,15 +248,62 @@ function getLatAndLng() {
 
 
 
-<label class="control-label" for="businesslocation-country_id">Business Address</label>
+<label class="control-label" for="businesslocation-country_id">
+  <span style="">Pin location</span>
+    <br/>
+  <span style="">You can pin the location on the map to help customers find it easily</span>
+
+</label>
 
           <!-- Vertical modal -->
           <div class="vertical-modal-ex">
               <!-- <button type="button" class="btn btn-outline-primary"> -->
-                <img  data-toggle="modal" data-target="#exampleModalCenter"
-                style="width: 100%;cursor: pointer;"
-                src=<?= "http://maps.googleapis.com/maps/api/staticmap?center=" .  $location ."&scale=2&style=feature:poi|visibility:off&zoom=16&size=430x50&key=AIzaSyCFeQ-wuP5iWVRTwMn5nZZeOE8yjGESFa8" ?> >
+              <?php if ($model->latitude && $model->longitude){ ?>
 
+                <div style="position: relative;">
+
+                  <button
+                  data-toggle="modal" data-target="#exampleModalCenter" type="button"
+                   style="
+                  border-radius: 4px;
+                      z-index: 99;
+                      opacity: 1;
+                  color: rgb(0, 0, 0);
+                  background-color: rgb(255, 255, 255);
+                  font-size: 13px;
+                  letter-spacing: -0.1px;
+                  line-height: 1.23;
+                  padding: 8px 16px;
+                  min-height: 32px;
+                  margin: 16px;
+                  cursor: pointer;
+                  display: flex;
+                  -webkit-box-align: center;
+                  align-items: center;
+                  font-stretch: normal;
+                  font-style: normal;
+                  font-weight: 600;
+                  text-decoration: none;
+                  touch-action: manipulation;
+                  transition: all 0.2s ease-in 0s;
+                  border: 1px solid;
+                  user-select: none;
+                  position: absolute;
+                  top: 0px;
+                  right: 0px;
+                  " ><span class="content" style="margin:0px">Tap to edit location</span></button>
+
+                  <img
+                  style="width: 100%;cursor: pointer;         opacity: 0.75;"
+                  src=<?= "http://maps.googleapis.com/maps/api/staticmap?center=" .  $location ."&scale=2&style=feature:poi|visibility:off&zoom=15&size=430x100&markers==color:green%7Clabel:G%7C|" . $model->latitude . "," . $model->longitude . "&key=AIzaSyCFeQ-wuP5iWVRTwMn5nZZeOE8yjGESFa8" ?> >
+
+
+                </div>
+              <?php } else {?>
+                <button data-toggle="modal" data-target="#exampleModalCenter" type="button" class="btn btn-outline-primary">
+                  Select location
+                </button>
+              <?php }?>
               <!-- </button> -->
               <!-- Modal -->
               <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -266,6 +318,7 @@ function getLatAndLng() {
 
 
                           <div class="modal-body">
+
                               <img alt="" class="map-marker-img" src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/marker-icon.png' ?>" draggable="false" usemap="#gmimap0" style="user-select: none;border: 0px;padding: 0px;margin: 0px;max-width: none;">
 
                               <div class="searchGrp map-search-box" id="searchGrp">

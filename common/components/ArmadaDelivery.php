@@ -88,8 +88,6 @@ class ArmadaDelivery extends Component {
             ],
         ];
 
-        die(var_dump($armadaApiKey));
-
         $client = new Client();
         $response = $client->createRequest()
                 ->setMethod('POST')

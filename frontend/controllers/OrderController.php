@@ -57,7 +57,7 @@ class OrderController extends Controller {
     public function actionIndex($storeUuid) {
 
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
-        $agentAssignment = $restaurant_model->getAgentAssignments()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->one();
+        $agentAssignment = $restaurant_model->getAgentAssignments()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid, 'agent_id' => Yii::$app->user->identity->agent_id])->one();
 
         $searchModel = new OrderSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid, $agentAssignment );
@@ -218,7 +218,7 @@ class OrderController extends Controller {
     public function actionDraft($storeUuid) {
 
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
-        $agentAssignment = $restaurant_model->getAgentAssignments()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->one();
+        $agentAssignment = $restaurant_model->getAgentAssignments()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid, 'agent_id' => Yii::$app->user->identity->agent_id])->one();
 
         $searchModel = new OrderSearch();
         $dataProvider = $searchModel->searchDraftOrders(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid, $agentAssignment);
@@ -237,7 +237,7 @@ class OrderController extends Controller {
     public function actionAbandonedCheckout($storeUuid) {
 
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
-        $agentAssignment = $restaurant_model->getAgentAssignments()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->one();
+        $agentAssignment = $restaurant_model->getAgentAssignments()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid, 'agent_id' => Yii::$app->user->identity->agent_id])->one();
 
         $searchModel = new OrderSearch();
         $dataProvider = $searchModel->searchAbandonedCheckoutOrders(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid, $agentAssignment);
@@ -289,6 +289,9 @@ class OrderController extends Controller {
             else
                Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
 
+
+            Yii::error('Error while requesting driver from Mashkor  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->data));
+
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
         }
 
@@ -323,10 +326,12 @@ class OrderController extends Controller {
 
 
               Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->content));
+              Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->content));
 
             } else {
 
               Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
+              Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
 
             }
 

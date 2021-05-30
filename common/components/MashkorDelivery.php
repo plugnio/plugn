@@ -184,8 +184,6 @@ class MashkorDelivery extends Component {
 
                   }
 
-                  die(var_dump($mashkorParams));
-
         $client = new Client();
         $response = $client->createRequest()
                 ->setMethod('POST')
