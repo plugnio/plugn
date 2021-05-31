@@ -1,0 +1,217 @@
+<?php
+
+namespace agent\modules\v1\controllers;
+
+use Yii;
+use yii\rest\Controller;
+use yii\data\ActiveDataProvider;
+use yii\helpers\Url;
+use yii\web\NotFoundHttpException;
+use common\models\DeliveryZone;
+use common\models\Area;
+use common\models\AreaDeliveryZone;
+
+class AreaDeliveryZoneController extends Controller {
+
+    public function behaviors() {
+        $behaviors = parent::behaviors();
+
+        // remove authentication filter for cors to work
+        unset($behaviors['authenticator']);
+
+        // Allow XHR Requests from our different subdomains and dev machines
+        $behaviors['corsFilter'] = [
+            'class' => \yii\filters\Cors::className(),
+            'cors' => [
+                'Origin' => Yii::$app->params['allowedOrigins'],
+                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
+                'Access-Control-Request-Headers' => ['*'],
+                'Access-Control-Allow-Credentials' => null,
+                'Access-Control-Max-Age' => 86400,
+                'Access-Control-Expose-Headers' => [
+                    'X-Pagination-Current-Page',
+                    'X-Pagination-Page-Count',
+                    'X-Pagination-Per-Page',
+                    'X-Pagination-Total-Count'
+                ],
+            ],
+        ];
+
+        // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
+              $behaviors['authenticator'] = [
+                  'class' => \yii\filters\auth\HttpBearerAuth::className(),
+              ];
+              // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+              $behaviors['authenticator']['except'] = ['options'];
+
+              return $behaviors;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function actions() {
+        $actions = parent::actions();
+        $actions['options'] = [
+            'class' => 'yii\rest\OptionsAction',
+            // optional:
+            'collectionOptions' => ['GET', 'POST', 'HEAD', 'OPTIONS'],
+            'resourceOptions' => ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
+        ];
+        return $actions;
+    }
+
+
+
+    /**
+     * Create AreaDelivery Zone
+     * @return array
+     */
+    public function actionCreate() {
+
+        $store_uuid = Yii::$app->request->getBodyParam("store_uuid");
+        $area_id = Yii::$app->request->getBodyParam("area_id");
+        $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
+
+
+        $delivery_zone_id =  Yii::$app->request->getBodyParam("delivery_zone_id");
+
+        $delivery_zone_model = DeliveryZone::findOne(['delivery_zone_id' => $delivery_zone_id, 'restaurant_uuid' => $store_model->restaurant_uuid]);
+
+        if(!$delivery_zone_model)
+           throw new NotFoundHttpException('The requested record does not exist.');
+
+        $area_model = Area::findOne(['area_id' => $area_id]);
+
+        if(!$area_model)
+           throw new NotFoundHttpException('The requested record does not exist.');
+
+
+       $model = new AreaDeliveryZone();
+       $model->restaurant_uuid =  $store_model->restaurant_uuid;
+       $model->delivery_zone_id =  $delivery_zone_model->delivery_zone_id;
+       $model->area_id = $area_model->area_id;
+
+
+
+        if (!$model->save()) {
+            return [
+                "operation" => "error",
+                "message" => $model->errors
+            ];
+        }
+
+        return [
+            "operation" => "success",
+            "message" => "Area Delivery Zone created successfully",
+            "model" => AreaDeliveryZone::findOne($model->area_delivery_zone)
+        ];
+
+    }
+
+     /**
+      * Update  AreaDelivery Zone
+      */
+     public function actionUpdate($area_delivery_zone_id, $store_uuid)
+     {
+
+         $store_uuid = Yii::$app->request->getBodyParam("store_uuid");
+         $area_id = Yii::$app->request->getBodyParam("area_id");
+         $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
+
+
+         $delivery_zone_id =  Yii::$app->request->getBodyParam("delivery_zone_id");
+
+         $delivery_zone_model = DeliveryZone::findOne(['delivery_zone_id' => $delivery_zone_id, 'restaurant_uuid' => $store_model->restaurant_uuid]);
+
+         if(!$delivery_zone_model)
+            throw new NotFoundHttpException('The requested record does not exist.');
+
+         $area_model = Area::findOne(['area_id' => $area_id]);
+
+         if(!$area_model)
+            throw new NotFoundHttpException('The requested record does not exist.');
+
+
+
+        $model = $this->findModel($area_delivery_zone_id, $store_uuid);
+
+        $model->delivery_zone_id =  $delivery_zone_model->delivery_zone_id;
+        $model->area_id = $area_model->area_id;
+
+         if (!$model->save())
+         {
+             if (isset($model->errors)) {
+                 return [
+                     "operation" => "error",
+                     "message" => $model->errors
+                 ];
+             } else {
+                 return [
+                     "operation" => "error",
+                     "message" => "We've faced a problem updating the delivery zone"
+                 ];
+             }
+         }
+
+         return [
+             "operation" => "success",
+             "message" => "Area Delivery Zone updated successfully",
+             "model" => $model
+         ];
+     }
+
+
+
+  /**
+   * Delete Delivery zone
+   */
+  public function actionDelete($area_delivery_zone_id, $store_uuid)
+  {
+
+      $model =  $this->findModel($area_delivery_zone_id, $store_uuid);
+      if (!$model->delete())
+      {
+          if (isset($model->errors)) {
+              return [
+                  "operation" => "error",
+                  "message" => $model->errors
+              ];
+          } else {
+              return [
+                  "operation" => "error",
+                  "message" => "We've faced a problem deleting the area delivery zone"
+              ];
+          }
+      }
+
+      return [
+          "operation" => "success",
+          "message" => "Area Delivery Zone deleted successfully"
+      ];
+  }
+
+
+
+   /**
+    * Finds the Delivery zone model based on its primary key value.
+    * If the model is not found, a 404 HTTP exception will be thrown.
+    * @param integer $id
+    * @return BusinessLocation the loaded model
+    * @throws NotFoundHttpException if the model cannot be found
+    */
+   protected function findModel($area_delivery_zone_id, $store_uuid)
+   {
+       $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
+
+       if (($model = AreaDeliveryZone::find()->where(['area_delivery_zone' => $area_delivery_zone_id , 'restaurant_uuid' => $store_model->restaurant_uuid])->one()) !== null) {
+           return $model;
+       } else {
+           throw new NotFoundHttpException('The requested record does not exist.');
+       }
+   }
+
+
+
+
+}

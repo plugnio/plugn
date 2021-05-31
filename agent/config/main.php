@@ -191,9 +191,28 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST create' => 'create',
+                        'DELETE <delivery_zone_id>/<store_uuid>' => 'delete',
+                        'PATCH <delivery_zone_id>/<store_uuid>' => 'update',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS <business_location_id>/<store_uuid>' => 'options',
+                    ]
+                ],
+                [// AreaDeliveryZoneController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/area-delivery-zone',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'POST create' => 'create',
+                        'DELETE <area_delivery_zone_id>/<store_uuid>' => 'delete',
+                        'PATCH <area_delivery_zone_id>/<store_uuid>' => 'update',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS <area_delivery_zone_id>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// WebLinkController

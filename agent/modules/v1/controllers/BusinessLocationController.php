@@ -200,17 +200,8 @@ class BusinessLocationController extends Controller {
      */
     public function actionDetail($store_uuid, $business_location_id) {
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
-
-        $businessLocation =  BusinessLocation::find()
-                  ->where(['restaurant_uuid' => $store_uuid])
-                  ->andWhere(['business_location_id' => $business_location_id])
-                  ->one();
-
+          $model = $this->findModel($business_location_id, $store_uuid);
           return $businessLocation;
-
-      }
-
   }
 
 
