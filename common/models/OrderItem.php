@@ -193,7 +193,7 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         return parent::afterSave($insert, $changedAttributes);
     }
-
+    
     /**
      * Gets query for [[ItemUu]].
      *

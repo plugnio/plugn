@@ -362,8 +362,9 @@ class Order extends \yii\db\ActiveRecord {
           'orderStatusInArabic',
           'restaurant',
           'orderItems' => function($order){
-              return $order->getOrderItems()->with('orderItemExtraOptions')->asArray()->all();
+              return $order->getOrderItems()->with(['orderItemExtraOptions','currency'])->asArray()->all();
           },
+          'currency',
           'restaurantBranch',
           'deliveryZone',
           'pickupLocation',
