@@ -9,11 +9,14 @@ use Yii;
  *
  * @property int $business_location_id
  * @property string $restaurant_uuid
+ * @property string $country_id
  * @property string $business_location_name
  * @property string $business_location_name_ar
  * @property int $support_pick_up
  * @property float $business_location_tax
  * @property string $address
+ * @property string $mashkor_branch_id
+ * @property string $armada_api_key
  * @property float|null $latitude
  * @property float|null $longitude
 
@@ -50,7 +53,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
-  
+
     /**
      * {@inheritdoc}
      */
@@ -64,6 +67,18 @@ class BusinessLocation extends \yii\db\ActiveRecord
             'business_location_name_ar' => 'Location Name in Arabic',
             'support_pick_up' => 'Support Pick Up',
             'business_location_tax' => 'Tax / VAT',
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function extraFields() {
+        return [
+            'country',
+            'deliveryZones',
+            'deliveryZones.country',
+            'deliveryZones.areas',
         ];
     }
 

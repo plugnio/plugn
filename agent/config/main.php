@@ -40,7 +40,7 @@ return [
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
-            'enableStrictParsing' => false,
+            'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
 
@@ -245,9 +245,14 @@ return [
                         'GET' => 'list',
                         'GET detail' => 'detail',
                         'POST' => 'filter',
+                        'POST create' => 'create',
+                        'PATCH <business_location_id>/<store_uuid>' => 'update',
+                        'DELETE <business_location_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS <business_location_id>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// StoreController

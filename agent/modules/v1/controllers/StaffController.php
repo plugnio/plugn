@@ -108,6 +108,11 @@ class StaffController extends Controller {
          $agent->agent_name = Yii::$app->request->getBodyParam("agent_name");
          $agent->agent_email = $agentEmail;
 
+         $password = Yii::$app->request->getBodyParam("password");
+
+         if($password)
+         $agent->tempPassword = $password;
+
          if (!$agent->save()) {
              return [
                  "operation" => "error",
