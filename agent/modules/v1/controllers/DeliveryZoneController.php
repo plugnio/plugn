@@ -95,7 +95,6 @@ class DeliveryZoneController extends Controller {
             $store_uuid = Yii::$app->request->getBodyParam("store_uuid");
             Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-
             $business_location_id =  Yii::$app->request->getBodyParam("business_location_id");
 
             $business_location_model = BusinessLocation::findOne(['business_location_id' => $business_location_id, 'restaurant_uuid' => $store_uuid]);
@@ -142,7 +141,6 @@ class DeliveryZoneController extends Controller {
          if(!$business_location_model)
             throw new NotFoundHttpException('The requested record does not exist.');
 
-         $model = $this->findModel($delivery_zone_id, $store_uuid);
 
          $model->country_id =  Yii::$app->request->getBodyParam("country_id");
          $model->business_location_id =  $business_location_model->business_location_id;

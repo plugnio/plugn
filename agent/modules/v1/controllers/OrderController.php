@@ -7,7 +7,7 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use common\models\Order;
+use agent\models\Order;
 
 class OrderController extends Controller {
 

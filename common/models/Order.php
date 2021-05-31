@@ -352,54 +352,24 @@ class Order extends \yii\db\ActiveRecord {
 
     }
 
-    // /**
-    //  * @inheritdoc
-    //  */
-    // public function extraFields()
-    // {
-    //   return [
-    //       'orderStatusInEnglish',
-    //       'orderStatusInArabic',
-    //       'restaurant',
-    //       'orderItems' => function($order){
-    //           return $order->getOrderItems()->with(['orderItemExtraOptions','currency'])->asArray()->all();
-    //       },
-    //       'currency',
-    //       'restaurantBranch',
-    //       'deliveryZone',
-    //       'pickupLocation',
-    //       'payment'
-    //   ];
-    // }
-
-
-        /**
+    /**
      * @inheritdoc
      */
     public function extraFields()
     {
       return [
-          'orderStatusInEnglish',
-          'orderStatusInArabic',
-          'restaurant',
-          'orderItems' => function($order){
-              return $order->getOrderItems()->with('orderItemExtraOptions')->asArray()->all();
-          },
-          'restaurantBranch',
-          'deliveryZone',
-          'pickupLocation',
-          'payment',
-          'items' => function($order){
-              return $order->getOrderItems()->all();
-          },
-          'voucher',
-          'bankDiscount',
-          'refunds',
-          'area'
+        'orderStatusInEnglish',
+        'orderStatusInArabic',
+        'restaurant',
+        'orderItems' => function($order){
+            return $order->getOrderItems()->with('orderItemExtraOptions')->asArray()->all();
+        },
+        'restaurantBranch',
+        'deliveryZone',
+        'pickupLocation',
+        'payment'
       ];
     }
-
-
 
     /**
      * Returns String value of current status
