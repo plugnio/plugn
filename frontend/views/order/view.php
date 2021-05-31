@@ -87,7 +87,7 @@ $this->registerJs($js);
                 'style' => 'margin-right: 7px;'
             ]);
         }
-        ?>
+        ?> 
 
     <div style="display: block">
 
@@ -98,7 +98,19 @@ $this->registerJs($js);
 
         if ($model->order_mode == Order::ORDER_MODE_DELIVERY) {
 
-            if ( ( ($model->area_id && ($model->area->country->country_name == 'Kuwait' || $model->area->country->country_name == 'Bahrain')) || ($model->shipping_country_id && ($model->country->country_name == 'Kuwait' || $model->country->country_name == 'Bahrain'))    )  && $model->restaurant->armada_api_key != null && $model->armada_tracking_link == null) {
+            if ( 
+                ( 
+                    (
+                        $model->area_id && 
+                        ($model->area->country->country_name == 'Kuwait' || $model->area->country->country_name == 'Bahrain')
+                    ) || 
+                    (
+                        $model->shipping_country_id && 
+                        ($model->country->country_name == 'Kuwait' || $model->country->country_name == 'Bahrain')
+                    )    
+                )  && 
+                $model->restaurant->armada_api_key != null && $model->armada_tracking_link == null
+            ) {
 
                 if ( $difference <= 1  && $model->restaurant->hide_request_driver_button ){
                           echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
