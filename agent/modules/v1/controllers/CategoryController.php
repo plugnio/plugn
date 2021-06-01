@@ -186,44 +186,45 @@ class CategoryController extends Controller {
     /**
      * Allows agent to upload category image
      */
-    // public function actionUploadCategoryImage() {
-    //
-    //     $category_image = urldecode(Yii::$app->request->getBodyParam('category_image'));
-    //     $store_uuid = Yii::$app->request->getBodyParam('store_uuid');
-    //
-    //     $model = $this->findModel($category_id, $store_uuid);
-    //
-    //     if (!isset($model->category_id)) {
-    //         return [
-    //             "operation" => "error",
-    //             "message" => 'Invalid Category ID'
-    //         ];
-    //     }
-    //
-    //
-    //     //Delete old category image
-    //     if ($model->category_image) {
-    //         $model->deleteCategoryImage();
-    //     }
-    //
-    //     $model->category_image = basename($category_image);
-    //
-    //     $result = $model->uploadImage();
-    //
-    //     if ($result) {
-    //         return [
-    //             'operation' => 'success',
-    //             'url' => Url::to("@categoty-image/" . 'restaurants/' . $model->restaurant_uuid . "/category/" . $model->category_image),
-    //             'logo' => $model->category_image,
-    //             'message' => Yii::t('app', 'Category Image Uploaded Successfully')
-    //         ];
-    //     } else {
-    //         return [
-    //             'operation' => 'error',
-    //             'message' => $model->errors
-    //         ];
-    //     }
-    // }
+    public function actionUploadCategoryImage() {
+
+        $category_image = urldecode(Yii::$app->request->getBodyParam('category_image'));
+        $store_uuid = Yii::$app->request->getBodyParam('store_uuid');
+        $category_id = Yii::$app->request->getBodyParam('category_id');
+
+        $model = $this->findModel($category_id, $store_uuid);
+
+        if (!isset($model->category_id)) {
+            return [
+                "operation" => "error",
+                "message" => 'Invalid Category ID'
+            ];
+        }
+
+
+        //Delete old category image
+        if ($model->category_image) {
+            $model->deleteCategoryImage();
+        }
+
+        $model->category_image = basename($category_image);
+
+        $result = $model->moveCategoryImageFromS3toCloudinary();
+
+        if ($result) {
+            return [
+                'operation' => 'success',
+                'url' => Url::to("@categoty-image/" . 'restaurants/' . $model->restaurant_uuid . "/category/" . $model->category_image),
+                'logo' => $model->category_image,
+                'message' => Yii::t('app', 'Category Image Uploaded Successfully')
+            ];
+        } else {
+            return [
+                'operation' => 'error',
+                'message' => $model->errors
+            ];
+        }
+    }
 
 
 

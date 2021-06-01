@@ -80,6 +80,7 @@ return [
                         'GET detail' => 'detail',
                         'POST' => 'filter',
                         'POST create' => 'create',
+                        'POST upload-image' => 'upload-category-image',
                         'PATCH <category_id>/<store_uuid>' => 'update',
                         'DELETE <category_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS

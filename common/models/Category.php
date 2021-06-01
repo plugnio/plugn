@@ -162,50 +162,41 @@ class Category extends \yii\db\ActiveRecord {
 
 
 
-
   /**
    * Upload category image to cloudinary
    */
-  // public function uploadImage() {
-  //
-  //     if (!$this->category_image) {
-  //         $this->addError('category image', Yii::t('app', 'Image not available to save.'));
-  //         return false;
-  //     }
-  //
-  //     try {
-  //         $url = Yii::$app->temporaryBucketResourceManager->getUrl($this->category_image);
-  //
-  //         $filename = Yii::$app->security->generateRandomString();
-  //
-  //         $result = Yii::$app->cloudinaryManager->upload(
-  //             $url, [
-  //               'public_id' => "restaurants/" . $this->restaurant_uuid . "/category/" . $filename
-  //             ]
-  //         );
-  //
-  //         if ($result) {
-  //             $this->category_image = basename($result['url']);
-  //             // $this->scenario = 'updateLogo';
-  //             return $this->save();
-  //         }
-  //     } catch (\Cloudinary\Error  $e) {
-  //
-  //         Yii::error($e->getMessage(), 'category');
-  //
-  //         $this->addError('category_image', Yii::t('app', 'Please try again.'));
-  //
-  //         return false;
-  //
-  //     } catch (Exception  $e) {
-  //
-  //         Yii::error($e->getMessage(), 'cateogry');
-  //
-  //         $this->addError('category_image', Yii::t('app', 'Image not available to save.'));
-  //
-  //         return false;
-  //     }
-  // }
+  public function moveCategoryImageFromS3toCloudinary() {
+
+      if (!$this->category_image) {
+          $this->addError('category image', Yii::t('app', 'Image not available to save.'));
+          return false;
+      }
+
+      try {
+          $url = Yii::$app->temporaryBucketResourceManager->getUrl($this->category_image);
+
+          $filename = Yii::$app->security->generateRandomString();
+
+          $result = Yii::$app->cloudinaryManager->upload(
+              $url, [
+                'public_id' => "restaurants/" . $this->restaurant_uuid . "/category/" . $filename
+              ]
+          );
+
+          if ($result) {
+              $this->category_image = basename($result['url']);
+              // $this->scenario = 'updateLogo';
+              return $this->save();
+          }
+      } catch (\Cloudinary\Error  $err) {
+
+          $this->addError('category_image', Yii::t('app', 'Please try again.'));
+          Yii::error("Error when uploading category image to Cloudinry: " . json_encode($err));
+
+          return false;
+
+      }
+  }
 
 
     /**
