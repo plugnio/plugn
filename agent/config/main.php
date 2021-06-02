@@ -213,7 +213,6 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',
-                        'GET detail' => 'detail',
                         'POST create' => 'create',
                         'DELETE <delivery_zone_id>/<store_uuid>' => 'delete',
                         'PATCH <delivery_zone_id>/<store_uuid>' => 'update',
@@ -222,6 +221,20 @@ return [
                         'OPTIONS detail' => 'options',
                         'OPTIONS create' => 'options',
                         'OPTIONS <business_location_id>/<store_uuid>' => 'options',
+                    ]
+                ],
+                [// OpeningHoursController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/opening-hours',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET <opening_hour_id>/<store_uuid>' => 'detail',
+                        'PATCH <opening_hour_id>/<store_uuid>' => 'update',
+                        'DELETE <opening_hour_id>/<store_uuid>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <opening_hour_id>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// AreaDeliveryZoneController
@@ -246,9 +259,14 @@ return [
                         'GET' => 'list',
                         'GET detail' => 'detail',
                         'POST' => 'filter',
+                        'POST create' => 'create',
+                        'PATCH <web_link_id>/<store_uuid>' => 'update',
+                        'DELETE <web_link_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
+                        'OPTIONS create' => 'options',
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS <web_link_id>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// ItemController

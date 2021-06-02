@@ -132,6 +132,15 @@ class WebLink extends \yii\db\ActiveRecord
     }
 
     /**
+     * @inheritdoc
+     */
+    public function extraFields() {
+        return [
+          'webLinkType'
+        ];
+    }
+
+    /**
      * Gets query for [[StoreWebLinks]].
      *
      * @return \yii\db\ActiveQuery

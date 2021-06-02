@@ -241,6 +241,16 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function extraFields() {
+        return [
+          'dayOfWeek'
+        ];
+    }
+
+
 //     public function getDeliveryTimes($delivery_time, $date, $startTime) {
 //
 //         $time_interval = [];
