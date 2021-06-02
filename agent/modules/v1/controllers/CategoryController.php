@@ -277,7 +277,7 @@ class CategoryController extends Controller {
        * Finds the Category model based on its primary key value.
        * If the model is not found, a 404 HTTP exception will be thrown.
        * @param integer $id
-       * @return Country the loaded model
+       * @return Category the loaded model
        * @throws NotFoundHttpException if the model cannot be found
        */
       protected function findModel($category_id, $store_uuid)

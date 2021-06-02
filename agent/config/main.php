@@ -54,11 +54,17 @@ return [
                         'GET draft' => 'list-draft-orders',
                         'GET abandoned' => 'list-abandoned-orders',
                         'GET detail' => 'detail',
+
                         'POST filter-pending' => 'filter-pending',
                         'POST filter-abandoned' => 'filter-abandoned',
                         'POST filter-draft' => 'filter-draft',
                         'POST filter-active' => 'filter-active',
-
+                        'POST <store_uuid>' => 'place-an-order',
+                        'PATCH <order_uuid>/<store_uuid>' => 'update',
+                        'PATCH update-order-status/<order_uuid>/<store_uuid>' => 'update-order-status',
+                        'POST request-driver-from-armada/<order_uuid>/<store_uuid>' => 'request-driver-from-armada',
+                        'POST request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'request-driver-from-mashkor',
+                        'DELETE <order_uuid>/<store_uuid>' => 'delete'
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS active' => 'options',
@@ -69,6 +75,22 @@ return [
                         'OPTIONS filter-active' => 'options',
                         'OPTIONS filter-draft' => 'options',
                         'OPTIONS filter-abandoned' => 'options',
+                        'OPTIONS update-order-status/<order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS request-driver-from-armada/<order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS <store_uuid>' => 'options',
+                        'OPTIONS <order_uuid>/<store_uuid>' => 'options',
+                    ]
+                ],
+                [// OrderItemController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/order-item',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'PATCH' => 'update',
+                        'DELETE' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
                     ]
                 ],
                 [// CategoryController
