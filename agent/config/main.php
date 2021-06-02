@@ -64,7 +64,7 @@ return [
                         'PATCH update-order-status/<order_uuid>/<store_uuid>' => 'update-order-status',
                         'POST request-driver-from-armada/<order_uuid>/<store_uuid>' => 'request-driver-from-armada',
                         'POST request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'request-driver-from-mashkor',
-                        'DELETE <order_uuid>/<store_uuid>' => 'delete'
+                        'DELETE <order_uuid>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS active' => 'options',
