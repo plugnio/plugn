@@ -201,7 +201,7 @@ class BusinessLocationController extends Controller {
     public function actionDetail($store_uuid, $business_location_id) {
 
           $model = $this->findModel($business_location_id, $store_uuid);
-          return $businessLocation;
+          return $model;
   }
 
 
