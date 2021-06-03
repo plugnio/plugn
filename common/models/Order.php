@@ -1247,6 +1247,15 @@ class Order extends \yii\db\ActiveRecord {
         return $this->hasMany(Refund::className(), ['order_uuid' => 'order_uuid']);
     }
 
+    /**
+     * Gets query for [[BusinessLocation]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBusinessLocation()
+    {
+        return $this->hasOne(BusinessLocation::className(), ['business_location_id' => 'business_location_id'])->via('deliveryZone');
+    }
 
     /**
      * Gets query for [[PickupLocation]].

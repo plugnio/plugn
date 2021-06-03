@@ -21,12 +21,10 @@ class Order extends \common\models\Order {
         'orderStatusInEnglish',
         'orderStatusInArabic',
         'restaurant',
-        /*'orderItems' => function($order){
-            return $order->getOrderItems()->with('orderItemExtraOptions')->asArray()->all();
-        },*/
         'restaurantBranch',
         'deliveryZone',
         'pickupLocation',
+        'businessLocation',
         'payment',
         'orderItems',
         'voucher',
