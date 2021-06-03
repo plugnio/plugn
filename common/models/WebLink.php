@@ -102,19 +102,6 @@ class WebLink extends \yii\db\ActiveRecord
     }
 
 
-    /**
-     * @inheritdoc
-     */
-    public function fields() {
-        $fields = parent::fields();
-
-        // remove fields that contain sensitive information
-        unset($fields['restaurant_uuid']);
-        unset($fields['web_link_id']);
-
-        return $fields;
-    }
-
 
     /**
     * @param type $insert

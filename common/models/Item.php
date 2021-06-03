@@ -180,7 +180,9 @@ class Item extends \yii\db\ActiveRecord
             // remove fields that contain sensitive information
             unset($fields['item_created_at']);
             unset($fields['item_updated_at']);
+            unset($fields['unit_sold']);
             unset($fields['barcode']);
+            unset($fields['sku']);
 
             return $fields;
         }

@@ -174,7 +174,6 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
-                        'POST' => 'filter',
                         'POST create' => 'create',
                         'PATCH <voucher_id>/<store_uuid>' => 'update',
                         'PATCH update-status' => 'update-voucher-status',
@@ -258,7 +257,6 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
-                        'POST' => 'filter',
                         'POST create' => 'create',
                         'PATCH <web_link_id>/<store_uuid>' => 'update',
                         'DELETE <web_link_id>/<store_uuid>' => 'delete',
@@ -276,7 +274,6 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
-                        'POST' => 'filter',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options'

@@ -68,47 +68,27 @@ class WebLinkController extends Controller {
      */
     public function actionList($store_uuid) {
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+      $keyword = Yii::$app->request->get('keyword');
 
-          $webLinks =  WebLink::find()
-                    ->where(['restaurant_uuid' => $store_uuid]);
+      Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-          return new ActiveDataProvider([
-              'query' => $webLinks
-          ]);
+
+      $query =  WebLink::find();
+
+      if ($keyword){
+        $query->where(['like', 'url', $keyword]);
+        $query->orWhere(['like', 'web_link_title', $keyword]);
+        $query->orWhere(['like', 'web_link_title_ar', $keyword]);
       }
+
+      $query->andWhere(['restaurant_uuid' => $store_uuid]);
+
+      return new ActiveDataProvider([
+          'query' => $query
+      ]);
+
 
     }
-
-
-
-
-      /**
-      * Return a List of Voucher by keyword
-      */
-      public function actionFilter($store_uuid)
-      {
-        if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
-
-          $keyword = Yii::$app->request->get('keyword');
-
-          $query =  WebLink::find();
-
-          if($keyword) {
-                $query->where(['like', 'url', $keyword]);
-                $query->orWhere(['like', 'web_link_title', $keyword]);
-                $query->orWhere(['like', 'web_link_title_ar', $keyword]);
-          }
-
-          $query->andWhere(['restaurant_uuid' => $store_uuid]);
-
-          return new ActiveDataProvider([
-              'query' => $query
-          ]);
-
-        }
-      }
-
 
 
       /**
