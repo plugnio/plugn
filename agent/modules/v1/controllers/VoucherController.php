@@ -68,45 +68,54 @@ class VoucherController extends Controller {
      */
     public function actionList($store_uuid) {
 
+      $keyword = Yii::$app->request->get('keyword');
+
       Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-          $vouchers =  Voucher::find()
-                    ->where(['restaurant_uuid' => $store_uuid]);
 
+      $query =  Voucher::find();
 
-          return new ActiveDataProvider([
-              'query' => $vouchers
-          ]);
+      if ($keyword){
+        $query->where(['like', 'code', $keyword]);
+        $query->orWhere(['like', 'description', $keyword]);
+        $query->orWhere(['like', 'description_ar', $keyword]);
+      }
+
+      $query->andWhere(['restaurant_uuid' => $store_uuid]);
+
+      return new ActiveDataProvider([
+          'query' => $query
+      ]);
 
 
     }
 
-
-      /**
-      * Return a List of Voucher by keyword
-      */
-      public function actionFilter($store_uuid)
-      {
-         Yii::$app->accountManager->getManagedAccount($store_uuid);
-
-          $keyword = Yii::$app->request->get('keyword');
-
-          $query =  Voucher::find();
-
-          if($keyword) {
-                $query->where(['like', 'code', $keyword]);
-                $query->orWhere(['like', 'description', $keyword]);
-                $query->orWhere(['like', 'description_ar', $keyword]);
-          }
-
-          $query->andWhere(['restaurant_uuid' => $store_uuid]);
-
-          return new ActiveDataProvider([
-              'query' => $query
-          ]);
-
-        
-      }
+      // 
+      // /**
+      // * Return a List of Voucher by keyword
+      // */
+      // public function actionFilter($store_uuid)
+      // {
+      //    Yii::$app->accountManager->getManagedAccount($store_uuid);
+      //
+      //     $keyword = Yii::$app->request->get('keyword');
+      //
+      //     $query =  Voucher::find();
+      //
+      //     if($keyword) {
+      //           $query->where(['like', 'code', $keyword]);
+      //           $query->orWhere(['like', 'description', $keyword]);
+      //           $query->orWhere(['like', 'description_ar', $keyword]);
+      //     }
+      //
+      //     $query->andWhere(['restaurant_uuid' => $store_uuid]);
+      //
+      //     return new ActiveDataProvider([
+      //         'query' => $query
+      //     ]);
+      //
+      //
+      // }
 
 
     /**
