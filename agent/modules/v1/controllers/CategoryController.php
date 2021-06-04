@@ -66,48 +66,28 @@ class CategoryController extends Controller {
      * @param type $store_uuid
      * @return type
      */
-    public function actionList($store_uuid) {
+     public function actionList($store_uuid) {
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+         $keyword = Yii::$app->request->get('keyword');
 
-          $query =  Category::find()
-                    ->where(['restaurant_uuid' => $store_uuid]);
+         Yii::$app->accountManager->getManagedAccount($store_uuid);
 
+         $query =  Category::find();
 
-          return new ActiveDataProvider([
-              'query' => $query
-          ]);
+         if ($keyword){
+           $query->where(['like', 'title', $keyword]);
+           $query->orWhere(['like', 'title_ar', $keyword]);
+           $query->orWhere(['like', 'subtitle', $keyword]);
+           $query->orWhere(['like', 'subtitle_ar', $keyword]);
+         }
 
-      }
+         $query->andWhere(['restaurant_uuid' => $store_uuid]);
 
-    }
+         return new ActiveDataProvider([
+           'query' => $query
+         ]);
 
-
-    /**
-    * Return a List of Category by keyword
-   */
-    public function actionFilter($store_uuid)
-    {
-      Yii::$app->accountManager->getManagedAccount($store_uuid);
-
-        $keyword = Yii::$app->request->get('keyword');
-
-        $query =  Category::find();
-
-        if($keyword) {
-              $query->where(['like', 'title', $keyword]);
-              $query->orWhere(['like', 'title_ar', $keyword]);
-              $query->orWhere(['like', 'subtitle', $keyword]);
-              $query->orWhere(['like', 'subtitle_ar', $keyword]);
-          }
-
-       $query =  $query->andWhere(['restaurant_uuid' => $store_uuid ]);
-
-        return new ActiveDataProvider([
-            'query' => $query
-        ]);
-
-    }
+     }
 
 
     /**

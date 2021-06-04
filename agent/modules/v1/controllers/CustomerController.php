@@ -69,46 +69,26 @@ class CustomerController extends Controller {
      */
     public function actionList($store_uuid) {
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+      $keyword = Yii::$app->request->get('keyword');
 
-          $query =  Customer::find()
-                    ->where(['restaurant_uuid' => $store_uuid]);
+      Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-          return new ActiveDataProvider([
-              'query' => $query
-          ]);
+      $query =  Customer::find();
 
+      if ($keyword){
+        $query->where(['like', 'customer_name', $keyword]);
+        $query->orWhere(['like', 'customer_phone_number', $keyword]);
+        $query->orWhere(['like', 'customer_email', $keyword]);
       }
+
+      $query->andWhere(['restaurant_uuid' => $store_uuid]);
+
+      return new ActiveDataProvider([
+        'query' => $query
+      ]);
 
     }
 
-
-
-    /**
-    * Return a List of Customer by keyword
-   */
-    public function actionFilter($store_uuid)
-    {
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
-
-        $keyword = Yii::$app->request->get('keyword');
-
-        $query =  Customer::find();
-
-        if($keyword) {
-              $query->where(['like', 'customer_name', $keyword]);
-              $query->orWhere(['like', 'customer_phone_number', $keyword]);
-              $query->orWhere(['like', 'customer_email', $keyword]);
-        }
-
-        $query->andWhere(['restaurant_uuid' => $store_uuid]);
-
-        return new ActiveDataProvider([
-            'query' => $query
-        ]);
-
-      }
-    }
 
     /**
     * Return customer detail

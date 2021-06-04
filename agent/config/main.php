@@ -100,7 +100,6 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
-                        'POST' => 'filter',
                         'POST create' => 'create',
                         'POST upload-image' => 'upload-category-image',
                         'PATCH <category_id>/<store_uuid>' => 'update',
@@ -119,7 +118,6 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
-                        'POST' => 'filter',
                         'POST create' => 'create',
                         'PATCH <assignment_id>/<store_uuid>' => 'update',
                         'DELETE <assignment_id>/<store_uuid>' => 'delete',
@@ -147,7 +145,6 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
-                        'POST' => 'filter',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options'
@@ -193,7 +190,6 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
-                        'POST' => 'filter',
                         'POST create' => 'create',
                         'PATCH <bank_discount_id>/<store_uuid>' => 'update',
                         'PATCH update-status' => 'update-bank-discount-status',
@@ -212,6 +208,7 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',
+                        'GET detail' => 'detail',
                         'POST create' => 'create',
                         'DELETE <delivery_zone_id>/<store_uuid>' => 'delete',
                         'PATCH <delivery_zone_id>/<store_uuid>' => 'update',
@@ -219,7 +216,7 @@ return [
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS create' => 'options',
-                        'OPTIONS <business_location_id>/<store_uuid>' => 'options',
+                        'OPTIONS <delivery_zone_id>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// OpeningHoursController
@@ -286,7 +283,6 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
-                        'POST' => 'filter',
                         'GET orders' => 'list-all-customer-orders',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
@@ -301,7 +297,6 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
-                        'POST' => 'filter',
                         'POST create' => 'create',
                         'PATCH <business_location_id>/<store_uuid>' => 'update',
                         'DELETE <business_location_id>/<store_uuid>' => 'delete',

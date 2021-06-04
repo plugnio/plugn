@@ -68,47 +68,27 @@ class BankDiscountController extends Controller {
      */
     public function actionList($store_uuid) {
 
-          Yii::$app->accountManager->getManagedAccount($store_uuid);
-
-          $bankDiscounts =  BankDiscount::find()
-                    ->where(['restaurant_uuid' => $store_uuid]);
-
-          return new ActiveDataProvider([
-            'query' => $bankDiscounts
-          ]);
-
-
-    }
-
-
-    /**
-    * Return a List of bank discount by keyword
-   */
-    public function actionFilter($store_uuid)
-    {
-        Yii::$app->accountManager->getManagedAccount($store_uuid);
-
         $keyword = Yii::$app->request->get('keyword');
 
-        $query =  BankDiscount::find()->joinWith('bank');
+        Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-        if($keyword) {
-              $query->andWhere(['like', 'discount_amount', $keyword]);
-              $query->orWhere(['like', 'bank.bank_name', $keyword]);
-              $query->orWhere(['like', 'max_redemption', $keyword]);
-              $query->orWhere(['like', 'discount_type', $keyword]);
-              $query->orWhere(['like', 'max_redemption', $keyword]);
-              $query->orWhere(['like', 'limit_per_customer', $keyword]);
-          }
+        $query =  BankDiscount::find();
+
+        if ($keyword){
+          $query->where(['like', 'discount_amount', $keyword]);
+          $query->orWhere(['like', 'bank.bank_name', $keyword]);
+          $query->orWhere(['like', 'max_redemption', $keyword]);
+          $query->orWhere(['like', 'discount_type', $keyword]);
+          $query->orWhere(['like', 'limit_per_customer', $keyword]);
+        }
 
         $query->andWhere(['restaurant_uuid' => $store_uuid]);
 
         return new ActiveDataProvider([
-            'query' => $query
+          'query' => $query
         ]);
 
     }
-
 
 
     /**
