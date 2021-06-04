@@ -259,7 +259,10 @@ class Restaurant extends \yii\db\ActiveRecord {
            //         $this->addError($attribute, "You've made your first sale, so you need to contact support if you want to change your currency.");
            // }],
 
-
+           [['schedule_interval'], 'required','when' => function($model) {
+                   return $model->schedule_order;
+               }
+           ],
             [['restaurant_email_notification', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable'], 'integer'],
             ['restaurant_email', 'email'],
             [['restaurant_uuid', 'restaurant_domain', 'name'], 'unique'],
