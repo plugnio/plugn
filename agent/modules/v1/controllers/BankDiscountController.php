@@ -72,7 +72,7 @@ class BankDiscountController extends Controller {
 
         Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-        $query =  BankDiscount::find();
+        $query =  BankDiscount::find()->joinWith('bank');
 
         if ($keyword){
           $query->where(['like', 'discount_amount', $keyword]);
