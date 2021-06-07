@@ -69,15 +69,24 @@ class StaffController extends Controller {
      */
     public function actionList($store_uuid) {
 
-          Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-          $model =  AgentAssignment::find()
-                    ->where(['restaurant_uuid' => $store_uuid]);
+        $keyword = Yii::$app->request->get('keyword');
 
+        Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-          return new ActiveDataProvider([
-              'query' => $model
-          ]);
+        $query =  AgentAssignment::find()->joinWith('agent');
+
+        if ($keyword){
+          $query->where(['like', 'agent.agent_name', $keyword]);
+          $query->orWhere(['like', 'assignment_agent_email', $keyword]);
+          $query->orWhere(['like', 'role', $keyword]);
+        }
+
+        $query->andWhere(['restaurant_uuid' => $store_uuid]);
+
+        return new ActiveDataProvider([
+          'query' => $query
+        ]);
 
 
     }
