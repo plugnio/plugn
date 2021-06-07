@@ -59,7 +59,7 @@ return [
             'agent/config/main-local.php',
         ],
     ],
-    'Develop' => [
+    'Dev-Server' => [
         'path' => 'dev-server',
         'setWritable' => [
             'backend/runtime',
@@ -89,7 +89,7 @@ return [
             'shortner/config/main-local.php',
         ],
     ],
-    'Staging' => [
+    'Staging-Server' => [
         'path' => 'staging',
         'setWritable' => [
             'backend/runtime',
