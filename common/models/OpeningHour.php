@@ -120,19 +120,6 @@ class OpeningHour extends \yii\db\ActiveRecord {
     }
 
     /**
-     * @inheritdoc
-     */
-    public function fields() {
-        $fields = parent::fields();
-
-        // remove fields that contain sensitive information
-        unset($fields['restaurant_uuid']);
-        unset($fields['opening_hour_id']);
-
-        return $fields;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function attributeLabels() {

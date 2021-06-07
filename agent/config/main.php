@@ -150,6 +150,18 @@ return [
                         'OPTIONS detail' => 'options'
                     ]
                 ],
+                [// CityController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/city',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options'
+                    ]
+                ],
                 [// AgentController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/agent',
@@ -225,12 +237,13 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',
-                        'GET <opening_hour_id>/<store_uuid>' => 'detail',
-                        'PATCH <opening_hour_id>/<store_uuid>' => 'update',
-                        'DELETE <opening_hour_id>/<store_uuid>' => 'delete',
+                        'GET <day_of_week>/<store_uuid>' => 'detail',
+                        'POST <day_of_week>/<store_uuid>' => 'create',
+                        'PATCH <day_of_week>/<store_uuid>' => 'update',
+                        'DELETE <day_of_week>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS <opening_hour_id>/<store_uuid>' => 'options',
+                        'OPTIONS <day_of_week>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// AreaDeliveryZoneController
