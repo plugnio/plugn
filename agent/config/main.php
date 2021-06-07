@@ -238,12 +238,12 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET <day_of_week>/<store_uuid>' => 'detail',
-                        'POST <day_of_week>/<store_uuid>' => 'create',
-                        'PATCH <day_of_week>/<store_uuid>' => 'update',
-                        'DELETE <day_of_week>/<store_uuid>' => 'delete',
+                        'POST <store_uuid>' => 'create',
+                        'PATCH <store_uuid>' => 'update',
+                        'DELETE <opening_hour_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS <day_of_week>/<store_uuid>' => 'options',
+                        'OPTIONS <opening_hour_id>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// AreaDeliveryZoneController
