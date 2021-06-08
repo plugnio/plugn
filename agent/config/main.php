@@ -239,10 +239,11 @@ return [
                         'GET' => 'list',
                         'GET <day_of_week>/<store_uuid>' => 'detail',
                         'POST <store_uuid>' => 'create',
-                        'PATCH <store_uuid>' => 'update',
+                        'PATCH <day_of_week>' => 'update',
                         'DELETE <opening_hour_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS <day_of_week>' => 'options',
                         'OPTIONS <opening_hour_id>/<store_uuid>' => 'options',
                     ]
                 ],
