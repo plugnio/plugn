@@ -2,6 +2,7 @@
 
 namespace agent\modules\v1\controllers;
 
+use agent\models\Restaurant;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
@@ -59,21 +60,44 @@ class StoreController extends Controller {
         return $actions;
     }
 
-
     /**
      * Return an overview of the store details
      * @param type $store_uuid
      */
     public function actionDetail($store_uuid) {
-
       if ($store = Yii::$app->accountManager->getManagedAccount($store_uuid)) {
-
-          return $store;
-
+          return Restaurant::findOne($store_uuid);
       }
-
     }
 
+    /**
+     * Return an overview of the store details
+     * @param type $store_uuid
+     */
+    public function actionUpdate($store_uuid) {
+        if ($store = Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+            $store->country_id = Yii::$app->request->getBodyParam('country_id');
+            $store->restaurant_email_notification = Yii::$app->request->getBodyParam('email_notification');
+            $store->phone_number = Yii::$app->request->getBodyParam('mobile');
+            $store->phone_number_country_code = Yii::$app->request->getBodyParam('mobile_country_code');
+            $store->name = Yii::$app->request->getBodyParam('name');
+            $store->name_ar = Yii::$app->request->getBodyParam('name_ar');
+            $store->schedule_interval = Yii::$app->request->getBodyParam('schedule_interval');
+            $store->schedule_order = Yii::$app->request->getBodyParam('schedule_order');
+            $store->restaurant_email = Yii::$app->request->getBodyParam('store_email');
+            $store->tagline = Yii::$app->request->getBodyParam('tagline');
+            $store->tagline_ar = Yii::$app->request->getBodyParam('tagline_ar');
+            if (!$store->save()) {
+                return [
+                    'operation'=>'error',
+                    'message'=>$store->getErrors()
+                ];
+            }
 
-
+            return [
+                'operation'=>'success',
+                'message'=>'Store details updated successfully'
+            ];
+        }
+    }
 }
