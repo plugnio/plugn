@@ -287,10 +287,13 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',
-                        'GET detail' => 'detail',
+                        'GET <id>' => 'detail',
+                        'POST' => 'create',
+                        'PATCH <id>' => 'update',
+                        'DELETE <id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
+                        'OPTIONS <id>' => 'options'
                     ]
                 ],
                 [// CustomerController
