@@ -132,47 +132,51 @@ class OpeningHoursController extends Controller {
      * Update opening hours
      * @return array
      */
-    public function actionUpdate($store_uuid) {
-
+    public function actionUpdate($day_of_week) {
 
         $opening_hours = Yii::$app->request->getBodyParam("opening_hours");
 
-        if(is_array($opening_hours) && sizeof($opening_hours) > 0){
+        //validate
+
+        $store_model = Yii::$app->accountManager->getManagedAccount();
+
+        //remove old
+
+        OpeningHour::deleteAll([
+            'day_of_week' => $day_of_week,
+            'restaurant_uuid' => $store_model->restaurant_uuid
+        ]);
+
+        //add new timeslots
 
             foreach ($opening_hours as $key => $opening_hour) {
 
-              $model =  $this->findModel($opening_hour['opening_hour_id'], $store_uuid);
-              $model->restaurant_uuid = $store_uuid;
+                $model = new OpeningHour;
+                $model->restaurant_uuid = $store_model->restaurant_uuid;
+                $model->day_of_week = $day_of_week;
+                $model->open_at = $opening_hour['open_at'];
+                $model->close_at = $opening_hour['close_at'];
 
-              $model->day_of_week = $opening_hour['day_of_week'];
-              $model->open_at = $opening_hour['open_at'];
-              $model->close_at = $opening_hour['close_at'];
-
-              if (!$model->save())
-              {
-                  if (isset($model->errors)) {
-                      return [
-                          "operation" => "error",
-                          "message" => $model->errors
-                      ];
-                  } else {
-                      return [
-                          "operation" => "error",
-                          "message" => "We've faced a problem updating the Opening Hour"
-                      ];
-                  }
-              }
-
+                if (!$model->save ()) {
+                    if (isset($model->errors)) {
+                        return [
+                            "operation" => "error",
+                            "message" => $model->errors
+                        ];
+                    } else {
+                        return [
+                            "operation" => "error",
+                            "message" => "We've faced a problem updating the Opening Hour"
+                        ];
+                    }
+                }
             }
 
-             return [
-                 "operation" => "success",
-                 "message" => "Opening Hour updated successfully"
-             ];
-        }
-
+        return [
+            "operation" => "success",
+            "message" => "Opening Hour updated successfully"
+        ];
     }
-
 
         /**
         * Return OpeningHour detail
