@@ -1,5 +1,69 @@
-## Configure Cron Commands using following intervals
+## Set up Docker Dev Environment
 
+Run the following command after installing Docker
+
+```bash
+docker-compose up
+```
+
+This should set you up with the entire app along with MySQL and Redis. Use the following links to check it out:
+
+* [Backend on localhost:21080](http://localhost:21080)
+* [Investor API on localhost:20080](http://localhost:20080)
+* [Phpmyadmin on localhost:8080](http://localhost:8080)
+
+
+## Accessing terminal in backend container
+
+```bash
+docker-compose exec backend bash
+
+# Now you can run things like
+./init
+./yii migrate
+```
+
+## Running Codeception Tests
+
+Use `docker-compose run --rm` to launch a new backend container which will run the automated tests then destroy the container after it's done.
+
+We have a shortcut script in the project main folder you can use to run complete tests.
+
+```bash
+# Shortcut script in project root folder.
+# Launch this from your own device(host) not the container
+./run-tests.sh
+
+# What this is doing is calling
+docker-compose run --rm backend vendor/bin/codecept run --fail-fast --html report-web.html
+
+# You can also run this in the background by passing `-d` flag
+# to docker-compose and check the test results in the
+# outputted report-web.html
+```
+
+## Managing MySQL Database
+
+### Using Terminal / CLI
+
+```bash
+# Connect to mysql container
+docker-compose exec mysql bash
+
+# Connect to db
+mysql -uroot -p12345
+```
+
+
+### Using Phpmyadmin
+
+Phpmyadmin is running on localhost port 8080.
+
+* [http://localhost:8080](http://localhost:8080)
+* Username: root
+* Password: 12345
+
+## Configure Cron Commands using following intervals
 
 ```bash
 # Every  minute
@@ -29,3 +93,4 @@
 
 # Every Sunday
 0 0 * * SAT php ~/www/yii cron/weekly-report  > /dev/null 2>&1
+```
