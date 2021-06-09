@@ -21,13 +21,10 @@ use yii\behaviors\TimestampBehavior;
  */
 class TapQueue extends \yii\db\ActiveRecord
 {
-
-
       //Values for `queue_status`
       const QUEUE_STATUS_PENDING = 1;
       const QUEUE_STATUS_CREATING = 2;
       const QUEUE_STATUS_COMPLETE = 3;
-
 
     /**
      * {@inheritdoc}

@@ -1,6 +1,9 @@
 <?php
-
-$index1 = $index % 20; //faker->unique()->numberBetween(0, 500);
+/**
+ * @var $faker \Faker\Generator
+ * @var $index integer
+ */
+$index1 = $index % 50; //faker->unique()->numberBetween(0, 500);
 
 $option_id = Yii::$app->db->createCommand('SELECT option_id from `option` limit ' . $index1 . ',1')->queryScalar();
                                                 

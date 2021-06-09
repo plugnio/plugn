@@ -1,9 +1,13 @@
 <?php
+/**
+ * @var $faker \Faker\Generator
+ * @var $index integer
+ */
+
 $index1 = $index % 5; //faker->unique()->numberBetween(0, 500);
 
 $orderItem = Yii::$app->db->createCommand('SELECT * from `order_item` limit ' . $index . ',1')->queryAll();
 $extraOption = Yii::$app->db->createCommand('SELECT * from `extra_option` limit ' . $index . ',1')->queryAll();
-
 
 return [
     'order_item_extra_option_id' => $faker->numberBetween(1,100000),

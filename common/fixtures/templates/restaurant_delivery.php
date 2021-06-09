@@ -1,4 +1,8 @@
 <?php
+/**
+ * @var $faker \Faker\Generator
+ * @var $index integer
+ */
 
 $index1 = $index % 500; //faker->unique()->numberBetween(0, 500);
 $index2 = $index % 50; //faker->unique()->numberBetween(0, 50);

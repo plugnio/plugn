@@ -1,9 +1,12 @@
 <?php
+/**
+ * @var $faker \Faker\Generator
+ * @var $index integer
+ */
 
-$index1 = $index % 3;//faker->unique()->numberBetween(0, 1000);
-$index2 = $index % 500;//$faker->unique()->numberBetween(0, 500);
+$index1 = $index % 50;//$faker->unique()->numberBetween(0, 500);
 
-$restaurant= Yii::$app->db->createCommand('SELECT * from restaurant')->queryOne();
+$restaurant= Yii::$app->db->createCommand('SELECT * from restaurant limit ' . $index1 . ',1')->queryOne();
 
 return [
     'item_uuid' => $faker->numberBetween(1000,1000000),
