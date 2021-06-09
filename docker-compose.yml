@@ -12,7 +12,7 @@ services:
       - MYSQL_USER=plugnuser
       - MYSQL_PASSWORD=12345
     entrypoint:
-      sh -c "echo 'CREATE DATABASE IF NOT EXISTS capital_test;' > /docker-entrypoint-initdb.d/init.sql;
+      sh -c "echo 'CREATE DATABASE IF NOT EXISTS plugn_test;' > /docker-entrypoint-initdb.d/init.sql;
         /usr/local/bin/docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
 
   redis:
@@ -32,7 +32,7 @@ services:
 
   # Start container to install composer deps and kill after
   composer-deps:
-    build: investor
+    build: backend
     command: composer install
     volumes:
       # Re-use local composer cache via host-volume
@@ -42,7 +42,7 @@ services:
 
   # Start container to init dev environment and kill after
   init-environment:
-    build: investor
+    build: backend
     command: ./init --env=Development --overwrite=All
     volumes:
       # Re-use local composer cache via host-volume
@@ -54,7 +54,7 @@ services:
 
   # Start container to run db migrations and kill after
   db-migration:
-    build: investor
+    build: backend
     command: bash -c "sleep 20 && ./yii migrate --interactive=0 && ./yii_test migrate --interactive=0"
     volumes:
       # Re-use local composer cache via host-volume
@@ -77,10 +77,10 @@ services:
     depends_on:
       - "db-migration"
 
-  investor-api:
-    build: investor
+  backend:
+    build: backend
     ports:
-      - 20080:80
+      - 21080:80
     volumes:
       # Re-use local composer cache via host-volume
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
@@ -89,10 +89,46 @@ services:
     depends_on:
       - "cron"
 
-  backend:
-    build: backend
+  store-dashboard:
+    build: frontend
     ports:
-      - 21080:80
+      - 22080:80
+    volumes:
+      # Re-use local composer cache via host-volume
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      # Mount source-code for development
+      - ./:/app
+    depends_on:
+      - "cron"
+
+  store-dashboard-api:
+    build: frontend
+    ports:
+      - 23080:80
+    volumes:
+      # Re-use local composer cache via host-volume
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      # Mount source-code for development
+      - ./:/app
+    depends_on:
+      - "cron"
+
+  storefront-api:
+    build: api
+    ports:
+      - 24080:80
+    volumes:
+      # Re-use local composer cache via host-volume
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      # Mount source-code for development
+      - ./:/app
+    depends_on:
+      - "cron"
+
+  shortner:
+    build: shortner
+    ports:
+      - 25080:80
     volumes:
       # Re-use local composer cache via host-volume
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
