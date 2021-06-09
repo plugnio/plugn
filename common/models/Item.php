@@ -43,17 +43,14 @@ class Item extends \yii\db\ActiveRecord
     public $items_category;
     public $item_images;
 
-
     //Values for `prep_time_unit`
     const TIME_UNIT_MIN = 'min';
     const TIME_UNIT_HRS = 'hrs';
     const TIME_UNIT_DAY = 'day';
 
-
     //Values for `item_status`
     const ITEM_STATUS_PUBLISH = 1;
     const ITEM_STATUS_UNPUBLISH =  2;
-
 
     /**
      * {@inheritdoc}

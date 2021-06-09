@@ -3,6 +3,7 @@
 namespace agent\modules\v1\controllers;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
@@ -138,6 +139,14 @@ class ItemController extends Controller
             }
         }
 
+        //save categories
+
+        $itemCategories = Yii::$app->request->getBodyParam ('itemCategories');
+
+        $arrCategoryIds = ArrayHelper::getColumn ($itemCategories, 'categorry_id');
+
+        $model->saveItemsCategory($arrCategoryIds);
+
         return [
             "operation" => "success",
             "message" => "Item created successfully"
@@ -177,6 +186,14 @@ class ItemController extends Controller
                 ];
             }
         }
+
+        //save categories
+
+        $itemCategories = Yii::$app->request->getBodyParam ('itemCategories');
+
+        $arrCategoryIds = ArrayHelper::getColumn ($itemCategories, 'categorry_id');
+
+        $model->saveItemsCategory($arrCategoryIds);
 
         return [
             "operation" => "success",
