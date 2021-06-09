@@ -1,4 +1,8 @@
 <?php
+/**
+ * @var $faker \Faker\Generator
+ * @var $index integer
+ */
 
 return [
     'payment_method_id' => $faker->numberBetween(0,500),

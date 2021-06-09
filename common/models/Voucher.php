@@ -41,7 +41,6 @@ class Voucher extends \yii\db\ActiveRecord {
     const DISCOUNT_TYPE_AMOUNT = 2;
     const DISCOUNT_TYPE_FREE_DELIVERY = 3;
 
-
     //Values for `voucher_status`
     const VOUCHER_STATUS_ACTIVE = 1;
     const VOUCHER_STATUS_EXPIRED = 2;

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @var $faker \Faker\Generator
+ * @var $index integer
+ */
 
 $item = Yii::$app->db->createCommand('SELECT * from `item` limit ' . $index . ',1')->queryAll();
 
