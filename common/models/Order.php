@@ -219,15 +219,15 @@ class Order extends \yii\db\ActiveRecord {
                 }
             ],
             [['floor'], 'required', 'when' => function($model) {
-                    return ($model->unit_type == 'Office' ||  $model->unit_type == 'Apartment') && ($model->restaurant->version == 2 || $model->restaurant->version == 3);
+                    return ($model->unit_type == 'Office' ||  $model->unit_type == 'Apartment') && ($model->restaurant->version == 2 || $model->restaurant->version == 3 || $model->restaurant->version == 4);
                 }
             ],
             [['office'], 'required', 'when' => function($model) {
-                    return $model->unit_type == 'Office' && ($model->restaurant->version == 2 || $model->restaurant->version == 3);
+                    return $model->unit_type == 'Office' && ($model->restaurant->version == 2 || $model->restaurant->version == 3 || $model->restaurant->version == 4);
                 }
             ],
             [['apartment'], 'required', 'when' => function($model) {
-                    return $model->unit_type == 'Apartment' && ($model->restaurant->version == 2 || $model->restaurant->version == 3);
+                    return $model->unit_type == 'Apartment' && ($model->restaurant->version == 2 || $model->restaurant->version == 3 || $model->restaurant->version == 4);
                 }
             ],
             [['postalcode', 'city', 'address_1' , 'address_2'], 'required', 'when' => function($model) {
@@ -853,7 +853,7 @@ class Order extends \yii\db\ActiveRecord {
         //   }
         // }
 
-        if($this->restaurant->version == 3){
+        if($this->restaurant->version == 4){
           if(!$this->is_order_scheduled && $this->orderItems){
 
               $maxPrepTime = 0;
