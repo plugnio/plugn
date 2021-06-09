@@ -7,6 +7,7 @@ use Yii;
 /**
  * This is the model class for table "area_delivery_zone".
  *
+ * @property int $area_delivery_zone
  * @property int $delivery_zone_id
  * @property int $area_id
  * @property string $restaurant_uuid
@@ -77,6 +78,14 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
         return true;
     }
 
+
+    public function extraFields() {
+        return [
+            'area',
+            'city',
+            'deliveryZone'
+        ];
+    }
 
     /**
      * Gets query for [[Area]].

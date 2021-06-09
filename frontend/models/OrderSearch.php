@@ -270,8 +270,9 @@ class OrderSearch extends Order {
             ->joinWith('pickupLocation', true)
             ->joinWith('customer', true)
             ->orderBy(['order_created_at' => SORT_DESC]);
-
+  
         if($agentAssignment && $agentAssignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
+
             $query
                 ->andWhere([ 'delivery_zone.business_location_id' => $agentAssignment->business_location_id])
                 ->orWhere([ 'pickup_location_id' => $agentAssignment->business_location_id]);

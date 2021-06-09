@@ -3,23 +3,26 @@
 namespace agent\modules\v1\controllers;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use common\models\Item;
+use agent\models\Item;
 
-class ItemController extends Controller {
+class ItemController extends Controller
+{
 
-    public function behaviors() {
-        $behaviors = parent::behaviors();
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors ();
 
         // remove authentication filter for cors to work
         unset($behaviors['authenticator']);
 
         // Allow XHR Requests from our different subdomains and dev machines
         $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className(),
+            'class' => \yii\filters\Cors::className (),
             'cors' => [
                 'Origin' => Yii::$app->params['allowedOrigins'],
                 'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
@@ -36,20 +39,21 @@ class ItemController extends Controller {
         ];
 
         // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-              $behaviors['authenticator'] = [
-                  'class' => \yii\filters\auth\HttpBearerAuth::className(),
-              ];
-              // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-              $behaviors['authenticator']['except'] = ['options'];
+        $behaviors['authenticator'] = [
+            'class' => \yii\filters\auth\HttpBearerAuth::className (),
+        ];
+        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+        $behaviors['authenticator']['except'] = ['options'];
 
-              return $behaviors;
+        return $behaviors;
     }
 
     /**
      * @inheritdoc
      */
-    public function actions() {
-        $actions = parent::actions();
+    public function actions()
+    {
+        $actions = parent::actions ();
         $actions['options'] = [
             'class' => 'yii\rest\OptionsAction',
             // optional:
@@ -59,72 +63,188 @@ class ItemController extends Controller {
         return $actions;
     }
 
-
     /**
-    * Get all store's products
-     * @param type $id
-     * @param type $store_uuid
+     * Get all store's products
      * @return type
      */
-    public function actionList($store_uuid) {
+    public function actionList()
+    {
+        $keyword = Yii::$app->request->get ('keyword');
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+        $store = Yii::$app->accountManager->getManagedAccount ();
 
-          $items =  Item::find()
-                    ->where(['restaurant_uuid' => $store_uuid])
-                    ->asArray()
-                    ->all();
+        $query = $store->getItems();
 
+        if ($keyword) {
+            $query->filterWhere ([
+                    'or',
+                    ['like', 'item_name', $keyword],
+                    ['like', 'item_name_ar', $keyword],
+                    ['like', 'item_description', $keyword],
+                    ['like', 'item_description_ar', $keyword]
+                ]);
+        }
 
-          if (!$items) {
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found'
-              ];
-          }
-
-          return [
-              'operation' => 'success',
-              'body' => $items
-          ];
-
-      }
-
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
     }
 
+    /**
+     * Return item detail
+     * @param string $id
+     * @return Item
+     */
+    public function actionDetail($id)
+    {
+        return $this->findModel($id);
+    }
 
     /**
-    * Return item detail
-     * @param type $store_uuid
-     * @param type $order_uuid
-     * @return type
+     * add new item
+     * @return array|string[]
+     * @throws NotFoundHttpException
      */
-    public function actionDetail($store_uuid, $item_uuid) {
+    public function actionCreate()
+    {
+        $store = Yii::$app->accountManager->getManagedAccount();
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+        $model = new Item();
 
-          $item =  Item::find()
-                    ->where(['restaurant_uuid' => $store_uuid])
-                    ->andWhere(['item_uuid' => $item_uuid])
-                    ->asArray()
-                    ->one();
+        $model->restaurant_uuid = $store->restaurant_uuid;
+        $model->item_name = Yii::$app->request->getBodyParam ("name");
+        $model->item_name_ar = Yii::$app->request->getBodyParam ("name_ar");
+        $model->item_description = Yii::$app->request->getBodyParam ("description");
+        $model->item_description_ar = (int)Yii::$app->request->getBodyParam ("description_ar");
+        $model->sort_number = Yii::$app->request->getBodyParam ("sort_number");
+        $model->prep_time = Yii::$app->request->getBodyParam ("prep_time");
+        $model->prep_time_unit = Yii::$app->request->getBodyParam ("prep_time_unit");
+        $model->item_price = Yii::$app->request->getBodyParam ("price");
+        $model->sku = Yii::$app->request->getBodyParam ("sku");
+        $model->barcode = Yii::$app->request->getBodyParam ("barcode");
+        $model->track_quantity = Yii::$app->request->getBodyParam ("track_quantity");
+        $model->stock_qty = Yii::$app->request->getBodyParam ("track_quantity");
 
+        if (!$model->save ()) {
+            if (isset($model->errors)) {
+                return [
+                    "operation" => "error",
+                    "message" => $model->errors
+                ];
+            } else {
+                return [
+                    "operation" => "error",
+                    "message" => "We've faced a problem creating the item"
+                ];
+            }
+        }
 
-          if (!$item) {
+        //save categories
 
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found.'
-              ];
-          }
+        $itemCategories = Yii::$app->request->getBodyParam ('itemCategories');
 
-          return [
-              'operation' => 'success',
-              'body' => $item
-          ];
+        $arrCategoryIds = ArrayHelper::getColumn ($itemCategories, 'categorry_id');
 
-      }
+        $model->saveItemsCategory($arrCategoryIds);
 
-  }
+        return [
+            "operation" => "success",
+            "message" => "Item created successfully"
+        ];
+    }
 
+    /**
+     * Update item
+     */
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel ($id);
+
+        $model->item_name = Yii::$app->request->getBodyParam ("name");
+        $model->item_name_ar = Yii::$app->request->getBodyParam ("name_ar");
+        $model->item_description = Yii::$app->request->getBodyParam ("description");
+        $model->item_description_ar = (int)Yii::$app->request->getBodyParam ("description_ar");
+        $model->sort_number = Yii::$app->request->getBodyParam ("sort_number");
+        $model->prep_time = Yii::$app->request->getBodyParam ("prep_time");
+        $model->prep_time_unit = Yii::$app->request->getBodyParam ("prep_time_unit");
+        $model->item_price = Yii::$app->request->getBodyParam ("price");
+        $model->sku = Yii::$app->request->getBodyParam ("sku");
+        $model->barcode = Yii::$app->request->getBodyParam ("barcode");
+        $model->track_quantity = Yii::$app->request->getBodyParam ("track_quantity");
+        $model->stock_qty = Yii::$app->request->getBodyParam ("track_quantity");
+
+        if (!$model->save ()) {
+            if (isset($model->errors)) {
+                return [
+                    "operation" => "error",
+                    "message" => $model->errors
+                ];
+            } else {
+                return [
+                    "operation" => "error",
+                    "message" => "We've faced a problem updating the item"
+                ];
+            }
+        }
+
+        //save categories
+
+        $itemCategories = Yii::$app->request->getBodyParam ('itemCategories');
+
+        $arrCategoryIds = ArrayHelper::getColumn ($itemCategories, 'categorry_id');
+
+        $model->saveItemsCategory($arrCategoryIds);
+
+        return [
+            "operation" => "success",
+            "message" => "Item updated successfully"
+        ];
+    }
+
+    /**
+     * Delete Business Location
+     */
+    public function actionDelete($id)
+    {
+        $model = $this->findModel ($id);
+
+        if (!$model->delete ()) {
+            if (isset($model->errors)) {
+                return [
+                    "operation" => "error",
+                    "message" => $model->errors
+                ];
+            } else {
+                return [
+                    "operation" => "error",
+                    "message" => "We've faced a problem deleting the item"
+                ];
+            }
+        }
+
+        return [
+            "operation" => "success",
+            "message" => "Item deleted successfully"
+        ];
+    }
+
+    /**
+     * Finds the Item model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $item_uuid
+     * @return Item the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($item_uuid)
+    {
+        $store = Yii::$app->accountManager->getManagedAccount();
+
+        $model = $store->getItems()->findOne($item_uuid);
+
+        if ($model !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested record does not exist.');
+        }
+    }
 }

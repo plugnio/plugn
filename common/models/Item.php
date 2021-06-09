@@ -43,17 +43,14 @@ class Item extends \yii\db\ActiveRecord
     public $items_category;
     public $item_images;
 
-
     //Values for `prep_time_unit`
     const TIME_UNIT_MIN = 'min';
     const TIME_UNIT_HRS = 'hrs';
     const TIME_UNIT_DAY = 'day';
 
-
     //Values for `item_status`
     const ITEM_STATUS_PUBLISH = 1;
     const ITEM_STATUS_UNPUBLISH =  2;
-
 
     /**
      * {@inheritdoc}
@@ -180,7 +177,9 @@ class Item extends \yii\db\ActiveRecord
             // remove fields that contain sensitive information
             unset($fields['item_created_at']);
             unset($fields['item_updated_at']);
+            unset($fields['unit_sold']);
             unset($fields['barcode']);
+            unset($fields['sku']);
 
             return $fields;
         }

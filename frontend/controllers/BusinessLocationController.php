@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use Yii;
+use common\models\Restaurant;
 use common\models\BusinessLocation;
 use frontend\models\BusinessLocationSearch;
 use yii\web\Controller;
@@ -65,17 +66,106 @@ class BusinessLocationController extends Controller
      */
     public function actionCreate($storeUuid)
     {
+        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
         $model = new BusinessLocation();
-        $model->restaurant_uuid = $storeUuid;
+        $model->restaurant_uuid = $store_model->restaurant_uuid;
 
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post()) ) {
+
+          if($model->latitude && $model->longitude ) {
+            $response = Yii::$app->googleMapComponent->getReverseGeocodeing($model->latitude,$model->longitude);
+
+            if($response->isOk){
+
+              $building = '';
+              $block = '';
+              $street = '';
+              $area = '';
+              $country = '';
+
+              foreach ($response->data['results'] as $key => $address) {
+
+                if(in_array('neighborhood', $address['types'])){
+                   foreach ($address['address_components'] as $key => $adress_component) {
+                     if(in_array('neighborhood', $adress_component['types'])){
+                       $block = $adress_component['long_name'];
+                     }
+                   }
+               }
+
+                else if(in_array('route', $address['types'])){
+                    foreach ($address['address_components'] as $key => $adress_component) {
+                      if(in_array('route', $adress_component['types'])){
+                        $street = $adress_component['long_name'];
+                      }
+                    }
+                }
+
+                else if(in_array('premise', $address['types'])){
+                    foreach ($address['address_components'] as $key => $adress_component) {
+                      if(in_array('premise', $adress_component['types'])){
+                        $building = $adress_component['long_name'];
+                      }
+                    }
+                }
+
+
+                else if(in_array('sublocality', $address['types'])){
+                    foreach ($address['address_components'] as $key => $adress_component) {
+                      if(in_array('sublocality', $adress_component['types'])){
+                        $area = $adress_component['long_name'];
+                      }
+                    }
+                }
+
+
+                else if(in_array('political', $address['types'])){
+                    foreach ($address['address_components'] as $key => $adress_component) {
+                      if(in_array('political', $adress_component['types'])){
+                        $country = $adress_component['long_name'];
+                      }
+                    }
+                }
+
+
+
+
+              }
+
+              $address = '';
+
+              if($building)
+                $address = $building . ', ';
+
+              if($block)
+                $address .= $block . ', ';
+
+              if($street)
+                $address .= $street . ', ';
+
+              if($area)
+                $address .= $area . ', ';
+
+                $address .=   $country;
+
+
+              $model->address = $address;
+
+            } else {
+              Yii::error('[ ReverseGeocodeing ]' . json_encode($response) . ' lat: '. $lat . ', lng: '. $lng , __METHOD__);
+            }
+          }
+
+
+          if($model->save())
             return $this->redirect(['index', 'storeUuid' => $storeUuid]);
+
         }
 
         return $this->render('create', [
             'model' => $model,
-            'storeUuid' => $storeUuid
+            'store_model' => $store_model
         ]);
     }
 
@@ -104,14 +194,14 @@ class BusinessLocationController extends Controller
 
 
 
-        public function actionRemoveTax($id, $storeUuid)
-        {
-            $model = $this->findModel($id, $storeUuid);
-            $model->business_location_tax = 0;
-            $model->save();
+    public function actionRemoveTax($id, $storeUuid)
+    {
+        $model = $this->findModel($id, $storeUuid);
+        $model->business_location_tax = 0;
+        $model->save();
 
-            return $this->redirect(['index',  'storeUuid' => $storeUuid]);
-        }
+        return $this->redirect(['index',  'storeUuid' => $storeUuid]);
+    }
 
     public function actionConfigureTax($id, $storeUuid)
     {
@@ -138,13 +228,101 @@ class BusinessLocationController extends Controller
     {
         $model = $this->findModel($id, $storeUuid);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index',  'storeUuid' => $storeUuid]);
+
+        if ($model->load(Yii::$app->request->post()) ) {
+
+          if($model->latitude && $model->longitude ) {
+            $response = Yii::$app->googleMapComponent->getReverseGeocodeing($model->latitude,$model->longitude);
+
+            if($response->isOk){
+
+              $building = '';
+              $block = '';
+              $street = '';
+              $area = '';
+              $country = '';
+
+              foreach ($response->data['results'] as $key => $address) {
+
+                if(in_array('neighborhood', $address['types'])){
+                   foreach ($address['address_components'] as $key => $adress_component) {
+                     if(in_array('neighborhood', $adress_component['types'])){
+                       $block = $adress_component['long_name'];
+                     }
+                   }
+               }
+
+                else if(in_array('route', $address['types'])){
+                    foreach ($address['address_components'] as $key => $adress_component) {
+                      if(in_array('route', $adress_component['types'])){
+                        $street = $adress_component['long_name'];
+                      }
+                    }
+                }
+
+                else if(in_array('premise', $address['types'])){
+                    foreach ($address['address_components'] as $key => $adress_component) {
+                      if(in_array('premise', $adress_component['types'])){
+                        $building = $adress_component['long_name'];
+                      }
+                    }
+                }
+
+
+                else if(in_array('sublocality', $address['types'])){
+                    foreach ($address['address_components'] as $key => $adress_component) {
+                      if(in_array('sublocality', $adress_component['types'])){
+                        $area = $adress_component['long_name'];
+                      }
+                    }
+                }
+
+
+                else if(in_array('political', $address['types'])){
+                    foreach ($address['address_components'] as $key => $adress_component) {
+                      if(in_array('political', $adress_component['types'])){
+                        $country = $adress_component['long_name'];
+                      }
+                    }
+                }
+
+              }
+
+              $address = '';
+
+              if($building)
+                $address = $building . ', ';
+
+              if($block)
+                $address .= $block . ', ';
+
+              if($street)
+                $address .= $street . ', ';
+
+              if($area)
+                $address .= $area . ', ';
+
+                $address .=   $country;
+
+
+              $model->address = $address;
+
+            } else {
+              Yii::error('[ ReverseGeocodeing ]' . json_encode($response) . ' lat: '. $lat . ', lng: '. $lng , __METHOD__);
+            }
+          }
+
+
+
+          if($model->save())
+            return $this->redirect(['index', 'storeUuid' => $storeUuid]);
         }
+
+
 
         return $this->render('update', [
             'model' => $model,
-            'storeUuid' => $storeUuid
+            'store_model' => Restaurant::findOne($storeUuid)
         ]);
     }
 

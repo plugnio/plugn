@@ -49,6 +49,17 @@ class City extends \yii\db\ActiveRecord
 
 
     /**
+     * @inheritdoc
+     */
+    public function extraFields() {
+        return [
+          'areas'
+        ];
+    }
+
+
+
+    /**
      * Gets query for [[Country]].
      *
      * @return \yii\db\ActiveQuery

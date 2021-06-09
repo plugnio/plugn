@@ -219,15 +219,15 @@ class Order extends \yii\db\ActiveRecord {
                 }
             ],
             [['floor'], 'required', 'when' => function($model) {
-                    return ($model->unit_type == 'Office' ||  $model->unit_type == 'Apartment') && $model->restaurant->version == 2;
+                    return ($model->unit_type == 'Office' ||  $model->unit_type == 'Apartment') && ($model->restaurant->version == 2 || $model->restaurant->version == 3);
                 }
             ],
             [['office'], 'required', 'when' => function($model) {
-                    return $model->unit_type == 'Office' && $model->restaurant->version == 2;
+                    return $model->unit_type == 'Office' && ($model->restaurant->version == 2 || $model->restaurant->version == 3);
                 }
             ],
             [['apartment'], 'required', 'when' => function($model) {
-                    return $model->unit_type == 'Apartment' && $model->restaurant->version == 2;
+                    return $model->unit_type == 'Apartment' && ($model->restaurant->version == 2 || $model->restaurant->version == 3);
                 }
             ],
             [['postalcode', 'city', 'address_1' , 'address_2'], 'required', 'when' => function($model) {
@@ -358,16 +358,16 @@ class Order extends \yii\db\ActiveRecord {
     public function extraFields()
     {
       return [
-          'orderStatusInEnglish',
-          'orderStatusInArabic',
-          'restaurant',
-          'orderItems' => function($order){
-              return $order->getOrderItems()->with('orderItemExtraOptions')->asArray()->all();
-          },
-          'restaurantBranch',
-          'deliveryZone',
-          'pickupLocation',
-          'payment'
+        'orderStatusInEnglish',
+        'orderStatusInArabic',
+        'restaurant',
+        'orderItems' => function($order){
+            return $order->getOrderItems()->with('orderItemExtraOptions')->asArray()->all();
+        },
+        'restaurantBranch',
+        'deliveryZone',
+        'pickupLocation',
+        'payment'
       ];
     }
 
@@ -1247,6 +1247,15 @@ class Order extends \yii\db\ActiveRecord {
         return $this->hasMany(Refund::className(), ['order_uuid' => 'order_uuid']);
     }
 
+    /**
+     * Gets query for [[BusinessLocation]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBusinessLocation()
+    {
+        return $this->hasOne(BusinessLocation::className(), ['business_location_id' => 'business_location_id'])->via('deliveryZone');
+    }
 
     /**
      * Gets query for [[PickupLocation]].

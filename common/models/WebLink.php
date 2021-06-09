@@ -76,7 +76,7 @@ class WebLink extends \yii\db\ActiveRecord
     public function getWebLinkType() {
         switch ($this->web_link_type) {
             case self::WEB_LINK_TYPE_WEBSITE_URL:
-                return "Webist Url";
+                return "Website Url";
                 break;
             case self::WEB_LINK_TYPE_FACEBOOK:
                 return "Facebook";
@@ -102,19 +102,6 @@ class WebLink extends \yii\db\ActiveRecord
     }
 
 
-    /**
-     * @inheritdoc
-     */
-    public function fields() {
-        $fields = parent::fields();
-
-        // remove fields that contain sensitive information
-        unset($fields['restaurant_uuid']);
-        unset($fields['web_link_id']);
-
-        return $fields;
-    }
-
 
     /**
     * @param type $insert
@@ -129,6 +116,15 @@ class WebLink extends \yii\db\ActiveRecord
       $store_web_link_model->save(false);
 
       return  true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function extraFields() {
+        return [
+          'webLinkType'
+        ];
     }
 
     /**

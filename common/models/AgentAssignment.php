@@ -46,7 +46,7 @@ class AgentAssignment extends \yii\db\ActiveRecord {
         return [
 //            [['assignment_agent_email'], 'required'],
             [['role'], 'required'],
-            [['business_location_id'], 'required', 'on'=>'update', 'when' => function($model) {
+            [['business_location_id'], 'required','when' => function($model) {
                     return ($model->role == self::AGENT_ROLE_BRANCH_MANAGER);
                 }
             ],
@@ -86,7 +86,7 @@ class AgentAssignment extends \yii\db\ActiveRecord {
                 return $this->addError('assignment_agent_email', 'Could not find a Plugn account matching ' . $this->assignment_agent_email);
 
             if (AgentAssignment::find()->where(['agent_id' => $this->agent_id, 'restaurant_uuid' => $this->restaurant_uuid])->exists())
-                return $this->addError('assignment_agent_email', 'This person has already been added as an agent.' . $this->assignment_agent_email);
+                return $this->addError('assignment_agent_email', 'This person has already been added as an agent.');
         }
 
 
@@ -113,6 +113,16 @@ class AgentAssignment extends \yii\db\ActiveRecord {
             'assignment_updated_at' => 'Assignment Updated At',
         ];
     }
+
+    public function extraFields()
+    {
+        return [
+          'agent',
+          'restaurant'
+        ];
+    }
+
+
 
     /**
      * Gets query for [[BusinessLocation]].

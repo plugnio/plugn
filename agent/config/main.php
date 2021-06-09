@@ -1,7 +1,10 @@
 <?php
 
 $params = array_merge(
-        require(__DIR__ . '/../../common/config/params.php'), require(__DIR__ . '/../../common/config/params-local.php'), require(__DIR__ . '/params.php'), require(__DIR__ . '/params-local.php')
+        require(__DIR__ . '/../../common/config/params.php'),
+        require(__DIR__ . '/../../common/config/params-local.php'),
+        require(__DIR__ . '/params.php'),
+        require(__DIR__ . '/params-local.php')
 );
 
 return [
@@ -40,7 +43,7 @@ return [
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
-            'enableStrictParsing' => false,
+            'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
 
@@ -54,12 +57,43 @@ return [
                         'GET draft' => 'list-draft-orders',
                         'GET abandoned' => 'list-abandoned-orders',
                         'GET detail' => 'detail',
+
+                        'POST filter-pending' => 'filter-pending',
+                        'POST filter-abandoned' => 'filter-abandoned',
+                        'POST filter-draft' => 'filter-draft',
+                        'POST filter-active' => 'filter-active',
+                        'POST <store_uuid>' => 'place-an-order',
+                        'PATCH <order_uuid>/<store_uuid>' => 'update',
+                        'PATCH update-order-status/<order_uuid>/<store_uuid>' => 'update-order-status',
+                        'POST request-driver-from-armada/<order_uuid>/<store_uuid>' => 'request-driver-from-armada',
+                        'POST request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'request-driver-from-mashkor',
+                        'DELETE <order_uuid>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS active' => 'options',
                         'OPTIONS draft' => 'options',
                         'OPTIONS abandoned' => 'options',
                         'OPTIONS detail' => 'options',
+                        'OPTIONS filter-pending' => 'options',
+                        'OPTIONS filter-active' => 'options',
+                        'OPTIONS filter-draft' => 'options',
+                        'OPTIONS filter-abandoned' => 'options',
+                        'OPTIONS update-order-status/<order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS request-driver-from-armada/<order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS <store_uuid>' => 'options',
+                        'OPTIONS <order_uuid>/<store_uuid>' => 'options',
+                    ]
+                ],
+                [// OrderItemController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/order-item',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'PATCH' => 'update',
+                        'DELETE' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
                     ]
                 ],
                 [// CategoryController
@@ -68,8 +102,33 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',
+                        'GET detail' => 'detail',
+                        'POST create' => 'create',
+                        'POST upload-image' => 'upload-category-image',
+                        'PATCH <category_id>/<store_uuid>' => 'update',
+                        'DELETE <category_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
-                        'OPTIONS' => 'options'
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS <category_id>/<store_uuid>' => 'options',
+                    ]
+                ],
+                [// StaffController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/staff',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        'POST create' => 'create',
+                        'PATCH <assignment_id>/<store_uuid>' => 'update',
+                        'DELETE <assignment_id>/<store_uuid>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS <agent_assignment_id>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// bankController
@@ -94,14 +153,30 @@ return [
                         'OPTIONS detail' => 'options'
                     ]
                 ],
+                [// CityController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/city',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options'
+                    ]
+                ],
                 [// AgentController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/agent',
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'detail',
+                        'PUT update' => 'update-agent-profile',
+                        'POST change-password' => 'change-password',
                         // OPTIONS VERBS
-                        'OPTIONS' => 'options'
+                        'OPTIONS' => 'options',
+                        'OPTIONS update' => 'options',
+                        'OPTIONS change-password' => 'options',
                     ]
                 ],
                 [// VoucherController
@@ -111,9 +186,16 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST create' => 'create',
+                        'PATCH <voucher_id>/<store_uuid>' => 'update',
+                        'PATCH update-status' => 'update-voucher-status',
+                        'DELETE <voucher_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS update-status' => 'options',
+                        'OPTIONS <voucher_id>/<store_uuid>' => 'options',
+                        'OPTIONS create' => 'options'
                     ]
                 ],
                 [// BankDiscountController
@@ -123,9 +205,16 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST create' => 'create',
+                        'PATCH <bank_discount_id>/<store_uuid>' => 'update',
+                        'PATCH update-status' => 'update-bank-discount-status',
+                        'DELETE <bank_discount_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS update-status' => 'options',
+                        'OPTIONS <bank_discount_id>/<store_uuid>' => 'options',
+                        'OPTIONS create' => 'options'
                     ]
                 ],
                 [// DeliveryZoneController
@@ -133,10 +222,46 @@ return [
                     'controller' => 'v1/delivery-zone',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST create' => 'create',
+                        'DELETE <delivery_zone_id>/<store_uuid>' => 'delete',
+                        'PATCH <delivery_zone_id>/<store_uuid>' => 'update',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS <delivery_zone_id>/<store_uuid>' => 'options',
+                    ]
+                ],
+                [// OpeningHoursController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/opening-hours',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET <day_of_week>/<store_uuid>' => 'detail',
+                        'POST <store_uuid>' => 'create',
+                        'PATCH <day_of_week>' => 'update',
+                        'DELETE <opening_hour_id>/<store_uuid>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <day_of_week>' => 'options',
+                        'OPTIONS <opening_hour_id>/<store_uuid>' => 'options',
+                    ]
+                ],
+                [// AreaDeliveryZoneController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/area-delivery-zone',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'POST create' => 'create',
+                        'DELETE <area_delivery_zone_id>/<store_uuid>' => 'delete',
+                        'PATCH <area_delivery_zone_id>/<store_uuid>' => 'update',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS <area_delivery_zone_id>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// WebLinkController
@@ -146,9 +271,14 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST create' => 'create',
+                        'PATCH <web_link_id>/<store_uuid>' => 'update',
+                        'DELETE <web_link_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
+                        'OPTIONS create' => 'options',
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS <web_link_id>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// ItemController
@@ -157,10 +287,13 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',
-                        'GET detail' => 'detail',
+                        'GET <id>' => 'detail',
+                        'POST' => 'create',
+                        'PATCH <id>' => 'update',
+                        'DELETE <id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
+                        'OPTIONS <id>' => 'options'
                     ]
                 ],
                 [// CustomerController
@@ -170,9 +303,11 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'GET orders' => 'list-all-customer-orders',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS orders' => 'options'
                     ]
                 ],
                 [// BusinessLocationController
@@ -182,9 +317,14 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'POST create' => 'create',
+                        'PATCH <business_location_id>/<store_uuid>' => 'update',
+                        'DELETE <business_location_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS <business_location_id>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// StoreController
@@ -193,6 +333,7 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'detail',
+                        'POST' => 'update',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options'
                     ]
@@ -204,9 +345,11 @@ return [
                    'pluralize' => false,
                    'patterns' => [
                        'GET login' => 'login',
+                       'POST request-reset-password' => 'request-reset-password',
 
                        // OPTIONS VERBS
-                       'OPTIONS login' => 'options'
+                       'OPTIONS login' => 'options',
+                       'OPTIONS request-reset-password' => 'options',
                    ]
                ],
             ],

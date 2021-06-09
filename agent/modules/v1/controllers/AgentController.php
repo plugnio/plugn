@@ -7,7 +7,7 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use common\models\BankDiscount;
+use common\models\Agent;
 
 class AgentController extends Controller {
 
@@ -63,27 +63,148 @@ class AgentController extends Controller {
 
     public function actionDetail() {
         $agent = Yii::$app->user->identity;
-        if($agent){
-          $accessToken = $agent->accessToken->token_value;
 
-          return [
-              "operation" => "success",
-              "body" => [
-                "id" => $agent->agent_id,
-                "agent_name" => $agent->agent_name,
-                "agent_email" => $agent->agent_email
-              ]
-          ];
-        } else {
+        if(!$agent){
           return [
               'operation' => 'error',
-              'message' => 'No results found'
+              'message' => 'No result found'
           ];
         }
+
+        $accessToken = $agent->accessToken->token_value;
+        return $agent;
 
 
     }
 
+
+    public function actionUpdateAgentProfile($store_uuid) {
+
+        $model = Yii::$app->user->identity;
+
+        if (!isset($model->agent_id)) {
+            return [
+                "operation" => "error",
+                "message" => 'Invalid Agent ID'
+            ];
+        }
+
+        $agentAssignment  = $model->getAgentAssignments()->where(['restaurant_uuid' => $store_uuid])->one();
+
+        if (!isset($agentAssignment->restaurant_uuid)) {
+          return [
+              "operation" => "error",
+              "message" => 'You do not own this store.'
+          ];
+      }
+
+
+        $model->agent_name = Yii::$app->request->getBodyParam("agent_name");
+        $model->agent_email = Yii::$app->request->getBodyParam("agent_email");
+
+        if (!$model->save()) {
+              return [
+                  "operation" => "error",
+                  "message" => $model->errors
+              ];
+          } else {
+
+            $agentAssignment->assignment_agent_email = Yii::$app->request->getBodyParam("agent_email");
+
+
+            if(Yii::$app->request->getBodyParam("email_notification") != null )
+              $agentAssignment->email_notification = Yii::$app->request->getBodyParam("email_notification");
+
+            if(Yii::$app->request->getBodyParam("reminder_email") != null )
+              $agentAssignment->reminder_email = Yii::$app->request->getBodyParam("reminder_email");
+
+            if(Yii::$app->request->getBodyParam("receive_weekly_stats") != null )
+              $agentAssignment->receive_weekly_stats = Yii::$app->request->getBodyParam("receive_weekly_stats");
+
+            $agentAssignment->save(false);
+
+        }
+
+        return [
+          'model' => $model,
+          "operation" => "success",
+          "message" => "Agent profile updated successfully"
+        ];
+
+    }
+
+
+
+      /**
+      * Return agent model
+      * @param type $employer_uuid
+      * @return \common\models\Agent
+      */
+     private function findModel($agent_id) {
+         $model = Agent::findIdentity($agent_id);
+
+         if (!$model) {
+             return false;
+         }
+
+         return $model;
+     }
+
+
+     /**
+      * change password
+      */
+     public function actionChangePassword()
+     {
+         $agent = Yii::$app->user->identity;
+
+         $oldPassword = Yii::$app->request->getBodyParam("oldPassword");
+         $newPassword = Yii::$app->request->getBodyParam("newPassword");
+         $confirmPassword = Yii::$app->request->getBodyParam("confirmPassword");
+
+         if(!$oldPassword) {
+                 return [
+                         'operation' => 'error',
+                         'message' => 'Old Password field required'
+                 ];
+         }
+
+         if(!$confirmPassword) {
+                 return [
+                         'operation' => 'error',
+                         'message' => 'Confirm Password field required'
+                 ];
+         }
+
+         if(!$newPassword) {
+                 return [
+                         'operation' => 'error',
+                         'message' => 'Password field required'
+                 ];
+         }
+
+         if($confirmPassword != $newPassword) {
+                 return [
+                         'operation' => 'error',
+                         'message' => 'Password not matching'
+                 ];
+         }
+
+         if (!$agent->validatePassword($oldPassword)) {
+                 return [
+                         'operation' => 'error',
+                         'message' => 'Old Password not valid'
+                 ];
+         }
+
+         $agent->setPassword($newPassword);
+         $agent->save(false);
+
+         return [
+                 "operation" => "success",
+                 "message" => "Account Password Updated Successfully"
+         ];
+     }
 
 
 }

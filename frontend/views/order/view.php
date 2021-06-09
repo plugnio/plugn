@@ -45,7 +45,20 @@ $this->registerJs($js);
         <h5><i class="icon fa fa-check"></i> Success!</h5>
         <?= (Yii::$app->session->getFlash('successResponse')) ?>
     </div>
-<?php } ?>
+<?php }
+
+
+$armadaApiKey = null;
+$mashkorBranchId = null;
+
+if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $model->deliveryZone->businessLocation->armada_api_key != null)
+  $armadaApiKey = $model->deliveryZone->businessLocation->armada_api_key;
+  
+if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $model->deliveryZone->businessLocation->mashkor_branch_id != null)
+  $mashkorBranchId = $model->deliveryZone->businessLocation->mashkor_branch_id;
+
+
+?>
 
 
 
@@ -98,10 +111,12 @@ $this->registerJs($js);
 
         if ($model->order_mode == Order::ORDER_MODE_DELIVERY) {
 
-            if ( ( ($model->area_id && ($model->area->country->country_name == 'Kuwait' || $model->area->country->country_name == 'Bahrain')) || ($model->shipping_country_id && ($model->country->country_name == 'Kuwait' || $model->country->country_name == 'Bahrain'))    )  && $model->restaurant->armada_api_key != null && $model->armada_tracking_link == null) {
+            if ( ( ($model->area_id && ($model->area->country->country_name == 'Kuwait' || $model->area->country->country_name == 'Bahrain')) || ($model->shipping_country_id && ($model->country->country_name == 'Kuwait' || $model->country->country_name == 'Bahrain'))    )  &&
+             $armadaApiKey != null && $model->armada_tracking_link == null
+           ) {
 
                 if ( $difference <= 1  && $model->restaurant->hide_request_driver_button ){
-                          echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
+                          echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid, 'armadaApiKey' => $armadaApiKey], [
                               'class' => 'btn btn-dark mr-1 mb-1',
                               'style' => 'margin-right: 7px;',
                               'data' => [
@@ -112,7 +127,7 @@ $this->registerJs($js);
                 }
 
                 if ( !$model->restaurant->hide_request_driver_button  )  {
-                      echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
+                      echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid , 'armadaApiKey' => $armadaApiKey], [
                           'class' => 'btn btn-dark mr-1 mb-1',
                           'style' => 'margin-right: 7px;',
                           'data' => [
@@ -124,10 +139,11 @@ $this->registerJs($js);
 
             }
 
-            if (( ($model->area_id && $model->area->country->country_name == 'Kuwait') || ($model->shipping_country_id && $model->country->country_name == 'Kuwait' )    ) &&   $model->restaurant->mashkor_branch_id != null && $model->mashkor_order_number == null) {
+            if (( ($model->area_id && $model->area->country->country_name == 'Kuwait') || ($model->shipping_country_id && $model->country->country_name == 'Kuwait' )    ) &&
+              $mashkorBranchId != null && $model->mashkor_order_number == null) {
 
                 if ($difference <= 1  && $model->restaurant->hide_request_driver_button ){
-                  echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
+                  echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid, 'mashkorBranchId' => $mashkorBranchId], [
                       'class' => 'btn btn-dark mr-1 mb-1',
                       'style' => 'margin-right: 7px;',
                       'data' => [
@@ -139,7 +155,7 @@ $this->registerJs($js);
 
 
                 if (!$model->restaurant->hide_request_driver_button){
-                          echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
+                          echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid, 'mashkorBranchId' => $mashkorBranchId], [
                               'class' => 'btn btn-dark mr-1 mb-1',
                               'style' => 'margin-right: 7px;',
                               'data' => [

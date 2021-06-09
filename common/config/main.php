@@ -48,6 +48,18 @@ return [
             'api_key' => '699963168546398',
             'api_secret' => 'SH2PbVsEsRT9Db257Pn9ZDgHGAU'
         ],
+        'temporaryBucketResourceManager' => [
+            'class' => 'common\components\S3ResourceManager',
+            'region' => 'eu-west-2', // Bucket based in London
+            'key' => 'AKIAJXOMRCDE65WKBPUA',
+            'secret' => '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',
+            'bucket' => 'plugn-public-anyone-can-upload-24hr-expiry'
+            /**
+             * You can access the Temporary bucket with:
+             * https://pogi-public-anyone-can-upload-24hr-expiry.s3.amazonaws.com/
+             * https://pogi-public-anyone-can-upload-24hr-expiry.s3.amazonaws.com/folderName/fileName.jpg
+             */
+        ],
         'accountManager' => [//Component for agent to manage Restaurant
             'class' => 'common\components\AccountManager',
         ],
@@ -71,6 +83,10 @@ return [
         'mashkorDelivery' => [
             'class' => 'common\components\MashkorDelivery',
             'keyToUse' => \common\components\MashkorDelivery::USE_LIVE_KEY
+        ],
+        'googleMapComponent' => [
+            'class' => 'common\components\GoogleMapComponent',
+            'token' => 'AIzaSyCFeQ-wuP5iWVRTwMn5nZZeOE8yjGESFa8'
         ],
         'netlifyComponent' => [
             'class' => 'common\components\NetlifyComponent',

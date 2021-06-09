@@ -50,7 +50,8 @@
         "ssimpson/yii2-dual-list-box": "dev-master",
         "borales/yii2-phone-input": "*",
         "segmentio/analytics-php": "^1.5",
-        "yiisoft/yii2-redis": "~2.0.0"
+        "yiisoft/yii2-redis": "~2.0.0",
+        "aws/aws-sdk-php": "^3.183"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

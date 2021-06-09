@@ -57,6 +57,8 @@ class BankDiscount extends \yii\db\ActiveRecord
         return [
             [['bank_id', 'discount_type', 'discount_amount', 'bank_discount_status', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'integer'],
             [['restaurant_uuid', 'discount_amount'], 'required'],
+            ['bank_discount_status', 'in', 'range' => [self::BANK_DISCOUNT_STATUS_ACTIVE, self::BANK_DISCOUNT_STATUS_EXPIRED]],
+            ['discount_type', 'in', 'range' => [self::DISCOUNT_TYPE_PERCENTAGE, self::DISCOUNT_TYPE_AMOUNT]],
             [['valid_from', 'valid_until', 'bank_discount_created_at', 'bank_discount_updated_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['bank_id'], 'exist', 'skipOnError' => true, 'targetClass' => Bank::className(), 'targetAttribute' => ['bank_id' => 'bank_id']],
@@ -101,6 +103,15 @@ class BankDiscount extends \yii\db\ActiveRecord
     }
 
 
+    public function extraFields()
+    {
+        return [
+          'restaurant',
+          'currency',
+          'bank',
+          'customerBankDiscounts'
+        ];
+    }
 
     public function isValid($phone_number) {
         $isValid = true;

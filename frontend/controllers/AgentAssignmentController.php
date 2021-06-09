@@ -71,8 +71,10 @@ class AgentAssignmentController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($assignment_id, $agent_id, $storeUuid) {
+      $model = $this->findModel($assignment_id, $agent_id, $storeUuid);
+
         return $this->render('view', [
-                    'model' => $this->findModel($assignment_id, $agent_id, $storeUuid),
+                    'model' => $model,
         ]);
     }
 
@@ -144,19 +146,21 @@ class AgentAssignmentController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($assignment_id, $agent_id, $storeUuid) {
-        if (Yii::$app->accountManager->getManagedAccount($storeUuid)) {
 
-            if (Yii::$app->user->identity->isOwner($storeUuid)) {
+      $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-                if (($model = AgentAssignment::find()->where(['assignment_id' => $assignment_id, 'agent_id' => $agent_id, 'restaurant_uuid' => $storeUuid])->one()) !== null) {
-                    return $model;
-                }
-            } else {
-                throw new \yii\web\BadRequestHttpException('Sorry, you are not allowed to access this page.');
-            }
-        } else {
+      if (Yii::$app->user->identity->isOwner($storeUuid)) {
+
+          if (($model = AgentAssignment::find()->where(['assignment_id' => $assignment_id, 'agent_id' => $agent_id, 'restaurant_uuid' => $store->restaurant_uuid])->one()) !== null) {
+              return $model;
+          } else {
             throw new NotFoundHttpException('The requested page does not exist.');
-        }
+
+          }
+      } else {
+          throw new \yii\web\BadRequestHttpException('Sorry, you are not allowed to access this page.');
+      }
+
     }
 
 }

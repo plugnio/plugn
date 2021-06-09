@@ -40,25 +40,34 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
+
   /**
    *
    */
-  public function actionMigration(){
-    $agents = Agent::find()->all();
-    foreach ($agents as $key => $agent) {
-      if($agentAssignments = $agent->getAgentAssignments()->all()){
-        foreach ($agentAssignments as  $agentAssignment) {
-          $agentAssignment->email_notification = $agent->email_notification;
-          $agentAssignment->reminder_email = $agent->reminder_email;
-          $agentAssignment->receive_weekly_stats = $agent->receive_weekly_stats;
-          $agentAssignment->save();
-        }
+  public function actionMigrateDeliveryApiKey(){
+
+    $stores = Restaurant::find()
+    ->where(['not', ['armada_api_key' => null]])
+    ->orWhere(['not', ['mashkor_branch_id' => null]])
+    ->all();
+
+    foreach ($stores as $key => $store) {
+
+      foreach ($store->getBusinessLocations()->all() as $key => $branch) {
+        // code...
+        $branch->armada_api_key = $store->armada_api_key;
+        $branch->mashkor_branch_id = $store->mashkor_branch_id;
+
+        if(!$branch->save())
+          die('error');
       }
+
     }
 
     $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
     return self::EXIT_CODE_NORMAL;
   }
+
 
     /**
      * Weekly Store Summary
@@ -420,7 +429,10 @@ class CronController extends \yii\console\Controller {
 
           $stores = Restaurant::find()
                   ->where(['sitemap_require_update' => 1])
-                  ->andWhere(['version' => 2])
+                  ->andWhere(['or',
+                       ['version'=>2],
+                       ['version'=>3]
+                   ])
                   ->andWhere(['!=', 'restaurant_uuid', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])
                   ->all();
 

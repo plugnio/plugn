@@ -65,7 +65,7 @@ class ArmadaDelivery extends Component {
     /**
      * Create a delivery request
      */
-    public function createDelivery($model) {
+    public function createDelivery($model, $armadaApiKey) {
 
       $phone =  str_replace(' ', '', $model->customer_phone_number);
       $phone =  str_replace('+', '00', $phone);
@@ -94,7 +94,7 @@ class ArmadaDelivery extends Component {
                 ->setUrl($this->apiEndpoint)
                 ->setData($deliveryParams)
                 ->addHeaders([
-                    'authorization' => 'Key ' . $model->restaurant->armada_api_key,
+                    'authorization' => 'Key ' . $armadaApiKey,
                     'content-type' => 'application/json',
                 ])
                 ->send();
