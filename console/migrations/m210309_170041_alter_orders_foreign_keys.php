@@ -12,6 +12,8 @@ class m210309_170041_alter_orders_foreign_keys extends Migration
      */
     public function safeUp()
     {
+        Yii::$app->db->createCommand('set foreign_key_checks=0')->execute();
+
       $this->dropForeignKey('fk-order-area_id', 'order');
 
       // add foreign key for table `order`
@@ -71,6 +73,7 @@ class m210309_170041_alter_orders_foreign_keys extends Migration
               'CASCADE'
       );
 
+      Yii::$app->db->createCommand('set foreign_key_checks=1')->execute();
     }
 
     /**
