@@ -854,7 +854,7 @@ class Order extends \yii\db\ActiveRecord {
         // }
 
 
-        if($this->orderItems){
+        if(!$this->is_order_scheduled && $this->orderItems ){
 
             $maxPrepTime = 0;
 
@@ -874,6 +874,7 @@ class Order extends \yii\db\ActiveRecord {
                 }
 
             }
+
 
             $this->estimated_time_of_arrival = date("c", strtotime('+' . $maxPrepTime  . ' min' ,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
 

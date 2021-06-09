@@ -143,6 +143,130 @@ class OpeningHour extends \yii\db\ActiveRecord {
     }
 
 
+    public static function getDeliveryTime($delivery_time, $prep_time ,$store) {
+
+      $schedule_time = [];
+
+
+      for ($i = 0; $i <= OpeningHour::DAY_OF_WEEK_SATURDAY; $i++) {
+
+         $currentWeekDay =  date('w',strtotime($i . " day"));
+
+
+
+         // $selectedDate =  date('c', strtotime('+ ' . $delivery_time . ' min'   ,strtotime($currentDate)));
+         $minDate =  date('c', strtotime("+". intval(($prep_time + $delivery_time))  . " min" ,strtotime('now')) );
+
+// 1155
+         $currentWeekDay =  date('w',strtotime($i . " day",strtotime($minDate)));
+         $currentDate =  date('c',strtotime($i . " day",strtotime($minDate)));
+
+
+          $getWorkingHours = OpeningHour::find()
+                              ->where(['restaurant_uuid' => $store->restaurant_uuid])
+                              ->andWhere(['day_of_week' => $currentWeekDay])
+                              ->orderBy(['open_at' => SORT_ASC])
+                              ->all();
+
+
+
+            $timeSlots = [];
+
+
+            foreach ($getWorkingHours as $key => $workingHours) {
+
+              $startAt = date('c', strtotime($workingHours->open_at, strtotime($currentDate) ));
+
+
+              $startAt =  date('c', strtotime("+". intval(($delivery_time))  . " min" , strtotime($startAt)) );
+
+
+              $startAt = static::roundToNextHour($startAt);
+
+
+              if($minDate < $startAt){
+
+                $startAt =  date('c', strtotime($workingHours->open_at, strtotime($startAt) ));
+
+                $startAt =  date('c', strtotime("+". intval(($delivery_time))  . " min" , strtotime($startAt)) );
+
+              }
+
+              $index = 0;
+              // while (date('H:i:s', strtotime($startAt)) <= $workingHours->close_at || ($prep_time > 0 && date('w',strtotime($minDate)) <  date('c', strtotime($startAt))  )) {
+              while (date('H:i:s', strtotime($startAt)) <= $workingHours->close_at ) {
+                $index++;
+
+
+
+                $endAt = date('c', strtotime("+ 60 min" ,strtotime($startAt)) );
+
+
+
+                if($minDate > $startAt){
+
+                  $startAt = $endAt;
+
+                  continue;
+
+                }
+
+
+
+
+
+                if ($workingHours->day_of_week == date('w', strtotime("today")) && date('c', strtotime("now")) < date('c', strtotime($startAt))) {
+
+                  if( date('c',strtotime($startAt))  >  date('c', strtotime("now") + (intval($delivery_time) * 60)) ){
+
+                  array_push($timeSlots, [
+                      'date' =>  date('Y-m-d', strtotime($startAt) ),
+                      'start_time' =>  date('c', strtotime($startAt) ) ,
+                      'end_time' =>   date('c' , strtotime( $endAt) )
+                  ]);
+                  }
+                } else if ($workingHours->day_of_week != date('w', strtotime("today")) ) {
+
+                  array_push($timeSlots, [
+                      'date' =>  date('Y-m-d', strtotime($startAt) ),
+                      'start_time' =>  date('c', strtotime($startAt) ) ,
+                      'end_time' =>   date('c' , strtotime( $endAt) )
+                  ]);
+
+
+                }
+
+
+                if (date("Y/m/d", strtotime($endAt)) != date("Y/m/d", strtotime($startAt)) )
+                  break;
+
+                  $startAt = $endAt;
+
+
+
+              }
+
+            }
+
+
+              if($timeSlots){
+                array_push($schedule_time, [
+
+                    'date' => date('c', strtotime($startAt)),
+                    'dayOfWeek' => date('w', strtotime($startAt)),
+                    'scheduleTimeSlots' => $timeSlots
+                ]);
+
+              }
+
+
+      }
+
+      return $schedule_time;
+
+    }
+
+
     public static function getAvailableTimeSlots($delivery_time, $store, $timeUnit) {
 
       $schedule_time = [];

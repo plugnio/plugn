@@ -181,6 +181,7 @@ class DeliveryZoneController extends Controller {
               }
 
               $deliveryTime = intval($deliveryZone['delivery_time']);
+              $deliveryTimeInMin = intval($deliveryZone['delivery_time']);
 
               if(DeliveryZone::TIME_UNIT_DAY == $deliveryZone['time_unit'])
                 $deliveryTime = $deliveryTime * 24 * 60 * 60;
@@ -189,6 +190,14 @@ class DeliveryZoneController extends Controller {
               else if (DeliveryZone::TIME_UNIT_MIN == $deliveryZone['time_unit'])
                 $deliveryTime = $deliveryTime *  60;
 
+              if(DeliveryZone::TIME_UNIT_DAY == $deliveryZone['time_unit'])
+                $deliveryTimeInMin = $deliveryTimeInMin * 24 * 60;
+              else if (DeliveryZone::TIME_UNIT_HRS == $deliveryZone['time_unit'])
+                $deliveryTimeInMin = $deliveryTimeInMin *  60;
+
+
+
+              $deliveryZone['delivery_time_in_min'] = $deliveryTimeInMin;
 
               $deliveryZone['delivery_time'] = Yii::$app->formatter->asDuration($deliveryTime);
 

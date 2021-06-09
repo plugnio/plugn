@@ -127,10 +127,12 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET get-opening-hours' => 'get-opening-hours',
+                        'POST get-delivery-time' => 'get-delivery-time',
                         'GET locations/<id>' => 'list-all-stores-locations',
                         'GET get-restaurant-data/<branch_name>' => 'get-restaurant-data',
                         // OPTIONS VERBS
                         'OPTIONS get-opening-hours' => 'options',
+                        'OPTIONS get-delivery-time' => 'options',
                         'OPTIONS locations/<id>' => 'options',
                         'OPTIONS get-restaurant-data/<branch_name>' => 'options',
                     ]

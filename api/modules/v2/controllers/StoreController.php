@@ -121,6 +121,75 @@ class StoreController extends Controller {
             ];
     }
 
+    public function actionGetDeliveryTime() {
+
+
+        $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
+        $delivery_zone_id = Yii::$app->request->get("delivery_zone_id");
+        $cart = Yii::$app->request->getBodyParam("cart");
+
+        if ($store_model = Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->one()) {
+          $deliveryZone =  $store_model->getDeliveryZones()->where(['delivery_zone_id' => $delivery_zone_id ])->one();
+
+          $schedule_time = [];
+
+
+            if($deliveryZone){
+
+              $timeUnit = $deliveryZone->time_unit == 'hrs' ? 'hour' : $deliveryZone->time_unit;
+              $startDate = strtotime('+ ' . $deliveryZone->delivery_time . ' ' . $timeUnit );
+
+
+              if($deliveryZone->time_unit == DeliveryZone::TIME_UNIT_MIN)
+                $deliveryTime = intval($deliveryZone->delivery_time) ;
+              else if($deliveryZone->time_unit == DeliveryZone::TIME_UNIT_HRS)
+                $deliveryTime =  intval($deliveryZone->delivery_time) * 60;
+              else if($deliveryZone->time_unit == DeliveryZone::TIME_UNIT_DAY)
+                $deliveryTime =  intval($deliveryZone->delivery_time) * 24 * 60;
+
+                $prepTime = 0;
+
+                if($cart && sizeof($cart) > 0){
+                  foreach ($cart as $key => $item) {
+                    if($item['prep_time_in_min'] > $prepTime)
+                      $prepTime = $item['prep_time_in_min'];
+                  }
+                }
+
+
+
+                    if($store_model->schedule_order){
+
+                      $schedule_time = OpeningHour::getDeliveryTime($deliveryTime, $prepTime,$store_model);
+
+                    }
+
+
+              $todayOpeningHours = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => date('w' , strtotime("now"))])->one();
+              $asap = date("c", strtotime('+' . ($deliveryTime + $prepTime) . ' min ',  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
+
+
+             return [
+                    'ASAP' => $store_model->isOpen($asap) && date('Y-m-d') == date('Y-m-d',strtotime($asap)) && $asap ? $asap : null,
+                    'scheduleOrder' => $store_model->schedule_order ?  ($schedule_time  ? $schedule_time  : null): null
+                ];
+
+
+
+            } else {
+              return [
+                  'operation' => 'error',
+                  'message' => "Unfortunately we don't currently deliver to the selected area."
+              ];
+            }
+        } else
+            return [
+                'operation' => 'error',
+                'message' => 'Restaurant Uuid is invalid'
+            ];
+    }
+
+
     /**
      * Return Store's Locations
      */
