@@ -64,11 +64,12 @@ class CategoryController extends Controller {
     * Get all store's categories
      * @param type $id
      * @param type $store_uuid
-     * @return type
+     * @return ActiveDataProvider
      */
      public function actionList($store_uuid) {
 
          $keyword = Yii::$app->request->get('keyword');
+         $page = Yii::$app->request->get('page');
 
          Yii::$app->accountManager->getManagedAccount($store_uuid);
 
@@ -83,12 +84,17 @@ class CategoryController extends Controller {
 
          $query->andWhere(['restaurant_uuid' => $store_uuid]);
 
+         if(!$page) {
+             return new ActiveDataProvider([
+                 'query' => $query,
+                 'pagination' => false
+             ]);
+         }
+
          return new ActiveDataProvider([
            'query' => $query
          ]);
-
      }
-
 
     /**
      * Create category
