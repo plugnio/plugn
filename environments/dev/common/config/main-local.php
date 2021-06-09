@@ -4,45 +4,26 @@ return [
     'components' => [
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=127.0.0.1;dbname=vendor',
-            'username' => 'vendor',
-            'password' => '',
+            'dsn' => 'mysql:host=mysql;dbname=plugn',
+            'username' => 'root',
+            'password' => '12345',
             'charset' => 'utf8mb4',
             // Enable Caching of Schema to Reduce SQL Queries
             'enableSchemaCache' => true,
             // Duration of schema cache.
-            'schemaCacheDuration' => 60, // 1 minute
+            'schemaCacheDuration' => 10, // 10 seconds
             // Name of the cache component used to store schema information
             'schemaCache' => 'cache',
         ],
-        // 'log' => [
-        //     'targets' => [
-        //         [
-        //             'class' => 'notamedia\sentry\SentryTarget',
-        //             'dsn' => 'https://f6033f8f46ba451abbf4fa2730e8305a:7266a5e7beca44ff96fb32294ca35557@o70039.ingest.sentry.io/5220572',
-        //             'levels' => ['error', 'warning'],
-        //             'except' => [
-        //                 'yii\web\BadRequestHttpException',
-        //                 'yii\web\UnauthorizedHttpException',
-        //                 'yii\web\NotFoundHttpException',
-        //                 'yii\web\HttpException:400',
-        //                 'yii\web\HttpException:401',
-        //                 'yii\web\HttpException:404',
-        //             ],
-        //             'clientOptions' => [
-        //                 //which environment are we running this on?
-        //                 'environment' => 'staging',
-        //             ],
-        //             'context' => true // Write the context information. The default is true.
-        //         ],
-        //         [
-        //             'class' => 'common\components\SlackLogger',
-        //             'logVars' => [],
-        //             'levels' => ['info', 'warning','error'],
-        //             'categories' => ['backend\*', 'frontend\*', 'common\*', 'console\*','api\*'],
-        //         ],
-        //     ],
-        // ],
+        'cache' => [
+            // Use Redis as a cache
+            'class' => 'yii\redis\Cache',
+            'redis' => [
+                'hostname' => 'redis',
+                'port' => 6379,
+                'database' => 2,
+            ]
+        ],
         'mailer' => [
                  'class' => 'yii\swiftmailer\Mailer',
                  'viewPath' => '@common/mail',
@@ -51,23 +32,6 @@ return [
                  // for the mailer to send real emails.
                  'useFileTransport' => true,
         ],
-        // 'mailer' => [
-        //     'class' => 'yii\swiftmailer\Mailer',
-        //     'viewPath' => '@common/mail',
-        //     'transport' => [
-        //         'class' => 'Swift_SmtpTransport',
-        //         'host' => 'smtp.sendgrid.net',
-        //         'username' => 'apikey',
-        //         'password' => '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',
-        //         'port' => '587',
-        //         'encryption' => 'tls',
-        //         'plugins' => [
-        //             [
-        //                 'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
-        //             ],
-        //         ],
-        //     ],
-        // ],
         'tapPayments' => [
             'gatewayToUse' => \common\components\TapPayments::USE_TEST_GATEWAY,
         ],

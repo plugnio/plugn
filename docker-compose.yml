@@ -8,8 +8,8 @@ services:
       - mysql-data:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=12345
-      - MYSQL_DATABASE=capital
-      - MYSQL_USER=capitaluser
+      - MYSQL_DATABASE=plugn
+      - MYSQL_USER=plugnuser
       - MYSQL_PASSWORD=12345
     entrypoint:
       sh -c "echo 'CREATE DATABASE IF NOT EXISTS capital_test;' > /docker-entrypoint-initdb.d/init.sql;
