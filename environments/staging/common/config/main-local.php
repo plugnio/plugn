@@ -31,7 +31,7 @@ return [
                     ],
                     'clientOptions' => [
                         //which environment are we running this on?
-                        'environment' => 'develop',
+                        'environment' => 'staging',
                     ],
                     'context' => true // Write the context information. The default is true.
                 ],
