@@ -81,7 +81,7 @@ class AccountManager  extends BaseObject
     public function getManagedAccount($restaurantUuid = null) {
 
         if(!$restaurantUuid) {
-            $restaurantUuid = Yii::$app->request->headers->get('store-id');
+            $restaurantUuid = Yii::$app->request->headers->get('Store-Id');
         }
 
         foreach($this->_managedAccounts as $restaurant){
@@ -94,7 +94,4 @@ class AccountManager  extends BaseObject
 
         throw new \yii\web\BadRequestHttpException('You do not own this store.');
     }
-
-
-
 }

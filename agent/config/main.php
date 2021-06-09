@@ -284,7 +284,6 @@ return [
                 [// ItemController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/item',
-                    'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',
                         'GET <id>' => 'detail',
