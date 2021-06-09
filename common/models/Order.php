@@ -853,32 +853,60 @@ class Order extends \yii\db\ActiveRecord {
         //   }
         // }
 
+        if($this->restaurant->version == 3){
+          if(!$this->is_order_scheduled && $this->orderItems){
 
-        if(!$this->is_order_scheduled && $this->orderItems ){
+              $maxPrepTime = 0;
 
-            $maxPrepTime = 0;
+              foreach ($this->orderItems as $key => $orderItem) {
 
-            foreach ($this->orderItems as $key => $orderItem) {
+                  if($orderItem->item_uuid && $orderItem->item->prep_time){
 
-                if($orderItem->item_uuid && $orderItem->item->prep_time){
+                      if($orderItem->item->prep_time_unit == Item::TIME_UNIT_MIN)
+                        $prep_time  = intval($orderItem->item->prep_time) ;
+                      else if($orderItem->item->prep_time_unit == Item::TIME_UNIT_HRS)
+                        $prep_time =  intval($orderItem->item->prep_time) * 60;
+                      else if($orderItem->item->prep_time_unit == Item::TIME_UNIT_DAY)
+                        $prep_time =  intval($orderItem->item->prep_time) * 24 * 60;
 
-                    if($orderItem->item->prep_time_unit == Item::TIME_UNIT_MIN)
-                      $prep_time  = intval($orderItem->item->prep_time) ;
-                    else if($orderItem->item->prep_time_unit == Item::TIME_UNIT_HRS)
-                      $prep_time =  intval($orderItem->item->prep_time) * 60;
-                    else if($orderItem->item->prep_time_unit == Item::TIME_UNIT_DAY)
-                      $prep_time =  intval($orderItem->item->prep_time) * 24 * 60;
+                        if($prep_time  >=  $maxPrepTime)
+                          $maxPrepTime = $prep_time;
+                  }
 
-                      if($prep_time  >=  $maxPrepTime)
-                        $maxPrepTime = $prep_time;
-                }
-
-            }
+              }
 
 
-            $this->estimated_time_of_arrival = date("c", strtotime('+' . $maxPrepTime  . ' min' ,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+              $this->estimated_time_of_arrival = date("c", strtotime('+' . $maxPrepTime  . ' min' ,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
 
+          }
+        } else {
+          if( $this->orderItems ){
+
+              $maxPrepTime = 0;
+
+              foreach ($this->orderItems as $key => $orderItem) {
+
+                  if($orderItem->item_uuid && $orderItem->item->prep_time){
+
+                      if($orderItem->item->prep_time_unit == Item::TIME_UNIT_MIN)
+                        $prep_time  = intval($orderItem->item->prep_time) ;
+                      else if($orderItem->item->prep_time_unit == Item::TIME_UNIT_HRS)
+                        $prep_time =  intval($orderItem->item->prep_time) * 60;
+                      else if($orderItem->item->prep_time_unit == Item::TIME_UNIT_DAY)
+                        $prep_time =  intval($orderItem->item->prep_time) * 24 * 60;
+
+                        if($prep_time  >=  $maxPrepTime)
+                          $maxPrepTime = $prep_time;
+                  }
+
+              }
+
+
+              $this->estimated_time_of_arrival = date("c", strtotime('+' . $maxPrepTime  . ' min' ,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+
+          }
         }
+
 
       }
 
