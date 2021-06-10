@@ -150,9 +150,6 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
       for ($i = 0; $i <= OpeningHour::DAY_OF_WEEK_SATURDAY; $i++) {
 
-         $currentWeekDay =  date('w',strtotime($i . " day"));
-
-
 
          // $selectedDate =  date('c', strtotime('+ ' . $delivery_time . ' min'   ,strtotime($currentDate)));
          $minDate =  date('c', strtotime("+". intval(($prep_time + $delivery_time))  . " min" ,strtotime('now')) );
@@ -177,8 +174,8 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
               $startAt = date('c', strtotime($workingHours->open_at, strtotime($currentDate) ));
 
-
-              $startAt =  date('c', strtotime("+". intval(($delivery_time))  . " min" , strtotime($startAt)) );
+              // if($delivery_time < 180)
+              //   $startAt =  date('c', strtotime("+". intval(($delivery_time))  . " min" , strtotime($startAt)) );
 
 
               $startAt = static::roundToNextHour($startAt);
@@ -188,16 +185,11 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
                 $startAt =  date('c', strtotime($workingHours->open_at, strtotime($startAt) ));
 
-                $startAt =  date('c', strtotime("+". intval(($delivery_time))  . " min" , strtotime($startAt)) );
-
+                // if($delivery_time < 180)
+                //   $startAt =  date('c', strtotime("+". intval(($delivery_time))  . " min" , strtotime($startAt)) );
               }
 
-              $index = 0;
-              // while (date('H:i:s', strtotime($startAt)) <= $workingHours->close_at || ($prep_time > 0 && date('w',strtotime($minDate)) <  date('c', strtotime($startAt))  )) {
               while (date('H:i:s', strtotime($startAt)) <= $workingHours->close_at ) {
-                $index++;
-
-
 
                 $endAt = date('c', strtotime("+ 60 min" ,strtotime($startAt)) );
 
