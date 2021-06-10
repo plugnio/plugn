@@ -1014,12 +1014,12 @@ class Restaurant extends \yii\db\ActiveRecord {
                                 ->orderBy(['open_at' => SORT_ASC])
                                 ->one();
 
-                                
+
           if ($opening_hour_model) {
               if (
                    date("w", strtotime($asap !== null ? $asap : "now")) == $opening_hour_model->day_of_week &&
-                   strtotime($asap !== null ? $asap : "now") > strtotime($opening_hour_model->open_at) &&
-                   strtotime($asap !== null ? $asap : "now") < strtotime($opening_hour_model->close_at)
+                   strtotime($asap !== null ? $asap : "now") > strtotime(date('c', strtotime($opening_hour_model->open_at, strtotime($asap ? $asap : "now") ))) &&
+                   strtotime($asap !== null ? $asap : "now") <  strtotime(date('c', strtotime($opening_hour_model->close_at, strtotime($asap ? $asap : "now") )) )
                   )
                   return true;
           }

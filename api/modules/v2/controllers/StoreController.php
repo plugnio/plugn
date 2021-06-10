@@ -164,9 +164,9 @@ class StoreController extends Controller {
 
                     }
 
-
               $todayOpeningHours = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => date('w' , strtotime("now"))])->one();
               $asap = date("c", strtotime('+' . ($deliveryTime + $prepTime) . ' min ',  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s'))));
+
 
              return [
                     'ASAP' => $store_model->isOpen($asap) && date('Y-m-d') == date('Y-m-d',strtotime($asap)) && $asap ? $asap : null,
