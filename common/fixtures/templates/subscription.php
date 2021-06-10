@@ -12,6 +12,6 @@ return [
     'plan_id' => $index + 1,
     'subscription_status' => 10,
     'notified_email' => 1,
-    'subscription_start_at' => $faker->dateTime(),
-    'subscription_end_at' => $faker->dateTime()
+    'subscription_start_at' => $faker->date('Y-m-d H:i:s'),
+    'subscription_end_at' => $faker->date('Y-m-d H:i:s'),
 ];

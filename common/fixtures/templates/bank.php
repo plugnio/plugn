@@ -11,7 +11,7 @@ return [
     'bank_swift_code' => $faker->word,
     'bank_address' => $faker->address,
     'bank_transfer_type' => 'NEFT',//todo: check value
-    'bank_created_at' => $faker->dateTime(),
-    'bank_updated_at' => $faker->dateTime(),
+    'bank_created_at' => $faker->date('Y-m-d H:i:s'),
+    'bank_updated_at' => $faker->date('Y-m-d H:i:s'),
     'deleted' => 0
 ];

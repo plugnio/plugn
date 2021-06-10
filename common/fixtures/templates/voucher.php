@@ -18,6 +18,6 @@ return [
     'max_redemption' => 100,
     'limit_per_customer' => 10,
     'minimum_order_amount' => $faker->numberBetween($min = 1000, $max = 9000),
-    'voucher_created_at' => $faker->dateTime(),
-    'voucher_updated_at' => $faker->dateTime(),
+    'voucher_created_at' => $faker->date('Y-m-d H:i:s'),
+    'voucher_updated_at' => $faker->date('Y-m-d H:i:s')
 ];

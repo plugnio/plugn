@@ -12,5 +12,5 @@ $item_uuid = Yii::$app->db->createCommand('SELECT item_uuid from item limit ' . 
 return [
     'item_image_id' => $index + 1,
     'item_uuid' => $item_uuid,
-    'product_file_name' => null//todo: set product file name for dev server
+    'product_file_name' => 'YSXEB58IS0em3uODSnMZS6dXnhG0seaS.jpg'
 ];
