@@ -151,7 +151,7 @@ class StoreController extends Controller {
 
                 if($cart && sizeof($cart) > 0){
                   foreach ($cart as $key => $item) {
-                    if($item['prep_time_in_min'] > $prepTime)
+                    if(isset($item['prep_time_in_min']) && $item['prep_time_in_min'] > $prepTime)
                       $prepTime = $item['prep_time_in_min'];
                   }
                 }

@@ -53,7 +53,7 @@ $mashkorBranchId = null;
 
 if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $model->deliveryZone->businessLocation->armada_api_key != null)
   $armadaApiKey = $model->deliveryZone->businessLocation->armada_api_key;
-  
+
 if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $model->deliveryZone->businessLocation->mashkor_branch_id != null)
   $mashkorBranchId = $model->deliveryZone->businessLocation->mashkor_branch_id;
 
@@ -880,7 +880,7 @@ DetailView::widget([
 
 
     <?php
-         if ($model->recipient_name || $model->recipient_phone_number || $model->gift_message) {
+         if ($model->recipient_name || $model->recipient_phone_number || $model->gift_message || $model->sender_name) {
        ?>
            <div class="card">
                <div class="card-body">
@@ -893,6 +893,14 @@ DetailView::widget([
                            'model' => $model,
                            'attributes' => [
 
+                               [
+                                   'attribute' => 'sender_name',
+                                   "format" => "raw",
+                                   "value" => function($model) {
+                                       return $model->sender_name;
+                                   },
+                                   'visible' => $model->sender_name != null && $model->sender_name,
+                               ],
                                [
                                    'attribute' => 'recipient_name',
                                    "format" => "raw",

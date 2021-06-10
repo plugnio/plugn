@@ -162,10 +162,11 @@ class OrderController extends Controller {
                 if($order->restaurant->enable_gift_message){
 
                   //save gift message
+                  $order->sender_name = Yii::$app->request->getBodyParam("sender_name");
                   $order->recipient_name = Yii::$app->request->getBodyParam("recipient_name");
                   $order->recipient_phone_number = Yii::$app->request->getBodyParam("recipient_phone_number");
                   $order->gift_message = Yii::$app->request->getBodyParam("gift_message");
-                  
+
                 }
 
                 $items = Yii::$app->request->getBodyParam("items");

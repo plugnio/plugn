@@ -74,6 +74,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property string $mashkor_driver_phone
  * @property string $mashkor_order_status
  * @property string $recipient_name
+ * @property string $sender_name
  * @property string $recipient_phone_number
  * @property string $gift_message
  * @property boolean $reminder_sent
@@ -256,7 +257,7 @@ class Order extends \yii\db\ActiveRecord {
                  'armada_tracking_link', 'armada_qr_code_link', 'armada_delivery_code',
                  'country_name','country_name_ar', 'business_location_name',
                  'building', 'apartment', 'city',  'address_1' , 'address_2','postalcode', 'floor', 'office',
-                 'recipient_name', 'recipient_phone_number', 'gift_message'
+                 'recipient_name', 'recipient_phone_number', 'gift_message', 'sender_name'
              ],
              'string', 'max' => 255],
              [['postalcode'], 'string', 'max' => 10],
@@ -565,6 +566,7 @@ class Order extends \yii\db\ActiveRecord {
             'voucher_id' => 'Voucher ID',
             'tax' => 'Tax',
             'recipient_name' => 'Recipient name',
+            'sender_name' => 'Sender name',
             'recipient_phone_number' => 'Recipient phone number',
             'gift_message' => 'Gift Message',
             'bank_discount_id' => 'Bank discount ID',
