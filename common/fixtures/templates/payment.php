@@ -22,8 +22,8 @@ return [
     'payment_udf3' => null,
     'payment_udf4' => null,
     'payment_udf5' => null,
-    'payment_created_at' => $faker->dateTime(),
-    'payment_updated_at' => $faker->dateTime(),
+    'payment_created_at' => $faker->date('Y-m-d H:i:s'),
+    'payment_updated_at' => $faker->date('Y-m-d H:i:s'),
     'received_callback' => 1,
     'response_message' => $faker->sentence(),
     'payment_token' => md5($index + 1)

@@ -4,40 +4,84 @@
  * @var $index integer
  */
 
-//todo: fix
-$index1 = $index % 50; //faker->unique()->numberBetween(0, 500);
-
-$item_uuid = Yii::$app->db->createCommand('SELECT item_uuid from item limit ' . $index1 . ',1')->queryScalar();
-$restaurant = Yii::$app->db->createCommand('SELECT * from restaurant')->queryOne();
-$restaurantDelivery = Yii::$app->db->createCommand('SELECT * from restaurant_delivery')->queryOne();
-$area = Yii::$app->db->createCommand('SELECT * from area where area_id = ' . $restaurantDelivery['area_id'])->queryOne();
-
-$restaurantPaymentMethod = Yii::$app->db->createCommand('SELECT * from restaurant_payment_method')->queryOne();
-$paymentMethod = Yii::$app->db->createCommand('SELECT * from payment_method where payment_method_id = ' . $restaurantPaymentMethod['payment_method_id'])->queryOne();
-
-$customer = Yii::$app->db->createCommand('SELECT * from customer')->queryOne();
+$paymentMethod = Yii::$app->db->createCommand('SELECT * from payment_method limit ' . $index . ',1')->queryOne();
 
 return [
-    'order_uuid' => $faker->numberBetween(1, 100000),
-    'customer_id' => $customer['customer_id'],
-    'customer_phone_number' => $customer['customer_phone_number'],
-    'customer_email' => $customer['customer_email'],
-    'restaurant_uuid' => $restaurant['restaurant_uuid'],
-    'area_id' => $restaurantDelivery['area_id'],
-    'area_name' => $area['area_name'],
-    'area_name_ar' => $area['area_name_ar'],
+    'order_uuid' => $index + 1,
+    'payment_uuid' => $index + 1,
+    'customer_id' => $index + 1,
+    'customer_name' => $faker->firstname,
+    'customer_phone_number' => $faker->phoneNumber,
+    'customer_phone_country_code' => '091',
+    'customer_email' => $faker->email,
+    'restaurant_uuid' => $index + 1,
+    'area_id' => $index + 1,
+    'area_name' => $faker->streetName,
+    'area_name_ar' => $faker->streetName,
     'unit_type' => 'House',
     'block' => $faker->numberBetween(1, 10),
     'street' => $faker->numberBetween(1, 10),
     'avenue' => $faker->numberBetween(1, 10),
     'house_number' => $faker->numberBetween(1, 10),
-    'special_directions' => $faker->firstname,
-    'customer_name' => $faker->firstname,
-    'order_mode' => 0,
-    'payment_method_id' => $restaurantPaymentMethod['payment_method_id'],
+    'delivery_zone_id' => $index + 1,
+    'shipping_country_id' => $index + 1,
+    'country_name' => $faker->country,
+    'country_name_ar' => $faker->country,
+    'business_location_name' => $faker->streetName,
+    'floor' => 4,
+    'apartment' => $faker->word,
+    'building' => 'A4',
+    'office' => 412,
+    'city' => $faker->city,
+    'address_1' => $faker->address,
+    'address_2' => $faker->address,
+    'special_directions' => $faker->sentence,
+    'payment_method_id' => $paymentMethod['payment_method_id'],
     'payment_method_name' => $paymentMethod['payment_method_name'],
     'payment_method_name_ar' => $paymentMethod['payment_method_name_ar'],
+    'total_price' => $faker->numberBetween (10, 100),
+    'subtotal' => $faker->numberBetween (10, 100),
+    'subtotal_before_refund' => $faker->numberBetween (10, 100),
+    'total_price_before_refund' => $faker->numberBetween (10, 100),
+    'delivery_fee' => $faker->numberBetween (10, 100),
+    'order_status' => $faker->randomElement ([
+        \common\models\Order::STATUS_REFUNDED,
+        \common\models\Order::STATUS_ACCEPTED,
+        \common\models\Order::STATUS_PARTIALLY_REFUNDED,
+        \common\models\Order::STATUS_PENDING,
+        \common\models\Order::STATUS_COMPLETE,
+    ]),
+    'order_mode' => 1,
+    'estimated_time_of_arrival' => $faker->date('Y-m-d H:i:s'),
+    'delivery_time' => 11,
     'order_created_at' => $faker->date('Y-m-d H:i:s'),
     'order_updated_at' => $faker->date('Y-m-d H:i:s'),
+    'restaurant_branch_id' => $index + 1,
+    'armada_tracking_link' => $faker->url,
+    'items_has_been_restocked' => 1,
+    'latitude' => $faker->latitude,
+    'longitude' => $faker->longitude,
+    'is_order_scheduled' => $faker->randomElement ([1,0]),
+    'scheduled_time_start_from' => $faker->date('Y-m-d H:i:s'),
+    'scheduled_time_to' => $faker->date('Y-m-d H:i:s'),
+    'voucher_id' => $index + 1,
+    'armada_qr_code_link' => $faker->url,
+    'armada_delivery_code' => $faker->md5,
+    'bank_discount_id' => $index + 1,
+    'mashkor_order_number' => $index + 1,
+    'mashkor_tracking_link' => $faker->url,
+    'mashkor_driver_name' => $faker->firstName . ' ' .$faker->lastName,
+    'mashkor_driver_phone' => $faker->phoneNumber,
+    'mashkor_order_status' => 'pending',
+    'reminder_sent' => 1,
+    'sms_sent' => 1,
+    'pickup_location_id' => $index + 1,
+    'tax' => $faker->numberBetween (10, 20),
+    'recipient_name' => $faker->firstName,
+    'recipient_phone_number' => $faker->phoneNumber,
+    'gift_message' => $faker->sentence
 ];
+
+
+
 

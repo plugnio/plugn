@@ -10,10 +10,11 @@ $orderItem = Yii::$app->db->createCommand('SELECT * from `order_item` limit ' . 
 $extraOption = Yii::$app->db->createCommand('SELECT * from `extra_option` limit ' . $index . ',1')->queryAll();
 
 return [
-    'order_item_extra_option_id' => $faker->numberBetween(1,100000),
-    'order_item_id' => $orderItem[0]['order_item_id'],
-    'extra_option_id' => $extraOption[0]['extra_option_id'],
-    'extra_option_name' => $extraOption[0]['extra_option_name'],
-    'extra_option_name_ar' => $extraOption[0]['extra_option_name_ar'],
-    'extra_option_price' => $extraOption[0]['extra_option_price'],
+    'order_item_extra_option_id' => $index + 1,
+    'order_item_id' => $index + 1,
+    'extra_option_id' => $index + 1,
+    'extra_option_name' => $faker->word,
+    'extra_option_name_ar' => $faker->word,
+    'extra_option_price' => $faker->numberBetween (10, 100),
+    'qty' => $faker->numberBetween (10, 100)
 ];
