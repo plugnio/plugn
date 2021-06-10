@@ -10,7 +10,7 @@ return [
     'order_item_id' => $index + 1,
     'order_uuid' => $index + 1,
     'item_uuid' => $index + 1,
-    'item_name' => $faker->words(3),
+    'item_name' => $faker->words(3, true),
     'item_price' => $faker->numberBetween(10, 100),
     'qty' => $faker->numberBetween(10, 100)
 ];

@@ -6,7 +6,7 @@
 
 $index1 = $index % 50;
 
-$restaurant_uuid = Yii::$app->db->createCommand('SELECT * from restaurant limit '.$index1.',1')->queryOne();
+$restaurant_uuid = Yii::$app->db->createCommand('SELECT * from restaurant limit '.$index1.',1')->queryScalar();
 
 return [
     'tap_queue_id' => $index + 1,
