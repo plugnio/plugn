@@ -67,11 +67,11 @@ class ItemController extends Controller
      * Get all store's products
      * @return type
      */
-    public function actionList()
+    public function actionList($store_uuid)
     {
-        $keyword = Yii::$app->request->get ('keyword');
+        $keyword = Yii::$app->request->get('keyword');
 
-        $store = Yii::$app->accountManager->getManagedAccount ();
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $query = $store->getItems();
 
