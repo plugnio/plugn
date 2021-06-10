@@ -69,7 +69,6 @@ class City extends \yii\db\ActiveRecord
         return $this->hasOne(Country::className(), ['country_id' => 'country_id']);
     }
 
-
     /**
      * Gets query for [[Areas]].
      *
@@ -78,6 +77,16 @@ class City extends \yii\db\ActiveRecord
     public function getAreas()
     {
         return $this->hasMany(Area::className(), ['city_id' => 'city_id']);
+    }
+
+    /**
+     * Gets query for [[Areas]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAreaDeliveryZones()
+    {
+        return $this->hasMany(AreaDeliveryZone::className(), ['city_id' => 'city_id']);
     }
 
         /**

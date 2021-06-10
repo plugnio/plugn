@@ -103,12 +103,11 @@ class DeliveryZone extends \yii\db\ActiveRecord
     public function extraFields()
     {
       return [
+          'totalAreas',
           'areas',
           'country'
       ];
     }
-
-
 
     /**
      * Gets query for [[AreaDeliveryZones]].
@@ -118,6 +117,11 @@ class DeliveryZone extends \yii\db\ActiveRecord
     public function getAreaDeliveryZones()
     {
         return $this->hasMany(AreaDeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id'])->joinWith(['area']);
+    }
+
+    public function getTotalAreas()
+    {
+        return $this->getAreas()->count();
     }
 
     /**

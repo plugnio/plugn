@@ -61,7 +61,42 @@ class AreaDeliveryZoneController extends Controller {
         return $actions;
     }
 
+    public function actionList() {
 
+        $page = Yii::$app->request->get('page');
+        $keyword = Yii::$app->request->get('keyword');
+        $city_id = Yii::$app->request->get('city_id');
+        $delivery_zone_id = Yii::$app->request->get('delivery_zone_id');
+
+        //validate
+
+        Yii::$app->accountManager->getManagedAccount();
+
+        $query = AreaDeliveryZone::find()
+            ->andWhere([
+                'city_id' => $city_id,
+                'delivery_zone_id' => $delivery_zone_id
+            ]);
+
+        if ($keyword) {
+            $query->andWhere([
+                'OR',
+                ['like', 'area_name', $keyword],
+                ['like', 'area_name_ar', $keyword]
+            ]);
+        }
+
+        if(!$page) {
+            return new ActiveDataProvider([
+                'query' => $query,
+                'pagination' => false
+            ]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
 
     /**
      * Create AreaDelivery Zone

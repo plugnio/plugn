@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $area_delivery_zone
  * @property int $delivery_zone_id
+ * @property int $city_id
  * @property int $area_id
  * @property string $restaurant_uuid
  *

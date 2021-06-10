@@ -156,10 +156,20 @@ return [
                 [// CityController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/city',
-                    'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options'
+                    ]
+                ],
+                [// AreaController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/area',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET <id>' => 'detail',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options'
@@ -253,8 +263,8 @@ return [
                 [// AreaDeliveryZoneController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/area-delivery-zone',
-                    'pluralize' => false,
                     'patterns' => [
+                        'GET' => 'list',
                         'POST create' => 'create',
                         'DELETE <area_delivery_zone_id>/<store_uuid>' => 'delete',
                         'PATCH <area_delivery_zone_id>/<store_uuid>' => 'update',

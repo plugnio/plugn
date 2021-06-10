@@ -2,16 +2,14 @@
 
 namespace agent\modules\v1\controllers;
 
-use common\models\DeliveryZone;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use agent\models\City;
+use agent\models\Area;
 
 
-class CityController extends Controller {
+class AreaController extends Controller {
 
     public function behaviors() {
         $behaviors = parent::behaviors();
@@ -38,13 +36,13 @@ class CityController extends Controller {
         ];
 
         // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-              $behaviors['authenticator'] = [
-                  'class' => \yii\filters\auth\HttpBearerAuth::className(),
-              ];
-              // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-              $behaviors['authenticator']['except'] = ['options'];
+        $behaviors['authenticator'] = [
+            'class' => \yii\filters\auth\HttpBearerAuth::className(),
+        ];
+        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+        $behaviors['authenticator']['except'] = ['options'];
 
-              return $behaviors;
+        return $behaviors;
     }
 
     /**
@@ -62,62 +60,62 @@ class CityController extends Controller {
     }
 
     /**
-    * Get all cities data
-     * @return type
+     * Get all areas data
+     * @return Area[]
      */
     public function actionList() {
 
+        $page = Yii::$app->request->get('page');
         $keyword = Yii::$app->request->get('keyword');
-        $country_id = Yii::$app->request->get('country_id');
-        $store_uuid = Yii::$app->request->get('store_uuid');
-        $delivery_zone_id = Yii::$app->request->get('delivery_zone_id');
+        $city_id = Yii::$app->request->get('city_id');
 
-        Yii::$app->accountManager->getManagedAccount($store_uuid);
+        Yii::$app->accountManager->getManagedAccount();
 
-        if($delivery_zone_id) {
-            $dz = DeliveryZone::findOne(['delivery_zone_id' => $delivery_zone_id]);
-
-            if($dz)
-                $country_id = $dz->country_id;
-        }
-
-        $query =  City::find();
+        $query =  Area::find()
+            ->andWhere(['city_id' => $city_id]);
 
         if ($keyword) {
-          $query->andWhere([
-              'OR',
-              ['like', 'city_name', $keyword],
-              ['like', 'city_name_ar', $keyword]
-          ]);
+            $query->andWhere([
+                'OR',
+                ['like', 'area_name', $keyword],
+                ['like', 'area_name_ar', $keyword]
+            ]);
         }
 
-        $query->andWhere(['country_id' => $country_id]);
+        if(!$page) {
+            return new ActiveDataProvider([
+                'query' => $query,
+                'pagination' => false
+            ]);
+        }
 
         return new ActiveDataProvider([
-          'query' => $query
+            'query' => $query
         ]);
     }
 
     /**
-    * Return City detail
-     * @param type $store_uuid
-     * @param type $city_id
-     * @return type
+     * Return Area detail
+     * @param integer $area_id
+     * @return Area
      */
-    public function actionDetail($city_id, $store_uuid) {
+    public function actionDetail($id) {
+        return $this->findModel($id);
+    }
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
-
-        $city =  City::find()
-                  ->where(['city_id' =>  $city_id])
-                  ->one();
-
-        return $city;
-
-      }
-
-  }
-
-
-
+    /**
+     * Finds the Area  model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Area the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($area_id)
+    {
+        if (($model = Area::findOne ($area_id)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested record does not exist.');
+        }
+    }
 }
