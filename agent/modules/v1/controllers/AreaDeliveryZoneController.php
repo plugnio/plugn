@@ -3,6 +3,7 @@
 namespace agent\modules\v1\controllers;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
@@ -10,6 +11,7 @@ use yii\web\NotFoundHttpException;
 use common\models\DeliveryZone;
 use common\models\Area;
 use common\models\AreaDeliveryZone;
+
 
 class AreaDeliveryZoneController extends Controller {
 
@@ -99,6 +101,73 @@ class AreaDeliveryZoneController extends Controller {
     }
 
     /**
+     * save delivery zone areas
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionSave() {
+
+        $store = Yii::$app->accountManager->getManagedAccount();
+
+        $areas = Yii::$app->request->getBodyParam("areas");
+        $city_id = Yii::$app->request->getBodyParam("city_id");
+        $delivery_zone_id =  Yii::$app->request->getBodyParam("delivery_zone_id");
+
+        $delivery_zone = $store->getDeliveryZones()
+            ->filterWhere(['delivery_zone_id' => $delivery_zone_id])
+            ->one();
+
+        if(!$delivery_zone)
+            throw new NotFoundHttpException('The requested record does not exist.');
+
+        //delete extra areas saved before
+
+        AreaDeliveryZone::deleteAll([
+            'AND',
+            ['delivery_zone_id' => $delivery_zone_id, 'city_id' => $city_id],
+            ['NOT IN', 'area_id', $areas]
+        ]);
+
+        //list already added areas
+
+        $addedAreas = $store->getAreaDeliveryZones()
+            ->filterWhere(['city_id' => $city_id, 'delivery_zone_id' => $delivery_zone_id])
+            ->all();
+
+        $addedAreaIds = ArrayHelper::getColumn ($addedAreas, 'area_id');
+
+        //add new areas
+
+        $arrDeliveryAreas = [];
+
+        foreach ($areas as $area) {
+            //skip if already added
+            if(!in_array ($area, $addedAreaIds)) {
+                $arrDeliveryAreas[] = [
+                    'restaurant_uuid' => $store->restaurant_uuid,
+                    'delivery_zone_id' => $delivery_zone_id,
+                    'country_id' => $delivery_zone->country_id,
+                    'city_id' => $city_id,
+                    'area_id' => $area
+                ];
+            }
+        }
+
+        if(sizeof($arrDeliveryAreas) > 0)
+        {
+            Yii::$app->db->createCommand()->batchInsert('area_delivery_zone',
+                ['restaurant_uuid', 'delivery_zone_id', 'country_id', 'city_id', 'area_id'],
+                $arrDeliveryAreas
+            )->execute();
+        }
+
+        return [
+            "operation" => "success",
+            "message" => "Delivery areas updated successfully"
+        ];
+    }
+
+    /**
      * Create AreaDelivery Zone
      * @return array
      */
@@ -127,8 +196,6 @@ class AreaDeliveryZoneController extends Controller {
        $model->delivery_zone_id =  $delivery_zone_model->delivery_zone_id;
        $model->area_id = $area_model->area_id;
 
-
-
         if (!$model->save()) {
             return [
                 "operation" => "error",
@@ -141,7 +208,6 @@ class AreaDeliveryZoneController extends Controller {
             "message" => "Area Delivery Zone created successfully",
             "model" => AreaDeliveryZone::findOne($model->area_delivery_zone)
         ];
-
     }
 
      /**
