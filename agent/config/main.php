@@ -265,12 +265,14 @@ return [
                     'controller' => 'v1/area-delivery-zone',
                     'patterns' => [
                         'GET' => 'list',
+                        'PATCH save' => 'save',
                         'POST create' => 'create',
                         'DELETE <area_delivery_zone_id>/<store_uuid>' => 'delete',
                         'PATCH <area_delivery_zone_id>/<store_uuid>' => 'update',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS create' => 'options',
+                        'OPTIONS save' => 'options',
                         'OPTIONS <area_delivery_zone_id>/<store_uuid>' => 'options',
                     ]
                 ],
