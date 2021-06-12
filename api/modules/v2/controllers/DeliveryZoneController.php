@@ -60,27 +60,27 @@ class DeliveryZoneController extends Controller {
     /**
      * Return Delivery zones
      */
-    public function actionDeliveryZone($restaurant_uuid) {
-
-        if ($store_model = Restaurant::findOne($restaurant_uuid)) {
-
-            $shipping_countries = $store_model->getShippingCountries()->asArray()->all();
-
-            foreach ($shipping_countries as $key => $shippingCountry) {
-              $deliveryZones = $store_model->getCountryDeliveryZones($shippingCountry['country_id'])->asArray()->all();
-              $shippingCountry['businessLocations'] = $deliveryZones;
-            }
-
-            return $shipping_countries;
-
-
-        } else {
-            return [
-                'operation' => 'error',
-                'message' => 'Store Uuid is invalid'
-            ];
-        }
-    }
+    // public function actionDeliveryZone($restaurant_uuid) {
+    //
+    //     if ($store_model = Restaurant::findOne($restaurant_uuid)) {
+    //
+    //         $shipping_countries = $store_model->getShippingCountries()->asArray()->all();
+    //
+    //         foreach ($shipping_countries as $key => $shippingCountry) {
+    //           $deliveryZones = $store_model->getCountryDeliveryZones($shippingCountry['country_id'])->asArray()->all();
+    //           $shippingCountry['businessLocations'] = $deliveryZones;
+    //         }
+    //
+    //         return $shipping_countries;
+    //
+    //
+    //     } else {
+    //         return [
+    //             'operation' => 'error',
+    //             'message' => 'Store Uuid is invalid'
+    //         ];
+    //     }
+    // }
 
     /**
      * Return List of countries available for delivery
@@ -181,6 +181,7 @@ class DeliveryZoneController extends Controller {
               }
 
               $deliveryTime = intval($deliveryZone['delivery_time']);
+              $deliveryTimeInMin = intval($deliveryZone['delivery_time']);
 
               if(DeliveryZone::TIME_UNIT_DAY == $deliveryZone['time_unit'])
                 $deliveryTime = $deliveryTime * 24 * 60 * 60;
@@ -189,6 +190,14 @@ class DeliveryZoneController extends Controller {
               else if (DeliveryZone::TIME_UNIT_MIN == $deliveryZone['time_unit'])
                 $deliveryTime = $deliveryTime *  60;
 
+              if(DeliveryZone::TIME_UNIT_DAY == $deliveryZone['time_unit'])
+                $deliveryTimeInMin = $deliveryTimeInMin * 24 * 60;
+              else if (DeliveryZone::TIME_UNIT_HRS == $deliveryZone['time_unit'])
+                $deliveryTimeInMin = $deliveryTimeInMin *  60;
+
+
+
+              $deliveryZone['delivery_time_in_min'] = $deliveryTimeInMin;
 
               $deliveryZone['delivery_time'] = Yii::$app->formatter->asDuration($deliveryTime);
 

@@ -17,6 +17,8 @@
 0 0 * * * php ~/www/yii  cron/update-sitemap  > /dev/null 2>&1
 0 0 * * * php ~/www/yii  cron/retention-emails-who-passed-five-days-and-no-sales  > /dev/null 2>&1
 0 0 * * * php ~/www/yii  cron/retention-emails-who-passed-two-days-and-no-products > /dev/null 2>&1
+0 0 * * * php ~/www/yii  cron/notify-agents-for-subscription-that-will-expire-soon > /dev/null 2>&1
+0 0 * * * php ~/www/yii  cron/downgraded-store-subscription    > /dev/null 2>&1
 
 # Build every 10 sec
 * * * * * php ~/www/yii  cron/update-voucher-status > /dev/null 2>&1
@@ -25,3 +27,6 @@
 * * * * * sleep 30 && php ~/www/yii  cron/create-build-js-file > /dev/null 2>&1
 * * * * * sleep 40 && php ~/www/yii  cron/create-build-js-file > /dev/null 2>&1
 * * * * * sleep 50 && php ~/www/yii  cron/create-build-js-file > /dev/null 2>&1
+
+# Every Sunday
+0 0 * * SAT php ~/www/yii cron/weekly-report  > /dev/null 2>&1

@@ -265,6 +265,10 @@ class Restaurant extends \yii\db\ActiveRecord {
 
 
             [['restaurant_email_notification', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable', 'is_myfatoorah_enable','supplierCode'], 'integer'],
+            [['schedule_interval'], 'required','when' => function($model) {
+                    return $model->schedule_order;
+                }
+            ],
             ['restaurant_email', 'email'],
             [['restaurant_uuid', 'restaurant_domain', 'name'], 'unique'],
             [['payment_gateway_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentGatewayQueue::className(), 'targetAttribute' => ['payment_gateway_queue_id' => 'payment_gateway_queue_id']],
@@ -335,8 +339,8 @@ class Restaurant extends \yii\db\ActiveRecord {
             'authorized_signature_file_purpose' => 'Authorized Signature File Purpose',
             'commercial_license_issuing_date' => 'Commercial License Issuing Date',
             'commercial_license_expiry_date' => 'Commercial License Expiry Date',
-            'commercial_license_file' => 'Commercial License File',
-            'restaurant_commercial_license_file' => 'Commercial License File',
+            'commercial_license_file' => 'License copy',
+            'restaurant_commercial_license_file' => 'License copy ',
             'commercial_license_title' => 'Commercial License Title',
             'commercial_license_file_purpose' => 'Commercial License File Purpose',
             'iban' => 'IBAN',
@@ -437,7 +441,7 @@ class Restaurant extends \yii\db\ActiveRecord {
                 );
 
                 if ($result || count($result) > 0) {
-                  
+
                     //delete the file from temp folder
                     unlink($file_path);
                     $this[$attribute] = basename($result['url']);
@@ -1150,24 +1154,24 @@ class Restaurant extends \yii\db\ActiveRecord {
         return $photo_url;
     }
 
-    public function isOpen() {
+    public function isOpen($asap = null) {
+
         $opening_hour_model = OpeningHour::find()
-                                ->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])
-                                ->andWhere(['<=','open_at', date("H:i:s", strtotime("now"))])
-                                ->andWhere(['>=','close_at', date("H:i:s", strtotime("now"))])
+                                ->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime($asap !== null ? $asap : "now"))])
+                                ->andWhere(['<=','open_at', date("H:i:s", strtotime($asap !== null ? $asap : "now"))])
+                                ->andWhere(['>=','close_at', date("H:i:s", strtotime($asap !== null ? $asap : "now"))])
                                 ->orderBy(['open_at' => SORT_ASC])
                                 ->one();
 
 
-
-                  if ($opening_hour_model) {
-                      if ( !$opening_hour_model->is_closed &&
-                           date("w", strtotime("now")) == $opening_hour_model->day_of_week &&
-                           strtotime("now") > strtotime($opening_hour_model->open_at) &&
-                           strtotime("now") < strtotime($opening_hour_model->close_at)
-                          )
-                          return true;
-                  }
+          if ($opening_hour_model) {
+              if (
+                   date("w", strtotime($asap !== null ? $asap : "now")) == $opening_hour_model->day_of_week &&
+                   strtotime($asap !== null ? $asap : "now") > strtotime(date('c', strtotime($opening_hour_model->open_at, strtotime($asap ? $asap : "now") ))) &&
+                   strtotime($asap !== null ? $asap : "now") <  strtotime(date('c', strtotime($opening_hour_model->close_at, strtotime($asap ? $asap : "now") )) )
+                  )
+                  return true;
+          }
 
 
 
@@ -1196,7 +1200,159 @@ class Restaurant extends \yii\db\ActiveRecord {
             },
             'supportPickup' => function($restaurant) {
                 return $restaurant->getPickupBusinessLocations()->count() > 0 ? 1 : 0;
-            }
+            },
+            'customerGained' => function($store) {
+
+                return [
+                  'customerGainedThisMonth' => $store
+                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") , 1)) , date("Y-m-d H:i:s") ),
+
+                  'customerGainedLastMonth' => $store
+                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-1,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  0 )) ),
+
+                  'customerGainedLastTwoMonth' => $store
+                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-2,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -1,  0 )) ),
+
+                  'customerGainedLastThreeMonth' => $store
+                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-3,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -2,  0 )) ),
+
+                  'customerGainedLastFourMonth' => $store
+                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-4,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -3,  0 )) ),
+
+                  'customerGainedLastFiveMonth' => $store
+                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-5,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -4,  0 )) ),
+
+                  'customerGainedLastSixDays' => $store
+                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -6 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -6 )) ),
+
+                  'customerGainedLastFiveDays' => $store
+                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -5 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -5 )) ),
+
+                  'customerGainedLastFourDays' => $store
+                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -4 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -4 )) ),
+
+                  'customerGainedLastThreeDays' => $store
+                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -3 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -3 )) ),
+
+                  'customerGainedLastTwoDays' => $store
+                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -2 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -2 )) ),
+
+                  'customerGainedYesterday' => $store
+                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -1 )) ),
+
+                  'customerGainedToday' => $store
+                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") )) , date("Y-m-d H:i:s") ),
+
+                ];
+            },
+            'soldItems' => function($model) {
+
+                return [
+                  'soldItemsLastSixDays' => $model->getOrderItems()->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 6 DAY) ')->sum('order_item.qty'),
+                  'soldItemsLastFiveDays' => $model->getOrderItems()->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')->sum('order_item.qty'),
+                  'soldItemsLastFourDays' => $model->getOrderItems()->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 4 DAY) ')->sum('order_item.qty'),
+                  'soldItemsLastThreeDays' => $model->getOrderItems()->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 3 DAY) ')->sum('order_item.qty'),
+                  'soldItemsLastTwoDays' => $model->getOrderItems()->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')->sum('order_item.qty'),
+                  'soldItemsYesterday' => $model->getOrderItems()->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 1 DAY) ')->sum('order_item.qty'),
+                  'soldItemsToday' => $model->getOrderItems()->andWhere(['DATE(order.order_created_at)' => new Expression('CURDATE()')])->sum('order_item.qty'),
+
+                ];
+            },
+            'bestSeller' => function($model) {
+              return \common\models\Item::find()
+                      ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                      ->orderBy(['unit_sold' => SORT_DESC])
+                      ->limit(5)
+                      ->select(['item_name','item_name_ar','unit_sold'])
+                      ->all();
+            },
+            'revenueGenerated' => function($store) {
+
+                return [
+                  'revenueGeneratedThisMonth' => $store
+                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") , 1)) , date("Y-m-d H:i:s") ),
+
+                  'revenueGeneratedLastMonth' => $store
+                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-1,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  0 )) ),
+
+                  'revenueGeneratedLastTwoMonth' => $store
+                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-2,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -1,  0 )) ),
+
+                  'revenueGeneratedLastThreeMonth' => $store
+                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-3,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -2,  0 )) ),
+
+                  'revenueGeneratedLastFourMonth' => $store
+                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-4,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -3,  0 )) ),
+
+                  'revenueGeneratedLastFiveMonth' => $store
+                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-5,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -4,  0 )) ),
+
+                  'revenueGeneratedLastSixDays' => $store
+                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -6 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -6 )) ),
+
+                  'revenueGeneratedLastFiveDays' => $store
+                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -5 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -5 )) ),
+
+                  'revenueGeneratedLastFourDays' => $store
+                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -4 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -4 )) ),
+
+                  'revenueGeneratedLastThreeDays' => $store
+                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -3 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -3 )) ),
+
+                  'revenueGeneratedLastTwoDays' => $store
+                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -2 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -2 )) ),
+
+                  'revenueGeneratedYesterday' => $store
+                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -1 )) ),
+
+                  'revenueGeneratedToday' => $store
+                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") )) , date("Y-m-d H:i:s") )
+                ];
+            },
+            'orderReceived' => function($store) {
+
+                return [
+                  'ordersRecivedThisMonth' => $store
+                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") , 1)) , date("Y-m-d H:i:s") ),
+
+                  'ordersRecivedLastMonth' => $store
+                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-1,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  0 )) ),
+
+                  'ordersRecivedLastTwoMonth' => $store
+                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-2,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -1,  0 )) ),
+
+                  'ordersRecivedLastThreeMonth' => $store
+                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-3,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -2,  0 )) ),
+
+                  'ordersRecivedLastFourMonth' => $store
+                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-4,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -3,  0 )) ),
+
+                  'ordersRecivedLastFiveMonth' => $store
+                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-5,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -4,  0 )) ),
+
+                  'ordersRecivedLastSixDays' => $store
+                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -6 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -6 )) ),
+
+                  'ordersRecivedLastFiveDays' => $store
+                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -5 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -5 )) ),
+
+                  'ordersRecivedLastFourDays' => $store
+                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -4 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -4 )) ),
+
+                  'ordersRecivedLastThreeDays' => $store
+                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -3 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -3 )) ),
+
+                  'ordersRecivedLastTwoDays' => $store
+                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -2 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -2 )) ),
+
+                  'ordersRecivedYesterday' => $store
+                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -1 )) ),
+
+                  'ordersRecivedToday' => $store
+                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") )) , date("Y-m-d H:i:s") )
+
+                ];
+            },
         ];
     }
 
@@ -1287,7 +1443,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      * @return \yii\db\ActiveQuery
      */
     public function getAgentAssignments() {
-        return $this->hasMany(AgentAssignment::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany(AgentAssignment::className(), ['restaurant_uuid' => 'restaurant_uuid'])->with('agent');
     }
 
     /**
@@ -1404,6 +1560,26 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getOrders() {
         return $this->hasMany(Order::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * Gets query for [[Orders]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getActiveOrders() {
+        return $this->hasMany(Order::className(), ['restaurant_uuid' => 'restaurant_uuid'])->activeOrders($this->restaurant_uuid);;
+    }
+
+    /**
+     * Gets query for [[OrderItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrderItems() {
+        return $this->hasMany(OrderItem::className(), ['order_uuid' => 'order_uuid'])
+        ->via('activeOrders')
+        ->joinWith('order');
     }
 
 
@@ -1624,15 +1800,15 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getShippingCountries()
-    {
-        return $this->hasMany(Country::className(), ['country_id' => 'country_id'])
-        ->joinWith([
-            'deliveryZones' => function ($query) {
-                $query->onCondition(['delivery_zone.restaurant_uuid' => 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290']);
-            },
-        ]);
-    }
+    // public function getShippingCountries()
+    // {
+    //     return $this->hasMany(Country::className(), ['country_id' => 'country_id'])
+    //     ->joinWith([
+    //         'deliveryZones' => function ($query) {
+    //             $query->onCondition(['delivery_zone.restaurant_uuid' => 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290']);
+    //         },
+    //     ]);
+    // }
 
 
     /**

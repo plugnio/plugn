@@ -204,32 +204,29 @@ $this->registerJs($js);
 
             </div>
             <div class="row">
+              <div class="col-12 col-sm-6 col-lg-6">
 
+                <?=
+                $form->field($model, 'vendor_sector')->radioList(['Shopping & Retail' => 'Shopping & Retail', 'F&B' => 'F&B', 'Other' => 'Other'], [
+                    'style' => 'display:grid',
+                    'item' => function($index, $label, $name, $checked, $value) {
 
-                <div class="col-12 col-sm-6 col-lg-6">
+                        $return = '<label class="vs-radio-con">';
+                        /* -----> */ if ($checked)
+                            $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                        /* -----> */
+                        else
+                            $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                        $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
+                        $return .= '<span>' . ucwords($label) . '</span>';
+                        $return .= '</label>';
 
-                  <?=
-                  $form->field($model, 'vendor_sector')->radioList(['Shopping & Retail' => 'Shopping & Retail', 'F&B' => 'F&B', 'Other' => 'Other'], [
-                      'style' => 'display:grid',
-                      'item' => function($index, $label, $name, $checked, $value) {
+                        return $return;
+                    }
+                ])->label('Vendor Sector *');
+                ?>
 
-                          $return = '<label class="vs-radio-con">';
-                          /* -----> */ if ($checked)
-                              $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                          /* -----> */
-                          else
-                              $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                          $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
-                          $return .= '<span>' . ucwords($label) . '</span>';
-                          $return .= '</label>';
-
-                          return $return;
-                      }
-                  ])->label('Vendor Sector *');
-                  ?>
-
-                </div>
-
+              </div>
 
 
                 <div class="col-12 col-sm-6 col-lg-6">
@@ -348,6 +345,14 @@ $this->registerJs($js);
 
     </div>
 
+				<button class="btn btn-success" type="button" id="loading" disabled style="width: 100%;height: 50px; display:none">
+					<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+					<span class="ml-25 align-middle">Loading...</span>
+				</button>
+
+
+
+    </div>
 </div>
 
 

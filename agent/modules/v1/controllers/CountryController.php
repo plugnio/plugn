@@ -68,29 +68,47 @@ class CountryController extends Controller {
      */
     public function actionList($store_uuid) {
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+        $keyword = Yii::$app->request->get('keyword');
 
-          $countries =  Country::find()
-                    ->asArray()
-                    ->all();
+        Yii::$app->accountManager->getManagedAccount($store_uuid);
 
+        $query =  Country::find();
 
-          if (!$countries) {
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found'
-              ];
-          }
+        if ($keyword){
+          $query->where(['like', 'country_name', $keyword]);
+          $query->orWhere(['like', 'country_name_ar', $keyword]);
+        }
 
-          return [
-              'operation' => 'success',
-              'body' => $countries
-          ];
-
-      }
+        return new ActiveDataProvider([
+          'query' => $query
+        ]);
 
     }
 
+
+
+
+    /**
+    * Return Country detail
+     * @param type $store_uuid
+     * @param type $order_uuid
+     * @return type
+     */
+    public function actionDetail($store_uuid, $country_id) {
+
+      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+
+        $country =  Country::find()
+                  ->where(['country_id' => $country_id])
+                  ->with('cities','cities.areas')
+                  ->asArray()
+                  ->one();
+
+          return $country;
+
+      }
+
+  }
 
 
 

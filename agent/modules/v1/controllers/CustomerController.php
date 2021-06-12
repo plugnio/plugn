@@ -8,6 +8,7 @@ use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use common\models\Customer;
+use common\models\Order;
 
 class CustomerController extends Controller {
 
@@ -68,27 +69,23 @@ class CustomerController extends Controller {
      */
     public function actionList($store_uuid) {
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+      $keyword = Yii::$app->request->get('keyword');
 
-          $customers =  Customer::find()
-                    ->where(['restaurant_uuid' => $store_uuid])
-                    ->asArray()
-                    ->all();
+      Yii::$app->accountManager->getManagedAccount($store_uuid);
 
+      $query =  Customer::find();
 
-          if (!$customers) {
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found'
-              ];
-          }
-
-          return [
-              'operation' => 'success',
-              'body' => $customers
-          ];
-
+      if ($keyword){
+        $query->where(['like', 'customer_name', $keyword]);
+        $query->orWhere(['like', 'customer_phone_number', $keyword]);
+        $query->orWhere(['like', 'customer_email', $keyword]);
       }
+
+      $query->andWhere(['restaurant_uuid' => $store_uuid]);
+
+      return new ActiveDataProvider([
+        'query' => $query
+      ]);
 
     }
 
@@ -106,25 +103,39 @@ class CustomerController extends Controller {
           $customer =  Customer::find()
                     ->where(['restaurant_uuid' => $store_uuid])
                     ->andWhere(['customer_id' => $customer_id])
-                    ->asArray()
                     ->one();
 
 
-          if (!$customer) {
-
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found.'
-              ];
-          }
-
-          return [
-              'operation' => 'success',
-              'body' => $customer
-          ];
+          return $customer;
 
       }
 
   }
+
+
+  /**
+   * Return a List of all customers Orders
+   * @param type $store_uuid
+   * @param type $customer_id
+   * @return type
+   */
+  public function actionListAllCustomerOrders($store_uuid, $customer_id) {
+
+    if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+
+        $query =  Order::find()
+                  ->where(['restaurant_uuid' => $store_uuid,'customer_id' => $customer_id])
+                  ->orderBy(['order_created_at' => SORT_DESC]);
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+
+
+    }
+
+  }
+
+
 
 }

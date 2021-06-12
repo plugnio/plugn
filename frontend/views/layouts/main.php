@@ -340,7 +340,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                     ?>
                                 </li>
 
-                              <?php if ($restaurant_model->version == 2) { ?>
+                              <?php if ($restaurant_model->version == 2 || $restaurant_model->version == 3 || $restaurant_model->version == 4) { ?>
 
                                 <li class=" nav-item <?= $this->context->route == 'business-location/index'  ? 'active' : '' ?> ">
                                     <?=
@@ -394,16 +394,6 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                             )
                                             ?>
                                         </li>
-                                        <?php if($restaurant_model->country_id = 84) { ?>
-                                        <li  <?= $this->context->route == 'restaurant/update-delivery-integration' ? 'class="active"' : '' ?>>
-                                            <?=
-                                            Html::a(
-                                                    Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                                    Html::tag('span', 'Delivery'), ['store/update-delivery-integration', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
-                                            )
-                                            ?>
-                                        </li>
-                                      <?php } ?>
                                     </ul>
                                 </li>
 
@@ -573,8 +563,9 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
       <?=  $storeConversionParams ?>
       }}();
     </script>
-    
+
     <?php $this->endBody() ?>
+
 
 </body>
 <!-- END: Body-->

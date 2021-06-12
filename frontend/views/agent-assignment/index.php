@@ -45,7 +45,7 @@ $this->registerJs($js);
             'dataProvider' => $dataProvider,
             'rowOptions' => function($model) {
                   if ($model->agent_id != Yii::$app->user->identity->agent_id) {
-                $url = Url::to(['update', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'storeUuid' => $model->restaurant_uuid]);
+                $url = Url::to(['view', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'storeUuid' => $model->restaurant_uuid]);
 
                 return [
                     'onclick' => "window.location.href='{$url}'"
@@ -60,7 +60,14 @@ $this->registerJs($js);
                   'attribute' => 'role',
                   'format' => 'html',
                   'value' => function ($data) {
-                      return $data->role == AgentAssignment::AGENT_ROLE_OWNER ? 'Owner' : 'Staff';
+                      if($data->role == AgentAssignment::AGENT_ROLE_OWNER)
+                        $role = 'Owner';
+                      else  if($data->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER)
+                        $role = 'Branch Manager';
+                      else
+                        $role = 'Staff';
+
+                      return $role;
                   },
               ],
               'assignment_created_at',

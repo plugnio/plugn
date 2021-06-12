@@ -79,7 +79,7 @@ return [
         ],
         'mashkorDelivery' => [
             'class' => 'common\components\MashkorDelivery',
-            'keyToUse' => \common\components\MashkorDelivery::USE_LIVE_KEY,
+            'keyToUse' => \common\components\MashkorDelivery::USE_TEST_KEY,
         ],
         'githubComponent' => [
             'class' => 'common\components\GithubComponent',

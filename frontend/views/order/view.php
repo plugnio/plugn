@@ -45,7 +45,20 @@ $this->registerJs($js);
         <h5><i class="icon fa fa-check"></i> Success!</h5>
         <?= (Yii::$app->session->getFlash('successResponse')) ?>
     </div>
-<?php } ?>
+<?php }
+
+
+$armadaApiKey = null;
+$mashkorBranchId = null;
+
+if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $model->deliveryZone->businessLocation->armada_api_key != null)
+  $armadaApiKey = $model->deliveryZone->businessLocation->armada_api_key;
+
+if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $model->deliveryZone->businessLocation->mashkor_branch_id != null)
+  $mashkorBranchId = $model->deliveryZone->businessLocation->mashkor_branch_id;
+
+
+?>
 
 
 
@@ -96,18 +109,14 @@ $this->registerJs($js);
         $deliveryTime = strtotime($model->estimated_time_of_arrival);
         $difference = round(abs($deliveryTime - $currentTime) / 3600, 2);
 
+        if ($model->order_mode == Order::ORDER_MODE_DELIVERY) {
 
-        if ($model->order_mode == Order::ORDER_MODE_DELIVERY && ( ($model->area_id && $model->area->country->country_name == 'Kuwait') || ($model->shipping_country_id && $model->country->country_name == 'Kuwait'))) {
+            if ( ( ($model->area_id && ($model->area->country->country_name == 'Kuwait' || $model->area->country->country_name == 'Bahrain')) || ($model->shipping_country_id && ($model->country->country_name == 'Kuwait' || $model->country->country_name == 'Bahrain'))    )  &&
+             $armadaApiKey != null && $model->armada_tracking_link == null
+           ) {
 
-            if ($model->restaurant->armada_api_key != null && $model->armada_tracking_link == null) {
-
-                if (
-                    $difference <= 1  &&
-                    $model->restaurant->hide_request_driver_button
-                    // $storeUuid != 'rest_6a55139f-f340-11ea-808a-0673128d0c9c' &&
-                    // $storeUuid != 'rest_5d657108-c91f-11ea-808a-0673128d0c9c'
-                   ){
-                          echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
+                if ( $difference <= 1  && $model->restaurant->hide_request_driver_button ){
+                          echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid, 'armadaApiKey' => $armadaApiKey], [
                               'class' => 'btn btn-dark mr-1 mb-1',
                               'style' => 'margin-right: 7px;',
                               'data' => [
@@ -117,12 +126,8 @@ $this->registerJs($js);
                           ]);
                 }
 
-                if (
-                    !$model->restaurant->hide_request_driver_button
-                    // $storeUuid == 'rest_6a55139f-f340-11ea-808a-0673128d0c9c' ||
-                    // $storeUuid == 'rest_5d657108-c91f-11ea-808a-0673128d0c9c'
-                   )  {
-                      echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
+                if ( !$model->restaurant->hide_request_driver_button  )  {
+                      echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid , 'armadaApiKey' => $armadaApiKey], [
                           'class' => 'btn btn-dark mr-1 mb-1',
                           'style' => 'margin-right: 7px;',
                           'data' => [
@@ -134,10 +139,11 @@ $this->registerJs($js);
 
             }
 
-            if ($model->restaurant->mashkor_branch_id != null && $model->mashkor_order_number == null) {
+            if (( ($model->area_id && $model->area->country->country_name == 'Kuwait') || ($model->shipping_country_id && $model->country->country_name == 'Kuwait' )    ) &&
+              $mashkorBranchId != null && $model->mashkor_order_number == null) {
 
                 if ($difference <= 1  && $model->restaurant->hide_request_driver_button ){
-                  echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
+                  echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid, 'mashkorBranchId' => $mashkorBranchId], [
                       'class' => 'btn btn-dark mr-1 mb-1',
                       'style' => 'margin-right: 7px;',
                       'data' => [
@@ -149,7 +155,7 @@ $this->registerJs($js);
 
 
                 if (!$model->restaurant->hide_request_driver_button){
-                          echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
+                          echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid, 'mashkorBranchId' => $mashkorBranchId], [
                               'class' => 'btn btn-dark mr-1 mb-1',
                               'style' => 'margin-right: 7px;',
                               'data' => [
@@ -894,7 +900,7 @@ DetailView::widget([
 
 
     <?php
-         if ($model->recipient_name || $model->recipient_phone_number || $model->gift_message) {
+         if ($model->recipient_name || $model->recipient_phone_number || $model->gift_message || $model->sender_name) {
        ?>
            <div class="card">
                <div class="card-body">
@@ -907,6 +913,14 @@ DetailView::widget([
                            'model' => $model,
                            'attributes' => [
 
+                               [
+                                   'attribute' => 'sender_name',
+                                   "format" => "raw",
+                                   "value" => function($model) {
+                                       return $model->sender_name;
+                                   },
+                                   'visible' => $model->sender_name != null && $model->sender_name,
+                               ],
                                [
                                    'attribute' => 'recipient_name',
                                    "format" => "raw",

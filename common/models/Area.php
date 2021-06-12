@@ -59,6 +59,12 @@ class Area extends \yii\db\ActiveRecord
         ];
     }
 
+    public function extraFields() {
+        return [
+            'city'
+        ];
+    }
+    
     /**
      * Gets query for [[City]].
      *

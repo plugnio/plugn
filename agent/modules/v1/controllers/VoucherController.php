@@ -68,29 +68,148 @@ class VoucherController extends Controller {
      */
     public function actionList($store_uuid) {
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+      $keyword = Yii::$app->request->get('keyword');
 
-          $vouchers =  Voucher::find()
-                    ->where(['restaurant_uuid' => $store_uuid])
-                    ->asArray()
-                    ->all();
+      Yii::$app->accountManager->getManagedAccount($store_uuid);
 
 
-          if (!$vouchers) {
+      $query =  Voucher::find();
+
+      if ($keyword){
+        $query->where(['like', 'code', $keyword]);
+        $query->orWhere(['like', 'description', $keyword]);
+        $query->orWhere(['like', 'description_ar', $keyword]);
+      }
+
+      $query->andWhere(['restaurant_uuid' => $store_uuid]);
+
+      return new ActiveDataProvider([
+          'query' => $query
+      ]);
+
+
+    }
+
+
+    /**
+     * Create voucher
+     * @return array
+     */
+    public function actionCreate() {
+
+        $store_uuid = Yii::$app->request->getBodyParam("store_uuid");
+        Yii::$app->accountManager->getManagedAccount($store_uuid);
+
+        $model = new Voucher();
+        $model->restaurant_uuid = $store_uuid;
+        $model->code =  Yii::$app->request->getBodyParam("code");
+        $model->description =  Yii::$app->request->getBodyParam("description");
+        $model->description_ar =  Yii::$app->request->getBodyParam("description_ar");
+        $model->discount_type = (int) Yii::$app->request->getBodyParam("discount_type");
+        $model->discount_amount = (int) Yii::$app->request->getBodyParam("discount_amount");
+        $model->voucher_status = Voucher::VOUCHER_STATUS_ACTIVE;
+        $model->valid_from = Yii::$app->request->getBodyParam("valid_from");
+        $model->valid_until = Yii::$app->request->getBodyParam("valid_until");
+        $model->max_redemption = Yii::$app->request->getBodyParam("max_redemption") ? Yii::$app->request->getBodyParam("max_redemption") : 0;
+        $model->limit_per_customer = Yii::$app->request->getBodyParam("limit_per_customer") ? Yii::$app->request->getBodyParam("limit_per_customer") : 0;
+        $model->minimum_order_amount = Yii::$app->request->getBodyParam("minimum_order_amount") ? Yii::$app->request->getBodyParam("minimum_order_amount") : 0;
+
+
+        if (!$model->save()) {
+            return [
+                "operation" => "error",
+                "message" => $model->errors
+            ];
+        }
+
+        return [
+            "operation" => "success",
+            "message" => "Voucher created successfully",
+            "data" => Voucher::findOne($model->voucher_id)
+        ];
+
+    }
+
+
+
+     /**
+      * Update voucher
+      */
+     public function actionUpdate($voucher_id, $store_uuid)
+     {
+
+         $model = $this->findModel($voucher_id, $store_uuid);
+
+         $model->code =  Yii::$app->request->getBodyParam("code");
+         $model->description =  Yii::$app->request->getBodyParam("description");
+         $model->description_ar =  Yii::$app->request->getBodyParam("description_ar");
+         $model->discount_type = (int) Yii::$app->request->getBodyParam("discount_type");
+         $model->discount_amount = (int) Yii::$app->request->getBodyParam("discount_amount");
+         $model->voucher_status = Yii::$app->request->getBodyParam("voucher_status");
+         $model->valid_from = Yii::$app->request->getBodyParam("valid_from");
+         $model->valid_until = Yii::$app->request->getBodyParam("valid_until");
+         $model->max_redemption = Yii::$app->request->getBodyParam("max_redemption") ? Yii::$app->request->getBodyParam("max_redemption") : 0;
+         $model->limit_per_customer = Yii::$app->request->getBodyParam("limit_per_customer") ? Yii::$app->request->getBodyParam("limit_per_customer") : 0;
+         $model->minimum_order_amount = Yii::$app->request->getBodyParam("minimum_order_amount") ? Yii::$app->request->getBodyParam("minimum_order_amount") : 0;
+
+
+         if (!$model->save())
+         {
+             if (isset($model->errors)) {
+                 return [
+                     "operation" => "error",
+                     "message" => $model->errors
+                 ];
+             } else {
+                 return [
+                     "operation" => "error",
+                     "message" => "We've faced a problem updating the voucher"
+                 ];
+             }
+         }
+
+         return [
+             "operation" => "success",
+             "message" => "Voucher updated successfully",
+             "data" => $model
+         ];
+     }
+
+
+
+      /**
+       * Ability to update voucher status
+       */
+      public function actionUpdateVoucherStatus() {
+
+
+          $store_uuid =  Yii::$app->request->getBodyParam('store_uuid');
+          $voucher_id =  Yii::$app->request->getBodyParam('voucher_id');
+          $voucherStatus = (int) Yii::$app->request->getBodyParam('voucherStatus');
+
+          $voucher_model = $this->findModel($voucher_id, $store_uuid);
+
+
+          if ($voucherStatus) {
+
+              $voucher_model->voucher_status = $voucherStatus;
+
+              if (!$voucher_model->save()) {
+                  return [
+                      "operation" => "error",
+                      "message" => $voucher_model->errors
+                  ];
+              }
+
               return [
-                  'operation' => 'error',
-                  'message' => 'No results found'
+                  "operation" => "success",
+                  "message" => "Voucher Status updated successfully"
               ];
-          }
 
-          return [
-              'operation' => 'success',
-              'body' => $vouchers
-          ];
+          }
 
       }
 
-    }
 
 
       /**
@@ -101,31 +220,62 @@ class VoucherController extends Controller {
        */
       public function actionDetail($store_uuid, $voucher_id) {
 
-        if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+          $voucher =  $this->findModel($voucher_id, $store_uuid);
 
-          $voucher =  Voucher::find()
-                    ->where(['restaurant_uuid' => $store_uuid])
-                    ->andWhere(['voucher_id' => $voucher_id])
-                    ->asArray()
-                    ->one();
-
-
-            if (!$voucher) {
-
-                return [
-                    'operation' => 'error',
-                    'message' => 'No results found.'
-                ];
-            }
-
-            return [
-                'operation' => 'success',
-                'body' => $voucher
-            ];
-
-        }
+          return $voucher;
 
     }
+
+    /**
+     * Delete Voucher
+     */
+    public function actionDelete($voucher_id, $store_uuid)
+    {
+        Yii::$app->accountManager->getManagedAccount($store_uuid);
+        $model =  $this->findModel($voucher_id, $store_uuid);
+
+        if (!$model->delete())
+        {
+            if (isset($model->errors)) {
+                return [
+                    "operation" => "error",
+                    "message" => $model->errors
+                ];
+            } else {
+                return [
+                    "operation" => "error",
+                    "message" => "We've faced a problem deleting the voucher"
+                ];
+            }
+        }
+
+        return [
+            "operation" => "success",
+            "message" => "Voucher deleted successfully"
+        ];
+    }
+
+
+
+   /**
+    * Finds the Voucher model based on its primary key value.
+    * If the model is not found, a 404 HTTP exception will be thrown.
+    * @param integer $id
+    * @return Country the loaded model
+    * @throws NotFoundHttpException if the model cannot be found
+    */
+   protected function findModel($voucher_id, $store_uuid)
+   {
+       $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
+
+       if (($model = Voucher::find()->where(['voucher_id' => $voucher_id, 'restaurant_uuid' => $store_model->restaurant_uuid])->one()) !== null) {
+           return $model;
+       } else {
+           throw new NotFoundHttpException('The requested record does not exist.');
+       }
+   }
+
+
 
 
 }

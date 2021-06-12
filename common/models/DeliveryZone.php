@@ -98,6 +98,19 @@ class DeliveryZone extends \yii\db\ActiveRecord
     }
 
     /**
+     * @inheritdoc
+     */
+    public function extraFields()
+    {
+      return [
+          'areas',
+          'country'
+      ];
+    }
+
+
+
+    /**
      * Gets query for [[AreaDeliveryZones]].
      *
      * @return \yii\db\ActiveQuery

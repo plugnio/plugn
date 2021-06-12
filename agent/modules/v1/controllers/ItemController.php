@@ -7,7 +7,7 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use common\models\Item;
+use agent\models\Item;
 
 class ItemController extends Controller {
 
@@ -62,35 +62,34 @@ class ItemController extends Controller {
 
     /**
     * Get all store's products
-     * @param type $id
      * @param type $store_uuid
      * @return type
      */
-    public function actionList($store_uuid) {
+     public function actionList($store_uuid) {
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+       $keyword = Yii::$app->request->get('keyword');
 
-          $items =  Item::find()
-                    ->where(['restaurant_uuid' => $store_uuid])
-                    ->asArray()
-                    ->all();
+       Yii::$app->accountManager->getManagedAccount($store_uuid);
 
 
-          if (!$items) {
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found'
-              ];
-          }
+       $query =  Item::find();
 
-          return [
-              'operation' => 'success',
-              'body' => $items
-          ];
+       if ($keyword){
+         $query->where(['like', 'item_name', $keyword]);
+         $query->orWhere(['like', 'item_name_ar', $keyword]);
+         $query->orWhere(['like', 'item_description', $keyword]);
+         $query->orWhere(['like', 'item_description_ar', $keyword]);
+       }
 
-      }
+       $query->andWhere(['restaurant_uuid' => $store_uuid]);
 
-    }
+       return new ActiveDataProvider([
+           'query' => $query
+       ]);
+
+
+     }
+
 
 
     /**
@@ -106,22 +105,10 @@ class ItemController extends Controller {
           $item =  Item::find()
                     ->where(['restaurant_uuid' => $store_uuid])
                     ->andWhere(['item_uuid' => $item_uuid])
-                    ->asArray()
                     ->one();
 
 
-          if (!$item) {
-
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found.'
-              ];
-          }
-
-          return [
-              'operation' => 'success',
-              'body' => $item
-          ];
+          return $item;
 
       }
 

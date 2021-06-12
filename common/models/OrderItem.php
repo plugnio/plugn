@@ -192,6 +192,16 @@ class OrderItem extends \yii\db\ActiveRecord {
         return parent::afterSave($insert, $changedAttributes);
     }
 
+
+    public function extraFields() {
+        return [
+            'currency',
+            'orderItemExtraOptions',
+            'itemImage',
+            'item'
+        ];
+    }
+
     /**
      * Gets query for [[ItemUu]].
      *

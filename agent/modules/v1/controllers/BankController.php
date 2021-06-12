@@ -68,26 +68,17 @@ class BankController extends Controller {
      */
     public function actionList($store_uuid) {
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+          Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-          $banks =  Bank::find()
-                    ->asArray()
-                    ->all();
+          $banks =  Bank::find();
 
 
-          if (!$banks) {
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found'
-              ];
-          }
+          return new ActiveDataProvider([
+            'query' => $banks
+          ]);
 
-          return [
-              'operation' => 'success',
-              'body' => $banks
-          ];
 
-      }
+
 
     }
 

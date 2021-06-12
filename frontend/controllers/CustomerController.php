@@ -56,6 +56,7 @@ class CustomerController extends Controller {
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
+                    'restaurant_model' => $restaurant_model,
                     'storeUuid' => $storeUuid
         ]);
     }

@@ -61,11 +61,11 @@ return [
                 'password' => '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',
                 'port' => '587',
                 'encryption' => 'tls',
-                'plugins' => [
-                    [
-                        'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
-                    ],
-                ],
+                // 'plugins' => [
+                //     [
+                //         'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
+                //     ],
+                // ],
             ],
         ],
         'cache' => [

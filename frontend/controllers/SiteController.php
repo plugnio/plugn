@@ -19,6 +19,7 @@ use common\models\BusinessLocation;
 use common\models\Restaurant;
 use common\models\OrderItem;
 use common\models\Category;
+use common\models\RestaurantPaymentMethod;
 use common\models\Order;
 use common\models\Plan;
 use common\models\PaymentMethod;
@@ -116,9 +117,10 @@ class SiteController extends Controller {
 
         $this->layout = false;
         $managedRestaurant = $this->findModel($storeUuid);
+        $agentAssignment = $managedRestaurant->getAgentAssignments()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])->one();
 
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid);
+        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid,$agentAssignment);
 
         return $this->render('incoming-orders-table', [
                     'searchModel' => $searchModel,
@@ -346,8 +348,12 @@ class SiteController extends Controller {
      */
     public function actionRealTimeOrders($storeUuid) {
 
+        $managedRestaurant = $this->findModel($storeUuid);
+        $agentAssignment = $managedRestaurant->getAgentAssignments()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])->one();
+
+
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid);
+        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid, $agentAssignment);
 
         return $this->render('real-time-orders', [
                     'searchModel' => $searchModel,
@@ -1220,7 +1226,7 @@ class SiteController extends Controller {
         $this->layout = 'login';
 
         $store_model = new Restaurant();
-        $store_model->version = 2;
+        $store_model->version = 3;
         $store_model->setScenario(Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
 
         $agent_model = new Agent();
@@ -1255,6 +1261,13 @@ class SiteController extends Controller {
                 $business_location_model->business_location_name = 'Main Branch';
                 $business_location_model->business_location_name_ar = 'الفرع الرئيسي';
                 $business_location_model->save();
+
+                //Enable cash by default
+                $payments_method = new RestaurantPaymentMethod();
+                $payments_method->payment_method_id = 3; //Cash
+                $payments_method->restaurant_uuid = $store_model->restaurant_uuid;
+                $payments_method->save();
+
 
                 //Enable cash by default
                 $payments_method = new RestaurantPaymentMethod();

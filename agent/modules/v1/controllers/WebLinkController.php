@@ -68,29 +68,99 @@ class WebLinkController extends Controller {
      */
     public function actionList($store_uuid) {
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+      $keyword = Yii::$app->request->get('keyword');
 
-          $webLinks =  WebLink::find()
-                    ->where(['restaurant_uuid' => $store_uuid])
-                    ->asArray()
-                    ->all();
+      Yii::$app->accountManager->getManagedAccount($store_uuid);
 
 
-          if (!$webLinks) {
+      $query =  WebLink::find();
+
+      if ($keyword){
+        $query->where(['like', 'url', $keyword]);
+        $query->orWhere(['like', 'web_link_title', $keyword]);
+        $query->orWhere(['like', 'web_link_title_ar', $keyword]);
+      }
+
+      $query->andWhere(['restaurant_uuid' => $store_uuid]);
+
+      return new ActiveDataProvider([
+          'query' => $query
+      ]);
+
+
+    }
+
+
+      /**
+       * Create Web Link
+       * @return array
+       */
+      public function actionCreate() {
+
+          $store_uuid = Yii::$app->request->getBodyParam("store_uuid");
+          $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
+
+          $model = new WebLink();
+          $model->restaurant_uuid = $store_model->restaurant_uuid;
+          $model->web_link_type = Yii::$app->request->getBodyParam("web_link_type");
+          $model->url =  Yii::$app->request->getBodyParam("url");
+          $model->web_link_title =  Yii::$app->request->getBodyParam("web_link_title");
+          $model->web_link_title_ar =  Yii::$app->request->getBodyParam("web_link_title_ar");
+
+
+          if (!$model->save()) {
               return [
-                  'operation' => 'error',
-                  'message' => 'No results found'
+                  "operation" => "error",
+                  "message" => $model->errors
               ];
           }
 
           return [
-              'operation' => 'success',
-              'body' => $webLinks
+              "operation" => "success",
+              "message" => "Web Link created successfully",
+              "model" => WebLink::findOne($model->web_link_id)
           ];
 
       }
 
-    }
+
+
+       /**
+        * Update Web Link
+        */
+       public function actionUpdate($web_link_id, $store_uuid)
+       {
+
+           $model = $this->findModel($web_link_id, $store_uuid);
+
+           $model->web_link_type = Yii::$app->request->getBodyParam("web_link_type");
+           $model->url =  Yii::$app->request->getBodyParam("url");
+           $model->web_link_title =  Yii::$app->request->getBodyParam("web_link_title");
+           $model->web_link_title_ar =  Yii::$app->request->getBodyParam("web_link_title_ar");
+
+
+           if (!$model->save())
+           {
+               if (isset($model->errors)) {
+                   return [
+                       "operation" => "error",
+                       "message" => $model->errors
+                   ];
+               } else {
+                   return [
+                       "operation" => "error",
+                       "message" => "We've faced a problem updating the Web Link"
+                   ];
+               }
+           }
+
+           return [
+               "operation" => "success",
+               "message" => "Web Link updated successfully",
+               "model" => $model
+           ];
+       }
+
 
 
     /**
@@ -101,31 +171,64 @@ class WebLinkController extends Controller {
      */
     public function actionDetail($store_uuid, $web_link_id) {
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+        $webLink =  $this->findModel($web_link_id, $store_uuid);
 
-        $webLink =  WebLink::find()
-                  ->where(['restaurant_uuid' => $store_uuid])
-                  ->andWhere(['web_link_id' => $web_link_id])
-                  ->asArray()
-                  ->one();
+        return $webLink;
+
+   }
 
 
-          if (!$webLink) {
+    /**
+     * Delete Web Link
+     */
+    public function actionDelete($web_link_id, $store_uuid)
+    {
+        $model =  $this->findModel($web_link_id, $store_uuid);
 
-              return [
-                  'operation' => 'error',
-                  'message' => 'No results found.'
-              ];
-          }
 
-          return [
-              'operation' => 'success',
-              'body' => $webLink
-          ];
+        if (!$model->delete())
+        {
+            if (isset($model->errors)) {
+                return [
+                    "operation" => "error",
+                    "message" => $model->errors
+                ];
+            } else {
+                return [
+                    "operation" => "error",
+                    "message" => "We've faced a problem deleting Web link"
+                ];
+            }
+        }
 
-      }
+        return [
+            "operation" => "success",
+            "message" => "Web Link deleted successfully"
+        ];
+    }
 
-  }
+
+
+   /**
+    * Finds the Web Link model based on its primary key value.
+    * If the model is not found, a 404 HTTP exception will be thrown.
+    * @param integer $id
+    * @return Country the loaded model
+    * @throws NotFoundHttpException if the model cannot be found
+    */
+   protected function findModel($web_link_id, $store_uuid)
+   {
+        $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
+
+        if (($model = WebLink::find()->where(['web_link_id' => $web_link_id, 'restaurant_uuid' => $store_model->restaurant_uuid])->one()) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested record does not exist.');
+        }
+   }
+
+
+
 
 
 }

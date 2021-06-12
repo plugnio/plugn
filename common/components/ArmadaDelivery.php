@@ -65,10 +65,10 @@ class ArmadaDelivery extends Component {
     /**
      * Create a delivery request
      */
-    public function createDelivery($model) {
+    public function createDelivery($model, $armadaApiKey) {
 
       $phone =  str_replace(' ', '', $model->customer_phone_number);
-      $phone =  str_replace('+'.$model->customer_phone_country_code, '', $phone);
+      $phone =  str_replace('+', '00', $phone);
 
         $deliveryParams = [
             "platformName" => "pos",
@@ -81,6 +81,7 @@ class ArmadaDelivery extends Component {
                     "street" => $model->street,
                     "buildingNumber" => $model->house_number,
                     "amount" => $model->total_price,
+                    "instructions" => $model->special_directions,
                     "paymentType" => $model->payment_method_id == 3 ? 'cash on delivery' : 'paid',
                     "threeDSecure" => true,
                     "save_card" => false,
@@ -93,7 +94,7 @@ class ArmadaDelivery extends Component {
                 ->setUrl($this->apiEndpoint)
                 ->setData($deliveryParams)
                 ->addHeaders([
-                    'authorization' => 'Key ' . $model->restaurant->armada_api_key,
+                    'authorization' => 'Key ' . $armadaApiKey,
                     'content-type' => 'application/json',
                 ])
                 ->send();

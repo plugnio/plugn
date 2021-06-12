@@ -96,7 +96,7 @@ return [
                         'GET list-of-areas/<restaurant_uuid>/<country_id>' => 'list-of-areas',
                         'GET pickup-location/<restaurant_uuid>/<pickup_location_id>' => 'get-pickup-location',
                         'GET <restaurant_uuid>/<delivery_zone_id>' => 'get-delivery-zone',
-                        'GET <restaurant_uuid>' => 'delivery-zone',
+                        // 'GET <restaurant_uuid>' => 'delivery-zone',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS list-of-countries/<restaurant_uuid>' => 'options',
@@ -104,7 +104,7 @@ return [
                         'OPTIONS list-of-areas/<restaurant_uuid>/<country_id>' => 'options',
                         'OPTIONS pickup-location/<restaurant_uuid>/<pickup_location_id>' => 'options',
                         'OPTIONS <restaurant_uuid>/<delivery_zone_id>' => 'options',
-                        'OPTIONS <restaurant_uuid>' => 'options'
+                        // 'OPTIONS <restaurant_uuid>' => 'options'
                     ]
                 ],
                 [// RestaurantController
@@ -127,10 +127,12 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET get-opening-hours' => 'get-opening-hours',
+                        'POST get-delivery-time' => 'get-delivery-time',
                         'GET locations/<id>' => 'list-all-stores-locations',
                         'GET get-restaurant-data/<branch_name>' => 'get-restaurant-data',
                         // OPTIONS VERBS
                         'OPTIONS get-opening-hours' => 'options',
+                        'OPTIONS get-delivery-time' => 'options',
                         'OPTIONS locations/<id>' => 'options',
                         'OPTIONS get-restaurant-data/<branch_name>' => 'options',
                     ]

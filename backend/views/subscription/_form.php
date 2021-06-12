@@ -45,7 +45,17 @@ use kartik\select2\Select2;
         ])->label('Plan');
     ?>
 
-
+    <?=
+        $form->field($model, 'subscription_status')->widget(Select2::classname(), [
+            'data' => [
+              10 => 'Active',
+              0 => 'Inactive'
+            ],
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+        ]);
+    ?>
 
     <?= $form->field($model, 'subscription_start_at')->textInput(['type' => 'datetime']) ?>
 

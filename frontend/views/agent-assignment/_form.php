@@ -46,6 +46,10 @@ $this->registerJs($js);
     $agentQuery = Agent::find()->asArray()->all();
     $agentArray = ArrayHelper::map($agentQuery, 'agent_id', 'agent_name');
 
+    if(!$model->isNewRecord && $model->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
+      $businessLocationsQuery = $model->restaurant->getBusinessLocations()->asArray()->all();
+      $businessLocationsList = ArrayHelper::map($businessLocationsQuery, 'business_location_id', 'business_location_name');
+    }
 
     $agentValue = [];
 
@@ -76,11 +80,24 @@ $this->registerJs($js);
     $form->field($model, 'role')->dropDownList(
             [
         AgentAssignment::AGENT_ROLE_OWNER => "Owner",
-        AgentAssignment::AGENT_ROLE_STAFF => "Staff"
+        AgentAssignment::AGENT_ROLE_STAFF => "Staff",
+        AgentAssignment::AGENT_ROLE_BRANCH_MANAGER => "Branch Manager"
             ], [
         'class' => 'form-control select2 select2',
         'multiple' => false,
     ]);
+    ?>
+
+    <?php
+
+      if(!$model->isNewRecord &&  $model->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
+      echo $form->field($model, 'business_location_id')->dropDownList(
+            $businessLocationsList, [
+            'class' => 'form-control select2 select2',
+            'multiple' => false,
+        ])->label('Managed branch');
+      }
+
     ?>
 
     <div class="form-group" style="background: #f4f6f9; margin-bottom: 0px;  background:#f4f6f9 ">
