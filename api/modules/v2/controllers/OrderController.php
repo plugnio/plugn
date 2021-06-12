@@ -481,7 +481,9 @@ class OrderController extends Controller {
                                     $order->order_uuid,
                                     $restaurant_model->supplierCode,
                                      $order->restaurant->platform_fee,
-                                    $paymentMethodId
+                                    $paymentMethodId,
+                                    $order->paymentMethod->payment_method_code,
+                                    $order->restaurant->warehouse_fee
                             );
 
                               $responseContent = json_decode($response->content);

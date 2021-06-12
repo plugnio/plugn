@@ -426,7 +426,6 @@ class Restaurant extends \yii\db\ActiveRecord {
      * @param type $imageURL
      */
     public function uploadFileToCloudinary($file_path, $attribute) {
-
         $filename = Yii::$app->security->generateRandomString();
 
             try {
@@ -438,6 +437,7 @@ class Restaurant extends \yii\db\ActiveRecord {
                 );
 
                 if ($result || count($result) > 0) {
+                  
                     //delete the file from temp folder
                     unlink($file_path);
                     $this[$attribute] = basename($result['url']);

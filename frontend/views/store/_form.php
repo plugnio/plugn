@@ -113,7 +113,14 @@ $this->registerJs($js);
         <div class="row">
 
             <div class="col-12 col-sm-6 col-lg-6">
-              <?= $form->field($model, 'country_id')->dropDownList($countryArray); ?>
+              <?= $form->field($model, 'country_id', ['template' =>
+                               ($model->is_tap_enable || $model->is_myfatoorah_enable)  ? "
+                               {label} {input} {hint}  {error}
+                                    <p>
+                                        You've created your payment gateway account, so you need to <a href='mailto:contact@plugn.io'>contact support</a> if you want to change your currency.
+                                    </p>"
+                              : '{label} {input} {hint}  {error}'
+                              ])->dropDownList($countryArray, ['disabled' => ($model->is_tap_enable || $model->is_myfatoorah_enable) ]); ?>
             </div>
 
 

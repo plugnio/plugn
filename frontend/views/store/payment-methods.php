@@ -210,12 +210,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                       <span>
                                         Sunday-Tuesday-Thursday
                                       </span>
-                                    <?php } else  if($model->country->iso == 'BH' && $model->currency->code == 'BHD') { ?>
-                                      <span>
-                                        24 working hours
-                                      </span>
-                                    <?php
-                                        }
+                                    <?php }
                                       }
                                  else if($model->is_tap_enable) {?>
                                   <span>
@@ -325,12 +320,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                           <span>
                                             Sunday-Tuesday-Thursday
                                           </span>
-                                        <?php } else  if($model->country->iso == 'BH' && $model->currency->code == 'BHD') { ?>
-                                          <span>
-                                            24 working hours
-                                          </span>
-                                        <?php
-                                            }
+                                        <?php }
                                         ?>
 
                                     </span>
@@ -342,7 +332,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <span >
                                       <h5><b>Fees (on premium plan)</b></h5>
                                       <span>
-                                        150 fils per transaction, no minimum
+                                        1% per transaction, a minimum of 100 fils
                                       </span>
                                     </span>
                                   </div>
@@ -352,7 +342,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <span >
                                       <h5><b>Fees (on free plan)</b></h5>
                                       <span>
-                                        5% per transaction, a minimum of 250 fils
+                                        5% per transaction, a minimum of 200 fils
                                       </span>
                                     </span>
                                   </div>
@@ -378,6 +368,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             </div>
                           </div>
 
+                  <?php if ( !$model->is_myfatoorah_enable && $model->is_tap_enable) { ?>
 
                       <!-- Benefit -->
                       <div class="card" style="margin-top:20px;box-shadow: 0px 5px 20px #88888854 !important;" id="paymentMethodCard">
@@ -393,8 +384,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                 <div class="card-body">
                                     <!-- Settlement window -->
-                                    <?php if($model->is_tap_enable){ ?>
-                                      <!-- Settlement window -->
+                                      <!-- Settlement window && Fees-->
                                       <div class="row" style="margin-bottom:15px">
                                         <div class="col-12 col-sm-4 col-lg-4">
                                           <!-- Settlement window -->
@@ -407,6 +397,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         </div>
 
 
+                                        <!-- Fees -->
                                         <div class="col-12 col-sm-4 col-lg-4">
                                           <!-- Fees (on premium plan) -->
                                           <span >
@@ -429,58 +420,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                       </div>
 
-                                    <?php  } else if ($model->is_myfatoorah_enable) { ?>
-                                      <!-- Settlement window -->
-                                      <div class="row" style="margin-bottom:15px">
-                                        <div class="col-12 col-sm-4 col-lg-4">
-                                          <!-- Settlement window -->
-                                          <span style="display:block">
-                                            <h5><b>Settlement window</b></h5>
-
-                                            <?php  if( $model->country->iso == 'KW' && $model->currency->code == 'KWD'  ) { ?>
-                                                <span>
-                                                  24 working hours
-                                                </span>
-                                              <?php } else  if($model->country->iso == 'SA' && $model->currency->code == 'SAR') { ?>
-                                                <span>
-                                                  Sunday-Tuesday-Thursday
-                                                </span>
-                                              <?php } else  if($model->country->iso == 'BH' && $model->currency->code == 'BHD') { ?>
-                                                <span>
-                                                  24 working hours
-                                                </span>
-                                              <?php
-                                                  }
-                                              ?>
-
-                                          </span>
-                                        </div>
-
-
-                                        <div class="col-12 col-sm-4 col-lg-4">
-                                          <!-- Fees (on premium plan) -->
-                                          <span >
-                                            <h5><b>Fees (on premium plan)</b></h5>
-                                            <span>
-                                              1.25%  per transaction, no minimum
-                                            </span>
-                                          </span>
-                                        </div>
-
-                                        <div class="col-12 col-sm-4 col-lg-4">
-                                          <!-- Fees (on free plan) -->
-                                          <span >
-                                            <h5><b>Fees (on free plan)</b></h5>
-                                            <span>
-                                              5% per transaction, no minimum
-                                            </span>
-                                          </span>
-                                        </div>
-
-                                      </div>
-
-                                    <?php } if ($model->country->iso == 'BH' && $model->currency->code == 'BHD') {
-                                      if($model->business_type == 'corp' && ($model->is_myfatoorah_enable || $model->is_tap_enable)){
+                                    <?php  if ($model->country->iso == 'BH' && $model->currency->code == 'BHD') {
+                                      if($model->business_type == 'corp' &&  $model->is_tap_enable ){
 
                                           if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 5])->exists())
                                             echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 5], ['class' => 'btn btn-danger']);
@@ -507,10 +448,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                   <?php } ?>
 
                                 </div>
-
-
-
                           </div>
+
+                        <?php  }?>
 
 
                       <!-- Mada  -->
@@ -577,12 +517,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         <span>
                                           Sunday-Tuesday-Thursday
                                         </span>
-                                      <?php } else  if($model->country->iso == 'BH' && $model->currency->code == 'BHD') { ?>
-                                        <span>
-                                          24 working hours
-                                        </span>
-                                      <?php
-                                          }
+                                      <?php }
                                       ?>
 
                                   </span>
@@ -686,12 +621,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                           <span>
                                             Sunday-Tuesday-Thursday
                                           </span>
-                                        <?php } else  if($model->country->iso == 'BH' && $model->currency->code == 'BHD') { ?>
-                                          <span>
-                                            24 working hours
-                                          </span>
-                                        <?php
-                                            }
+                                        <?php }
                                         ?>
 
                                     </span>
@@ -770,7 +700,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
   <?php }   ?>
 
-<?php if($model->is_myfatoorah_enable || $model->is_tap_enable) { ?>
+<?php if($model->is_myfatoorah_enable || ($model->is_tap_enable && $model->country->iso != 'BH' && $model->currency->code != 'BHD')) { ?>
   <div class="card">
     <div class="card-header">
       <h3>

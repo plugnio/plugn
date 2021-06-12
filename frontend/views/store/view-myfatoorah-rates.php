@@ -46,9 +46,16 @@ $this->params['breadcrumbs'][] = $this->title;
       <!-- Settlement window -->
       <span style="display:block">
         <h5><b>Settlement window</b></h5>
+        <?php if ($model->country->iso == 'KW' && $model->currency->code == 'KWD') {  ?>
+          <span>
+            Within 5 working days
+          </span>
+      <?php } elseif ($model->country->iso == 'SA' && $model->currency->code == 'SAR') {  ?>
         <span>
-          Within 5 working days
+          Sunday-Tuesday-Thursday
         </span>
+      <?php }?>
+
       </span>
     </div>
 
@@ -99,7 +106,7 @@ $this->params['breadcrumbs'][] = $this->title;
       <span style="display:block">
         <h5><b>Settlement window</b></h5>
         <span>
-          Within 3 working days
+          24 working hours
         </span>
       </span>
     </div>
@@ -109,7 +116,7 @@ $this->params['breadcrumbs'][] = $this->title;
       <span >
         <h5><b>Fees (on premium plan)</b></h5>
         <span>
-          150 fils per transaction, no minimum
+          1% per transaction, a minimum of 100 fils
         </span>
       </span>
     </div>
@@ -120,59 +127,11 @@ $this->params['breadcrumbs'][] = $this->title;
       <span >
         <h5><b>Fees (on free plan)</b></h5>
         <span>
-          5% per transaction, a minimum of 250 fils
+          5% per transaction, a minimum of 200 fils
         </span>
       </span>
 
     </div>
-
-
-  </div>
-</div>
-
-<!-- Benefit -->
-<div class="card">
-  <div class="card-header">
-      <h3>
-        Benefit
-      </h3>
-      <div style="text-align: center; display:block">
-        <img src="<?= Yii::$app->urlManager->getBaseUrl() . '/img/benefit.png' ?>" style="width: 50px;">
-      </div>
-  </div>
-
-  <div class="card-body row">
-    <div class="col-12 col-sm-4 col-lg-4">
-      <!-- Settlement window -->
-      <span style="display:block">
-        <h5><b>Settlement window</b></h5>
-        <span>
-          Within 3 working days
-        </span>
-      </span>
-    </div>
-
-
-    <div class="col-12 col-sm-4 col-lg-4">
-      <!-- Fees (on premium plan) -->
-      <span >
-        <h5><b>Fees (on premium plan)</b></h5>
-        <span>
-            1.25% per transaction, no minimum
-        </span>
-      </span>
-    </div>
-
-    <div class="col-12 col-sm-4 col-lg-4">
-      <!-- Fees (on free plan) -->
-      <span >
-        <h5><b>Fees (on free plan)</b></h5>
-        <span>
-          5% per transaction, no minimum
-        </span>
-      </span>
-    </div>
-
 
   </div>
 </div>
@@ -194,7 +153,7 @@ $this->params['breadcrumbs'][] = $this->title;
       <span style="display:block">
         <h5><b>Settlement window</b></h5>
         <span>
-          Within 3 working days
+          Sunday-Tuesday-Thursday
         </span>
       </span>
     </div>
@@ -222,6 +181,7 @@ $this->params['breadcrumbs'][] = $this->title;
   </div>
 </div>
 
+
 <!-- Sadad -->
 <div class="card" style="margin-top:10p">
   <div class="card-header">
@@ -240,7 +200,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <span style="display:block">
           <h5><b>Settlement window</b></h5>
           <span>
-            Within 3 working days
+            Sunday-Tuesday-Thursday
           </span>
         </span>
 

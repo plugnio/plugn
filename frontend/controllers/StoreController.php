@@ -336,8 +336,12 @@ class StoreController extends Controller {
 
         $model = $this->findModel($id);
 
-        if($model->country->iso != 'KW' && $paymentGateway == 'myfatoorah')
+        if(($model->country->iso == 'BH' || $model->currency->code == 'BHD' ) && $paymentGateway == 'myfatoorah')
           return $this->redirect(['setup-online-payments', 'storeUuid' => $model->restaurant_uuid]);
+
+          if($model->country->iso != 'KW')
+                $model->business_type = 'corp';
+
 
         if($paymentGateway == 'tap')
           $model->setScenario(Restaurant::SCENARIO_CREATE_TAP_ACCOUNT);
@@ -447,6 +451,8 @@ class StoreController extends Controller {
 
             if (sizeof($restaurant_authorized_signature_file) > 0)
                 $model->authorized_signature_file = str_replace('uploads/', '', $restaurant_authorized_signature_file[0]['file']);  //Authorized signature
+
+
 
             if (sizeof($owner_identification_file_front_side) > 0)
                 $model->identification_file_front_side = str_replace('uploads/', '', $owner_identification_file_front_side[0]['file']); //Owner's civil id front side
@@ -616,6 +622,13 @@ class StoreController extends Controller {
 
         $model = $this->findModel($storeUuid);
 
+        if($model->country->iso == 'BH' || $model->currency->code == 'BHD'){
+          Yii::$app->session->setFlash('error','Contact us if you want to enable this option');
+          return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
+        }
+
+
+
         if($model->supplierCode){
           $model->is_tap_enable = 0;
           $model->is_myfatoorah_enable = 1;
@@ -671,6 +684,10 @@ class StoreController extends Controller {
     public function actionViewMyfatoorahRates($storeUuid) {
 
         $model = $this->findModel($storeUuid);
+
+        if(($model->country->iso == 'BH' || $model->currency->code == 'BHD' ))
+          return $this->redirect(['setup-online-payments', 'storeUuid' => $model->restaurant_uuid]);
+
         if ($model->country->iso == 'KW'){
           return $this->render('view-myfatoorah-rates', [
                       'model' => $model

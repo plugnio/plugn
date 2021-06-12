@@ -28,7 +28,7 @@ class MyFatoorahPayment extends Component
     /**
      * @var string Generated link sends user directly to KNET portal
      */
-    const GATEWAY_KNET = 1;
+    const GATEWAY_KNET = 'kn';
 
     /**
      * @var string Generated link sends user directly to VISA/MASTER portal
@@ -43,18 +43,13 @@ class MyFatoorahPayment extends Component
     /**
      * @var string Generated link sends user directly to SADAD portal
      */
-    const GATEWAY_SADAD = 4;
-
-    /**
-     * @var string Generated link sends user directly to BENEFIT portal
-     */
-    const GATEWAY_BENEFIT = 5;
+    const GATEWAY_SADAD = 's';
 
 
     /**
      * @var string Generated link sends user directly to MADA portal
      */
-    const GATEWAY_MADA = 6;
+    const GATEWAY_MADA = 'md';
 
     /**
      * @var string Generated link sends user directly to UAE Debit Cards	 portal
@@ -81,6 +76,7 @@ class MyFatoorahPayment extends Component
      */
     const GATEWAY_OMAN_NET = 15;
 
+
     /**
      * @var float gateway fee charged by portal
      */
@@ -94,19 +90,27 @@ class MyFatoorahPayment extends Component
     /**
      * @var float gateway fee charged by portal
      */
-    public $knetGatewayFee = 0.15; // How much is charged per KNET transaction
-
-
-    /**
-     * @var float gateway fee charged by portal
-     */
-    public $minPlugnFee = 0.100;
-
+    public $knetGatewayFee = 0.01; // How much is charged per KNET transaction
 
     /**
      * @var float gateway fee charged by portal
      */
-    public $minChargeAmount = 5; // How much is charged per KNET transaction
+    public $minKnetGatewayFee = 0.100; // How much is charged per KNET transaction
+
+    /**
+     * @var float gateway fee charged by portal
+     */
+    public $minChargeAmount = 4; // How much is charged per KNET transaction
+
+    /**
+     * @var float gateway fee charged by portal
+     */
+    public $sadadGatewayFee = 0.025; // How much is charged per Creditcard transaction
+
+    /**
+     * @var float gateway fee charged by portal
+     */
+    public $minMadaGatewayFee = 0; // How much is charged per Creditcard transaction
 
     /**
      * @var float gateway fee charged by portal
@@ -117,16 +121,6 @@ class MyFatoorahPayment extends Component
      * @var float gateway fee charged by portal
      */
     public $minCreditcardGatewayFee = 0; // How much is charged per Creditcard transaction
-
-    /**
-     * @var float gateway fee charged by portal
-     */
-    public $minMadaGatewayFee = 0; // How much is charged per Creditcard transaction
-
-    /**
-     * @var float gateway fee charged by portal
-     */
-    public $minBenefitGatewayFee = 0; // How much is charged per Creditcard transaction
 
 
     /**
@@ -345,7 +339,7 @@ class MyFatoorahPayment extends Component
     /**
    * Create a charge for redirect
    */
-  public function createCharge($currency, $amount ,$firstName, $email, $country_code ,$phone, $redirectUrl, $orderUuid, $supplierCode , $platform_fee , $gateway)
+  public function createCharge($currency, $amount ,$firstName, $email, $country_code ,$phone, $redirectUrl, $orderUuid, $supplierCode , $platform_fee  , $paymentMethodId, $paymentMethodCode,$warehouse_fee = 0)
   {
 
       $chargeEndpoint = $this->apiEndpoint . "/ExecutePayment";
@@ -354,53 +348,49 @@ class MyFatoorahPayment extends Component
       $phone =  str_replace(' ', '', $phone);
       $phone =  str_replace("+". $country_code, '', $phone);
 
+      $proposedShare = $amount;
 
-
-      //Amount = 10
-      // if knet
-      //10 - myfatorah fees - platform fee
-
-
-      //KNET (0.15) e7na 5% min 250FILS
-      //5kd w agl 250 fils fixed
-
-      //Benefit 1.25%
-      //CD 2.5%
-      //Mada 2.5%
-      //UAE debit & credit 2.5%
-
-
-      //Naps 1.25% + 1 riyal
-
-      //  6KD => will deposit 5.70
-      //  5KD => will deposit 4.75
-      //  4KD => will deposit 4.75
-
-      $proposedShare = null;
 
       if($platform_fee > 0){
+         if($paymentMethodCode == static::GATEWAY_KNET){
 
-        if($gateway == static::GATEWAY_KNET){
+               //if greater than 10KD
+              if (($amount * $this->knetGatewayFee) >= $this->minKnetGatewayFee){
+                $platform_fee = $amount *  ( $platform_fee  - $this->knetGatewayFee );
+              }
 
-           // if amount greater than 5
-          if  ($amount <= $this->minChargeAmount){
-              $proposedShare = $amount - ( $this->minPlugnFee + $this->knetGatewayFee ) ;
-           }
+               // if amount greater than  4 and  equal 10
+               else if  ($amount > $this->minChargeAmount && ( ($amount * $this->knetGatewayFee) < $this->minKnetGatewayFee)){
+                 $platform_fee = ($amount *  $platform_fee ) - $this->minKnetGatewayFee;
+               }
 
-           //if amount greater than 5kd
-           else if ($amount > $this->minChargeAmount ) {
-             $proposedShare = $amount - ($amount *  $platform_fee);
-           }
+               //if amount less than or equal 4
+               else if ($this->minChargeAmount >= $amount) {
+                 $platform_fee = 0.100;
+               }
 
-
-        }
+        } else if($paymentMethodCode == static::GATEWAY_SADAD)
+            $platform_fee = $amount *  ( $platform_fee  - $this->sadadGatewayFee );
+          else if($paymentMethodCode == static::GATEWAY_MADA)
+              $platform_fee = $amount *  ( $platform_fee  - $this->madaGatewayFee );
         else
-          $proposedShare = $amount - ($amount *  $platform_fee);
+           $platform_fee = $amount *  ($platform_fee  - $this->creditcardGatewayFeePercentage);
 
-      }
+
+         if($warehouse_fee > 0)
+           $platform_fee = $warehouse_fee + $platform_fee;
+
+           $proposedShare = $proposedShare - $platform_fee;
+
+       } else if ($platform_fee == 0 && $warehouse_fee > 0) {
+
+         $proposedShare = $proposedShare - $warehouse_fee;
+
+       }
+
 
       $chargeParams = [
-            "PaymentMethodId" => $gateway,
+            "PaymentMethodId" => $paymentMethodId,
             "CustomerName"=> $firstName,
             "DisplayCurrencyIso"=> $currency,
             "MobileCountryCode"=> "+". $country_code,

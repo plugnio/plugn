@@ -23,6 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
   <br/>
 
 You can only connect one of the two. Choose wisely.
+
 </p>
 
 
@@ -58,7 +59,7 @@ You can only connect one of the two. Choose wisely.
   </div>
 </div>
 
-<?php if ($model->country->iso == 'KW'){ ?>
+<?php if ( $model->country->iso != 'BH' && $model->currency->code != 'BHD' ){ ?>
     <div class="card">
       <div class="card-header">
           <h3>
@@ -70,7 +71,7 @@ You can only connect one of the two. Choose wisely.
         <span style="display:block">
           Supported Payment Options
           <br/>
-          KNET, Credit Card, Mada, Sadad and Benefit
+          KNET, Credit Card, Mada and Sadad
         </span>
 
       <div style="display:block">
