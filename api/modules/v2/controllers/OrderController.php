@@ -740,6 +740,7 @@ class OrderController extends Controller {
                 ->innerJoin('bank', 'bank.bank_id = bank_discount.bank_id')
                 ->where(['bank.bank_name' => $bank_name])
                 ->andWhere(['restaurant_uuid' => $restaurant_uuid])
+                ->andWhere(['bank_discount_status' => BankDiscount::BANK_DISCOUNT_STATUS_ACTIVE])
                 ->one();
 
         if ($bank_discount_model && $bank_discount_model->isValid($phone_number)) {

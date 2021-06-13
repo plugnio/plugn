@@ -352,35 +352,37 @@ class MyFatoorahPayment extends Component
 
 
       if($platform_fee > 0){
-         if($paymentMethodCode == static::GATEWAY_KNET){
+         // if($paymentMethodCode == static::GATEWAY_KNET){
 
-               //if greater than 10KD
-              if (($amount * $this->knetGatewayFee) >= $this->minKnetGatewayFee){
-                $platform_fee = $amount *  ( $platform_fee  - $this->knetGatewayFee );
-              }
+        //        //if greater than 10KD
+        //       if (($amount * $this->knetGatewayFee) >= $this->minKnetGatewayFee){
+        //         $platform_fee =  $amount - ($amount *  ( $platform_fee  ));
+        //       }
+        //
+        //        // if amount greater than  4 and  equal 10
+        //        else if  ($amount > $this->minChargeAmount && ( ($amount * $this->knetGatewayFee) < $this->minKnetGatewayFee)){
+        //          $platform_fee = ($amount *  $platform_fee ) - $this->minKnetGatewayFee;
+        //        }
+        //
+        //        //if amount less than or equal 4
+        //        else if ($this->minChargeAmount >= $amount) {
+        //          $platform_fee = 0.100;
+        //        }
+        //
+        // } else if($paymentMethodCode == static::GATEWAY_SADAD)
+        //     $platform_fee = $amount *  ( $platform_fee  - $this->sadadGatewayFee );
+        //   else if($paymentMethodCode == static::GATEWAY_MADA)
+        //       $platform_fee = $amount *  ( $platform_fee  - $this->madaGatewayFee );
+        // else
+        //    $platform_fee = $amount *  ($platform_fee  - $this->creditcardGatewayFeePercentage);
 
-               // if amount greater than  4 and  equal 10
-               else if  ($amount > $this->minChargeAmount && ( ($amount * $this->knetGatewayFee) < $this->minKnetGatewayFee)){
-                 $platform_fee = ($amount *  $platform_fee ) - $this->minKnetGatewayFee;
-               }
-
-               //if amount less than or equal 4
-               else if ($this->minChargeAmount >= $amount) {
-                 $platform_fee = 0.100;
-               }
-
-        } else if($paymentMethodCode == static::GATEWAY_SADAD)
-            $platform_fee = $amount *  ( $platform_fee  - $this->sadadGatewayFee );
-          else if($paymentMethodCode == static::GATEWAY_MADA)
-              $platform_fee = $amount *  ( $platform_fee  - $this->madaGatewayFee );
-        else
-           $platform_fee = $amount *  ($platform_fee  - $this->creditcardGatewayFeePercentage);
-
+      $platform_fee =  $amount *  $platform_fee ;
 
          if($warehouse_fee > 0)
            $platform_fee = $warehouse_fee + $platform_fee;
 
-           $proposedShare = $proposedShare - $platform_fee;
+       $proposedShare = $proposedShare - $platform_fee;
+
 
        } else if ($platform_fee == 0 && $warehouse_fee > 0) {
 

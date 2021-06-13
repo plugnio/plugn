@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'refund_status',
                 [
                     'class' => 'yii\grid\ActionColumn',
-                    'template' => ' {view} {delete}',
+                    'template' => ' {view} {update}',
                     'buttons' => [
                         'view' => function ($url, $model) {
                             return Html::a(

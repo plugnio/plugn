@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index', 'store
 $this->params['breadcrumbs'][] = ['label' => 'Order #' . $model->order_uuid, 'url' => ['index', 'storeUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
 
-
+$currency = $order_model->currency->code;
 
 $js = "
 $(document).on('wheel', 'input[type=number]', function (e) {
@@ -41,9 +41,13 @@ $this->registerJs($js);
         userInput = parseFloat(document.getElementById("refund_amount").value);
 
 
+          // document.getElementById("refund_amount").value = userInput.toFixed(3) ;
+          if(userInput)
+            document.getElementById("refund_amount_btn").innerHTML = userInput.toFixed(3)  + ' '+'<?= $currency ?>';
+          else
+            document.getElementById("refund_amount_btn").innerHTML = '0.000'  + ' '+'<?= $currency ?>';
 
-        document.getElementById("refund_amount").value = userInput.toFixed(3) ;
-        document.getElementById("refund_amount_btn").innerHTML = userInput.toFixed(3)  + ' KWD';
+
 
     }
 
@@ -58,9 +62,9 @@ $this->registerJs($js);
             itemCounter++;
             itemsSubtotal += parseFloat(itemPrice);
 
-            document.getElementById("items_subtotal").innerHTML = parseFloat(itemsSubtotal).toFixed(3) + ' KWD';
-            document.getElementById("refund_total").innerHTML = parseFloat(itemsSubtotal).toFixed(3) + ' KWD';
-            document.getElementById("refund_amount_btn").innerHTML = parseFloat(itemsSubtotal).toFixed(3) + ' KWD';
+            document.getElementById("items_subtotal").innerHTML = parseFloat(itemsSubtotal).toFixed(3) + ' '+'<?= $currency ?>';
+            document.getElementById("refund_total").innerHTML = parseFloat(itemsSubtotal).toFixed(3) + ' '+'<?= $currency ?>';
+            document.getElementById("refund_amount_btn").innerHTML = parseFloat(itemsSubtotal).toFixed(3) + ' '+'<?= $currency ?>';
             document.getElementById("refund_amount").value = parseFloat(itemsSubtotal).toFixed(3);
 
             if (itemCounter > 1)
@@ -91,9 +95,9 @@ $this->registerJs($js);
             itemCounter--;
             itemsSubtotal -= parseFloat(itemPrice);
 
-            document.getElementById("items_subtotal").innerHTML = parseFloat(itemsSubtotal).toFixed(3) + ' KWD';
-            document.getElementById("refund_total").innerHTML = parseFloat(itemsSubtotal).toFixed(3) + ' KWD';
-            document.getElementById("refund_amount_btn").innerHTML = parseFloat(itemsSubtotal).toFixed(3) + ' KWD';
+            document.getElementById("items_subtotal").innerHTML = parseFloat(itemsSubtotal).toFixed(3) + ' '+'<?= $currency ?>';
+            document.getElementById("refund_total").innerHTML = parseFloat(itemsSubtotal).toFixed(3) + ' '+'<?= $currency ?>';
+            document.getElementById("refund_amount_btn").innerHTML = parseFloat(itemsSubtotal).toFixed(3) + ' '+'<?= $currency ?>';
             document.getElementById("refund_amount").value = parseFloat(itemsSubtotal).toFixed(3);
 
             if (itemCounter > 1)
@@ -387,7 +391,7 @@ z-index: 2;
                               <?php
 
                                 if($refundedItem->orderItem)
-                                  echo $refundedItem->orderItem->order->payment_method_name;
+                                  echo $order_model->payment_method_name;
                                ?>
                             </span>
 
@@ -401,9 +405,12 @@ z-index: 2;
                                 ])->textInput([
                                     'type' => 'number',
                                     'oninput' => 'inputHasBeenUpdated(event)',
-                                    'step' => '0.050',
+                                    'step' => '0.100',
+                                    'min' => 0,
+                                    'placeholder' => '0',
+                                    // 'max' => $order_model->total_price,
                                     'id' => 'refund_amount',
-                                    'value' => \Yii::$app->formatter->asDecimal(0, 3),
+                                    // 'value' => \Yii::$app->formatter->asDecimal(0, 3),
                                     'class' => 'form-control'
                                 ])->label(false)
                                 ?>
@@ -413,7 +420,7 @@ z-index: 2;
 
                                 if($refundedItem->orderItem){
 
-                                  echo Yii::$app->formatter->asCurrency($refundedItem->orderItem->order->total_price, $refundedItem->currency->code , [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]);
+                                  echo Yii::$app->formatter->asCurrency($order_model->total_price, $refundedItem->currency->code , [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]);
                                 }
                                ?>
                                available for refund

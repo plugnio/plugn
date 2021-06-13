@@ -136,6 +136,10 @@ class Refund extends \yii\db\ActiveRecord
     public function validateRefundAmount($attribute, $params, $validator)
     {
 
+      if($this->order->total_price < $this->refund_amount)
+        return  $this->addError($attribute, 'Can’t refund more than available');
+
+
       $totalAwaitingBalanceResponse = Yii::$app->myFatoorahPayment->getSupplierDashboard($this->store->supplierCode);
 
       $responseContent = json_decode($totalAwaitingBalanceResponse->content);

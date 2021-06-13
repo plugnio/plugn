@@ -339,7 +339,7 @@ class StoreController extends Controller {
         if(($model->country->iso == 'BH' || $model->currency->code == 'BHD' ) && $paymentGateway == 'myfatoorah')
           return $this->redirect(['setup-online-payments', 'storeUuid' => $model->restaurant_uuid]);
 
-          if($model->country->iso != 'KW')
+          if($model->currency->code != 'KWD')
                 $model->business_type = 'corp';
 
 
@@ -352,8 +352,6 @@ class StoreController extends Controller {
         if (($model->is_myfatoorah_enable && $paymentGateway == 'myfatoorah') || ($model->is_tap_enable && $paymentGateway == 'tap') )
             return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
 
-          if($model->country->iso != 'KW')
-                $model->business_type = 'corp';
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->save()) {
 

@@ -249,6 +249,18 @@ class Restaurant extends \yii\db\ActiveRecord {
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'app_id', 'armada_api_key', 'mashkor_branch_id', 'store_branch_name', 'live_public_key', 'test_public_key', 'company_name'], 'string', 'max' => 255],
 
             [['live_public_key', 'test_public_key'], 'default', 'value' => null],
+
+            [['authorized_signature_title'], 'default', 'value' => 'Authorized Signature', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            [['authorized_signature_file_purpose'], 'default', 'value' => 'customer_signature', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+
+            [['commercial_license_title'], 'default', 'value' => 'Commercial License', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            [['commercial_license_file_purpose'], 'default', 'value' => 'customer_signature', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+
+
+            [['identification_title'], 'default', 'value' => 'Owner civil id', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            [['identification_file_purpose'], 'default', 'value' => 'identity_document', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+
+
             [[ 'country_id', 'currency_id', 'owner_phone_country_code', 'phone_number_country_code', 'retention_email_sent','enable_gift_message'], 'integer'],
 
             [['phone_number' , 'owner_number'], 'string', 'min' => 6, 'max' => 20],

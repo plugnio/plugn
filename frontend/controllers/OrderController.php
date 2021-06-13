@@ -610,6 +610,7 @@ class OrderController extends Controller {
 
       return $this->render('refund-order', [
                   'model' => $model,
+                  'order_model' => $order_model,
                   'refunded_items_model' => $refunded_items_model
       ]);
     }
