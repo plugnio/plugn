@@ -544,7 +544,7 @@ class Restaurant extends \yii\db\ActiveRecord {
 
 
         //Upload Authorized Signature file
-        if ($this->authorized_signature_file  && $this->authorized_signature_file_purpose && $this->authorized_signature_title) {
+        if ($this->authorized_signature_file) {
 
           $tmpFile = sys_get_temp_dir() . '/' . $this->authorized_signature_file;
 
@@ -566,7 +566,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         }
 
         //Upload commercial_license file
-        if ($this->commercial_license_file  && $this->commercial_license_file_purpose && $this->commercial_license_title) {
+        if ($this->commercial_license_file ) {
 
           $commercialLicenseTmpFile = sys_get_temp_dir() . '/' . $this->commercial_license_file;
 
@@ -589,7 +589,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         }
 
         //Upload Owner civil id front side
-        if ($this->identification_file_front_side  && $this->identification_file_purpose && $this->identification_title) {
+        if ($this->identification_file_front_side) {
 
           $civilIdFrontSideTmpFile = sys_get_temp_dir() . '/' . $this->identification_file_front_side;
 
@@ -612,7 +612,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         }
 
         //Upload Owner civil id back side
-        if ($this->identification_file_back_side  && $this->identification_file_purpose && $this->identification_title) {
+        if ($this->identification_file_back_side) {
 
             $civilIdBackSideTmpFile = sys_get_temp_dir() . '/' . $this->identification_file_back_side;
 

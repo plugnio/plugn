@@ -43,6 +43,12 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
+    public function actionUpload(){
+      $store = Restaurant::find()->one();
+      $store->uploadDocumentsToTap();
+
+
+    }
     public function actionMigration(){
 
         foreach (TapQueue::find()->all() as $key => $queue) {
