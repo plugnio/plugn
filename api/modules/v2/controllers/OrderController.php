@@ -690,4 +690,49 @@ class OrderController extends Controller {
 
     }
 
+    /**
+     * Update order status
+     */
+    public function actionUpdateArmadaOrderStatus() {
+
+         $armada_delivery_code = Yii::$app->request->getBodyParam("code");
+
+
+          $order_model = Order::find()->where(['armada_delivery_code' => $armada_delivery_code])->one();
+
+          if(  $order_model ) {
+
+
+            $order_model->armada_order_status = Yii::$app->request->getBodyParam("orderStatus");
+
+
+            if( $order_model->armada_order_status == 'en_route' ) // In delivery
+                $order_model->order_status = Order::STATUS_OUT_FOR_DELIVERY;
+
+            else if( $order_model->armada_order_status == 'complete' ) // Delivered
+                $order_model->order_status = Order::STATUS_COMPLETE;
+
+
+            if ($order_model->save()) {
+                return [
+                    'operation' => 'success'
+                ];
+            } else {
+              return [
+                  'operation' => 'error',
+                  'message' => $order_model->getErrors(),
+              ];
+            }
+
+          } else {
+            return [
+                'operation' => 'error',
+                'message' => 'Invalid Order id',
+            ];
+          }
+
+
+
+    }
+
 }

@@ -61,6 +61,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property datetime $scheduled_time_to
  * @property string $armada_tracking_link
  * @property string $armada_qr_code_link
+ * @property string $armada_order_status
 * @property int|null $voucher_id
  * @property int $subtotal_before_refund
  * @property int $total_price_before_refund
@@ -257,7 +258,7 @@ class Order extends \yii\db\ActiveRecord {
                  'armada_tracking_link', 'armada_qr_code_link', 'armada_delivery_code',
                  'country_name','country_name_ar', 'business_location_name',
                  'building', 'apartment', 'city',  'address_1' , 'address_2','postalcode', 'floor', 'office',
-                 'recipient_name', 'recipient_phone_number', 'gift_message', 'sender_name'
+                 'recipient_name', 'recipient_phone_number', 'gift_message', 'sender_name','armada_order_status'
              ],
              'string', 'max' => 255],
              [['postalcode'], 'string', 'max' => 10],
@@ -336,6 +337,7 @@ class Order extends \yii\db\ActiveRecord {
         $fields = parent::fields();
 
         // remove fields that contain sensitive information
+        unset($fields['armada_order_status']);
         unset($fields['armada_delivery_code']);
         unset($fields['mashkor_order_number']);
         unset($fields['mashkor_tracking_link']);
