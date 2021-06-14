@@ -73,7 +73,8 @@ class ItemController extends Controller
 
         $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-        $query = $store->getItems();
+        $query = Item::find();
+        $query->andWhere(['restaurant_uuid'=>$store_uuid]);
 
         if ($keyword) {
             $query->filterWhere ([
@@ -125,6 +126,7 @@ class ItemController extends Controller
         $model->track_quantity = (int)Yii::$app->request->getBodyParam ("track_quantity");
         $model->stock_qty = Yii::$app->request->getBodyParam ("stock_qty");
         $model->items_category = Yii::$app->request->getBodyParam ("itemCategories");
+        $model->item_images = Yii::$app->request->getBodyParam ("itemImages");
 
         if (!$model->save ()) {
             if (isset($model->errors)) {
@@ -132,20 +134,16 @@ class ItemController extends Controller
                     "operation" => "error",
                     "message" => $model->errors
                 ];
-            } else {
-                return [
-                    "operation" => "error",
-                    "message" => "We've faced a problem creating the item"
-                ];
             }
         }
 
+        // save images
+        $itemImages = Yii::$app->request->getBodyParam ("itemImages");
+        $model->saveItemImages($itemImages);
+
         //save categories
-
-        $itemCategories = Yii::$app->request->getBodyParam ('itemCategories');
-
+        $itemCategories = Yii::$app->request->getBodyParam ("itemCategories");
         $arrCategoryIds = ArrayHelper::getColumn ($itemCategories, 'category_id');
-
         $model->saveItemsCategory($arrCategoryIds);
 
         return [
