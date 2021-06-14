@@ -13,94 +13,94 @@ use borales\extensions\phoneInput\PhoneInputValidator;
 /**
  * This is the model class for table "restaurant".
  *
- /**
-  * This is the model class for table "restaurant".
-  *
-  * @property string $restaurant_uuid
-  * @property int $country_id
-  * @property int $currency_id
-  * @property string $name
-  * @property string|null $name_ar
-  * @property string|null $tagline
-  * @property string|null $tagline_ar
-  * @property string|null $restaurant_domain
-  * @property string|null $app_id
-  * @property int $restaurant_status
-  * @property string|null $thumbnail_image
-  * @property string|null $logo
-  * @property int|null $support_delivery
-  * @property int|null $version
-  * @property int|null $sitemap_require_update
-  * @property int|null $support_pick_up
-  * @property int|null $hide_request_driver_button // hide requerst driver button if the order is scheduled
-  * @property string|null $phone_number
-  * @property string|null $phone_number_country_code
-  * @property string $restaurant_email
-  * @property string|null $restaurant_created_at
-  * @property string|null $restaurant_updated_at
-  * @property string|null $business_id
-  * @property string|null $business_entity_id
-  * @property string|null $wallet_id
-  * @property string|null $merchant_id
-  * @property string|null $operator_id
-  * @property string|null $live_api_key
-  * @property string|null $test_api_key
-  * @property string|null $business_type
-  * @property string|null $vendor_sector
-  * @property string|null $license_number
-  * @property int $not_for_profit
-  * @property string|null $authorized_signature_issuing_date
-  * @property string|null $authorized_signature_expiry_date
-  * @property string|null $authorized_signature_title
-  * @property string|null $authorized_signature_file
-  * @property string|null $authorized_signature_file_id
-  * @property string|null $authorized_signature_file_purpose
-  * @property string|null $iban
-  * @property string|null $owner_first_name
-  * @property string|null $owner_last_name
-  * @property string|null $owner_email
-  * @property string|null $owner_number
-  * @property string|null $owner_phone_country_code
-  * @property string|null $identification_issuing_date
-  * @property string|null $identification_expiry_date
-  * @property string|null $identification_file_front_side
-  * @property string|null $identification_file_id_front_side
-  * @property string|null $identification_title
-  * @property string|null $identification_file_purpose
-  * @property int|null $restaurant_email_notification
-  * @property int $retention_email_sent
-  * @property int $enable_gift_message
-  * @property string|null $developer_id
-  * @property string|null $armada_api_key
-  * @property int|null $phone_number_display
-  * @property string|null $store_branch_name
-  * @property string|null $custom_css
-  * @property int|null $store_layout
-  * @property string|null $commercial_license_issuing_date
-  * @property string|null $commercial_license_expiry_date
-  * @property string|null $commercial_license_title
-  * @property string|null $commercial_license_file
-  * @property string|null $commercial_license_file_id
-  * @property string|null $commercial_license_file_purpose
-  * @property float|null $platform_fee
-  * @property string|null $google_analytics_id
-  * @property string|null $facebook_pixil_id
-  * @property string|null $snapchat_pixil_id
-  * @property int|null $show_opening_hours
-  * @property string|null $instagram_url
-  * @property int|null $schedule_order
-  * @property int|null $schedule_interval
-  * @property string|null $mashkor_branch_id
-  * @property string|null $live_public_key
-  * @property string|null $test_public_key
-  * @property string|null $site_id
-  * @property string|null $company_name
-  * @property int|null $is_tap_enable
-  * @property int|null $has_deployed
-  * @property int|null $tap_queue_id
-  * @property string|null $identification_file_back_side
-  * @property string|null $identification_file_id_back_side
-  * @property string|null $default_language
+ * /**
+ * This is the model class for table "restaurant".
+ *
+ * @property string $restaurant_uuid
+ * @property int $country_id
+ * @property int $currency_id
+ * @property string $name
+ * @property string|null $name_ar
+ * @property string|null $tagline
+ * @property string|null $tagline_ar
+ * @property string|null $restaurant_domain
+ * @property string|null $app_id
+ * @property int $restaurant_status
+ * @property string|null $thumbnail_image
+ * @property string|null $logo
+ * @property int|null $support_delivery
+ * @property int|null $version
+ * @property int|null $sitemap_require_update
+ * @property int|null $support_pick_up
+ * @property int|null $hide_request_driver_button // hide requerst driver button if the order is scheduled
+ * @property string|null $phone_number
+ * @property string|null $phone_number_country_code
+ * @property string $restaurant_email
+ * @property string|null $restaurant_created_at
+ * @property string|null $restaurant_updated_at
+ * @property string|null $business_id
+ * @property string|null $business_entity_id
+ * @property string|null $wallet_id
+ * @property string|null $merchant_id
+ * @property string|null $operator_id
+ * @property string|null $live_api_key
+ * @property string|null $test_api_key
+ * @property string|null $business_type
+ * @property string|null $vendor_sector
+ * @property string|null $license_number
+ * @property int $not_for_profit
+ * @property string|null $authorized_signature_issuing_date
+ * @property string|null $authorized_signature_expiry_date
+ * @property string|null $authorized_signature_title
+ * @property string|null $authorized_signature_file
+ * @property string|null $authorized_signature_file_id
+ * @property string|null $authorized_signature_file_purpose
+ * @property string|null $iban
+ * @property string|null $owner_first_name
+ * @property string|null $owner_last_name
+ * @property string|null $owner_email
+ * @property string|null $owner_number
+ * @property string|null $owner_phone_country_code
+ * @property string|null $identification_issuing_date
+ * @property string|null $identification_expiry_date
+ * @property string|null $identification_file_front_side
+ * @property string|null $identification_file_id_front_side
+ * @property string|null $identification_title
+ * @property string|null $identification_file_purpose
+ * @property int|null $restaurant_email_notification
+ * @property int $retention_email_sent
+ * @property int $enable_gift_message
+ * @property string|null $developer_id
+ * @property string|null $armada_api_key
+ * @property int|null $phone_number_display
+ * @property string|null $store_branch_name
+ * @property string|null $custom_css
+ * @property int|null $store_layout
+ * @property string|null $commercial_license_issuing_date
+ * @property string|null $commercial_license_expiry_date
+ * @property string|null $commercial_license_title
+ * @property string|null $commercial_license_file
+ * @property string|null $commercial_license_file_id
+ * @property string|null $commercial_license_file_purpose
+ * @property float|null $platform_fee
+ * @property string|null $google_analytics_id
+ * @property string|null $facebook_pixil_id
+ * @property string|null $snapchat_pixil_id
+ * @property int|null $show_opening_hours
+ * @property string|null $instagram_url
+ * @property int|null $schedule_order
+ * @property int|null $schedule_interval
+ * @property string|null $mashkor_branch_id
+ * @property string|null $live_public_key
+ * @property string|null $test_public_key
+ * @property string|null $site_id
+ * @property string|null $company_name
+ * @property int|null $is_tap_enable
+ * @property int|null $has_deployed
+ * @property int|null $tap_queue_id
+ * @property string|null $identification_file_back_side
+ * @property string|null $identification_file_id_back_side
+ * @property string|null $default_language
  *
  * @property AgentAssignment[] $agentAssignments
  * @property Agent[] $agents
@@ -122,9 +122,9 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property Subscription[] $subscriptions
  * @property BusinessLocation[] $businessLocations
  * @property DeliveryZones[] $deliveryZones
-
  */
-class Restaurant extends \yii\db\ActiveRecord {
+class Restaurant extends \yii\db\ActiveRecord
+{
 
     //Values for `restaurant_status`
     const RESTAURANT_STATUS_OPEN = 1;
@@ -141,8 +141,6 @@ class Restaurant extends \yii\db\ActiveRecord {
     const STORE_LAYOUT_LIST_HALFWIDTH = 4;
     const STORE_LAYOUT_GRID_HALFWIDTH = 5;
     const STORE_LAYOUT_CATEGORY_HALFWIDTH = 6;
-
-
 
 
     const SCENARIO_CREATE_STORE_BY_AGENT = 'create-by-agent';
@@ -163,14 +161,16 @@ class Restaurant extends \yii\db\ActiveRecord {
     /**
      * {@inheritdoc}
      */
-    public static function tableName() {
+    public static function tableName()
+    {
         return 'restaurant';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules() {
+    public function rules()
+    {
         return [
             [['owner_first_name', 'owner_last_name', 'owner_email', 'owner_number'], 'required', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
 
@@ -183,18 +183,18 @@ class Restaurant extends \yii\db\ActiveRecord {
             ],
             [
                 [
-                   'identification_file_front_side', 'identification_file_back_side'
+                    'identification_file_front_side', 'identification_file_back_side'
                 ],
                 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT
             ],
 
 
-            [['commercial_license_file', 'authorized_signature_file'], 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function($model) {
+            [['commercial_license_file', 'authorized_signature_file'], 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function ($model) {
                 return $model->business_type == 'corp';
             }],
 
             [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3, 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
-            [['identification_file_id_back_side','identification_file_id_front_side', 'authorized_signature_file_id', 'commercial_license_file_id'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            [['identification_file_id_back_side', 'identification_file_id_front_side', 'authorized_signature_file_id', 'commercial_license_file_id'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             [['not_for_profit'], 'number'],
             [['authorized_signature_issuing_date', 'authorized_signature_expiry_date', 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             ['owner_email', 'email'],
@@ -206,7 +206,7 @@ class Restaurant extends \yii\db\ActiveRecord {
                     'authorized_signature_file', 'authorized_signature_file_purpose', 'authorized_signature_title',
                     'commercial_license_issuing_date', 'commercial_license_expiry_date',
                     'commercial_license_file', 'commercial_license_file_purpose', 'commercial_license_title',
-                     'owner_first_name', 'owner_last_name',
+                    'owner_first_name', 'owner_last_name',
                     'owner_email',
                     'identification_issuing_date', 'identification_title',
                     'identification_expiry_date', 'identification_file_back_side', 'identification_file_front_side', 'identification_file_purpose',
@@ -215,7 +215,7 @@ class Restaurant extends \yii\db\ActiveRecord {
                 ],
                 'string', 'max' => 255
             ],
-            ['iban', 'string', 'min'=>10, 'max'=>34 , 'message' => 'The IBAN must be at least 10 characters long.', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            ['iban', 'string', 'min' => 10, 'max' => 34, 'message' => 'The IBAN must be at least 10 characters long.', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
 
             ['iban', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/', 'message' => 'Please check the IBAN, we might not support transfering to this bank.', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             [['restaurant_commercial_license_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
@@ -226,55 +226,56 @@ class Restaurant extends \yii\db\ActiveRecord {
             ['name', 'match', 'pattern' => '/^[a-zA-Z0-9-\s]+$/', 'message' => 'Your store name can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             ['restaurant_domain', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/', 'message' => 'Your store url can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             [['restaurant_domain'], 'url', 'except' => self::SCENARIO_CREATE_STORE_BY_AGENT],
-            [['restaurant_domain'], 'string',  'min' => 3, 'max' => 20, 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
+            [['restaurant_domain'], 'string', 'min' => 3, 'max' => 20, 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png, pdf', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
-            [['restaurant_status', 'support_delivery', 'support_pick_up', 'hide_request_driver_button' , 'sitemap_require_update', 'version'], 'integer', 'min' => 0],
+            [['restaurant_status', 'support_delivery', 'support_pick_up', 'hide_request_driver_button', 'sitemap_require_update', 'version'], 'integer', 'min' => 0],
             [['schedule_interval'], 'integer', 'min' => 5],
             ['restaurant_status', 'in', 'range' => [self::RESTAURANT_STATUS_OPEN, self::RESTAURANT_STATUS_BUSY, self::RESTAURANT_STATUS_CLOSED]],
             ['store_layout', 'in', 'range' => [self::STORE_LAYOUT_LIST_FULLWIDTH, self::STORE_LAYOUT_GRID_FULLWIDTH, self::STORE_LAYOUT_CATEGORY_FULLWIDTH, self::STORE_LAYOUT_LIST_HALFWIDTH, self::STORE_LAYOUT_GRID_HALFWIDTH, self::STORE_LAYOUT_CATEGORY_HALFWIDTH]],
             ['phone_number_display', 'in', 'range' => [self::PHONE_NUMBER_DISPLAY_ICON, self::PHONE_NUMBER_DISPLAY_SHOW_PHONE_NUMBER, self::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER]],
-            [['restaurant_created_at', 'restaurant_updated_at', 'has_deployed','tap_queue_id'], 'safe'],
+            [['restaurant_created_at', 'restaurant_updated_at', 'has_deployed', 'tap_queue_id'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['default_language'], 'string', 'max' => 2],
             [['custom_css'], 'string'],
             [['platform_fee', 'warehouse_fee'], 'number'],
             [['instagram_url'], 'url'],
-            [['export_orders_data_in_specific_date_range','export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'snapchat_pixil_id', 'site_id'], 'safe'],
+            [['export_orders_data_in_specific_date_range', 'export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'snapchat_pixil_id', 'site_id'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'app_id', 'armada_api_key', 'mashkor_branch_id', 'store_branch_name', 'live_public_key', 'test_public_key', 'company_name'], 'string', 'max' => 255],
 
             [['live_public_key', 'test_public_key'], 'default', 'value' => null],
-            [[ 'country_id', 'currency_id', 'owner_phone_country_code', 'phone_number_country_code', 'retention_email_sent','enable_gift_message'], 'integer'],
+            [['country_id', 'currency_id', 'owner_phone_country_code', 'phone_number_country_code', 'retention_email_sent', 'enable_gift_message'], 'integer'],
 
-            [['phone_number' , 'owner_number'], 'string', 'min' => 6, 'max' => 20],
-            [['phone_number' , 'owner_number'], 'number'],
+            [['phone_number', 'owner_number'], 'string', 'min' => 6, 'max' => 20],
+            [['phone_number', 'owner_number'], 'number'],
 
-            [['owner_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_STORE_BY_AGENT]],
-            [['phone_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number'],
+            [['owner_number'], PhoneInputValidator::className (), 'message' => 'Please insert a valid phone number', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_STORE_BY_AGENT]],
+            [['phone_number'], PhoneInputValidator::className (), 'message' => 'Please insert a valid phone number'],
 
 
-           //  ['currency_id', function ($attribute, $params, $validator) {
-           //     if ($this->getOrders()->exists())
-           //         $this->addError($attribute, "You've made your first sale, so you need to contact support if you want to change your currency.");
-           // }],
+            //  ['currency_id', function ($attribute, $params, $validator) {
+            //     if ($this->getOrders()->exists())
+            //         $this->addError($attribute, "You've made your first sale, so you need to contact support if you want to change your currency.");
+            // }],
 
-           [['schedule_interval'], 'required','when' => function($model) {
-                   return $model->schedule_order;
-               }
-           ],
+            [['schedule_interval'], 'required', 'when' => function ($model) {
+                return $model->schedule_order;
+            }
+            ],
             [['restaurant_email_notification', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable'], 'integer'],
             ['restaurant_email', 'email'],
             [['restaurant_uuid', 'restaurant_domain', 'name'], 'unique'],
-            [['tap_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => TapQueue::className(), 'targetAttribute' => ['tap_queue_id' => 'tap_queue_id']],
-            [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country_id' => 'country_id']],
-            [['currency_id'], 'exist', 'skipOnError' => true, 'targetClass' => Currency::className(), 'targetAttribute' => ['currency_id' => 'currency_id']],
+            [['tap_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => TapQueue::className (), 'targetAttribute' => ['tap_queue_id' => 'tap_queue_id']],
+            [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className (), 'targetAttribute' => ['country_id' => 'country_id']],
+            [['currency_id'], 'exist', 'skipOnError' => true, 'targetClass' => Currency::className (), 'targetAttribute' => ['currency_id' => 'currency_id']],
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels() {
+    public function attributeLabels()
+    {
         return [
             'restaurant_uuid' => 'Restaurant Uuid',
             'country_id' => 'Country',
@@ -359,41 +360,42 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return type
      */
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             [
-                'class' => AttributeBehavior::className(),
+                'class' => AttributeBehavior::className (),
                 'attributes' => [
                     \yii\db\ActiveRecord::EVENT_BEFORE_INSERT => 'restaurant_uuid',
                 ],
-                'value' => function() {
+                'value' => function () {
                     if (!$this->restaurant_uuid)
-                        $this->restaurant_uuid = 'rest_' . Yii::$app->db->createCommand('SELECT uuid()')->queryScalar();
+                        $this->restaurant_uuid = 'rest_' . Yii::$app->db->createCommand ('SELECT uuid()')->queryScalar ();
 
                     return $this->restaurant_uuid;
                 }
             ],
             [
-                'class' => TimestampBehavior::className(),
+                'class' => TimestampBehavior::className (),
                 'createdAtAttribute' => 'restaurant_created_at',
                 'updatedAtAttribute' => 'restaurant_updated_at',
                 'value' => new Expression('NOW()'),
             ],
             [
-             'class' => \borales\extensions\phoneInput\PhoneInputBehavior::className(),
-             // 'attributes' => [
-             //           ActiveRecord::EVENT_BEFORE_INSERT => ['owner_phone_country_code', 'owner_number'],
-             //       ],
-             'countryCodeAttribute' => 'owner_phone_country_code',
-             'phoneAttribute' => 'owner_number',
+                'class' => \borales\extensions\phoneInput\PhoneInputBehavior::className (),
+                // 'attributes' => [
+                //           ActiveRecord::EVENT_BEFORE_INSERT => ['owner_phone_country_code', 'owner_number'],
+                //       ],
+                'countryCodeAttribute' => 'owner_phone_country_code',
+                'phoneAttribute' => 'owner_number',
             ],
             [
-             'class' => \borales\extensions\phoneInput\PhoneInputBehavior::className(),
-             // 'attributes' => [
-             //           ActiveRecord::EVENT_BEFORE_INSERT => ['phone_number_country_code', 'phone_number'],
-             //       ],
-             'countryCodeAttribute' => 'phone_number_country_code',
-             'phoneAttribute' => 'phone_number',
+                'class' => \borales\extensions\phoneInput\PhoneInputBehavior::className (),
+                // 'attributes' => [
+                //           ActiveRecord::EVENT_BEFORE_INSERT => ['phone_number_country_code', 'phone_number'],
+                //       ],
+                'countryCodeAttribute' => 'phone_number_country_code',
+                'phoneAttribute' => 'phone_number',
             ],
         ];
     }
@@ -402,7 +404,8 @@ class Restaurant extends \yii\db\ActiveRecord {
      * Returns String value of current status
      * @return string
      */
-    public function getStatus() {
+    public function getStatus()
+    {
         switch ($this->restaurant_status) {
             case self::RESTAURANT_STATUS_OPEN:
                 return "Open";
@@ -422,113 +425,115 @@ class Restaurant extends \yii\db\ActiveRecord {
      * Upload a File to cloudinary
      * @param type $imageURL
      */
-    public function uploadFileToCloudinary($file_path, $attribute) {
+    public function uploadFileToCloudinary($file_path, $attribute)
+    {
 
-        $filename = Yii::$app->security->generateRandomString();
+        $filename = Yii::$app->security->generateRandomString ();
 
-            try {
+        try {
 
-                $result = Yii::$app->cloudinaryManager->upload(
-                        $file_path, [
+            $result = Yii::$app->cloudinaryManager->upload (
+                $file_path, [
                     'public_id' => "restaurants/" . $this->restaurant_uuid . "/private_documents/" . $filename
-                        ]
-                );
+                ]
+            );
 
-                if ($result || count($result) > 0) {
-                    //delete the file from temp folder
-                    unlink($file_path);
-                    $this[$attribute] = basename($result['url']);
-                }
-            } catch (\Cloudinary\Error $err) {
-                Yii::error('Error when uploading restaurant document to Cloudinary: ' . json_encode($err));
+            if ($result || count ($result) > 0) {
+                //delete the file from temp folder
+                unlink ($file_path);
+                $this[$attribute] = basename ($result['url']);
             }
+        } catch (\Cloudinary\Error $err) {
+            Yii::error ('Error when uploading restaurant document to Cloudinary: ' . json_encode ($err));
+        }
 
     }
 
-    public function uploadDocumentsToTap() {
+    public function uploadDocumentsToTap()
+    {
 
 
         //Upload Authorized Signature file
-        if ($this->authorized_signature_file  && $this->authorized_signature_file_purpose && $this->authorized_signature_title) {
+        if ($this->authorized_signature_file && $this->authorized_signature_file_purpose && $this->authorized_signature_title) {
 
-          $tmpFile = sys_get_temp_dir() . '/' . $this->authorized_signature_file;
+            $tmpFile = sys_get_temp_dir () . '/' . $this->authorized_signature_file;
 
-          if(!file_put_contents($tmpFile, file_get_contents($this->getAuthorizedSignaturePhoto())))
-              return Yii::error('Error reading authorized signature document: ');
+            if (!file_put_contents ($tmpFile, file_get_contents ($this->getAuthorizedSignaturePhoto ())))
+                return Yii::error ('Error reading authorized signature document: ');
 
-            $response = Yii::$app->tapPayments->uploadFileToTap($tmpFile, $this->authorized_signature_file_purpose ,$this->authorized_signature_title);
+            $response = Yii::$app->tapPayments->uploadFileToTap ($tmpFile, $this->authorized_signature_file_purpose, $this->authorized_signature_title);
 
-            @unlink($tmpFile);
+            @unlink ($tmpFile);
 
 
             if ($response->isOk)
-              $this->authorized_signature_file_id = $response->data['id'];
+                $this->authorized_signature_file_id = $response->data['id'];
 
             else
-                return Yii::error('Error when uploading authorized signature document: ' . json_encode($response->data));
+                return Yii::error ('Error when uploading authorized signature document: ' . json_encode ($response->data));
         }
 
         //Upload commercial_license file
-        if ($this->commercial_license_file  && $this->commercial_license_file_purpose && $this->commercial_license_title) {
+        if ($this->commercial_license_file && $this->commercial_license_file_purpose && $this->commercial_license_title) {
 
-          $commercialLicenseTmpFile = sys_get_temp_dir() . '/' . $this->commercial_license_file;
+            $commercialLicenseTmpFile = sys_get_temp_dir () . '/' . $this->commercial_license_file;
 
-          if(!file_put_contents($commercialLicenseTmpFile, file_get_contents($this->getCommercialLicensePhoto())))
-              return Yii::error('Error reading commercial license document: ');
+            if (!file_put_contents ($commercialLicenseTmpFile, file_get_contents ($this->getCommercialLicensePhoto ())))
+                return Yii::error ('Error reading commercial license document: ');
 
 
-            $response = Yii::$app->tapPayments->uploadFileToTap(
-                    $commercialLicenseTmpFile, $this->commercial_license_file_purpose, $this->commercial_license_title);
+            $response = Yii::$app->tapPayments->uploadFileToTap (
+                $commercialLicenseTmpFile, $this->commercial_license_file_purpose, $this->commercial_license_title);
 
-            @unlink($commercialLicenseTmpFile);
+            @unlink ($commercialLicenseTmpFile);
 
             if ($response->isOk)
                 $this->commercial_license_file_id = $response->data['id'];
 
             else
-                return Yii::error('Error when uploading commercial license document: ' . json_encode($response->data));
+                return Yii::error ('Error when uploading commercial license document: ' . json_encode ($response->data));
         }
 
         //Upload Owner civil id front side
-        if ($this->identification_file_front_side  && $this->identification_file_purpose && $this->identification_title) {
+        if ($this->identification_file_front_side && $this->identification_file_purpose && $this->identification_title) {
 
-          $civilIdFrontSideTmpFile = sys_get_temp_dir() . '/' . $this->identification_file_front_side;
+            $civilIdFrontSideTmpFile = sys_get_temp_dir () . '/' . $this->identification_file_front_side;
 
-          if(!file_put_contents($civilIdFrontSideTmpFile, file_get_contents($this->getCivilIdFrontSidePhoto())))
-              return Yii::error('Error reading civil id (front side): ');
+            if (!file_put_contents ($civilIdFrontSideTmpFile, file_get_contents ($this->getCivilIdFrontSidePhoto ())))
+                return Yii::error ('Error reading civil id (front side): ');
 
 
-            $response = Yii::$app->tapPayments->uploadFileToTap(
-                    $civilIdFrontSideTmpFile, $this->identification_file_purpose, $this->identification_title);
+            $response = Yii::$app->tapPayments->uploadFileToTap (
+                $civilIdFrontSideTmpFile, $this->identification_file_purpose, $this->identification_title);
 
-            @unlink($civilIdFrontSideTmpFile);
+            @unlink ($civilIdFrontSideTmpFile);
 
 
             if ($response->isOk)
-              $this->identification_file_id_front_side = $response->data['id'];
+                $this->identification_file_id_front_side = $response->data['id'];
             else
-              return Yii::error('Error when uploading civil id (front side): ' . json_encode($response->data));
+                return Yii::error ('Error when uploading civil id (front side): ' . json_encode ($response->data));
 
         }
 
         //Upload Owner civil id back side
-        if ($this->identification_file_back_side  && $this->identification_file_purpose && $this->identification_title) {
+        if ($this->identification_file_back_side && $this->identification_file_purpose && $this->identification_title) {
 
-          $civilIdBackSideTmpFile = sys_get_temp_dir() . '/' . $this->identification_file_back_side;
+            $civilIdBackSideTmpFile = sys_get_temp_dir () . '/' . $this->identification_file_back_side;
 
-          if(!file_put_contents($civilIdBackSideTmpFile, file_get_contents($this->getCivilIdBackSidePhoto())))
-              return Yii::error('Error reading civil id (back side): ');
+            if (!file_put_contents ($civilIdBackSideTmpFile, file_get_contents ($this->getCivilIdBackSidePhoto ())))
+                return Yii::error ('Error reading civil id (back side): ');
 
 
-            $response = Yii::$app->tapPayments->uploadFileToTap(
-                    $civilIdBackSideTmpFile, $this->identification_file_purpose, $this->identification_title);
+            $response = Yii::$app->tapPayments->uploadFileToTap (
+                $civilIdBackSideTmpFile, $this->identification_file_purpose, $this->identification_title);
 
-            @unlink($civilIdBackSideTmpFile);
+            @unlink ($civilIdBackSideTmpFile);
 
             if ($response->isOk)
-              $this->identification_file_id_back_side = $response->data['id'];
+                $this->identification_file_id_back_side = $response->data['id'];
             else
-              return Yii::error('Error when uploading civil id (back side): ' . json_encode($response->data));
+                return Yii::error ('Error when uploading civil id (back side): ' . json_encode ($response->data));
         }
 
     }
@@ -537,15 +542,16 @@ class Restaurant extends \yii\db\ActiveRecord {
      * Return Civil id front side url
      * @return string
      */
-    public function getCivilIdFrontSidePhoto() {
+    public function getCivilIdFrontSidePhoto()
+    {
         $photo_url = [];
 
 
         if ($this->identification_file_front_side) {
 
             $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
-                    . $this->restaurant_uuid . '/private_documents/'
-                    . $this->identification_file_front_side;
+                . $this->restaurant_uuid . '/private_documents/'
+                . $this->identification_file_front_side;
             $photo_url = $url;
         }
 
@@ -556,15 +562,16 @@ class Restaurant extends \yii\db\ActiveRecord {
      * Return Civil id back side url
      * @return string
      */
-    public function getCivilIdBackSidePhoto() {
+    public function getCivilIdBackSidePhoto()
+    {
         $photo_url = [];
 
 
         if ($this->identification_file_back_side) {
 
             $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
-                    . $this->restaurant_uuid . '/private_documents/'
-                    . $this->identification_file_back_side;
+                . $this->restaurant_uuid . '/private_documents/'
+                . $this->identification_file_back_side;
             $photo_url = $url;
         }
 
@@ -575,14 +582,15 @@ class Restaurant extends \yii\db\ActiveRecord {
      * Return commercial_license_file
      * @return string
      */
-    public function getCommercialLicensePhoto() {
+    public function getCommercialLicensePhoto()
+    {
         $photo_url = [];
 
         if ($this->commercial_license_file) {
 
             $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
-                    .  $this->restaurant_uuid  . '/private_documents/'
-                    . $this->commercial_license_file;
+                . $this->restaurant_uuid . '/private_documents/'
+                . $this->commercial_license_file;
             $photo_url = $url;
         }
 
@@ -594,14 +602,15 @@ class Restaurant extends \yii\db\ActiveRecord {
      * Return authorized_signature_file
      * @return string
      */
-    public function getAuthorizedSignaturePhoto() {
+    public function getAuthorizedSignaturePhoto()
+    {
         $photo_url = [];
 
         if ($this->authorized_signature_file) {
 
             $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
-                    .  $this->restaurant_uuid  . '/private_documents/'
-                    . $this->authorized_signature_file;
+                . $this->restaurant_uuid . '/private_documents/'
+                . $this->authorized_signature_file;
             $photo_url = $url;
         }
 
@@ -611,15 +620,16 @@ class Restaurant extends \yii\db\ActiveRecord {
     /**
      * Create an account for vendor on tap
      */
-    public function createAnAccountOnTap() {
+    public function createAnAccountOnTap()
+    {
 
 
         //Upload documents file on our server before we create an account on tap we gonaa delete them
-        $this->uploadDocumentsToTap();
+        $this->uploadDocumentsToTap ();
 
 
         //Create a business for a vendor on Tap
-        $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
+        $businessApiResponse = Yii::$app->tapPayments->createBussiness ($this);
 
         if ($businessApiResponse->isOk) {
 
@@ -627,69 +637,68 @@ class Restaurant extends \yii\db\ActiveRecord {
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
             $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
         } else {
-            Yii::error('Error while create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
+            Yii::error ('Error while create Business [' . $this->name . '] ' . json_encode ($businessApiResponse->data));
             return false;
         }
 
         //Create a merchant on Tap
-        $merchantApiResponse = Yii::$app->tapPayments->createMergentAccount($this->company_name, $this->currency->code ,$this->business_id, $this->business_entity_id, $this->iban);
+        $merchantApiResponse = Yii::$app->tapPayments->createMergentAccount ($this->company_name, $this->currency->code, $this->business_id, $this->business_entity_id, $this->iban);
 
 
         if ($merchantApiResponse->isOk) {
             $this->merchant_id = $merchantApiResponse->data['id'];
             $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
-        }
+        } else {
+            Yii::error ('Error while create Merchant #1 ' . json_encode ($merchantApiResponse->data));
+            if ($merchantApiResponse->data['message'] == 'Profile Name already exists') {
+                $merchantApiResponse = Yii::$app->tapPayments->createMergentAccount ($this->company_name . '-' . $this->country->iso, $this->currency->code, $this->business_id, $this->business_entity_id, $this->iban);
 
-        else {
-             Yii::error('Error while create Merchant #1 ' . json_encode($merchantApiResponse->data));
-             if($merchantApiResponse->data['message'] == 'Profile Name already exists') {
-               $merchantApiResponse = Yii::$app->tapPayments->createMergentAccount($this->company_name . '-' . $this->country->iso, $this->currency->code ,$this->business_id, $this->business_entity_id, $this->iban);
-
-               if ($merchantApiResponse->isOk) {
-                   $this->merchant_id = $merchantApiResponse->data['id'];
-                   $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
-               } else
-                return  Yii::error('Error while create Merchant [ ' . $this->name . '] ' . json_encode($merchantApiResponse->data));
-             }
+                if ($merchantApiResponse->isOk) {
+                    $this->merchant_id = $merchantApiResponse->data['id'];
+                    $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
+                } else
+                    return Yii::error ('Error while create Merchant [ ' . $this->name . '] ' . json_encode ($merchantApiResponse->data));
+            }
         }
 
         //Create an Operator
-        $operatorApiResponse = Yii::$app->tapPayments->createAnOperator($this->name, $this->wallet_id, $this->developer_id);
+        $operatorApiResponse = Yii::$app->tapPayments->createAnOperator ($this->name, $this->wallet_id, $this->developer_id);
 
         if ($operatorApiResponse->isOk) {
             $this->operator_id = $operatorApiResponse->data['id'];
             $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
             $this->test_public_key = $operatorApiResponse->data['api_credentials']['test']['public'];
 
-            if (array_key_exists('live', $operatorApiResponse->data['api_credentials'])){
-              $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
-              $this->live_public_key = $operatorApiResponse->data['api_credentials']['live']['public'];
+            if (array_key_exists ('live', $operatorApiResponse->data['api_credentials'])) {
+                $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
+                $this->live_public_key = $operatorApiResponse->data['api_credentials']['live']['public'];
             }
 
-            \Yii::info($this->name . " has just created TAP account", __METHOD__);
-            $this->save();
+            \Yii::info ($this->name . " has just created TAP account", __METHOD__);
+            $this->save ();
             return true;
         } else {
-          Yii::error('Error while create Operator  [' . $this->name . '] ' . json_encode($operatorApiResponse->data));
-          return false;
+            Yii::error ('Error while create Operator  [' . $this->name . '] ' . json_encode ($operatorApiResponse->data));
+            return false;
         }
     }
 
     /**
      * save restaurant payment method
      */
-    public function saveRestaurantPaymentMethod($payments_method = null) {
+    public function saveRestaurantPaymentMethod($payments_method = null)
+    {
 
         if ($payments_method) {
 
-            $sotred_restaurant_payment_method = RestaurantPaymentMethod::find()
-                    ->where(['restaurant_uuid' => $this->restaurant_uuid])
-                    ->all();
+            $sotred_restaurant_payment_method = RestaurantPaymentMethod::find ()
+                ->where (['restaurant_uuid' => $this->restaurant_uuid])
+                ->all ();
 
 
             foreach ($sotred_restaurant_payment_method as $restaurant_payment_method) {
-                if (!in_array($restaurant_payment_method->payment_method_id, $payments_method)) {
-                    RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $this->restaurant_uuid, 'payment_method_id' => $restaurant_payment_method->payment_method_id]);
+                if (!in_array ($restaurant_payment_method->payment_method_id, $payments_method)) {
+                    RestaurantPaymentMethod::deleteAll (['restaurant_uuid' => $this->restaurant_uuid, 'payment_method_id' => $restaurant_payment_method->payment_method_id]);
                 }
             }
 
@@ -697,27 +706,29 @@ class Restaurant extends \yii\db\ActiveRecord {
                 $payments_method = new RestaurantPaymentMethod();
                 $payments_method->payment_method_id = $payment_method_id;
                 $payments_method->restaurant_uuid = $this->restaurant_uuid;
-                $payments_method->save();
+                $payments_method->save ();
             }
         } else {
-            RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
+            RestaurantPaymentMethod::deleteAll (['restaurant_uuid' => $this->restaurant_uuid]);
         }
     }
 
     /**
      * Return Restaurant's logo url
      */
-    public function getRestaurantLogoUrl() {
-        if($this->logo)
-          return 'https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/' . $this->restaurant_uuid . "/logo/" . $this->logo;
+    public function getRestaurantLogoUrl()
+    {
+        if ($this->logo)
+            return 'https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/' . $this->restaurant_uuid . "/logo/" . $this->logo;
         else
-          return 'https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/plugn-icon.png';
+            return 'https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/plugn-icon.png';
     }
 
     /**
      * Return Restaurant's thumbnail image url
      */
-    public function getRestaurantThumbnailImageUrl() {
+    public function getRestaurantThumbnailImageUrl()
+    {
         return 'https://res.cloudinary.com/plugn/image/upload/c_scale,w_600/restaurants/' . $this->restaurant_uuid . "/thumbnail-image/" . $this->thumbnail_image;
     }
 
@@ -725,33 +736,34 @@ class Restaurant extends \yii\db\ActiveRecord {
      * Upload restaurant's logo  to cloudinary
      * @param type $imageURL
      */
-    public function uploadLogo($imageURL) {
+    public function uploadLogo($imageURL)
+    {
 
-        $filename = Yii::$app->security->generateRandomString();
+        $filename = Yii::$app->security->generateRandomString ();
 
         try {
-            $result = Yii::$app->cloudinaryManager->upload(
-                    $imageURL, [
-                'public_id' => "restaurants/" . $this->restaurant_uuid . "/logo/" . $filename
-                    ]
+            $result = Yii::$app->cloudinaryManager->upload (
+                $imageURL, [
+                    'public_id' => "restaurants/" . $this->restaurant_uuid . "/logo/" . $filename
+                ]
             );
 
             //Delete old store's logo
             if ($this->logo) {
-                $this->deleteRestaurantLogo();
+                $this->deleteRestaurantLogo ();
             }
 
 
-            if ($result || count($result) > 0) {
-                $this->logo = basename($result['url']);
-                $this->save();
+            if ($result || count ($result) > 0) {
+                $this->logo = basename ($result['url']);
+                $this->save ();
             }
 
-            unlink($imageURL);
+            unlink ($imageURL);
 
 
         } catch (\Cloudinary\Error $err) {
-            Yii::error("Error when uploading logo photos to Cloudinry: " . json_encode($err));
+            Yii::error ("Error when uploading logo photos to Cloudinry: " . json_encode ($err));
         }
     }
 
@@ -759,42 +771,43 @@ class Restaurant extends \yii\db\ActiveRecord {
      * Upload thumbnailImage  to cloudinary
      * @param type $imageURL
      */
-    public function uploadThumbnailImage($imageURL) {
+    public function uploadThumbnailImage($imageURL)
+    {
 
-        $filename = Yii::$app->security->generateRandomString();
+        $filename = Yii::$app->security->generateRandomString ();
 
         try {
-            $result = Yii::$app->cloudinaryManager->upload(
-                    $imageURL, [
-                'public_id' => "restaurants/" . $this->restaurant_uuid . "/thumbnail-image/" . $filename
-                    ]
+            $result = Yii::$app->cloudinaryManager->upload (
+                $imageURL, [
+                    'public_id' => "restaurants/" . $this->restaurant_uuid . "/thumbnail-image/" . $filename
+                ]
             );
-
 
 
             //Delete old store's ThumbnailImage
             if ($this->thumbnail_image) {
-                $this->deleteRestaurantThumbnailImage();
+                $this->deleteRestaurantThumbnailImage ();
             }
 
-            if ($result || count($result) > 0) {
-                $this->thumbnail_image = basename($result['url']);
-                $this->save();
+            if ($result || count ($result) > 0) {
+                $this->thumbnail_image = basename ($result['url']);
+                $this->save ();
             }
 
-            unlink($imageURL);
+            unlink ($imageURL);
 
 
         } catch (\Cloudinary\Error $err) {
-            Yii::error("Error when uploading thumbnail photos to Cloudinry: " . json_encode($err));
+            Yii::error ("Error when uploading thumbnail photos to Cloudinry: " . json_encode ($err));
         }
     }
 
     /**
      * @inheritdoc
      */
-    public function fields() {
-        $fields = parent::fields();
+    public function fields()
+    {
+        $fields = parent::fields ();
 
         // remove fields that contain sensitive information
         unset($fields['restaurant_email_notification']);
@@ -862,24 +875,24 @@ class Restaurant extends \yii\db\ActiveRecord {
         return $fields;
     }
 
-    public function beforeSave($insert) {
+    public function beforeSave($insert)
+    {
 
         if ($this->scenario == self::SCENARIO_CREATE_STORE_BY_AGENT && $insert) {
 
-            $store_name = strtolower(str_replace(' ', '_', $this->name));
-            $store_domain = strtolower(str_replace(' ', '_', $this->restaurant_domain));
+            $store_name = strtolower (str_replace (' ', '_', $this->name));
+            $store_domain = strtolower (str_replace (' ', '_', $this->restaurant_domain));
             $this->app_id = 'store.plugn.' . $store_domain;
             $this->restaurant_domain = 'https://' . $store_domain . '.plugn.store';
             $this->store_branch_name = $store_name;
 
-          $isDomainExist = self::find()->where(['restaurant_domain' => $this->restaurant_domain])->exists();
+            $isDomainExist = self::find ()->where (['restaurant_domain' => $this->restaurant_domain])->exists ();
 
-          if($isDomainExist)
-            return  $this->addError('restaurant_domain', 'Another store is already using this domain');
+            if ($isDomainExist)
+                return $this->addError ('restaurant_domain', 'Another store is already using this domain');
 
 
         }
-
 
 
         if ($this->live_api_key && $this->test_api_key)
@@ -890,31 +903,32 @@ class Restaurant extends \yii\db\ActiveRecord {
 
         if ($this->scenario == self::SCENARIO_UPLOAD_STORE_DOCUMENT) {
             //delete tmp files
-            $this->deleteTempFiles();
+            $this->deleteTempFiles ();
         }
 
 
-        return parent::beforeSave($insert);
+        return parent::beforeSave ($insert);
     }
 
     /**
      * Deletes the files associated with this project
      */
-    public function deleteTempFiles() {
-        if ($this->authorized_signature_file && file_exists(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->authorized_signature_file)) {
-            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->authorized_signature_file, 'authorized_signature_file');
+    public function deleteTempFiles()
+    {
+        if ($this->authorized_signature_file && file_exists (Yii::getAlias ('@privateDocuments') . "/uploads/" . $this->authorized_signature_file)) {
+            $this->uploadFileToCloudinary (Yii::getAlias ('@privateDocuments') . "/uploads/" . $this->authorized_signature_file, 'authorized_signature_file');
         }
 
-        if ($this->commercial_license_file && file_exists(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->commercial_license_file)) {
-            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->commercial_license_file,  'commercial_license_file');
+        if ($this->commercial_license_file && file_exists (Yii::getAlias ('@privateDocuments') . "/uploads/" . $this->commercial_license_file)) {
+            $this->uploadFileToCloudinary (Yii::getAlias ('@privateDocuments') . "/uploads/" . $this->commercial_license_file, 'commercial_license_file');
         }
 
-        if ($this->identification_file_front_side && file_exists(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->identification_file_front_side)) {
-            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->identification_file_front_side, 'identification_file_front_side');
+        if ($this->identification_file_front_side && file_exists (Yii::getAlias ('@privateDocuments') . "/uploads/" . $this->identification_file_front_side)) {
+            $this->uploadFileToCloudinary (Yii::getAlias ('@privateDocuments') . "/uploads/" . $this->identification_file_front_side, 'identification_file_front_side');
         }
 
-        if ($this->identification_file_back_side && file_exists(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->identification_file_back_side)) {
-            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->identification_file_back_side, 'identification_file_back_side');
+        if ($this->identification_file_back_side && file_exists (Yii::getAlias ('@privateDocuments') . "/uploads/" . $this->identification_file_back_side)) {
+            $this->uploadFileToCloudinary (Yii::getAlias ('@privateDocuments') . "/uploads/" . $this->identification_file_back_side, 'identification_file_back_side');
         }
     }
 
@@ -923,8 +937,9 @@ class Restaurant extends \yii\db\ActiveRecord {
      * @param type $insert
      * @param type $changedAttributes
      */
-    public function afterSave($insert, $changedAttributes) {
-        parent::afterSave($insert, $changedAttributes);
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave ($insert, $changedAttributes);
 
 
         if ($this->scenario == self::SCENARIO_CREATE_STORE_BY_AGENT && $insert) {
@@ -934,26 +949,26 @@ class Restaurant extends \yii\db\ActiveRecord {
             $queue_model->restaurant_uuid = $this->restaurant_uuid;
             $queue_model->queue_status = Queue::QUEUE_STATUS_PENDING;
 
-            if (!$queue_model->save())
-                Yii::error('Queue Error:' . json_encode($queue_model->errors));
+            if (!$queue_model->save ())
+                Yii::error ('Queue Error:' . json_encode ($queue_model->errors));
 
         }
 
 
         if ($insert) {
 
-          $freePlan = Plan::find()->where(['valid_for' => 0])->one();
+            $freePlan = Plan::find ()->where (['valid_for' => 0])->one ();
 
-          $subscription = new Subscription();
-          $subscription->restaurant_uuid = $this->restaurant_uuid;
-          $subscription->plan_id = $freePlan->plan_id; //Free plan by default
-          $subscription->subscription_status = Subscription::STATUS_ACTIVE; //Free plan by default
-          $subscription->save();
+            $subscription = new Subscription();
+            $subscription->restaurant_uuid = $this->restaurant_uuid;
+            $subscription->plan_id = $freePlan->plan_id; //Free plan by default
+            $subscription->subscription_status = Subscription::STATUS_ACTIVE; //Free plan by default
+            $subscription->save ();
 
 
             $restaurant_theme = new RestaurantTheme();
             $restaurant_theme->restaurant_uuid = $this->restaurant_uuid;
-            $restaurant_theme->save();
+            $restaurant_theme->save ();
 
 
             //Add opening hrs
@@ -963,7 +978,7 @@ class Restaurant extends \yii\db\ActiveRecord {
                 $opening_hour->day_of_week = $i;
                 $opening_hour->open_at = 0;
                 $opening_hour->close_at = '23:59:59';
-                $opening_hour->save();
+                $opening_hour->save ();
             }
         }
     }
@@ -972,14 +987,15 @@ class Restaurant extends \yii\db\ActiveRecord {
      * Return Logo url to dispaly it on backend
      * @return string
      */
-    public function getLogo() {
+    public function getLogo()
+    {
         $photo_url = [];
 
         if ($this->logo) {
-            $restaurantName = str_replace(' ', '', $this->name);
+            $restaurantName = str_replace (' ', '', $this->name);
             $url = 'https://res.cloudinary.com/agent/image/upload/v1579525808/restaurants/'
-                    . $restaurantName . '/logo/'
-                    . $this->logo;
+                . $restaurantName . '/logo/'
+                . $this->logo;
             $photo_url = $url;
         }
 
@@ -990,39 +1006,39 @@ class Restaurant extends \yii\db\ActiveRecord {
      *  Return ThumbnailImage url to dispaly it on backend
      * @return string
      */
-    public function getThumbnailImage() {
+    public function getThumbnailImage()
+    {
         $photo_url = [];
 
         if ($this->thumbnail_image) {
-            $restaurantName = str_replace(' ', '', $this->name);
+            $restaurantName = str_replace (' ', '', $this->name);
             $url = 'https://res.cloudinary.com/agent/image/upload/v1579525808/restaurants/'
-                    . $restaurantName . '/thumbnail-image/'
-                    . $this->thumbnail_image;
+                . $restaurantName . '/thumbnail-image/'
+                . $this->thumbnail_image;
             $photo_url = $url;
         }
 
         return $photo_url;
     }
 
-    public function isOpen() {
-        $opening_hour_model = OpeningHour::find()
-                                ->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])
-                                ->andWhere(['<=','open_at', date("H:i:s", strtotime("now"))])
-                                ->andWhere(['>=','close_at', date("H:i:s", strtotime("now"))])
-                                ->orderBy(['open_at' => SORT_ASC])
-                                ->one();
+    public function isOpen()
+    {
+        $opening_hour_model = OpeningHour::find ()
+            ->where (['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date ('w', strtotime ("now"))])
+            ->andWhere (['<=', 'open_at', date ("H:i:s", strtotime ("now"))])
+            ->andWhere (['>=', 'close_at', date ("H:i:s", strtotime ("now"))])
+            ->orderBy (['open_at' => SORT_ASC])
+            ->one ();
 
 
-
-                  if ($opening_hour_model) {
-                      if ( !$opening_hour_model->is_closed &&
-                           date("w", strtotime("now")) == $opening_hour_model->day_of_week &&
-                           strtotime("now") > strtotime($opening_hour_model->open_at) &&
-                           strtotime("now") < strtotime($opening_hour_model->close_at)
-                          )
-                          return true;
-                  }
-
+        if ($opening_hour_model) {
+            if (!$opening_hour_model->is_closed &&
+                date ("w", strtotime ("now")) == $opening_hour_model->day_of_week &&
+                strtotime ("now") > strtotime ($opening_hour_model->open_at) &&
+                strtotime ("now") < strtotime ($opening_hour_model->close_at)
+            )
+                return true;
+        }
 
 
         return false;
@@ -1031,175 +1047,176 @@ class Restaurant extends \yii\db\ActiveRecord {
     /**
      * @inheritdoc
      */
-    public function extraFields() {
+    public function extraFields()
+    {
         return [
-            'isOpen' => function($restaurant) {
-                return $restaurant->isOpen();
+            'isOpen' => function ($restaurant) {
+                return $restaurant->isOpen ();
             },
-            'webLinks' => function($restaurant) {
-                return $restaurant->getWebLinks()->all();
+            'webLinks' => function ($restaurant) {
+                return $restaurant->getWebLinks ()->all ();
             },
-            'country' => function($restaurant) {
-                return $restaurant->getCountry()->one();
+            'country' => function ($restaurant) {
+                return $restaurant->getCountry ()->one ();
             },
-            'currency' => function($restaurant) {
-                return $restaurant->getCurrency()->one();
+            'currency' => function ($restaurant) {
+                return $restaurant->getCurrency ()->one ();
             },
-            'supportDelivery' => function($restaurant) {
-                return $restaurant->getAreaDeliveryZones()->count() > 0 ? 1 : 0;
+            'supportDelivery' => function ($restaurant) {
+                return $restaurant->getAreaDeliveryZones ()->count () > 0 ? 1 : 0;
             },
-            'supportPickup' => function($restaurant) {
-                return $restaurant->getPickupBusinessLocations()->count() > 0 ? 1 : 0;
+            'supportPickup' => function ($restaurant) {
+                return $restaurant->getPickupBusinessLocations ()->count () > 0 ? 1 : 0;
             },
-            'customerGained' => function($store) {
+            'customerGained' => function ($store) {
 
                 return [
-                  'customerGainedThisMonth' => $store
-                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") , 1)) , date("Y-m-d H:i:s") ),
+                    'customerGainedThisMonth' => $store
+                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), 1)), date ("Y-m-d H:i:s")),
 
-                  'customerGainedLastMonth' => $store
-                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-1,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  0 )) ),
+                    'customerGainedLastMonth' => $store
+                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 1, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), 0))),
 
-                  'customerGainedLastTwoMonth' => $store
-                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-2,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -1,  0 )) ),
+                    'customerGainedLastTwoMonth' => $store
+                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 2, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 1, 0))),
 
-                  'customerGainedLastThreeMonth' => $store
-                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-3,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -2,  0 )) ),
+                    'customerGainedLastThreeMonth' => $store
+                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 3, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 2, 0))),
 
-                  'customerGainedLastFourMonth' => $store
-                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-4,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -3,  0 )) ),
+                    'customerGainedLastFourMonth' => $store
+                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 4, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 3, 0))),
 
-                  'customerGainedLastFiveMonth' => $store
-                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-5,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -4,  0 )) ),
+                    'customerGainedLastFiveMonth' => $store
+                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 5, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 4, 0))),
 
-                  'customerGainedLastSixDays' => $store
-                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -6 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -6 )) ),
+                    'customerGainedLastSixDays' => $store
+                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 6)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 6))),
 
-                  'customerGainedLastFiveDays' => $store
-                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -5 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -5 )) ),
+                    'customerGainedLastFiveDays' => $store
+                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 5)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 5))),
 
-                  'customerGainedLastFourDays' => $store
-                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -4 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -4 )) ),
+                    'customerGainedLastFourDays' => $store
+                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 4)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 4))),
 
-                  'customerGainedLastThreeDays' => $store
-                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -3 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -3 )) ),
+                    'customerGainedLastThreeDays' => $store
+                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 3)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 3))),
 
-                  'customerGainedLastTwoDays' => $store
-                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -2 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -2 )) ),
+                    'customerGainedLastTwoDays' => $store
+                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 2)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 2))),
 
-                  'customerGainedYesterday' => $store
-                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -1 )) ),
+                    'customerGainedYesterday' => $store
+                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 1))),
 
-                  'customerGainedToday' => $store
-                                      ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") )) , date("Y-m-d H:i:s") ),
+                    'customerGainedToday' => $store
+                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d"))), date ("Y-m-d H:i:s")),
 
                 ];
             },
-            'soldItems' => function($model) {
+            'soldItems' => function ($model) {
 
                 return [
-                  'soldItemsLastSixDays' => $model->getOrderItems()->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 6 DAY) ')->sum('order_item.qty'),
-                  'soldItemsLastFiveDays' => $model->getOrderItems()->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')->sum('order_item.qty'),
-                  'soldItemsLastFourDays' => $model->getOrderItems()->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 4 DAY) ')->sum('order_item.qty'),
-                  'soldItemsLastThreeDays' => $model->getOrderItems()->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 3 DAY) ')->sum('order_item.qty'),
-                  'soldItemsLastTwoDays' => $model->getOrderItems()->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')->sum('order_item.qty'),
-                  'soldItemsYesterday' => $model->getOrderItems()->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 1 DAY) ')->sum('order_item.qty'),
-                  'soldItemsToday' => $model->getOrderItems()->andWhere(['DATE(order.order_created_at)' => new Expression('CURDATE()')])->sum('order_item.qty'),
+                    'soldItemsLastSixDays' => $model->getOrderItems ()->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 6 DAY) ')->sum ('order_item.qty'),
+                    'soldItemsLastFiveDays' => $model->getOrderItems ()->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')->sum ('order_item.qty'),
+                    'soldItemsLastFourDays' => $model->getOrderItems ()->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 4 DAY) ')->sum ('order_item.qty'),
+                    'soldItemsLastThreeDays' => $model->getOrderItems ()->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 3 DAY) ')->sum ('order_item.qty'),
+                    'soldItemsLastTwoDays' => $model->getOrderItems ()->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')->sum ('order_item.qty'),
+                    'soldItemsYesterday' => $model->getOrderItems ()->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 1 DAY) ')->sum ('order_item.qty'),
+                    'soldItemsToday' => $model->getOrderItems ()->andWhere (['DATE(order.order_created_at)' => new Expression('CURDATE()')])->sum ('order_item.qty'),
 
                 ];
             },
-            'bestSeller' => function($model) {
-              return \common\models\Item::find()
-                      ->where(['restaurant_uuid' => $model->restaurant_uuid])
-                      ->orderBy(['unit_sold' => SORT_DESC])
-                      ->limit(5)
-                      ->select(['item_name','item_name_ar','unit_sold'])
-                      ->all();
+            'bestSeller' => function ($model) {
+                return \common\models\Item::find ()
+                    ->where (['restaurant_uuid' => $model->restaurant_uuid])
+                    ->orderBy (['unit_sold' => SORT_DESC])
+                    ->limit (5)
+                    ->select (['item_name', 'item_name_ar', 'unit_sold'])
+                    ->all ();
             },
-            'revenueGenerated' => function($store) {
+            'revenueGenerated' => function ($store) {
 
                 return [
-                  'revenueGeneratedThisMonth' => $store
-                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") , 1)) , date("Y-m-d H:i:s") ),
+                    'revenueGeneratedThisMonth' => $store
+                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), 1)), date ("Y-m-d H:i:s")),
 
-                  'revenueGeneratedLastMonth' => $store
-                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-1,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  0 )) ),
+                    'revenueGeneratedLastMonth' => $store
+                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 1, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), 0))),
 
-                  'revenueGeneratedLastTwoMonth' => $store
-                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-2,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -1,  0 )) ),
+                    'revenueGeneratedLastTwoMonth' => $store
+                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 2, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 1, 0))),
 
-                  'revenueGeneratedLastThreeMonth' => $store
-                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-3,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -2,  0 )) ),
+                    'revenueGeneratedLastThreeMonth' => $store
+                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 3, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 2, 0))),
 
-                  'revenueGeneratedLastFourMonth' => $store
-                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-4,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -3,  0 )) ),
+                    'revenueGeneratedLastFourMonth' => $store
+                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 4, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 3, 0))),
 
-                  'revenueGeneratedLastFiveMonth' => $store
-                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-5,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -4,  0 )) ),
+                    'revenueGeneratedLastFiveMonth' => $store
+                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 5, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 4, 0))),
 
-                  'revenueGeneratedLastSixDays' => $store
-                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -6 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -6 )) ),
+                    'revenueGeneratedLastSixDays' => $store
+                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 6)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 6))),
 
-                  'revenueGeneratedLastFiveDays' => $store
-                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -5 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -5 )) ),
+                    'revenueGeneratedLastFiveDays' => $store
+                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 5)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 5))),
 
-                  'revenueGeneratedLastFourDays' => $store
-                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -4 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -4 )) ),
+                    'revenueGeneratedLastFourDays' => $store
+                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 4)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 4))),
 
-                  'revenueGeneratedLastThreeDays' => $store
-                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -3 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -3 )) ),
+                    'revenueGeneratedLastThreeDays' => $store
+                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 3)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 3))),
 
-                  'revenueGeneratedLastTwoDays' => $store
-                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -2 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -2 )) ),
+                    'revenueGeneratedLastTwoDays' => $store
+                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 2)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 2))),
 
-                  'revenueGeneratedYesterday' => $store
-                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -1 )) ),
+                    'revenueGeneratedYesterday' => $store
+                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 1))),
 
-                  'revenueGeneratedToday' => $store
-                                      ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") )) , date("Y-m-d H:i:s") )
+                    'revenueGeneratedToday' => $store
+                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d"))), date ("Y-m-d H:i:s"))
                 ];
             },
-            'orderReceived' => function($store) {
+            'orderReceived' => function ($store) {
 
                 return [
-                  'ordersRecivedThisMonth' => $store
-                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") , 1)) , date("Y-m-d H:i:s") ),
+                    'ordersRecivedThisMonth' => $store
+                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), 1)), date ("Y-m-d H:i:s")),
 
-                  'ordersRecivedLastMonth' => $store
-                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-1,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  0 )) ),
+                    'ordersRecivedLastMonth' => $store
+                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 1, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), 0))),
 
-                  'ordersRecivedLastTwoMonth' => $store
-                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-2,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -1,  0 )) ),
+                    'ordersRecivedLastTwoMonth' => $store
+                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 2, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 1, 0))),
 
-                  'ordersRecivedLastThreeMonth' => $store
-                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-3,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -2,  0 )) ),
+                    'ordersRecivedLastThreeMonth' => $store
+                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 3, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 2, 0))),
 
-                  'ordersRecivedLastFourMonth' => $store
-                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-4,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -3,  0 )) ),
+                    'ordersRecivedLastFourMonth' => $store
+                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 4, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 3, 0))),
 
-                  'ordersRecivedLastFiveMonth' => $store
-                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m")-5,  1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") -4,  0 )) ),
+                    'ordersRecivedLastFiveMonth' => $store
+                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 5, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 4, 0))),
 
-                  'ordersRecivedLastSixDays' => $store
-                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -6 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -6 )) ),
+                    'ordersRecivedLastSixDays' => $store
+                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 6)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 6))),
 
-                  'ordersRecivedLastFiveDays' => $store
-                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -5 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -5 )) ),
+                    'ordersRecivedLastFiveDays' => $store
+                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 5)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 5))),
 
-                  'ordersRecivedLastFourDays' => $store
-                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -4 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -4 )) ),
+                    'ordersRecivedLastFourDays' => $store
+                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 4)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 4))),
 
-                  'ordersRecivedLastThreeDays' => $store
-                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -3 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -3 )) ),
+                    'ordersRecivedLastThreeDays' => $store
+                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 3)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 3))),
 
-                  'ordersRecivedLastTwoDays' => $store
-                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -2 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -2 )) ),
+                    'ordersRecivedLastTwoDays' => $store
+                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 2)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 2))),
 
-                  'ordersRecivedYesterday' => $store
-                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") -1 )) , date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") -1 )) ),
+                    'ordersRecivedYesterday' => $store
+                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 1))),
 
-                  'ordersRecivedToday' => $store
-                                      ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") )) , date("Y-m-d H:i:s") )
+                    'ordersRecivedToday' => $store
+                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d"))), date ("Y-m-d H:i:s"))
 
                 ];
             },
@@ -1209,7 +1226,8 @@ class Restaurant extends \yii\db\ActiveRecord {
     /**
      * Delete Restaurant's logo
      */
-    public function deleteRestaurantLogo($logo = null) {
+    public function deleteRestaurantLogo($logo = null)
+    {
 
         if (!$logo)
             $logo = $this->logo;
@@ -1217,16 +1235,17 @@ class Restaurant extends \yii\db\ActiveRecord {
         $imageURL = "restaurants/" . $this->restaurant_uuid . "/logo/" . $logo;
 
         try {
-            Yii::$app->cloudinaryManager->delete($imageURL);
+            Yii::$app->cloudinaryManager->delete ($imageURL);
         } catch (\Cloudinary\Error $err) {
-            Yii::error('Error while deleting logo photos to Cloudinry: ' . json_encode($err));
+            Yii::error ('Error while deleting logo photos to Cloudinry: ' . json_encode ($err));
         }
     }
 
     /**
      * Delete Restaurant's Thumbnail Image
      */
-    public function deleteRestaurantThumbnailImage($thumbnail_image = null) {
+    public function deleteRestaurantThumbnailImage($thumbnail_image = null)
+    {
 
         if (!$thumbnail_image)
             $thumbnail_image = $this->thumbnail_image;
@@ -1234,48 +1253,52 @@ class Restaurant extends \yii\db\ActiveRecord {
         $imageURL = "restaurants/" . $this->restaurant_uuid . "/thumbnail-image/" . $thumbnail_image;
 
         try {
-            Yii::$app->cloudinaryManager->delete($imageURL);
+            Yii::$app->cloudinaryManager->delete ($imageURL);
         } catch (\Cloudinary\Error $err) {
-            Yii::error('Error while deleting thumbnail image to Cloudinry: ' . json_encode($err));
+            Yii::error ('Error while deleting thumbnail image to Cloudinry: ' . json_encode ($err));
         }
     }
 
-    public function beforeDelete() {
+    public function beforeDelete()
+    {
 
-        $this->deleteRestaurantThumbnailImage();
-        $this->deleteRestaurantLogo();
+        $this->deleteRestaurantThumbnailImage ();
+        $this->deleteRestaurantLogo ();
 
-        return parent::beforeDelete();
+        return parent::beforeDelete ();
     }
 
     /**
      * Promotes current restaurant to busy restaurant while disabling rest
      */
-    public function markAsBusy() {
+    public function markAsBusy()
+    {
         $this->restaurant_status = Restaurant::RESTAURANT_STATUS_BUSY;
-        $this->save(false);
+        $this->save (false);
     }
 
     /**
      * Promotes current restaurant to open restaurant while disabling rest
      */
-    public function markAsOpen() {
+    public function markAsOpen()
+    {
         $this->restaurant_status = Restaurant::RESTAURANT_STATUS_OPEN;
-        $this->save(false);
+        $this->save (false);
     }
 
     /**
      * save restaurant delivery areas
      */
-    public function saveRestaurantDeliveryArea($delivery_areas) {
+    public function saveRestaurantDeliveryArea($delivery_areas)
+    {
 
-        RestaurantDelivery::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
+        RestaurantDelivery::deleteAll (['restaurant_uuid' => $this->restaurant_uuid]);
 
         foreach ($delivery_areas as $area_id) {
             $delivery_area = new RestaurantDelivery();
             $delivery_area->area_id = $area_id;
             $delivery_area->restaurant_uuid = $this->restaurant_uuid;
-            $delivery_area->save();
+            $delivery_area->save ();
         }
     }
 
@@ -1284,35 +1307,39 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItems() {
-        return $this->hasMany(Item::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getItems()
+    {
+        return $this->hasMany (Item::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Get Agent Assignment Records
      * @return \yii\db\ActiveQuery
      */
-    public function getAgentAssignments() {
-        return $this->hasMany(AgentAssignment::className(), ['restaurant_uuid' => 'restaurant_uuid'])->with('agent');
+    public function getAgentAssignments()
+    {
+        return $this->hasMany (AgentAssignment::className (), ['restaurant_uuid' => 'restaurant_uuid'])->with ('agent');
     }
 
     /**
      * Get Agents assigned to this Restaurant
      * @return \yii\db\ActiveQuery
      */
-    public function getAgents() {
-        return $this->hasMany(Agent::className(), ['agent_id' => 'agent_id'])
-                        ->via('agentAssignments');
+    public function getAgents()
+    {
+        return $this->hasMany (Agent::className (), ['agent_id' => 'agent_id'])
+            ->via ('agentAssignments');
     }
 
     /**
      * Return owner of this store
      */
-    public function getOwnerAgent() {
-        return $this->hasMany(Agent::className(), ['agent_id' => 'agent_id'])
-                        ->via('agentAssignments', function($query) {
-                            return $query->andWhere(['agent_assignment.role' => AgentAssignment::AGENT_ROLE_OWNER]);
-                        });
+    public function getOwnerAgent()
+    {
+        return $this->hasMany (Agent::className (), ['agent_id' => 'agent_id'])
+            ->via ('agentAssignments', function ($query) {
+                return $query->andWhere (['agent_assignment.role' => AgentAssignment::AGENT_ROLE_OWNER]);
+            });
     }
 
     /**
@@ -1320,8 +1347,9 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getSubscriptions() {
-        return $this->hasMany(Subscription::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getSubscriptions()
+    {
+        return $this->hasMany (Subscription::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -1329,8 +1357,9 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getActiveSubscription() {
-        return $this->hasOne(Subscription::className(), ['restaurant_uuid' => 'restaurant_uuid'])->where(['subscription_status' => Subscription::STATUS_ACTIVE]);
+    public function getActiveSubscription()
+    {
+        return $this->hasOne (Subscription::className (), ['restaurant_uuid' => 'restaurant_uuid'])->where (['subscription_status' => Subscription::STATUS_ACTIVE]);
     }
 
     /**
@@ -1338,12 +1367,13 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPlan() {
+    public function getPlan()
+    {
 
-      return $this->hasOne(Plan::className(), ['plan_id' => 'plan_id'])
-                      ->via('subscriptions', function($query) {
-                          return $query->andWhere(['subscription.subscription_status' => Subscription::STATUS_ACTIVE]);
-                      });
+        return $this->hasOne (Plan::className (), ['plan_id' => 'plan_id'])
+            ->via ('subscriptions', function ($query) {
+                return $query->andWhere (['subscription.subscription_status' => Subscription::STATUS_ACTIVE]);
+            });
     }
 
     /**
@@ -1351,8 +1381,9 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantDeliveryAreas() {
-        return $this->hasMany(RestaurantDelivery::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurantDeliveryAreas()
+    {
+        return $this->hasMany (RestaurantDelivery::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -1360,10 +1391,11 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getAvailableAreas() {
+    public function getAvailableAreas()
+    {
 
-      return $this->hasMany(AreaDeliveryZone::className(), ['restaurant_uuid' => 'restaurant_uuid'])
-         ->where(['is', 'area_delivery_zone.area_id', null]);
+        return $this->hasMany (AreaDeliveryZone::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->where (['is', 'area_delivery_zone.area_id', null]);
     }
 
     /**
@@ -1371,8 +1403,9 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantBranches() {
-        return $this->hasMany(RestaurantBranch::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurantBranches()
+    {
+        return $this->hasMany (RestaurantBranch::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -1380,8 +1413,9 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantPaymentMethods() {
-        return $this->hasMany(RestaurantPaymentMethod::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurantPaymentMethods()
+    {
+        return $this->hasMany (RestaurantPaymentMethod::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
 
@@ -1390,8 +1424,9 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPaymentMethods() {
-        return $this->hasMany(PaymentMethod::className(), ['payment_method_id' => 'payment_method_id'])->viaTable('restaurant_payment_method', ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getPaymentMethods()
+    {
+        return $this->hasMany (PaymentMethod::className (), ['payment_method_id' => 'payment_method_id'])->viaTable ('restaurant_payment_method', ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -1399,8 +1434,9 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOpeningHours() {
-        return $this->hasMany(OpeningHour::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getOpeningHours()
+    {
+        return $this->hasMany (OpeningHour::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -1408,8 +1444,9 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrders() {
-        return $this->hasMany(Order::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getOrders()
+    {
+        return $this->hasMany (Order::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -1417,8 +1454,10 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getActiveOrders() {
-        return $this->hasMany(Order::className(), ['restaurant_uuid' => 'restaurant_uuid'])->activeOrders($this->restaurant_uuid);;
+    public function getActiveOrders()
+    {
+        return $this->hasMany (Order::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->activeOrders ($this->restaurant_uuid);;
     }
 
     /**
@@ -1426,10 +1465,24 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderItems() {
-        return $this->hasMany(OrderItem::className(), ['order_uuid' => 'order_uuid'])
-        ->via('activeOrders')
-        ->joinWith('order');
+    public function getOrderItems()
+    {
+        return $this->hasMany (OrderItem::className (), ['order_uuid' => 'order_uuid'])
+            //->via('orders');
+            ->via ('activeOrders')
+            ->joinWith ('order');
+    }
+
+    /**
+     * Gets query for [[OrderItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSoldOrderItems()
+    {
+        return $this->hasMany (OrderItem::className (), ['order_uuid' => 'order_uuid'])
+            //->via('orders');
+            ->via ('activeOrders');
     }
 
 
@@ -1438,12 +1491,13 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getStoreRevenue($start_date,$end_date) {
+    public function getStoreRevenue($start_date, $end_date)
+    {
 
-        return $this->hasMany(Order::className(), ['restaurant_uuid' => 'restaurant_uuid'])
-          ->activeOrders($this->restaurant_uuid)
-         ->andWhere(['between', 'order.order_created_at', $start_date, $end_date])
-         ->sum('total_price');
+        return $this->hasMany (Order::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->activeOrders ($this->restaurant_uuid)
+            ->andWhere (['between', 'order.order_created_at', $start_date, $end_date])
+            ->sum ('total_price');
     }
 
 
@@ -1452,10 +1506,11 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrdersReceived($start_date,$end_date) {
+    public function getOrdersReceived($start_date, $end_date)
+    {
 
-        return $this->hasMany(Order::className(), ['restaurant_uuid' => 'restaurant_uuid'])
-          ->ordersReceived($this->restaurant_uuid, $start_date, $end_date);
+        return $this->hasMany (Order::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->ordersReceived ($this->restaurant_uuid, $start_date, $end_date);
     }
 
 
@@ -1464,8 +1519,9 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getVouchers() {
-        return $this->hasMany(Voucher::className(), ['restaurant_uuid' => 'restaurant_uuid'])->with('bank');
+    public function getVouchers()
+    {
+        return $this->hasMany (Voucher::className (), ['restaurant_uuid' => 'restaurant_uuid'])->with ('bank');
     }
 
     /**
@@ -1473,8 +1529,9 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCustomers() {
-        return $this->hasMany(Customer::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getCustomers()
+    {
+        return $this->hasMany (Customer::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
 
@@ -1483,10 +1540,11 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCustomerGained($start_date,$end_date) {
+    public function getCustomerGained($start_date, $end_date)
+    {
 
-        return $this->hasMany(Customer::className(), ['restaurant_uuid' => 'restaurant_uuid'])
-          ->customerGained($this->restaurant_uuid,$start_date, $end_date);
+        return $this->hasMany (Customer::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->customerGained ($this->restaurant_uuid, $start_date, $end_date);
     }
 
     /**
@@ -1494,8 +1552,9 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRefunds() {
-        return $this->hasMany(Refund::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRefunds()
+    {
+        return $this->hasMany (Refund::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -1503,8 +1562,9 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getQueues() {
-        return $this->hasMany(Queue::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getQueues()
+    {
+        return $this->hasMany (Queue::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -1512,8 +1572,9 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantTheme() {
-        return $this->hasOne(RestaurantTheme::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurantTheme()
+    {
+        return $this->hasOne (RestaurantTheme::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
 
@@ -1524,7 +1585,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getTapQueue()
     {
-        return $this->hasOne(TapQueue::className(), ['tap_queue_id' => 'tap_queue_id']);
+        return $this->hasOne (TapQueue::className (), ['tap_queue_id' => 'tap_queue_id']);
     }
 
 
@@ -1533,8 +1594,9 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getWebLinks() {
-        return $this->hasMany(WebLink::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getWebLinks()
+    {
+        return $this->hasMany (WebLink::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -1542,8 +1604,9 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getStoreWebLinks() {
-        return $this->hasMany(StoreWebLink::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getStoreWebLinks()
+    {
+        return $this->hasMany (StoreWebLink::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
 
@@ -1554,7 +1617,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getCountryDeliveryZones($countryId)
     {
-        return $this->hasMany(DeliveryZone::className(), ['restaurant_uuid' => 'restaurant_uuid'])->where(['country_id' => $countryId]);
+        return $this->hasMany (DeliveryZone::className (), ['restaurant_uuid' => 'restaurant_uuid'])->where (['country_id' => $countryId]);
     }
 
 
@@ -1565,7 +1628,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getBusinessLocations()
     {
-        return $this->hasMany(BusinessLocation::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany (BusinessLocation::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
 
@@ -1576,7 +1639,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getPickupBusinessLocations()
     {
-        return $this->hasMany(BusinessLocation::className(), ['restaurant_uuid' => 'restaurant_uuid'])->where(['support_pick_up' => 1]);
+        return $this->hasMany (BusinessLocation::className (), ['restaurant_uuid' => 'restaurant_uuid'])->where (['support_pick_up' => 1]);
     }
 
     /**
@@ -1586,7 +1649,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getDeliveryZones()
     {
-        return $this->hasMany(DeliveryZone::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany (DeliveryZone::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
 
@@ -1609,8 +1672,8 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getAreaDeliveryZonesForSpecificCountry($countryId)
     {
-        return $this->hasMany(AreaDeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id'])->via('deliveryZones')
-              ->where(['delivery_zone.country_id' => $countryId])->joinWith(['deliveryZone','city']);
+        return $this->hasMany (AreaDeliveryZone::className (), ['delivery_zone_id' => 'delivery_zone_id'])->via ('deliveryZones')
+            ->where (['delivery_zone.country_id' => $countryId])->joinWith (['deliveryZone', 'city']);
     }
 
     /**
@@ -1618,10 +1681,10 @@ class Restaurant extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getAreas() {
-        return $this->hasMany(Area::className(), ['area_id' => 'area_id'])->via('areaDeliveryZones');
+    public function getAreas()
+    {
+        return $this->hasMany (Area::className (), ['area_id' => 'area_id'])->via ('areaDeliveryZones');
     }
-
 
 
     /**
@@ -1631,7 +1694,7 @@ class Restaurant extends \yii\db\ActiveRecord {
      */
     public function getAreaDeliveryZones()
     {
-        return $this->hasMany(AreaDeliveryZone::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany (AreaDeliveryZone::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
 
@@ -1652,24 +1715,24 @@ class Restaurant extends \yii\db\ActiveRecord {
 
 
     /**
-   * Gets query for [[Country]].
-   *
-   * @return \yii\db\ActiveQuery
-   */
-  public function getCountry()
-  {
-      return $this->hasOne(Country::className(), ['country_id' => 'country_id']);
-  }
+     * Gets query for [[Country]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCountry()
+    {
+        return $this->hasOne (Country::className (), ['country_id' => 'country_id']);
+    }
 
-  /**
-   * Gets query for [[Currency]].
-   *
-   * @return \yii\db\ActiveQuery
-   */
-  public function getCurrency()
-  {
-      return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id']);
-  }
+    /**
+     * Gets query for [[Currency]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne (Currency::className (), ['currency_id' => 'currency_id']);
+    }
 
 
 }

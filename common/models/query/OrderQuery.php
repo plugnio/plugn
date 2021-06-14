@@ -42,8 +42,8 @@ class OrderQuery extends \yii\db\ActiveQuery {
     public function activeOrders($storeUuid)
     {
         return $this->where(['restaurant_uuid' => $storeUuid])
-        ->andWhere([ '!=' , 'order_status' , Order::STATUS_DRAFT])
-        ->andWhere([ '!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
+        ->andWhere(['!=' , 'order_status' , Order::STATUS_DRAFT])
+        ->andWhere(['!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
         ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
         ->andWhere(['!=', 'order_status', Order::STATUS_PARTIALLY_REFUNDED])
         ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED]);

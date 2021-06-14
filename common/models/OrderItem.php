@@ -3,6 +3,9 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\AttributeBehavior;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "order_item".
@@ -15,7 +18,8 @@ use Yii;
  * @property float $item_price
  * @property int|null $qty
  * @property string|null $customer_instruction
- *
+ * @property datetime $order_item_created_at
+ * @property datetime $order_item_updated_at
  * @property Item $item
  * @property Restaurant $restaurant
  * @property Order $order
@@ -44,6 +48,20 @@ class OrderItem extends \yii\db\ActiveRecord {
             [['item_name', 'item_name_ar', 'customer_instruction'], 'string', 'max' => 255],
             [['item_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_uuid' => 'item_uuid']],
             [['order_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_uuid' => 'order_uuid']],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors() {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'createdAtAttribute' => 'order_item_created_at',
+                'updatedAtAttribute' => 'order_item_updated_at',
+                'value' => new Expression('NOW()'),
+            ]
         ];
     }
 
@@ -86,8 +104,6 @@ class OrderItem extends \yii\db\ActiveRecord {
           $totalPrice = $this->item->item_price; //5
         else
           $totalPrice = $this->item_price; //5
-
-
 
         foreach ($this->getOrderItemExtraOptions()->asArray()->all() as $extraOption)
             $totalPrice += $extraOption['extra_option_price']; //1

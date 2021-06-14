@@ -73,19 +73,18 @@ class StatsController extends Controller
         $store = Yii::$app->accountManager->getManagedAccount();
 
         $numberOfOrders = $store->getOrders()
-            ->checkoutCompleted()
+            ->activeOrders($store->restaurant_uuid)
             ->count();
 
-        //todo: check relation exists
         $itemsCount = $store->getItems()->count();
 
         $today_orders_received = $store->getOrders()
-            ->checkoutCompleted()
+            ->activeOrders($store->restaurant_uuid)
             ->andWhere(new Expression("date(order_created_at) = date(NOW())"))
             ->count();
 
         $today_revenue_generated = $store->getOrders()
-            ->checkoutCompleted()
+            ->activeOrders($store->restaurant_uuid)
             ->andWhere(new Expression("date(order_created_at) = date(NOW())"))
             ->sum('total_price');
 
@@ -93,10 +92,9 @@ class StatsController extends Controller
             ->andWhere(new Expression("date(customer_created_at) = date(NOW())"))
             ->count();
 
-        //todo: add model relation?
         $today_sold_items = $store->getOrderItems()
             ->joinWith('order')
-            ->checkoutCompleted()
+            //->activeOrders($store->restaurant_uuid)
             ->andWhere(new Expression("date(order_created_at) = date(NOW())"))
             ->sum('order_item.qty');
 
@@ -107,18 +105,16 @@ class StatsController extends Controller
             ->count();
 
         $number_of_all_revenue_generated = $store->getOrders()
-            ->checkoutCompleted()
+            ->activeOrders($store->restaurant_uuid)
             ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
             ->sum('total_price');
 
-        $number_of_all_sold_item = $store->getOrderItems()
-            ->joinWith('order')
-            ->checkoutCompleted()
-            ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+        $number_of_all_sold_item = $store->getSoldOrderItems()
+            ->andWhere(new Expression("DATE(order_item_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
             ->sum('order_item.qty');
 
         $number_of_all_orders_received = $store->getOrders()
-            ->checkoutCompleted()
+            ->activeOrders($store->restaurant_uuid)
             ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
             ->count();
 
@@ -126,53 +122,54 @@ class StatsController extends Controller
         //last-month - day
         //last-3-month - month
 
+        
         $customer_chart_data = $store->getCustomers()
-            ->select('count(*) as total')
+            ->select(new Expression('customer_created_at, COUNT(*) as total'))
             ->andWhere(new Expression("date(customer_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
             ->groupBy(new Expression('DAY(customer_created_at)'))
             ->asArray()
             ->all();
 
         $revenue_generated_chart_data = $store->getOrders()
-            ->checkoutCompleted()
-            ->select('total_price')
+            ->activeOrders($store->restaurant_uuid)
+            ->select(new Expression('order.order_created_at, SUM(`total_price`) as total'))
             ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
             ->groupBy(new Expression('DAY(order.order_created_at)'))
             ->asArray()
             ->all();
 
         $orders_received_chart_data = $store->getOrders()
-            ->checkoutCompleted()
-            ->select('count(*) as total')
+            ->activeOrders($store->restaurant_uuid)
+            ->select(new Expression('order_created_at, COUNT(*) as total'))
             ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
             ->groupBy(new Expression('DAY(order.order_created_at)'))
             ->asArray()
             ->all();
 
-        $sold_item_chart_data = $store->getOrderItems()
-            ->joinWith('order')
-            ->checkoutCompleted()
-            ->select('order_item.qty')
-            ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->groupBy(new Expression('DAY(order.order_created_at)'))
+        $sold_item_chart_data = $store->getSoldOrderItems()
+            ->select('order_item_created_at, SUM(order_item.qty) as total')
+            ->andWhere(new Expression("DATE(order_item_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+            ->groupBy(new Expression('DAY(order_item_created_at)'))
             ->asArray()
             ->all();
+
+        $currencyCode = $store->currency->code;
 
         return [
-            "number_of_all_customer_gained" => $number_of_all_customer_gained,
-            "number_of_all_revenue_generated" => $number_of_all_revenue_generated,
-            "number_of_all_sold_item" => $number_of_all_sold_item,
-            "number_of_all_orders_received" => $number_of_all_orders_received,
+            "number_of_all_customer_gained" => (int) $number_of_all_customer_gained,
+            "number_of_all_revenue_generated" => (int)  $number_of_all_revenue_generated,
+            "number_of_all_sold_item" => (int) $number_of_all_sold_item,
+            "number_of_all_orders_received" => (int) $number_of_all_orders_received,
             "customer_chart_data" => $customer_chart_data,
             "revenue_generated_chart_data" => $revenue_generated_chart_data,
             "orders_received_chart_data" => $orders_received_chart_data,
             "sold_item_chart_data" => $sold_item_chart_data,
-            "numberOfOrders" => $numberOfOrders,
-            "itemsCount" => $itemsCount,
-            "today_customer_gained" => $today_customer_gained,
-            "today_revenue_generated" => $today_revenue_generated,
-            "today_sold_items" => $today_sold_items,
-            "today_orders_received" => $today_orders_received
+            "numberOfOrders" => (int) $numberOfOrders,
+            "itemsCount" => (int) $itemsCount,
+            "today_customer_gained" => (int) $today_customer_gained,
+            "today_revenue_generated" => (float) $today_revenue_generated,//Yii::$app->formatter->asCurrency($today_revenue_generated, $currencyCode),//, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]
+            "today_sold_items" => (int) $today_sold_items,
+            "today_orders_received" => (float)  $today_orders_received, //Yii::$app->formatter->asCurrency($today_orders_received, $currencyCode)//, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]
         ];
     }
 }
