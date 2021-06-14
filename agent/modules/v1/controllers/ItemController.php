@@ -161,18 +161,20 @@ class ItemController extends Controller
     {
         $model = $this->findModel ($id);
 
-        $model->item_name = Yii::$app->request->getBodyParam ("name");
-        $model->item_name_ar = Yii::$app->request->getBodyParam ("name_ar");
-        $model->item_description = Yii::$app->request->getBodyParam ("description");
-        $model->item_description_ar = (int)Yii::$app->request->getBodyParam ("description_ar");
+        $model->item_name = Yii::$app->request->getBodyParam ("item_name");
+        $model->item_name_ar = Yii::$app->request->getBodyParam ("item_name_ar");
+        $model->item_description = Yii::$app->request->getBodyParam ("item_description");
+        $model->item_description_ar = Yii::$app->request->getBodyParam ("item_description_ar");
         $model->sort_number = Yii::$app->request->getBodyParam ("sort_number");
         $model->prep_time = Yii::$app->request->getBodyParam ("prep_time");
         $model->prep_time_unit = Yii::$app->request->getBodyParam ("prep_time_unit");
-        $model->item_price = Yii::$app->request->getBodyParam ("price");
+        $model->item_price = Yii::$app->request->getBodyParam ("item_price");
         $model->sku = Yii::$app->request->getBodyParam ("sku");
         $model->barcode = Yii::$app->request->getBodyParam ("barcode");
-        $model->track_quantity = Yii::$app->request->getBodyParam ("track_quantity");
-        $model->stock_qty = Yii::$app->request->getBodyParam ("track_quantity");
+        $model->track_quantity = (int)Yii::$app->request->getBodyParam ("track_quantity");
+        $model->stock_qty = Yii::$app->request->getBodyParam ("stock_qty");
+        $model->items_category = Yii::$app->request->getBodyParam ("itemCategories");
+        $model->item_images = Yii::$app->request->getBodyParam ("itemImages");
 
         if (!$model->save ()) {
             if (isset($model->errors)) {
@@ -190,10 +192,8 @@ class ItemController extends Controller
 
         //save categories
 
-        $itemCategories = Yii::$app->request->getBodyParam ('itemCategories');
-
-        $arrCategoryIds = ArrayHelper::getColumn ($itemCategories, 'categorry_id');
-
+        $itemCategories = Yii::$app->request->getBodyParam ("itemCategories");
+        $arrCategoryIds = ArrayHelper::getColumn ($itemCategories, 'category_id');
         $model->saveItemsCategory($arrCategoryIds);
 
         return [
@@ -240,8 +240,7 @@ class ItemController extends Controller
     {
         $store = Yii::$app->accountManager->getManagedAccount();
 
-        $model = $store->getItems()->findOne($item_uuid);
-
+        $model = Item::findOne(['item_uuid'=>$item_uuid,'restaurant_uuid'=>$store->restaurant_uuid]);
         if ($model !== null) {
             return $model;
         } else {
