@@ -75,6 +75,7 @@ class ItemController extends Controller
 
         $query = Item::find();
         $query->andWhere(['restaurant_uuid'=>$store_uuid]);
+        $query->orderBy('item_created_at DESC');
 
         if ($keyword) {
             $query->filterWhere ([
@@ -139,7 +140,7 @@ class ItemController extends Controller
 
         // save images
         $itemImages = Yii::$app->request->getBodyParam ("itemImages");
-        $model->saveItemImages($itemImages);
+        $data[] = $model->saveItemImages($itemImages);
 
         //save categories
         $itemCategories = Yii::$app->request->getBodyParam ("itemCategories");
@@ -148,7 +149,8 @@ class ItemController extends Controller
 
         return [
             "operation" => "success",
-            "message" => "Item created successfully"
+            "message" => "Item created successfully",
+            "image" => $data
         ];
     }
 

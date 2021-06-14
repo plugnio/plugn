@@ -41,6 +41,7 @@ class Item extends \common\models\Item {
      */
     public function saveItemImages($images)
     {
+        $data = [];
         //deleteallofThem
 //        foreach ($this->getItemImages()->all() as  $itemImage) {
 //          $itemImage->delete();
@@ -51,36 +52,34 @@ class Item extends \common\models\Item {
                     try {
                         $url = Yii::$app->temporaryBucketResourceManager->getUrl($img['product_file_name']);
                         $filename = Yii::$app->security->generateRandomString();
-                        $result = Yii::$app->cloudinaryManager->upload(
+                        $data[] = $result = Yii::$app->cloudinaryManager->upload(
                             $url,
                             [
                                 'public_id' => "restaurants/" . $this->restaurant_uuid . "/items/" . $filename
                             ]
                         );
-
-                        if ($result || count($result) > 0) {
-                            $item_image_model = new ItemImage();
-                            $item_image_model->item_uuid = $this->item_uuid;
-                            $item_image_model->product_file_name = basename($result['url']);
-                            $item_image_model->save(false);
-                        }
+                        $item_image_model = new ItemImage();
+                        $item_image_model->item_uuid = $this->item_uuid;
+                        $item_image_model->product_file_name = basename($result['url']);
+                        $item_image_model->save(false);
 
                     } catch (\Cloudinary\Error $err) {
-                        Yii::error("Error when uploading item's image to Cloudinry: " . json_encode($err));
-//                        Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($images));
+                        Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($images));
+                        return false;
                     }
                 }
             }
         }
+        return $data;
     }
 
     public function extraFields()
     {
-        $fields = parent::extraFields();
         return [
             'itemImage',
             'itemImages',
-            'options'
+            'options',
+            'categoryItems',
         ];
     }
 
@@ -94,13 +93,23 @@ class Item extends \common\models\Item {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItemImages()
+    public function getItemImages($model = '\agent\models\ItemImage')
     {
-        return parent::getItemImages();
+        return parent::getItemImages($model);
     }
 
-    public function getItemImage(){
-        return parent::getItemImage();
+    public function getItemImage($model = '\agent\models\ItemImage'){
+        return parent::getItemImage($model);
+    }
+
+    /**
+     * Gets query for [[CategoryItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCategoryItems($model = '\agent\models\CategoryItem')
+    {
+        return parent::getCategoryItems($model);
     }
 
 }

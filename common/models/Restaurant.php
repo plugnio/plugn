@@ -115,7 +115,6 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property RestaurantPaymentMethod[] $restaurantPaymentMethods
  * @property RestaurantTheme $restaurantTheme
  * @property PaymentMethod[] $paymentMethods
- * @property Agent[] $agents
  * @property WebLink[] $webLinks
  * @property StoreWebLink[] $storeWebLinks
  * @property Voucher[] $vouchers

@@ -313,9 +313,9 @@ class Item extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCategoryItems()
+    public function getCategoryItems($model = 'common\models\CategoryItem')
     {
-        return $this->hasMany(CategoryItem::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasMany($model::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -373,14 +373,14 @@ class Item extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItemImages()
+    public function getItemImages($model = 'common\models\ItemImage')
     {
-        return $this->hasMany(ItemImage::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasMany($model::className(), ['item_uuid' => 'item_uuid']);
     }
 
 
-    public function getItemImage(){
-      return $this->hasOne(ItemImage::className(), ['item_uuid' => 'item_uuid']);
+    public function getItemImage($model = 'common\models\ItemImage'){
+      return $this->hasOne($model::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**

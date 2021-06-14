@@ -55,9 +55,9 @@ class CategoryItem extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCategory()
+    public function getCategory($model = '\common\models\Category')
     {
-        return $this->hasOne(Category::className(), ['category_id' => 'category_id']);
+        return $this->hasOne($model::className(), ['category_id' => 'category_id']);
     }
 
     /**
