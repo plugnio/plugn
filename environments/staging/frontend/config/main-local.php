@@ -8,7 +8,7 @@ $config = [
         ],
         'urlManager' => [
             'class' => 'yii\web\UrlManager',
-            'baseUrl' => 'https://dashboard.dev.plugn.io',
+            'baseUrl' => 'https://dashboard.staging.plugn.io',
             'enablePrettyUrl' => true,
             'showScriptName' => false,
         ],

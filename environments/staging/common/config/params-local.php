@@ -1,5 +1,5 @@
 <?php
 return [
-  'apiEndpoint' => 'https://api.dev.plugn.io',
-  'frontendUrl' => 'http://dashboard.dev.plugn.io',
+  'apiEndpoint' => 'https://api.staging.plugn.io',
+  'frontendUrl' => 'http://dashboard.staging.plugn.io',
 ];
