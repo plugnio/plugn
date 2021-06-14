@@ -28,6 +28,13 @@ class OrderQuery extends \yii\db\ActiveQuery {
         return parent::one($db);
     }
 
+    /**
+     * Orders successfully placed
+     */
+    public function checkoutCompleted()
+    {
+        return $this->filterWhere([ 'NOT IN' , 'order_status' , [Order::STATUS_ABANDONED_CHECKOUT, Order::STATUS_DRAFT]]);
+    }
 
     /**
      * Active records only

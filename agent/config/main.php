@@ -351,16 +351,25 @@ return [
                 ],
 
                 [ // AuthController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/auth',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET login' => 'login',
+                        'POST request-reset-password' => 'request-reset-password',
+                        // OPTIONS VERBS
+                        'OPTIONS login' => 'options',
+                        'OPTIONS request-reset-password' => 'options',
+                    ]
+                ],
+                [ // StatsController
                    'class' => 'yii\rest\UrlRule',
-                   'controller' => 'v1/auth',
+                   'controller' => 'v1/stats',
                    'pluralize' => false,
                    'patterns' => [
-                       'GET login' => 'login',
-                       'POST request-reset-password' => 'request-reset-password',
-
+                       'GET' => 'view',
                        // OPTIONS VERBS
-                       'OPTIONS login' => 'options',
-                       'OPTIONS request-reset-password' => 'options',
+                       'OPTIONS' => 'options'
                    ]
                ],
             ],
