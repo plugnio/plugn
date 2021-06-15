@@ -136,6 +136,7 @@ class StatsController extends Controller
             $revenue_data,
             $orders_data,
             $sold_item_data,[
+                "currency_code" => $store->currency?$store->currency->code: null,
                 "numberOfOrders" => (int) $numberOfOrders,
                 "itemsCount" => (int) $itemsCount,
                 "today_customer_gained" => (int) $today_customer_gained,
