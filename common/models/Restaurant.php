@@ -563,7 +563,7 @@ class Restaurant extends \yii\db\ActiveRecord {
           if(!file_put_contents($tmpFile, file_get_contents($this->getAuthorizedSignaturePhoto())))
               return Yii::error('Error reading authorized signature document: ');
 
-            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($tmpFile, 2 ,$this->supplierCode); //Upload Signature file
+            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($tmpFile, 2 ,$this->supplierCode,$this->currency->code); //Upload Signature file
 
             $responseContent = json_decode($response->content);
 
@@ -586,7 +586,7 @@ class Restaurant extends \yii\db\ActiveRecord {
               return Yii::error('Error reading commercial license document: ');
 
 
-            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($commercialLicenseTmpFile, 1 ,$this->supplierCode); //Upload commercial License
+            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($commercialLicenseTmpFile, 1 ,$this->supplierCode, $this->currency->code); //Upload commercial License
 
             $responseContent = json_decode($response->content);
 
@@ -609,7 +609,7 @@ class Restaurant extends \yii\db\ActiveRecord {
               return Yii::error('Error reading civil id (front side): ');
 
 
-            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($civilIdFrontSideTmpFile, 4 ,$this->supplierCode); //Upload civil Id Front Side
+            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($civilIdFrontSideTmpFile, 4 ,$this->supplierCode, $this->currency->code); //Upload civil Id Front Side
 
             $responseContent = json_decode($response->content);
 
@@ -631,7 +631,7 @@ class Restaurant extends \yii\db\ActiveRecord {
             if(!file_put_contents($civilIdBackSideTmpFile, file_get_contents($this->getCivilIdBackSidePhoto())))
                 return Yii::error('Error reading civil id (back side): ');
 
-            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($civilIdBackSideTmpFile, 5 ,$this->supplierCode); //Upload civil Id back Side
+            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($civilIdBackSideTmpFile, 5 ,$this->supplierCode, $this->currency->code); //Upload civil Id back Side
 
             $responseContent = json_decode($response->content);
 

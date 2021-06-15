@@ -140,7 +140,7 @@ class Refund extends \yii\db\ActiveRecord
         return  $this->addError($attribute, 'Can’t refund more than available');
 
 
-      $totalAwaitingBalanceResponse = Yii::$app->myFatoorahPayment->getSupplierDashboard($this->store->supplierCode);
+      $totalAwaitingBalanceResponse = Yii::$app->myFatoorahPayment->getSupplierDashboard($this->store->supplierCode,$this->currency->code);
 
       $responseContent = json_decode($totalAwaitingBalanceResponse->content);
 

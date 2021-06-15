@@ -202,11 +202,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <h5><b>Settlement window</b></h5>
                                 <?php
                                   if($model->is_myfatoorah_enable) {
-                                    if ( $model->country->iso == 'KW' && $model->currency->code == 'KWD'  ) { ?>
+                                    if ($model->currency->code == 'KWD'  ) { ?>
                                       <span>
                                         24 working hours
                                       </span>
-                                    <?php } else  if($model->country->iso == 'SA' && $model->currency->code == 'SAR') { ?>
+                                    <?php } else  if( $model->currency->code == 'SAR') { ?>
                                       <span>
                                         Sunday-Tuesday-Thursday
                                       </span>
@@ -312,11 +312,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <span style="display:block">
                                       <h5><b>Settlement window</b></h5>
 
-                                      <?php  if( $model->country->iso == 'KW' && $model->currency->code == 'KWD'  ) { ?>
+                                      <?php  if( $model->currency->code == 'KWD'  ) { ?>
                                           <span>
                                             24 working hours
                                           </span>
-                                        <?php } else  if($model->country->iso == 'SA' && $model->currency->code == 'SAR') { ?>
+                                        <?php } else  if( $model->currency->code == 'SAR') { ?>
                                           <span>
                                             Sunday-Tuesday-Thursday
                                           </span>
@@ -420,7 +420,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                       </div>
 
-                                    <?php  if ($model->country->iso == 'BH' && $model->currency->code == 'BHD') {
+                                    <?php  if ( $model->currency->code == 'BHD') {
                                       if($model->business_type == 'corp' &&  $model->is_tap_enable ){
 
                                           if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 5])->exists())
@@ -430,7 +430,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         }
 
 
-                                         if($model->business_type == 'ind'){ ?>
+                                        else if($model->business_type == 'ind'){ ?>
 
                                             <div style="background-color:#fff5f5; padding:16px">
                                               <span>
@@ -509,11 +509,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                   <span style="display:block">
                                     <h5><b>Settlement window</b></h5>
 
-                                    <?php  if( $model->country->iso == 'KW' && $model->currency->code == 'KWD'  ) { ?>
+                                    <?php  if(  $model->currency->code == 'KWD'  ) { ?>
                                         <span>
                                           24 working hours
                                         </span>
-                                      <?php } else  if($model->country->iso == 'SA' && $model->currency->code == 'SAR') { ?>
+                                      <?php } else  if($model->currency->code == 'SAR') { ?>
                                         <span>
                                           Sunday-Tuesday-Thursday
                                         </span>
@@ -613,11 +613,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <span style="display:block">
                                       <h5><b>Settlement window</b></h5>
 
-                                      <?php  if( $model->country->iso == 'KW' && $model->currency->code == 'KWD'  ) { ?>
+                                      <?php  if( $model->currency->code == 'KWD'  ) { ?>
                                           <span>
                                             24 working hours
                                           </span>
-                                        <?php } else  if($model->country->iso == 'SA' && $model->currency->code == 'SAR') { ?>
+                                        <?php } else  if( $model->currency->code == 'SAR') { ?>
                                           <span>
                                             Sunday-Tuesday-Thursday
                                           </span>
@@ -700,7 +700,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
   <?php }   ?>
 
-<?php if($model->is_myfatoorah_enable || ($model->is_tap_enable && $model->country->iso != 'BH' && $model->currency->code != 'BHD')) { ?>
+<?php if($model->is_myfatoorah_enable || ($model->is_tap_enable  && $model->currency->code != 'BHD')) { ?>
   <div class="card">
     <div class="card-header">
       <h3>

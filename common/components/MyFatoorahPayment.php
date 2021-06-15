@@ -139,14 +139,19 @@ class MyFatoorahPayment extends Component
     public $plugnTestApiKey;
 
     /**
-     * @var string test api key to use will be stored here
+     * @var string kuwait test api key to use will be stored here
      */
-    public $testApiKey;
+    public $kuwaitTestApiKey;
 
     /**
-     * @var string live api key to use will be stored here
+     * @var string kuwait live api key to use will be stored here
      */
-    public $liveApiKey;
+    public $kuwaitLiveApiKey;
+
+    /**
+     * @var string kuwait live api key to use will be stored here
+     */
+    public $saudiLiveApiKey;
 
     /**
      * @var string live api key to use will be stored here
@@ -154,12 +159,11 @@ class MyFatoorahPayment extends Component
     public $apiKey;
 
 
-    private $liveApiEndpoint = "https://apitest.myfatoorah.com/v2";
+    private $liveApiEndpoint = "https://api.myfatoorah.com/v2";
 
     private $testApiEndpoint = "https://apitest.myfatoorah.com/v2";
 
-
-    private $apiEndpoint = "https://apitest.myfatoorah.com/v2";
+    private $apiEndpoint;
 
     /**
      * @inheritdoc
@@ -167,7 +171,7 @@ class MyFatoorahPayment extends Component
     public function init()
     {
         // Fields required by default
-        $requiredAttributes = ['gatewayToUse', 'liveApiKey', 'testApiKey'];
+        $requiredAttributes = ['gatewayToUse', 'kuwaitLiveApiKey', 'kuwaitTestApiKey','saudiLiveApiKey'];
 
         // Process Validation
         foreach ($requiredAttributes as $attribute) {
@@ -179,14 +183,7 @@ class MyFatoorahPayment extends Component
             }
         }
 
-        // Set the API key we're going to use
-        if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
-            $this->apiEndpoint = $this->liveApiEndpoint;
-            $this->apiKey = $this->liveApiKey;
-        } else {
-            $this->apiEndpoint = $this->testApiEndpoint;
-            $this->apiKey = $this->testApiKey;
-        }
+
 
         parent::init();
     }
@@ -197,8 +194,29 @@ class MyFatoorahPayment extends Component
      * @param type $title
      * @return type
      */
-    public function uploadSupplierDocument($file_path, $fileType, $supplierCode)
+    public function uploadSupplierDocument($file_path, $fileType, $supplierCode, $currency)
     {
+
+
+        // Set the API key we're going to use
+        if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
+            $this->apiEndpoint = $this->liveApiEndpoint;
+
+            if($currency == 'KWD')
+              $this->apiKey =  $this->kuwaitLiveApiKey;
+            else if($currency == 'SAR')
+              $this->apiKey =  $this->saudiLiveApiKey;
+
+
+        } else {
+            $this->apiEndpoint = $this->testApiEndpoint;
+
+            if($currency == 'KWD')
+              $this->apiKey =  $this->kuwaitTestApiKey;
+            else if($currency == 'SAR')
+              $this->apiKey =  $this->saudiLiveApiKey;
+
+        }
 
         $fileEndpoint = $this->apiEndpoint . "/UploadSupplierDocument";
 
@@ -272,6 +290,28 @@ class MyFatoorahPayment extends Component
      */
     public function createSupplier($store)
     {
+
+      // Set the API key we're going to use
+      if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
+          $this->apiEndpoint = $this->liveApiEndpoint;
+
+          if($store->currency->code == 'KWD')
+            $this->apiKey =  $this->kuwaitLiveApiKey;
+          else if($store->currency->code == 'SAR')
+            $this->apiKey =  $this->saudiLiveApiKey;
+
+
+      } else {
+          $this->apiEndpoint = $this->testApiEndpoint;
+
+          if($store->currency->code == 'KWD')
+            $this->apiKey =  $this->kuwaitTestApiKey;
+          else if($store->currency->code == 'SAR')
+            $this->apiKey =  $this->saudiLiveApiKey;
+
+      }
+
+
         $createSupplierEndpoint = $this->apiEndpoint . "/CreateSupplier";
 
         $store_phone_number =  str_replace(' ','',(str_replace('+', '00',$store->owner_number)));
@@ -307,6 +347,28 @@ class MyFatoorahPayment extends Component
      */
     public function editSupplier($store)
     {
+
+      // Set the API key we're going to use
+      if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
+          $this->apiEndpoint = $this->liveApiEndpoint;
+
+          if($store->currency->code == 'KWD')
+            $this->apiKey =  $this->kuwaitLiveApiKey;
+          else if($store->currency->code == 'SAR')
+            $this->apiKey =  $this->saudiLiveApiKey;
+
+
+      } else {
+          $this->apiEndpoint = $this->testApiEndpoint;
+
+          if($store->currency->code == 'KWD')
+            $this->apiKey =  $this->kuwaitTestApiKey;
+          else if($store->currency->code == 'SAR')
+            $this->apiKey =  $this->saudiLiveApiKey;
+
+      }
+
+
         $editSupplierEndpoint = $this->apiEndpoint . "/EditSupplier";
 
         $store_phone_number =  str_replace(' ','',(str_replace('+', '00',$store->owner_number)));
@@ -341,6 +403,27 @@ class MyFatoorahPayment extends Component
    */
   public function createCharge($currency, $amount ,$firstName, $email, $country_code ,$phone, $redirectUrl, $orderUuid, $supplierCode , $platform_fee  , $paymentMethodId, $paymentMethodCode,$warehouse_fee = 0)
   {
+
+      // Set the API key we're going to use
+      if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
+          $this->apiEndpoint = $this->liveApiEndpoint;
+
+          if($currency == 'KWD')
+            $this->apiKey =  $this->kuwaitLiveApiKey;
+          else if($currency == 'SAR')
+            $this->apiKey =  $this->saudiLiveApiKey;
+
+
+      } else {
+          $this->apiEndpoint = $this->testApiEndpoint;
+
+          if($currency == 'KWD')
+            $this->apiKey =  $this->kuwaitTestApiKey;
+          else if($currency == 'SAR')
+            $this->apiKey =  $this->saudiLiveApiKey;
+
+      }
+
 
       $chargeEndpoint = $this->apiEndpoint . "/ExecutePayment";
 
@@ -441,7 +524,25 @@ class MyFatoorahPayment extends Component
             "CurrencyIso" => $currencyCode
           ];
 
+          // Set the API key we're going to use
+          if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
+              $this->apiEndpoint = $this->liveApiEndpoint;
 
+              if($currencyCode == 'KWD')
+                $this->apiKey =  $this->kuwaitLiveApiKey;
+              else if($currencyCode == 'SAR')
+                $this->apiKey =  $this->saudiLiveApiKey;
+
+
+          } else {
+              $this->apiEndpoint = $this->testApiEndpoint;
+
+              if($currencyCode == 'KWD')
+                $this->apiKey =  $this->kuwaitTestApiKey;
+              else if($currencyCode == 'SAR')
+                $this->apiKey =  $this->saudiLiveApiKey;
+
+          }
 
           $client = new Client();
           $response = $client->createRequest()
@@ -462,11 +563,30 @@ class MyFatoorahPayment extends Component
     /**
    * Make a Refund
    */
-  public function makeRefund($paymentId, $amount , $comment, $supplierCode)
+  public function makeRefund($paymentId, $amount , $comment, $supplierCode,$currency)
   {
 
       $refundEndpoint = $this->apiEndpoint . "/MakeSupplierRefund";
 
+
+      // Set the API key we're going to use
+      if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
+          $this->apiEndpoint = $this->liveApiEndpoint;
+
+          if($currency == 'KWD')
+            $this->apiKey =  $this->kuwaitLiveApiKey;
+          else if($currency == 'SAR')
+            $this->apiKey =  $this->saudiLiveApiKey;
+
+
+      } else {
+          $this->apiEndpoint = $this->testApiEndpoint;
+
+          if($currency == 'KWD')
+            $this->apiKey =  $this->kuwaitTestApiKey;
+          else if($currency == 'SAR')
+            $this->apiKey =  $this->saudiLiveApiKey;
+      }
 
       $refundParams = [
           "Key"=> $paymentId,
@@ -498,8 +618,29 @@ class MyFatoorahPayment extends Component
      * get the supplier dashboard
      * @param  string $chargeId
      */
-    public function getSupplierDashboard($supplierCode)
+    public function getSupplierDashboard($supplierCode, $currency)
     {
+
+
+        // Set the API key we're going to use
+        if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
+            $this->apiEndpoint = $this->liveApiEndpoint;
+
+            if($currency == 'KWD')
+              $this->apiKey =  $this->kuwaitLiveApiKey;
+            else if($currency == 'SAR')
+              $this->apiKey =  $this->saudiLiveApiKey;
+
+
+        } else {
+            $this->apiEndpoint = $this->testApiEndpoint;
+
+            if($currency == 'KWD')
+              $this->apiKey =  $this->kuwaitTestApiKey;
+            else if($currency == 'SAR')
+              $this->apiKey =  $this->saudiLiveApiKey;
+        }
+
         $client = new Client();
         $response = $client->createRequest()
                 ->setMethod('GET')
@@ -517,8 +658,30 @@ class MyFatoorahPayment extends Component
      * Check charge object for status updates
      * @param  string $chargeId
      */
-    public function retrieveCharge($paymentId, $keyType)
+    public function retrieveCharge($paymentId, $keyType,$currency)
     {
+
+
+        // Set the API key we're going to use
+        if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
+            $this->apiEndpoint = $this->liveApiEndpoint;
+
+            if($currency == 'KWD')
+              $this->apiKey =  $this->kuwaitLiveApiKey;
+            else if($currency == 'SAR')
+              $this->apiKey =  $this->saudiLiveApiKey;
+
+
+        } else {
+            $this->apiEndpoint = $this->testApiEndpoint;
+
+            if($currency == 'KWD')
+              $this->apiKey =  $this->kuwaitTestApiKey;
+            else if($currency == 'SAR')
+              $this->apiKey =  $this->saudiLiveApiKey;
+        }
+
+
 
         $chargeParams = [
           "Key" => $paymentId,

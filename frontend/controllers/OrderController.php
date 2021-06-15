@@ -355,10 +355,10 @@ class OrderController extends Controller {
 
             if (($payment = Payment::find()->where(['payment_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->one()) !== null) {
 
-              if($payment->payment_gateway == 'tap'){
+              if($payment->payment_gateway_name == 'tap'){
                 $transaction_id = $payment->payment_gateway_transaction_id;
                 Payment::updatePaymentStatusFromTap($transaction_id, true);
-              } else if ($payment->payment_gateway == 'myfatoorah'){
+              } else if ($payment->payment_gateway_name == 'myfatoorah'){
                 $invoice_id = $payment->payment_gateway_invoice_id;
                 Payment::updatePaymentStatusFromMyFatoorah($invoice_id, true);
               }

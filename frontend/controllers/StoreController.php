@@ -336,7 +336,7 @@ class StoreController extends Controller {
 
         $model = $this->findModel($id);
 
-        if(($model->country->iso == 'BH' || $model->currency->code == 'BHD' ) && $paymentGateway == 'myfatoorah')
+        if( $model->currency->code == 'BHD'  && $paymentGateway == 'myfatoorah')
           return $this->redirect(['setup-online-payments', 'storeUuid' => $model->restaurant_uuid]);
 
           if($model->currency->code != 'KWD')
@@ -622,7 +622,7 @@ class StoreController extends Controller {
 
         $model = $this->findModel($storeUuid);
 
-        if($model->country->iso == 'BH' || $model->currency->code == 'BHD'){
+        if($model->currency->code == 'BHD'){
           Yii::$app->session->setFlash('error','Contact us if you want to enable this option');
           return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
         }
@@ -685,14 +685,14 @@ class StoreController extends Controller {
 
         $model = $this->findModel($storeUuid);
 
-        if(($model->country->iso == 'BH' || $model->currency->code == 'BHD' ))
+        if($model->currency->code == 'BHD')
           return $this->redirect(['setup-online-payments', 'storeUuid' => $model->restaurant_uuid]);
 
-        if ($model->country->iso == 'KW'){
-          return $this->render('view-myfatoorah-rates', [
-                      'model' => $model
-          ]);
-        }
+
+        return $this->render('view-myfatoorah-rates', [
+                    'model' => $model
+        ]);
+
 
 
         return $this->redirect(['setup-online-payments', 'storeUuid' => $model->restaurant_uuid]);

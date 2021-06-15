@@ -595,13 +595,20 @@ class OrderController extends Controller {
     }
 
     /**
-     * Process callback from TAP payment gateway
-     * @param string $tap_id
+     * Process callback from My Fatoorah payment gateway
+     * @param string $paymentId
      * @return mixed
      */
     public function actionMyFatoorahCallback($paymentId) {
 
-            $response = Yii::$app->myFatoorahPayment->retrieveCharge($paymentId, 'PaymentId');
+            $model = Payment::find()->where(['payment_gateway_payment_id' => $paymentId])->one();
+  
+            if (!$model){
+              \Yii::error('[Payment Issue]' . 'Invalid payment id', __METHOD__); // Log error faced by user
+              throw new NotFoundHttpException('Invalid payment id');
+            }
+
+            $response = Yii::$app->myFatoorahPayment->retrieveCharge($paymentId, 'PaymentId',$model->currency->code);
 
             $responseContent = json_decode($response->content);
 
