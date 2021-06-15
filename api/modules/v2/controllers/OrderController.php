@@ -608,9 +608,15 @@ class OrderController extends Controller {
               throw new NotFoundHttpException('Invalid payment id');
             }
 
-            $response = Yii::$app->myFatoorahPayment->retrieveCharge($paymentId, 'PaymentId',$model->currency->code);
+            $response = Yii::$app->myFatoorahPayment->retrieveCharge($paymentId, 'PaymentId', 'KWD');
 
             $responseContent = json_decode($response->content);
+
+            if(!$responseContent->IsSuccess){
+              $response = Yii::$app->myFatoorahPayment->retrieveCharge($paymentId, 'PaymentId', 'SAR');
+              $responseContent = json_decode($response->content);
+            }
+
 
             if($responseContent->IsSuccess){
 
