@@ -254,7 +254,7 @@ class Payment extends \yii\db\ActiveRecord {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
-        $response = Yii::$app->myFatoorahPayment->retrieveCharge($invoiceId, 'InvoiceId');
+        $response = Yii::$app->myFatoorahPayment->retrieveCharge($invoiceId, 'InvoiceId',$paymentRecord->currency->code);
 
         $responseContent = json_decode($response->content);
 
