@@ -735,7 +735,7 @@ class OrderController extends Controller {
             if( $order_model->armada_order_status == 'en_route' ) // In delivery
                 $order_model->order_status = Order::STATUS_OUT_FOR_DELIVERY;
 
-            else if( $order_model->armada_order_status == 'complete' ) // Delivered
+            else if( $order_model->armada_order_status == 'completed' ) // Delivered
                 $order_model->order_status = Order::STATUS_COMPLETE;
 
 
