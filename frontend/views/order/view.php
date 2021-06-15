@@ -741,7 +741,7 @@ DetailView::widget([
                     return $data->payment->payment_gateway_transaction_id;
                 }
             },
-            'visible' => $model->payment_method_id != 3 && $model->payment_uuid && $data->payment->payment_gateway_name == 'tap',
+            'visible' => $model->payment_method_id != 3 && $model->payment_uuid && $model->payment->payment_gateway_name == 'tap',
         ],
         [
             'label' => 'Payment ID',
@@ -751,7 +751,7 @@ DetailView::widget([
                     return $data->payment->payment_gateway_payment_id;
                 }
             },
-            'visible' => $model->payment_method_id != 3 && $model->payment_uuid && $data->payment->payment_gateway_name == 'myfatoorah' && $data->payment->payment_gateway_payment_id,
+            'visible' => $model->payment_method_id != 3 && $model->payment_uuid && $model->payment->payment_gateway_name == 'myfatoorah' && $model->payment->payment_gateway_payment_id,
         ],
     ],
     'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
