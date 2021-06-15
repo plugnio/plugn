@@ -1302,6 +1302,510 @@ class Restaurant extends \yii\db\ActiveRecord
         }
     }
 
+    public function getTotalCustomersByWeek()
+    {
+        $customer_data = [];
+
+        $date_start = strtotime ('-6 days');//date('w')
+
+        for ($i = 0; $i < 7; $i++) {
+            $date = date ('Y-m-d', $date_start + ($i * 86400));
+
+            $customer_data[date ('w', strtotime ($date))] = array(
+                'day' => date ('D', strtotime ($date)),
+                'total' => 0
+            );
+        }
+
+        $rows = $this->getCustomers()
+            ->select(new Expression('customer_created_at, COUNT(*) as total'))
+            ->andWhere(new Expression("DATE(customer_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+            ->groupBy(new Expression('DAYNAME(customer_created_at)'))
+            ->asArray()
+            ->all();
+
+        foreach ($rows as $result) {
+            $customer_data[date ('w', strtotime ($result['customer_created_at']))] = array(
+                'day' => date ('D', strtotime ($result['customer_created_at'])),
+                'total' => $result['total']
+            );
+        }
+
+        $number_of_all_customer_gained = $this->getCustomers()
+            ->andWhere(new Expression("date(customer_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+            ->count();
+
+        return [
+            'customer_chart_data' => array_values($customer_data),
+            'number_of_all_customer_gained' => (int) $number_of_all_customer_gained
+        ];
+    }
+
+    public function getTotalRevenueByWeek()
+    {
+        $revenue_generated_chart_data = [];
+
+        $date_start = strtotime ('-6 days');//date('w')
+
+        for ($i = 0; $i < 7; $i++) {
+            $date = date ('Y-m-d', $date_start + ($i * 86400));
+
+            $revenue_generated_chart_data[date ('w', strtotime ($date))] = array(
+                'day' => date ('D', strtotime ($date)),
+                'total' => 0
+            );
+        }
+
+        $rows = $this->getOrders ()
+            ->activeOrders ($this->restaurant_uuid)
+            ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
+            ->andWhere (new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+            ->groupBy (new Expression('DAY(order.order_created_at)'))
+            ->asArray ()
+            ->all ();
+
+        foreach ($rows as $result) {
+            $revenue_generated_chart_data[date ('w', strtotime ($result['order_created_at']))] = array(
+                'day' => date ('D', strtotime ($result['order_created_at'])),
+                'total' => $result['total']
+            );
+        }
+
+        $number_of_all_revenue_generated = $this->getOrders()
+            ->activeOrders($this->restaurant_uuid)
+            ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+            ->sum('total_price');
+
+        return [
+            'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
+            'number_of_all_revenue_generated' => (int) $number_of_all_revenue_generated
+        ];
+    }
+
+    public function getTotalOrdersByWeek()
+    {
+        $orders_received_chart_data = [];
+
+        $date_start = strtotime ('-6 days');//date('w')
+
+        for ($i = 0; $i < 7; $i++) {
+            $date = date ('Y-m-d', $date_start + ($i * 86400));
+
+            $orders_received_chart_data[date ('w', strtotime ($date))] = array(
+                'day' => date ('D', strtotime ($date)),
+                'total' => 0
+            );
+        }
+
+        $rows = $this->getOrders ()
+            ->activeOrders ($this->restaurant_uuid)
+            ->select (new Expression('order_created_at, COUNT(*) as total'))
+            ->andWhere (new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+            ->groupBy (new Expression('DAY(order.order_created_at)'))
+            ->asArray ()
+            ->all ();
+
+        foreach ($rows as $result) {
+            $orders_received_chart_data[date ('w', strtotime ($result['order_created_at']))] = array(
+                'day' => date ('D', strtotime ($result['order_created_at'])),
+                'total' => $result['total']
+            );
+        }
+
+        $number_of_all_orders_received = $this->getOrders()
+            ->activeOrders($this->restaurant_uuid)
+            ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+            ->count();
+
+        return [
+            'orders_received_chart_data' => array_values ($orders_received_chart_data),
+            'number_of_all_orders_received' => (int) $number_of_all_orders_received
+        ];
+    }
+
+    public function getTotalSoldItemsByWeek()
+    {
+        $sold_item_chart_data = [];
+
+        $date_start = strtotime ('-6 days');//date('w')
+
+        for ($i = 0; $i < 7; $i++) {
+            $date = date ('Y-m-d', $date_start + ($i * 86400));
+
+            $sold_item_chart_data[date ('w', strtotime ($date))] = array(
+                'day' => date ('D', strtotime ($date)),
+                'total' => 0
+            );
+        }
+
+        $rows = $this->getSoldOrderItems ()
+            ->select ('order_item_created_at, SUM(order_item.qty) as total')
+            ->andWhere (new Expression("DATE(order_item_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+            ->groupBy (new Expression('DAY(order_item_created_at)'))
+            ->asArray ()
+            ->all ();
+
+        foreach ($rows as $result) {
+            $sold_item_chart_data[date ('w', strtotime ($result['order_item_created_at']))] = array(
+                'day' => date ('D', strtotime ($result['order_item_created_at'])),
+                'total' => $result['total']
+            );
+        }
+
+        $number_of_all_sold_item = $this->getSoldOrderItems()
+            ->andWhere(new Expression("DATE(order_item_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+            ->sum('order_item.qty');
+
+        return [
+            'sold_item_chart_data' => array_values($sold_item_chart_data),
+            'number_of_all_sold_item' => (int) $number_of_all_sold_item
+        ];
+    }
+
+    public function getTotalCustomersByMonth()
+    {
+        $customer_data = [];
+
+        $date_start = date('Y') . '-' . date('m', strtotime('-1 month')) . '-1';
+
+        for ($i = 1; $i <= date('t', strtotime($date_start)); $i++) {
+            $customer_data[$i] = array(
+                'day'   => $i,
+                'total' => 0
+            );
+        }
+
+        $rows = $this->getCustomers()
+            ->select(new Expression('customer_created_at, COUNT(*) as total'))
+            ->andWhere('
+                YEAR(customer_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND 
+                MONTH(customer_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->groupBy(new Expression('DAY(customer_created_at)'))
+            ->asArray()
+            ->all();
+
+        foreach ($rows as $result) {
+            $customer_data[date ('j', strtotime ($result['customer_created_at']))] = array(
+                'day' => (int) date ('j', strtotime ($result['customer_created_at'])),
+                'total' => $result['total']
+            );
+        }
+
+        $number_of_all_customer_gained = $this->getCustomers()
+            ->andWhere('
+                YEAR(customer_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND 
+                MONTH(customer_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->count();
+
+        return [
+            'customer_chart_data' => array_values($customer_data),
+            'number_of_all_customer_gained' => (int) $number_of_all_customer_gained
+        ];
+    }
+
+    public function getTotalRevenueByMonth()
+    {
+        $revenue_generated_chart_data = [];
+
+        $date_start = date('Y') . '-' . date('m', strtotime('-1 month')) . '-1';
+
+        for ($i = 1; $i <= date('t', strtotime($date_start)); $i++) {
+            $revenue_generated_chart_data[$i] = array(
+                'day'   => $i,
+                'total' => 0
+            );
+        }
+
+        $rows = $this->getOrders ()
+            ->activeOrders ($this->restaurant_uuid)
+            ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
+            ->andWhere('
+                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND 
+                MONTH(order.order_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->groupBy (new Expression('DAY(order.order_created_at)'))
+            ->asArray ()
+            ->all ();
+
+        foreach ($rows as $result) {
+            $revenue_generated_chart_data[date ('j', strtotime ($result['order_created_at']))] = array(
+                'day' => (int) date ('j', strtotime ($result['order_created_at'])),
+                'total' => $result['total']
+            );
+        }
+
+        $number_of_all_revenue_generated = $this->getOrders()
+            ->activeOrders($this->restaurant_uuid)
+            ->andWhere('
+                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND 
+                MONTH(order.order_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->sum('total_price');
+
+        return [
+            'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
+            'number_of_all_revenue_generated' => (int) $number_of_all_revenue_generated
+        ];
+    }
+
+    public function getTotalOrdersByMonth()
+    {
+        $orders_received_chart_data = [];
+
+        $date_start = date('Y') . '-' . date('m', strtotime('-1 month')) . '-1';
+
+        for ($i = 1; $i <= date('t', strtotime($date_start)); $i++) {
+            $orders_received_chart_data[$i] = array(
+                'day'   => $i,
+                'total' => 0
+            );
+        }
+
+        $rows = $this->getOrders ()
+            ->activeOrders ($this->restaurant_uuid)
+            ->select (new Expression('order_created_at, COUNT(*) as total'))
+            ->andWhere('
+                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND 
+                MONTH(order.order_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->groupBy (new Expression('DAY(order.order_created_at)'))
+            ->asArray ()
+            ->all ();
+
+        foreach ($rows as $result) {
+            $orders_received_chart_data[date ('j', strtotime ($result['order_created_at']))] = array(
+                'day' => (int) date ('j', strtotime ($result['order_created_at'])),
+                'total' => $result['total']
+            );
+        }
+
+        $number_of_all_orders_received = $this->getOrders()
+            ->activeOrders($this->restaurant_uuid)
+            ->andWhere('
+                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND 
+                MONTH(order.order_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->count();
+
+        return [
+            'orders_received_chart_data' => array_values ($orders_received_chart_data),
+            'number_of_all_orders_received' => (int) $number_of_all_orders_received
+        ];
+    }
+
+    public function getTotalSoldItemsByMonth()
+    {
+        $sold_item_chart_data = [];
+
+        $date_start = date('Y') . '-' . date('m', strtotime('-1 month')) . '-1';
+
+        for ($i = 1; $i <= date('t', strtotime($date_start)); $i++) {
+            $sold_item_chart_data[$i] = array(
+                'day'   => $i,
+                'total' => 0
+            );
+        }
+
+        $rows = $this->getSoldOrderItems ()
+            ->select ('order_item_created_at, SUM(order_item.qty) as total')
+            ->andWhere('
+                YEAR(`order_item_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND 
+                MONTH(`order_item_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->groupBy (new Expression('DATE(order_item_created_at)'))
+            ->asArray ()
+            ->all ();
+
+        foreach ($rows as $result) {
+            $sold_item_chart_data[date ('j', strtotime ($result['order_item_created_at']))] = array(
+                'day' => (int) date ('j', strtotime ($result['order_item_created_at'])),
+                'total' => $result['total']
+            );
+        }
+
+        $number_of_all_sold_item = $this->getSoldOrderItems()
+            ->andWhere('
+                YEAR(`order_item_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND 
+                MONTH(`order_item_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->sum('order_item.qty');
+
+        return [
+            'sold_item_chart_data' => array_values($sold_item_chart_data),
+            'number_of_all_sold_item' => (int) $number_of_all_sold_item
+        ];
+    }
+
+    public function getTotalCustomersByMonths($months)
+    {
+        //inclue current month
+        $months--;
+
+        $customer_data = [];
+
+        $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
+
+        for ($i = 0; $i <= $months; $i++) {
+
+            $month = date('m', strtotime('-'.($months - $i).' month'));
+
+            $customer_data[$month] = array(
+                'month'   => (int) $month,
+                'total' => 0
+            );
+        }
+
+        $rows = $this->getCustomers()
+            ->select(new Expression('customer_created_at, COUNT(*) as total'))
+            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'")')
+            ->groupBy(new Expression('MONTH(customer_created_at)'))
+            ->asArray()
+            ->all();
+
+        foreach ($rows as $result) {
+            $customer_data[date ('m', strtotime ($result['customer_created_at']))] = array(
+                'month' => (int) date ('m', strtotime ($result['customer_created_at'])),
+                'total' => $result['total']
+            );
+        }
+
+        $number_of_all_customer_gained = $this->getCustomers()
+            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'")')
+            ->count();
+
+        return [
+            'customer_chart_data' => array_values($customer_data),
+            'number_of_all_customer_gained' => (int) $number_of_all_customer_gained
+        ];
+    }
+
+    public function getTotalRevenueByMonths($months)
+    {
+        //inclue current month
+        $months--;
+
+        $revenue_generated_chart_data = [];
+
+        $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
+
+        for ($i = 0; $i <= $months; $i++) {
+
+            $month = date('m', strtotime('-'.($months - $i).' month'));
+
+            $revenue_generated_chart_data[$month] = array(
+                'month'   => (int) $month,
+                'total' => 0
+            );
+        }
+
+        $rows = $this->getOrders ()
+            ->activeOrders ($this->restaurant_uuid)
+            ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
+            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'")')
+            ->groupBy (new Expression('MONTH(order.order_created_at)'))
+            ->asArray ()
+            ->all ();
+
+        foreach ($rows as $result) {
+            $revenue_generated_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
+                'month' => (int) date ('m', strtotime ($result['order_created_at'])),
+                'total' => $result['total']
+            );
+        }
+
+        $number_of_all_revenue_generated = $this->getOrders()
+            ->activeOrders($this->restaurant_uuid)
+            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'")')
+            ->sum('total_price');
+
+        return [
+            'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
+            'number_of_all_revenue_generated' => (int) $number_of_all_revenue_generated
+        ];
+    }
+
+    public function getTotalOrdersByMonths($months)
+    {
+        //inclue current month
+        $months--;
+
+        $orders_received_chart_data = [];
+
+        $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
+
+        for ($i = 0; $i <= $months; $i++) {
+
+            $month = date('m', strtotime('-'.($months - $i).' month'));
+
+            $orders_received_chart_data[$month] = array(
+                'month'   => (int) $month,
+                'total' => 0
+            );
+        }
+
+        $rows = $this->getOrders ()
+            ->activeOrders ($this->restaurant_uuid)
+            ->select (new Expression('order_created_at, COUNT(*) as total'))
+            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'")')
+            ->groupBy (new Expression('MONTH(order.order_created_at)'))
+            ->asArray ()
+            ->all ();
+
+        foreach ($rows as $result) {
+            $orders_received_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
+                'month' => (int) date ('m', strtotime ($result['order_created_at'])),
+                'total' => $result['total']
+            );
+        }
+
+        $number_of_all_orders_received = $this->getOrders()
+            ->activeOrders($this->restaurant_uuid)
+            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'")')
+            ->count();
+
+        return [
+            'orders_received_chart_data' => array_values ($orders_received_chart_data),
+            'number_of_all_orders_received' => (int) $number_of_all_orders_received
+        ];
+    }
+
+    public function getTotalSoldItemsByMonths($months)
+    {
+        //inclue current month
+        $months--;
+
+        $sold_item_chart_data = [];
+
+        $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
+
+        for ($i = 0; $i <= $months; $i++) {
+
+            $month = date('m', strtotime('-'.($months - $i).' month'));
+
+            $sold_item_chart_data[$month] = array(
+                'month'   => (int) $month,
+                'total' => 0
+            );
+        }
+
+        $rows = $this->getSoldOrderItems ()
+            ->select ('order_item_created_at, SUM(order_item.qty) as total')
+            ->andWhere('DATE(`order_item_created_at`) >= DATE("'.$date_start.'")')
+            ->groupBy (new Expression('MONTH(order_item_created_at)'))
+            ->asArray ()
+            ->all ();
+
+        foreach ($rows as $result) {
+            $sold_item_chart_data[date ('m', strtotime ($result['order_item_created_at']))] = array(
+                'month' => (int) date ('m', strtotime ($result['order_item_created_at'])),
+                'total' => $result['total']
+            );
+        }
+
+        $number_of_all_sold_item = $this->getSoldOrderItems()
+            ->andWhere('DATE(`order_item_created_at`) >= DATE("'.$date_start.'")')
+            ->sum('order_item.qty');
+
+        return [
+            'sold_item_chart_data' => array_values($sold_item_chart_data),
+            'number_of_all_sold_item' => (int) $number_of_all_sold_item
+        ];
+    }
+
     /**
      * Gets query for [[Items]].
      *
