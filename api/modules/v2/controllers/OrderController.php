@@ -604,7 +604,7 @@ class OrderController extends Controller {
             $model = Payment::find()->where(['payment_gateway_payment_id' => $paymentId])->one();
 
             if (!$model){
-              \Yii::error('[Payment Issue]' . 'Invalid payment id => '. $paymentId), __METHOD__); // Log error faced by user
+              \Yii::error('[Payment Issue]' . 'Invalid payment id => '. $paymentId, __METHOD__); // Log error faced by user
               throw new NotFoundHttpException('Invalid payment id');
             }
 
