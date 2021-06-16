@@ -10,9 +10,11 @@ use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use common\models\Store;
 
-class StoreController extends Controller {
+class StoreController extends Controller
+{
 
-    public function behaviors() {
+    public function behaviors()
+    {
         $behaviors = parent::behaviors();
 
         // remove authentication filter for cors to work
@@ -37,19 +39,20 @@ class StoreController extends Controller {
         ];
 
         // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-              $behaviors['authenticator'] = [
-                  'class' => \yii\filters\auth\HttpBearerAuth::className(),
-              ];
-              // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-              $behaviors['authenticator']['except'] = ['options'];
+        $behaviors['authenticator'] = [
+            'class' => \yii\filters\auth\HttpBearerAuth::className(),
+        ];
+        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+        $behaviors['authenticator']['except'] = ['options'];
 
-              return $behaviors;
+        return $behaviors;
     }
 
     /**
      * @inheritdoc
      */
-    public function actions() {
+    public function actions()
+    {
         $actions = parent::actions();
         $actions['options'] = [
             'class' => 'yii\rest\OptionsAction',
@@ -64,17 +67,19 @@ class StoreController extends Controller {
      * Return an overview of the store details
      * @param type $store_uuid
      */
-    public function actionDetail($store_uuid) {
-      if ($store = Yii::$app->accountManager->getManagedAccount($store_uuid)) {
-          return Restaurant::findOne($store_uuid);
-      }
+    public function actionDetail($store_uuid)
+    {
+        if ($store = Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+            return Restaurant::findOne($store_uuid);
+        }
     }
 
     /**
      * Return an overview of the store details
      * @param type $store_uuid
      */
-    public function actionUpdate($store_uuid) {
+    public function actionUpdate($store_uuid)
+    {
         if ($store = Yii::$app->accountManager->getManagedAccount($store_uuid)) {
             $store->country_id = Yii::$app->request->getBodyParam('country_id');
             $store->restaurant_email_notification = Yii::$app->request->getBodyParam('email_notification');
@@ -87,17 +92,68 @@ class StoreController extends Controller {
             $store->restaurant_email = Yii::$app->request->getBodyParam('store_email');
             $store->tagline = Yii::$app->request->getBodyParam('tagline');
             $store->tagline_ar = Yii::$app->request->getBodyParam('tagline_ar');
+
             if (!$store->save()) {
                 return [
-                    'operation'=>'error',
-                    'message'=>$store->getErrors()
+                    'operation' => 'error',
+                    'message' => $store->getErrors()
                 ];
             }
 
             return [
-                'operation'=>'success',
-                'message'=>'Store details updated successfully'
+                'operation' => 'success',
+                'message' => 'Store details updated successfully'
             ];
         }
+    }
+
+
+    /**
+     * Displays  Real time orders
+     *
+     * @return mixed
+     */
+    public function actionConnectDomain()
+    {
+        $domain = Yii::$app->request->getBodyParam('domain');
+
+        $store = Yii::$app->accountManager->getManagedAccount();
+
+        if ($store->restaurant_domain == $domain) {
+            return [
+                'operation' => 'error',
+                'message' => 'New domain can not be same as old domain'
+            ];
+        }
+
+        $old_domain = $store->restaurant_domain;
+
+        $store->setScenario(Restaurant::SCENARIO_CONNECT_DOMAIN);
+
+        $store->restaurant_domain = rtrim($domain, '/');
+
+        if (!$store->save()) {
+            return [
+                'operation' => 'error',
+                'message' => $store->getErrors()
+            ];
+        }
+
+        \Yii::$app->mailer->compose([
+                'html' => 'domain-update-request',
+            ], [
+                'store_name' => $store->name,
+                'new_domain' => $store->restaurant_domain,
+                'old_domain' => $old_domain
+            ])
+            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+            ->setTo(Yii::$app->params['supportEmail'])
+            ->setSubject('[Plugn] Agent updated DN')
+            ->send();
+
+        return [
+            'operation' => 'success',
+            "message" => "Congratulations you have successfully changed your domain name"
+        ];
     }
 }
