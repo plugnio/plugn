@@ -90,9 +90,7 @@ class OrderController extends Controller {
             return new ActiveDataProvider([
                 'query' => $pendingOrders
             ]);
-
       }
-
     }
 
 
