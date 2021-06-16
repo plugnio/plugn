@@ -114,4 +114,11 @@ class Option extends \yii\db\ActiveRecord {
         return $this->hasOne(Item::className(), ['item_uuid' => 'item_uuid']);
     }
 
+    public function extraFields()
+    {
+        return [
+            'extraOptions'
+        ];
+    }
+
 }
