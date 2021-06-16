@@ -345,8 +345,10 @@ return [
                     'patterns' => [
                         'GET' => 'detail',
                         'POST' => 'update',
+                        'POST connect-domain' => 'connect-domain',
                         // OPTIONS VERBS
-                        'OPTIONS' => 'options'
+                        'OPTIONS' => 'options',
+                        'OPTIONS connect-domain' => 'options',
                     ]
                 ],
 

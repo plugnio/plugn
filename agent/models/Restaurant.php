@@ -13,6 +13,7 @@ class Restaurant extends \common\models\Restaurant {
         $fields['store_email'] = function($model) {
             return $model->restaurant_email;
         };
+
         return $fields;
     }
 

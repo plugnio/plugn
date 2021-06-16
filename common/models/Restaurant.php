@@ -142,10 +142,10 @@ class Restaurant extends \yii\db\ActiveRecord
     const STORE_LAYOUT_GRID_HALFWIDTH = 5;
     const STORE_LAYOUT_CATEGORY_HALFWIDTH = 6;
 
-
     const SCENARIO_CREATE_STORE_BY_AGENT = 'create-by-agent';
     const SCENARIO_CREATE_TAP_ACCOUNT = 'tap_account';
     const SCENARIO_UPLOAD_STORE_DOCUMENT = 'upload';
+    const SCENARIO_CONNECT_DOMAIN = 'domain';
 
     public $restaurant_delivery_area;
     public $restaurant_payments_method;
@@ -174,7 +174,6 @@ class Restaurant extends \yii\db\ActiveRecord
         return [
             [['owner_first_name', 'owner_last_name', 'owner_email', 'owner_number'], 'required', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
 
-
             [
                 [
                     'vendor_sector', 'iban', 'company_name', 'business_type'
@@ -187,7 +186,6 @@ class Restaurant extends \yii\db\ActiveRecord
                 ],
                 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT
             ],
-
 
             [['commercial_license_file', 'authorized_signature_file'], 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function ($model) {
                 return $model->business_type == 'corp';
@@ -268,6 +266,29 @@ class Restaurant extends \yii\db\ActiveRecord
             [['tap_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => TapQueue::className (), 'targetAttribute' => ['tap_queue_id' => 'tap_queue_id']],
             [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className (), 'targetAttribute' => ['country_id' => 'country_id']],
             [['currency_id'], 'exist', 'skipOnError' => true, 'targetClass' => Currency::className (), 'targetAttribute' => ['currency_id' => 'currency_id']],
+        ];
+    }
+
+    public function scenarios()
+    {
+        return [
+            self::SCENARIO_CONNECT_DOMAIN => ['restaurant_domain'],
+            self::SCENARIO_CREATE_STORE_BY_AGENT => [
+                'name', 'owner_number', 'restaurant_domain', 'currency_id', 'country_id'
+            ],
+            self::SCENARIO_CREATE_TAP_ACCOUNT => [
+                'owner_first_name', 'owner_last_name', 'owner_email', 'owner_number',
+                'vendor_sector', 'iban', 'company_name', 'business_type',
+                'identification_file_id_back_side', 'identification_file_id_front_side',
+                'authorized_signature_file_id', 'commercial_license_file_id',
+                'iban', 'authorized_signature_issuing_date', 'authorized_signature_expiry_date',
+                'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date',
+                'identification_expiry_date'],
+            self::SCENARIO_UPLOAD_STORE_DOCUMENT => [
+                'commercial_license_file', 'authorized_signature_file', 'identification_file_front_side',
+                'identification_file_back_side', 'restaurant_commercial_license_file', 'owner_identification_file_front_side',
+                'owner_identification_file_back_side', 'restaurant_authorized_signature_file',
+            ]
         ];
     }
 
@@ -856,9 +877,9 @@ class Restaurant extends \yii\db\ActiveRecord
         unset($fields['owner_last_name']);
         unset($fields['owner_email']);
         unset($fields['owner_number']);
-        unset($fields['has_deployed']);
-        unset($fields['tap_queue_id']);
-        unset($fields['is_tap_enable']);
+        //unset($fields['has_deployed']);
+        //unset($fields['tap_queue_id']);
+        //unset($fields['is_tap_enable']);
         unset($fields['company_name']);
         unset($fields['owner_phone_country_code']);
         unset($fields['identification_issuing_date']);
