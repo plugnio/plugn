@@ -216,7 +216,6 @@ class DeliveryZoneController extends Controller
         ];
     }
 
-
     /**
      * Finds the Delivery zone model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
@@ -234,6 +233,4 @@ class DeliveryZoneController extends Controller
             throw new NotFoundHttpException('The requested record does not exist.');
         }
     }
-
-
 }
