@@ -37,7 +37,9 @@ class Item extends \common\models\Item {
 
     /**
      * Upload item image  to Cloudinary
-     * @param type $images
+     * @param $images
+     * @return array|false
+     * @throws \yii\base\Exception
      */
     public function saveItemImages($images)
     {

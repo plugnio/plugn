@@ -2,7 +2,10 @@
 
 namespace agent\modules\v1\controllers;
 
+use common\models\ExtraOption;
+use common\models\Option;
 use Yii;
+use yii\base\BaseObject;
 use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
@@ -128,30 +131,74 @@ class ItemController extends Controller
         $model->stock_qty = Yii::$app->request->getBodyParam ("stock_qty");
         $model->items_category = Yii::$app->request->getBodyParam ("itemCategories");
         $model->item_images = Yii::$app->request->getBodyParam ("itemImages");
-
-        if (!$model->save ()) {
-            if (isset($model->errors)) {
+        $itemOptions = Yii::$app->request->getBodyParam('itemOptions');
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            if (!$model->save()) {
+                $transaction->rollBack();
                 return [
                     "operation" => "error",
                     "message" => $model->errors
                 ];
             }
+
+            if ($itemOptions && count($itemOptions) > 0) {
+                foreach ($itemOptions as $option) {
+                    $optionModel = new Option();
+                    $optionModel->item_uuid = $model->item_uuid;
+                    $optionModel->option_name = $option['option_name'];
+                    $optionModel->option_name_ar = $option['option_name_ar'];
+                    $optionModel->max_qty = $option['max_qty'];
+                    $optionModel->min_qty = $option['min_qty'];
+                    if (!$optionModel->save()) {
+                        $transaction->rollBack();
+                        return [
+                            "operation" => "error",
+                            "message" => $optionModel->errors
+                        ];
+                    }
+
+                    if ($option['optionExtra'] && count($option['optionExtra']) > 0) {
+                        foreach ($option['optionExtra'] as $extraOption) {
+                            $extraOptionModel = new ExtraOption();
+                            $extraOptionModel->option_id = $optionModel->option_id;
+                            $extraOptionModel->extra_option_name = $extraOption['extra_option_name'];
+                            $extraOptionModel->extra_option_name_ar = $extraOption['extra_option_name_ar'];
+                            $extraOptionModel->extra_option_price = $extraOption['extra_option_price'];
+                            $extraOptionModel->stock_qty = $extraOption['stock_qty'];
+                            if (!$extraOptionModel->save()) {
+                                $transaction->rollBack();
+                                return [
+                                    "operation" => "error",
+                                    "message" => $extraOptionModel->errors
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+
+            // save images
+            $itemImages = Yii::$app->request->getBodyParam ("itemImages");
+            $model->saveItemImages($itemImages);
+
+            //save categories
+            $itemCategories = Yii::$app->request->getBodyParam ("itemCategories");
+            $arrCategoryIds = ArrayHelper::getColumn ($itemCategories, 'category_id');
+            $model->saveItemsCategory($arrCategoryIds);
+
+            $transaction->commit();
+            return [
+                "operation" => "success",
+                "message" => "Item created successfully",
+            ];
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            return [
+                "operation" => "error",
+                "message" => $e->getMessage()
+            ];
         }
-
-        // save images
-        $itemImages = Yii::$app->request->getBodyParam ("itemImages");
-        $data[] = $model->saveItemImages($itemImages);
-
-        //save categories
-        $itemCategories = Yii::$app->request->getBodyParam ("itemCategories");
-        $arrCategoryIds = ArrayHelper::getColumn ($itemCategories, 'category_id');
-        $model->saveItemsCategory($arrCategoryIds);
-
-        return [
-            "operation" => "success",
-            "message" => "Item created successfully",
-            "image" => $data
-        ];
     }
 
     /**
