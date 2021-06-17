@@ -1910,7 +1910,6 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getAvailableAreas()
     {
-
         return $this->hasMany (AreaDeliveryZone::className (), ['restaurant_uuid' => 'restaurant_uuid'])
             ->where (['is', 'area_delivery_zone.area_id', null]);
     }
@@ -1943,7 +1942,8 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getPaymentMethods()
     {
-        return $this->hasMany (PaymentMethod::className (), ['payment_method_id' => 'payment_method_id'])->viaTable ('restaurant_payment_method', ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany (PaymentMethod::className (), ['payment_method_id' => 'payment_method_id'])
+            ->viaTable ('restaurant_payment_method', ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**

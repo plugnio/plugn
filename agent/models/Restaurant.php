@@ -17,4 +17,13 @@ class Restaurant extends \common\models\Restaurant {
         return $fields;
     }
 
+    public function extraFields()
+    {
+        $fields = parent::extraFields ();
+
+        return array_merge ($fields, [
+            'restaurantPaymentMethods',
+            'activeSubscription'
+        ]);
+    }
 }
