@@ -2,17 +2,16 @@
 
 namespace agent\modules\v1\controllers;
 
+use Yii;
+use yii\rest\Controller;
+use yii\data\ActiveDataProvider;
+use yii\web\NotFoundHttpException;
+use common\models\Store;
 use agent\models\Restaurant;
 use common\components\FileUploader;
 use common\models\RestaurantPaymentMethod;
 use common\models\TapQueue;
-use Yii;
-use yii\base\BaseObject;
-use yii\rest\Controller;
-use yii\data\ActiveDataProvider;
-use yii\helpers\Url;
-use yii\web\NotFoundHttpException;
-use common\models\Store;
+
 
 class StoreController extends Controller
 {
@@ -158,16 +157,13 @@ class StoreController extends Controller
         ];
     }
 
-    //-- convert to API --//
-
     /**
      * Disable payment method
      * @return mixed
      */
-    public function actionDisablePaymentMethod($storeUuid, $paymentMethodId)
+    public function actionDisablePaymentMethod($id, $paymentMethodId)
     {
-
-        $model = $this->findModel($storeUuid);
+        $model = $this->findModel($id);
 
         RestaurantPaymentMethod::deleteAll([
             'restaurant_uuid' => $model->restaurant_uuid,
@@ -184,10 +180,9 @@ class StoreController extends Controller
      * Enable payment method
      * @return mixed
      */
-    public function actionEnablePaymentMethod($storeUuid, $paymentMethodId)
+    public function actionEnablePaymentMethod($id, $paymentMethodId)
     {
-
-        $model = $this->findModel($storeUuid);
+        $model = $this->findModel($id);
 
         $method = new RestaurantPaymentMethod();
         $method->payment_method_id = $paymentMethodId;
@@ -210,10 +205,9 @@ class StoreController extends Controller
      * View payment settings page
      * @return mixed
      */
-    public function actionViewPaymentMethods($storeUuid)
+    public function actionViewPaymentMethods($id)
     {
-
-        $model = $this->findModel($storeUuid);
+        $model = $this->findModel($id);
 
         $query = $model->getPaymentMethods();
 
@@ -229,7 +223,6 @@ class StoreController extends Controller
      */
     public function actionCreateTapAccount($id)
     {
-
         $model = $this->findModel($id);
 
         $model->setScenario(Restaurant::SCENARIO_CREATE_TAP_ACCOUNT);
@@ -374,9 +367,9 @@ class StoreController extends Controller
     /**
      *  Enable OnlinePayment on delivery
      */
-    public function actionEnableOnlinePayment($storeUuid)
+    public function actionEnableOnlinePayment($id)
     {
-        $model = $this->findModel($storeUuid);
+        $model = $this->findModel($id);
 
         $transaction = Yii::$app->db->beginTransaction();
 
@@ -429,10 +422,9 @@ class StoreController extends Controller
     /**
      *  Disable OnlinePayment on delivery
      */
-    public function actionDisableOnlinePayment($storeUuid)
+    public function actionDisableOnlinePayment($id)
     {
-
-        $model = $this->findModel($storeUuid);
+        $model = $this->findModel($id);
 
         $payments = $model->getRestaurantPaymentMethods()
             ->where(['<>', 'payment_method_id', 3])
