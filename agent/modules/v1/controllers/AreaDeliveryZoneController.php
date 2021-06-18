@@ -8,9 +8,9 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use common\models\DeliveryZone;
-use common\models\Area;
-use common\models\AreaDeliveryZone;
+use agent\models\DeliveryZone;
+use agent\models\Area;
+use agent\models\AreaDeliveryZone;
 
 
 class AreaDeliveryZoneController extends Controller {

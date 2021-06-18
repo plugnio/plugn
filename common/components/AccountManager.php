@@ -6,7 +6,8 @@ use Yii;
 use yii\base\BaseObject;
 use yii\base\InvalidParamException;
 use yii\web\NotFoundHttpException;
-use common\models\Restaurant;
+use agent\models\Restaurant;
+
 
 /**
  * AccountManager is a component that holds a list of Restaurants this agent owns

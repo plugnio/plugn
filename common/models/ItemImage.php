@@ -48,7 +48,6 @@ class ItemImage extends \yii\db\ActiveRecord
         ];
     }
 
-
     public function beforeDelete()
     {
         $this->deleteItemImageFromCloudinary();
@@ -70,15 +69,14 @@ class ItemImage extends \yii\db\ActiveRecord
         }
     }
 
-
     /**
      * Gets query for [[ItemUu]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItem()
+    public function getItem($modelClass = "\common\models\Item")
     {
-        return $this->hasOne(Item::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -86,8 +84,9 @@ class ItemImage extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
+    public function getRestaurant($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('item');
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->via('item');
     }
 }

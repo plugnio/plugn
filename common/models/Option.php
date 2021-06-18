@@ -101,7 +101,7 @@ class Option extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getExtraOptions() {
+    public function getExtraOptions($modelClass = "\common\models\Restaurant") {
         return $this->hasMany(ExtraOption::className(), ['option_id' => 'option_id']);
     }
 
@@ -110,8 +110,8 @@ class Option extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItem() {
-        return $this->hasOne(Item::className(), ['item_uuid' => 'item_uuid']);
+    public function getItem($modelClass = "\common\models\Item") {
+        return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid']);
     }
 
     public function extraFields()

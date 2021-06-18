@@ -5,9 +5,8 @@ namespace agent\modules\v1\controllers;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use common\models\Voucher;
+use agent\models\Voucher;
 
 class VoucherController extends Controller {
 

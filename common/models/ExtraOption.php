@@ -97,7 +97,6 @@ class ExtraOption extends \yii\db\ActiveRecord {
         }
     }
 
-
     /**
      * decrease stock_qty
      * @param type $qty
@@ -109,7 +108,6 @@ class ExtraOption extends \yii\db\ActiveRecord {
           $this->save(false);
         }
     }
-
 
     public function beforeSave($insert) {
         if ($this->extra_option_price == null) {
@@ -125,14 +123,13 @@ class ExtraOption extends \yii\db\ActiveRecord {
         ];
     }
 
-
     /**
      * Gets query for [[Option]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOption() {
-        return $this->hasOne(Option::className(), ['option_id' => 'option_id']);
+    public function getOption($modelClass = "\common\models\Option") {
+        return $this->hasOne($modelClass::className(), ['option_id' => 'option_id']);
     }
 
     /**
@@ -140,8 +137,8 @@ class ExtraOption extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItem() {
-        return $this->hasOne(Item::className(), ['item_uuid' => 'item_uuid'])->via('option');
+    public function getItem($modelClass = "\common\models\Item") {
+        return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid'])->via('option');
     }
 
     /**
@@ -149,8 +146,7 @@ class ExtraOption extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderItemExtraOptions() {
-        return $this->hasMany(OrderItemExtraOption::className(), ['extra_option_id' => 'extra_option_id']);
+    public function getOrderItemExtraOptions($modelClass = "\common\models\OrderItemExtraOption") {
+        return $this->hasMany($modelClass::className(), ['extra_option_id' => 'extra_option_id']);
     }
-
 }

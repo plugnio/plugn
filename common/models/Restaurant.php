@@ -5,10 +5,9 @@ namespace common\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
-use yii\db\ActiveRecord;
 use yii\behaviors\AttributeBehavior;
-use common\models\WebLink;
 use borales\extensions\phoneInput\PhoneInputValidator;
+
 
 /**
  * This is the model class for table "restaurant".
@@ -1782,36 +1781,36 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItems()
+    public function getItems($modelClass = "\common\models\Item")
     {
-        return $this->hasMany (Item::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Get Agent Assignment Records
      * @return \yii\db\ActiveQuery
      */
-    public function getAgentAssignments()
+    public function getAgentAssignments($modelClass = "\common\models\AgentAssignment")
     {
-        return $this->hasMany (AgentAssignment::className (), ['restaurant_uuid' => 'restaurant_uuid'])->with ('agent');
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])->with ('agent');
     }
 
     /**
      * Get Agents assigned to this Restaurant
      * @return \yii\db\ActiveQuery
      */
-    public function getAgents()
+    public function getAgents($modelClass = "\common\models\Agent")
     {
-        return $this->hasMany (Agent::className (), ['agent_id' => 'agent_id'])
+        return $this->hasMany ($modelClass::className (), ['agent_id' => 'agent_id'])
             ->via ('agentAssignments');
     }
 
     /**
      * Return owner of this store
      */
-    public function getOwnerAgent()
+    public function getOwnerAgent($modelClass = "\common\models\Agent")
     {
-        return $this->hasMany (Agent::className (), ['agent_id' => 'agent_id'])
+        return $this->hasMany ($modelClass::className (), ['agent_id' => 'agent_id'])
             ->via ('agentAssignments', function ($query) {
                 return $query->andWhere (['agent_assignment.role' => AgentAssignment::AGENT_ROLE_OWNER]);
             });
@@ -1822,9 +1821,9 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getSubscriptions()
+    public function getSubscriptions($modelClass = "\common\models\Subscription")
     {
-        return $this->hasMany (Subscription::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -1832,9 +1831,10 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getActiveSubscription()
+    public function getActiveSubscription($modelClass = "\common\models\Subscription")
     {
-        return $this->hasOne (Subscription::className (), ['restaurant_uuid' => 'restaurant_uuid'])->where (['subscription_status' => Subscription::STATUS_ACTIVE]);
+        return $this->hasOne ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->where (['subscription_status' => Subscription::STATUS_ACTIVE]);
     }
 
     /**
@@ -1842,10 +1842,9 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPlan()
+    public function getPlan($modelClass = "\common\models\Plan")
     {
-
-        return $this->hasOne (Plan::className (), ['plan_id' => 'plan_id'])
+        return $this->hasOne ($modelClass::className (), ['plan_id' => 'plan_id'])
             ->via ('subscriptions', function ($query) {
                 return $query->andWhere (['subscription.subscription_status' => Subscription::STATUS_ACTIVE]);
             });
@@ -1856,9 +1855,9 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantDeliveryAreas()
+    public function getRestaurantDeliveryAreas($modelClass = "\common\models\RestaurantDelivery")
     {
-        return $this->hasMany (RestaurantDelivery::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -1866,9 +1865,9 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getAvailableAreas()
+    public function getAvailableAreas($modelClass = "\common\models\AreaDeliveryZone")
     {
-        return $this->hasMany (AreaDeliveryZone::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
             ->where (['is', 'area_delivery_zone.area_id', null]);
     }
 
@@ -1877,9 +1876,9 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantBranches()
+    public function getRestaurantBranches($modelClass = "\common\models\RestaurantBranch")
     {
-        return $this->hasMany (RestaurantBranch::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -1887,20 +1886,19 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantPaymentMethods()
+    public function getRestaurantPaymentMethods($modelClass = "\common\models\RestaurantPaymentMethod")
     {
-        return $this->hasMany (RestaurantPaymentMethod::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-
 
     /**
      * Gets query for [[PaymentMethods]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPaymentMethods()
+    public function getPaymentMethods($modelClass = "\common\models\PaymentMethod")
     {
-        return $this->hasMany (PaymentMethod::className (), ['payment_method_id' => 'payment_method_id'])
+        return $this->hasMany ($modelClass::className (), ['payment_method_id' => 'payment_method_id'])
             ->viaTable ('restaurant_payment_method', ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
@@ -1909,9 +1907,9 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOpeningHours()
+    public function getOpeningHours($modelClass = "\common\models\OpeningHour")
     {
-        return $this->hasMany (OpeningHour::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -1919,9 +1917,9 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrders()
+    public function getOrders($modelClass = "\common\models\Order")
     {
-        return $this->hasMany (Order::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -1929,9 +1927,9 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getActiveOrders()
+    public function getActiveOrders($modelClass = "\common\models\Order")
     {
-        return $this->hasMany (Order::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
             ->activeOrders ($this->restaurant_uuid);;
     }
 
@@ -1940,9 +1938,9 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderItems()
+    public function getOrderItems($modelClass = "\common\models\OrderItem")
     {
-        return $this->hasMany (OrderItem::className (), ['order_uuid' => 'order_uuid'])
+        return $this->hasMany ($modelClass::className (), ['order_uuid' => 'order_uuid'])
             //->via('orders');
             ->via ('activeOrders')
             ->joinWith ('order');
@@ -1953,50 +1951,46 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getSoldOrderItems()
+    public function getSoldOrderItems($modelClass = "\common\models\OrderItem")
     {
-        return $this->hasMany (OrderItem::className (), ['order_uuid' => 'order_uuid'])
+        return $this->hasMany ($modelClass::className (), ['order_uuid' => 'order_uuid'])
             //->via('orders');
             ->via ('activeOrders');
     }
-
 
     /**
      * Gets query for [[Orders]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getStoreRevenue($start_date, $end_date)
+    public function getStoreRevenue($start_date, $end_date, $modelClass = "\common\models\Order")
     {
-
-        return $this->hasMany (Order::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
             ->activeOrders ($this->restaurant_uuid)
             ->andWhere (['between', 'order.order_created_at', $start_date, $end_date])
             ->sum ('total_price');
     }
 
-
     /**
      * Gets query for [[Orders]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrdersReceived($start_date, $end_date)
+    public function getOrdersReceived($start_date, $end_date, $modelClass = "\common\models\Order")
     {
-
-        return $this->hasMany (Order::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
             ->ordersReceived ($this->restaurant_uuid, $start_date, $end_date);
     }
-
 
     /**
      * Gets query for [[Vouchers]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getVouchers()
+    public function getVouchers($modelClass = "\common\models\Voucher")
     {
-        return $this->hasMany (Voucher::className (), ['restaurant_uuid' => 'restaurant_uuid'])->with ('bank');
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->with ('bank');
     }
 
     /**
@@ -2004,21 +1998,19 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCustomers()
+    public function getCustomers($modelClass = "\common\models\Customer")
     {
-        return $this->hasMany (Customer::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-
 
     /**
      * Gets query for [[Customers]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCustomerGained($start_date, $end_date)
+    public function getCustomerGained($start_date, $end_date, $modelClass = "\common\models\Customer")
     {
-
-        return $this->hasMany (Customer::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
             ->customerGained ($this->restaurant_uuid, $start_date, $end_date);
     }
 
@@ -2027,9 +2019,9 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRefunds()
+    public function getRefunds($modelClass = "\common\models\Refund")
     {
-        return $this->hasMany (Refund::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -2037,9 +2029,9 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getQueues()
+    public function getQueues($modelClass = "\common\models\Queue")
     {
-        return $this->hasMany (Queue::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -2047,31 +2039,29 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantTheme()
+    public function getRestaurantTheme($modelClass = "\common\models\RestaurantTheme")
     {
-        return $this->hasOne (RestaurantTheme::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasOne ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-
 
     /**
      * Gets query for [[TapQueue]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getTapQueue()
+    public function getTapQueue($modelClass = "\common\models\TapQueue")
     {
-        return $this->hasOne (TapQueue::className (), ['tap_queue_id' => 'tap_queue_id']);
+        return $this->hasOne ($modelClass::className (), ['tap_queue_id' => 'tap_queue_id']);
     }
-
 
     /**
      * Gets query for [[WebLinks]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getWebLinks()
+    public function getWebLinks($modelClass = "\common\models\WebLink")
     {
-        return $this->hasMany (WebLink::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -2079,42 +2069,40 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getStoreWebLinks()
+    public function getStoreWebLinks($modelClass = "\common\models\StoreWebLink")
     {
-        return $this->hasMany (StoreWebLink::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-
 
     /**
      * Gets query for [[BusinessLocations]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCountryDeliveryZones($countryId)
+    public function getCountryDeliveryZones($countryId, $modelClass = "\common\models\DeliveryZone")
     {
-        return $this->hasMany (DeliveryZone::className (), ['restaurant_uuid' => 'restaurant_uuid'])->where (['country_id' => $countryId]);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])->where (['country_id' => $countryId]);
     }
-
 
     /**
      * Gets query for [[BusinessLocations]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getBusinessLocations()
+    public function getBusinessLocations($modelClass = "\common\models\BusinessLocation")
     {
-        return $this->hasMany (BusinessLocation::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-
 
     /**
      * Gets query for [[BusinessLocations]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPickupBusinessLocations()
+    public function getPickupBusinessLocations($modelClass = "\common\models\BusinessLocation")
     {
-        return $this->hasMany (BusinessLocation::className (), ['restaurant_uuid' => 'restaurant_uuid'])->where (['support_pick_up' => 1]);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->where (['support_pick_up' => 1]);
     }
 
     /**
@@ -2122,11 +2110,10 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getDeliveryZones()
+    public function getDeliveryZones($modelClass = "\common\models\DeliveryZone")
     {
-        return $this->hasMany (DeliveryZone::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-
 
     // /**
     //  * Gets query for [[BusinessLocations]].
@@ -2139,16 +2126,17 @@ class Restaurant extends \yii\db\ActiveRecord
     //       ->viaTable('business_location', ['restaurant_uuid' => 'restaurant_uuid']);
     // }
 
-
     /**
      * Gets query for [[BusinessLocations]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getAreaDeliveryZonesForSpecificCountry($countryId)
+    public function getAreaDeliveryZonesForSpecificCountry($countryId, $modelClass = "\common\models\AreaDeliveryZone")
     {
-        return $this->hasMany (AreaDeliveryZone::className (), ['delivery_zone_id' => 'delivery_zone_id'])->via ('deliveryZones')
-            ->where (['delivery_zone.country_id' => $countryId])->joinWith (['deliveryZone', 'city']);
+        return $this->hasMany ($modelClass::className (), ['delivery_zone_id' => 'delivery_zone_id'])
+            ->via ('deliveryZones')
+            ->where (['delivery_zone.country_id' => $countryId])
+            ->joinWith (['deliveryZone', 'city']);
     }
 
     /**
@@ -2156,31 +2144,29 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getAreas()
+    public function getAreas($modelClass = "\common\models\Area")
     {
-        return $this->hasMany (Area::className (), ['area_id' => 'area_id'])->via ('areaDeliveryZones');
+        return $this->hasMany ($modelClass::className (), ['area_id' => 'area_id'])->via ('areaDeliveryZones');
     }
-
 
     /**
      * Gets query for [[AreaDeliveryZones]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getAreaDeliveryZones()
+    public function getAreaDeliveryZones($modelClass = "\common\models\AreaDeliveryZone")
     {
-        return $this->hasMany (AreaDeliveryZone::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-
 
     /**
      * list of all the countries around the world that store can ship orders to
      *
      * @return \yii\db\ActiveQuery
      */
-    // public function getShippingCountries()
+    // public function getShippingCountries($modelClass = "\common\models\Country")
     // {
-    //     return $this->hasMany(Country::className(), ['country_id' => 'country_id'])
+    //     return $this->hasMany($modelClass::className(), ['country_id' => 'country_id'])
     //     ->joinWith([
     //         'deliveryZones' => function ($query) {
     //             $query->onCondition(['delivery_zone.restaurant_uuid' => 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290']);
@@ -2194,9 +2180,9 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCountry()
+    public function getCountry($modelClass = "\common\models\Country")
     {
-        return $this->hasOne (Country::className (), ['country_id' => 'country_id']);
+        return $this->hasOne ($modelClass::className (), ['country_id' => 'country_id']);
     }
 
     /**
@@ -2204,9 +2190,9 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
+    public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne (Currency::className (), ['currency_id' => 'currency_id']);
+        return $this->hasOne ($modelClass::className (), ['currency_id' => 'currency_id']);
     }
 
 

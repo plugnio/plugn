@@ -2,12 +2,10 @@
 
 namespace agent\modules\v1\controllers;
 
-use common\models\DeliveryZone;
+use agent\models\DeliveryZone;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Url;
-use yii\web\NotFoundHttpException;
 use agent\models\City;
 
 

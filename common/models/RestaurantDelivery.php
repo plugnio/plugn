@@ -89,8 +89,8 @@ class RestaurantDelivery extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getArea() {
-        return $this->hasOne(Area::className(), ['area_id' => 'area_id']);
+    public function getArea($modelClass = "\common\models\Area") {
+        return $this->hasOne($modelClass::className(), ['area_id' => 'area_id']);
     }
 
     /**
@@ -98,8 +98,8 @@ class RestaurantDelivery extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCity() {
-        return $this->hasOne(City::className(), ['city_id' => 'city_id'])->via('area');
+    public function getCity($modelClass = "\common\models\City") {
+        return $this->hasOne($modelClass::className(), ['city_id' => 'city_id'])->via('area');
     }
 
     /**
@@ -107,8 +107,8 @@ class RestaurantDelivery extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
 }

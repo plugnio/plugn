@@ -57,8 +57,8 @@ class Plan extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getSubscriptions()
+    public function getSubscriptions($modelClass = "\common\models\Subscription")
     {
-        return $this->hasMany(Subscription::className(), ['plan_id' => 'plan_id']);
+        return $this->hasMany($modelClass::className(), ['plan_id' => 'plan_id']);
     }
 }

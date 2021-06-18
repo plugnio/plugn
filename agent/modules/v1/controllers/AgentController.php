@@ -4,10 +4,7 @@ namespace agent\modules\v1\controllers;
 
 use Yii;
 use yii\rest\Controller;
-use yii\data\ActiveDataProvider;
-use yii\helpers\Url;
-use yii\web\NotFoundHttpException;
-use common\models\Agent;
+use agent\models\Agent;
 
 class AgentController extends Controller {
 
@@ -138,7 +135,7 @@ class AgentController extends Controller {
       /**
       * Return agent model
       * @param type $employer_uuid
-      * @return \common\models\Agent
+      * @return \agent\models\Agent
       */
      private function findModel($agent_id) {
          $model = Agent::findIdentity($agent_id);

@@ -23,4 +23,14 @@ class CategoryItem extends \common\models\CategoryItem
     {
         return parent::getCategory($model);
     }
+
+    /**
+     * Gets query for [[ItemUu]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItem($modelClass = "\agent\models\Item")
+    {
+        return parent::getItem ($modelClass);
+    }
 }

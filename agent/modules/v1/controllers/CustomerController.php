@@ -5,10 +5,8 @@ namespace agent\modules\v1\controllers;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Url;
-use yii\web\NotFoundHttpException;
-use common\models\Customer;
-use common\models\Order;
+use agent\models\Customer;
+use agent\models\Order;
 
 class CustomerController extends Controller {
 

@@ -7,8 +7,9 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use agent\models\Restaurant;
-use common\models\RestaurantPaymentMethod;
-use common\models\TapQueue;
+use common\components\FileUploader;
+use agent\models\RestaurantPaymentMethod;
+use agent\models\TapQueue;
 
 
 class StoreController extends Controller
@@ -197,10 +198,6 @@ class StoreController extends Controller
     public function actionCreateTapAccount($id)
     {
         $model = $this->findModel($id);
-
-//        if ($model->is_tap_enable) {
-//            return self::message("error",'Tap already enabled');
-//        }
 
         $model->setScenario(Restaurant::SCENARIO_CREATE_TAP_ACCOUNT);
 
