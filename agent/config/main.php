@@ -300,11 +300,13 @@ return [
                         'GET' => 'list',
                         'GET <id>' => 'detail',
                         'POST' => 'create',
+                        'POST update-stock' => 'update-stock-qty',
                         'PATCH <id>' => 'update',
                         'DELETE <id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS <id>' => 'options'
+                        'OPTIONS <id>' => 'options',
+                        'OPTIONS update-stock' => 'options',
                     ]
                 ],
                 [// CustomerController

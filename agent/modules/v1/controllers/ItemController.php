@@ -295,6 +295,30 @@ class ItemController extends Controller
         }
     }
 
+
+    /**
+     * Update Stock Qty
+     * @param type $itemUuid
+     * @return boolean
+     */
+    public function actionUpdateStockQty(){
+
+        $id = Yii::$app->request->getBodyParam('item_uuid');
+        $model = $this->findModel($id);
+        $model->stock_qty = Yii::$app->request->getBodyParam('stock_qty');
+        if (!$model->save(false)){
+            return [
+                "operation" => "error",
+                "message" => $model->errors
+            ];
+        }
+        return [
+            "operation" => "success",
+            "message" => "Item quantity updated successfully",
+        ];
+    }
+
+
     /**
      * Delete Business Location
      */

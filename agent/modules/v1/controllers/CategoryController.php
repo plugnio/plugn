@@ -7,7 +7,7 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use Agent\models\Category;
+use agent\models\Category;
 
 class CategoryController extends Controller {
 
@@ -76,10 +76,14 @@ class CategoryController extends Controller {
          $query =  Category::find();
 
          if ($keyword){
-           $query->where(['like', 'title', $keyword]);
-           $query->orWhere(['like', 'title_ar', $keyword]);
-           $query->orWhere(['like', 'subtitle', $keyword]);
-           $query->orWhere(['like', 'subtitle_ar', $keyword]);
+             $query->andWhere([
+                 'or', [
+                     ['like', 'title', $keyword],
+                     ['like', 'title_ar', $keyword],
+                     ['like', 'subtitle', $keyword],
+                     ['like', 'subtitle_ar', $keyword]
+                 ]
+             ]);
          }
 
          $query->andWhere(['restaurant_uuid' => $store_uuid]);
@@ -126,16 +130,13 @@ class CategoryController extends Controller {
             "message" => "Category created successfully",
             "model" => Category::findOne($model->category_id)
         ];
-
     }
-
 
      /**
       * Update category
       */
      public function actionUpdate($category_id, $store_uuid)
      {
-
          $model = $this->findModel($category_id, $store_uuid);
 
          $model->title = Yii::$app->request->getBodyParam("title");
@@ -143,7 +144,6 @@ class CategoryController extends Controller {
          $model->subtitle = Yii::$app->request->getBodyParam("subtitle");
          $model->subtitle_ar = Yii::$app->request->getBodyParam("subtitle_ar");
          $model->sort_number = Yii::$app->request->getBodyParam("sort_number");
-
 
          if (!$model->save())
          {
@@ -167,8 +167,6 @@ class CategoryController extends Controller {
          ];
      }
 
-
-
     /**
      * Allows agent to upload category image
      */
@@ -186,7 +184,6 @@ class CategoryController extends Controller {
                 "message" => 'Invalid Category ID'
             ];
         }
-
 
         //Delete old category image
         if ($model->category_image) {
@@ -211,8 +208,6 @@ class CategoryController extends Controller {
             ];
         }
     }
-
-
 
       /**
        * Delete Category
@@ -252,10 +247,7 @@ class CategoryController extends Controller {
          */
         public function actionDetail($store_uuid, $category_id) {
 
-            $model =  $this->findModel($category_id, $store_uuid);
-
-            return $model;
-
+            return $this->findModel($category_id, $store_uuid);
       }
 
 
@@ -276,7 +268,4 @@ class CategoryController extends Controller {
               throw new NotFoundHttpException('The requested record does not exist.');
           }
       }
-
-
-
 }
