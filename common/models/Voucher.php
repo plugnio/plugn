@@ -2,12 +2,9 @@
 
 namespace common\models;
 
-use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
-use yii\behaviors\AttributeBehavior;
-use common\models\Customer;
-use common\models\CustomerVoucher;
+
 
 /**
  * This is the model class for table "voucher".
@@ -196,18 +193,16 @@ class Voucher extends \yii\db\ActiveRecord {
           }
         }
 
-
         return $isValid ? $this : false;
     }
-
 
     /**
      * Gets query for [[CustomerVouchers]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCustomerVouchers() {
-        return $this->hasMany(CustomerVoucher::className(), ['voucher_id' => 'voucher_id']);
+    public function getCustomerVouchers($modelClass = "\common\models\CustomerVoucher") {
+        return $this->hasMany($modelClass::className(), ['voucher_id' => 'voucher_id']);
     }
 
     /**
@@ -215,8 +210,8 @@ class Voucher extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrders() {
-        return $this->hasMany(Order::className(), ['voucher_id' => 'voucher_id']);
+    public function getOrders($modelClass = "\common\models\Order") {
+        return $this->hasMany($modelClass::className(), ['voucher_id' => 'voucher_id']);
     }
 
     /**
@@ -224,8 +219,8 @@ class Voucher extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getActiveOrders() {
-        return $this->hasMany(Order::className(), ['voucher_id' => 'voucher_id'])
+    public function getActiveOrders($modelClass = "\common\models\Order") {
+        return $this->hasMany($modelClass::className(), ['voucher_id' => 'voucher_id'])
         ->activeOrders($this->restaurant_uuid);
     }
 
@@ -234,8 +229,8 @@ class Voucher extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -243,8 +238,8 @@ class Voucher extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
+    public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])->via('restaurant');
     }
 }

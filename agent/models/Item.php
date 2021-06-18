@@ -85,9 +85,9 @@ class Item extends \common\models\Item {
         ];
     }
 
-    public function getOptions()
+    public function getOptions($modelClass = "\agent\models\Option")
     {
-        return parent::getOptions();
+        return parent::getOptions($modelClass);
     }
 
     /**
@@ -100,6 +100,10 @@ class Item extends \common\models\Item {
         return parent::getItemImages($model);
     }
 
+    /**
+     * @param string $model
+     * @return \yii\db\ActiveQuery
+     */
     public function getItemImage($model = '\agent\models\ItemImage'){
         return parent::getItemImage($model);
     }
@@ -114,4 +118,73 @@ class Item extends \common\models\Item {
         return parent::getCategoryItems($model);
     }
 
+    /**
+     * Gets query for [[CategoryItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCategory($modelClass = "\agent\models\Category")
+    {
+        return parent::getCategory ($modelClass);
+    }
+
+    /**
+     * Gets query for [[Categories]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCategories($modelClass = "\agent\models\Category")
+    {
+        return parent::getCategories ($modelClass);
+    }
+
+    /**
+     * Gets query for [[RestaurantUu]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurant($modelClass = "\agent\models\Restaurant")
+    {
+        return parent::getRestaurant ($modelClass);
+    }
+
+    /**
+     * Gets query for [[Currency]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency($modelClass = "\agent\models\Currency")
+    {
+        return parent::getCurrency($modelClass);
+    }
+
+    /**
+     * Gets query for [[Options]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getExtraOptions($modelClass = "\agent\models\ExtraOption")
+    {
+        return parent::getExtraOptions($modelClass);
+    }
+
+    /**
+     * Gets query for [[OrderItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrderItems($modelClass = "\agent\models\OrderItem")
+    {
+        return parent::getOrderItems($modelClass);
+    }
+
+    /**
+     * Gets query for [[OrderItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrder($modelClass = "\agent\models\Order")
+    {
+        return parent::getOrder($modelClass);
+    }
 }

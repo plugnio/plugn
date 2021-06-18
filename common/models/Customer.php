@@ -81,8 +81,8 @@ class Customer extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrders() {
-        return $this->hasMany(Order::className(), ['customer_id' => 'customer_id']);
+    public function getOrders($modelClass = "\common\models\Order") {
+        return $this->hasMany($modelClass::className(), ['customer_id' => 'customer_id']);
     }
 
     /**
@@ -90,19 +90,19 @@ class Customer extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getActiveOrders() {
-        return $this->hasMany(Order::className(), ['customer_id' => 'customer_id'])
+    public function getActiveOrders($modelClass = "\common\models\Order") {
+        return $this->hasMany($modelClass::className(), ['customer_id' => 'customer_id'])
         ->activeOrders($this->restaurant_uuid);
     }
 
-    public function getTotalSpent() {
-        return $this->hasMany(Order::className(), ['customer_id' => 'customer_id'])
+    /**
+     * @param string $modelClass
+     * @return mixed
+     */
+    public function getTotalSpent($modelClass = "\common\models\Order") {
+        return $this->hasMany($modelClass::className(), ['customer_id' => 'customer_id'])
         ->activeOrders($this->restaurant_uuid)
         ->sum('total_price');
-    }
-
-    public static function find() {
-      return new query\CustomerQuery(get_called_class());
     }
 
     /**
@@ -110,9 +110,9 @@ class Customer extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCustomerVouchers()
+    public function getCustomerVouchers($modelClass = "\common\models\CustomerVoucher")
     {
-        return $this->hasMany(CustomerVoucher::className(), ['customer_id' => 'customer_id']);
+        return $this->hasMany($modelClass::className(), ['customer_id' => 'customer_id']);
     }
 
     /**
@@ -120,8 +120,8 @@ class Customer extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasMany(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -129,10 +129,12 @@ class Customer extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
+    public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])->via('restaurant');
     }
 
-
+    public static function find() {
+        return new query\CustomerQuery(get_called_class());
+    }
 }

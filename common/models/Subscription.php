@@ -196,9 +196,9 @@ class Subscription extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getSubscriptionPayment()
+    public function getSubscriptionPayment($modelClass = "\common\models\SubscriptionPayment")
     {
-        return $this->hasOne(SubscriptionPayment::className(), ['payment_uuid' => 'payment_uuid']);
+        return $this->hasOne($modelClass::className(), ['payment_uuid' => 'payment_uuid']);
     }
 
     /**
@@ -206,19 +206,18 @@ class Subscription extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPaymentMethod()
+    public function getPaymentMethod($modelClass = "\common\models\PaymentMethod")
     {
-        return $this->hasOne(PaymentMethod::className(), ['payment_method_id' => 'payment_method_id']);
+        return $this->hasOne($modelClass::className(), ['payment_method_id' => 'payment_method_id']);
     }
-
 
     /**
      * Gets query for [[Plan]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPlan() {
-        return $this->hasOne(Plan::className(), ['plan_id' => 'plan_id']);
+    public function getPlan($modelClass = "\common\models\Plan") {
+        return $this->hasOne($modelClass::className(), ['plan_id' => 'plan_id']);
     }
 
     /**
@@ -226,8 +225,8 @@ class Subscription extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
 }

@@ -66,8 +66,8 @@ class Bank extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getBankDiscounts()
+    public function getBankDiscounts($modelClass = "\common\models\BankDiscount")
     {
-        return $this->hasMany(BankDiscount::className(), ['bank_id' => 'bank_id']);
+        return $this->hasMany($modelClass::className(), ['bank_id' => 'bank_id']);
     }
 }

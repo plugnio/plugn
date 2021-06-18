@@ -122,31 +122,28 @@ class AgentAssignment extends \yii\db\ActiveRecord {
         ];
     }
 
-
-
     /**
      * Gets query for [[BusinessLocation]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getBusinessLocation()
+    public function getBusinessLocation($modelClass = "\common\models\BusinessLocation")
     {
-        return $this->hasOne(BusinessLocation::className(), ['business_location_id' => 'business_location_id']);
+        return $this->hasOne($modelClass::className(), ['business_location_id' => 'business_location_id']);
     }
 
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getAgent() {
-        return $this->hasOne(Agent::className(), ['agent_id' => 'agent_id']);
+    public function getAgent($modelClass = "\common\models\Agent") {
+        return $this->hasOne($modelClass::className(), ['agent_id' => 'agent_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-
 }

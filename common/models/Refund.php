@@ -4,11 +4,7 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\AttributeBehavior;
-use common\models\Order;
-use common\models\Payment;
-use common\models\OrderItem;
-use common\models\Restaurant;
-use yii\helpers\Html;
+
 
 /**
  * This is the model class for table "refund".
@@ -28,7 +24,6 @@ use yii\helpers\Html;
  */
 class Refund extends \yii\db\ActiveRecord
 {
-
     /**
      * {@inheritdoc}
      */
@@ -79,7 +74,6 @@ class Refund extends \yii\db\ActiveRecord
         ];
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -96,16 +90,12 @@ class Refund extends \yii\db\ActiveRecord
         ];
     }
 
-
     public function validateRefundAmount($attribute, $params, $validator)
     {
         if ($this->refund_amount > $this->order->total_price) {
             $this->addError($attribute, 'Can’t refund more than available');
         }
     }
-
-
-
 
     public function beforeSave($insert)
     {
@@ -124,7 +114,6 @@ class Refund extends \yii\db\ActiveRecord
                 }
             }
 
-
             $order_model = Order::findOne($this->order_uuid);
 
             if ($this->order->total_price == $this->refund_amount) {
@@ -132,8 +121,6 @@ class Refund extends \yii\db\ActiveRecord
             } elseif ($this->order->total_price > $this->refund_amount) {
                 $order_model->order_status = Order::STATUS_PARTIALLY_REFUNDED ;
             }
-
-
 
              if($this->getRefundedItems()->count() == 0 ) {
                $order_model->subtotal_before_refund = $order_model->subtotal;
@@ -147,10 +134,7 @@ class Refund extends \yii\db\ActiveRecord
                $order_model->total_price -= $this->refund_amount;
              }
 
-
-
              $order_model->save(false);
-
         }
 
         return parent::beforeSave($insert);
@@ -161,9 +145,9 @@ class Refund extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrder()
+    public function getOrder($modelClass = "\common\models\Order")
     {
-        return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid']);
+        return $this->hasOne($modelClass::className(), ['order_uuid' => 'order_uuid']);
     }
 
     /**
@@ -171,9 +155,10 @@ class Refund extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPayment()
+    public function getPayment($modelClass = "\common\models\Payment")
     {
-        return $this->hasOne(Payment::className(), ['payment_uuid' => 'payment_uuid'])->via('order');
+        return $this->hasOne($modelClass::className(), ['payment_uuid' => 'payment_uuid'])
+            ->via('order');
     }
 
     /**
@@ -181,30 +166,29 @@ class Refund extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
+    public function getRestaurant($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-
 
     /**
      * Gets query for [[RefundedItems]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRefundedItems()
+    public function getRefundedItems($modelClass = "\common\models\RefundedItem")
     {
-        return $this->hasMany(RefundedItem::className(), ['refund_id' => 'refund_id']);
+        return $this->hasMany($modelClass::className(), ['refund_id' => 'refund_id']);
     }
-
 
     /**
      * Gets query for [[OrderItem]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderItem()
+    public function getOrderItem($modelClass = "\common\models\OrderItem")
     {
-        return $this->hasOne(OrderItem::className(), ['order_item_id' => 'order_item_id'])->via('refundedItems');
+        return $this->hasOne($modelClass::className(), ['order_item_id' => 'order_item_id'])
+            ->via('refundedItems');
     }
 }

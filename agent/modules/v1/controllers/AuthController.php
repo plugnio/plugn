@@ -5,7 +5,7 @@ namespace agent\modules\v1\controllers;
 use Yii;
 use yii\rest\Controller;
 use yii\filters\auth\HttpBasicAuth;
-use common\models\Agent;
+use agent\models\Agent;
 use agent\models\PasswordResetRequestForm;
 
 /**

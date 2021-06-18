@@ -51,8 +51,8 @@ class Currency extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurants()
+    public function getRestaurants($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasMany(Restaurant::className(), ['currency_id' => 'currency_id']);
+        return $this->hasMany($modelClass::className(), ['currency_id' => 'currency_id']);
     }
 }
