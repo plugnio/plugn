@@ -2,14 +2,12 @@
 
 namespace agent\modules\v1\controllers;
 
-use common\models\ExtraOption;
-use common\models\Option;
+use agent\models\ExtraOption;
+use agent\models\Option;
 use Yii;
-use yii\base\BaseObject;
 use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use agent\models\Item;
 

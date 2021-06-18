@@ -105,10 +105,9 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
 
     public function beforeSave($insert) {
 
+        $extra_option_model = ExtraOption::findOne($this->extra_option_id);
 
         if ($insert) {
-            $extra_option_model = ExtraOption::findOne($this->extra_option_id);
-
 
             if ($extra_option_model) {
 
@@ -135,12 +134,9 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
 
         } else {
 
-            if ($extra_option_model->stock_qty !== null && $extra_option_model->stock_qty >= $this->qty)
+            if ($extra_option_model && $extra_option_model->stock_qty !== null && $extra_option_model->stock_qty >= $this->qty)
                 return $this->addError('qty', $extra_option_model->extra_option_name . " is currently out of stock and unavailable.");
         }
-
-
-
 
         return parent::beforeSave($insert);
     }
@@ -161,8 +157,8 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrder() {
-        return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid'])->via('orderItem');
+    public function getOrder($modelClass = "\common\models\Order") {
+        return $this->hasOne($modelClass::className(), ['order_uuid' => 'order_uuid'])->via('orderItem');
     }
 
     /**
@@ -170,8 +166,8 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('order');
+    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('order');
     }
 
     /**
@@ -179,9 +175,9 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
+    public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])->via('restaurant');
     }
     
     /**
@@ -189,8 +185,8 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getExtraOption() {
-        return $this->hasOne(ExtraOption::className(), ['extra_option_id' => 'extra_option_id']);
+    public function getExtraOption($modelClass = "\common\models\ExtraOption") {
+        return $this->hasOne($modelClass::className(), ['extra_option_id' => 'extra_option_id']);
     }
 
     /**
@@ -198,8 +194,8 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderItem() {
-        return $this->hasOne(OrderItem::className(), ['order_item_id' => 'order_item_id']);
+    public function getOrderItem($modelClass = "\common\models\OrderItem") {
+        return $this->hasOne($modelClass::className(), ['order_item_id' => 'order_item_id']);
     }
 
     /**
@@ -207,8 +203,8 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItem() {
-        return $this->hasOne(OrderItem::className(), ['item_uuid' => 'item_uuid'])->via('orderItem');
+    public function getItem($modelClass = "\common\models\Item") {
+        return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid'])
+            ->via('orderItem');
     }
-
 }

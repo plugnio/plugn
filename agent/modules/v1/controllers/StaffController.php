@@ -4,11 +4,10 @@ namespace agent\modules\v1\controllers;
 
 use Yii;
 use yii\rest\Controller;
-use yii\data\ActiveDataProvider;
-use yii\helpers\Url;
+use yii\data\ActiveDataProvider;;
 use yii\web\NotFoundHttpException;
-use common\models\AgentAssignment;
-use common\models\Agent;
+use agent\models\AgentAssignment;
+use agent\models\Agent;
 
 class StaffController extends Controller {
 

@@ -6,11 +6,10 @@ use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
-use common\models\Store;
 use agent\models\Restaurant;
 use common\components\FileUploader;
-use common\models\RestaurantPaymentMethod;
-use common\models\TapQueue;
+use agent\models\RestaurantPaymentMethod;
+use agent\models\TapQueue;
 
 
 class StoreController extends Controller

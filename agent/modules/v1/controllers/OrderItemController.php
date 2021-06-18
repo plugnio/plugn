@@ -4,12 +4,9 @@ namespace agent\modules\v1\controllers;
 
 use Yii;
 use yii\rest\Controller;
-use yii\data\ActiveDataProvider;
-use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use agent\models\Order;
-use common\models\Restaurant;
-use common\models\OrderItem;
+use agent\models\OrderItem;
 
 
 class OrderItemController extends Controller {

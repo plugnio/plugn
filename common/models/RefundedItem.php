@@ -112,9 +112,9 @@ class RefundedItem extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItem()
+    public function getItem($modelClass = "\common\models\Item")
     {
-        return $this->hasOne(Item::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -122,9 +122,9 @@ class RefundedItem extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
+    public function getRestaurant($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('order');
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('order');
     }
 
     /**
@@ -132,9 +132,9 @@ class RefundedItem extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderItem()
+    public function getOrderItem($modelClass = "\common\models\OrderItem")
     {
-        return $this->hasOne(OrderItem::className(), ['order_item_id' => 'order_item_id']);
+        return $this->hasOne($modelClass::className(), ['order_item_id' => 'order_item_id']);
     }
 
     /**
@@ -142,9 +142,9 @@ class RefundedItem extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItemImages()
+    public function getItemImages($modelClass = "\common\models\ItemImage")
     {
-        return $this->hasMany(ItemImage::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -152,9 +152,9 @@ class RefundedItem extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrder()
+    public function getOrder($modelClass = "\common\models\Order")
     {
-        return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid']);
+        return $this->hasOne($modelClass::className(), ['order_uuid' => 'order_uuid']);
     }
 
     /**
@@ -162,8 +162,8 @@ class RefundedItem extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRefund()
+    public function getRefund($modelClass = "\common\models\Refund")
     {
-        return $this->hasOne(Refund::className(), ['refund_id' => 'refund_id']);
+        return $this->hasOne($modelClass::className(), ['refund_id' => 'refund_id']);
     }
 }

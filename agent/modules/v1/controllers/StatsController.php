@@ -2,10 +2,6 @@
 
 namespace agent\modules\v1\controllers;
 
-use agent\models\Item;
-use common\models\Customer;
-use common\models\Order;
-use common\models\OrderItem;
 use Yii;
 use yii\db\Expression;
 use yii\rest\Controller;

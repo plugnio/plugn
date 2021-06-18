@@ -53,9 +53,9 @@ class CustomerVoucher extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCustomer()
+    public function getCustomer($modelClass = "\common\models\Customer")
     {
-        return $this->hasOne(Customer::className(), ['customer_id' => 'customer_id']);
+        return $this->hasOne($modelClass::className(), ['customer_id' => 'customer_id']);
     }
 
     /**
@@ -63,8 +63,8 @@ class CustomerVoucher extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getVoucher()
+    public function getVoucher($modelClass = "\common\models\Voucher")
     {
-        return $this->hasOne(Voucher::className(), ['voucher_id' => 'voucher_id']);
+        return $this->hasOne($modelClass::className(), ['voucher_id' => 'voucher_id']);
     }
 }

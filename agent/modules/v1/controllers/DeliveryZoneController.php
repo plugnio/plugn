@@ -7,10 +7,10 @@ use yii\filters\auth\HttpBearerAuth;
 use yii\filters\Cors;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use common\models\DeliveryZone;
-use common\models\BusinessLocation;
+use agent\models\DeliveryZone;
+use agent\models\BusinessLocation;
+
 
 class DeliveryZoneController extends Controller
 {

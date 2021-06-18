@@ -5,9 +5,9 @@ namespace agent\modules\v1\controllers;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use common\models\BusinessLocation;
+use agent\models\BusinessLocation;
+
 
 class BusinessLocationController extends Controller
 {

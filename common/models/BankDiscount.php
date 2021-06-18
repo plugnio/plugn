@@ -151,7 +151,6 @@ class BankDiscount extends \yii\db\ActiveRecord
           }
         }
 
-
         return $isValid ? $this : false;
     }
 
@@ -160,20 +159,19 @@ class BankDiscount extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCustomerBankDiscounts()
+    public function getCustomerBankDiscounts($modelClass = "\common\models\CustomerBankDiscount")
     {
-        return $this->hasMany(CustomerBankDiscount::className(), ['bank_discount_id' => 'bank_discount_id']);
+        return $this->hasMany($modelClass::className(), ['bank_discount_id' => 'bank_discount_id']);
     }
-
 
     /**
      * Gets query for [[Bank]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getBank()
+    public function getBank($modelClass = "\common\models\Bank")
     {
-        return $this->hasOne(Bank::className(), ['bank_id' => 'bank_id']);
+        return $this->hasOne($modelClass::className(), ['bank_id' => 'bank_id']);
     }
 
     /**
@@ -181,9 +179,9 @@ class BankDiscount extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
+    public function getRestaurant($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -191,9 +189,8 @@ class BankDiscount extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
+    public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])->via('restaurant');
     }
-
 }

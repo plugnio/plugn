@@ -225,8 +225,8 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItem() {
-        return $this->hasOne(Item::className(), ['item_uuid' => 'item_uuid']);
+    public function getItem($modelClass = "\common\models\Item") {
+        return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -234,9 +234,9 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItemImage()
+    public function getItemImage($modelClass = "\common\models\ItemImage")
     {
-        return $this->hasOne(ItemImage::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -244,8 +244,8 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrder() {
-        return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid']);
+    public function getOrder($modelClass = "\common\models\Order") {
+        return $this->hasOne($modelClass::className(), ['order_uuid' => 'order_uuid']);
     }
 
     /**
@@ -253,8 +253,9 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('order');
+    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->via('order');
     }
 
     /**
@@ -262,9 +263,10 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
+    public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])
+            ->via('restaurant');
     }
 
     /**
@@ -272,8 +274,7 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderItemExtraOptions() {
-        return $this->hasMany(OrderItemExtraOption::className(), ['order_item_id' => 'order_item_id']);
+    public function getOrderItemExtraOptions($modelClass = "\common\models\OrderItemExtraOption") {
+        return $this->hasMany($modelClass::className(), ['order_item_id' => 'order_item_id']);
     }
-
 }

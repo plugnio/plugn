@@ -327,7 +327,6 @@ public function getAccessToken() {
         return $this->isOwner;
     }
 
-
     /**
      * @inheritdoc
      */
@@ -342,15 +341,13 @@ public function getAccessToken() {
         return $fields;
     }
 
-
-
     /**
      * Get all Restaurant accounts this agent is assigned to manage
      * @return \yii\db\ActiveQuery
      */
-    public function getAccountsManaged()
+    public function getAccountsManaged($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasMany(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
                 ->via('agentAssignments');
     }
 
@@ -358,9 +355,8 @@ public function getAccessToken() {
      * All assignment records made for this agent
      * @return \yii\db\ActiveQuery
      */
-    public function getAgentAssignments()
+    public function getAgentAssignments($modelClass = "\common\models\AgentAssignment")
     {
-        return $this->hasMany(AgentAssignment::className(), ['agent_id' => 'agent_id']);
+        return $this->hasMany($modelClass::className(), ['agent_id' => 'agent_id']);
     }
-
 }
