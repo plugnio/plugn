@@ -2,17 +2,14 @@
 
 namespace agent\modules\v1\controllers;
 
-use agent\models\Restaurant;
-use common\components\FileUploader;
-use common\models\RestaurantPaymentMethod;
-use common\models\TapQueue;
 use Yii;
-use yii\base\BaseObject;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use common\models\Store;
+use agent\models\Restaurant;
+use common\models\RestaurantPaymentMethod;
+use common\models\TapQueue;
+
 
 class StoreController extends Controller
 {
@@ -97,16 +94,10 @@ class StoreController extends Controller
         $store->tagline_ar = Yii::$app->request->getBodyParam('tagline_ar');
 
         if (!$store->save()) {
-            return [
-                'operation' => 'error',
-                'message' => $store->getErrors()
-            ];
+            return self::message("error",$store->getErrors());
         }
 
-        return [
-            'operation' => 'success',
-            'message' => 'Store details updated successfully'
-        ];
+        return self::message("success",'Store details updated successfully');
     }
 
     /**
@@ -121,10 +112,7 @@ class StoreController extends Controller
         $store = Yii::$app->accountManager->getManagedAccount();
 
         if ($store->restaurant_domain == $domain) {
-            return [
-                'operation' => 'error',
-                'message' => 'New domain can not be same as old domain'
-            ];
+            return self::message("error",'New domain can not be same as old domain');
         }
 
         $old_domain = $store->restaurant_domain;
@@ -134,10 +122,7 @@ class StoreController extends Controller
         $store->restaurant_domain = rtrim($domain, '/');
 
         if (!$store->save()) {
-            return [
-                'operation' => 'error',
-                'message' => $store->getErrors()
-            ];
+            return self::message("error",$store->getErrors());
         }
 
         \Yii::$app->mailer->compose([
@@ -152,68 +137,50 @@ class StoreController extends Controller
             ->setSubject('[Plugn] Agent updated DN')
             ->send();
 
-        return [
-            'operation' => 'success',
-            "message" => "Congratulations you have successfully changed your domain name"
-        ];
+        return self::message("success","Congratulations you have successfully changed your domain name");
     }
-
-    //-- convert to API --//
 
     /**
      * Disable payment method
      * @return mixed
      */
-    public function actionDisablePaymentMethod($storeUuid, $paymentMethodId)
+    public function actionDisablePaymentMethod($id, $paymentMethodId)
     {
-
-        $model = $this->findModel($storeUuid);
+        $model = $this->findModel($id);
 
         RestaurantPaymentMethod::deleteAll([
             'restaurant_uuid' => $model->restaurant_uuid,
             'payment_method_id' => $paymentMethodId
         ]);
 
-        return [
-            'operation' => 'success',
-            'message' => 'Payment method disabled successfully'
-        ];
+        return self::message("success",'Payment method disabled successfully');
     }
 
     /**
      * Enable payment method
      * @return mixed
      */
-    public function actionEnablePaymentMethod($storeUuid, $paymentMethodId)
+    public function actionEnablePaymentMethod($id, $paymentMethodId)
     {
-
-        $model = $this->findModel($storeUuid);
+        $model = $this->findModel($id);
 
         $method = new RestaurantPaymentMethod();
         $method->payment_method_id = $paymentMethodId;
         $method->restaurant_uuid = $model->restaurant_uuid;
 
         if (!$method->save()) {
-            return [
-                'operation' => 'error',
-                'message' => $method->getErrors()
-            ];
+            return self::message("error",$method->getErrors());
         }
-
-        return [
-            'operation' => 'success',
-            'message' => 'Payment method added successfully'
-        ];
+        return self::message("success",'Payment method added successfully');
     }
 
     /**
      * View payment settings page
      * @return mixed
      */
-    public function actionViewPaymentMethods($storeUuid)
+    public function actionViewPaymentMethods($id)
     {
-
-        $model = $this->findModel($storeUuid);
+        $model = $this->findModel($id);
 
         $query = $model->getPaymentMethods();
 
@@ -225,158 +192,103 @@ class StoreController extends Controller
     /**
      * Create tap account
      * @param type $id
-     * @return type
+     * @return array
      */
     public function actionCreateTapAccount($id)
     {
-
         $model = $this->findModel($id);
+
+//        if ($model->is_tap_enable) {
+//            return self::message("error",'Tap already enabled');
+//        }
 
         $model->setScenario(Restaurant::SCENARIO_CREATE_TAP_ACCOUNT);
 
-        if ($model->is_tap_enable) {
-            return [
-                'operation' => 'error',
-                'message' => 'Tap already enabled'
-            ];
-        }
+        $model->owner_first_name = Yii::$app->request->getBodyParam('owner_first_name');
+        $model->owner_last_name = Yii::$app->request->getBodyParam('owner_last_name');
+        $model->owner_email = Yii::$app->request->getBodyParam('owner_email');
+        $model->owner_number = Yii::$app->request->getBodyParam('owner_number');
+        $model->company_name = Yii::$app->request->getBodyParam('company_name');
+        $model->vendor_sector = Yii::$app->request->getBodyParam('vendor_sector');
+        $model->business_type = Yii::$app->request->getBodyParam('business_type');
+        $model->license_number = Yii::$app->request->getBodyParam('license_number');
+        $model->iban = Yii::$app->request->getBodyParam('iban');
+        $model->identification_file_front_side = Yii::$app->request->getBodyParam('identification_file_front_side');
+        $model->identification_file_back_side = Yii::$app->request->getBodyParam('identification_file_back_side');
+        $model->commercial_license_file = Yii::$app->request->getBodyParam('commercial_license_file');
+        $model->authorized_signature_file = Yii::$app->request->getBodyParam('authorized_signature_file');
 
         if ($model->country->iso != 'KW') {
             $model->business_type = 'corp';
         }
 
-        if (!$model->save()) {
-            return [
-                'operation' => 'error',
-                'message' => $model->getErrors()
-            ];
-        }
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            if (!$model->save()) {
+                $transaction->rollBack();
+                return self::message("error",$model->errors);
+            }
 
-        $model->setScenario(Restaurant::SCENARIO_UPLOAD_STORE_DOCUMENT);
+            /*-------- uploading documents-------*/
+            if (
+            !$model->uploadFileToCloudinary(
+                $model->identification_file_front_side, 'identification_file_front_side')
+            ) {
+                $transaction->rollBack();
+                return self::message("error",$model->errors);
+            }
 
-        // initialize FileUploader
-        $FileUploader = new FileUploader('identification_file_front_side', array(
-            'limit' => null,
-            'maxSize' => 30,
-            'extensions' => null,
-            'uploadDir' => 'uploads/',
-            'title' => 'name'
-        ));
+            if (
+            !$model->uploadFileToCloudinary(
+                $model->identification_file_back_side, 'identification_file_back_side')
+            ) {
+                $transaction->rollBack();
+                return self::message("error",$model->errors);
+            }
 
-        // call to upload the files
-        $data = $FileUploader->upload();
+            if (
+            !$model->uploadFileToCloudinary(
+                $model->commercial_license_file, 'commercial_license_file')
+            ) {
+                $transaction->rollBack();
+                return self::message("error",$model->errors);
+            }
+            if (
+            !$model->uploadFileToCloudinary(
+                $model->authorized_signature_file, 'authorized_signature_file')
+            ) {
+                $transaction->rollBack();
+                return self::message("error",$model->errors);
+            }
 
-        // if uploaded and success
-        if ($data['isSuccess'] && count($data['files']) > 0) {
-            // get uploaded files
-            $uploadedFiles = $data['files'];
-        }
+            /*-------- uploading documents-------*/
 
-        // get the fileList
-        $owner_identification_file_front_side = $FileUploader->getFileList();
-
-        // initialize FileUploader
-        $FileUploader = new FileUploader('identification_file_back_side', array(
-            'limit' => null,
-            'maxSize' => 30,
-            'extensions' => null,
-            'uploadDir' => 'uploads/',
-            'title' => 'name'
-        ));
-
-
-        // call to upload the files
-        $data = $FileUploader->upload();
-
-        // if uploaded and success
-        if ($data['isSuccess'] && count($data['files']) > 0) {
-            // get uploaded files
-            $uploadedFiles = $data['files'];
-        }
-
-        // get the fileList
-        $owner_identification_file_back_side = $FileUploader->getFileList();
-
-
-        // initialize FileUploader
-        $FileUploader = new FileUploader('commercial_license', array(
-            'limit' => null,
-            'maxSize' => 30,
-            'extensions' => null,
-            'uploadDir' => 'uploads/',
-            'title' => 'name'
-        ));
-
-        // call to upload the files
-        $data = $FileUploader->upload();
-
-        // if uploaded and success
-        if ($data['isSuccess'] && count($data['files']) > 0) {
-            // get uploaded files
-            $uploadedFiles = $data['files'];
-        }
-
-        // get the fileList
-        $restaurant_commercial_license_file = $FileUploader->getFileList();
-
-        // initialize FileUploader
-        $FileUploader = new FileUploader('authorized_signature', array(
-            'limit' => null,
-            'maxSize' => 30,
-            'extensions' => null,
-            'uploadDir' => 'uploads/',
-            'title' => 'name'
-        ));
-
-        // call to upload the files
-        $data = $FileUploader->upload();
-
-        // if uploaded and success
-        if ($data['isSuccess'] && count($data['files']) > 0) {
-            // get uploaded files
-            $uploadedFiles = $data['files'];
-        }
-
-        // get the fileList
-        $restaurant_authorized_signature_file = $FileUploader->getFileList();
-
-
-        if (sizeof($restaurant_commercial_license_file) > 0)
-            $model->commercial_license_file = str_replace('uploads/', '', $restaurant_commercial_license_file[0]['file']); //Commercial License
-
-
-        if (sizeof($restaurant_authorized_signature_file) > 0)
-            $model->authorized_signature_file = str_replace('uploads/', '', $restaurant_authorized_signature_file[0]['file']);  //Authorized signature
-
-        if (sizeof($owner_identification_file_front_side) > 0)
-            $model->identification_file_front_side = str_replace('uploads/', '', $owner_identification_file_front_side[0]['file']); //Owner's civil id front side
-
-        if (sizeof($owner_identification_file_back_side) > 0)
-            $model->identification_file_back_side = str_replace('uploads/', '', $owner_identification_file_back_side[0]['file']); //Owner's civil id back side
-
-
-        if (!$model->save()) {
-            //     $model->errors
-        }
-
-        if (!$model->is_tap_enable) {
             $tap_queue_model = new TapQueue;
             $tap_queue_model->queue_status = TapQueue::QUEUE_STATUS_PENDING;
             $tap_queue_model->restaurant_uuid = $model->restaurant_uuid;
-            if ($tap_queue_model->save()) {
-                $model->tap_queue_id = $tap_queue_model->tap_queue_id;
-                $model->save(false);
+            if (!$tap_queue_model->save()) {
+                $transaction->rollBack();
+                return self::message("error",$model->errors);
             }
-        }
 
+            $model->tap_queue_id = $tap_queue_model->tap_queue_id;
+            $model->save(false);
+
+            $transaction->commit();
+
+            return self::message("success","Files & data saved successfully");
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            return self::message("error",$e->getMessage());
+        }
     }
 
     /**
      *  Enable OnlinePayment on delivery
      */
-    public function actionEnableOnlinePayment($storeUuid)
+    public function actionEnableOnlinePayment($id)
     {
-        $model = $this->findModel($storeUuid);
+        $model = $this->findModel($id);
 
         $transaction = Yii::$app->db->beginTransaction();
 
@@ -393,10 +305,7 @@ class StoreController extends Controller
 
                 $transaction->rollBack();
 
-                return [
-                    "operation" => "error",
-                    "message" => $knet->getErrors()
-                ];
+                return self::message("error",$knet->getErrors());
             }
         }
 
@@ -411,28 +320,20 @@ class StoreController extends Controller
 
                 $transaction->rollBack();
 
-                return [
-                    "operation" => "error",
-                    "message" => $creditCard->getErrors()
-                ];
+                return self::message("error",$creditCard->getErrors());
             }
         }
 
         $transaction->commit();
-
-        return [
-            "operation" => "success",
-            "message" => "Online payments enabled successfully"
-        ];
+        return self::message("success","Online payments enabled successfully");
     }
 
     /**
      *  Disable OnlinePayment on delivery
      */
-    public function actionDisableOnlinePayment($storeUuid)
+    public function actionDisableOnlinePayment($id)
     {
-
-        $model = $this->findModel($storeUuid);
+        $model = $this->findModel($id);
 
         $payments = $model->getRestaurantPaymentMethods()
             ->where(['<>', 'payment_method_id', 3])
@@ -444,19 +345,13 @@ class StoreController extends Controller
             if (!$payment->delete()) {
                 $transaction->rollBack();
 
-                return [
-                    "operation" => "error",
-                    "message" => 'Error on disabling ' . $payment->payment_method_name
-                ];
+                return self::message("error",'Error on disabling ' . $payment->payment_method_name);
             }
         }
 
         $transaction->commit();
 
-        return [
-            "operation" => "success",
-            "message" => "Online payments disabled successfully"
-        ];
+        return self::message("success","Online payments disabled successfully");
     }
 
     /**
@@ -471,10 +366,7 @@ class StoreController extends Controller
             ->exists();
 
         if (!$payment_method) {
-            return [
-                "operation" => "error",
-                "message" => 'Cash on delivery already enabled'
-            ];
+            return self::message("error",'Cash on delivery already enabled');
         }
 
         $payments_method = new RestaurantPaymentMethod();
@@ -482,16 +374,10 @@ class StoreController extends Controller
         $payments_method->restaurant_uuid = $model->restaurant_uuid;
 
         if (!$payments_method->save()) {
-            return [
-                "operation" => "error",
-                "message" => $payments_method->getErrors()
-            ];
+            return self::message("error",$payments_method->getErrors());
         }
 
-        return [
-            "operation" => "success",
-            "message" => "Cash on delivery enabled successfully"
-        ];
+        return self::message("success","Cash on delivery enabled successfully");
     }
 
     /**
@@ -511,16 +397,10 @@ class StoreController extends Controller
         }
 
         if (!$payment_method->delete()) {
-            return [
-                "operation" => "error",
-                "message" => $payment_method->getErrors()
-            ];
+            return self::message("error",$payment_method->getErrors());
         }
 
-        return [
-            "operation" => "success",
-            "message" => "Cash on delivery disabled successfully"
-        ];
+        return self::message("success","Cash on delivery disabled successfully");
     }
 
     /**
@@ -539,5 +419,17 @@ class StoreController extends Controller
         } else {
             throw new NotFoundHttpException('The requested record does not exist.');
         }
+    }
+
+    /**
+     * @param string $type
+     * @param $message
+     * @return array
+     */
+    public static function message($type = "success", $message) {
+        return [
+            "operation" => $type,
+            "message" => $message
+        ];
     }
 }

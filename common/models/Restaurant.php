@@ -173,24 +173,11 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         return [
             [['owner_first_name', 'owner_last_name', 'owner_email', 'owner_number'], 'required', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
-
-            [
-                [
-                    'vendor_sector', 'iban', 'company_name', 'business_type'
-                ],
-                'required', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT
-            ],
-            [
-                [
-                    'identification_file_front_side', 'identification_file_back_side'
-                ],
-                'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT
-            ],
-
+            [['vendor_sector', 'iban', 'company_name', 'business_type'], 'required', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
+            [['identification_file_front_side', 'identification_file_back_side'], 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
             [['commercial_license_file', 'authorized_signature_file'], 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function ($model) {
                 return $model->business_type == 'corp';
             }],
-
             [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3, 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             [['identification_file_id_back_side', 'identification_file_id_front_side', 'authorized_signature_file_id', 'commercial_license_file_id'], 'safe', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
             [['not_for_profit'], 'number'],
@@ -259,6 +246,46 @@ class Restaurant extends \yii\db\ActiveRecord
             [['schedule_interval'], 'required', 'when' => function ($model) {
                 return $model->schedule_order;
             }
+            ],
+            [
+                ['identification_file_front_side'],
+                '\common\components\S3FileExistValidator',
+                'filePath' => '',
+                'message' => Yii::t('app',"Please upload identification file (front side)"),
+                'resourceManager' => Yii::$app->temporaryBucketResourceManager,
+                'when' => function($model, $attribute) {
+                    return $model->{$attribute} !== $model->getOldAttribute($attribute);
+                }
+            ],
+            [
+                ['identification_file_back_side'],
+                '\common\components\S3FileExistValidator',
+                'filePath' => '',
+                'message' => Yii::t('app',"Please upload identification file (back side)"),
+                'resourceManager' => Yii::$app->temporaryBucketResourceManager,
+                'when' => function($model, $attribute) {
+                    return $model->{$attribute} !== $model->getOldAttribute($attribute);
+                }
+            ],
+            [
+                ['commercial_license_file'],
+                '\common\components\S3FileExistValidator',
+                'filePath' => '',
+                'message' => Yii::t('app',"Please upload commercial license file"),
+                'resourceManager' => Yii::$app->temporaryBucketResourceManager,
+                'when' => function($model, $attribute) {
+                    return $model->{$attribute} !== $model->getOldAttribute($attribute);
+                }
+            ],
+            [
+                ['authorized_signature_file'],
+                '\common\components\S3FileExistValidator',
+                'filePath' => '',
+                'message' => Yii::t('app',"Please upload a authorized signature file"),
+                'resourceManager' => Yii::$app->temporaryBucketResourceManager,
+                'when' => function($model, $attribute) {
+                    return $model->{$attribute} !== $model->getOldAttribute($attribute);
+                }
             ],
             [['restaurant_email_notification', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable'], 'integer'],
             ['restaurant_email', 'email'],
@@ -444,28 +471,32 @@ class Restaurant extends \yii\db\ActiveRecord
 
     /**
      * Upload a File to cloudinary
-     * @param type $imageURL
+     * @param $file_path
+     * @param $attribute
+     * @return bool
+     * @throws \yii\base\Exception
      */
-    public function uploadFileToCloudinary($file_path, $attribute)
+    public function uploadFileToCloudinary($file, $attribute)
     {
-
-        $filename = Yii::$app->security->generateRandomString ();
-
+        $url = Yii::$app->temporaryBucketResourceManager->getUrl($file);
         try {
-
+            $filename = Yii::$app->security->generateRandomString();
             $result = Yii::$app->cloudinaryManager->upload (
-                $file_path, [
+                $url, [
                     'public_id' => "restaurants/" . $this->restaurant_uuid . "/private_documents/" . $filename
                 ]
             );
 
             if ($result || count ($result) > 0) {
                 //delete the file from temp folder
-                unlink ($file_path);
                 $this[$attribute] = basename ($result['url']);
+                $this->$attribute = basename ($result['url']);
+                return true;
             }
         } catch (\Cloudinary\Error $err) {
             Yii::error ('Error when uploading restaurant document to Cloudinary: ' . json_encode ($err));
+            $this->addError($attribute, $err->getMessage());
+            return false;
         }
 
     }
@@ -821,79 +852,6 @@ class Restaurant extends \yii\db\ActiveRecord
         } catch (\Cloudinary\Error $err) {
             Yii::error ("Error when uploading thumbnail photos to Cloudinry: " . json_encode ($err));
         }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function fields()
-    {
-        $fields = parent::fields ();
-
-        // remove fields that contain sensitive information
-        unset($fields['restaurant_email_notification']);
-        unset($fields['developer_id']);
-        unset($fields['site_id']);
-        unset($fields['retention_email_sent']);
-        unset($fields['hide_request_driver_button']);
-        unset($fields['platform_fee']);
-        unset($fields['warehouse_fee']);
-        unset($fields['store_branch_name']);
-        unset($fields['armada_api_key']);
-        unset($fields['mashkor_branch_id']);
-        unset($fields['app_id']);
-        unset($fields['restaurant_status']);
-        unset($fields['vendor_sector']);
-        unset($fields['business_id']);
-        unset($fields['business_entity_id']);
-        unset($fields['wallet_id']);
-        unset($fields['merchant_id']);
-        unset($fields['operator_id']);
-        unset($fields['live_api_key']);
-        unset($fields['test_api_key']);
-        // unset($fields['live_public_key']);
-        unset($fields['test_public_key']);
-        unset($fields['sitemap_require_update']);
-        unset($fields['business_type']);
-        unset($fields['restaurant_email']);
-        unset($fields['license_number']);
-        unset($fields['not_for_profit']);
-        unset($fields['authorized_signature_issuing_date']);
-        unset($fields['authorized_signature_issuing_date']);
-        unset($fields['authorized_signature_expiry_date']);
-        unset($fields['authorized_signature_title']);
-        unset($fields['authorized_signature_file']);
-        unset($fields['authorized_signature_file_id']);
-        unset($fields['authorized_signature_file_purpose']);
-        unset($fields['commercial_license_issuing_date']);
-        unset($fields['commercial_license_issuing_date']);
-        unset($fields['commercial_license_expiry_date']);
-        unset($fields['commercial_license_title']);
-        unset($fields['commercial_license_file']);
-        unset($fields['commercial_license_file_id']);
-        unset($fields['commercial_license_file_purpose']);
-        unset($fields['iban']);
-        unset($fields['owner_first_name']);
-        unset($fields['owner_last_name']);
-        unset($fields['owner_email']);
-        unset($fields['owner_number']);
-        //unset($fields['has_deployed']);
-        //unset($fields['tap_queue_id']);
-        //unset($fields['is_tap_enable']);
-        unset($fields['company_name']);
-        unset($fields['owner_phone_country_code']);
-        unset($fields['identification_issuing_date']);
-        unset($fields['identification_expiry_date']);
-        unset($fields['identification_file_front_side']);
-        unset($fields['identification_file_back_side']);
-        unset($fields['identification_file_id_front_side']);
-        unset($fields['identification_file_id_back_side']);
-        unset($fields['identification_title']);
-        unset($fields['identification_file_purpose']);
-        unset($fields['restaurant_created_at']);
-        unset($fields['restaurant_updated_at']);
-
-        return $fields;
     }
 
     public function beforeSave($insert)
@@ -1910,7 +1868,6 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getAvailableAreas()
     {
-
         return $this->hasMany (AreaDeliveryZone::className (), ['restaurant_uuid' => 'restaurant_uuid'])
             ->where (['is', 'area_delivery_zone.area_id', null]);
     }
@@ -1943,7 +1900,8 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getPaymentMethods()
     {
-        return $this->hasMany (PaymentMethod::className (), ['payment_method_id' => 'payment_method_id'])->viaTable ('restaurant_payment_method', ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany (PaymentMethod::className (), ['payment_method_id' => 'payment_method_id'])
+            ->viaTable ('restaurant_payment_method', ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
