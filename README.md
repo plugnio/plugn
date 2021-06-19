@@ -9,7 +9,7 @@ docker-compose up
 This should set you up with the entire app along with MySQL and Redis. Use the following links to check it out:
 
 * [Backend on localhost:21080](http://localhost:21080)
-* [Investor API on localhost:20080](http://localhost:20080)
+* [Store Dashboard API on localhost:23080](http://localhost:23080)
 * [Phpmyadmin on localhost:8080](http://localhost:8080)
 
 
