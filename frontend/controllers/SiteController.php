@@ -197,6 +197,7 @@ class SiteController extends Controller {
 
 
     public function actionConfirmPlan($id, $selectedPlanId) {
+
       if ($managedRestaurant = $this->findModel($id)) {
 
         $selectedPlan = Plan::findOne($selectedPlanId);

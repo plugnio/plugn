@@ -15,6 +15,7 @@ use agent\models\PasswordResetRequestForm;
 class AuthController extends Controller {
 
     public function behaviors() {
+
         $behaviors = parent::behaviors();
 
         // remove authentication filter for cors to work

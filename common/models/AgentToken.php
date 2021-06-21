@@ -112,7 +112,6 @@ class AgentToken extends \yii\db\ActiveRecord
         }else return static::generateUniqueTokenString();
     }
 
-
     /**
      * Gets query for [[Agent]].
      *

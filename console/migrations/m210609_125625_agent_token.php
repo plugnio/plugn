@@ -18,6 +18,10 @@ class m210609_125625_agent_token extends Migration
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
         }
 
+        if ($this->db->getTableSchema('{{%agent_token}}', true) !== null) {
+            return true;
+        }
+
         $this->createTable('{{%agent_token}}', [
             'token_uuid' => $this->char(36),
             'agent_id' => $this->bigInteger(20)->notNull(),
