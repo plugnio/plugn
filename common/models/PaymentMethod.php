@@ -10,6 +10,7 @@ use Yii;
  * @property int $payment_method_id
  * @property string|null $payment_method_name
  * @property string|null $payment_method_name_ar
+ * @property int $vat
  * @property string $payment_method_code
  * @property string|null $source_id
  *
@@ -33,6 +34,7 @@ class PaymentMethod extends \yii\db\ActiveRecord
     {
         return [
             [['payment_method_name' , 'payment_method_name_ar', 'source_id','payment_method_code'], 'string', 'max' => 255],
+            [['vat'], 'number']
         ];
     }
 

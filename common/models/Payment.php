@@ -22,6 +22,7 @@ use yii\web\NotFoundHttpException;
  * @property double $payment_amount_charged amount charged to customer
  * @property double $payment_net_amount net amount deposited into our account
  * @property double $payment_gateway_fee gateway fee charged
+ * @property double $payment_vat vat on gateway fee
  * @property double $plugn_fee our commision
  * @property double $payment_token
  * @property string $payment_udf1
@@ -56,7 +57,7 @@ class Payment extends \yii\db\ActiveRecord {
             [['customer_id', 'received_callback'], 'integer'],
             [['order_uuid'], 'string', 'max' => 40],
             [['payment_gateway_order_id', 'payment_current_status'], 'string'],
-            [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee', 'plugn_fee'], 'number'],
+            [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee', 'plugn_fee','payment_vat'], 'number'],
             [['payment_uuid'], 'string', 'max' => 36],
             [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'response_message','payment_token', 'payment_gateway_name'], 'string', 'max' => 255],
             [['payment_uuid'], 'unique'],
@@ -107,6 +108,7 @@ class Payment extends \yii\db\ActiveRecord {
             'payment_amount_charged' => Yii::t('app', 'Amount Charged'),
             'payment_net_amount' => Yii::t('app', 'Net Amount'),
             'payment_gateway_fee' => Yii::t('app', 'Gateway Fee'),
+            'payment_vat' => Yii::t('app', 'VAT'),
             'payment_gateway_name' => Yii::t('app', 'Gateway name'),
             'plugn_fee' => Yii::t('app', 'Plugn Fee'),
             'payment_token' => Yii::t('app', 'Payment Token'),
@@ -282,6 +284,9 @@ class Payment extends \yii\db\ActiveRecord {
         // payment_gateway_fee
         $paymentRecord->payment_gateway_fee  = (float) $responseContent->Data->InvoiceDisplayValue - (float) $responseContent->Data->Suppliers[0]->InvoiceShare;
 
+        if($paymentRecord->paymentMethod->vat > 0)
+          $paymentRecord->payment_vat  = (float) $responseContent->Data->InvoiceDisplayValue * $paymentRecord->paymentMethod->vat;
+
         //platform fee
         if($paymentRecord->restaurant->platform_fee > 0)
           $paymentRecord->plugn_fee = (float) $responseContent->Data->Suppliers[0]->InvoiceShare - (float) $responseContent->Data->Suppliers[0]->ProposedShare;
@@ -401,6 +406,16 @@ class Payment extends \yii\db\ActiveRecord {
     public function getOrder() {
         return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid']);
     }
+
+
+      /**
+       * Gets query for [[PaymentMethod]].
+       *
+       * @return \yii\db\ActiveQuery
+       */
+      public function getPaymentMethod() {
+          return $this->hasOne(PaymentMethod::className(), ['payment_method_id' => 'payment_method_id'])->via('order');
+      }
 
     /**
      * Gets query for [[OrderItems]].

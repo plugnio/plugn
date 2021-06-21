@@ -43,12 +43,7 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-    public function actionUpload(){
-      $store = Restaurant::find()->one();
-      $store->uploadDocumentsToTap();
 
-
-    }
     public function actionMigration(){
 
         foreach (TapQueue::find()->all() as $key => $queue) {
@@ -72,6 +67,7 @@ class CronController extends \yii\console\Controller {
         $payment_method->payment_method_name = 'Sadad';
         $payment_method->payment_method_name_ar = 'سداد';
         $payment_method->payment_method_code = 's';
+        $payment_method->vat = 0.15;
         $payment_method->save();
 
         foreach (PaymentMethod::find()->all() as $key => $paymentMethod) {
@@ -79,11 +75,12 @@ class CronController extends \yii\console\Controller {
           if($paymentMethod->payment_method_id == 1){
             $paymentMethod->payment_method_code = 'kn';
           }
-          else if($paymentMethod->payment_method_id == 2){
+          else if($paymentMethod->payment_method_id == 2){//Credit Card
             $paymentMethod->payment_method_code = 'vm';
           }
-          else if($paymentMethod->payment_method_id == 4){
+          else if($paymentMethod->payment_method_id == 4){ //MADA
             $paymentMethod->payment_method_code = 'md';
+            $paymentMethod->vat = 0.15;
           }
           else if($paymentMethod->payment_method_id == 5){
             $paymentMethod->payment_method_code = 'b';
