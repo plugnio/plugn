@@ -23,7 +23,6 @@ $interval = $today->diff($expiry);
 
 ?>
 
-
 <style>
     .current-plan{
         color: white;

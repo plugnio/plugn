@@ -144,70 +144,6 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public static function findIdentity($id) {
-        return static::findOne(['agent_id' => $id, 'agent_status' => self::STATUS_ACTIVE]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function findIdentityByAccessToken($token, $type = null) {
-        $token = AgentToken::find()->where([
-                    'token_value' => $token,
-                    'token_status' => AgentToken::STATUS_ACTIVE
-                ])
-                ->with('agent')
-                ->one();
-
-        if (!$token)
-            return false;
-
-        //update last used datetime
-
-        $token->token_last_used_datetime = new Expression('NOW()');
-        $token->save();
-
-        //should not able to login, if email not verified but have valid token
-
-        if ($token->agent) {
-            return $token->agent;
-        }
-
-        //invalid token
-        $token->delete();
-    }
-
-    /**
-* Create an Access Token Record for this agent
-* if the agent already has one, it will return it instead
-* @return \common\models\AgentToken
-*/
-public function getAccessToken() {
-   // Return existing inactive token if found
-   $token = AgentToken::findOne([
-               'agent_id' => $this->agent_id,
-               'token_status' => AgentToken::STATUS_ACTIVE
-   ]);
-
-   if ($token) {
-       return $token;
-   }
-
-   // Create new inactive token
-
-   $token = new AgentToken();
-   $token->agent_id = $this->agent_id;
-   $token->token_value = AgentToken::generateUniqueTokenString();
-   $token->token_status = AgentToken::STATUS_ACTIVE;
-   $token->save();
-
-   return $token;
-}
-
-
-    /**
      * Finds user by username
      *
      * @param string $email
@@ -309,6 +245,70 @@ public function getAccessToken() {
      */
     public function removePasswordResetToken() {
         $this->agent_password_reset_token = null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function findIdentity($id) {
+        return static::findOne(['agent_id' => $id, 'agent_status' => self::STATUS_ACTIVE]);
+    }
+
+    /**
+     * Create an Access Token Record for this agent
+     * if the agent already has one, it will return it instead
+     * @return \common\models\AgentToken
+     */
+    public function getAccessToken() {
+        // Return existing inactive token if found
+        $token = \agent\models\AgentToken::findOne([
+            'agent_id' => $this->agent_id,
+            'token_status' => AgentToken::STATUS_ACTIVE
+        ]);
+
+        if ($token) {
+            return $token;
+        }
+
+        // Create new inactive token
+
+        $token = new AgentToken();
+        $token->agent_id = $this->agent_id;
+        $token->token_value = AgentToken::generateUniqueTokenString();
+        $token->token_status = AgentToken::STATUS_ACTIVE;
+        $token->save();
+
+        return $token;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function findIdentityByAccessToken($token, $type = null, $modelClass = "\agent\models\AgentToken") {
+
+        $token = $modelClass::find()->where([
+                'token_value' => $token,
+                'token_status' => $modelClass::STATUS_ACTIVE
+            ])
+            ->with('agent')
+            ->one();
+
+        if (!$token)
+            return false;
+
+        //update last used datetime
+
+        $token->token_last_used_datetime = new Expression('NOW()');
+        $token->save();
+
+        //should not able to login, if email not verified but have valid token
+
+        if ($token->agent) {
+            return $token->agent;
+        }
+
+        //invalid token
+        $token->delete();
     }
 
     /**

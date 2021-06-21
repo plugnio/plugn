@@ -5,6 +5,7 @@ namespace agent\modules\v1\controllers;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
+use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use agent\models\Restaurant;
 use common\components\FileUploader;
@@ -354,15 +355,15 @@ class StoreController extends Controller
     /**
      *  Enable Cash on delivery
      */
-    public function actionEnableCod($storeUuid)
+    public function actionEnableCod($id)
     {
-        $model = $this->findModel($storeUuid);
+        $model = $this->findModel($id);
 
         $payment_method = $model->getRestaurantPaymentMethods()
             ->where(['payment_method_id' => 3])
             ->exists();
 
-        if (!$payment_method) {
+        if ($payment_method) {
             return self::message("error",'Cash on delivery already enabled');
         }
 
@@ -380,21 +381,20 @@ class StoreController extends Controller
     /**
      *  Disable Cash on delivery
      */
-    public function actionDisableCod($storeUuid)
+    public function actionDisableCod($id)
     {
-
-        $model = $this->findModel($storeUuid);
+        $model = $this->findModel($id);
 
         $payment_method = $model->getRestaurantPaymentMethods()
             ->where(['payment_method_id' => 3])
             ->one();
 
         if (!$payment_method) {
-            throw new NotFoundHttpException('The requested record does not exist.');
+            throw new BadRequestHttpException('The requested record does not exist.');
         }
 
         if (!$payment_method->delete()) {
-            return self::message("error",$payment_method->getErrors());
+            return self::message("error", $payment_method->getErrors());
         }
 
         return self::message("success","Cash on delivery disabled successfully");

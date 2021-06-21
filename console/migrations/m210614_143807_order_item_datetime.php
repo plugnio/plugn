@@ -15,7 +15,7 @@ class m210614_143807_order_item_datetime extends Migration
         $this->addColumn ('order_item', 'order_item_created_at', $this->dateTime ()->after ('customer_instruction'));
         $this->addColumn ('order_item', 'order_item_updated_at', $this->dateTime ()->after ('order_item_created_at'));
 
-        $orders = \common\models\Order::find()->all();
+        $orders = \common\models\Order::find()->each();
 
         foreach($orders as $order) {
             \common\models\OrderItem::updateAll ([

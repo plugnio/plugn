@@ -2,8 +2,8 @@
 
 namespace agent\models;
 
-use agent\models\AgentAssignment;
-use agent\models\Restaurant;
+use yii\db\Expression;
+use yii\web\IdentityInterface;
 
 
 /**
@@ -11,7 +11,7 @@ use agent\models\Restaurant;
  * It extends from \common\models\Agent but with custom functionality for Candidate application module
  *
  */
-class Agent extends \common\models\Agent {
+class Agent extends \common\models\Agent implements IdentityInterface {
 
     /**
      * @inheritdoc
@@ -19,6 +19,13 @@ class Agent extends \common\models\Agent {
     public function fields() {
         $fields = parent::fields();
         return $fields;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function findIdentityByAccessToken($token, $type = null, $modelClass = "\agent\models\AgentToken") {
+        return parent::findIdentityByAccessToken($token, $type, $modelClass);
     }
 
     /**

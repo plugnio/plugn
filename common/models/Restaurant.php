@@ -1834,7 +1834,11 @@ class Restaurant extends \yii\db\ActiveRecord
     public function getActiveSubscription($modelClass = "\common\models\Subscription")
     {
         return $this->hasOne ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->where (['subscription_status' => Subscription::STATUS_ACTIVE]);
+            ->filterWhere([
+                'AND',
+                ['subscription_status' => Subscription::STATUS_ACTIVE],
+                new Expression('DATE(subscription_end_at) >= DATE(NOW())')
+            ]);
     }
 
     /**
@@ -1845,9 +1849,7 @@ class Restaurant extends \yii\db\ActiveRecord
     public function getPlan($modelClass = "\common\models\Plan")
     {
         return $this->hasOne ($modelClass::className (), ['plan_id' => 'plan_id'])
-            ->via ('subscriptions', function ($query) {
-                return $query->andWhere (['subscription.subscription_status' => Subscription::STATUS_ACTIVE]);
-            });
+            ->via ('activeSubscription');
     }
 
     /**
