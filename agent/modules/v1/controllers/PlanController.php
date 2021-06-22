@@ -4,9 +4,9 @@ namespace agent\modules\v1\controllers;
 
 use Yii;
 use common\components\TapPayments;
-use common\models\Plan;
-use common\models\Subscription;
-use common\models\SubscriptionPayment;
+use agent\models\Plan;
+use agent\models\Subscription;
+use agent\models\SubscriptionPayment;
 use yii\helpers\Url;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
@@ -69,7 +69,7 @@ class PlanController extends Controller
      * @return Plan|null
      * @throws NotFoundHttpException
      */
-    public function view($id)
+    public function actionView($id)
     {
         return $this->findModel ($id);
     }
@@ -79,15 +79,19 @@ class PlanController extends Controller
      * @param $id
      * @return array|string[]
      */
-    public function actionConfirm($id)
+    public function actionConfirm()
     {
         $store = Yii::$app->accountManager->getManagedAccount ();
 
-        $selectedPlan = Plan::findOne ($id);
+        $plan_id = Yii::$app->request->getBodyParam ('plan_id');
+        $payment_method_id = Yii::$app->request->getBodyParam ('payment_method_id');
+
+        $selectedPlan = Plan::findOne ($plan_id);
 
         $subscription_model = new Subscription();
         $subscription_model->restaurant_uuid = $store->restaurant_uuid;
         $subscription_model->plan_id = $selectedPlan->plan_id;
+        $subscription_model->payment_method_id = $payment_method_id;
 
         if (!$subscription_model->save ()) {
             return [
@@ -111,7 +115,7 @@ class PlanController extends Controller
         $payment->payment_current_status = "Redirected to payment gateway";
 
         if (!$payment->save ()) {
-            $response = [
+            return [
                 'operation' => 'error',
                 'message' => $payment->getErrors ()
             ];
@@ -135,7 +139,7 @@ class PlanController extends Controller
             $store->country->country_code,
             $store->owner_number ? $store->owner_number : null,
             0, //Comission
-            Url::to (['plan/callback'], true),
+            Url::to (['plans/callback'], true),
             $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD,
             0
         );
@@ -206,14 +210,17 @@ class PlanController extends Controller
      * @param string $tap_id
      * @return mixed
      */
-    public function actionCallback($id)
+    public function actionCallback()
     {
         try {
+
+            $id = Yii::$app->request->get('tap_id');
+
             $paymentRecord = SubscriptionPayment::updatePaymentStatusFromTap($id);
             $paymentRecord->received_callback = true;
             $paymentRecord->save(false);
 
-            if ($paymentRecord->payment_current_status != 'CAPTURED') {
+            if ($paymentRecord->payment_current_status == 'CAPTURED') {
                 $this->_addCallbackCookies ("paymentSuccess", "There seems to be an issue with your payment, please try again.");
             } else {
                 $this->_addCallbackCookies ("paymentFailed", $paymentRecord->plan->name . ' has been activated');
