@@ -22,7 +22,6 @@ use yii\web\NotFoundHttpException;
  * @property double $payment_amount_charged amount charged to customer
  * @property double $payment_net_amount net amount deposited into our account
  * @property double $payment_gateway_fee gateway fee charged
- * @property double $payment_vat vat on gateway fee
  * @property double $plugn_fee our commision
  * @property double $payment_token
  * @property string $payment_udf1
@@ -283,10 +282,6 @@ class Payment extends \yii\db\ActiveRecord {
 
         // payment_gateway_fee
         $paymentRecord->payment_gateway_fee  = (float) $responseContent->Data->InvoiceDisplayValue - (float) $responseContent->Data->Suppliers[0]->InvoiceShare;
-
-        //calculate vat on Transaction fee
-        if($paymentRecord->paymentMethod->vat > 0)
-          $paymentRecord->payment_vat  = (float) $paymentRecord->payment_gateway_fee * $paymentRecord->paymentMethod->vat;
 
         //platform fee
         if($paymentRecord->restaurant->platform_fee > 0)

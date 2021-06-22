@@ -74,13 +74,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             ],
             [
-                'attribute' => 'payment_vat',
-                'format' => 'raw',
-                'value' => function ($data) {
-                    return Yii::$app->formatter->asCurrency($data->payment_vat, $data->currency->code);;
-                }
-            ],
-            [
                 'attribute' => 'plugn_fee',
                 'format' => 'raw',
                 'value' => function ($data) {
