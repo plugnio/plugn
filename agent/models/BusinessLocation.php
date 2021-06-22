@@ -4,7 +4,7 @@
 namespace agent\models;
 
 
-class BusinessLocation extends \common\models\AgentAssignment
+class BusinessLocation extends \common\models\BusinessLocation
 {
     /**
      * Gets query for [[Country]].
