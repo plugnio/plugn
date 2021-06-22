@@ -400,8 +400,11 @@ class TapPayments extends Component
     /**
      * Create a refund for a customer
      */
-    public function createRefund($chargeId, $amount, $currency , $reason="requested_by_customer")  {
+    public function createRefund($chargeId, $amount, $currency , $reason)  {
 
+        if(!$reason)
+          $reason = "requested_by_customer";
+        
         $refundEndpoint = $this->apiEndpoint . "/refunds";
 
         $refundParams = [
