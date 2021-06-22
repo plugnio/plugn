@@ -284,8 +284,9 @@ class Payment extends \yii\db\ActiveRecord {
         // payment_gateway_fee
         $paymentRecord->payment_gateway_fee  = (float) $responseContent->Data->InvoiceDisplayValue - (float) $responseContent->Data->Suppliers[0]->InvoiceShare;
 
+        //calculate vat on Transaction fee
         if($paymentRecord->paymentMethod->vat > 0)
-          $paymentRecord->payment_vat  = (float) $responseContent->Data->InvoiceDisplayValue * $paymentRecord->paymentMethod->vat;
+          $paymentRecord->payment_vat  = (float) $paymentRecord->payment_gateway_fee * $paymentRecord->paymentMethod->vat;
 
         //platform fee
         if($paymentRecord->restaurant->platform_fee > 0)
