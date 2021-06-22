@@ -575,7 +575,7 @@ class OrderController extends Controller {
 
       $order_model = $this->findModel($order_uuid, $storeUuid);
 
-      if(($order_model->payment_uuid && !$order_model->payment->payment_gateway_invoice_id) || ( $order_model->currency->code != 'KWD') ){
+      if(($order_model->payment_uuid && !$order_model->payment->payment_gateway_invoice_id && !$order_model->payment->payment_gateway_transaction_id) || !$order_model->payment_uuid ){
         return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
       }
 

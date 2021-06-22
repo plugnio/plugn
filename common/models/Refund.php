@@ -139,27 +139,32 @@ class Refund extends \yii\db\ActiveRecord
       if($this->order->total_price < $this->refund_amount)
         return  $this->addError($attribute, 'Can’t refund more than available');
 
+      if ($this->refund_amount < 0 )
+        return  $this->addError($attribute, 'Refund amount must be greater than zero.');
+      else if ($this->refund_amount > $this->order->total_price)
+        return  $this->addError($attribute, 'Refund amount cannot exceed amount available for refund.');
 
-      $totalAwaitingBalanceResponse = Yii::$app->myFatoorahPayment->getSupplierDashboard($this->store->supplierCode,$this->currency->code);
+      if($this->store->is_myfatoorah_enable){
 
-      $responseContent = json_decode($totalAwaitingBalanceResponse->content);
+        $totalAwaitingBalanceResponse = Yii::$app->myFatoorahPayment->getSupplierDashboard($this->store->supplierCode,$this->currency->code);
 
-        if ( !$totalAwaitingBalanceResponse->isOk && !$responseContent->IsSuccess){
-            $errorMessage = "Error: " . $responseContent->Message;
-            Yii::error('Refund Error (#'. $this->order_uuid .'): ' . $errorMessage);
+        $responseContent = json_decode($totalAwaitingBalanceResponse->content);
+
+          if ( !$totalAwaitingBalanceResponse->isOk && !$responseContent->IsSuccess){
+              $errorMessage = "Error: " . $responseContent->Message;
+              Yii::error('Refund Error (#'. $this->order_uuid .'): ' . $errorMessage);
+              return $this->addError($attribute, 'Refund amount cannot exceed amount available for refund.');
+
+          }else if ($totalAwaitingBalanceResponse->isOk){
+            if($responseContent->TotalAwaitingBalance < $this->refund_amount)
+              $this->addError($attribute, 'Insufficcent Balance');
+
+
+          } else {
             return $this->addError($attribute, 'Refund amount cannot exceed amount available for refund.');
+          }
 
-        }else if ($totalAwaitingBalanceResponse->isOk){
-          if($responseContent->TotalAwaitingBalance < $this->refund_amount)
-            $this->addError($attribute, 'Insufficcent Balance');
-
-          if ($this->refund_amount < 0.1 )
-              $this->addError($attribute, 'Refund amount must be greater than zero.');
-          else if ($this->refund_amount > $this->order->total_price)
-            $this->addError($attribute, 'Refund amount cannot exceed amount available for refund.');
-        } else {
-          return $this->addError($attribute, 'Refund amount cannot exceed amount available for refund.');
-        }
+      }
 
 
     }

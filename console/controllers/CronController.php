@@ -571,28 +571,59 @@ class CronController extends \yii\console\Controller {
         $refunds = Refund::find()
                     ->joinWith(['store','payment','currency'])
                     ->where(['refund.refund_reference' => null])
-                    ->andWhere(['restaurant.is_myfatoorah_enable' => 1])
                     ->andWhere(['NOT', ['refund.payment_uuid' => null]])
                     ->all();
 
         foreach ($refunds as $refund) {
 
-                $response = Yii::$app->myFatoorahPayment->makeRefund($refund->payment->payment_gateway_payment_id, $refund->refund_amount, $refund->reason, $refund->store->supplierCode,$refund->currency->code);
+                if($refund->store->is_myfatoorah_enable) {
 
-                $responseContent = json_decode($response->content);
+                  $response = Yii::$app->myFatoorahPayment->makeRefund($refund->payment->payment_gateway_payment_id, $refund->refund_amount, $refund->reason, $refund->store->supplierCode,$refund->currency->code);
 
-                if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
-                    $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
-                    return Yii::error('Refund Error ('. $refund->refund_id .'): ' . $errorMessage);
-                } else {
+                  $responseContent = json_decode($response->content);
 
-                  $refund->refund_reference = $responseContent->Data->RefundReference;
-                  $refund->refund_status = 'Pending';
-                  $refund->save(false);
+                  if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
+                      $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
+                      return Yii::error('Refund Error ('. $refund->refund_id .'): ' . $errorMessage);
+                  } else {
 
-                  $this->stdout("Your refund request has been initiated successfully  \n", Console::FG_RED, Console::BOLD);
-                  return self::EXIT_CODE_NORMAL;
+                    $refund->refund_reference = $responseContent->Data->RefundReference;
+                    $refund->refund_status = 'Pending';
+                    $refund->save(false);
+
+                    $this->stdout("Your refund request has been initiated successfully  \n", Console::FG_RED, Console::BOLD);
+                    return self::EXIT_CODE_NORMAL;
+                  }
+
+                } else if($refund->store->is_tap_enable) {
+
+                  Yii::$app->tapPayments->setApiKeys($refund->store->live_api_key, $refund->store->test_api_key);
+
+
+                  $response = Yii::$app->tapPayments->createRefund(
+                          $order_model->payment->payment_gateway_transaction_id, $refund->refund_amount, $refund->reason
+                  );
+
+                  if (array_key_exists('errors', $response->data)) {
+
+                      $errorMessage = $response->data['errors'][0]['description'];
+
+                      Yii::error('Refund Error ('. $refund->refund_id .'): ' . $errorMessage);
+
+                      return $refund->addError('refund_amount', $response->data['errors'][0]['description']);
+
+                  } else if ($response->data) {
+                      $refund->refund_reference = $response->data['id'];
+                      $refund->refund_status = $response->data['status'];
+                      $refund->save(false);
+
+                      $this->stdout("Your refund request has been initiated successfully  \n", Console::FG_RED, Console::BOLD);
+                      return self::EXIT_CODE_NORMAL;
+
+                  }
+
                 }
+
         }
 
         $this->stdout("No refund requests available \n", Console::FG_RED, Console::BOLD);
@@ -604,25 +635,32 @@ class CronController extends \yii\console\Controller {
     /**
      * Update refund status  for all refunds record
      */
-    // public function actionUpdateRefundStatusMessage() {
-    //
-    //     $restaurants = Restaurant::find()->all();
-    //     foreach ($restaurants as $restaurant) {
-    //
-    //         foreach ($restaurant->getRefunds()->all() as $refund) {
-    //
-    //             Yii::$app->tapPayments->setApiKeys($restaurant->live_api_key, $restaurant->test_api_key);
-    //             $response = Yii::$app->tapPayments->retrieveRefund($refund->refund_id);
-    //
-    //             if (!array_key_exists('errors', $response->data)) {
-    //                 if ($refund->refund_status != $response->data['status']) {
-    //                     $refund->refund_status = $response->data['status'];
-    //                     $refund->save(false);
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
+    public function actionUpdateRefundStatusMessage() {
+
+      $refunds = Refund::find()
+                  ->joinWith(['store'])
+                  ->where(['refund.refund_reference' => null])
+                  ->andWhere(['restaurant.is_tap_enable' => 1])
+                  ->andWhere(['NOT', ['refund.payment_uuid' => null]])
+                  ->all();
+
+
+        foreach ($refunds as $refund) {
+
+          Yii::$app->tapPayments->setApiKeys($refund->store->live_api_key, $refund->store->test_api_key);
+          $response = Yii::$app->tapPayments->retrieveRefund($refund->refund_reference);
+
+          if (!array_key_exists('errors', $response->data)) {
+              if ($refund->refund_status != $response->data['status']) {
+                  $refund->refund_status = $response->data['status'];
+                  $refund->save(false);
+              }
+          }
+
+        }
+    }
+
+
 
     /**
      * Update voucher status

@@ -84,7 +84,8 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
         ?>
 
         <?php
-        if ($orderItems->totalCount > 0 && $model->payment_uuid && $model->restaurant->is_myfatoorah_enable  && $model->payment->payment_gateway_invoice_id &&  $model->order_status != Order::STATUS_REFUNDED && $model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT ) {
+        if ($orderItems->totalCount > 0 && $model->payment_uuid &&  $model->order_status != Order::STATUS_REFUNDED && $model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT ) {
+          if(($model->restaurant->is_myfatoorah_enable  && $model->payment->payment_gateway_invoice_id ) || ($model->restaurant->is_tap_enable  && $model->payment->payment_gateway_transaction_id ))
             echo Html::a('Refund', ['refund-order', 'order_uuid' => $model->order_uuid, 'storeUuid' => $storeUuid,], ['class' => 'btn btn-warning  mr-1 mb-1', 'style'=>'margin-left: 7px;']) ;
         }
         ?>
