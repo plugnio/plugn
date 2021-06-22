@@ -731,39 +731,35 @@ class OrderController extends Controller {
     public function actionDetail($store_uuid, $order_uuid) {
 
         $order =  $this->findModel($order_uuid, $store_uuid);
-
          return $order;
-
-  }
+    }
 
 
       /**
        * Delete Order
        */
-      public function actionDelete($order_uuid, $store_uuid)
-      {
-          $model =  $this->findModel($order_uuid, $store_uuid);
+    public function actionDelete($order_uuid, $store_uuid) {
+        $model =  $this->findModel($order_uuid, $store_uuid);
 
-          if (!$model->delete())
-          {
-              if (isset($model->errors)) {
-                  return [
-                      "operation" => "error",
-                      "message" => $model->errors
-                  ];
-              } else {
-                  return [
-                      "operation" => "error",
-                      "message" => "We've faced a problem deleting the order"
-                  ];
-              }
-          }
+        if (!$model->delete()) {
+            if (isset($model->errors)) {
+                return [
+                    "operation" => "error",
+                    "message" => $model->errors
+                ];
+            } else {
+                return [
+                    "operation" => "error",
+                    "message" => "We've faced a problem deleting the order"
+                ];
+            }
+        }
 
-          return [
-              "operation" => "success",
-              "message" => "Order deleted successfully"
-          ];
-      }
+        return [
+            "operation" => "success",
+            "message" => "Order deleted successfully"
+        ];
+    }
 
 
 
