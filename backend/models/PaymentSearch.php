@@ -47,7 +47,7 @@ class PaymentSearch extends Payment
 
         $query = Payment::find()
               ->joinWith(['restaurant', 'customer'])
-              ->orderBy(['order_created_at' => SORT_DESC]);
+              ->orderBy(['payment_created_at' => SORT_DESC]);
 
 
         // add conditions that should always apply here
