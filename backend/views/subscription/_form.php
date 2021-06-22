@@ -61,8 +61,6 @@ use kartik\select2\Select2;
 
     <?= $form->field($model, 'subscription_end_at')->textInput(['type' => 'datetime']) ?>
 
-      
-    <?= $form->field($model, 'subscription_status')->textInput() ?>
 
 
 
