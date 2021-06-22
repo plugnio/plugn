@@ -60,13 +60,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             ],
             [
-                'attribute' => 'payment_net_amount',
-                'format' => 'raw',
-                'value' => function ($data) {
-                    return Yii::$app->formatter->asCurrency($data->payment_net_amount, $data->currency->code);;
-                }
-            ],
-            [
                 'attribute' => 'payment_gateway_fee',
                 'format' => 'raw',
                 'value' => function ($data) {
@@ -78,6 +71,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'raw',
                 'value' => function ($data) {
                     return Yii::$app->formatter->asCurrency($data->plugn_fee, $data->currency->code);
+                }
+            ],
+            [
+                'attribute' => 'payment_net_amount',
+                'format' => 'raw',
+                'value' => function ($data) {
+                    return Yii::$app->formatter->asCurrency($data->payment_net_amount, $data->currency->code);;
                 }
             ],
             'payment_created_at',
