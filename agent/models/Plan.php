@@ -6,6 +6,25 @@ namespace agent\models;
 
 class Plan extends \common\models\Plan
 {
+    public function extraFields()
+    {
+        $fields = parent::extraFields ();
+
+        $fields['paymentMethods'] = PaymentMethod::find()
+            ->where(['payment_method_id' => '1'])
+            ->orWhere(['payment_method_id' => '2'])
+            ->all();
+
+        $fields['formatedPrice'] = function ($model) {
+
+            $store = Yii::$app->accountManager->getManagedAccount();
+
+            return \Yii::$app->formatter->asCurrency($model->price, $store->currency->code);
+        };
+
+        return $fields;
+    }
+
     /**
      * Gets query for [[Subscriptions]].
      *
