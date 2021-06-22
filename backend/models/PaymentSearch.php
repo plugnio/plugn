@@ -44,7 +44,11 @@ class PaymentSearch extends Payment
      */
     public function search($params)
     {
-        $query = Payment::find()->joinWith(['restaurant', 'customer']);
+
+        $query = Payment::find()
+              ->joinWith(['restaurant', 'customer'])
+              ->orderBy(['order_created_at' => SORT_DESC]);
+
 
         // add conditions that should always apply here
 
