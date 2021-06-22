@@ -396,8 +396,9 @@ return [
                    'class' => 'yii\rest\UrlRule',
                    'controller' => 'v1/plan',
                    'patterns' => [
+                       'GET callback' => 'callback',
                        'GET <id>' => 'view',
-                       'GET callback/<id>' => 'callback',
+                       'POST confirm' => 'confirm',
                        // OPTIONS VERBS
                        'OPTIONS <id>' => 'options'
                    ]

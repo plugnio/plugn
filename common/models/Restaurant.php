@@ -1837,8 +1837,9 @@ class Restaurant extends \yii\db\ActiveRecord
             ->filterWhere([
                 'AND',
                 ['subscription_status' => Subscription::STATUS_ACTIVE],
-                new Expression('DATE(subscription_end_at) >= DATE(NOW())')
-            ]);
+                new Expression('subscription_end_at IS NULL || DATE(subscription_end_at) >= DATE(NOW())')
+            ])
+            ->orderBy('subscription_start_at DESC');
     }
 
     /**
