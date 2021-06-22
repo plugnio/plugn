@@ -383,13 +383,23 @@ return [
                     ]
                 ],
                 [ // StatsController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/stats',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'view',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
+                    ]
+                ],
+                [ // PlanController
                    'class' => 'yii\rest\UrlRule',
-                   'controller' => 'v1/stats',
-                   'pluralize' => false,
+                   'controller' => 'v1/plan',
                    'patterns' => [
-                       'GET' => 'view',
+                       'GET <id>' => 'view',
+                       'GET callback/<id>' => 'callback',
                        // OPTIONS VERBS
-                       'OPTIONS' => 'options'
+                       'OPTIONS <id>' => 'options'
                    ]
                ],
             ],
