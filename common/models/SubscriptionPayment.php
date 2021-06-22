@@ -123,17 +123,18 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
      * @return self                                [description]
      */
     public static function updatePaymentStatusFromTap($id, $showUpdatedFlashNotification = false) {
+
         // Look for payment with same Payment Gateway Transaction ID
         $paymentRecord = \common\models\SubscriptionPayment::findOne(['payment_gateway_transaction_id' => $id]);
         if (!$paymentRecord) {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
-
         // Request response about it from TAP
         Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
 
         $response = Yii::$app->tapPayments->retrieveCharge($id);
+
         $responseContent = json_decode($response->content);
 
         // If there's an error from TAP, exit and display error
