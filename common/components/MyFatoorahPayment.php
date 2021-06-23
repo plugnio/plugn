@@ -384,7 +384,7 @@ class MyFatoorahPayment extends Component
 
       if($platform_fee > 0){
 
-        if($gateway == static::GATEWAY_KNET){
+        if($paymentMethodCode == static::GATEWAY_KNET){
 
                //if amount less than or equal 10
               if ($this->minChargeAmount <= $amount) {
