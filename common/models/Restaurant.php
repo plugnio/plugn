@@ -124,15 +124,16 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  */
 class Restaurant extends \yii\db\ActiveRecord
 {
-
     //Values for `restaurant_status`
     const RESTAURANT_STATUS_OPEN = 1;
     const RESTAURANT_STATUS_BUSY = 2;
     const RESTAURANT_STATUS_CLOSED = 3;
+
     //Values for `phone_number_display`
     const PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER = 1;
     const PHONE_NUMBER_DISPLAY_ICON = 2;
     const PHONE_NUMBER_DISPLAY_SHOW_PHONE_NUMBER = 3;
+
     //Values for `store_layout`
     const STORE_LAYOUT_LIST_FULLWIDTH = 1;
     const STORE_LAYOUT_GRID_FULLWIDTH = 2;
@@ -145,6 +146,7 @@ class Restaurant extends \yii\db\ActiveRecord
     const SCENARIO_CREATE_TAP_ACCOUNT = 'tap_account';
     const SCENARIO_UPLOAD_STORE_DOCUMENT = 'upload';
     const SCENARIO_CONNECT_DOMAIN = 'domain';
+    const SCENARIO_UPDATE_LAYOUT = 'layout';
 
     public $restaurant_delivery_area;
     public $restaurant_payments_method;
@@ -301,6 +303,9 @@ class Restaurant extends \yii\db\ActiveRecord
             self::SCENARIO_CONNECT_DOMAIN => ['restaurant_domain'],
             self::SCENARIO_CREATE_STORE_BY_AGENT => [
                 'name', 'owner_number', 'restaurant_domain', 'currency_id', 'country_id'
+            ],
+            self::SCENARIO_UPDATE_LAYOUT => [
+                'default_language', 'store_layout', 'phone_number_display', 'logo', 'thumbnail_image'
             ],
             self::SCENARIO_CREATE_TAP_ACCOUNT => [
                 'owner_first_name', 'owner_last_name', 'owner_email', 'owner_number',
@@ -503,7 +508,6 @@ class Restaurant extends \yii\db\ActiveRecord
     public function uploadDocumentsToTap()
     {
 
-
         //Upload Authorized Signature file
         if ($this->authorized_signature_file && $this->authorized_signature_file_purpose && $this->authorized_signature_title) {
 
@@ -673,8 +677,6 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function createAnAccountOnTap()
     {
-
-
         //Upload documents file on our server before we create an account on tap we gonaa delete them
         $this->uploadDocumentsToTap ();
 
@@ -746,7 +748,6 @@ class Restaurant extends \yii\db\ActiveRecord
                 ->where (['restaurant_uuid' => $this->restaurant_uuid])
                 ->all ();
 
-
             foreach ($sotred_restaurant_payment_method as $restaurant_payment_method) {
                 if (!in_array ($restaurant_payment_method->payment_method_id, $payments_method)) {
                     RestaurantPaymentMethod::deleteAll (['restaurant_uuid' => $this->restaurant_uuid, 'payment_method_id' => $restaurant_payment_method->payment_method_id]);
@@ -789,12 +790,12 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function uploadLogo($imageURL)
     {
-
         $filename = Yii::$app->security->generateRandomString ();
 
         try {
             $result = Yii::$app->cloudinaryManager->upload (
-                $imageURL, [
+                $imageURL,
+                [
                     'public_id' => "restaurants/" . $this->restaurant_uuid . "/logo/" . $filename
                 ]
             );
@@ -804,14 +805,15 @@ class Restaurant extends \yii\db\ActiveRecord
                 $this->deleteRestaurantLogo ();
             }
 
-
             if ($result || count ($result) > 0) {
                 $this->logo = basename ($result['url']);
                 $this->save ();
             }
 
-            unlink ($imageURL);
+            if(!str_contains ($imageURL, 'amazonaws.com'))
+                unlink ($imageURL);
 
+            return true;
 
         } catch (\Cloudinary\Error $err) {
             Yii::error ("Error when uploading logo photos to Cloudinry: " . json_encode ($err));
@@ -824,38 +826,41 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function uploadThumbnailImage($imageURL)
     {
-
         $filename = Yii::$app->security->generateRandomString ();
 
         try {
+            //Delete old store's ThumbnailImage
+            if ($this->thumbnail_image) {
+                $this->deleteRestaurantThumbnailImage ();
+            }
+
             $result = Yii::$app->cloudinaryManager->upload (
                 $imageURL, [
                     'public_id' => "restaurants/" . $this->restaurant_uuid . "/thumbnail-image/" . $filename
                 ]
             );
 
-
-            //Delete old store's ThumbnailImage
-            if ($this->thumbnail_image) {
-                $this->deleteRestaurantThumbnailImage ();
-            }
-
             if ($result || count ($result) > 0) {
                 $this->thumbnail_image = basename ($result['url']);
                 $this->save ();
             }
 
-            unlink ($imageURL);
+            if(!str_contains ($imageURL, 'amazonaws.com'))
+                unlink ($imageURL);
 
+            return true;
 
         } catch (\Cloudinary\Error $err) {
             Yii::error ("Error when uploading thumbnail photos to Cloudinry: " . json_encode ($err));
         }
     }
 
+    /**
+     * @param bool $insert
+     * @return bool|void
+     */
     public function beforeSave($insert)
     {
-
         if ($this->scenario == self::SCENARIO_CREATE_STORE_BY_AGENT && $insert) {
 
             $store_name = strtolower (str_replace (' ', '_', $this->name));
@@ -868,22 +873,17 @@ class Restaurant extends \yii\db\ActiveRecord
 
             if ($isDomainExist)
                 return $this->addError ('restaurant_domain', 'Another store is already using this domain');
-
-
         }
-
 
         if ($this->live_api_key && $this->test_api_key)
             $this->is_tap_enable = 1;
         else
             $this->is_tap_enable = 0;
 
-
         if ($this->scenario == self::SCENARIO_UPLOAD_STORE_DOCUMENT) {
             //delete tmp files
             $this->deleteTempFiles ();
         }
-
 
         return parent::beforeSave ($insert);
     }
@@ -919,7 +919,6 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         parent::afterSave ($insert, $changedAttributes);
 
-
         if ($this->scenario == self::SCENARIO_CREATE_STORE_BY_AGENT && $insert) {
 
             //Create a new record in queue table
@@ -929,9 +928,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
             if (!$queue_model->save ())
                 Yii::error ('Queue Error:' . json_encode ($queue_model->errors));
-
         }
-
 
         if ($insert) {
 

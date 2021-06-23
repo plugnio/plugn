@@ -24,9 +24,9 @@ class Restaurant extends \common\models\Restaurant {
 
         return array_merge ($fields, [
             'restaurantPaymentMethods',
-            'activeSubscription'
+            'activeSubscription',
+            'restaurantTheme'
         ]);
-
     }
 
     /**

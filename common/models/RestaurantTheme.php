@@ -69,5 +69,4 @@ class RestaurantTheme extends \yii\db\ActiveRecord {
     public function getRestaurant($modelClass = "\common\models\Restaurant") {
         return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-
 }
