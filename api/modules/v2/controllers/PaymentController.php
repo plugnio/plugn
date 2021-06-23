@@ -68,7 +68,12 @@ class PaymentController extends Controller {
 
       $headerSignature = $headers->get('MyFatoorah-Signature');
 
-      $payCurrency = $data['PayCurrency'];
+
+      if($eventType == 1)  //1 For Transaction Status Changed
+        $payCurrency = $data['PayCurrency'];
+      else if  ($eventType == 2) //2 For Refund Status Changed
+        $payCurrency = Yii::$app->request->getBodyParam("CountryIsoCode");;
+
 
       if($payCurrency == 'KWD')
         $secretKey = 'WmlCnGR8+MXAlNZ3lyMdW/mD06jXa2kWa44g21lPawoRTMoZpKmn39ihdcQKYKw3uax7QYfhuEK+qPDkIvzfmA=='; // from portal
