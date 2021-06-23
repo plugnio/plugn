@@ -62,6 +62,7 @@ class PaymentController extends Controller {
     public function actionMyFatoorahWebhook() {
 
       $data = Yii::$app->request->getBodyParam("Data");
+      $eventType = Yii::$app->request->getBodyParam("EventType");
 
 
       $headers = Yii::$app->request->headers;
@@ -87,7 +88,6 @@ class PaymentController extends Controller {
       if ($headerSignature != null)  {
         $isValidSignature = false;
 
-        $eventType = Yii::$app->request->getBodyParam("EventType");
         $data = Yii::$app->request->getBodyParam("Data");
 
 
