@@ -405,10 +405,10 @@ z-index: 2;
                                 ])->textInput([
                                     'type' => 'number',
                                     'oninput' => 'inputHasBeenUpdated(event)',
-                                    'step' => '0.100',
+                                    'step' => '0.01',
                                     'min' => 0,
                                     'placeholder' => '0',
-                                    // 'max' => $order_model->total_price,
+                                    'max' => $order_model->total_price,
                                     'id' => 'refund_amount',
                                     // 'value' => \Yii::$app->formatter->asDecimal(0, 3),
                                     'class' => 'form-control'
