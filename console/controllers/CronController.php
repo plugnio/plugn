@@ -578,7 +578,9 @@ class CronController extends \yii\console\Controller {
 
                 if($refund->store->is_myfatoorah_enable) {
 
-                  $response = Yii::$app->myFatoorahPayment->makeRefund($refund->payment->payment_gateway_payment_id, $refund->refund_amount, $refund->reason, $refund->store->supplierCode,$refund->currency->code);
+                  Yii::$app->myFatoorahPayment->setApiKeys($refund->currency->code);
+
+                  $response = Yii::$app->myFatoorahPayment->makeRefund($refund->payment->payment_gateway_payment_id, $refund->refund_amount, $refund->reason, $refund->store->supplierCode);
 
                   $responseContent = json_decode($response->content);
 

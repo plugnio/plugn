@@ -146,7 +146,9 @@ class Refund extends \yii\db\ActiveRecord
 
       if($this->store->is_myfatoorah_enable){
 
-        $totalAwaitingBalanceResponse = Yii::$app->myFatoorahPayment->getSupplierDashboard($this->store->supplierCode,$this->currency->code);
+        Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
+
+        $totalAwaitingBalanceResponse = Yii::$app->myFatoorahPayment->getSupplierDashboard($this->store->supplierCode);
 
         $responseContent = json_decode($totalAwaitingBalanceResponse->content);
 

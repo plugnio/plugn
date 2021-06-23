@@ -442,6 +442,7 @@ class OrderController extends Controller {
 
                             Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
 
+                            Yii::$app->myFatoorahPayment->setApiKeys($order->currency->code);
                             $initiatePayment = Yii::$app->myFatoorahPayment->initiatePayment($order->total_price, $order->currency->code);
                             $initiatePaymentResponse = json_decode($initiatePayment->content);
 
@@ -470,6 +471,8 @@ class OrderController extends Controller {
                                   'message' =>  'This payment method is not supported'
                               ];
                             }
+
+                            Yii::$app->myFatoorahPayment->setApiKeys($order->currency->code);
 
                             $response = Yii::$app->myFatoorahPayment->createCharge(
                                     $order->currency->code,
@@ -601,12 +604,14 @@ class OrderController extends Controller {
      */
     public function actionMyFatoorahCallback($paymentId) {
 
-            $response = Yii::$app->myFatoorahPayment->retrieveCharge($paymentId, 'PaymentId', 'KWD');
+            Yii::$app->myFatoorahPayment->setApiKeys('KWD');
+            $response = Yii::$app->myFatoorahPayment->retrieveCharge($paymentId, 'PaymentId');
 
             $responseContent = json_decode($response->content);
 
             if(!$responseContent->IsSuccess){
-              $response = Yii::$app->myFatoorahPayment->retrieveCharge($paymentId, 'PaymentId', 'SAR');
+              Yii::$app->myFatoorahPayment->setApiKeys('SAR');
+              $response = Yii::$app->myFatoorahPayment->retrieveCharge($paymentId, 'PaymentId');
               $responseContent = json_decode($response->content);
             }
 
