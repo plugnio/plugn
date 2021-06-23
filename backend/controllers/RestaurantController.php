@@ -190,28 +190,6 @@ class RestaurantController extends Controller {
 
 
     /**
-     * Merge
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionMergeBranch($id, $head) {
-
-        $store = $this->findModel($id);
-
-        $mergeDevelopResponse = Yii::$app->githubComponent->mergeABranch('Merge branch develop into' . $store->store_branch_name, $store->store_branch_name,  $head);
-
-        if (!$mergeDevelopResponse->isOk) {
-          Yii::error('[Github > Error While merging with develop]' . json_encode($mergeDevelopResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
-          Yii::$app->session->setFlash('errorResponse', json_encode($mergeDevelopResponse->data['message']));
-          return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
-        }
-
-      return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
-
-    }
-
-    /**
      * Update sitemap
      * @param integer $id
      * @return mixed
@@ -278,86 +256,6 @@ class RestaurantController extends Controller {
 
       return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
 
-    }
-
-
-    /**
-     * Creates a new Tap account
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreateTapAccount($restaurant_uuid) {
-        $model = $this->findModel($restaurant_uuid);
-        $model->setScenario(Restaurant::SCENARIO_CREATE_TAP_ACCOUNT);
-
-        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
-
-            $restaurant_authorized_signature_file = UploadedFile::getInstances($model, 'restaurant_authorized_signature_file');
-            $restaurant_commercial_license_file = UploadedFile::getInstances($model, 'restaurant_commercial_license_file');
-
-            $owner_identification_file_front_side = UploadedFile::getInstances($model, 'owner_identification_file_front_side');
-            $owner_identification_file_back_side = UploadedFile::getInstances($model, 'owner_identification_file_back_side');
-
-            if (sizeof($restaurant_commercial_license_file) > 0)
-                $model->restaurant_commercial_license_file = $restaurant_commercial_license_file[0]; //Commercial License
-
-            if (sizeof($restaurant_authorized_signature_file) > 0)
-                $model->restaurant_authorized_signature_file = $restaurant_authorized_signature_file[0]; //Authorized signature
-
-            if (sizeof($owner_identification_file_front_side) > 0)
-                $model->owner_identification_file_front_side = $owner_identification_file_front_side[0]; //Owner's civil id front side
-
-            if (sizeof($owner_identification_file_back_side) > 0)
-                $model->owner_identification_file_back_side = $owner_identification_file_back_side[0]; //Owner's civil id back side
-
-
-
-            $model->createTapAccount();
-
-
-            if ($model->validate() && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
-            } else {
-                Yii::$app->session->setFlash('error', print_r($model->errors, true));
-            }
-        }
-
-        return $this->render('create_tap_account', [
-                    'model' => $model,
-        ]);
-    }
-
-    /**
-     * Creates a new Restaurant model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate() {
-        $model = new Restaurant();
-
-        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->save()) {
-
-            if ($model->restaurant_payments_method)
-                $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
-
-
-            $thumbnail_image = UploadedFile::getInstances($model, 'restaurant_thumbnail_image');
-
-            $logo = UploadedFile::getInstances($model, 'restaurant_logo');
-
-            if ($thumbnail_image)
-                $model->uploadThumbnailImage($thumbnail_image[0]->tempName);
-
-            if ($logo)
-                $model->uploadLogo($logo[0]->tempName);
-
-
-            return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
-        }
-
-        return $this->render('create', [
-                    'model' => $model,
-        ]);
     }
 
     /**
