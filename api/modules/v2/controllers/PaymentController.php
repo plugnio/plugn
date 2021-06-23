@@ -61,10 +61,20 @@ class PaymentController extends Controller {
      */
     public function actionMyFatoorahWebhook() {
 
+      $data = Yii::$app->request->getBodyParam("Data");
+
+
       $headers = Yii::$app->request->headers;
 
       $headerSignature = $headers->get('MyFatoorah-Signature');
-      $secretKey = 'EZS82VQx/n67xEW+rtA8pHSGDM3+lbS9EWB7kUo6tUzFrHekGK7AaAxhIXOnAbs3jQorjTF3t8B1Lhf1qkSloQ=='; // from portal
+
+      $payCurrency = $data['PayCurrency'];
+
+      if($payCurrency == 'KWD')
+        $secretKey = 'WmlCnGR8+MXAlNZ3lyMdW/mD06jXa2kWa44g21lPawoRTMoZpKmn39ihdcQKYKw3uax7QYfhuEK+qPDkIvzfmA=='; // from portal
+      else if ($payCurrency == 'SAR')
+        $secretKey = 'sFfT2vIPVu7+GWlGFWqyH47wuVfNrhnqNpg2FCScRDrhoDiEmyvCPKBJcWcPf4takQR21o/PBK/oXfabiq0dUg==';// from portal
+
 
       $isValidSignature = true;
 
