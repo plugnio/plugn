@@ -100,7 +100,7 @@ class MyFatoorahPayment extends Component
     /**
      * @var float gateway fee charged by portal
      */
-    public $minChargeAmount = 4; // How much is charged per KNET transaction
+    public $minChargeAmount = 10; // How much is charged per KNET transaction
 
     /**
      * @var float gateway fee charged by portal
@@ -384,10 +384,24 @@ class MyFatoorahPayment extends Component
 
       if($platform_fee > 0){
 
-      $platform_fee =  $amount *  $platform_fee ;
+        if($gateway == static::GATEWAY_KNET){
 
-         if($warehouse_fee > 0)
-           $platform_fee = $warehouse_fee + $platform_fee;
+               //if amount less than or equal 10
+              if ($this->minChargeAmount <= $amount) {
+                 $platform_fee = 0.200;
+               }
+               //else if greater than 10
+               else {
+                 $platform_fee = $amount *  $platform_fee;
+               }
+
+          }
+          else
+              $platform_fee =  $amount *  $platform_fee ;
+
+       if($warehouse_fee > 0)
+         $platform_fee = $warehouse_fee + $platform_fee;
+
 
        $proposedShare = $proposedShare - $platform_fee;
 

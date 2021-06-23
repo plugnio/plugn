@@ -16,10 +16,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="restaurant-view">
     <h1>
         <?= Html::encode($this->title) ?>
-        <span class="badge">
-            <?= $model->status ?>
-        </span>
-        <?= $model->is_tap_enable ? '' : Html::a('Create Tap account', ['create-tap-account', 'restaurant_uuid' => $model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
 
 
     </h1>
