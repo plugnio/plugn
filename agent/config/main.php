@@ -356,6 +356,7 @@ return [
                         'POST disable-online-payment/<id>' => 'disable-online-payment',
                         'POST enable-cod/<id>' => 'enable-cod',
                         'POST disable-cod/<id>' => 'disable-cod',
+                        'POST update-layout' => 'update-layout',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS connect-domain' => 'options',
@@ -367,6 +368,7 @@ return [
                         'OPTIONS disable-online-payment/<id>' => 'options',
                         'OPTIONS enable-cod/<id>' => 'options',
                         'OPTIONS disable-cod/<id>' => 'options',
+                        'OPTIONS update-layout' => 'options'
                     ]
                 ],
 

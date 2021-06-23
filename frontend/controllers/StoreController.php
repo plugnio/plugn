@@ -551,7 +551,6 @@ class StoreController extends Controller {
 
         $store_theme_model = RestaurantTheme::findOne($model->restaurant_uuid);
 
-
         return $this->render('design-layout/view-design-layout', [
                     'model' => $model,
                     'store_theme_model' => $store_theme_model
