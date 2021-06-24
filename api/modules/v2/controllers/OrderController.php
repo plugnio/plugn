@@ -617,6 +617,7 @@ class OrderController extends Controller {
 
 
             if($responseContent->IsSuccess){
+              \Yii::error('enter actionMyFatoorahCallback => ' . $responseContent, __METHOD__); // Log error faced by user
 
               $paymentRecord = Payment::updatePaymentStatusFromMyFatoorah($responseContent->Data->InvoiceId);
 
