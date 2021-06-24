@@ -96,8 +96,13 @@ class RefundController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save(false)) {
-            return $this->redirect(['view', 'id' => $model->refund_id]);
+        if ($model->load(Yii::$app->request->post()) ) {
+
+            if(!$model->refund_reference)
+              $model->refund_reference = null;
+
+            if($model->save(false))
+              return $this->redirect(['view', 'id' => $model->refund_id]);
         }
 
         return $this->render('update', [
