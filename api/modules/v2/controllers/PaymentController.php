@@ -77,9 +77,9 @@ class PaymentController extends Controller {
 
 
       if($payCurrency == 'KWD')
-        $secretKey = 'WmlCnGR8+MXAlNZ3lyMdW/mD06jXa2kWa44g21lPawoRTMoZpKmn39ihdcQKYKw3uax7QYfhuEK+qPDkIvzfmA=='; // from portal
+        $secretKey = \Yii::$app->params['myfatoorah.kuwaitSecretKey']; // from portal 
       else if ($payCurrency == 'SAR')
-        $secretKey = 'sFfT2vIPVu7+GWlGFWqyH47wuVfNrhnqNpg2FCScRDrhoDiEmyvCPKBJcWcPf4takQR21o/PBK/oXfabiq0dUg==';// from portal
+        $secretKey = \Yii::$app->params['myfatoorah.saudiSecretKey'];// from portal
 
 
       $isValidSignature = true;

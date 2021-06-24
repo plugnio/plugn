@@ -78,7 +78,7 @@ return [
             ]
         ],
         'tapPayments' => [
-            'gatewayToUse' => \common\components\TapPayments::USE_TEST_GATEWAY,
+            'gatewayToUse' => \common\components\TapPayments::USE_LIVE_GATEWAY,
         ],
         'myFatoorahPayment' => [
             'gatewayToUse' => \common\components\MyFatoorahPayment::USE_LIVE_GATEWAY
