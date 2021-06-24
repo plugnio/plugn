@@ -6,6 +6,17 @@ namespace agent\models;
 
 class BankDiscount extends \common\models\BankDiscount
 {
+
+    public function fields()
+    {
+        $field = parent::fields();
+
+        $field['redeemed'] = function ($model) {
+            return $model->getCustomerBankDiscounts()->count();
+        };
+        return $field;
+    }
+
     /**
      * Gets query for [[CustomerBankDiscounts]].
      *

@@ -4,7 +4,7 @@
 namespace agent\models;
 
 
-class Bank extends \common\models\AgentAssignment
+class Bank extends \common\models\Bank
 {
     /**
      * Gets query for [[BankDiscounts]].

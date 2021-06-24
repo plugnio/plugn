@@ -60,10 +60,8 @@ class BankDiscountController extends Controller {
 
 
     /**
-    * Get all store's bankDiscounts
-     * @param type $id
-     * @param type $store_uuid
-     * @return type
+     * @param $store_uuid
+     * @return ActiveDataProvider
      */
     public function actionList($store_uuid) {
 
@@ -74,21 +72,22 @@ class BankDiscountController extends Controller {
         $query =  BankDiscount::find()->joinWith('bank');
 
         if ($keyword){
-          $query->where(['like', 'discount_amount', $keyword]);
-          $query->orWhere(['like', 'bank.bank_name', $keyword]);
-          $query->orWhere(['like', 'max_redemption', $keyword]);
-          $query->orWhere(['like', 'discount_type', $keyword]);
-          $query->orWhere(['like', 'limit_per_customer', $keyword]);
+            $query->andWhere(
+                ['or',
+                    ['like', 'bank_discount.discount_amount', $keyword],
+                    ['like', 'bank.bank_name', $keyword],
+                    ['like', 'bank_discount.max_redemption', $keyword],
+                    ['like', 'bank_discount.discount_type', $keyword],
+                    ['like', 'bank_discount.limit_per_customer', $keyword]
+                ]
+            );
         }
-
-        $query->andWhere(['restaurant_uuid' => $store_uuid]);
+        $query->andWhere(['bank_discount.restaurant_uuid' => $store_uuid]);
 
         return new ActiveDataProvider([
           'query' => $query
         ]);
-
     }
-
 
     /**
      * Create bank discount
@@ -124,14 +123,14 @@ class BankDiscountController extends Controller {
             "message" => "Bank Discount created successfully",
             "model" => BankDiscount::findOne($model->bank_discount_id)
         ];
-
     }
 
-
-
-     /**
-      * Update bank discount
-      */
+    /**
+     * @param $bank_discount_id
+     * @param $store_uuid
+     * @return array|string[]
+     * @throws NotFoundHttpException
+     */
      public function actionUpdate($bank_discount_id, $store_uuid)
      {
 
@@ -146,7 +145,6 @@ class BankDiscountController extends Controller {
          $model->max_redemption = Yii::$app->request->getBodyParam("max_redemption") ? Yii::$app->request->getBodyParam("max_redemption") : 0;
          $model->limit_per_customer = Yii::$app->request->getBodyParam("limit_per_customer") ? Yii::$app->request->getBodyParam("limit_per_customer") : 0;
          $model->minimum_order_amount = Yii::$app->request->getBodyParam("minimum_order_amount") ? Yii::$app->request->getBodyParam("minimum_order_amount") : 0;
-
 
          if (!$model->save())
          {
@@ -170,18 +168,16 @@ class BankDiscountController extends Controller {
          ];
      }
 
-
-     /**
-      * Ability to update bank discount status
-      */
+    /**
+     * Ability to update bank discount status
+     * @return array
+     * @throws NotFoundHttpException
+     */
      public function actionUpdateBankDiscountStatus() {
-
 
          $store_uuid =  Yii::$app->request->getBodyParam('store_uuid');
          $bank_discount_id =  Yii::$app->request->getBodyParam('bank_discount_id');
          $bankDiscountStatus = (int) Yii::$app->request->getBodyParam('bankDiscountStatus');
-
-
          $bank_discount_model = $this->findModel($bank_discount_id, $store_uuid);
 
          if ($bankDiscountStatus) {
@@ -197,28 +193,21 @@ class BankDiscountController extends Controller {
              return [
                  "operation" => "success",
                  "message" => "Bank Discount Status updated successfully",
-                 "model" => $model
+                 "model" => $bank_discount_model
              ];
          }
-
      }
 
-
-
-
     /**
-    * Return bank discount detail
-     * @param type $store_uuid
-     * @param type $order_uuid
-     * @return type
+     * @param $store_uuid
+     * @param $bank_discount_id
+     * @return BankDiscount
+     * @throws NotFoundHttpException
      */
     public function actionDetail($store_uuid, $bank_discount_id) {
 
-        $bank_discount_model =  $this->findModel($bank_discount_id, $store_uuid);
-
-        return $bank_discount_model;
-  }
-
+        return $this->findModel($bank_discount_id, $store_uuid);
+    }
 
      /**
       * Delete Bank Discount
@@ -249,13 +238,11 @@ class BankDiscountController extends Controller {
          ];
      }
 
-
-
     /**
      * Finds the Bank discount model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Country the loaded model
+     * @return BankDiscount the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($bank_discount_id, $store_uuid)
@@ -268,6 +255,4 @@ class BankDiscountController extends Controller {
             throw new NotFoundHttpException('The requested record does not exist.');
         }
     }
-
-
 }

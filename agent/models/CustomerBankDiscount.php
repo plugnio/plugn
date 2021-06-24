@@ -4,7 +4,7 @@
 namespace agent\models;
 
 
-class CustomerBankDiscount
+class CustomerBankDiscount extends \common\models\CustomerBankDiscount
 {
 
     /**
@@ -14,7 +14,7 @@ class CustomerBankDiscount
      */
     public function getBankDiscount($modelClass = "\agent\models\BankDiscount")
     {
-        return parent::getBankAccount($modelClass);
+        return parent::getBankDiscount($modelClass);
     }
 
     /**
