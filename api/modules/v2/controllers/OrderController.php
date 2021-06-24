@@ -617,10 +617,10 @@ class OrderController extends Controller {
 
 
             if($responseContent->IsSuccess){
-              \Yii::error('enter actionMyFatoorahCallback => ' . json_encode($responseContent), __METHOD__); // Log error faced by user
-              \Yii::error('enter $paymentRecord->payment_current_status => ' . $paymentRecord->payment_current_status, __METHOD__); // Log error faced by user
 
               $paymentRecord = Payment::updatePaymentStatusFromMyFatoorah($responseContent->Data->InvoiceId);
+              \Yii::error('enter actionMyFatoorahCallback => ' . json_encode($responseContent), __METHOD__); // Log error faced by user
+              \Yii::error('enter $paymentRecord->payment_current_status => ' . $paymentRecord->payment_current_status, __METHOD__); // Log error faced by user
 
               $paymentRecord->payment_gateway_transaction_id = $responseContent->Data->InvoiceTransactions[0]->TransactionId; //TransactionId
               $paymentRecord->payment_gateway_payment_id = $responseContent->Data->InvoiceTransactions[0]->PaymentId; //payment_gateway_transaction_id = PaymentId
