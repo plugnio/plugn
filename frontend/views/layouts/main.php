@@ -111,6 +111,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
 
 
         <!-- BEGIN: Main Menu-->
+        
         <div class="main-menu menu-fixed menu-light menu-accordion menu-shadow" data-scroll-to-active="true">
             <div class="navbar-header">
                 <ul class="nav navbar-nav flex-row">
