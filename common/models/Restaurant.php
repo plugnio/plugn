@@ -801,17 +801,22 @@ class Restaurant extends \yii\db\ActiveRecord
         $filename = Yii::$app->security->generateRandomString ();
 
         try {
+            //Delete old store's logo
+
+            if ($this->logo) {
+                $this->deleteRestaurantLogo ();
+            }
+
+            if(!$imageURL) {
+                return true;
+            }
+
             $result = Yii::$app->cloudinaryManager->upload (
                 $imageURL,
                 [
                     'public_id' => "restaurants/" . $this->restaurant_uuid . "/logo/" . $filename
                 ]
             );
-
-            //Delete old store's logo
-            if ($this->logo) {
-                $this->deleteRestaurantLogo ();
-            }
 
             if ($result || count ($result) > 0) {
                 $this->logo = basename ($result['url']);
@@ -838,8 +843,13 @@ class Restaurant extends \yii\db\ActiveRecord
 
         try {
             //Delete old store's ThumbnailImage
+
             if ($this->thumbnail_image) {
                 $this->deleteRestaurantThumbnailImage ();
+            }
+
+            if(!$imageURL) {
+                return true;
             }
 
             $result = Yii::$app->cloudinaryManager->upload (

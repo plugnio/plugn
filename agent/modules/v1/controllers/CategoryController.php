@@ -107,6 +107,7 @@ class CategoryController extends Controller {
     public function actionCreate() {
 
         $store_uuid = Yii::$app->request->getBodyParam("store_uuid");
+
         Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $model = new Category();
@@ -117,6 +118,20 @@ class CategoryController extends Controller {
         $model->subtitle_ar = Yii::$app->request->getBodyParam("subtitle_ar");
         $model->sort_number = Yii::$app->request->getBodyParam("sort_number");
 
+        //validate before uploading image
+
+        if (!$model->validate()) {
+            return [
+                "operation" => "error",
+                "message" => $model->errors
+            ];
+        }
+
+        $category_image = Yii::$app->request->getBodyParam('category_image');
+
+        if($category_image) {
+            $model->updateImage($category_image);
+        }
 
         if (!$model->save()) {
             return [
@@ -144,6 +159,21 @@ class CategoryController extends Controller {
          $model->subtitle = Yii::$app->request->getBodyParam("subtitle");
          $model->subtitle_ar = Yii::$app->request->getBodyParam("subtitle_ar");
          $model->sort_number = Yii::$app->request->getBodyParam("sort_number");
+
+         //validate before uploading image
+
+         if (!$model->validate()) {
+             return [
+                 "operation" => "error",
+                 "message" => $model->errors
+             ];
+         }
+
+         $category_image = Yii::$app->request->getBodyParam('category_image');
+
+         if($model->category_image != $category_image) {
+             $model->updateImage($category_image);
+         }
 
          if (!$model->save())
          {
@@ -186,6 +216,7 @@ class CategoryController extends Controller {
         }
 
         //Delete old category image
+
         if ($model->category_image) {
             $model->deleteCategoryImage();
         }
