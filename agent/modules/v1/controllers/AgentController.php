@@ -56,7 +56,15 @@ class AgentController extends Controller {
         return $actions;
     }
 
-
+    /**
+     * return stores assigned
+     * @return mixed
+     */
+    public function actionStores() {
+        return Yii::$app->user->identity
+            ->getAgentAssignments()
+            ->all();
+    }
 
     public function actionDetail() {
         $agent = Yii::$app->user->identity;
