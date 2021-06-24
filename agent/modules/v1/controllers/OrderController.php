@@ -109,6 +109,7 @@ class OrderController extends Controller {
     public function actionListActiveOrders($store_uuid) {
 
         $keyword = Yii::$app->request->get('keyword');
+        $customer_id = Yii::$app->request->get('customer_id');
 
         if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
             $order =  Order::find();
@@ -138,6 +139,10 @@ class OrderController extends Controller {
                     ]
                 );
             }
+            if ($customer_id) {
+                $order->andWhere(['customer_id'=>$customer_id]);
+            }
+
             return new ActiveDataProvider([
               'query' => $order
             ]);
