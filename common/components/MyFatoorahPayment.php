@@ -317,7 +317,6 @@ class MyFatoorahPayment extends Component
           "IsActive" => "true"
         ];
 
-        Yii::error('$this->apiKey => '. $this->apiKey ,__METHOD__);
         $client = new Client();
         $response = $client->createRequest()
                 ->setMethod('POST')
