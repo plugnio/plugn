@@ -271,8 +271,7 @@ class Payment extends \yii\db\ActiveRecord {
             return $paymentRecord;
         }
 
-
-        $paymentRecord->payment_current_status = $responseContent->Data->InvoiceTransactions['TransactionStatus']; // 'CAPTURED' ?
+            $paymentRecord->payment_current_status = $responseContent->Data->InvoiceTransactions[0]->TransactionStatus // 'CAPTURED' ?
 
         $isError = false;
         $errorMessage = "";
@@ -290,10 +289,10 @@ class Payment extends \yii\db\ActiveRecord {
 
 
         // Update payment method used and the order id assigned to it
-        if( isset($responseContent->Data->InvoiceTransactions['PaymentGateway']) && $responseContent->Data->InvoiceTransactions['PaymentGateway'] )
-          $paymentRecord->payment_mode = $responseContent->Data->InvoiceTransactions['PaymentGateway'];
+        if( isset($responseContent->Data->InvoiceTransactions[0]->PaymentGateway) && $responseContent->Data->InvoiceTransactions[0]->PaymentGateway )
+          $paymentRecord->payment_mode = $responseContent->Data->InvoiceTransactions[0]->PaymentGateway;
         if( isset($responseContent->reference->payment) && $responseContent->reference->payment )
-          $paymentRecord->payment_gateway_order_id = $responseContent->Data->InvoiceTransactions['ReferenceId'];
+          $paymentRecord->payment_gateway_order_id = $responseContent->Data->InvoiceTransactions[0]->ReferenceId;
 
           // Net amount after deducting gateway fee
           $paymentRecord->payment_net_amount = (float) $responseContent->Data->Suppliers[0]->DepositShare;
