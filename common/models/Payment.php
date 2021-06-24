@@ -272,7 +272,7 @@ class Payment extends \yii\db\ActiveRecord {
         }
 
 
-        $paymentRecord->payment_current_status = $responseContent->Data->InvoiceStatus; // 'CAPTURED' ?
+        $paymentRecord->payment_current_status = $responseContent->Data->TransactionStatus; // 'CAPTURED' ?
 
         $isError = false;
         $errorMessage = "";
