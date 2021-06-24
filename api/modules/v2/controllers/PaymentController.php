@@ -63,6 +63,7 @@ class PaymentController extends Controller {
 
       $data = Yii::$app->request->getBodyParam("Data");
       $eventType = Yii::$app->request->getBodyParam("EventType");
+      \Yii::error('enter actionMyFatoorahWebhook => ' . $eventType, __METHOD__); // Log error faced by user
 
 
       $headers = Yii::$app->request->headers;
@@ -82,6 +83,8 @@ class PaymentController extends Controller {
         $secretKey = 'sFfT2vIPVu7+GWlGFWqyH47wuVfNrhnqNpg2FCScRDrhoDiEmyvCPKBJcWcPf4takQR21o/PBK/oXfabiq0dUg==';// from portal
 
 
+
+
       $isValidSignature = true;
 
        //Check If Enabled Secret Key and If The header has request
@@ -95,7 +98,10 @@ class PaymentController extends Controller {
 
           if (!$isValidSignature) {
                  $isValidSignature = Yii::$app->myFatoorahPayment->checkMyFatoorahSignature($data, $secretKey, $headerSignature);
-                 if (!$isValidSignature)  throw new ForbiddenHttpException('Invalid Signature');
+                 if (!$isValidSignature) {
+                   \Yii::error('enter actionMyFatoorahWebhook => ' . $eventType, __METHOD__); // Log error faced by user
+                    throw new ForbiddenHttpException('Invalid Signature');
+                 }
           }
 
           switch ($eventType) {
