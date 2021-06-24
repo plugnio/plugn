@@ -118,6 +118,7 @@ class Category extends \yii\db\ActiveRecord
     {
         if ($this->category_image)
             $this->deleteCategoryImage ();
+
         return parent::beforeDelete ();
     }
 
@@ -164,6 +165,46 @@ class Category extends \yii\db\ActiveRecord
         } catch (\Cloudinary\Error $err) {
             Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
             Yii::error ("Error when uploading category image to Cloudinry: ImageUrl Value " . json_encode ($imageURL));
+        }
+    }
+
+    /**
+     * Upload category image to cloudinary
+     * @param type $imageURL
+     */
+    public function updateImage($imageURL)
+    {
+        $filename = Yii::$app->security->generateRandomString ();
+
+        try {
+            //Delete old category image
+
+            if ($this->category_image) {
+                $this->deleteCategoryImage ();
+            }
+
+            if(!$imageURL) {
+                return true;
+            }
+
+            $result = Yii::$app->cloudinaryManager->upload (
+                $imageURL,
+                [
+                    'public_id' => "restaurants/" . $this->restaurant_uuid . "/category/" . $filename
+                ]
+            );
+
+            if ($result || count ($result) > 0) {
+                $this->category_image = basename ($result['url']);
+            }
+
+            if(!str_contains ($imageURL, 'amazonaws.com'))
+                unlink ($imageURL);
+
+            return true;
+
+        } catch (\Cloudinary\Error $err) {
+            Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
         }
     }
 
