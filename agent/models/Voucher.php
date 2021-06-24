@@ -6,6 +6,22 @@ namespace agent\models;
 
 class Voucher extends \common\models\Voucher
 {
+
+    public function fields()
+    {
+        $field = parent::fields();
+        $field['redeemed_txt'] = function($model) {
+            return sizeof($model->activeOrders);
+        };
+
+        $field['total_spent_txt'] = function($model) {
+            $totalSpent = $model->getOrders()->andWhere(['restaurant_uuid' => $model->restaurant_uuid])->sum('total_price');
+
+            return  \Yii::$app->formatter->asCurrency($totalSpent ? $totalSpent : 0, $model->restaurant->currency->code) ;
+        };
+        return $field;
+    }
+
     /**
      * Gets query for [[CustomerVouchers]].
      *
