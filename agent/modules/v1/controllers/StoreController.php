@@ -2,6 +2,7 @@
 
 namespace agent\modules\v1\controllers;
 
+use agent\models\Currency;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
@@ -83,10 +84,12 @@ class StoreController extends Controller
     {
         $store = $this->findModel($store_uuid);
 
+        $store->setScenario(Restaurant::SCENARIO_UPDATE);
+
         $store->country_id = Yii::$app->request->getBodyParam('country_id');
         $store->restaurant_email_notification = Yii::$app->request->getBodyParam('email_notification');
         $store->phone_number = Yii::$app->request->getBodyParam('mobile');
-        $store->phone_number_country_code = Yii::$app->request->getBodyParam('mobile_country_code');
+        $store->phone_number_country_code = (int) Yii::$app->request->getBodyParam('mobile_country_code');
         $store->name = Yii::$app->request->getBodyParam('name');
         $store->name_ar = Yii::$app->request->getBodyParam('name_ar');
         $store->schedule_interval = Yii::$app->request->getBodyParam('schedule_interval');
@@ -94,6 +97,14 @@ class StoreController extends Controller
         $store->restaurant_email = Yii::$app->request->getBodyParam('store_email');
         $store->tagline = Yii::$app->request->getBodyParam('tagline');
         $store->tagline_ar = Yii::$app->request->getBodyParam('tagline_ar');
+
+        $currencyCode = Yii::$app->request->getBodyParam('currency');
+
+        $currency = Currency::findOne(['code' => $currencyCode]);
+
+        if($currency) {
+            $store->currency_id = $currency->currency_id;
+        }
 
         if (!$store->save()) {
             return self::message("error",$store->getErrors());

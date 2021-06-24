@@ -145,6 +145,7 @@ class Restaurant extends \yii\db\ActiveRecord
     const SCENARIO_CREATE_TAP_ACCOUNT = 'tap_account';
     const SCENARIO_UPLOAD_STORE_DOCUMENT = 'upload';
     const SCENARIO_CONNECT_DOMAIN = 'domain';
+    const SCENARIO_UPDATE = 'update';
 
     public $restaurant_delivery_area;
     public $restaurant_payments_method;
@@ -234,7 +235,7 @@ class Restaurant extends \yii\db\ActiveRecord
             [['phone_number', 'owner_number'], 'number'],
 
             [['owner_number'], PhoneInputValidator::className (), 'message' => 'Please insert a valid phone number', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_STORE_BY_AGENT]],
-            [['phone_number'], PhoneInputValidator::className (), 'message' => 'Please insert a valid phone number'],
+            //[['phone_number'], PhoneInputValidator::className (), 'message' => 'Please insert a valid phone number'],
 
 
             //  ['currency_id', function ($attribute, $params, $validator) {
@@ -297,7 +298,9 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function scenarios()
     {
-        return [
+        $scenarios = parent::scenarios();
+
+        return array_merge($scenarios, [
             self::SCENARIO_CONNECT_DOMAIN => ['restaurant_domain'],
             self::SCENARIO_CREATE_STORE_BY_AGENT => [
                 'name', 'owner_number', 'restaurant_domain', 'currency_id', 'country_id'
@@ -314,8 +317,13 @@ class Restaurant extends \yii\db\ActiveRecord
                 'commercial_license_file', 'authorized_signature_file', 'identification_file_front_side',
                 'identification_file_back_side', 'restaurant_commercial_license_file', 'owner_identification_file_front_side',
                 'owner_identification_file_back_side', 'restaurant_authorized_signature_file',
+            ],
+            self::SCENARIO_UPDATE => [
+                'country_id', 'restaurant_email_notification', 'phone_number', 'phone_number_country_code',
+                'name', 'name_ar', 'schedule_interval', 'schedule_order',
+                'restaurant_email', 'tagline', 'tagline_ar', 'currency_id'
             ]
-        ];
+        ]);
     }
 
     /**
