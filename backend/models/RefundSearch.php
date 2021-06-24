@@ -42,8 +42,9 @@ class RefundSearch extends Refund
      */
     public function search($params)
     {
-        $query = Refund::find()->with('store');
-      
+        $query = Refund::find()->with('store')
+                        ->orderBy(['refund_created_at' => SORT_DESC]);
+
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([

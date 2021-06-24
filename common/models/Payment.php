@@ -332,12 +332,10 @@ class Payment extends \yii\db\ActiveRecord {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
-        \Yii::error('enter updatePaymentStatusFromMyFatoorahWebhook => ' . json_encode($responseContent), __METHOD__); // Log error faced by user
-
 
         $paymentRecord->payment_current_status = $responseContent['TransactionStatus']; // 'SUCCESS' ?
         $paymentRecord->received_callback = 1;
-        \Yii::error('new payment_current_status  => ' . json_encode($paymentRecord->payment_current_status), __METHOD__); // Log error faced by user
+
 
         // On Successful Payments
         if ($responseContent['TransactionStatus'] != 'SUCCESS') {
@@ -352,7 +350,6 @@ class Payment extends \yii\db\ActiveRecord {
           $paymentRecord->payment_gateway_order_id = $responseContent['ReferenceId'];
 
         $paymentRecord->save();
-        \Yii::error('new payment_current_status22  => ' . json_encode($paymentRecord->payment_current_status), __METHOD__); // Log error faced by user
 
         return true;
     }

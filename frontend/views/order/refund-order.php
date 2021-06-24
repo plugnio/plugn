@@ -405,7 +405,7 @@ z-index: 2;
                                 ])->textInput([
                                     'type' => 'number',
                                     'oninput' => 'inputHasBeenUpdated(event)',
-                                    'step' => '0.01',
+                                    'step' => '0.001',
                                     'min' => 0,
                                     'placeholder' => '0',
                                     'max' => $order_model->total_price,
