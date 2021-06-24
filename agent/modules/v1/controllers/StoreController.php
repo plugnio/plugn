@@ -412,6 +412,83 @@ class StoreController extends Controller
     }
 
     /**
+     * Updates store layout
+     */
+    public function actionUpdateLayout() {
+
+        $model = Yii::$app->accountManager->getManagedAccount();
+
+        $model->setScenario(Restaurant::SCENARIO_UPDATE_LAYOUT);
+
+        //restaurant
+
+        $model->default_language = Yii::$app->request->getBodyParam('default_language');
+        $model->store_layout = Yii::$app->request->getBodyParam('store_layout');
+        $model->phone_number_display = Yii::$app->request->getBodyParam('phone_number_display');
+
+        if(!$model->validate()) {
+            return [
+                'operation' => 'error',
+                'message' => $model->getErrors()
+            ];
+        }
+
+        $transaction = Yii::$app->db->beginTransaction ();
+
+        if($model->logo != Yii::$app->request->getBodyParam('logo')) {
+            $model->uploadLogo(Yii::$app->request->getBodyParam('logo'));
+        }
+
+        if($model->thumbnail_image != Yii::$app->request->getBodyParam('thumbnail_image')) {
+            $model->uploadThumbnailImage(Yii::$app->request->getBodyParam('thumbnail_image'));
+        }
+
+        if(!$model->save()) {
+
+            $transaction->rollBack ();
+
+            return [
+                'operation' => 'error',
+                'message' => $model->getErrors()
+            ];
+        }
+
+        //theme 
+
+        $restaurantTheme = $model->restaurantTheme;
+
+        if(!$restaurantTheme) {
+            $restaurantTheme = new RestaurantTheme;
+            $restaurantTheme->restaurant_uuid = $model->restaurant_uuid;
+        }
+
+        $themeData = Yii::$app->request->getBodyParam('restaurantTheme');
+
+        $restaurantTheme->primary = $themeData['primary'];
+        $restaurantTheme->secondary = $themeData['secondary'];
+        $restaurantTheme->tertiary = $themeData['tertiary'];
+        $restaurantTheme->light = $themeData['light'];
+        $restaurantTheme->medium = $themeData['medium'];
+        $restaurantTheme->dark = $themeData['dark'];
+
+        if(!$restaurantTheme->save()) {
+            $transaction->rollBack ();
+
+            return [
+                'operation' => 'error',
+                'message' => $restaurantTheme->getErrors()
+            ];
+        }
+
+        $transaction->commit ();
+
+        return [
+            'operation' => 'success',
+            'message' => 'Layout updated successfully'
+        ];
+    }
+
+    /**
      * Finds the Restaurant model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id

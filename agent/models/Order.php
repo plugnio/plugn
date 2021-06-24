@@ -12,6 +12,25 @@ use Yii;
  */
 class Order extends \common\models\Order
 {
+
+    public function fields()
+    {
+        $fields = parent::fields();
+        $fields['status_txt'] = function($model) {
+            return $model->orderStatusInEnglish;
+        };
+        $fields['total_price_txt'] = function($model) {
+            return Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code);
+        };
+
+        $fields['payment_txt'] =  function($model) {
+            return ($model->payment_uuid) ?
+                $model->payment->payment_current_status :
+                $model->paymentMethod->payment_method_name;
+        };
+        return $fields;
+    }
+
     /**
      * @inheritdoc
      */
