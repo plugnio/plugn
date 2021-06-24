@@ -96,7 +96,7 @@ class Refund extends \yii\db\ActiveRecord
      * @return self                                [description]
      */
     public static function updateRefundStatus($refundReference, $responseContent) {
-      \Yii::error('enter updateRefundStatus => ' . $refundReference, __METHOD__); // Log error faced by user
+      \Yii::error('enter updateRefundStatus => ' . json_encode($refundReference), __METHOD__); // Log error faced by user
 
         // Look for refund with same refund_reference
         $refundRecord = \common\models\Refund::findOne(['refund_reference' => $refundReference]);

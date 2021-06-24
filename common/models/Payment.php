@@ -336,7 +336,7 @@ class Payment extends \yii\db\ActiveRecord {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
-        \Yii::error('enter updatePaymentStatusFromMyFatoorahWebhook => ' . $responseContent, __METHOD__); // Log error faced by user
+        \Yii::error('enter updatePaymentStatusFromMyFatoorahWebhook => ' . json_encode($responseContent), __METHOD__); // Log error faced by user
 
         $currentPaymentStatus = $paymentRecord->payment_current_status;
 
