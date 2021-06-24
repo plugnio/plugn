@@ -83,6 +83,8 @@ class PaymentController extends Controller {
         $secretKey = 'sFfT2vIPVu7+GWlGFWqyH47wuVfNrhnqNpg2FCScRDrhoDiEmyvCPKBJcWcPf4takQR21o/PBK/oXfabiq0dUg==';// from portal
 
 
+        \Yii::error('$payCurrency => ' . $payCurrency, __METHOD__); // Log error faced by user
+        \Yii::error('$secretKey => ' . $secretKey, __METHOD__); // Log error faced by user
 
 
       $isValidSignature = true;
