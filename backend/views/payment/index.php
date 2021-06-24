@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'payment_uuid',
+            'order_uuid',
             [
               'attribute' => 'store_name',
               'value' =>     'restaurant.name'
@@ -35,8 +35,8 @@ $this->params['breadcrumbs'][] = $this->title;
               'attribute' => 'customer_name',
               'value' =>     'customer.customer_name'
             ],
-            'order_uuid',
-            'payment_gateway_invoice_id',
+            'payment_current_status:ntext',
+            // 'payment_gateway_invoice_id',
             //'payment_gateway_transaction_id',
             //'payment_gateway_payment_id',
             //'payment_gateway_invoice_id',
