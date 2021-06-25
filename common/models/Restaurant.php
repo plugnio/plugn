@@ -1635,7 +1635,7 @@ class Restaurant extends \yii\db\ActiveRecord
             $month = date('m', strtotime('-'.($months - $i).' month'));
 
             $customer_data[$month] = array(
-                'month'   => (int) $month,
+                'month'   => date('F', strtotime('-'.($months - $i).' month')),
                 'total' => 0
             );
         }
@@ -1649,7 +1649,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         foreach ($rows as $result) {
             $customer_data[date ('m', strtotime ($result['customer_created_at']))] = array(
-                'month' => (int) date ('m', strtotime ($result['customer_created_at'])),
+                'month' => date ('F', strtotime ($result['customer_created_at'])),
                 'total' => (int) $result['total']
             );
         }
@@ -1676,7 +1676,7 @@ class Restaurant extends \yii\db\ActiveRecord
             $month = date('m', strtotime('-'.($months - $i).' month'));
 
             $revenue_generated_chart_data[$month] = array(
-                'month'   => (int) $month,
+                'month'   => date('F', strtotime('-'.($months - $i).' month')),
                 'total' => 0
             );
         }
@@ -1691,7 +1691,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         foreach ($rows as $result) {
             $revenue_generated_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
-                'month' => (int) date ('m', strtotime ($result['order_created_at'])),
+                'month' => date ('F', strtotime ($result['order_created_at'])),
                 'total' => (float) $result['total']
             );
         }
@@ -1719,7 +1719,7 @@ class Restaurant extends \yii\db\ActiveRecord
             $month = date('m', strtotime('-'.($months - $i).' month'));
 
             $orders_received_chart_data[$month] = array(
-                'month'   => (int) $month,
+                'month'   => date('F', strtotime('-'.($months - $i).' month')),
                 'total' => 0
             );
         }
@@ -1734,7 +1734,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         foreach ($rows as $result) {
             $orders_received_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
-                'month' => (int) date ('m', strtotime ($result['order_created_at'])),
+                'month' => date ('F', strtotime ($result['order_created_at'])),
                 'total' => (int) $result['total']
             );
         }
@@ -1762,7 +1762,7 @@ class Restaurant extends \yii\db\ActiveRecord
             $month = date('m', strtotime('-'.($months - $i).' month'));
 
             $sold_item_chart_data[$month] = array(
-                'month'   => (int) $month,
+                'month'   => date('F', strtotime('-'.($months - $i).' month')),
                 'total' => 0
             );
         }
@@ -1776,7 +1776,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         foreach ($rows as $result) {
             $sold_item_chart_data[date ('m', strtotime ($result['order_item_created_at']))] = array(
-                'month' => (int) date ('m', strtotime ($result['order_item_created_at'])),
+                'month' => date ('F', strtotime ($result['order_item_created_at'])),
                 'total' => (int) $result['total']
             );
         }
