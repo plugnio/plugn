@@ -489,6 +489,38 @@ class StoreController extends Controller
     }
 
     /**
+     * Updates an existing Analytics integration.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionUpdateAnalyticsIntegration($id) {
+
+        $model = $this->findModel($id);
+
+        $model->setScenario (Restaurant::SCENARIO_UPDATE_ANALYTICS);
+
+        $model->google_analytics_id = Yii::$app->request->getBodyParam ('google_analytics_id');
+        $model->facebook_pixil_id = Yii::$app->request->getBodyParam ('facebook_pixil_id');
+        $model->snapchat_pixil_id = Yii::$app->request->getBodyParam ('snapchat_pixil_id');
+
+        $model->sitemap_require_update = 1;
+
+        if (!$model->save()) {
+            return [
+                'operation' => 'error',
+                'message' => $model->getErrors ()
+            ];
+        }
+
+        return [
+            'operation' => 'success',
+            'message' => 'Analytics integration updated successfully'
+        ];
+    }
+
+    /**
      * Finds the Restaurant model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
