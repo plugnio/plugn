@@ -148,6 +148,7 @@ class Restaurant extends \yii\db\ActiveRecord
     const SCENARIO_CONNECT_DOMAIN = 'domain';
     const SCENARIO_UPDATE = 'update';
     const SCENARIO_UPDATE_LAYOUT = 'layout';
+    const SCENARIO_UPDATE_ANALYTICS = 'update_analytics';
 
     public $restaurant_delivery_area;
     public $restaurant_payments_method;
@@ -304,6 +305,12 @@ class Restaurant extends \yii\db\ActiveRecord
 
         return array_merge($scenarios, [
             self::SCENARIO_CONNECT_DOMAIN => ['restaurant_domain'],
+            self::SCENARIO_UPDATE_ANALYTICS => [
+                'google_analytics_id',
+                'facebook_pixil_id',
+                'snapchat_pixil_id',
+                'sitemap_require_update'
+            ],
             self::SCENARIO_CREATE_STORE_BY_AGENT => [
                 'name', 'owner_number', 'restaurant_domain', 'currency_id', 'country_id'
             ],

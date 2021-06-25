@@ -345,9 +345,11 @@ return [
                         'POST enable-cod/<id>' => 'enable-cod',
                         'POST disable-cod/<id>' => 'disable-cod',
                         'POST update-layout' => 'update-layout',
+                        'POST update-analytics-integration/<id>' => 'update-analytics-integration',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS connect-domain' => 'options',
+                        'OPTIONS update-analytics-integration/<id>' => 'options',
                         'OPTIONS disable-payment-method/<id>/<paymentMethodId>' => 'options',
                         'OPTIONS enable-payment-method/<id>/<paymentMethodId>' => 'options',
                         'OPTIONS view-payment-methods/<id>' => 'options',
