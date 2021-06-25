@@ -472,7 +472,7 @@ class TapPayments extends Component
         ];
 
 
-        if($platform_fee > 0){
+        if($platform_fee > 0) {
            if($gateway == static::GATEWAY_KNET){
 
                  //if greater than 10KD
@@ -526,6 +526,7 @@ class TapPayments extends Component
          }
 
         $client = new Client();
+
         $response = $client->createRequest()
                 ->setMethod('POST')
                 ->setUrl($chargeEndpoint)
