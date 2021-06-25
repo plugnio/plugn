@@ -18,7 +18,6 @@ class City extends \common\models\City
                 ->filterWhere(['delivery_zone_id' => $delivery_zone_id])
                 ->count();
         };
-
         return $fields;
     }
 

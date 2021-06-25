@@ -61,61 +61,16 @@ class OrderController extends Controller {
         return $actions;
     }
 
-    /**
-     * Return a List pending Orders
-     * @param $store_uuid
-     * @return ActiveDataProvider
-     */
-    public function actionListPendingOrders($store_uuid) {
-
+    public function actionList($type) {
+        $store_uuid = Yii::$app->request->get('store_uuid');
         $keyword = Yii::$app->request->get('keyword');
+        Yii::$app->accountManager->getManagedAccount($store_uuid);
+        $order =  Order::find();
+        $order->orderBy(['order_created_at' => SORT_DESC]);
 
-        if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
-
-            $order =  Order::find();
-            $order->orderBy(['order_created_at' => SORT_DESC]);
-            if($keyword) {
-                $order->andWhere(
-                    ['or',
-                        ['like', 'business_location_name', $keyword],
-                        ['like', 'payment_method_name', $keyword],
-                        ['like', 'order_uuid', $keyword],
-                        ['like', 'customer_name', $keyword],
-                        ['like', 'customer_phone_number', $keyword],
-                        ['like', 'order_uuid', $keyword]
-                    ]
-                );
-            }
-
+        if ($type == 'active') {
             $order->andWhere(
                 [
-                    'restaurant_uuid' => $store_uuid,
-                    'order_status' => Order::STATUS_PENDING
-                ]
-            );
-
-            return new ActiveDataProvider([
-                'query' => $order
-            ]);
-        }
-    }
-
-
-    /**
-     * Return a List active Orders
-     * @param $store_uuid
-     * @return ActiveDataProvider
-     */
-    public function actionListActiveOrders($store_uuid) {
-
-        $keyword = Yii::$app->request->get('keyword');
-        $customer_id = Yii::$app->request->get('customer_id');
-
-        if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
-            $order =  Order::find();
-            $order->andWhere(
-                [
-                    'restaurant_uuid' => $store_uuid,
                     'order_status' => [
                         Order::STATUS_PENDING,
                         Order::STATUS_BEING_PREPARED,
@@ -124,109 +79,32 @@ class OrderController extends Controller {
                         Order::STATUS_ACCEPTED
                     ]
                 ]
-            )
-              ->orderBy(['order_created_at' => SORT_DESC]);
-
-            if($keyword) {
-                $order->andWhere(
-                    ['or',
-                      ['like', 'business_location_name', $keyword],
-                      ['like', 'payment_method_name', $keyword],
-                      ['like', 'order_uuid', $keyword],
-                      ['like', 'customer_name', $keyword],
-                      ['like', 'customer_phone_number', $keyword],
-                      ['like', 'order_uuid', $keyword]
-                    ]
-                );
-            }
-            if ($customer_id) {
-                $order->andWhere(['customer_id'=>$customer_id]);
-            }
-
-            return new ActiveDataProvider([
-              'query' => $order
-            ]);
+            );
+        } else if ($type == 'pending') {
+            $order->andWhere(['order_status' => Order::STATUS_PENDING]);
+        } else if ($type == 'abandoned') {
+            $order->andWhere(['order_status' => Order::STATUS_ABANDONED_CHECKOUT]);
+        } else if ($type == 'draft') {
+            $order->andWhere(['order_status' => Order::STATUS_DRAFT]);
         }
-    }
 
-    /**
-     * Return a List draft Orders
-     * @param $store_uuid
-     * @return ActiveDataProvider
-     */
-    public function actionListDraftOrders($store_uuid) {
-
-      $keyword = Yii::$app->request->get('keyword');
-
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
-
-          $order =  Order::find();
-
-          if($keyword) {
-              $order->andWhere(
-                  ['or',
-                      ['like', 'business_location_name', $keyword],
-                      ['like', 'payment_method_name', $keyword],
-                      ['like', 'order_uuid', $keyword],
-                      ['like', 'customer_name', $keyword],
-                      ['like', 'customer_phone_number', $keyword],
-                      ['like', 'order_uuid', $keyword]
-                  ]
-              );
-          }
-          $order->andWhere(
-              [
-                'restaurant_uuid' => $store_uuid,
-                  'order_status' => Order::STATUS_DRAFT
-              ]
-          )
-          ->orderBy(['order.order_created_at' => SORT_DESC]);
-
-          return new ActiveDataProvider([
-              'query' => $order
-          ]);
-      }
-    }
-
-
-    /**
-     * Return a List abandoned Orders
-     * @param $store_uuid
-     * @return ActiveDataProvider
-     */
-    public function actionListAbandonedOrders($store_uuid) {
-
-      $keyword = Yii::$app->request->get('keyword');
-
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
-          $order =  Order::find();
-          if($keyword) {
-              $order->andWhere(
-                  ['or',
-                      ['like', 'business_location_name', $keyword],
-                      ['like', 'payment_method_name', $keyword],
-                      ['like', 'order_uuid', $keyword],
-                      ['like', 'customer_name', $keyword],
-                      ['like', 'customer_phone_number', $keyword],
-                      ['like', 'order_uuid', $keyword]
-                  ]
-              );
-          }
-
-          $order->andWhere(
-              [
-                  'restaurant_uuid' => $store_uuid,
-                  'order_status' => Order::STATUS_ABANDONED_CHECKOUT
-              ]
-          )
-          ->orderBy(['order.order_created_at' => SORT_DESC]);
-
-            return new ActiveDataProvider([
-                'query' => $order
-            ]);
+        $order->andWhere(['restaurant_uuid' => $store_uuid]);
+        if ($keyword) {
+            $order->andWhere(
+                ['or',
+                    ['like', 'business_location_name', $keyword],
+                    ['like', 'payment_method_name', $keyword],
+                    ['like', 'order_uuid', $keyword],
+                    ['like', 'customer_name', $keyword],
+                    ['like', 'customer_phone_number', $keyword],
+                    ['like', 'order_uuid', $keyword]
+                ]
+            );
         }
+        return new ActiveDataProvider([
+            'query' => $order
+        ]);
     }
-
 
       /**
        * Place an order

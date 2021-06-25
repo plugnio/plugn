@@ -6,6 +6,16 @@ namespace agent\models;
 
 class Country extends \common\models\Country
 {
+    public function fields()
+    {
+        $field = parent::fields();
+        $field['area_count_txt'] = function($model) {
+            return count($model->areas);
+        };
+
+        return $field;
+    }
+
     /**
      * Gets query for [[Cities]].
      *

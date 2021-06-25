@@ -4,7 +4,7 @@
 namespace agent\models;
 
 
-class AreaDeliveryZone extends \common\models\AgentAssignment
+class AreaDeliveryZone extends \common\models\AreaDeliveryZone
 {
     /**
      * Gets query for [[Area]].

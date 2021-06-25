@@ -74,14 +74,11 @@ class OpeningHoursController extends Controller {
                     ->where(['restaurant_uuid' => $store_model->restaurant_uuid])
                     ->orderBy(['day_of_week' => SORT_ASC, 'open_at' => SORT_ASC]);
 
-
       return new ActiveDataProvider([
           'query' => $query
       ]);
 
     }
-
-
 
     /**
      * Create opening hours
@@ -99,8 +96,8 @@ class OpeningHoursController extends Controller {
               $model->restaurant_uuid = $store_model->restaurant_uuid;
 
               $model->day_of_week = $opening_hour['day_of_week'];
-              $model->open_at = $opening_hour['open_at'];
-              $model->close_at = $opening_hour['close_at'];
+              $model->open_at = date('H:i:s', strtotime($opening_hour['open_at']));
+              $model->close_at = date('H:i:s', strtotime($opening_hour['close_at']));
 
               if (!$model->save())
               {
@@ -116,16 +113,12 @@ class OpeningHoursController extends Controller {
                       ];
                   }
               }
-
             }
-
              return [
                  "operation" => "success",
                  "message" => "Opening Hour created successfully"
              ];
         }
-
-
     }
 
     /**
@@ -154,8 +147,8 @@ class OpeningHoursController extends Controller {
                 $model = new OpeningHour;
                 $model->restaurant_uuid = $store_model->restaurant_uuid;
                 $model->day_of_week = $day_of_week;
-                $model->open_at = $opening_hour['open_at'];
-                $model->close_at = $opening_hour['close_at'];
+                $model->open_at = date('H:i:s', strtotime($opening_hour['open_at']));
+                $model->close_at = date('H:i:s', strtotime($opening_hour['close_at']));
 
                 if (!$model->save ()) {
                     if (isset($model->errors)) {
