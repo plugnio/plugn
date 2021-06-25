@@ -23,6 +23,10 @@ class Order extends \common\models\Order
             return Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code);
         };
 
+        $fields['delivery_fee_txt'] = function($model) {
+            return Yii::$app->formatter->asCurrency($model->delivery_fee, $model->currency->code);
+        };
+
         $fields['payment_txt'] =  function($model) {
             return ($model->payment_uuid) ?
                 $model->payment->payment_current_status :
