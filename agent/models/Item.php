@@ -82,6 +82,7 @@ class Item extends \common\models\Item {
             'itemImages',
             'options',
             'categoryItems',
+            'extraOptions',
         ];
     }
 

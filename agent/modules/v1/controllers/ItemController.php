@@ -78,7 +78,7 @@ class ItemController extends Controller
         $query->andWhere(['restaurant_uuid'=>$store_uuid]);
         $query->orderBy('item_created_at DESC');
 
-        if ($keyword) {
+        if ($keyword && $keyword != 'null') {
             $query->filterWhere ([
                     'or',
                     ['like', 'item_name', $keyword],
