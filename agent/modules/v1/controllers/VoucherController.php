@@ -73,7 +73,7 @@ class VoucherController extends Controller {
         $query =  Voucher::find();
         $query->andWhere(['restaurant_uuid' => $store_uuid]);
         $query->orderBy('voucher_id DESC');
-        if ($keyword) {
+        if ($keyword && $keyword != null) {
             $query->filterWhere ([
                 'or',
                 ['like', 'code', $keyword],
