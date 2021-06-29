@@ -84,7 +84,6 @@ class OrderController extends Controller {
 
             list($start_date, $end_date) = explode(' - ', $store_model->export_orders_data_in_specific_date_range);
 
-
             $searchResult = Order::find()
                     ->activeOrders($storeUuid)
                     ->with('voucher')
@@ -211,7 +210,8 @@ class OrderController extends Controller {
                     'model' => $store_model
         ]);
       }
-    /**
+
+      /**
      * Lists all draft Orders.
      * @return mixed
      */

@@ -4,12 +4,14 @@ namespace agent\modules\v1\controllers;
 
 use agent\models\ExtraOption;
 use agent\models\Option;
+use agent\models\Order;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use agent\models\Item;
+
 
 class ItemController extends Controller
 {
@@ -344,6 +346,92 @@ class ItemController extends Controller
             "operation" => "success",
             "message" => "Item deleted successfully"
         ];
+    }
+
+    public function actionItemsReport()
+    {
+        $store_model = Yii::$app->accountManager->getManagedAccount();
+
+        if($store_model->export_sold_items_data_in_specific_date_range) {
+            list($start_date, $end_date) = explode(' - ', $store_model->export_sold_items_data_in_specific_date_range);
+        } else {
+            $start_date = $end_date = null;
+        }
+
+            $query = \agent\models\Item::find()
+                ->joinWith(['orderItems', 'orderItems.order'])
+                ->where(['order.order_status' => Order::STATUS_PENDING])
+                ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
+                ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
+                ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                ->andWhere(['order.restaurant_uuid' => $store_model->restaurant_uuid]);
+
+            if($start_date && $end_date) {
+                $query->andWhere (['between', 'order.order_created_at', $start_date, $end_date]);
+            }
+
+            $searchResult = $query->all();
+
+            header('Access-Control-Allow-Origin: *');
+            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
+            header("Cache-Control: max-age=0");
+
+            \moonland\phpexcel\Excel::export([
+                'isMultipleSheet' => false,
+                'models' => $searchResult,
+                'columns' => [
+                    'item_name',
+                    'sku',
+                    'barcode',
+                    [
+                        'header' => 'Unit sold',
+                        'label' => 'Sold items',
+                        'format' => 'html',
+                        'value' => function ($data)  use ($start_date,$end_date) {
+                            return $data->getSoldUnitsInSpecifcDate($start_date,$end_date);
+                        },
+                    ],
+                ],
+            ]);
+    }
+
+    public function actionExportToExcel()
+    {
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount();
+
+        $model = \agent\models\Item::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->all();
+
+        header('Access-Control-Allow-Origin: *');
+        header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        header("Content-Disposition: attachment;filename=\"item-report.xlsx\"");
+        header("Cache-Control: max-age=0");
+
+        \moonland\phpexcel\Excel::export([
+            'isMultipleSheet' => false,
+            'models' => $model,
+            'columns' => [
+                [
+                    'header' => 'Item name',
+                    "format" => "raw",
+                    "value" => function($data) {
+                        return $data->item_name;
+                    }
+                ],
+                'sku',
+                'barcode',
+                'stock_qty',
+                'unit_sold',
+                [
+                    'attribute' => 'item_price',
+                    "format" => "raw",
+                    "value" => function($data) {
+                        return Yii::$app->formatter->asCurrency($data->item_price, $data->currency->code);
+                    }
+                ]
+            ],
+        ]);
     }
 
     /**
