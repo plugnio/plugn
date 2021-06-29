@@ -149,6 +149,7 @@ class Restaurant extends \yii\db\ActiveRecord
     const SCENARIO_UPDATE = 'update';
     const SCENARIO_UPDATE_LAYOUT = 'layout';
     const SCENARIO_UPDATE_ANALYTICS = 'update_analytics';
+    const SCENARIO_UPDATE_DELIVERY = 'update_delivery';
 
     public $restaurant_delivery_area;
     public $restaurant_payments_method;
@@ -334,6 +335,9 @@ class Restaurant extends \yii\db\ActiveRecord
                 'country_id', 'restaurant_email_notification', 'phone_number', 'phone_number_country_code',
                 'name', 'name_ar', 'schedule_interval', 'schedule_order',
                 'restaurant_email', 'tagline', 'tagline_ar', 'currency_id'
+            ],
+            self::SCENARIO_UPDATE_DELIVERY => [
+                'armada_api_key', 'mashkor_branch_id'
             ]
         ]);
     }

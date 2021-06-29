@@ -293,7 +293,7 @@ class StoreController extends Controller
     }
 
     /**
-     *  Enable OnlinePayment on delivery
+     *  Enable OnlinePayment
      */
     public function actionEnableOnlinePayment($id)
     {
@@ -338,7 +338,7 @@ class StoreController extends Controller
     }
 
     /**
-     *  Disable OnlinePayment on delivery
+     *  Disable OnlinePayment
      */
     public function actionDisableOnlinePayment($id)
     {
@@ -485,6 +485,28 @@ class StoreController extends Controller
         return [
             'operation' => 'success',
             'message' => 'Layout updated successfully'
+        ];
+    }
+
+    public function actionUpdateDeliveryIntegration($id) {
+
+        $model = $this->findModel($id);
+
+        $model->setScenario (Restaurant::SCENARIO_UPDATE_DELIVERY);
+
+        $model->armada_api_key = Yii::$app->request->getBodyParam ('armada_api_key');
+        $model->mashkor_branch_id = Yii::$app->request->getBodyParam ('mashkor_branch_id');
+
+        if (!$model->save()) {
+            return [
+                'operation' => 'error',
+                'message' => $model->getErrors ()
+            ];
+        }
+
+        return [
+            'operation' => 'success',
+            'message' => 'Delivery integration updated successfully'
         ];
     }
 
