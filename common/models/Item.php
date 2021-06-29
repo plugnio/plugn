@@ -410,17 +410,21 @@ class Item extends \yii\db\ActiveRecord
      * Gets query for [[Options]].
      *
      */
-    public function getSoldUnitsInSpecifcDate($start_date, $end_date, $modelClass = "\common\models\OrderItem")
+    public function getSoldUnitsInSpecifcDate($start_date = null, $end_date = null, $modelClass = "\common\models\OrderItem")
     {
-        return $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
+        $query = $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
             ->joinWith ('order')
             ->where (['order.order_status' => Order::STATUS_PENDING])
             ->orWhere (['order.order_status' => Order::STATUS_BEING_PREPARED])
             ->orWhere (['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
             ->orWhere (['order.order_status' => Order::STATUS_COMPLETE])
-            ->orWhere (['order_status' => Order::STATUS_CANCELED])
-            ->andWhere (['between', 'order.order_created_at', $start_date, $end_date])
-            ->sum ('qty');
+            ->orWhere (['order_status' => Order::STATUS_CANCELED]);
+
+        if($start_date && $end_date) {
+            $query->andWhere (['between', 'order.order_created_at', $start_date, $end_date]);
+        }
+
+        return $query->sum ('qty');
     }
 
     /**

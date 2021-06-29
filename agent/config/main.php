@@ -53,6 +53,7 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET detail' => 'detail',
+                        'GET orders-report' => 'orders-report',
                         'GET <type>' => 'list',
                         'POST <store_uuid>' => 'place-an-order',
                         'PATCH <order_uuid>/<store_uuid>' => 'update',
@@ -62,6 +63,7 @@ return [
                         'DELETE <order_uuid>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS orders-report' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS update-order-status/<order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS request-driver-from-armada/<order_uuid>/<store_uuid>' => 'options',
@@ -286,6 +288,8 @@ return [
                     'controller' => 'v1/item',
                     'patterns' => [
                         'GET' => 'list',
+                        'GET export-to-excel' => 'export-to-excel',
+                        'GET items-report' => 'items-report',
                         'GET <id>' => 'detail',
                         'POST' => 'create',
                         'POST update-stock' => 'update-stock-qty',
@@ -293,6 +297,8 @@ return [
                         'DELETE <id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS export-to-excel' => 'options',
+                        'OPTIONS items-report' => 'options',
                         'OPTIONS <id>' => 'options',
                         'OPTIONS update-stock' => 'options',
                     ]
@@ -303,10 +309,12 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',
+                        'GET export-to-excel' => 'export-to-excel',
                         'GET detail' => 'detail',
                         'GET orders' => 'list-all-customer-orders',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS export-to-excel' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS orders' => 'options'
                     ]
