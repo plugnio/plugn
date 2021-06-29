@@ -65,11 +65,18 @@ class OrderController extends Controller
         return $actions;
     }
 
+    /**
+     * list orders
+     * @param $type
+     * @return ActiveDataProvider
+     */
     public function actionList($type)
     {
         $store_uuid = Yii::$app->request->get ('store_uuid');
         $keyword = Yii::$app->request->get ('keyword');
+
         Yii::$app->accountManager->getManagedAccount ($store_uuid);
+
         $order = Order::find ();
         $order->orderBy (['order_created_at' => SORT_DESC]);
 
@@ -94,6 +101,7 @@ class OrderController extends Controller
         }
 
         $order->andWhere (['restaurant_uuid' => $store_uuid]);
+
         if ($keyword) {
             $order->andWhere (
                 ['or',
@@ -106,9 +114,55 @@ class OrderController extends Controller
                 ]
             );
         }
+
         return new ActiveDataProvider([
             'query' => $order
         ]);
+    }
+
+    /**
+     * return active order count
+     * @return ActiveDataProvider
+     */
+    public function actionTotalActive()
+    {
+        $store = Yii::$app->accountManager->getManagedAccount ();
+
+        $totalActiveOrders = Order::find ()
+            ->andWhere ([
+                'in',
+                'order_status',
+                [
+                    Order::STATUS_PENDING,
+                    Order::STATUS_BEING_PREPARED,
+                    Order::STATUS_OUT_FOR_DELIVERY,
+                    Order::STATUS_COMPLETE,
+                    Order::STATUS_ACCEPTED
+                ]
+            ])
+            ->andWhere (['restaurant_uuid' => $store->restaurant_uuid])
+            ->count();
+
+        $latestOrder = Order::find ()
+            ->andWhere ([
+                'in',
+                'order_status',
+                [
+                    Order::STATUS_PENDING,
+                    Order::STATUS_BEING_PREPARED,
+                    Order::STATUS_OUT_FOR_DELIVERY,
+                    Order::STATUS_COMPLETE,
+                    Order::STATUS_ACCEPTED
+                ]
+            ])
+            ->andWhere (['restaurant_uuid' => $store->restaurant_uuid])
+            ->orderBy (['order_created_at' => SORT_DESC])
+            ->one();
+
+        return [
+            'totalActiveOrders' => (int) $totalActiveOrders,
+            'latestOrderId' => $latestOrder? $latestOrder->order_uuid: null
+        ];
     }
 
     /**
@@ -307,10 +361,7 @@ class OrderController extends Controller
      */
     public function actionUpdate($order_uuid, $store_uuid)
     {
-
-
         $order = $this->findModel ($order_uuid, $store_uuid);
-
 
         //Save Customer Info
         $order->customer_name = Yii::$app->request->getBodyParam ("customer_name");
@@ -318,9 +369,7 @@ class OrderController extends Controller
         $order->customer_phone_country_code = Yii::$app->request->getBodyParam ("country_code") ? Yii::$app->request->getBodyParam ("country_code") : 965;
         $order->customer_email = Yii::$app->request->getBodyParam ("email"); //optional
 
-
         $order->order_mode = Yii::$app->request->getBodyParam ("order_mode");
-
 
         //Apply promo code
         if (Yii::$app->request->getBodyParam ("voucher_id")) {
@@ -368,7 +417,6 @@ class OrderController extends Controller
         } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
             $order->pickup_location_id = Yii::$app->request->getBodyParam ("business_location_id");
         }
-
 
         $response = [];
 
@@ -465,19 +513,15 @@ class OrderController extends Controller
             }
         }
 
-
         return $response;
     }
-
 
     /**
      * Update Order Status
      */
     public function actionUpdateOrderStatus($order_uuid, $store_uuid)
     {
-
         $model = $this->findModel ($order_uuid, $store_uuid);
-
 
         //Update order status
         $model->order_status = Yii::$app->request->getBodyParam ("order_status");
@@ -501,13 +545,10 @@ class OrderController extends Controller
             "message" => "Order status updated successfully",
             "model" => $model
         ];
-
     }
-
 
     public function actionRequestDriverFromArmada($order_uuid, $store_uuid)
     {
-
         $armadaApiKey = Yii::$app->request->getBodyParam ("armada_api_key");
 
         $model = $this->findModel ($order_uuid, $store_uuid);
@@ -549,9 +590,7 @@ class OrderController extends Controller
             "operation" => "success",
             "message" => "Your request has been successfully submitted"
         ];
-
     }
-
 
     /**
      * Request a driver from Mashkor
@@ -580,7 +619,6 @@ class OrderController extends Controller
             ];
         }
 
-
         if (!$model->save ()) {
             if (isset($model->errors)) {
                 return [
@@ -599,9 +637,7 @@ class OrderController extends Controller
             "operation" => "success",
             "message" => "Your request has been successfully submitted"
         ];
-
     }
-
 
     /**
      * Return order detail
@@ -643,7 +679,6 @@ class OrderController extends Controller
             "message" => "Order deleted successfully"
         ];
     }
-
 
     /**
      * Lists all Order models.

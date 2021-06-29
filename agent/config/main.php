@@ -54,6 +54,7 @@ return [
                     'patterns' => [
                         'GET detail' => 'detail',
                         'GET orders-report' => 'orders-report',
+                        'GET total-active' => 'total-active',
                         'GET <type>' => 'list',
                         'POST <store_uuid>' => 'place-an-order',
                         'PATCH <order_uuid>/<store_uuid>' => 'update',
@@ -63,6 +64,7 @@ return [
                         'DELETE <order_uuid>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS total-active' => 'options',
                         'OPTIONS orders-report' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS update-order-status/<order_uuid>/<store_uuid>' => 'options',
