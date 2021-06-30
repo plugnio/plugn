@@ -56,7 +56,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'payment_amount_charged',
                 'format' => 'raw',
                 'value' => function ($data) {
-                    return Yii::$app->formatter->asCurrency($data->payment_amount_charged, $data->currency->code);;
+                    return Yii::$app->formatter->asCurrency($data->payment_amount_charged, $data->currency->code,[ \NumberFormatter::MIN_FRACTION_DIGITS => 0, \NumberFormatter::MAX_FRACTION_DIGITS => 3 ]);
                 }
             ],
             [
