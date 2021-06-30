@@ -94,7 +94,7 @@ return [
         ],
         'githubComponent' => [
             'class' => 'common\components\GithubComponent',
-            'token' => '12f36b57c96399bbee096fa2c8f858d06eef883a',
+            'token' => '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',
             'branch' => 'master'
         ],
         'slack' => [
