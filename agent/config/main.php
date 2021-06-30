@@ -171,11 +171,13 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'detail',
+                        'GET store-profile' => 'store-profile',
                         'GET stores' => 'stores',
                         'PUT update' => 'update-agent-profile',
                         'POST change-password' => 'change-password',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS store-profile' => 'options',
                         'OPTIONS stores' => 'options',
                         'OPTIONS update' => 'options',
                         'OPTIONS change-password' => 'options',
