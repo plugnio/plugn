@@ -63,21 +63,21 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'payment_gateway_fee',
                 'format' => 'raw',
                 'value' => function ($data) {
-                    return Yii::$app->formatter->asCurrency($data->payment_gateway_fee, $data->currency->code);;
+                    return Yii::$app->formatter->asCurrency($data->payment_gateway_fee, $data->currency->code,,[ \NumberFormatter::MIN_FRACTION_DIGITS => 0, \NumberFormatter::MAX_FRACTION_DIGITS => 3 ]);
                 }
             ],
             [
                 'attribute' => 'plugn_fee',
                 'format' => 'raw',
                 'value' => function ($data) {
-                    return Yii::$app->formatter->asCurrency($data->plugn_fee, $data->currency->code);
+                    return Yii::$app->formatter->asCurrency($data->plugn_fee, $data->currency->code,,[ \NumberFormatter::MIN_FRACTION_DIGITS => 0, \NumberFormatter::MAX_FRACTION_DIGITS => 3 ]);
                 }
             ],
             [
                 'attribute' => 'payment_net_amount',
                 'format' => 'raw',
                 'value' => function ($data) {
-                    return Yii::$app->formatter->asCurrency($data->payment_net_amount, $data->currency->code);;
+                    return Yii::$app->formatter->asCurrency($data->payment_net_amount, $data->currency->code,,[ \NumberFormatter::MIN_FRACTION_DIGITS => 0, \NumberFormatter::MAX_FRACTION_DIGITS => 3 ]);
                 }
             ],
             'payment_created_at',

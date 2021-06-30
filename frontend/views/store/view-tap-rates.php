@@ -209,7 +209,7 @@ $this->params['breadcrumbs'][] = $this->title;
       <span >
         <h5><b>Fees (on premium plan)</b></h5>
         <span>
-            1.5% per transaction, no minimum
+            1.725% per transaction, no minimum
         </span>
       </span>
     </div>
