@@ -296,6 +296,7 @@ return [
                         'POST' => 'create',
                         'POST update-stock' => 'update-stock-qty',
                         'PATCH <id>' => 'update',
+                        'PATCH update-status/<id>/<store_uuid>' => 'change-status',
                         'DELETE <id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
@@ -303,6 +304,7 @@ return [
                         'OPTIONS items-report' => 'options',
                         'OPTIONS <id>' => 'options',
                         'OPTIONS update-stock' => 'options',
+                        'OPTIONS update-status/<id>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// CustomerController

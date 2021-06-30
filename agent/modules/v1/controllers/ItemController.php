@@ -320,9 +320,12 @@ class ItemController extends Controller
         ];
     }
 
-
     /**
-     * Delete Business Location
+     * @param $id
+     * @return array|string[]
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
      */
     public function actionDelete($id)
     {
@@ -432,6 +435,39 @@ class ItemController extends Controller
                 ]
             ],
         ]);
+    }
+
+    /**
+     * change status
+     * @param $id
+     * @param $store_uuid
+     * @return array|string[]
+     * @throws NotFoundHttpException
+     */
+    public function actionChangeStatus($id, $store_uuid)
+    {
+        $model = $this->findModel($id, $store_uuid);
+        $model->scenario = Item::SCENARIO_UPDATE_STATUS;
+
+        $model->item_status = ($model->item_status == Item::ITEM_STATUS_PUBLISH) ? Item::ITEM_STATUS_UNPUBLISH : Item::ITEM_STATUS_PUBLISH;
+        if (!$model->save ()) {
+            if (isset($model->errors)) {
+                return [
+                    "operation" => "error",
+                    "message" => $model->errors
+                ];
+            } else {
+                return [
+                    "operation" => "error",
+                    "message" => "We've faced a problem while status change of item"
+                ];
+            }
+        }
+
+        return [
+            "operation" => "success",
+            "message" => "Item status changed successfully"
+        ];
     }
 
     /**

@@ -51,6 +51,8 @@ class Item extends \yii\db\ActiveRecord
     const ITEM_STATUS_PUBLISH = 1;
     const ITEM_STATUS_UNPUBLISH = 2;
 
+    const SCENARIO_UPDATE_STATUS = 'update-status';
+
     /**
      * {@inheritdoc}
      */
@@ -85,6 +87,15 @@ class Item extends \yii\db\ActiveRecord
             [['item_uuid'], 'unique'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className (), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
+    }
+
+
+    public function scenarios()
+    {
+        $parent = parent::scenarios();
+
+        $parent[self::SCENARIO_UPDATE_STATUS] = ['item_status'];
+        return $parent;
     }
 
     /**
