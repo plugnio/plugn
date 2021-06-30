@@ -54,6 +54,7 @@ return [
                     'patterns' => [
                         'GET detail' => 'detail',
                         'GET orders-report' => 'orders-report',
+                        'GET total-active' => 'total-active',
                         'GET <type>' => 'list',
                         'POST <store_uuid>' => 'place-an-order',
                         'PATCH <order_uuid>/<store_uuid>' => 'update',
@@ -63,6 +64,7 @@ return [
                         'DELETE <order_uuid>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS total-active' => 'options',
                         'OPTIONS orders-report' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS update-order-status/<order_uuid>/<store_uuid>' => 'options',
@@ -354,9 +356,11 @@ return [
                         'POST disable-cod/<id>' => 'disable-cod',
                         'POST update-layout' => 'update-layout',
                         'POST update-analytics-integration/<id>' => 'update-analytics-integration',
+                        'POST update-delivery-integration/<id>' => 'update-delivery-integration',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS connect-domain' => 'options',
+                        'OPTIONS update-delivery-integration/<id>' => 'options',
                         'OPTIONS update-analytics-integration/<id>' => 'options',
                         'OPTIONS disable-payment-method/<id>/<paymentMethodId>' => 'options',
                         'OPTIONS enable-payment-method/<id>/<paymentMethodId>' => 'options',
