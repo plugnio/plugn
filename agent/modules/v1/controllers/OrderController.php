@@ -74,14 +74,34 @@ class OrderController extends Controller
     {
         $store_uuid = Yii::$app->request->get ('store_uuid');
         $keyword = Yii::$app->request->get ('keyword');
+        $order_uuid = Yii::$app->request->get ('order_uuid');
+        $phone = Yii::$app->request->get ('phone');
+        $status = Yii::$app->request->get ('status');
+        $date_range = Yii::$app->request->get ('date_range');
 
         Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
-        $order = Order::find ();
-        $order->orderBy (['order_created_at' => SORT_DESC]);
+        $query = Order::find();
 
+        # as we already doing some search with keyword textbox so reusing that
+        if ($order_uuid) {
+            $keyword = $order_uuid;
+        } else if ($phone) {
+            $keyword = $phone;
+        }
+
+        // grid filtering conditions
+        $query->orderBy (['order_created_at' => SORT_DESC]);
+
+        if ($status) {
+            $query->andFilterWhere(['order_status' => $status]);
+        }
+
+        if ($date_range) {
+            $query->filterByCreatedDate($date_range);
+        }
         if ($type == 'active') {
-            $order->andWhere (
+            $query->andWhere (
                 [
                     'order_status' => [
                         Order::STATUS_PENDING,
@@ -93,30 +113,29 @@ class OrderController extends Controller
                 ]
             );
         } else if ($type == 'pending') {
-            $order->andWhere (['order_status' => Order::STATUS_PENDING]);
+            $query->andWhere (['order_status' => Order::STATUS_PENDING]);
         } else if ($type == 'abandoned') {
-            $order->andWhere (['order_status' => Order::STATUS_ABANDONED_CHECKOUT]);
+            $query->andWhere (['order_status' => Order::STATUS_ABANDONED_CHECKOUT]);
         } else if ($type == 'draft') {
-            $order->andWhere (['order_status' => Order::STATUS_DRAFT]);
+            $query->andWhere (['order_status' => Order::STATUS_DRAFT]);
         }
 
-        $order->andWhere (['restaurant_uuid' => $store_uuid]);
+        $query->andWhere(['restaurant_uuid' => $store_uuid]);
 
         if ($keyword) {
-            $order->andWhere (
+            $query->andWhere (
                 ['or',
                     ['like', 'business_location_name', $keyword],
                     ['like', 'payment_method_name', $keyword],
                     ['like', 'order_uuid', $keyword],
                     ['like', 'customer_name', $keyword],
                     ['like', 'customer_phone_number', $keyword],
-                    ['like', 'order_uuid', $keyword]
                 ]
             );
         }
 
         return new ActiveDataProvider([
-            'query' => $order
+            'query' => $query
         ]);
     }
 

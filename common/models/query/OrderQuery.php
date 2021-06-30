@@ -70,4 +70,12 @@ class OrderQuery extends \yii\db\ActiveQuery
             ->count ();
     }
 
+    public function filterByCreatedDate($date_range){
+        // do we have values? if so, add a filter to our query
+        if (!empty($date_range) && strpos($date_range, '-') !== false) {
+            list($start_date, $end_date) = explode(' - ', $date_range);
+            return $this->andFilterWhere(['between', 'order_created_at', $start_date, $end_date]);
+        }
+    }
+
 }
