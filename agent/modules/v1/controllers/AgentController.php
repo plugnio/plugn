@@ -66,6 +66,16 @@ class AgentController extends Controller {
             ->all();
     }
 
+    public function actionStoreProfile() {
+
+        $restaurant = Yii::$app->accountManager->getManagedAccount();
+
+        return Yii::$app->user->identity
+            ->getAgentAssignments()
+            ->andWhere(['restaurant_uuid' => $restaurant->restaurant_uuid])
+            ->one();
+    }
+
     public function actionDetail() {
         $agent = Yii::$app->user->identity;
 
@@ -82,7 +92,11 @@ class AgentController extends Controller {
 
     }
 
-
+    /**
+     * update store profile
+     * @param $store_uuid
+     * @return array|string[]
+     */
     public function actionUpdateAgentProfile($store_uuid) {
 
         $model = Yii::$app->user->identity;
@@ -115,16 +129,9 @@ class AgentController extends Controller {
           } else {
 
             $agentAssignment->assignment_agent_email = Yii::$app->request->getBodyParam("agent_email");
-
-
-            if(Yii::$app->request->getBodyParam("email_notification") != null )
-              $agentAssignment->email_notification = Yii::$app->request->getBodyParam("email_notification");
-
-            if(Yii::$app->request->getBodyParam("reminder_email") != null )
-              $agentAssignment->reminder_email = Yii::$app->request->getBodyParam("reminder_email");
-
-            if(Yii::$app->request->getBodyParam("receive_weekly_stats") != null )
-              $agentAssignment->receive_weekly_stats = Yii::$app->request->getBodyParam("receive_weekly_stats");
+            $agentAssignment->email_notification = Yii::$app->request->getBodyParam("email_notification");
+            $agentAssignment->reminder_email = Yii::$app->request->getBodyParam("reminder_email");
+            $agentAssignment->receive_weekly_stats = Yii::$app->request->getBodyParam("receive_weekly_stats");
 
             $agentAssignment->save(false);
 
