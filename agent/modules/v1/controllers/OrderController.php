@@ -2,7 +2,7 @@
 
 namespace agent\modules\v1\controllers;
 
-use frontend\models\OrderSearch;
+use common\models\AreaDeliveryZone;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
@@ -839,6 +839,79 @@ class OrderController extends Controller
         ]);
     }
 
+    /**
+     * Creates a new Order model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreate($storeUuid) {
+
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $model = new Order();
+        $model->setScenario(\common\models\Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
+
+        $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
+        $model->is_order_scheduled = 0;
+
+        $order_mode = Yii::$app->request->getBodyParam('order_mode');
+        $customer_name = Yii::$app->request->getBodyParam('customer_name');
+        $area_name = Yii::$app->request->getBodyParam('area_name');
+        $area_id = Yii::$app->request->getBodyParam('area_id');
+        $unit_type = Yii::$app->request->getBodyParam('unit_type');
+        $street = Yii::$app->request->getBodyParam('street');
+        $avenue = Yii::$app->request->getBodyParam('avenue');
+        $building = Yii::$app->request->getBodyParam('building');
+        $block = Yii::$app->request->getBodyParam('block');
+        $customer_email = Yii::$app->request->getBodyParam('customer_email');
+        $customer_phone_country_code = Yii::$app->request->getBodyParam('customer_phone_country_code');
+        $customer_phone_number = Yii::$app->request->getBodyParam('customer_phone_number');
+        $pickup_location_id = Yii::$app->request->getBodyParam('pickup_location_id');
+        $estimated_time_of_arrival = Yii::$app->request->getBodyParam('estimated_time_of_arrival');
+        $special_directions = Yii::$app->request->getBodyParam('special_directions');
+
+        $model->order_mode = $order_mode;
+        $model->customer_name= $customer_name;
+        $model->area_name = $area_name;
+        $model->area_id = $area_id;
+        $model->unit_type = $unit_type;
+        $model->street = $street;
+        $model->avenue = $avenue;
+        $model->building = $building;
+        $model->block = $block;
+        $model->customer_email = $customer_email;
+        $model->customer_phone_country_code = $customer_phone_country_code;
+        $model->customer_phone_number = $customer_phone_number;
+        $model->pickup_location_id = $pickup_location_id;
+        $model->estimated_time_of_arrival = $estimated_time_of_arrival;
+        $model->special_directions = $special_directions;
+
+        if($model->order_mode == Order::ORDER_MODE_DELIVERY){
+
+            if($areaDeliveryZone = AreaDeliveryZone::find() ->where([ 'restaurant_uuid' => $restaurant_model->restaurant_uuid, 'area_id' => $model->area_id ])->one())
+                $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
+        }
+
+        if (!$model->save ()) {
+            if (isset($model->errors)) {
+                return [
+                    "operation" => "error",
+                    "message" => $model->errors
+                ];
+            } else {
+                return [
+                    "operation" => "error",
+                    "message" => "We've faced a problem created the order"
+                ];
+            }
+        }
+
+        return [
+            "operation" => "success",
+            "message" => "Order created successfully"
+        ];
+    }
+
 
     /**
      * Finds the Order model based on its primary key value.
@@ -857,6 +930,4 @@ class OrderController extends Controller
             throw new NotFoundHttpException('The requested record does not exist.');
         }
     }
-
-
 }

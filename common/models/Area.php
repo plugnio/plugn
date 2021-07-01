@@ -122,6 +122,6 @@ class Area extends \yii\db\ActiveRecord
      */
     public function getRestaurant($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])->viaTable('restaurant_delivery', ['area_id' => 'area_id']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])->viaTable('area_delivery_zone', ['area_id' => 'area_id']);
     }
 }

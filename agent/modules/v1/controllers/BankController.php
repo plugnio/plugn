@@ -57,28 +57,16 @@ class BankController extends Controller {
         return $actions;
     }
 
-
     /**
-    * Get all store's banks
-     * @param type $id
-     * @param type $store_uuid
-     * @return type
+     * @param $store_uuid
+     * @return ActiveDataProvider
      */
     public function actionList($store_uuid) {
-
           Yii::$app->accountManager->getManagedAccount($store_uuid);
 
           $banks =  Bank::find();
-
-
           return new ActiveDataProvider([
             'query' => $banks
           ]);
-
-
-
-
     }
-
-
 }

@@ -60,32 +60,31 @@ class AreaController extends Controller {
     }
 
     /**
-     * Get all areas data
-     * @return Area[]
+     * @return ActiveDataProvider
      */
     public function actionList() {
 
-        $page = Yii::$app->request->get('page');
         $keyword = Yii::$app->request->get('keyword');
         $city_id = Yii::$app->request->get('city_id');
+        $store_id = Yii::$app->request->get('store_id');
 
         Yii::$app->accountManager->getManagedAccount();
 
-        $query =  Area::find()
-            ->andWhere(['city_id' => $city_id]);
+        $query =  Area::find();
+
+        if ($city_id) {
+            $query->andWhere(['city_id' => $city_id]);
+        }
+        if ($store_id) {
+            $query->joinWith('restaurant');
+            $query->andWhere(['restaurant.restaurant_uuid' => $store_id]);
+        }
 
         if ($keyword) {
             $query->andWhere([
                 'OR',
                 ['like', 'area_name', $keyword],
                 ['like', 'area_name_ar', $keyword]
-            ]);
-        }
-
-        if(!$page) {
-            return new ActiveDataProvider([
-                'query' => $query,
-                'pagination' => false
             ]);
         }
 

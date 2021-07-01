@@ -61,6 +61,7 @@ return [
                         'PATCH update-order-status/<order_uuid>/<store_uuid>' => 'update-order-status',
                         'POST request-driver-from-armada/<order_uuid>/<store_uuid>' => 'request-driver-from-armada',
                         'POST request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'request-driver-from-mashkor',
+                        'POST create/<store_uuid>' => 'create',
                         'DELETE <order_uuid>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
@@ -73,6 +74,7 @@ return [
                         'OPTIONS <store_uuid>' => 'options',
                         'OPTIONS <order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS <type>' => 'options',
+                        'OPTIONS create/<store_uuid>' => 'options',
                     ]
                 ],
                 [// OrderItemController
