@@ -572,6 +572,7 @@ class CronController extends \yii\console\Controller {
                     ->joinWith(['store','payment','currency'])
                     ->where(['refund.refund_reference' => null])
                     ->andWhere(['NOT', ['refund.payment_uuid' => null]])
+                    ->andWhere(['NOT', ['refund.refund_status' => 'REJECTED']])
                     ->all();
 
         foreach ($refunds as $refund) {
@@ -585,6 +586,8 @@ class CronController extends \yii\console\Controller {
                   $responseContent = json_decode($response->content);
 
                   if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
+                      $refund->refund_status = 'REJECTED';
+                      $refund->save(false);
                       $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
                       return Yii::error('Refund Error ('. $refund->refund_id .'): ' . $errorMessage);
                   } else {
