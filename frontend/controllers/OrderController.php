@@ -589,6 +589,7 @@ class OrderController extends Controller {
 
 
       $model = new Refund();
+      $model->setScenario('create');
       $model->restaurant_uuid = $order_model->restaurant_uuid;
       $model->payment_uuid = $order_model->payment_uuid;
       $model->order_uuid = $order_model->order_uuid;

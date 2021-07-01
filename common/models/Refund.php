@@ -138,13 +138,14 @@ class Refund extends \yii\db\ActiveRecord
     public function validateRefundAmount($attribute, $params, $validator)
     {
 
-
+      Yii::error('enter here', __METHOD__);
       if ($this->refund_amount < 0 )
         return  $this->addError($attribute, 'Refund amount must be greater than zero.');
       else if ($this->refund_amount > $this->order->total_price)
         return  $this->addError($attribute, 'Refund amount cannot exceed amount available for refund.');
 
       if($this->store->is_myfatoorah_enable){
+        Yii::error('enter is_myfatoorah_enable', __METHOD__);
 
         Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
 
@@ -159,13 +160,15 @@ class Refund extends \yii\db\ActiveRecord
 
           }else if ($totalAwaitingBalanceResponse->isOk){
             if($responseContent->TotalAwaitingBalance < $this->refund_amount)
-              $this->addError($attribute, 'Insufficcent Balance');
+              return  $this->addError($attribute, 'Insufficcent Balance');
 
 
           } else {
             return $this->addError($attribute, 'Refund amount cannot exceed amount available for refund.');
           }
 
+      } else {
+        Yii::error('enter is_tap_enable', __METHOD__);
       }
 
 
