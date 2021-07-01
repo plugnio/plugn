@@ -146,8 +146,6 @@ class OpeningHour extends \yii\db\ActiveRecord {
         public static function getReopeningAt($store) {
 
 
-          $currentDate =  date('c',strtotime('now'));
-
           for ($i = 0; $i <= 7; $i++) {
 
 
@@ -159,10 +157,6 @@ class OpeningHour extends \yii\db\ActiveRecord {
                                   ->andWhere(['day_of_week' => date('w',strtotime($data))])
                                   ->orderBy(['open_at' => SORT_ASC])
                                   ->all();
-
-
-
-                $timeSlots = [];
 
 
                 foreach ($getWorkingHours as $key => $workingHours) {
