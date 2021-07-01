@@ -46,7 +46,7 @@ class Refund extends \yii\db\ActiveRecord
     {
         return [
             [['restaurant_uuid', 'order_uuid', 'refund_amount', 'payment_uuid'], 'required'],
-            [['refund_amount'], 'validateRefundAmount'],
+            [['refund_amount'], 'validateRefundAmount','on' =>'create'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['order_uuid'], 'string', 'max' => 40],
             [['payment_uuid'], 'string', 'max' => 36],
@@ -96,7 +96,6 @@ class Refund extends \yii\db\ActiveRecord
      * @return self                                [description]
      */
     public static function updateRefundStatus($refundReference, $responseContent) {
-      \Yii::error('enter updateRefundStatus => ' . json_encode($refundReference), __METHOD__); // Log error faced by user
 
         // Look for refund with same refund_reference
         $refundRecord = \common\models\Refund::findOne(['refund_reference' => $refundReference]);
@@ -106,7 +105,9 @@ class Refund extends \yii\db\ActiveRecord
 
         $refundRecord->refund_status = $responseContent['RefundStatus'];
 
-        $refundRecord->save();
+        if(!$refundRecord->save()){
+           Yii::error("Error when updating refund status" . json_encode($refundRecord->errors));
+        }
 
         return true;
     }

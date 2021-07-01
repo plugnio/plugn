@@ -70,15 +70,12 @@ class PaymentController extends Controller {
       $headerSignature = $headers->get('MyFatoorah-Signature');
 
 
-      if($eventType == 1)  //1 For Transaction Status Changed
-        $payCurrency = $data['PayCurrency'];
-      else if  ($eventType == 2) //2 For Refund Status Changed
-        $payCurrency = Yii::$app->request->getBodyParam("CountryIsoCode");;
+    $countryIsoCode = Yii::$app->request->getBodyParam("CountryIsoCode");;
 
 
-      if($payCurrency == 'KWD')
-        $secretKey = \Yii::$app->params['myfatoorah.kuwaitSecretKey']; // from portal 
-      else if ($payCurrency == 'SAR')
+      if($countryIsoCode == 'KWT')
+        $secretKey = \Yii::$app->params['myfatoorah.kuwaitSecretKey']; // from portal
+      else if ($countryIsoCode == 'SA')
         $secretKey = \Yii::$app->params['myfatoorah.saudiSecretKey'];// from portal
 
 
