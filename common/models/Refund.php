@@ -138,8 +138,6 @@ class Refund extends \yii\db\ActiveRecord
     public function validateRefundAmount($attribute, $params, $validator)
     {
 
-      if($this->order->total_price < $this->refund_amount)
-        return  $this->addError($attribute, 'Can’t refund more than available');
 
       if ($this->refund_amount < 0 )
         return  $this->addError($attribute, 'Refund amount must be greater than zero.');
