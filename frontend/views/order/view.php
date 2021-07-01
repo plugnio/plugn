@@ -699,7 +699,7 @@ DetailView::widget([
             'format' => 'html',
             'value' => function ($data) {
                 if ($data->payment) {
-                    return $data->payment->payment_current_status == 'CAPTURED' || $data->payment->payment_current_status == 'SUCCESS' || $data->payment->payment_current_status == 'Paid' ? '<span class="badge bg-success" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>' : '<span class="badge bg-danger" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>';
+                    return $data->payment->payment_current_status == 'CAPTURED' || $data->payment->payment_current_status == 'SUCCESS' || $data->payment->payment_current_status == 'Paid'  || $data->payment->payment_current_status == 'Succss' ? '<span class="badge bg-success" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>' : '<span class="badge bg-danger" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>';
                 }
             },
             'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
