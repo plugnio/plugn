@@ -8,6 +8,7 @@ use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use agent\models\Voucher;
 
+
 class VoucherController extends Controller {
 
     public function behaviors() {
@@ -121,7 +122,7 @@ class VoucherController extends Controller {
 
         return [
             "operation" => "success",
-            "message" => "Voucher created successfully",
+            "message" => Yii::t('agent', "Voucher created successfully"),
             "data" => Voucher::findOne($model->voucher_id)
         ];
     }
@@ -155,14 +156,14 @@ class VoucherController extends Controller {
              } else {
                  return [
                      "operation" => "error",
-                     "message" => "We've faced a problem updating the voucher"
+                     "message" => Yii::t('agent', "We've faced a problem updating the voucher"),
                  ];
              }
          }
 
          return [
              "operation" => "success",
-             "message" => "Voucher updated successfully",
+             "message" => Yii::t('agent',"Voucher updated successfully"),
              "data" => $model
          ];
      }
@@ -190,7 +191,7 @@ class VoucherController extends Controller {
 
               return [
                   "operation" => "success",
-                  "message" => "Voucher Status updated successfully"
+                  "message" => Yii::t('agent',"Voucher Status updated successfully")
               ];
 
           }
@@ -223,14 +224,14 @@ class VoucherController extends Controller {
             } else {
                 return [
                     "operation" => "error",
-                    "message" => "We've faced a problem deleting the voucher"
+                    "message" => Yii::t('agent',"We've faced a problem deleting the voucher")
                 ];
             }
         }
 
         return [
             "operation" => "success",
-            "message" => "Voucher deleted successfully"
+            "message" => Yii::t('agent',"Voucher deleted successfully")
         ];
     }
 
@@ -253,8 +254,4 @@ class VoucherController extends Controller {
            throw new NotFoundHttpException('The requested record does not exist.');
        }
    }
-
-
-
-
 }

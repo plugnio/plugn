@@ -354,7 +354,7 @@ class StoreController extends Controller
             if (!$payment->delete()) {
                 $transaction->rollBack();
 
-                return self::message("error",'Error on disabling ' . $payment->payment_method_name);
+                return self::message("error",'Error on disabling payment method');
             }
         }
 
@@ -482,10 +482,7 @@ class StoreController extends Controller
 
         $transaction->commit ();
 
-        return [
-            'operation' => 'success',
-            'message' => 'Layout updated successfully'
-        ];
+        return self::message("success","Layout updated successfully");
     }
 
     public function actionUpdateDeliveryIntegration($id) {
@@ -504,10 +501,7 @@ class StoreController extends Controller
             ];
         }
 
-        return [
-            'operation' => 'success',
-            'message' => 'Delivery integration updated successfully'
-        ];
+        return self::message("success","Delivery integration updated successfully");
     }
 
     /**
@@ -536,10 +530,7 @@ class StoreController extends Controller
             ];
         }
 
-        return [
-            'operation' => 'success',
-            'message' => 'Analytics integration updated successfully'
-        ];
+        return self::message("success","Analytics integration updated successfully");
     }
 
     /**
@@ -568,7 +559,7 @@ class StoreController extends Controller
     public static function message($type = "success", $message) {
         return [
             "operation" => $type,
-            "message" => $message
+            "message" => Yii::t('agent', $message)
         ];
     }
 }

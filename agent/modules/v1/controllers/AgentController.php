@@ -4,19 +4,20 @@ namespace agent\modules\v1\controllers;
 
 use Yii;
 use yii\rest\Controller;
-use agent\models\Agent;
 
-class AgentController extends Controller {
 
-    public function behaviors() {
-        $behaviors = parent::behaviors();
+class AgentController extends Controller
+{
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors ();
 
         // remove authentication filter for cors to work
         unset($behaviors['authenticator']);
 
         // Allow XHR Requests from our different subdomains and dev machines
         $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className(),
+            'class' => \yii\filters\Cors::className (),
             'cors' => [
                 'Origin' => Yii::$app->params['allowedOrigins'],
                 'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
@@ -33,20 +34,21 @@ class AgentController extends Controller {
         ];
 
         // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-              $behaviors['authenticator'] = [
-                  'class' => \yii\filters\auth\HttpBearerAuth::className(),
-              ];
-              // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-              $behaviors['authenticator']['except'] = ['options'];
+        $behaviors['authenticator'] = [
+            'class' => \yii\filters\auth\HttpBearerAuth::className (),
+        ];
+        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+        $behaviors['authenticator']['except'] = ['options'];
 
-              return $behaviors;
+        return $behaviors;
     }
 
     /**
      * @inheritdoc
      */
-    public function actions() {
-        $actions = parent::actions();
+    public function actions()
+    {
+        $actions = parent::actions ();
         $actions['options'] = [
             'class' => 'yii\rest\OptionsAction',
             // optional:
@@ -60,36 +62,34 @@ class AgentController extends Controller {
      * return stores assigned
      * @return mixed
      */
-    public function actionStores() {
+    public function actionStores()
+    {
         return Yii::$app->user->identity
-            ->getAgentAssignments()
-            ->all();
+            ->getAgentAssignments ()
+            ->all ();
     }
 
-    public function actionStoreProfile() {
-
-        $restaurant = Yii::$app->accountManager->getManagedAccount();
+    /**
+     * return store assignment details
+     * @return mixed
+     */
+    public function actionStoreProfile()
+    {
+        $restaurant = Yii::$app->accountManager->getManagedAccount ();
 
         return Yii::$app->user->identity
-            ->getAgentAssignments()
-            ->andWhere(['restaurant_uuid' => $restaurant->restaurant_uuid])
-            ->one();
+            ->getAgentAssignments ()
+            ->andWhere (['restaurant_uuid' => $restaurant->restaurant_uuid])
+            ->one ();
     }
 
-    public function actionDetail() {
-        $agent = Yii::$app->user->identity;
-
-        if(!$agent){
-          return [
-              'operation' => 'error',
-              'message' => 'No result found'
-          ];
-        }
-
-        $accessToken = $agent->accessToken->token_value;
-        return $agent;
-
-
+    /**
+     * return user profile
+     * @return \yii\web\IdentityInterface|null
+     */
+    public function actionDetail()
+    {
+        return Yii::$app->user->identity;
     }
 
     /**
@@ -97,126 +97,104 @@ class AgentController extends Controller {
      * @param $store_uuid
      * @return array|string[]
      */
-    public function actionUpdateAgentProfile($store_uuid) {
-
+    public function actionUpdateAgentProfile($store_uuid)
+    {
         $model = Yii::$app->user->identity;
 
         if (!isset($model->agent_id)) {
             return [
                 "operation" => "error",
-                "message" => 'Invalid Agent ID'
+                "message" => Yii::t('agent', 'Invalid Agent ID')
             ];
         }
 
-        $agentAssignment  = $model->getAgentAssignments()->where(['restaurant_uuid' => $store_uuid])->one();
+        $agentAssignment = $model->getAgentAssignments ()->where (['restaurant_uuid' => $store_uuid])->one ();
 
         if (!isset($agentAssignment->restaurant_uuid)) {
-          return [
-              "operation" => "error",
-              "message" => 'You do not own this store.'
-          ];
-      }
+            return [
+                "operation" => "error",
+                "message" => Yii::t('agent','You do not own this store.')
+            ];
+        }
 
 
-        $model->agent_name = Yii::$app->request->getBodyParam("agent_name");
-        $model->agent_email = Yii::$app->request->getBodyParam("agent_email");
+        $model->agent_name = Yii::$app->request->getBodyParam ("agent_name");
+        $model->agent_email = Yii::$app->request->getBodyParam ("agent_email");
 
-        if (!$model->save()) {
-              return [
-                  "operation" => "error",
-                  "message" => $model->errors
-              ];
-          } else {
+        if (!$model->save ()) {
+            return [
+                "operation" => "error",
+                "message" => $model->errors
+            ];
+        } else {
 
-            $agentAssignment->assignment_agent_email = Yii::$app->request->getBodyParam("agent_email");
-            $agentAssignment->email_notification = Yii::$app->request->getBodyParam("email_notification");
-            $agentAssignment->reminder_email = Yii::$app->request->getBodyParam("reminder_email");
-            $agentAssignment->receive_weekly_stats = Yii::$app->request->getBodyParam("receive_weekly_stats");
+            $agentAssignment->assignment_agent_email = Yii::$app->request->getBodyParam ("agent_email");
+            $agentAssignment->email_notification = Yii::$app->request->getBodyParam ("email_notification");
+            $agentAssignment->reminder_email = Yii::$app->request->getBodyParam ("reminder_email");
+            $agentAssignment->receive_weekly_stats = Yii::$app->request->getBodyParam ("receive_weekly_stats");
 
-            $agentAssignment->save(false);
-
+            $agentAssignment->save (false);
         }
 
         return [
-          'model' => $model,
-          "operation" => "success",
-          "message" => "Agent profile updated successfully"
+            'model' => $model,
+            "operation" => "success",
+            "message" => Yii::t('agent', "Agent profile updated successfully")
         ];
-
     }
 
+    /**
+     * change password
+     */
+    public function actionChangePassword()
+    {
+        $agent = Yii::$app->user->identity;
 
+        $oldPassword = Yii::$app->request->getBodyParam ("oldPassword");
+        $newPassword = Yii::$app->request->getBodyParam ("newPassword");
+        $confirmPassword = Yii::$app->request->getBodyParam ("confirmPassword");
 
-      /**
-      * Return agent model
-      * @param type $employer_uuid
-      * @return \agent\models\Agent
-      */
-     private function findModel($agent_id) {
-         $model = Agent::findIdentity($agent_id);
+        if (!$oldPassword) {
+            return [
+                'operation' => 'error',
+                'message' => Yii::t('agent', 'Old Password field required')
+            ];
+        }
 
-         if (!$model) {
-             return false;
-         }
+        if (!$confirmPassword) {
+            return [
+                'operation' => 'error',
+                'message' => Yii::t('agent','Confirm Password field required')
+            ];
+        }
 
-         return $model;
-     }
+        if (!$newPassword) {
+            return [
+                'operation' => 'error',
+                'message' => Yii::t('agent','Password field required')
+            ];
+        }
 
+        if ($confirmPassword != $newPassword) {
+            return [
+                'operation' => 'error',
+                'message' => Yii::t('agent','Password not matching')
+            ];
+        }
 
-     /**
-      * change password
-      */
-     public function actionChangePassword()
-     {
-         $agent = Yii::$app->user->identity;
+        if (!$agent->validatePassword ($oldPassword)) {
+            return [
+                'operation' => 'error',
+                'message' => Yii::t('agent', 'Old Password not valid')
+            ];
+        }
 
-         $oldPassword = Yii::$app->request->getBodyParam("oldPassword");
-         $newPassword = Yii::$app->request->getBodyParam("newPassword");
-         $confirmPassword = Yii::$app->request->getBodyParam("confirmPassword");
+        $agent->setPassword ($newPassword);
+        $agent->save (false);
 
-         if(!$oldPassword) {
-                 return [
-                         'operation' => 'error',
-                         'message' => 'Old Password field required'
-                 ];
-         }
-
-         if(!$confirmPassword) {
-                 return [
-                         'operation' => 'error',
-                         'message' => 'Confirm Password field required'
-                 ];
-         }
-
-         if(!$newPassword) {
-                 return [
-                         'operation' => 'error',
-                         'message' => 'Password field required'
-                 ];
-         }
-
-         if($confirmPassword != $newPassword) {
-                 return [
-                         'operation' => 'error',
-                         'message' => 'Password not matching'
-                 ];
-         }
-
-         if (!$agent->validatePassword($oldPassword)) {
-                 return [
-                         'operation' => 'error',
-                         'message' => 'Old Password not valid'
-                 ];
-         }
-
-         $agent->setPassword($newPassword);
-         $agent->save(false);
-
-         return [
-                 "operation" => "success",
-                 "message" => "Account Password Updated Successfully"
-         ];
-     }
-
-
+        return [
+            "operation" => "success",
+            "message" => Yii::t('agent', "Account Password Updated Successfully")
+        ];
+    }
 }

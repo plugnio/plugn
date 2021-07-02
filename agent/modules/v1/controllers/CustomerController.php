@@ -199,7 +199,7 @@ class CustomerController extends Controller
                     }
                 ],
                 [
-                    'header' => 'Account created at',
+                    'header' => Yii::t('agent', 'Account created at'),
                     "format" => "raw",
                     "value" => function ($data) {
                         return $data->customer_created_at;

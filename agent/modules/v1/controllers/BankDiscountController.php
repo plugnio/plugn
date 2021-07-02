@@ -8,6 +8,7 @@ use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use agent\models\BankDiscount;
 
+
 class BankDiscountController extends Controller {
 
     public function behaviors() {
@@ -120,7 +121,7 @@ class BankDiscountController extends Controller {
 
         return [
             "operation" => "success",
-            "message" => "Bank Discount created successfully",
+            "message" => Yii::t ('agent',"Bank Discount created successfully"),
             "model" => BankDiscount::findOne($model->bank_discount_id)
         ];
     }
@@ -133,7 +134,6 @@ class BankDiscountController extends Controller {
      */
      public function actionUpdate($bank_discount_id, $store_uuid)
      {
-
          $model = $this->findModel($bank_discount_id, $store_uuid);
 
          $model->bank_id = Yii::$app->request->getBodyParam("bank_id");
@@ -156,14 +156,14 @@ class BankDiscountController extends Controller {
              } else {
                  return [
                      "operation" => "error",
-                     "message" => "We've faced a problem updating the bank discount"
+                     "message" => Yii::t ('agent',"We've faced a problem updating the bank discount")
                  ];
              }
          }
 
          return [
              "operation" => "success",
-             "message" => "Bank Discount updated successfully",
+             "message" => Yii::t ('agent',"Bank Discount updated successfully"),
              "model" => $model
          ];
      }
@@ -192,7 +192,7 @@ class BankDiscountController extends Controller {
 
              return [
                  "operation" => "success",
-                 "message" => "Bank Discount Status updated successfully",
+                 "message" => Yii::t ('agent',"Bank Discount Status updated successfully"),
                  "model" => $bank_discount_model
              ];
          }
@@ -227,14 +227,14 @@ class BankDiscountController extends Controller {
              } else {
                  return [
                      "operation" => "error",
-                     "message" => "We've faced a problem deleting the bank discount"
+                     "message" => Yii::t ('agent',"We've faced a problem deleting the bank discount")
                  ];
              }
          }
 
          return [
              "operation" => "success",
-             "message" => "Bank discount deleted successfully"
+             "message" => Yii::t ('agent',"Bank discount deleted successfully")
          ];
      }
 
@@ -249,7 +249,14 @@ class BankDiscountController extends Controller {
     {
         $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-        if (($model = BankDiscount::find()->where(['bank_discount_id' => $bank_discount_id, 'restaurant_uuid' => $store_model->restaurant_uuid])->one()) !== null) {
+        $model = BankDiscount::find()
+            ->where([
+                'bank_discount_id' => $bank_discount_id,
+                'restaurant_uuid' => $store_model->restaurant_uuid
+            ])
+            ->one();
+
+        if ($model !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested record does not exist.');

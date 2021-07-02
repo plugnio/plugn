@@ -103,7 +103,7 @@ class StaffController extends Controller {
         if(!$this->_isOwner($store_uuid)) {
          return [
              'operation' => 'error',
-             'message' => Yii::t('app', 'You are not allowed to add staff member. Please contact with store owner'),
+             'message' => Yii::t('agent', 'You are not allowed to add staff member. Please contact with store owner'),
          ];
        }
 
@@ -147,13 +147,10 @@ class StaffController extends Controller {
 
         return [
             "operation" => "success",
-            "message" => "Staff created successfully",
+            "message" => Yii::t('agent',"Staff created successfully"),
             "data" => AgentAssignment::findOne($model->assignment_id)
         ];
-
     }
-
-
 
      /**
       * Update voucher
@@ -166,7 +163,7 @@ class StaffController extends Controller {
          if(!$this->_isOwner($store_uuid)) {
           return [
               'operation' => 'error',
-              'message' => Yii::t('app', 'You are not allowed to update staff role. Please contact with store owner'),
+              'message' => Yii::t('agent', 'You are not allowed to update staff role. Please contact with store owner'),
           ];
         }
 
@@ -184,14 +181,14 @@ class StaffController extends Controller {
              } else {
                  return [
                      "operation" => "error",
-                     "message" => "We've faced a problem updating the Staff"
+                     "message" => Yii::t('agent',"We've faced a problem updating the Staff")
                  ];
              }
          }
 
          return [
              "operation" => "success",
-             "message" => "Staff updated successfully",
+             "message" => Yii::t('agent',"Staff updated successfully"),
              "data" => $model
          ];
      }
@@ -212,7 +209,7 @@ class StaffController extends Controller {
           if(!$this->_isOwner($store_uuid)) {
            return [
                'operation' => 'error',
-               'message' => Yii::t('app', 'You are not allowed to perform this action. Please contact with store owner'),
+               'message' => Yii::t('agent', 'You are not allowed to perform this action. Please contact with store owner'),
 
            ];
          }
@@ -231,7 +228,7 @@ class StaffController extends Controller {
         if(!$this->_isOwner($store_uuid)) {
          return [
              'operation' => 'error',
-             'message' => Yii::t('app', 'You are not allowed to delete staff access. Please contact with store owner'),
+             'message' => Yii::t('agent', 'You are not allowed to delete staff access. Please contact with store owner'),
          ];
        }
 
@@ -246,18 +243,16 @@ class StaffController extends Controller {
             } else {
                 return [
                     "operation" => "error",
-                    "message" => "We've faced a problem deleting Staff"
+                    "message" => Yii::t('agent',"We've faced a problem deleting Staff")
                 ];
             }
         }
 
         return [
             "operation" => "success",
-            "message" => "Staff deleted successfully"
+            "message" => Yii::t('agent',"Staff deleted successfully")
         ];
     }
-
-
 
    /**
     * Finds the Agent Assignment model based on its primary key value.
@@ -288,7 +283,4 @@ class StaffController extends Controller {
          $model = AgentAssignment::findOne(['agent_id' => Yii::$app->user->identity->agent_id , 'restaurant_uuid' => $store_uuid]);
          return $model->role == AgentAssignment::AGENT_ROLE_OWNER;
      }
-
-
-
 }
