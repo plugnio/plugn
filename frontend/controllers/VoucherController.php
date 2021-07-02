@@ -90,11 +90,11 @@ class VoucherController extends Controller
                       'event' => 'Voucher Created',
                       'properties' => [
                           'type' => $model->discountType,
-                           'discountAmount' => ($model->discount_amount * 3.28)
+                           'discountAmount' => $model->discount_amount ? ((float) $model->discount_amount * 3.28) : 0
                       ]
                   ]);
                 }
-                
+
                 return $this->redirect(['index',  'storeUuid' => $storeUuid]);
 
               }
