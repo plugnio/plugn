@@ -9,6 +9,7 @@ use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use agent\models\Category;
 
+
 class CategoryController extends Controller {
 
     public function behaviors() {
@@ -142,7 +143,7 @@ class CategoryController extends Controller {
 
         return [
             "operation" => "success",
-            "message" => "Category created successfully",
+            "message" => Yii::t('agent', "Category created successfully"),
             "model" => Category::findOne($model->category_id)
         ];
     }
@@ -185,14 +186,14 @@ class CategoryController extends Controller {
              } else {
                  return [
                      "operation" => "error",
-                     "message" => "We've faced a problem updating the category"
+                     "message" => Yii::t('agent',"We've faced a problem updating the category")
                  ];
              }
          }
 
          return [
              "operation" => "success",
-             "message" => "Category updated successfully",
+             "message" => Yii::t('agent',"Category updated successfully"),
              "model" => $model
          ];
      }
@@ -211,7 +212,7 @@ class CategoryController extends Controller {
         if (!isset($model->category_id)) {
             return [
                 "operation" => "error",
-                "message" => 'Invalid Category ID'
+                "message" => Yii::t('agent','Invalid Category ID')
             ];
         }
 
@@ -230,7 +231,7 @@ class CategoryController extends Controller {
                 'operation' => 'success',
                 'url' => Url::to("@categoty-image/" . 'restaurants/' . $model->restaurant_uuid . "/category/" . $model->category_image),
                 'logo' => $model->category_image,
-                'message' => Yii::t('app', 'Category Image Uploaded Successfully')
+                'message' => Yii::t('agent', 'Category Image Uploaded Successfully')
             ];
         } else {
             return [
@@ -258,14 +259,14 @@ class CategoryController extends Controller {
               } else {
                   return [
                       "operation" => "error",
-                      "message" => "We've faced a problem deleting the category"
+                      "message" => Yii::t('agent',"We've faced a problem deleting the category")
                   ];
               }
           }
 
           return [
               "operation" => "success",
-              "message" => "Category deleted successfully"
+              "message" => Yii::t('agent',"Category deleted successfully")
           ];
       }
 

@@ -325,7 +325,7 @@ class OrderController extends Controller
             } else {
                 $response = [
                     'operation' => 'error',
-                    'message' => 'Item Uuid is invalid.'
+                    'message' => Yii::t('agent', 'Item Uuid is invalid.')
                 ];
             }
         } else {
@@ -338,7 +338,9 @@ class OrderController extends Controller
         if (!$order->is_order_scheduled && !$store_model->isOpen ()) {
             $response = [
                 'operation' => 'error',
-                'message' => $store_model->name . ' is currently closed and is not accepting orders at this time',
+                'message' => Yii::t('agent',  '{store} is currently closed and is not accepting orders at this time', [
+                    'store' => $store_model->name
+                ])
             ];
         }
 
@@ -349,7 +351,9 @@ class OrderController extends Controller
             if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
                 $response = [
                     'operation' => 'error',
-                    'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency ($order->deliveryZone->min_charge, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
+                    'message' => Yii::t('agent', 'Minimum order amount {amount}', [
+                        'amount' => Yii::$app->formatter->asCurrency ($order->deliveryZone->min_charge, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
+                    ])
                 ];
             }
 
@@ -358,11 +362,10 @@ class OrderController extends Controller
                 $response = [
                     'operation' => 'success',
                     "model" => Order::findOne ($order->order_uuid),
-                    'message' => 'Order created successfully'
+                    'message' => Yii::t('agent','Order created successfully')
                 ];
             }
         }
-
 
         if (array_key_exists ('operation', $response) && $response['operation'] == 'error') {
             if (!isset($response['message']['qty']))
@@ -370,7 +373,6 @@ class OrderController extends Controller
 
             $order->delete ();
         }
-
 
         return $response;
     }
@@ -395,7 +397,6 @@ class OrderController extends Controller
             $order->voucher_id = Yii::$app->request->getBodyParam ("voucher_id");
         }
 
-
         //if the order mode = 1 => Delivery
         if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
 
@@ -408,7 +409,6 @@ class OrderController extends Controller
                 $order->street = Yii::$app->request->getBodyParam ("street");
                 $order->avenue = Yii::$app->request->getBodyParam ("avenue"); //optional
                 $order->house_number = Yii::$app->request->getBodyParam ("house_number");
-
 
                 if (Yii::$app->request->getBodyParam ("floor") != null && ($order->unit_type == 'Apartment' || $order->unit_type == 'Office'))
                     $order->floor = Yii::$app->request->getBodyParam ("floor");
@@ -500,7 +500,7 @@ class OrderController extends Controller
             } else {
                 $response = [
                     'operation' => 'error',
-                    'message' => 'Item Uuid is invalid.'
+                    'message' => Yii::t('agent', 'Item Uuid is invalid.')
                 ];
             }
         } else {
@@ -518,7 +518,9 @@ class OrderController extends Controller
             if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
                 $response = [
                     'operation' => 'error',
-                    'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency ($order->deliveryZone->min_charge, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
+                    'message' => Yii::t('agent', 'Minimum order amount {amount}', [
+                        'amount' => Yii::$app->formatter->asCurrency ($order->deliveryZone->min_charge, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
+                    ])
                 ];
             }
 
@@ -526,7 +528,7 @@ class OrderController extends Controller
 
                 $response = [
                     'operation' => 'success',
-                    'message' => 'Order updated successfully',
+                    'message' => Yii::t('agent','Order updated successfully'),
                     "model" => $order
                 ];
             }
@@ -554,14 +556,14 @@ class OrderController extends Controller
             } else {
                 return [
                     "operation" => "error",
-                    "message" => "We've faced a problem updating the order status"
+                    "message" => Yii::t('agent',"We've faced a problem updating the order status")
                 ];
             }
         }
 
         return [
             "operation" => "success",
-            "message" => "Order status updated successfully",
+            "message" => Yii::t('agent',"Order status updated successfully"),
             "model" => $model
         ];
     }
@@ -586,7 +588,7 @@ class OrderController extends Controller
 
             return [
                 "operation" => "error",
-                "message" => "We've faced a problem requesting driver from Armada"
+                "message" => Yii::t('agent',"We've faced a problem requesting driver from Armada")
             ];
         }
 
@@ -600,14 +602,14 @@ class OrderController extends Controller
             } else {
                 return [
                     "operation" => "error",
-                    "message" => "We've faced a problem requesting driver from Armada"
+                    "message" => Yii::t('agent',"We've faced a problem requesting driver from Armada")
                 ];
             }
         }
 
         return [
             "operation" => "success",
-            "message" => "Your request has been successfully submitted"
+            "message" => Yii::t('agent',"Your request has been successfully submitted")
         ];
     }
 
@@ -634,7 +636,7 @@ class OrderController extends Controller
 
             return [
                 "operation" => "error",
-                "message" => "We've faced a problem requesting driver from Mashkor"
+                "message" => Yii::t('agent',"We've faced a problem requesting driver from Mashkor")
             ];
         }
 
@@ -647,14 +649,14 @@ class OrderController extends Controller
             } else {
                 return [
                     "operation" => "error",
-                    "message" => "We've faced a problem requesting driver from Mashkor"
+                    "message" => Yii::t('agent',"We've faced a problem requesting driver from Mashkor")
                 ];
             }
         }
 
         return [
             "operation" => "success",
-            "message" => "Your request has been successfully submitted"
+            "message" => Yii::t('agent',"Your request has been successfully submitted")
         ];
     }
 
@@ -666,11 +668,8 @@ class OrderController extends Controller
      */
     public function actionDetail($store_uuid, $order_uuid)
     {
-
-        $order = $this->findModel ($order_uuid, $store_uuid);
-        return $order;
+        return $this->findModel ($order_uuid, $store_uuid);
     }
-
 
     /**
      * Delete Order
@@ -688,14 +687,14 @@ class OrderController extends Controller
             } else {
                 return [
                     "operation" => "error",
-                    "message" => "We've faced a problem deleting the order"
+                    "message" => Yii::t('agent',"We've faced a problem deleting the order")
                 ];
             }
         }
 
         return [
             "operation" => "success",
-            "message" => "Order deleted successfully"
+            "message" => Yii::t('agent',"Order deleted successfully")
         ];
     }
 
@@ -749,13 +748,13 @@ class OrderController extends Controller
                 ],
                 'customer_phone_number',
                 [
-                    'header' => 'Order Mode',
+                    'header' => Yii::t('agent','Order Mode'),
                     'value' => function ($data) {
                         return $data->order_mode == Order::ORDER_MODE_DELIVERY ? 'Delivery' : 'Pickup';
                     }
                 ],
                 [
-                    'header' => 'Area',
+                    'header' => Yii::t('agent','Area'),
                     // 'format' => 'html',
                     'value' => function ($data) {
                         if ($data->area_id)
@@ -798,7 +797,7 @@ class OrderController extends Controller
                 ],
 
                 [
-                    'header' => 'Amount Charged',
+                    'header' => Yii::t('agent','Amount Charged'),
                     'attribute' => 'total_price',
                     "value" => function ($data) {
                         return \Yii::$app->formatter->asCurrency ($data->payment_uuid ? $data->payment->payment_amount_charged : $data->total_price, $data->currency->code);
@@ -806,7 +805,7 @@ class OrderController extends Controller
                 ],
 
                 [
-                    'header' => 'Net Amount',
+                    'header' => Yii::t('agent','Net Amount'),
                     "value" => function ($data) {
                         if ($data->payment_uuid)
                             return \Yii::$app->formatter->asCurrency ($data->payment->payment_net_amount, $data->currency->code);
@@ -815,7 +814,7 @@ class OrderController extends Controller
                     }
                 ],
                 [
-                    'header' => 'Plugn fee',
+                    'header' => Yii::t('agent','Plugn fee'),
                     "value" => function ($data) {
                         if ($data->payment_uuid && $data->payment->plugn_fee)
                             return \Yii::$app->formatter->asCurrency ($data->payment->plugn_fee, $data->currency->code);
@@ -824,7 +823,7 @@ class OrderController extends Controller
                     }
                 ],
                 [
-                    'header' => 'Payment Gateway fee',
+                    'header' => Yii::t('agent','Payment Gateway fee'),
                     "value" => function ($data) {
                         if ($data->payment_uuid)
                             return \Yii::$app->formatter->asCurrency ($data->payment->payment_gateway_fee, $data->currency->code);
@@ -901,17 +900,16 @@ class OrderController extends Controller
             } else {
                 return [
                     "operation" => "error",
-                    "message" => "We've faced a problem created the order"
+                    "message" => Yii::t('agent',"We've faced a problem created the order")
                 ];
             }
         }
 
         return [
             "operation" => "success",
-            "message" => "Order created successfully"
+            "message" => Yii::t('agent',"Order created successfully")
         ];
     }
-
 
     /**
      * Finds the Order model based on its primary key value.

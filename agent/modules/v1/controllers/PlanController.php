@@ -103,7 +103,7 @@ class PlanController extends Controller
         if ($selectedPlan->price == 0) {
             return [
                 "operation" => 'success',
-                "message" => 'Subscribed successfully'
+                "message" => Yii::t('agent', 'Subscribed successfully')
             ];
         }
 
@@ -182,7 +182,7 @@ class PlanController extends Controller
 
                 return [
                     'operation' => 'error',
-                    'message' => 'Payment Issue > Charge id is missing'
+                    'message' => Yii::t('agent','Payment Issue > Charge id is missing')
                 ];
             }
 

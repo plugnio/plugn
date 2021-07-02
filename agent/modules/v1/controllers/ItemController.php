@@ -2,15 +2,15 @@
 
 namespace agent\modules\v1\controllers;
 
-use agent\models\ExtraOption;
-use agent\models\Option;
-use agent\models\Order;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use agent\models\Item;
+use agent\models\ExtraOption;
+use agent\models\Option;
+use agent\models\Order;
 
 
 class ItemController extends Controller
@@ -133,6 +133,7 @@ class ItemController extends Controller
         $model->item_images = Yii::$app->request->getBodyParam ("itemImages");
         $itemOptions = Yii::$app->request->getBodyParam('options');
         $transaction = Yii::$app->db->beginTransaction();
+
         try {
             if (!$model->save()) {
                 $transaction->rollBack();
@@ -191,7 +192,7 @@ class ItemController extends Controller
 
             return [
                 "operation" => "success",
-                "message" => "Item created successfully",
+                "message" => Yii::t('translate', "Item created successfully"),
             ];
         } catch (\Exception $e) {
             $transaction->rollBack();
@@ -286,7 +287,7 @@ class ItemController extends Controller
 
             return [
                 "operation" => "success",
-                "message" => "Item updated successfully",
+                "message" => Yii::t('translate',"Item updated successfully")
             ];
         } catch (\Exception $e) {
             $transaction->rollBack();
@@ -296,7 +297,6 @@ class ItemController extends Controller
             ];
         }
     }
-
 
     /**
      * Update Stock Qty
@@ -316,7 +316,7 @@ class ItemController extends Controller
         }
         return [
             "operation" => "success",
-            "message" => "Item quantity updated successfully",
+            "message" => Yii::t('agent', "Item quantity updated successfully")
         ];
     }
 
@@ -340,14 +340,14 @@ class ItemController extends Controller
             } else {
                 return [
                     "operation" => "error",
-                    "message" => "We've faced a problem deleting the item"
+                    "message" => Yii::t('agent',"We've faced a problem deleting the item")
                 ];
             }
         }
 
         return [
             "operation" => "success",
-            "message" => "Item deleted successfully"
+            "message" => Yii::t('agent',"Item deleted successfully")
         ];
     }
 
@@ -389,7 +389,7 @@ class ItemController extends Controller
                     'sku',
                     'barcode',
                     [
-                        'header' => 'Unit sold',
+                        'header' => Yii::t('agent','Unit sold'),
                         'label' => 'Sold items',
                         'format' => 'html',
                         'value' => function ($data)  use ($start_date,$end_date) {
@@ -416,7 +416,7 @@ class ItemController extends Controller
             'models' => $model,
             'columns' => [
                 [
-                    'header' => 'Item name',
+                    'header' => Yii::t('agent','Item name'),
                     "format" => "raw",
                     "value" => function($data) {
                         return $data->item_name;
@@ -459,14 +459,14 @@ class ItemController extends Controller
             } else {
                 return [
                     "operation" => "error",
-                    "message" => "We've faced a problem while status change of item"
+                    "message" => Yii::t('agent',"We've faced a problem while status change of item")
                 ];
             }
         }
 
         return [
             "operation" => "success",
-            "message" => "Item status changed successfully"
+            "message" => Yii::t('agent',"Item status changed successfully")
         ];
     }
 

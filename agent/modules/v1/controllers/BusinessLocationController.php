@@ -155,14 +155,14 @@ class BusinessLocationController extends Controller
             } else {
                 return [
                     "operation" => "error",
-                    "message" => "We've faced a problem updating the business location"
+                    "message" => Yii::t('agent', "We've faced a problem updating the business location")
                 ];
             }
         }
 
         return [
             "operation" => "success",
-            "message" => "Business Location updated successfully",
+            "message" => Yii::t('agent',"Business Location updated successfully"),
             "model" => $model
         ];
     }
@@ -195,14 +195,14 @@ class BusinessLocationController extends Controller
             } else {
                 return [
                     "operation" => "error",
-                    "message" => "We've faced a problem deleting the business location"
+                    "message" => Yii::t('agent',"We've faced a problem deleting the business location")
                 ];
             }
         }
 
         return [
             "operation" => "success",
-            "message" => "Business location deleted successfully"
+            "message" => Yii::t('agent',"Business location deleted successfully")
         ];
     }
 

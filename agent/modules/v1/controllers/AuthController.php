@@ -96,9 +96,6 @@ class AuthController extends Controller {
         return $this->_loginResponse($agent);
     }
 
-
-
-
     /**
      * Sends password reset email to user
      * @return array
@@ -119,11 +116,11 @@ class AuthController extends Controller {
 
             if ($agent) {
 
-
                 if (!$model->sendEmail($agent)) {
                     $errors = 'Sorry, we are unable to reset a password for email provided.';
                 }
             }
+
         } else if (isset($model->errors['agent_email'])) {
             $errors = $model->errors['agent_email'];
         }
@@ -139,11 +136,9 @@ class AuthController extends Controller {
         // Otherwise return success
         return [
             'operation' => 'success',
-            'message' => 'Please check the link sent to you on your email to set new password.'
+            'message' => Yii::t ('agent', 'Please check the link sent to you on your email to set new password.')
         ];
     }
-
-
 
     /**
      * Updates password based on passed token
@@ -159,26 +154,26 @@ class AuthController extends Controller {
         if (!$agent) {
             return [
                 'operation' => 'error',
-                'message' => 'Invalid password reset token.'
+                'message' => Yii::t ('agent', 'Invalid password reset token.')
             ];
         }
         if (!$newPassword) {
             return [
                 'operation' => 'error',
-                'message' => 'Password field required'
+                'message' => Yii::t ('agent', 'Password field required')
             ];
         }
         if (!$cPassword) {
             return [
                 'operation' => 'error',
-                'message' => 'Confirm Password field required'
+                'message' => Yii::t ('agent', 'Confirm Password field required')
             ];
         }
 
         if ($cPassword != $newPassword) {
             return [
                 'operation' => 'error',
-                'message' => 'Password & Confirm Password does not match'
+                'message' => Yii::t ('agent', 'Password & Confirm Password does not match')
             ];
         }
 

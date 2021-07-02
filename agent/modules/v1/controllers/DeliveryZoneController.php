@@ -126,7 +126,7 @@ class DeliveryZoneController extends Controller
 
         return [
             "operation" => "success",
-            "message" => "Delivery Zone created successfully",
+            "message" => Yii::t('agent', "Delivery Zone created successfully"),
             "model" => DeliveryZone::findOne($model->delivery_zone_id)
         ];
 
@@ -164,18 +164,17 @@ class DeliveryZoneController extends Controller
             } else {
                 return [
                     "operation" => "error",
-                    "message" => "We've faced a problem updating the delivery zone"
+                    "message" => Yii::t('agent',"We've faced a problem updating the delivery zone")
                 ];
             }
         }
 
         return [
             "operation" => "success",
-            "message" => "Delivery zone updated successfully",
+            "message" => Yii::t('agent',"Delivery zone updated successfully"),
             "model" => $model
         ];
     }
-
 
     /**
      * Return Delivery zone detail
@@ -205,14 +204,14 @@ class DeliveryZoneController extends Controller
             } else {
                 return [
                     "operation" => "error",
-                    "message" => "We've faced a problem deleting the delivery zone"
+                    "message" => Yii::t('agent',"We've faced a problem deleting the delivery zone")
                 ];
             }
         }
 
         return [
             "operation" => "success",
-            "message" => "Delivery Zone deleted successfully"
+            "message" => Yii::t('agent',"Delivery Zone deleted successfully")
         ];
     }
 
@@ -227,7 +226,13 @@ class DeliveryZoneController extends Controller
     {
         $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-        if (($model = DeliveryZone::find()->where(['delivery_zone_id' => $delivery_zone_id, 'restaurant_uuid' => $store_model->restaurant_uuid])->one()) !== null) {
+        $model = DeliveryZone::find()->where([
+                'delivery_zone_id' => $delivery_zone_id,
+                'restaurant_uuid' => $store_model->restaurant_uuid
+            ])
+            ->one();
+
+        if ($model !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested record does not exist.');
