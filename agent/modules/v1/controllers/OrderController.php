@@ -77,6 +77,7 @@ class OrderController extends Controller
         $order_uuid = Yii::$app->request->get ('order_uuid');
         $phone = Yii::$app->request->get ('phone');
         $status = Yii::$app->request->get ('status');
+        $customer = Yii::$app->request->get ('customer');
         $date_range = Yii::$app->request->get ('date_range');
 
         Yii::$app->accountManager->getManagedAccount ($store_uuid);
@@ -88,6 +89,8 @@ class OrderController extends Controller
             $keyword = $order_uuid;
         } else if ($phone) {
             $keyword = $phone;
+        } else if ($customer) {
+            $keyword = $customer;
         }
 
         // grid filtering conditions
