@@ -19,11 +19,11 @@ class Module extends \yii\base\Module
     {
         parent::init();
 
-        $lang = Yii::$app->request->headers->get('language');
+        $lang = \Yii::$app->request->headers->get('language');
 
-        if ($lang && $lang != Yii::$app->language)
+        if ($lang && $lang != \Yii::$app->language)
         {
-            Yii::$app->language = $lang;
+            \Yii::$app->language = $lang;
         }
     }
 }
