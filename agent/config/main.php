@@ -302,6 +302,7 @@ return [
                         'PATCH <id>' => 'update',
                         'PATCH update-status/<id>/<store_uuid>' => 'change-status',
                         'DELETE <id>' => 'delete',
+                        'DELETE delete-image/<id>/<image>' => 'delete-image',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS export-to-excel' => 'options',
@@ -309,6 +310,7 @@ return [
                         'OPTIONS <id>' => 'options',
                         'OPTIONS update-stock' => 'options',
                         'OPTIONS update-status/<id>/<store_uuid>' => 'options',
+                        'OPTIONS delete-image/<id>/<image>' => 'options',
                     ]
                 ],
                 [// CustomerController

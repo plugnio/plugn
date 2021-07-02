@@ -7,6 +7,7 @@ use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
+use common\models\ItemImage;
 use agent\models\Item;
 use agent\models\ExtraOption;
 use agent\models\Option;
@@ -100,8 +101,7 @@ class ItemController extends Controller
      * @param string $id
      * @return Item
      */
-    public function actionDetail($id)
-    {
+    public function actionDetail($id) {
         return $this->findModel($id);
     }
 
@@ -348,6 +348,36 @@ class ItemController extends Controller
         return [
             "operation" => "success",
             "message" => Yii::t('agent',"Item deleted successfully")
+        ];
+    }
+
+    /**
+     * @param $id
+     * @return array|string[]
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function actionDeleteImage($id, $image)
+    {
+        $itemImage = ItemImage::findOne(['item_uuid'=>$id, 'product_file_name'=>$image]);
+        if ($itemImage && !$itemImage->delete()) {
+            if (isset($model->errors)) {
+                return [
+                    "operation" => "error",
+                    "message" => $model->errors
+                ];
+            } else {
+                return [
+                    "operation" => "error",
+                    "message" => "We've faced a problem deleting the item"
+                ];
+            }
+        }
+
+        return [
+            "operation" => "success",
+            "message" => "Item image deleted successfully"
         ];
     }
 
