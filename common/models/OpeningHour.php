@@ -218,7 +218,7 @@ class OpeningHour extends \yii\db\ActiveRecord {
                 $startAt =  date('c', strtotime($workingHours->open_at, strtotime($startAt) ));
               }
 
-              while (date('H:i:s', strtotime($startAt)) <= $workingHours->close_at ) {
+              while (date('H:i:s', strtotime($startAt)) <= $workingHours->close_at  && date('H:i:s', strtotime($startAt)) >= $workingHours->open_at) {
 
                 $endAt = date('c', strtotime("+". intval($store->schedule_interval)  . " min" ,strtotime($startAt)) );
 
@@ -231,8 +231,6 @@ class OpeningHour extends \yii\db\ActiveRecord {
                   continue;
 
                 }
-
-
 
 
                 if ($workingHours->day_of_week == date('w', strtotime("today")) && date('c', strtotime("now")) < date('c', strtotime($startAt))) {
