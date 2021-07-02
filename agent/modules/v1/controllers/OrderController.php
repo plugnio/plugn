@@ -844,9 +844,9 @@ class OrderController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($storeUuid) {
+    public function actionCreate($store_uuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $model = new Order();
         $model->setScenario(\common\models\Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
@@ -877,7 +877,7 @@ class OrderController extends Controller
         $model->unit_type = $unit_type;
         $model->street = $street;
         $model->avenue = $avenue;
-        $model->building = $building;
+        $model->house_number = $building;
         $model->block = $block;
         $model->customer_email = $customer_email;
         $model->customer_phone_country_code = $customer_phone_country_code;
