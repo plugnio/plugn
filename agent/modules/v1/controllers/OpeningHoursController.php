@@ -9,17 +9,19 @@ use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use agent\models\OpeningHour;
 
-class OpeningHoursController extends Controller {
+class OpeningHoursController extends Controller
+{
 
-    public function behaviors() {
-        $behaviors = parent::behaviors();
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors ();
 
         // remove authentication filter for cors to work
         unset($behaviors['authenticator']);
 
         // Allow XHR Requests from our different subdomains and dev machines
         $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className(),
+            'class' => \yii\filters\Cors::className (),
             'cors' => [
                 'Origin' => Yii::$app->params['allowedOrigins'],
                 'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
@@ -36,20 +38,21 @@ class OpeningHoursController extends Controller {
         ];
 
         // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-              $behaviors['authenticator'] = [
-                  'class' => \yii\filters\auth\HttpBearerAuth::className(),
-              ];
-              // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-              $behaviors['authenticator']['except'] = ['options'];
+        $behaviors['authenticator'] = [
+            'class' => \yii\filters\auth\HttpBearerAuth::className (),
+        ];
+        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+        $behaviors['authenticator']['except'] = ['options'];
 
-              return $behaviors;
+        return $behaviors;
     }
 
     /**
      * @inheritdoc
      */
-    public function actions() {
-        $actions = parent::actions();
+    public function actions()
+    {
+        $actions = parent::actions ();
         $actions['options'] = [
             'class' => 'yii\rest\OptionsAction',
             // optional:
@@ -61,22 +64,23 @@ class OpeningHoursController extends Controller {
 
 
     /**
-    * Get all opening hours store
+     * Get all opening hours store
      * @param type $id
      * @param type $store_uuid
      * @return type
      */
-    public function actionList($store_uuid) {
+    public function actionList($store_uuid)
+    {
 
-      $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
+        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
-      $query = OpeningHour::find()
-                    ->where(['restaurant_uuid' => $store_model->restaurant_uuid])
-                    ->orderBy(['day_of_week' => SORT_ASC, 'open_at' => SORT_ASC]);
+        $query = OpeningHour::find ()
+            ->where (['restaurant_uuid' => $store_model->restaurant_uuid])
+            ->orderBy (['day_of_week' => SORT_ASC, 'open_at' => SORT_ASC]);
 
-      return new ActiveDataProvider([
-          'query' => $query
-      ]);
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
 
     }
 
@@ -84,71 +88,21 @@ class OpeningHoursController extends Controller {
      * Create opening hours
      * @return array
      */
-    public function actionCreate($store_uuid) {
-        $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
-        $opening_hours = Yii::$app->request->getBodyParam("opening_hours");
+    public function actionCreate($store_uuid)
+    {
+        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $opening_hours = Yii::$app->request->getBodyParam ("opening_hours");
 
-        if(is_array($opening_hours) && sizeof($opening_hours) > 0){
-
-            foreach ($opening_hours as $key => $opening_hour) {
-
-              $model = new OpeningHour();
-              $model->restaurant_uuid = $store_model->restaurant_uuid;
-
-              $model->day_of_week = $opening_hour['day_of_week'];
-              $model->open_at = date('H:i:s', strtotime($opening_hour['open_at']));
-              $model->close_at = date('H:i:s', strtotime($opening_hour['close_at']));
-
-              if (!$model->save())
-              {
-                  if (isset($model->errors)) {
-                      return [
-                          "operation" => "error",
-                          "message" => $model->errors
-                      ];
-                  } else {
-                      return [
-                          "operation" => "error",
-                          "message" => "We've faced a problem creating the Opening Hour"
-                      ];
-                  }
-              }
-            }
-             return [
-                 "operation" => "success",
-                 "message" => "Opening Hour created successfully"
-             ];
-        }
-    }
-
-    /**
-     * Update opening hours
-     * @return array
-     */
-    public function actionUpdate($day_of_week) {
-
-        $opening_hours = Yii::$app->request->getBodyParam("opening_hours");
-
-        //validate
-
-        $store_model = Yii::$app->accountManager->getManagedAccount();
-
-        //remove old
-
-        OpeningHour::deleteAll([
-            'day_of_week' => $day_of_week,
-            'restaurant_uuid' => $store_model->restaurant_uuid
-        ]);
-
-        //add new timeslots
+        if (is_array ($opening_hours) && sizeof ($opening_hours) > 0) {
 
             foreach ($opening_hours as $key => $opening_hour) {
 
-                $model = new OpeningHour;
+                $model = new OpeningHour();
                 $model->restaurant_uuid = $store_model->restaurant_uuid;
-                $model->day_of_week = $day_of_week;
-                $model->open_at = date('H:i:s', strtotime($opening_hour['open_at']));
-                $model->close_at = date('H:i:s', strtotime($opening_hour['close_at']));
+
+                $model->day_of_week = $opening_hour['day_of_week'];
+                $model->open_at = date ('H:i:s', strtotime ($opening_hour['open_at']));
+                $model->close_at = date ('H:i:s', strtotime ($opening_hour['close_at']));
 
                 if (!$model->save ()) {
                     if (isset($model->errors)) {
@@ -159,90 +113,137 @@ class OpeningHoursController extends Controller {
                     } else {
                         return [
                             "operation" => "error",
-                            "message" => "We've faced a problem updating the Opening Hour"
+                            "message" => Yii::t ('agent', "We've faced a problem adding the Opening Hour")
                         ];
                     }
                 }
             }
+            return [
+                "operation" => "success",
+                "message" => Yii::t ('agent', "Opening Hour created successfully")
+            ];
+        }
+    }
+
+    /**
+     * Update opening hours
+     * @return array
+     */
+    public function actionUpdate($day_of_week)
+    {
+
+        $opening_hours = Yii::$app->request->getBodyParam ("opening_hours");
+
+        //validate
+
+        $store_model = Yii::$app->accountManager->getManagedAccount ();
+
+        //remove old
+
+        OpeningHour::deleteAll ([
+            'day_of_week' => $day_of_week,
+            'restaurant_uuid' => $store_model->restaurant_uuid
+        ]);
+
+        //add new timeslots
+
+        foreach ($opening_hours as $key => $opening_hour) {
+
+            $model = new OpeningHour;
+            $model->restaurant_uuid = $store_model->restaurant_uuid;
+            $model->day_of_week = $day_of_week;
+            $model->open_at = date ('H:i:s', strtotime ($opening_hour['open_at']));
+            $model->close_at = date ('H:i:s', strtotime ($opening_hour['close_at']));
+
+            if (!$model->save ()) {
+                if (isset($model->errors)) {
+                    return [
+                        "operation" => "error",
+                        "message" => $model->errors
+                    ];
+                } else {
+                    return [
+                        "operation" => "error",
+                        "message" => Yii::t ('agent', "We've faced a problem updating the Opening Hour")
+                    ];
+                }
+            }
+        }
 
         return [
             "operation" => "success",
-            "message" => "Opening Hour updated successfully"
+            "message" => Yii::t ('agent', "Opening Hour updated successfully")
         ];
     }
 
-        /**
-        * Return OpeningHour detail
-         * @param type $store_uuid
-         * @param type $opening_hour_id
-         * @return type
-         */
-        public function actionDetail($store_uuid, $day_of_week) {
+    /**
+     * Return OpeningHour detail
+     * @param type $store_uuid
+     * @param type $opening_hour_id
+     * @return type
+     */
+    public function actionDetail($store_uuid, $day_of_week)
+    {
 
-          $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
+        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
-          if (($model = OpeningHour::find()->where(['day_of_week' => $day_of_week, 'restaurant_uuid' => $store_model->restaurant_uuid])) !== null) {
+        if (($model = OpeningHour::find ()->where (['day_of_week' => $day_of_week, 'restaurant_uuid' => $store_model->restaurant_uuid])) !== null) {
 
             return new ActiveDataProvider([
                 'query' => $model
             ]);
 
-          } else {
-              throw new NotFoundHttpException('The requested record does not exist.');
-          }
+        } else {
+            throw new NotFoundHttpException('The requested record does not exist.');
+        }
 
-      }
-
-
-      /**
-       * Delete Opening hours
-       */
-      public function actionDelete($opening_hour_id, $store_uuid)
-      {
-          $model =  $this->findModel($opening_hour_id, $store_uuid);
+    }
 
 
-          if (!$model->delete())
-          {
-              if (isset($model->errors)) {
-                  return [
-                      "operation" => "error",
-                      "message" => $model->errors
-                  ];
-              } else {
-                  return [
-                      "operation" => "error",
-                      "message" => "We've faced a problem deleting opening hours"
-                  ];
-              }
-          }
-
-          return [
-              "operation" => "success",
-              "message" => "Opening Hour deleted successfully"
-          ];
-      }
+    /**
+     * Delete Opening hours
+     */
+    public function actionDelete($opening_hour_id, $store_uuid)
+    {
+        $model = $this->findModel ($opening_hour_id, $store_uuid);
 
 
+        if (!$model->delete ()) {
+            if (isset($model->errors)) {
+                return [
+                    "operation" => "error",
+                    "message" => $model->errors
+                ];
+            } else {
+                return [
+                    "operation" => "error",
+                    "message" => Yii::t ('agent', "We've faced a problem deleting opening hours")
+                ];
+            }
+        }
 
-      /**
-       * Finds the OpeningHour model based on its primary key value.
-       * If the model is not found, a 404 HTTP exception will be thrown.
-       * @param integer $id
-       * @return OpeningHour the loaded model
-       * @throws NotFoundHttpException if the model cannot be found
-       */
-      protected function findModel($opening_hour_id, $store_uuid)
-      {
-          $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
-
-          if (($model = OpeningHour::find()->where(['opening_hour_id' => $opening_hour_id, 'restaurant_uuid' => $store_model->restaurant_uuid])->one()) !== null) {
-              return $model;
-          } else {
-              throw new NotFoundHttpException('The requested record does not exist.');
-          }
-      }
+        return [
+            "operation" => "success",
+            "message" => Yii::t ('agent', "Opening Hour deleted successfully")
+        ];
+    }
 
 
+    /**
+     * Finds the OpeningHour model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return OpeningHour the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($opening_hour_id, $store_uuid)
+    {
+        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
+        if (($model = OpeningHour::find ()->where (['opening_hour_id' => $opening_hour_id, 'restaurant_uuid' => $store_model->restaurant_uuid])->one ()) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested record does not exist.');
+        }
+    }
 }
