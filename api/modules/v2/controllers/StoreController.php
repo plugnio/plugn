@@ -169,8 +169,7 @@ class StoreController extends Controller {
 
              return [
                     'ASAP' => $store_model->isOpen($asap)  && $asap ? $asap : null,
-                    'scheduleOrder' => $store_model->schedule_order ?  ($schedule_time  ? $schedule_time  : null): null,
-                    'reopening' => OpeningHour::getReopeningAt($store_model)
+                    'scheduleOrder' => $store_model->schedule_order ?  ($schedule_time  ? $schedule_time  : null): null
                 ];
 
 

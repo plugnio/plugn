@@ -1037,6 +1037,9 @@ class Restaurant extends \yii\db\ActiveRecord {
             'isOpen' => function($restaurant) {
                 return $restaurant->isOpen();
             },
+            'reopeningAt' => function($restaurant) {
+                return OpeningHour::getReopeningAt($restaurant);
+            },
             'webLinks' => function($restaurant) {
                 return $restaurant->getWebLinks()->all();
             },

@@ -167,9 +167,30 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
                     if(date('c', strtotime($startAt)) > date('c', strtotime('now')) ){
 
-                      return [
-                          'date' =>  date('c', strtotime($startAt) )
-                      ];
+
+                        $tmwDate = date('Y-m-d', strtotime("1 day"));
+                        if($tmwDate == date('Y-m-d', strtotime($startAt) )){
+                          Yii::$app->formatter->locale = 'en';
+                          $en = 'Reopening Tomorrow at ' .  Yii::$app->formatter->asDate($startAt,  'php:h:i A');
+
+                          Yii::$app->formatter->locale = 'ar';
+                          $ar =  ' سيعاد الافتتاح غدا الساعه' . Yii::$app->formatter->asDate($startAt,  'php:h:i A') ;
+
+
+                        } else {
+                          Yii::$app->formatter->locale = 'en';
+                          $en = 'Reopening  at ' . Yii::$app->formatter->asDate($startAt,  'php:H:i A') . ' on ' . Yii::$app->formatter->asDate($startAt,  'php:l');
+
+                          Yii::$app->formatter->locale = 'ar';
+                          $ar =  ' سيعاد الافتتاح الساعة ' . Yii::$app->formatter->asDate($startAt,  'php:h:i A') . ' يوم ' . Yii::$app->formatter->asDate($startAt,  'php:l');
+
+                        }
+
+                        return [
+                          'en' => $en ,
+                          'ar' => $ar
+                        ];
+
 
                   }
 
