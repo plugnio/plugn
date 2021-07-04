@@ -179,10 +179,12 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
                         } else {
                           Yii::$app->formatter->locale = 'en';
-                          $en = 'Reopening  at ' . Yii::$app->formatter->asDate($startAt,  'php:H:i A') . ' on ' . Yii::$app->formatter->asDate($startAt,  'php:l');
+                          $en = 'Reopening on '. Yii::$app->formatter->asDate($startAt,  'php:l') .' at ' .  Yii::$app->formatter->asDate($startAt,  'php:h:i A');
 
                           Yii::$app->formatter->locale = 'ar';
-                          $ar =  ' سيعاد الافتتاح الساعة ' . Yii::$app->formatter->asDate($startAt,  'php:h:i A') . ' يوم ' . Yii::$app->formatter->asDate($startAt,  'php:l');
+                          $ar =  ' سيعاد الافتتاح غدا الساعه' . Yii::$app->formatter->asDate($startAt,  'php:h:i A') ;
+                          $ar = 'سيعاد الافتتاح يوم '. Yii::$app->formatter->asDate($startAt,  'php:l') .' الساعة ' .  Yii::$app->formatter->asDate($startAt,  'php:h:i A');
+
 
                         }
 
