@@ -62,7 +62,8 @@ class AuthController extends Controller {
         $behaviors['authenticator']['except'] = [
             'options',
             'request-reset-password',
-            'update-password'
+            'update-password',
+            'signup'
         ];
 
         return $behaviors;
@@ -113,6 +114,7 @@ class AuthController extends Controller {
         $agent->agent_name = Yii::$app->request->getBodyParam ('agent_name');
         $agent->agent_email = Yii::$app->request->getBodyParam ('agent_email');
         $agent->setPassword(Yii::$app->request->getBodyParam ('password'));
+        $agent->tempPassword = Yii::$app->request->getBodyParam ('password');
 
         $store = new Restaurant();
         $store->version = 3;

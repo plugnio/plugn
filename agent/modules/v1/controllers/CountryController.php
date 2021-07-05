@@ -38,7 +38,7 @@ class CountryController extends Controller {
                   'class' => \yii\filters\auth\HttpBearerAuth::className(),
               ];
               // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-              $behaviors['authenticator']['except'] = ['options'];
+              $behaviors['authenticator']['except'] = ['options', 'list'];
 
               return $behaviors;
     }
@@ -64,11 +64,11 @@ class CountryController extends Controller {
      * @param type $store_uuid
      * @return type
      */
-    public function actionList($store_uuid) {
+    public function actionList() {
 
         $keyword = Yii::$app->request->get('keyword');
 
-        Yii::$app->accountManager->getManagedAccount($store_uuid);
+        //Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $query =  Country::find();
 
