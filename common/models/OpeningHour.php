@@ -171,18 +171,18 @@ class OpeningHour extends \yii\db\ActiveRecord {
                         $tmwDate = date('Y-m-d', strtotime("1 day"));
                         if($tmwDate == date('Y-m-d', strtotime($startAt) )){
                           Yii::$app->formatter->locale = 'en';
-                          $en = 'Reopening Tomorrow at ' .  Yii::$app->formatter->asDate($startAt,  'php:h:i A');
+                          $en = 'Opens Tomorrow at ' .  Yii::$app->formatter->asDate($startAt,  'php:h:i A');
 
                           Yii::$app->formatter->locale = 'ar';
-                          $ar =  ' سيعاد الافتتاح غدا الساعه' . Yii::$app->formatter->asDate($startAt,  'php:h:i A') ;
+                          $ar =  ' سيعاد الافتتاح غدا الساعه ' . Yii::$app->formatter->asDate($startAt,  'php:h:i A') ;
 
 
                         } else {
                           Yii::$app->formatter->locale = 'en';
-                          $en = 'Reopening on '. Yii::$app->formatter->asDate($startAt,  'php:l') .' at ' .  Yii::$app->formatter->asDate($startAt,  'php:h:i A');
+                          $en = 'Opening on '. Yii::$app->formatter->asDate($startAt,  'php:l') .' at ' .  Yii::$app->formatter->asDate($startAt,  'php:h:i A');
 
                           Yii::$app->formatter->locale = 'ar';
-                          $ar =  ' سيعاد الافتتاح غدا الساعه' . Yii::$app->formatter->asDate($startAt,  'php:h:i A') ;
+                          $ar =  ' سيعاد الافتتاح غدا الساعه ' . Yii::$app->formatter->asDate($startAt,  'php:h:i A') ;
                           $ar = 'سيعاد الافتتاح يوم '. Yii::$app->formatter->asDate($startAt,  'php:l') .' الساعة ' .  Yii::$app->formatter->asDate($startAt,  'php:h:i A');
 
 
