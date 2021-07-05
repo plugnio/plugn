@@ -388,10 +388,12 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET login' => 'login',
+                        'PATCH update-password' => 'update-password',
                         'POST request-reset-password' => 'request-reset-password',
                         // OPTIONS VERBS
                         'OPTIONS login' => 'options',
-                        'OPTIONS request-reset-password' => 'options',
+                        'OPTIONS update-password' => 'options',
+                        'OPTIONS request-reset-password' => 'options'
                     ]
                 ],
                 [ // StatsController
