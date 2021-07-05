@@ -29,8 +29,8 @@ use common\models\AgentToken;
  * @property Restaurant[] $restaurants
  * @property AgentAssignment[] $agentAssignments
  */
-class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
-
+class Agent extends \yii\db\ActiveRecord implements IdentityInterface
+{
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
 
@@ -48,23 +48,25 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      * Field for temporary password. If set, it will overwrite the old password on save
      * @var string
      */
-     public $isOwner = null;
+    public $isOwner = null;
 
     /**
      * {@inheritdoc}
      */
-    public static function tableName() {
+    public static function tableName()
+    {
         return 'agent';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules() {
+    public function rules()
+    {
         return [
             [['agent_name', 'agent_email'], 'required'],
             ['tempPassword', 'required', 'on' => [self::SCENARIO_CHANGE_PASSWORD, self::SCENARIO_CREATE_NEW_AGENT]],
-            [['agent_status','email_notification', 'reminder_email','receive_weekly_stats'], 'integer'],
+            [['agent_status', 'email_notification', 'reminder_email', 'receive_weekly_stats'], 'integer'],
             [['agent_created_at', 'agent_updated_at'], 'safe'],
             [['agent_name', 'agent_email', 'agent_password_hash', 'agent_password_reset_token'], 'string', 'max' => 255],
             [['agent_auth_key'], 'string', 'max' => 32],
@@ -79,7 +81,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels() {
+    public function attributeLabels()
+    {
         return [
             'agent_id' => 'Agent ID',
             'agent_name' => 'Agent Name',
@@ -95,10 +98,11 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
         ];
     }
 
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             [
-                'class' => TimestampBehavior::className(),
+                'class' => TimestampBehavior::className (),
                 'createdAtAttribute' => 'agent_created_at',
                 'updatedAtAttribute' => 'agent_updated_at',
                 'value' => new Expression('NOW()'),
@@ -109,17 +113,18 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     /**
      * {@inheritdoc}
      */
-    public function beforeSave($insert) {
-        if (parent::beforeSave($insert)) {
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave ($insert)) {
 
             // Generate Auth key if its a new agent record
             if ($insert) {
-                $this->generateAuthKey();
+                $this->generateAuthKey ();
             }
 
             // If tempPassword is set, save it as the new password for this user
             if ($this->tempPassword) {
-                $this->setPassword($this->tempPassword);
+                $this->setPassword ($this->tempPassword);
             }
 
             return true;
@@ -130,7 +135,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      * Returns String value of current status
      * @return string
      */
-    public function getStatus() {
+    public function getStatus()
+    {
         switch ($this->agent_status) {
             case self::STATUS_ACTIVE:
                 return "Active";
@@ -149,8 +155,9 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      * @param string $email
      * @return static|null
      */
-    public static function findByEmail($email) {
-        return static::findOne(['agent_email' => $email, 'agent_status' => self::STATUS_ACTIVE]);
+    public static function findByEmail($email)
+    {
+        return static::findOne (['agent_email' => $email, 'agent_status' => self::STATUS_ACTIVE]);
     }
 
     /**
@@ -159,14 +166,15 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      * @param string $token password reset token
      * @return static|null
      */
-    public static function findByPasswordResetToken($token) {
-        if (!static::isPasswordResetTokenValid($token)) {
+    public static function findByPasswordResetToken($token)
+    {
+        if (!static::isPasswordResetTokenValid ($token)) {
             return null;
         }
 
-        return static::findOne([
-                    'agent_password_reset_token' => $token,
-                    'agent_status' => self::STATUS_ACTIVE,
+        return static::findOne ([
+            'agent_password_reset_token' => $token,
+            'agent_status' => self::STATUS_ACTIVE,
         ]);
     }
 
@@ -176,35 +184,39 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      * @param string $token password reset token
      * @return bool
      */
-    public static function isPasswordResetTokenValid($token) {
+    public static function isPasswordResetTokenValid($token)
+    {
         if (empty($token)) {
             return false;
         }
 
-        $timestamp = (int) substr($token, strrpos($token, '_') + 1);
+        $timestamp = (int)substr ($token, strrpos ($token, '_') + 1);
         $expire = Yii::$app->params['user.passwordResetTokenExpire'];
-        return $timestamp + $expire >= time();
+        return $timestamp + $expire >= time ();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getId() {
-        return $this->getPrimaryKey();
+    public function getId()
+    {
+        return $this->getPrimaryKey ();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAuthKey() {
+    public function getAuthKey()
+    {
         return $this->agent_auth_key;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function validateAuthKey($authKey) {
-        return $this->getAuthKey() === $authKey;
+    public function validateAuthKey($authKey)
+    {
+        return $this->getAuthKey () === $authKey;
     }
 
     /**
@@ -213,8 +225,9 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      * @param string $password password to validate
      * @return bool if password provided is valid for current user
      */
-    public function validatePassword($password) {
-        return Yii::$app->security->validatePassword($password, $this->agent_password_hash);
+    public function validatePassword($password)
+    {
+        return Yii::$app->security->validatePassword ($password, $this->agent_password_hash);
     }
 
     /**
@@ -222,36 +235,41 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      *
      * @param string $password
      */
-    public function setPassword($password) {
-        $this->agent_password_hash = Yii::$app->security->generatePasswordHash($password);
+    public function setPassword($password)
+    {
+        $this->agent_password_hash = Yii::$app->security->generatePasswordHash ($password);
     }
 
     /**
      * Generates "remember me" authentication key
      */
-    public function generateAuthKey() {
-        $this->agent_auth_key = Yii::$app->security->generateRandomString();
+    public function generateAuthKey()
+    {
+        $this->agent_auth_key = Yii::$app->security->generateRandomString ();
     }
 
     /**
      * Generates new password reset token
      */
-    public function generatePasswordResetToken() {
-        $this->agent_password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
+    public function generatePasswordResetToken()
+    {
+        $this->agent_password_reset_token = Yii::$app->security->generateRandomString () . '_' . time ();
     }
 
     /**
      * Removes password reset token
      */
-    public function removePasswordResetToken() {
+    public function removePasswordResetToken()
+    {
         $this->agent_password_reset_token = null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function findIdentity($id) {
-        return static::findOne(['agent_id' => $id, 'agent_status' => self::STATUS_ACTIVE]);
+    public static function findIdentity($id)
+    {
+        return static::findOne (['agent_id' => $id, 'agent_status' => self::STATUS_ACTIVE]);
     }
 
     /**
@@ -259,9 +277,10 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      * if the agent already has one, it will return it instead
      * @return \common\models\AgentToken
      */
-    public function getAccessToken() {
+    public function getAccessToken()
+    {
         // Return existing inactive token if found
-        $token = \agent\models\AgentToken::findOne([
+        $token = \agent\models\AgentToken::findOne ([
             'agent_id' => $this->agent_id,
             'token_status' => AgentToken::STATUS_ACTIVE
         ]);
@@ -274,9 +293,9 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
 
         $token = new AgentToken();
         $token->agent_id = $this->agent_id;
-        $token->token_value = AgentToken::generateUniqueTokenString();
+        $token->token_value = AgentToken::generateUniqueTokenString ();
         $token->token_status = AgentToken::STATUS_ACTIVE;
-        $token->save();
+        $token->save ();
 
         return $token;
     }
@@ -284,14 +303,15 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     /**
      * @inheritdoc
      */
-    public static function findIdentityByAccessToken($token, $type = null, $modelClass = "\agent\models\AgentToken") {
+    public static function findIdentityByAccessToken($token, $type = null, $modelClass = "\agent\models\AgentToken")
+    {
 
-        $token = $modelClass::find()->where([
-                'token_value' => $token,
-                'token_status' => $modelClass::STATUS_ACTIVE
-            ])
-            ->with('agent')
-            ->one();
+        $token = $modelClass::find ()->where ([
+            'token_value' => $token,
+            'token_status' => $modelClass::STATUS_ACTIVE
+        ])
+            ->with ('agent')
+            ->one ();
 
         if (!$token)
             return false;
@@ -299,7 +319,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
         //update last used datetime
 
         $token->token_last_used_datetime = new Expression('NOW()');
-        $token->save();
+        $token->save ();
 
         //should not able to login, if email not verified but have valid token
 
@@ -308,7 +328,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
         }
 
         //invalid token
-        $token->delete();
+        $token->delete ();
     }
 
     /**
@@ -316,22 +336,24 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      * @param type $restaurant_uuid
      * @return type
      */
-    public function isOwner($storeUuid) {
+    public function isOwner($storeUuid)
+    {
 
-      if($this->isOwner == null){
+        if ($this->isOwner == null) {
 
-          $this->isOwner = AgentAssignment::find()
-                            ->where(['agent_id' => Yii::$app->user->identity->agent_id, 'restaurant_uuid' => $storeUuid, 'role' => AgentAssignment::AGENT_ROLE_OWNER])
-                            ->exists();
-      }
+            $this->isOwner = AgentAssignment::find ()
+                ->where (['agent_id' => Yii::$app->user->identity->agent_id, 'restaurant_uuid' => $storeUuid, 'role' => AgentAssignment::AGENT_ROLE_OWNER])
+                ->exists ();
+        }
         return $this->isOwner;
     }
 
     /**
      * @inheritdoc
      */
-    public function fields() {
-        $fields = parent::fields();
+    public function fields()
+    {
+        $fields = parent::fields ();
 
         // remove fields that contain sensitive information
         unset($fields['agent_auth_key']);
@@ -342,13 +364,98 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
     }
 
     /**
+     * default values for new store
+     * @param $store
+     * @return array|string[]
+     */
+    public function afterSignUp($store)
+    {
+        //Create a catrgory for a store by default named "Products". so they can get started adding products without having to add category first
+        $category_model = new Category();
+        $category_model->restaurant_uuid = $store->restaurant_uuid;
+        $category_model->title = 'Products';
+        $category_model->title_ar = 'منتجات';
+        if (!$category_model->save ()) {
+            return [
+                "operation" => "error",
+                "message" => $category_model->errors
+            ];
+        }
+
+        //Create a business Location for a store by default named "Main Branch".
+        $business_location_model = new BusinessLocation();
+        $business_location_model->restaurant_uuid = $store->restaurant_uuid;
+        $business_location_model->country_id = $store->country_id;
+        $business_location_model->support_pick_up = 1;
+        $business_location_model->business_location_name = 'Main Branch';
+        $business_location_model->business_location_name_ar = 'الفرع الرئيسي';
+        if (!$business_location_model->save ()) {
+            return [
+                "operation" => "error",
+                "message" => $business_location_model->errors
+            ];
+        }
+
+        //Enable cash by default
+        $payments_method = new RestaurantPaymentMethod();
+        $payments_method->payment_method_id = 3; //Cash
+        $payments_method->restaurant_uuid = $store->restaurant_uuid;
+        if (!$payments_method->save ()) {
+            return [
+                "operation" => "error",
+                "message" => $payments_method->errors
+            ];
+        }
+
+        $assignment_agent_model = new AgentAssignment();
+        $assignment_agent_model->agent_id = $this->agent_id;
+        $assignment_agent_model->assignment_agent_email = $this->agent_email;
+        $assignment_agent_model->role = AgentAssignment::AGENT_ROLE_OWNER;
+        $assignment_agent_model->restaurant_uuid = $store->restaurant_uuid;
+        if (!$assignment_agent_model->save ()) {
+            return [
+                "operation" => "error",
+                "message" => $assignment_agent_model->errors
+            ];
+        }
+
+        \Yii::info("[New Store Signup] " . $store->name . " has just joined Plugn", __METHOD__);
+
+        if(YII_ENV == 'prod') {
+
+            $full_name = explode(' ', $this->agent_name);
+            $firstname = $full_name[0];
+            $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
+
+            \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+            \Segment::track([
+                'userId' => $store->restaurant_uuid,
+                'event' => 'Store Created',
+                'type' => 'track',
+                'properties' => [
+                    'first_name' => trim($firstname),
+                    'last_name' => trim($lastname),
+                    'store_name' => $store->name,
+                    'phone_number' => $store->owner_number,
+                    'email' => $this->agent_email,
+                    'store_url' => $store->restaurant_domain
+                ]
+            ]);
+        }
+
+        return  [
+            'operation' => 'success',
+        ];
+    }
+
+    /**
      * Get all Restaurant accounts this agent is assigned to manage
      * @return \yii\db\ActiveQuery
      */
     public function getAccountsManaged($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
-                ->via('agentAssignments');
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->via ('agentAssignments');
     }
 
     /**
@@ -357,6 +464,6 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface {
      */
     public function getAgentAssignments($modelClass = "\common\models\AgentAssignment")
     {
-        return $this->hasMany($modelClass::className(), ['agent_id' => 'agent_id']);
+        return $this->hasMany ($modelClass::className (), ['agent_id' => 'agent_id']);
     }
 }

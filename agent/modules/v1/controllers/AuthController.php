@@ -2,6 +2,8 @@
 
 namespace agent\modules\v1\controllers;
 
+use agent\models\Currency;
+use agent\models\Restaurant;
 use Yii;
 use yii\rest\Controller;
 use yii\filters\auth\HttpBasicAuth;
@@ -94,6 +96,65 @@ class AuthController extends Controller {
         $agent = Yii::$app->user->identity;
 
         return $this->_loginResponse($agent);
+    }
+
+    /**
+     * register user with store
+     * @return mixed
+     */
+    public function actionSignup() {
+
+        $currencyCode = Yii::$app->request->getBodyParam('currency');
+
+        $currency = Currency::findOne(['code' => $currencyCode]);
+
+        $agent = new Agent();
+        $agent->setScenario(Agent::SCENARIO_CREATE_NEW_AGENT);
+        $agent->agent_name = Yii::$app->request->getBodyParam ('agent_name');
+        $agent->agent_email = Yii::$app->request->getBodyParam ('agent_email');
+        $agent->setPassword(Yii::$app->request->getBodyParam ('password'));
+
+        $store = new Restaurant();
+        $store->version = 3;
+        $store->setScenario(Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
+        $store->owner_number = Yii::$app->request->getBodyParam ('owner_number');
+        $store->owner_phone_country_code= Yii::$app->request->getBodyParam ('owner_phone_country_code');
+
+        $store->name = Yii::$app->request->getBodyParam ('name');
+        $store->restaurant_domain = Yii::$app->request->getBodyParam ('restaurant_domain');
+        $store->country_id = Yii::$app->request->getBodyParam ('country_id');
+        $store->currency_id = $currency? $currency->currency_id: null;
+
+        $store->restaurant_email = $agent->agent_email;
+        $store->owner_first_name = $agent->agent_name;
+        $store->name_ar = $store->name;
+
+        if (!$agent->save()) {
+            return [
+                "operation" => "error",
+                "message" => $agent->errors
+            ];
+        }
+
+        if (!$store->save()) {
+            return [
+                "operation" => "error",
+                "message" => $store->errors
+            ];
+        }
+
+        $result =  $agent->afterSignUp($store);
+
+        if($result['operation'] != 'success') {
+            return $result;
+        }
+
+        return $this->_loginResponse ($agent);
+
+        /*return [
+            'operation' => 'success',
+            'unVerifiedToken' => $this->_loginResponse ($agent),
+        ];*/
     }
 
     /**

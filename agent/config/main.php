@@ -173,6 +173,7 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'detail',
+                        //todo: update-email
                         'GET store-profile' => 'store-profile',
                         'GET stores' => 'stores',
                         'PUT update' => 'update-agent-profile',
@@ -388,12 +389,19 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET login' => 'login',
+                        'POST signup' => 'signup',
                         'PATCH update-password' => 'update-password',
                         'POST request-reset-password' => 'request-reset-password',
                         // OPTIONS VERBS
                         'OPTIONS login' => 'options',
                         'OPTIONS update-password' => 'options',
-                        'OPTIONS request-reset-password' => 'options'
+                        'OPTIONS request-reset-password' => 'options',
+                        'OPTIONS signup' => 'signup'
+/*todo: implement for email verification
+  public _urlresendVerificationEmail = '/auth/resend-verification-email';
+  public _urlUpdateEmail = '/auth/update-email';
+  public _urlIsEmailVerified = '/auth/is-email-verified';
+  public _urlVerifyEmail = '/auth/verify-email';*/
                     ]
                 ],
                 [ // StatsController
