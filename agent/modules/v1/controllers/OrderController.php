@@ -889,7 +889,7 @@ class OrderController extends Controller
         $model->customer_phone_country_code = $customer_phone_country_code;
         $model->customer_phone_number = $customer_phone_number;
         $model->pickup_location_id = $pickup_location_id;
-        $model->estimated_time_of_arrival = $estimated_time_of_arrival;
+        $model->estimated_time_of_arrival = date ("Y-m-d H:i:s", strtotime ($estimated_time_of_arrival));
         $model->special_directions = $special_directions;
 
         if($model->order_mode == Order::ORDER_MODE_DELIVERY){
