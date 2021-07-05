@@ -105,7 +105,7 @@ class VoucherController extends Controller
                       'event' => 'Voucher Created',
                       'properties' => [
                           'type' => $model->discountType,
-                           'discountAmount' => $discount_amount
+                          'discountAmount' => $model->discount_amount ? ((float) $model->discount_amount * 3.28) : 0
                       ]
                   ]);
                 }

@@ -205,6 +205,7 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'POST status-update-webhook' => 'update-mashkor-order-status',
+                        'POST update-armada-order-status' => 'update-armada-order-status',
                         'POST <id>' => 'place-an-order',
                         'GET check-for-pending-orders/<restaurant_uuid>' => 'check-pending-orders',
                         'GET callback' => 'callback',
@@ -215,6 +216,7 @@ return [
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
+                        'OPTIONS update-armada-order-status' => 'options',
                         'OPTIONS <id>' => 'options',
                         'OPTIONS check-for-pending-orders/<restaurant_uuid>' => 'options',
                         'OPTIONS callback' => 'options',

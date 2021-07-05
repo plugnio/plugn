@@ -226,6 +226,9 @@ class Payment extends \yii\db\ActiveRecord {
 
             Yii::info('[Response from TAP for Failed Payment] ' .
                     print_r($responseContent, true), __METHOD__);
+                    
+            Yii::error('[Response from TAP for Failed Payment] ' .
+                    print_r($responseContent, true), __METHOD__);
         }
 
         $paymentRecord->save();

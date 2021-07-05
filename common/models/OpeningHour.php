@@ -143,6 +143,66 @@ class OpeningHour extends \yii\db\ActiveRecord {
     }
 
 
+        public static function getReopeningAt($store) {
+
+
+          for ($i = 0; $i <= 7; $i++) {
+
+
+             $data =  date('c',strtotime($i . " day",strtotime('now')));
+
+
+              $getWorkingHours = OpeningHour::find()
+                                  ->where(['restaurant_uuid' => $store->restaurant_uuid])
+                                  ->andWhere(['day_of_week' => date('w',strtotime($data))])
+                                  ->orderBy(['open_at' => SORT_ASC])
+                                  ->all();
+
+
+                foreach ($getWorkingHours as $key => $workingHours) {
+
+
+                  $startAt = date('c', strtotime($workingHours->open_at, strtotime($data) ));
+
+
+                    if(date('c', strtotime($startAt)) > date('c', strtotime('now')) ){
+
+
+                        $tmwDate = date('Y-m-d', strtotime("1 day"));
+                        if($tmwDate == date('Y-m-d', strtotime($startAt) )){
+                          Yii::$app->formatter->locale = 'en';
+                          $en = 'Opens Tomorrow at ' .  Yii::$app->formatter->asDate($startAt,  'php:h:i A');
+
+                          Yii::$app->formatter->locale = 'ar';
+                          $ar =  ' سيعاد الافتتاح غدا الساعه ' . Yii::$app->formatter->asDate($startAt,  'php:h:i A') ;
+
+
+                        } else {
+                          Yii::$app->formatter->locale = 'en';
+                          $en = 'Opening on '. Yii::$app->formatter->asDate($startAt,  'php:l') .' at ' .  Yii::$app->formatter->asDate($startAt,  'php:h:i A');
+
+                          Yii::$app->formatter->locale = 'ar';
+                          $ar =  ' سيعاد الافتتاح غدا الساعه ' . Yii::$app->formatter->asDate($startAt,  'php:h:i A') ;
+                          $ar = 'سيعاد الافتتاح يوم '. Yii::$app->formatter->asDate($startAt,  'php:l') .' الساعة ' .  Yii::$app->formatter->asDate($startAt,  'php:h:i A');
+
+
+                        }
+
+                        return [
+                          'en' => $en ,
+                          'ar' => $ar
+                        ];
+
+
+                  }
+
+
+
+          }
+        }
+
+    }
+
     public static function getDeliveryTime($delivery_time, $prep_time ,$store) {
 
       $schedule_time = [];
@@ -151,10 +211,9 @@ class OpeningHour extends \yii\db\ActiveRecord {
       for ($i = 0; $i <= OpeningHour::DAY_OF_WEEK_SATURDAY; $i++) {
 
 
-         // $selectedDate =  date('c', strtotime('+ ' . $delivery_time . ' min'   ,strtotime($currentDate)));
          $minDate =  date('c', strtotime("+". intval(($prep_time + $delivery_time))  . " min" ,strtotime('now')) );
 
-// 1155
+
          $currentWeekDay =  date('w',strtotime($i . " day",strtotime($minDate)));
          $currentDate =  date('c',strtotime($i . " day",strtotime($minDate)));
 
@@ -174,24 +233,17 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
               $startAt = date('c', strtotime($workingHours->open_at, strtotime($currentDate) ));
 
-              // if($delivery_time < 180)
-              //   $startAt =  date('c', strtotime("+". intval(($delivery_time))  . " min" , strtotime($startAt)) );
-
 
               $startAt = static::roundToNextHour($startAt);
 
 
               if($minDate < $startAt){
-
                 $startAt =  date('c', strtotime($workingHours->open_at, strtotime($startAt) ));
-
-                // if($delivery_time < 180)
-                //   $startAt =  date('c', strtotime("+". intval(($delivery_time))  . " min" , strtotime($startAt)) );
               }
 
-              while (date('H:i:s', strtotime($startAt)) <= $workingHours->close_at ) {
+              while (date('H:i:s', strtotime($startAt)) <= $workingHours->close_at  && date('H:i:s', strtotime($startAt)) >= $workingHours->open_at) {
 
-                $endAt = date('c', strtotime("+ 60 min" ,strtotime($startAt)) );
+                $endAt = date('c', strtotime("+". intval($store->schedule_interval)  . " min" ,strtotime($startAt)) );
 
 
 
@@ -202,9 +254,6 @@ class OpeningHour extends \yii\db\ActiveRecord {
                   continue;
 
                 }
-
-
-
 
 
                 if ($workingHours->day_of_week == date('w', strtotime("today")) && date('c', strtotime("now")) < date('c', strtotime($startAt))) {

@@ -812,9 +812,23 @@ class OrderController extends Controller {
         $mashkor_order_number = Yii::$app->request->getBodyParam("order_number");
         $mashkor_secret_token = Yii::$app->request->getBodyParam("webhook_token");
 
+        if(!$mashkor_order_number){
+          return [
+              'operation' => 'error',
+              'message' => 'Invalid order number',
+          ];
+        }
+
+
+
         if ($mashkor_secret_token === '2125bf59e5af2b8c8b5e8b3b19f13e1221') {
 
-          $order_model = Order::find()->where(['mashkor_order_number' => $mashkor_order_number])->one();
+          $order_model = Order::find()
+                        ->where(['mashkor_order_number' => $mashkor_order_number])
+                        ->andWhere(['not', ['mashkor_order_number' => null]])
+                        ->andWhere(['not', ['mashkor_tracking_link' => null]])
+                        ->andWhere(['not', ['mashkor_driver_name' => null]])
+                        ->one();
 
           if(  $order_model ) {
 
@@ -858,6 +872,63 @@ class OrderController extends Controller {
               'message' => 'Failed to authorize the request.',
           ];
         }
+
+    }
+
+    /**
+     * Update order status
+     */
+    public function actionUpdateArmadaOrderStatus() {
+
+         $armada_delivery_code = Yii::$app->request->getBodyParam("code");
+
+         if(!$armada_delivery_code ){
+           return [
+               'operation' => 'error',
+               'message' => 'Invalid Delivery code',
+           ];
+         }
+
+
+          $order_model = Order::find()
+                        ->where(['armada_delivery_code' => $armada_delivery_code])
+                        ->andWhere(['not', ['armada_delivery_code' => null]])
+                        ->andWhere(['not', ['armada_qr_code_link' => null]])
+                        ->andWhere(['not', ['armada_tracking_link' => null]])
+                        ->one();
+
+
+          if($order_model) {
+
+            $order_model->armada_order_status = Yii::$app->request->getBodyParam("orderStatus");
+
+
+            if( $order_model->armada_order_status == 'en_route' ) // In delivery
+                $order_model->order_status = Order::STATUS_OUT_FOR_DELIVERY;
+
+            else if( $order_model->armada_order_status == 'completed' ) // Delivered
+                $order_model->order_status = Order::STATUS_COMPLETE;
+
+
+            if ($order_model->save()) {
+                return [
+                    'operation' => 'success'
+                ];
+            } else {
+              return [
+                  'operation' => 'error',
+                  'message' => $order_model->getErrors(),
+              ];
+            }
+
+          } else {
+            return [
+                'operation' => 'error',
+                'message' => 'Invalid Delivery code',
+            ];
+          }
+
+
 
     }
 

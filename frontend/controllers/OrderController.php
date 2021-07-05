@@ -317,6 +317,8 @@ class OrderController extends Controller {
             $order_model->armada_tracking_link = $createDeliveryApiResponse->data['trackingLink'];
             $order_model->armada_qr_code_link = $createDeliveryApiResponse->data['qrCodeLink'];
             $order_model->armada_delivery_code = $createDeliveryApiResponse->data['code'];
+            $order_model->armada_order_status = $createDeliveryApiResponse->data['orderStatus'];
+            
             $order_model->save(false);
             Yii::$app->session->setFlash('successResponse', "Your request has been successfully submitted");
 

@@ -88,16 +88,17 @@ class ArmadaDelivery extends Component {
             ],
         ];
 
-        $client = new Client();
-        $response = $client->createRequest()
-                ->setMethod('POST')
-                ->setUrl($this->apiEndpoint)
-                ->setData($deliveryParams)
-                ->addHeaders([
-                    'authorization' => 'Key ' . $armadaApiKey,
-                    'content-type' => 'application/json',
-                ])
-                ->send();
+
+      $client = new Client();
+      $response = $client->createRequest()
+              ->setMethod('POST')
+              ->setUrl($this->apiEndpoint)
+              ->setData($deliveryParams)
+              ->addHeaders([
+                  'authorization' => 'Key ' . $armadaApiKey,
+                  'content-type' => 'application/json',
+              ])
+              ->send();
 
         return $response;
     }
