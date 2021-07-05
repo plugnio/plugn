@@ -79,6 +79,7 @@ class OrderController extends Controller
         $status = Yii::$app->request->get ('status');
         $customer = Yii::$app->request->get ('customer');
         $date_range = Yii::$app->request->get ('date_range');
+        $customer_id = Yii::$app->request->get ('customer_id');
 
         Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
@@ -102,6 +103,9 @@ class OrderController extends Controller
 
         if ($date_range) {
             $query->filterByCreatedDate($date_range);
+        }
+        if ($customer_id) {
+            $query->andFilterWhere(['customer_id' => $customer_id]);
         }
         if ($type == 'active') {
             $query->andWhere (
@@ -885,7 +889,7 @@ class OrderController extends Controller
         $model->customer_phone_country_code = $customer_phone_country_code;
         $model->customer_phone_number = $customer_phone_number;
         $model->pickup_location_id = $pickup_location_id;
-        $model->estimated_time_of_arrival = $estimated_time_of_arrival;
+        $model->estimated_time_of_arrival = date ("Y-m-d H:i:s", strtotime ($estimated_time_of_arrival));
         $model->special_directions = $special_directions;
 
         if($model->order_mode == Order::ORDER_MODE_DELIVERY){

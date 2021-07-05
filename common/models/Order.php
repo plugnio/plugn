@@ -72,6 +72,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property string $recipient_phone_number
  * @property string $gift_message
  * @property boolean $reminder_sent
+ * @property boolean estimated_time_of_arrival
  *
  * @property Area
  * @property BankDiscount $bankDiscount
