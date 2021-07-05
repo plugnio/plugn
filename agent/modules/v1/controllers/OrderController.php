@@ -79,6 +79,7 @@ class OrderController extends Controller
         $status = Yii::$app->request->get ('status');
         $customer = Yii::$app->request->get ('customer');
         $date_range = Yii::$app->request->get ('date_range');
+        $customer_id = Yii::$app->request->get ('customer_id');
 
         Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
@@ -102,6 +103,9 @@ class OrderController extends Controller
 
         if ($date_range) {
             $query->filterByCreatedDate($date_range);
+        }
+        if ($customer_id) {
+            $query->andFilterWhere(['customer_id' => $customer_id]);
         }
         if ($type == 'active') {
             $query->andWhere (
