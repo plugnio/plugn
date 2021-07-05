@@ -34,7 +34,7 @@ class SubscriptionSearch extends Subscription
     public function scenarios()
     {
         // bypass scenarios() implementation in the parent class
-        return Model::scenarios();
+        return parent::scenarios();
     }
 
     /**

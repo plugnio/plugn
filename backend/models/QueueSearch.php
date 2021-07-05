@@ -28,7 +28,7 @@ class QueueSearch extends Queue
     public function scenarios()
     {
         // bypass scenarios() implementation in the parent class
-        return Model::scenarios();
+        return parent::scenarios();
     }
 
     /**
