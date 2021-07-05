@@ -145,9 +145,10 @@ class AuthController extends Controller {
      * @return array
      */
     public function actionUpdatePassword() {
+
         $token = Yii::$app->request->getBodyParam("token");
         $newPassword = Yii::$app->request->getBodyParam("newPassword");
-        $cPassword = Yii::$app->request->getBodyParam("cPassword");
+        //$cPassword = Yii::$app->request->getBodyParam("cPassword");
 
         $agent = Agent::findByPasswordResetToken($token);
 
@@ -163,7 +164,8 @@ class AuthController extends Controller {
                 'message' => Yii::t ('agent', 'Password field required')
             ];
         }
-        if (!$cPassword) {
+        
+        /*if (!$cPassword) {
             return [
                 'operation' => 'error',
                 'message' => Yii::t ('agent', 'Confirm Password field required')
@@ -175,7 +177,7 @@ class AuthController extends Controller {
                 'operation' => 'error',
                 'message' => Yii::t ('agent', 'Password & Confirm Password does not match')
             ];
-        }
+        }*/
 
         $agent->setPassword($newPassword);
         $agent->removePasswordResetToken();
