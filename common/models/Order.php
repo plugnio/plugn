@@ -363,7 +363,8 @@ class Order extends \yii\db\ActiveRecord
             'restaurantBranch',
             'deliveryZone',
             'pickupLocation',
-            'payment'
+            'payment',
+            'currency'
         ];
     }
 
