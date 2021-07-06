@@ -216,6 +216,33 @@ class DeliveryZoneController extends Controller
     }
 
     /**
+     * cancel-override Delivery zone
+     */
+    public function actionCancelOverride($delivery_zone_id, $store_uuid)
+    {
+        $model = $this->findModel($delivery_zone_id, $store_uuid);
+        $model->delivery_zone_tax = null;
+        if (!$model->save()) {
+            if (isset($model->errors)) {
+                return [
+                    "operation" => "error",
+                    "message" => $model->errors
+                ];
+            } else {
+                return [
+                    "operation" => "error",
+                    "message" => Yii::t('agent',"We've faced a problem cancelling VAT Charged")
+                ];
+            }
+        }
+
+        return [
+            "operation" => "success",
+            "message" => Yii::t('agent',"Delivery Zone VAT Charged cancelled successfully")
+        ];
+    }
+
+    /**
      * Finds the Delivery zone model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id

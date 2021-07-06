@@ -234,11 +234,13 @@ return [
                         'POST create' => 'create',
                         'DELETE <delivery_zone_id>/<store_uuid>' => 'delete',
                         'PATCH <delivery_zone_id>/<store_uuid>' => 'update',
+                        'DELETE cancel-override/<delivery_zone_id>/<store_uuid>' => 'cancel-override',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS create' => 'options',
                         'OPTIONS <delivery_zone_id>/<store_uuid>' => 'options',
+                        'OPTIONS cancel-override/<delivery_zone_id>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// OpeningHoursController
