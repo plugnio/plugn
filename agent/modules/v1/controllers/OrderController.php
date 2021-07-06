@@ -10,6 +10,7 @@ use yii\web\NotFoundHttpException;
 use agent\models\Order;
 use agent\models\OrderItem;
 use agent\models\OrderItemExtraOption;
+use yii\db\Expression;
 
 
 class OrderController extends Controller
@@ -575,6 +576,12 @@ class OrderController extends Controller
         ];
     }
 
+    /**
+     * @param $order_uuid
+     * @param $store_uuid
+     * @return array
+     * @throws NotFoundHttpException
+     */
     public function actionRequestDriverFromArmada($order_uuid, $store_uuid)
     {
         $armadaApiKey = Yii::$app->request->getBodyParam ("armada_api_key");
@@ -627,7 +634,6 @@ class OrderController extends Controller
      */
     public function actionRequestDriverFromMashkor($order_uuid, $store_uuid)
     {
-
         $mashkorBranchId = Yii::$app->request->getBodyParam ("mashkor_branch_id");
 
         $model = $this->findModel ($order_uuid, $store_uuid);
@@ -720,12 +726,15 @@ class OrderController extends Controller
         }
 
         $query = \common\models\Order::find ()
+            ->joinWith(['currency', 'paymentMethod', 'payment'])
             ->activeOrders ($store_model->restaurant_uuid)
             ->with ('voucher')
             ->orderBy (['order_created_at' => SORT_ASC]);
 
         if ($start_date && $end_date) {
             $query->andWhere (['between', 'order_created_at', $start_date, $end_date]);
+        } else {
+            $query->andWhere (new Expression('DATE(order_created_at) > DATE_SUB(now(), INTERVAL 3 MONTH)'));
         }
 
         $searchResult = $query->all ();

@@ -53,7 +53,8 @@ class Order extends \common\models\Order
             'voucher',
             'bankDiscount',
             'refunds',
-            'area'
+            'area',
+            'currency'
         ];
     }
 

@@ -83,6 +83,7 @@ class Item extends \common\models\Item {
             'options',
             'categoryItems',
             'extraOptions',
+            'currency'
         ];
     }
 

@@ -194,6 +194,16 @@ class Item extends \yii\db\ActiveRecord
 
 
     /**
+     * @inheritdoc
+     */
+    public function extraFields()
+    {
+        return [
+            'currency'
+        ];
+    }
+
+    /**
      *
      * @param type $insert
      * @param type $changedAttributes

@@ -68,13 +68,17 @@ class AreaController extends Controller {
         $city_id = Yii::$app->request->get('city_id');
         $store_id = Yii::$app->request->get('store_id');
 
-        Yii::$app->accountManager->getManagedAccount();
+        //valdiate access
+        if ($store_id) {
+            Yii::$app->accountManager->getManagedAccount($store_id);
+        }
 
         $query =  Area::find();
 
         if ($city_id) {
             $query->andWhere(['city_id' => $city_id]);
         }
+
         if ($store_id) {
             $query->joinWith('restaurant');
             $query->andWhere(['restaurant.restaurant_uuid' => $store_id]);
