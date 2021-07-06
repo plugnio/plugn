@@ -71,14 +71,14 @@ class ItemController extends Controller
      * Get all store's products
      * @return type
      */
-    public function actionList($store_uuid)
+    public function actionList()
     {
         $keyword = Yii::$app->request->get('keyword');
 
-        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount();
 
         $query = Item::find();
-        $query->andWhere(['restaurant_uuid'=>$store_uuid]);
+        $query->andWhere(['restaurant_uuid'=> $store->restaurant_uuid]);
         $query->orderBy('item_created_at DESC');
 
         if ($keyword && $keyword != 'null') {
@@ -511,7 +511,8 @@ class ItemController extends Controller
     {
         $store = Yii::$app->accountManager->getManagedAccount();
 
-        $model = Item::findOne(['item_uuid'=>$item_uuid,'restaurant_uuid'=>$store->restaurant_uuid]);
+        $model = Item::findOne(['item_uuid'=>$item_uuid,'restaurant_uuid' => $store->restaurant_uuid]);
+
         if ($model !== null) {
             return $model;
         } else {

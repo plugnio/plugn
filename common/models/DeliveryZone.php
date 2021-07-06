@@ -165,7 +165,8 @@ class DeliveryZone extends \yii\db\ActiveRecord
      */
     public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])
+            ->via('restaurant');
     }
 
     /**
