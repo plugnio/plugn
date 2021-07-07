@@ -655,7 +655,7 @@ class Order extends \yii\db\ActiveRecord {
 
                     if ($orderItemExtraOptions->count() > 0) {
                         foreach ($orderItemExtraOptions->all() as $orderItemExtraOption){
-                          if ($orderItemExtraOption->order_item_extra_option_id && $orderItemExtraOption->extra_option_id)
+                          if ($orderItemExtraOption->order_item_extra_option_id && $orderItemExtraOption->order_item_extra_option_id && $orderItemExtraOption->extra_option_id)
                               $orderItemExtraOption->extraOption->increaseStockQty($orderItem->qty);
                         }
                     }
@@ -693,6 +693,40 @@ class Order extends \yii\db\ActiveRecord {
 
         if(YII_ENV == 'prod') {
 
+        $plugn_fee = 0;
+        $payment_gateway_fee = 0;
+        $total_price = $this->total_price;
+        $delivery_fee = $this->delivery_fee;
+        $subtotal = $this->subtotal;
+
+        if($this->payment_uuid){
+          if($this->currency->code == 'KWD'){
+            $plugn_fee = $this->payment->plugn_fee * 3.28;
+            $total_price = $total_price * 3.28;
+            $delivery_fee = $delivery_fee * 3.28;
+            $subtotal = $subtotal * 3.28;
+            $payment_gateway_fee = $this->payment->payment_gateway_fee * 3.28;
+
+          }
+          else if($this->currency->code == 'SAR'){
+            $plugn_fee = $this->payment->plugn_fee * 0.27;
+            $total_price = $total_price *  0.27;
+            $delivery_fee = $delivery_fee * 0.27;
+            $subtotal = $subtotal * 0.27;
+            $payment_gateway_fee = $this->payment->payment_gateway_fee * 0.27;
+          }
+          else if($this->currency->code == 'BHD'){
+            $plugn_fee = $this->payment->plugn_fee * 2.65;
+            $total_price = $total_price  * 2.65;
+            $delivery_fee = $delivery_fee * 2.65;
+            $subtotal = $subtotal * 2.65;
+            $payment_gateway_fee = $this->payment->payment_gateway_fee * 2.65;
+
+          }
+        }
+
+            
+
           \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
           \Segment::track([
               'userId' => $this->restaurant_uuid,
@@ -701,13 +735,13 @@ class Order extends \yii\db\ActiveRecord {
               'properties' => [
                   'checkout_id' => $this->order_uuid,
                   'order_id' => $this->order_uuid,
-                  'total' => ($this->total_price * 3.28),
-                  'revenue' => $this->payment_uuid ? ($this->payment->plugn_fee * 3.28) : 0,
-                  'gateway_fee' => $this->payment_uuid ? ($this->payment->payment_gateway_fee * 3.28 ) : 0,
+                  'total' => $total_price,
+                  'revenue' => $plugn_fee,
+                  'gateway_fee' => $payment_gateway_fee,
                   'payment_method' => $this->payment_method_name,
-                  'gateway' => $this->payment_uuid ? 'Tap' : null,
-                  'shipping' => ($this->delivery_fee * 3.28),
-                  'subtotal' => ($this->subtotal * 3.28),
+                  'gateway' => $this->payment_uuid ? $this->payment_gateway_name : null,
+                  'shipping' => $delivery_fee,
+                  'subtotal' => $subtotal,
                   'currency' => 'USD',
                   'coupon' => $this->voucher && $this->voucher->code  ? $this->voucher->code : null,
                   'products' => $productsList ? $productsList : null

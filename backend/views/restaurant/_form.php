@@ -95,8 +95,30 @@ use borales\extensions\phoneInput\PhoneInput;
 
 
     <?=
+      $form->field($model, 'is_tap_enable')->dropDownList(
+              [
+                  1 => 'Yes',
+                  0 => 'No',
+              ]
+      );
+    ?>
+
+    <?=
+      $form->field($model, 'is_myfatoorah_enable')->dropDownList(
+              [
+                  1 => 'Yes',
+                  0 => 'No',
+              ]
+      );
+    ?>
+
+
+    <?=
       $form->field($model, 'country_id')->dropDownList(  $countryArray  );
     ?>
+
+
+
 
     <?=
     $form->field($model, 'restaurant_payments_method')->widget(Select2::classname(), [
@@ -113,6 +135,8 @@ use borales\extensions\phoneInput\PhoneInput;
     ]);
     ?>
 
+    <?= $form->field($model, 'payment_gateway_queue_id')->textInput(['maxlength' => true]) ?>
+    
     <?= $form->field($model, 'version')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
@@ -193,6 +217,15 @@ use borales\extensions\phoneInput\PhoneInput;
         );
         ?>
 
+        <?=
+          $form->field($model, 'business_type')->dropDownList(
+                  [
+                  'ind' => 'ind',
+                  'corp' => 'corp',
+                  ]
+          );
+        ?>
+
     <?=
        $form->field($model, 'phone_number')->widget(PhoneInput::className(), [
           'jsOptions' => [
@@ -203,6 +236,7 @@ use borales\extensions\phoneInput\PhoneInput;
     ?>
 
     <?= $form->field($model, 'restaurant_email')->input('email') ?>
+
 
     <?= $form->field($model, 'iban')->textInput() ?>
     <?= $form->field($model, 'owner_first_name')->textInput() ?>
@@ -233,7 +267,7 @@ use borales\extensions\phoneInput\PhoneInput;
     <?= $form->field($model, 'google_analytics_id')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'facebook_pixil_id')->textInput(['maxlength' => true]) ?>
-    
+
     <?= $form->field($model, 'snapchat_pixil_id')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'custom_css')->textarea(['rows' => '12']) ?>
@@ -241,6 +275,8 @@ use borales\extensions\phoneInput\PhoneInput;
     <?= $form->field($model, 'identification_file_id_front_side')->textInput() ?>
 
     <?= $form->field($model, 'identification_file_id_back_side')->textInput() ?>
+
+    <?= $form->field($model, 'supplierCode')->textInput() ?>
 
     <?= $form->field($model, 'business_id')->textInput() ?>
 

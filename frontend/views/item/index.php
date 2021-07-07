@@ -157,7 +157,7 @@ $this->registerJs($js);
                 [
                     'header' => 'Action',
                     'class' => 'yii\grid\ActionColumn',
-                    'template' => ' {view} {update} {delete}',
+                    'template' => ' {update}',
                     'buttons' => [
                         'update' => function ($url, $model) {
                             return Html::a(

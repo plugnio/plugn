@@ -154,8 +154,6 @@ class OrderItem extends \yii\db\ActiveRecord {
 
 
 
-
-
         //Update product inventory
         if ($insert){
           if ($item_model) {

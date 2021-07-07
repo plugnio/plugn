@@ -10,6 +10,7 @@ use common\models\Item;
 use yii\db\Expression;
 use common\models\Customer;
 use common\models\RestaurantTheme;
+use common\models\PaymentGatewayQueue;
 use common\models\TapQueue;
 use common\models\AgentAssignment;
 use yii\data\ActiveDataProvider;
@@ -325,21 +326,32 @@ class StoreController extends Controller {
         ]);
     }
 
+
     /**
-     * Create tap account
+     * Create paymentGateway account
      * @param type $id
-     * @return type
+     * @return type $paymentGateway
      */
-    public function actionCreateTapAccount($id) {
+    public function actionCreatePaymentGatewayAccount($id, $paymentGateway) {
 
         $model = $this->findModel($id);
-        $model->setScenario(Restaurant::SCENARIO_CREATE_TAP_ACCOUNT);
 
-        if ($model->is_tap_enable)
+        if( $model->currency->code == 'BHD'  && $paymentGateway == 'myfatoorah')
+          return $this->redirect(['setup-online-payments', 'storeUuid' => $model->restaurant_uuid]);
+
+          if($model->currency->code != 'KWD')
+                $model->business_type = 'corp';
+
+
+        if($paymentGateway == 'tap')
+          $model->setScenario(Restaurant::SCENARIO_CREATE_TAP_ACCOUNT);
+        else if ($paymentGateway == 'myfatoorah')
+          $model->setScenario(Restaurant::SCENARIO_CREATE_MYFATOORAH_ACCOUNT);
+
+
+        if (($model->is_myfatoorah_enable && $paymentGateway == 'myfatoorah') || ($model->is_tap_enable && $paymentGateway == 'tap') )
             return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
 
-          if($model->country->iso != 'KW')
-                $model->business_type = 'corp';
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->save()) {
 
@@ -440,26 +452,39 @@ class StoreController extends Controller {
             if (sizeof($restaurant_authorized_signature_file) > 0)
                 $model->authorized_signature_file = str_replace('uploads/', '', $restaurant_authorized_signature_file[0]['file']);  //Authorized signature
 
+
+
             if (sizeof($owner_identification_file_front_side) > 0)
                 $model->identification_file_front_side = str_replace('uploads/', '', $owner_identification_file_front_side[0]['file']); //Owner's civil id front side
 
             if (sizeof($owner_identification_file_back_side) > 0)
                 $model->identification_file_back_side = str_replace('uploads/', '', $owner_identification_file_back_side[0]['file']); //Owner's civil id back side
 
+            $model->is_myfatoorah_enable = 0;
+            $model->is_tap_enable = 0;
+
+
+            //make sure we delete all payment methods
+            foreach ($model->getRestaurantPaymentMethods()->all() as $restaurant_payment_method) {
+              if($restaurant_payment_method->payment_method_id != 3)
+                $restaurant_payment_method->delete();
+            }
+
 
 
             if ($model->validate() && $model->save()) {
 
 
-                if (!$model->is_tap_enable) {
-                    $tap_queue_model = new TapQueue;
-                    $tap_queue_model->queue_status = TapQueue::QUEUE_STATUS_PENDING;
-                    $tap_queue_model->restaurant_uuid = $model->restaurant_uuid;
-                    if ($tap_queue_model->save()) {
-                        $model->tap_queue_id = $tap_queue_model->tap_queue_id;
+              // if ($paymentGateway == 'tap ? !$model->is_myfatoorah_enable : ($paymentGateway == 'my')) {
+                    $payment_gateway_queue_model = new PaymentGatewayQueue;
+                    $payment_gateway_queue_model->queue_status = PaymentGatewayQueue::QUEUE_STATUS_PENDING;
+                    $payment_gateway_queue_model->payment_gateway =  $paymentGateway;
+                    $payment_gateway_queue_model->restaurant_uuid = $model->restaurant_uuid;
+                    if ($payment_gateway_queue_model->save()) {
+                        $model->payment_gateway_queue_id = $payment_gateway_queue_model->payment_gateway_queue_id;
                         $model->save(false);
                     }
-                }
+                // }
 
                 return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
             } else {
@@ -467,9 +492,10 @@ class StoreController extends Controller {
             }
         }
 
-        return $this->render('create-tap-account', [
-                    'model' => $model
-        ]);
+
+          return $this->render($paymentGateway == 'tap' ? 'create-tap-account' : 'create-myfatoorah-account', [
+                      'model' => $model
+          ]);
     }
 
     /**
@@ -580,6 +606,97 @@ class StoreController extends Controller {
         return $this->render('update', [
                     'model' => $model
         ]);
+    }
+
+
+    public function actionSetupOnlinePayments($storeUuid) {
+
+        $model = $this->findModel($storeUuid);
+
+        return $this->render('setup-online-payments', [
+                    'model' => $model
+        ]);
+    }
+
+    public function actionSwitchToMyfatoorah($storeUuid) {
+
+        $model = $this->findModel($storeUuid);
+
+        if($model->currency->code == 'BHD'){
+          Yii::$app->session->setFlash('error','Contact us if you want to enable this option');
+          return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
+        }
+
+
+
+        if($model->supplierCode){
+          $model->is_tap_enable = 0;
+          $model->is_myfatoorah_enable = 1;
+          $model->save(false);
+
+
+          foreach ($model->getRestaurantPaymentMethods()->all() as $restaurant_payment_method) {
+            if($restaurant_payment_method->payment_method_id != 3)
+              $restaurant_payment_method->delete();
+          }
+
+          return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
+
+        }
+
+        return $this->redirect(['create-payment-gateway-account',  'paymentGateway' =>'myfatoorah','id' => $model->restaurant_uuid]);
+
+    }
+
+    public function actionSwitchToTap($storeUuid) {
+
+        $model = $this->findModel($storeUuid);
+
+        if($model->live_api_key && $model->test_api_key){
+          $model->is_tap_enable = 1;
+          $model->is_myfatoorah_enable = 0;
+          $model->save(false);
+
+          foreach ($model->getRestaurantPaymentMethods()->all() as $restaurant_payment_method) {
+            if($restaurant_payment_method->payment_method_id != 3)
+              $restaurant_payment_method->delete();
+          }
+
+          return $this->redirect(['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
+
+        }
+
+        return $this->redirect(['create-payment-gateway-account',  'paymentGateway' =>'tap','id' => $model->restaurant_uuid]);
+
+    }
+
+
+    public function actionViewTapRates($storeUuid) {
+
+        $model = $this->findModel($storeUuid);
+
+        return $this->render('view-tap-rates', [
+                    'model' => $model
+        ]);
+    }
+
+
+    public function actionViewMyfatoorahRates($storeUuid) {
+
+        $model = $this->findModel($storeUuid);
+
+        if($model->currency->code == 'BHD')
+          return $this->redirect(['setup-online-payments', 'storeUuid' => $model->restaurant_uuid]);
+
+
+        return $this->render('view-myfatoorah-rates', [
+                    'model' => $model
+        ]);
+
+
+
+        return $this->redirect(['setup-online-payments', 'storeUuid' => $model->restaurant_uuid]);
+
     }
 
     /**

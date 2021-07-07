@@ -21,7 +21,7 @@ class DashboardAsset extends AssetBundle {
         'app-assets/css/pages/card-analytics.css',
         'app-assets/css/pages/dashboard-ecommerce.css',
         'app-assets/css/plugins/tour/tour.css',
-        // 'assets/css/style.css',
+        'css/styles.css',
         'https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600',
         'app-assets/css/pages/data-list-view.css',
         'app-assets/vendors/css/tables/datatable/datatables.min.css',

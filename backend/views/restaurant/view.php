@@ -16,10 +16,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="restaurant-view">
     <h1>
         <?= Html::encode($this->title) ?>
-        <span class="badge">
-            <?= $model->status ?>
-        </span>
-        <?= $model->is_tap_enable ? '' : Html::a('Create Tap account', ['create-tap-account', 'restaurant_uuid' => $model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
 
 
     </h1>
@@ -45,21 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ])
         ?>
 
-    </p>
-
-    <p>
-      <?= Html::a('Update sitemap', ['update-sitemap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>
-      <?= Html::a('Delete Build Js', ['delete-specific-file','filePath' =>'build.js' ,'id' => $model->restaurant_uuid], ['class' => 'btn btn-danger']) ?>
-      <?= Html::a('Delete branch-name txt', ['delete-specific-file','filePath' =>'branch-name.txt' ,'id' => $model->restaurant_uuid], ['class' => 'btn btn-danger']) ?>
-      <?= Html::a('Merge w/ master', ['merge-branch', 'id' => $model->restaurant_uuid, 'head' => 'master'], ['class' => 'btn btn-primary']) ?>
-      <?= Html::a('Merge w/ master-temp', ['merge-branch', 'id' => $model->restaurant_uuid, 'head' => 'master-temp'], ['class' => 'btn btn-primary']) ?>
-
-
-
-      <?= Html::a('Merge', ['merge-to-master-branch', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
-
-
-
+        <?= Html::a('Update sitemap', ['update-sitemap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>
 
     </p>
 
@@ -67,6 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
     DetailView::widget([
         'model' => $model,
         'attributes' => [
+          'payment_gateway_queue_id',
           [
               'label' => 'is_tap_enable',
               'value' => function ($data) {
@@ -74,7 +57,14 @@ $this->params['breadcrumbs'][] = $this->title;
               },
               'format' => 'raw'
           ],
-            'retention_email_sent',
+          [
+              'label' => 'is_myfatoorah_enable',
+              'value' => function ($data) {
+                  return $data->is_myfatoorah_enable ? 'Yes' : 'No';
+              },
+              'format' => 'raw'
+          ],
+          'retention_email_sent',
             'tap_queue_id',
             'version',
             'sitemap_require_update',
@@ -171,6 +161,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'owner_email',
             'owner_number',
             'vendor_sector',
+            'supplierCode',
             'business_id',
             'developer_id',
             'business_entity_id',

@@ -199,6 +199,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
           }
 
 
+
         } else {
             Yii::info('[TAP Payment Issue > ' . $paymentRecord->restaurant->name . ']'
                     . $paymentRecord->restaurant->name .

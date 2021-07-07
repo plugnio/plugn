@@ -167,8 +167,10 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET <id>' => 'list-all-restaurants-payment-method',
+                        'POST status-update-webhook' => 'my-fatoorah-webhook',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS status-update-webhook' => 'options',
                         'OPTIONS <id>' => 'options',
                     ]
                 ],
@@ -207,6 +209,7 @@ return [
                         'POST <id>' => 'place-an-order',
                         'GET check-for-pending-orders/<restaurant_uuid>' => 'check-pending-orders',
                         'GET callback' => 'callback',
+                        'GET my-fatoorah-callback' => 'my-fatoorah-callback',
                         'GET apply-promo-code' => 'apply-promo-code',
                         'GET apply-bank-discount' => 'apply-bank-discount',
                         'GET order-details/<id>/<restaurant_uuid>' => 'order-details',
@@ -217,6 +220,7 @@ return [
                         'OPTIONS <id>' => 'options',
                         'OPTIONS check-for-pending-orders/<restaurant_uuid>' => 'options',
                         'OPTIONS callback' => 'options',
+                        'GET my-fatoorah-callback' => 'my-fatoorah-callback',
                         'OPTIONS apply-promo-code' => 'options',
                         'OPTIONS apply-bank-discount' => 'options',
                         'OPTIONS order-details/<id>/<restaurant_uuid>' => 'options',

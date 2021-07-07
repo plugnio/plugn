@@ -19,13 +19,13 @@ use common\models\BusinessLocation;
 use common\models\Restaurant;
 use common\models\OrderItem;
 use common\models\Category;
-use common\models\RestaurantPaymentMethod;
 use common\models\Order;
 use common\models\Plan;
 use common\models\PaymentMethod;
 use common\models\Subscription;
 use common\models\AgentAssignment;
 use common\models\Item;
+use common\models\RestaurantPaymentMethod;
 use common\models\Customer;
 use common\models\SubscriptionPayment;
 use yii\db\Expression;
@@ -1260,6 +1260,12 @@ class SiteController extends Controller {
                 $business_location_model->business_location_name = 'Main Branch';
                 $business_location_model->business_location_name_ar = 'الفرع الرئيسي';
                 $business_location_model->save();
+
+                //Enable cash by default
+                $payments_method = new RestaurantPaymentMethod();
+                $payments_method->payment_method_id = 3; //Cash
+                $payments_method->restaurant_uuid = $store_model->restaurant_uuid;
+                $payments_method->save();
 
 
                 //Enable cash by default

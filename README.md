@@ -4,12 +4,14 @@
 ```bash
 # Every  minute
 * * * * * php ~/www/yii cron/site-status > /dev/null 2>&1
-* * * * * php ~/www/yii cron/create-tap-account > /dev/null 2>&1
+* * * * * php ~/www/yii cron/create-payment-gateway-account > /dev/null 2>&1
 
 # Every 5 minutes
 */5 * * * * php ~/www/yii cron/update-transactions > /dev/null 2>&1
 */5 * * * * php ~/www/yii cron/update-stock-qty > /dev/null 2>&1
 */5 * * * * php ~/www/yii cron/send-reminder-email  > /dev/null 2>&1
+*/5 * * * * php ~/www/yii cron/make-refund  > /dev/null 2>&1
+*/5 * * * * php ~/www/yii cron/update-refund-status-message  > /dev/null 2>&1
 
 # Every day at midnight
 0 0 * * * php ~/www/yii  cron/update-voucher-status > /dev/null 2>&1

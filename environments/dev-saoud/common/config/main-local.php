@@ -71,6 +71,9 @@ return [
         'tapPayments' => [
             'gatewayToUse' => \common\components\TapPayments::USE_TEST_GATEWAY,
         ],
+        'myFatoorahPayment' => [
+            'gatewayToUse' => \common\components\MyFatoorahPayment::USE_TEST_GATEWAY
+        ],
         'armadaDelivery' => [
             'keyToUse' => \common\components\ArmadaDelivery::USE_TEST_KEY,
         ],

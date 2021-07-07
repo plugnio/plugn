@@ -84,9 +84,10 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
         ?>
 
         <?php
-        // if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT ) {
-        //     echo Html::a('Refund', ['refund-order', 'order_uuid' => $model->order_uuid, 'storeUuid' => $storeUuid,], ['class' => 'btn btn-warning', 'style'=>'margin-left: 5px;']) ;
-        // }
+        if ($orderItems->totalCount > 0 && $model->payment_uuid &&  $model->order_status != Order::STATUS_REFUNDED && $model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT ) {
+          if(($model->restaurant->is_myfatoorah_enable  && $model->payment->payment_gateway_invoice_id ) || ($model->restaurant->is_tap_enable  && $model->payment->payment_gateway_transaction_id ))
+            echo Html::a('Refund', ['refund-order', 'order_uuid' => $model->order_uuid, 'storeUuid' => $storeUuid,], ['class' => 'btn btn-warning  mr-1 mb-1', 'style'=>'margin-left: 7px;']) ;
+        }
         ?>
 
         <?php
@@ -188,7 +189,7 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
             <p style="margin-top: 1rem">
 
 <?php
-if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Order::STATUS_ABANDONED_CHECKOUT || $model->order_status == Order::STATUS_CANCELED ) && $model->getOrderItems()->count()) {
+if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Order::STATUS_ABANDONED_CHECKOUT || $model->order_status == Order::STATUS_CANCELED ) && $orderItems->totalCount) {
     echo Html::a('Mark as pending', [
         'change-order-status',
         'order_uuid' => $model->order_uuid,
@@ -387,7 +388,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
             </div>
         </div>
     </div>
-    <?php if ($orderItems->totalCount > 0) { ?>
+    <?php if ($orderItems->totalCount) { ?>
         <section id="data-list-view" class="data-list-view-header">
 
             <div class="card">
@@ -596,8 +597,8 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                         </tr>
                     </tbody>
     <?php
-    if ($model->order_status == Order::STATUS_REFUNDED || $model->order_status == Order::STATUS_PARTIALLY_REFUNDED && ($refunds->count() > 0)) {
-        foreach ($refunds->all() as $refund) {
+    if ($model->order_status == Order::STATUS_REFUNDED || $model->order_status == Order::STATUS_PARTIALLY_REFUNDED && ($model->refunds > 0)) {
+        foreach ($model->refunds as $refund) {
             ?>
                             <tbody class="order-details__summary__refund-lines">
                                 <tr class="order-details__summary__detail-line-row">
@@ -626,10 +627,6 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                 <?php } ?>
 
 <?php
-// order's Item
-$refundDataProvider = new \yii\data\ActiveDataProvider([
-    'query' => $model->getRefunds()
-        ]);
 
 
 if ($refundDataProvider->totalCount > 0 && $model->payment) {
@@ -637,22 +634,33 @@ if ($refundDataProvider->totalCount > 0 && $model->payment) {
         <div class="card">
             <div class="card-body">
 
-                <h3 style="margin-bottom: 20px;"> Refunds  </h3>
-
-
+                <h3 style="margin-bottom: 20px;">
                 <?php
-                // GridView::widget([
-                //     'dataProvider' => $refundDataProvider,
-                //     'sorter' => false,
-                //     'columns' => [
-                //         'refund_id',
-                //         'refund_amount:currency',
-                //         'refund_status',
-                //     ],
-                //     'layout' => '{items}{pager} ',
-                //     'tableOptions' => ['class' => 'table table-bordered table-hover'],
-                // ]);
+                  if($refundDataProvider->totalCount == 1)
+                    echo 'Refund';
+                  else if($refundDataProvider->totalCount > 1)
+                    echo 'Refunds';
                 ?>
+                </h3>
+
+                <?= GridView::widget([
+                    'dataProvider' => $refundDataProvider,
+                    'columns' => [
+                      ['class' => 'yii\grid\SerialColumn'],
+
+                      [
+                          'attribute' => 'refund_amount',
+                          "value" => function($data) {
+                                  return Yii::$app->formatter->asCurrency($data->refund_amount, $data->currency->code);
+                          },
+                      ],
+                        'refund_status',
+                    ],
+                    'layout' => '{items}{pager} ',
+                    'tableOptions' => ['class' => 'table table-bordered table-hover'],
+
+
+                ]); ?>
             </div>
         </div>
 
@@ -666,8 +674,11 @@ if ($refundDataProvider->totalCount > 0 && $model->payment) {
 
             <?php
 
-            if($model->payment_uuid && $model->payment->payment_current_status  != 'CAPTURED')
+            if($model->restaurant->is_tap_enable && $model->payment_uuid && $model->payment->payment_current_status  != 'CAPTURED')
               echo Html::a('Request Payment Status Update from TAP', ['update-payment-status','id' => $model->payment_uuid, 'storeUuid' => $storeUuid], ['class'=>'btn btn-outline-primary']);
+
+            // if($model->restaurant->is_myfatoorah_enable && $model->payment_uuid && $model->payment->payment_current_status  != 'Succss')
+            //   echo Html::a('Request Payment Status Update from MyFatoorah', ['update-payment-status','id' => $model->payment_uuid, 'storeUuid' => $storeUuid], ['class'=>'btn btn-outline-primary']);
 
             ?>
 
@@ -696,7 +707,7 @@ DetailView::widget([
             'format' => 'html',
             'value' => function ($data) {
                 if ($data->payment) {
-                    return $data->payment->payment_current_status == 'CAPTURED' ? '<span class="badge bg-success" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>' : '<span class="badge bg-danger" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>';
+                    return $data->payment->payment_current_status == 'CAPTURED' || $data->payment->payment_current_status == 'SUCCESS' || $data->payment->payment_current_status == 'Paid'  || $data->payment->payment_current_status == 'Succss' ? '<span class="badge bg-success" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>' : '<span class="badge bg-danger" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>';
                 }
             },
             'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
@@ -705,11 +716,21 @@ DetailView::widget([
             'label' => 'Gateway ID',
             'format' => 'html',
             'value' => function ($data) {
-                if ($data->payment) {
+                if ($data->payment_uuid) {
                     return $data->payment->payment_gateway_order_id;
                 }
             },
-            'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
+            'visible' => $model->payment_method_id != 3 && $model->payment_uuid && $model->payment->payment_gateway_name == 'tap',
+        ],
+        [
+            'label' => 'Invoice ID',
+            'format' => 'html',
+            'value' => function ($data) {
+                if ($data->payment_uuid) {
+                    return $data->payment->payment_gateway_invoice_id;
+                }
+            },
+            'visible' => $model->payment_method_id != 3 && $model->payment_uuid && $model->payment->payment_gateway_name == 'myfatoorah',
         ],
         [
             'label' => 'Received Callback',
@@ -729,7 +750,17 @@ DetailView::widget([
                     return $data->payment->payment_gateway_transaction_id;
                 }
             },
-            'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
+            'visible' => $model->payment_method_id != 3 && $model->payment_uuid && $model->payment->payment_gateway_name == 'tap',
+        ],
+        [
+            'label' => 'Payment ID',
+            'format' => 'html',
+            'value' => function ($data) {
+                if ($data->payment) {
+                    return $data->payment->payment_gateway_payment_id;
+                }
+            },
+            'visible' => $model->payment_method_id != 3 && $model->payment_uuid && $model->payment->payment_gateway_name == 'myfatoorah' && $model->payment->payment_gateway_payment_id,
         ],
     ],
     'options' => ['class' => 'table table-hover text-nowrap table-bordered'],

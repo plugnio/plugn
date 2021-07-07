@@ -8,12 +8,15 @@ use common\models\OrderItem;
 use common\models\Queue;
 use common\models\TapQueue;
 use common\models\AgentAssignment;
+use common\models\PaymentGatewayQueue;
 use common\models\Voucher;
 use common\models\BankDiscount;
 use common\models\Payment;
 use common\models\Item;
 use common\models\Customer;
 use common\models\City;
+use common\models\PaymentMethod;
+use common\models\Refund;
 use common\models\Plan;
 use common\models\Area;
 use common\models\Order;
@@ -41,32 +44,59 @@ use yii\db\Expression;
 class CronController extends \yii\console\Controller {
 
 
-  /**
-   *
-   */
-  public function actionMigrateDeliveryApiKey(){
+    public function actionMigration(){
 
-    $stores = Restaurant::find()
-    ->where(['not', ['armada_api_key' => null]])
-    ->orWhere(['not', ['mashkor_branch_id' => null]])
-    ->all();
+        foreach (TapQueue::find()->all() as $key => $queue) {
+          $paymentGatewayQueueModel = new PaymentGatewayQueue();
+          $paymentGatewayQueueModel->restaurant_uuid = $queue->restaurant_uuid;
+          $paymentGatewayQueueModel->payment_gateway = 'tap';
+          $paymentGatewayQueueModel->queue_status = 3;
+          $paymentGatewayQueueModel->queue_created_at = $queue->queue_created_at;
+          $paymentGatewayQueueModel->queue_updated_at = $queue->queue_updated_at;
+          $paymentGatewayQueueModel->queue_start_at = $queue->queue_start_at;
+          $paymentGatewayQueueModel->queue_end_at = $queue->queue_end_at;
+          $paymentGatewayQueueModel->save();
+        }
 
-    foreach ($stores as $key => $store) {
+        foreach (Payment::find()->all() as $key => $payment) {
+          $payment->payment_gateway_name = 'tap';
+          $payment->save();
+        }
 
-      foreach ($store->getBusinessLocations()->all() as $key => $branch) {
-        // code...
-        $branch->armada_api_key = $store->armada_api_key;
-        $branch->mashkor_branch_id = $store->mashkor_branch_id;
+        $payment_method = new PaymentMethod();
+        $payment_method->payment_method_name = 'Sadad';
+        $payment_method->payment_method_name_ar = 'سداد';
+        $payment_method->payment_method_code = 's';
+        $payment_method->vat = 0.15;
+        $payment_method->save();
 
-        if(!$branch->save())
-          die('error');
-      }
+        foreach (PaymentMethod::find()->all() as $key => $paymentMethod) {
+
+          if($paymentMethod->payment_method_id == 1){
+            $paymentMethod->payment_method_code = 'kn';
+          }
+          else if($paymentMethod->payment_method_id == 2){//Credit Card
+            $paymentMethod->payment_method_code = 'vm';
+          }
+          else if($paymentMethod->payment_method_id == 4){ //MADA
+            $paymentMethod->payment_method_code = 'md';
+            $paymentMethod->vat = 0.15;
+          }
+          else if($paymentMethod->payment_method_id == 5){
+            $paymentMethod->payment_method_code = 'b';
+          }
+
+
+          $paymentMethod->save();
+
+
+        }
+
+
+        $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
+        return self::EXIT_CODE_NORMAL;
 
     }
-
-    $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-    return self::EXIT_CODE_NORMAL;
-  }
 
 
     /**
@@ -203,9 +233,6 @@ class CronController extends \yii\console\Controller {
         }
 
     }
-
-
-
 
     public function actionSiteStatus(){
 
@@ -393,15 +420,15 @@ class CronController extends \yii\console\Controller {
 
     }
 
-    public function actionCreateTapAccount() {
+    public function actionCreatePaymentGatewayAccount() {
 
-      $queue = TapQueue::find()
+      $queue = PaymentGatewayQueue::find()
               ->where(['queue_status' => Queue::QUEUE_STATUS_PENDING])
               ->orderBy(['queue_created_at' => SORT_ASC])
               ->one();
 
       if($queue && $queue->restaurant_uuid){
-        $queue->queue_status = TapQueue::QUEUE_STATUS_CREATING;
+        $queue->queue_status = PaymentGatewayQueue::QUEUE_STATUS_CREATING;
         $queue->save();
       }
 
@@ -509,27 +536,107 @@ class CronController extends \yii\console\Controller {
 
 
     /**
+     * make the Refund Request from the API directly without the need of login into MyFatoorah dashboard
+     */
+    public function actionMakeRefund() {
+
+        $refunds = Refund::find()
+                    ->joinWith(['store','payment','currency'])
+                    ->where(['refund.refund_reference' => null])
+                    ->andWhere(['NOT', ['refund.payment_uuid' => null]])
+                    ->all();
+
+        foreach ($refunds as $refund) {
+
+                if($refund->store->is_myfatoorah_enable) {
+
+                  Yii::$app->myFatoorahPayment->setApiKeys($refund->currency->code);
+
+                  $response = Yii::$app->myFatoorahPayment->makeRefund($refund->payment->payment_gateway_payment_id, $refund->refund_amount, $refund->reason, $refund->store->supplierCode);
+
+                  $responseContent = json_decode($response->content);
+
+                  if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
+                      $refund->refund_status = 'REJECTED';
+                      $refund->save(false);
+                      $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
+                      return Yii::error('Refund Error ('. $refund->refund_id .'): ' . $errorMessage);
+                  } else {
+
+                    $refund->refund_reference = $responseContent->Data->RefundReference;
+                    $refund->refund_status = 'Pending';
+                    $refund->save(false);
+
+                    $this->stdout("Your refund request has been initiated successfully  \n", Console::FG_RED, Console::BOLD);
+                    return self::EXIT_CODE_NORMAL;
+                  }
+
+                } else if($refund->store->is_tap_enable) {
+
+                  Yii::$app->tapPayments->setApiKeys($refund->store->live_api_key, $refund->store->test_api_key);
+
+
+                  $response = Yii::$app->tapPayments->createRefund(
+                          $refund->payment->payment_gateway_transaction_id, $refund->refund_amount, $refund->currency->code, $refund->reason
+                  );
+
+                  if (array_key_exists('errors', $response->data)) {
+
+                      $errorMessage = $response->data['errors'][0]['description'];
+
+                      Yii::error('Refund Error ('. $refund->refund_id .'): ' . $errorMessage);
+
+                      return $refund->addError('refund_amount', $response->data['errors'][0]['description']);
+
+                  } else if ($response->data) {
+                      $refund->refund_reference = $response->data['id'];
+                      $refund->refund_status = $response->data['status'];
+                      $refund->save(false);
+
+                      $this->stdout("Your refund request has been initiated successfully  \n", Console::FG_RED, Console::BOLD);
+                      return self::EXIT_CODE_NORMAL;
+
+                  }
+
+                }
+
+        }
+
+        $this->stdout("No refund requests available \n", Console::FG_RED, Console::BOLD);
+        return self::EXIT_CODE_NORMAL;
+
+    }
+
+
+    /**
      * Update refund status  for all refunds record
      */
     public function actionUpdateRefundStatusMessage() {
 
-        $restaurants = Restaurant::find()->all();
-        foreach ($restaurants as $restaurant) {
+      $refunds = Refund::find()
+                  ->joinWith(['store'])
+                  ->where(['refund.refund_reference' => null])
+                  ->andWhere(['restaurant.is_tap_enable' => 1])
+                  ->andWhere(['NOT', ['refund.payment_uuid' => null]])
+                  ->all();
 
-            foreach ($restaurant->getRefunds()->all() as $refund) {
 
-                Yii::$app->tapPayments->setApiKeys($restaurant->live_api_key, $restaurant->test_api_key);
-                $response = Yii::$app->tapPayments->retrieveRefund($refund->refund_id);
+        foreach ($refunds as $refund) {
 
-                if (!array_key_exists('errors', $response->data)) {
-                    if ($refund->refund_status != $response->data['status']) {
-                        $refund->refund_status = $response->data['status'];
-                        $refund->save(false);
-                    }
-                }
-            }
+          Yii::$app->tapPayments->setApiKeys($refund->store->live_api_key, $refund->store->test_api_key);
+          $response = Yii::$app->tapPayments->retrieveRefund($refund->refund_reference);
+
+          if (!array_key_exists('errors', $response->data)) {
+              if ($refund->refund_status != $response->data['status']) {
+                  $refund->refund_status = $response->data['status'];
+                  $refund->save(false);
+              }
+          }
+
         }
     }
+
+
 
     /**
      * Update voucher status
@@ -563,6 +670,7 @@ class CronController extends \yii\console\Controller {
         $payments = Payment::find()
                 ->joinWith('order')
                 ->where(['!=', 'payment.payment_current_status', 'CAPTURED'])
+                ->andWhere(['!=', 'payment.payment_current_status', 'Paid'])
                 ->andWhere(['order.order_status' => Order::STATUS_ABANDONED_CHECKOUT])
                 ->andWhere(['order.items_has_been_restocked' => 0]) // if items hasnt been restocked
                 ->andWhere(['<', 'payment.payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')]);
@@ -580,13 +688,15 @@ class CronController extends \yii\console\Controller {
         $now = new DateTime('now');
         $payments = Payment::find()
                 ->where("received_callback = 0")
+                ->andWhere(['payment_gateway_name' => 'tap'])
                 ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')])
                 ->all();
 
         if ($payments) {
             foreach ($payments as $payment) {
                 try {
-                    if ($payment->payment_gateway_transaction_id) {
+
+                    if ( $payment->payment_gateway_transaction_id ) {
                         $payment = Payment::updatePaymentStatusFromTap($payment->payment_gateway_transaction_id);
                         $payment->received_callback = true;
                         $payment->save(false);

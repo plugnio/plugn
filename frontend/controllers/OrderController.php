@@ -356,8 +356,15 @@ class OrderController extends Controller {
             $payment = Payment::findOne($id);
 
             if (($payment = Payment::find()->where(['payment_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->one()) !== null) {
-              $transaction_id = $payment->payment_gateway_transaction_id;
-              Payment::updatePaymentStatusFromTap($transaction_id, true);
+
+              if($payment->payment_gateway_name == 'tap'){
+                $transaction_id = $payment->payment_gateway_transaction_id;
+                Payment::updatePaymentStatusFromTap($transaction_id, true);
+              } else if ($payment->payment_gateway_name == 'myfatoorah'){
+                $invoice_id = $payment->payment_gateway_invoice_id;
+                Payment::updatePaymentStatusFromMyFatoorah($invoice_id, true);
+              }
+
               return $this->redirect(['view', 'id' => $payment->order_uuid, 'storeUuid' => $storeUuid]);
             }
 
@@ -450,9 +457,25 @@ class OrderController extends Controller {
            //     'pagination' => false
            // ]);
 
+           // order's Item
+           $refundDataProvider = new \yii\data\ActiveDataProvider([
+               'query' => $order_model->getRefunds(),
+               'sort' =>false
+          ]);
+
+           // order's Item
+           $refundItemsDataProvider = new \yii\data\ActiveDataProvider([
+               'query' => $order_model->getRefundedItems()->with('item'),
+               'sort' =>false
+          ]);
+
+
+
            return $this->render('view', [
                        'model' => $order_model,
+                       'refundDataProvider' => $refundDataProvider,
                        'storeUuid' => $storeUuid,
+                       'refundItemsDataProvider' => $refundItemsDataProvider,
                        'orderItems' => $orderItems
            ]);
 
@@ -554,10 +577,9 @@ class OrderController extends Controller {
 
       $order_model = $this->findModel($order_uuid, $storeUuid);
 
-      // foreach ($order_model->getOrderItems()->all() as $orderItem) {
-      //    $refunded_items_model = new RefundedItem();
-      //    $refunded_items_model->order_item_id = $orderItem->order_item_id;
-      // }
+      if(($order_model->payment_uuid && !$order_model->payment->payment_gateway_invoice_id && !$order_model->payment->payment_gateway_transaction_id) || !$order_model->payment_uuid ){
+        return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
+      }
 
       $refunded_items_model = [new RefundedItem()];
 
@@ -569,20 +591,21 @@ class OrderController extends Controller {
 
 
       $model = new Refund();
+      $model->setScenario('create');
       $model->restaurant_uuid = $order_model->restaurant_uuid;
+      $model->payment_uuid = $order_model->payment_uuid;
       $model->order_uuid = $order_model->order_uuid;
 
-      if(Model::loadMultiple($refunded_items_model, Yii::$app->request->post())  && $model->load(Yii::$app->request->post())){
+      if(Model::loadMultiple($refunded_items_model, Yii::$app->request->post())  && $model->load(Yii::$app->request->post()) && $model->save()){
 
 
           foreach ($refunded_items_model as  $key => $refunded_item_model) {
             if($refunded_item_model->qty > 0){
               $refunded_item_model->refund_id = $model->refund_id;
               $refunded_item_model->save();
+
             }
 
-
-          if($model->save())
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
         }
      }
@@ -590,6 +613,7 @@ class OrderController extends Controller {
 
       return $this->render('refund-order', [
                   'model' => $model,
+                  'order_model' => $order_model,
                   'refunded_items_model' => $refunded_items_model
       ]);
     }

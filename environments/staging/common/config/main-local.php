@@ -80,6 +80,9 @@ return [
         'tapPayments' => [
             'gatewayToUse' => \common\components\TapPayments::USE_LIVE_GATEWAY,
         ],
+        'myFatoorahPayment' => [
+            'gatewayToUse' => \common\components\MyFatoorahPayment::USE_LIVE_GATEWAY
+        ],
         'armadaDelivery' => [
             'keyToUse' => \common\components\ArmadaDelivery::USE_LIVE_KEY,
         ],

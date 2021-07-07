@@ -338,7 +338,7 @@ class TapPayments extends Component
      * @param type $iban
      * @return type
      */
-    public function createMergentAccount($company_name,$currency,  $business_id, $business_entity_id, $iban)
+    public function createMerchantAccount($company_name,$currency,  $business_id, $business_entity_id, $iban)
     {
         $merchantEndpoint = $this->apiEndpoint . "/merchant";
 
@@ -400,8 +400,11 @@ class TapPayments extends Component
     /**
      * Create a refund for a customer
      */
-    public function createRefund($chargeId, $amount, $currency , $reason="requested_by_customer")  {
+    public function createRefund($chargeId, $amount, $currency , $reason)  {
 
+        if(!$reason)
+          $reason = "requested_by_customer";
+        
         $refundEndpoint = $this->apiEndpoint . "/refunds";
 
         $refundParams = [
