@@ -66,7 +66,6 @@ class OrderController extends Controller {
      */
     public function actionPlaceAnOrder($id) {
 
-        if ($restaurant_model) {
 
 
             $order = new Order();
