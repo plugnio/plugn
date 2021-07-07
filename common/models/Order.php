@@ -725,7 +725,7 @@ class Order extends \yii\db\ActiveRecord {
           }
         }
 
-            
+
 
           \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
           \Segment::track([
@@ -739,7 +739,7 @@ class Order extends \yii\db\ActiveRecord {
                   'revenue' => $plugn_fee,
                   'gateway_fee' => $payment_gateway_fee,
                   'payment_method' => $this->payment_method_name,
-                  'gateway' => $this->payment_uuid ? $this->payment_gateway_name : null,
+                  'gateway' => $this->payment_uuid ? $this->payment->payment_gateway_name : null,
                   'shipping' => $delivery_fee,
                   'subtotal' => $subtotal,
                   'currency' => 'USD',
