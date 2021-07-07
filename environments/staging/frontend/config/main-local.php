@@ -19,7 +19,7 @@ $config = [
         'redis' => [
             'hostname' => 'plugn-redis.0x1cgp.0001.euw2.cache.amazonaws.com',
             'port' => 6379,
-            'database' => 4,
+            'database' => 9,
         ]
     ],
 ];
