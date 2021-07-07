@@ -51,7 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
             //'payment_udf3',
             //'payment_udf4',
             //'payment_udf5',
-            //'payment_created_at',
+            'payment_created_at',
             //'payment_updated_at',
             //'received_callback',
             //'response_message',

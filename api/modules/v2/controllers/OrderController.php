@@ -66,17 +66,6 @@ class OrderController extends Controller {
      */
     public function actionPlaceAnOrder($id) {
 
-
-        $restaurant_model = Restaurant::findOne($id);
-
-        if($restaurant_model->version != 5){
-          return [
-            'operation' => 'error',
-            'message' => 'temporarily down for maintenance'
-          ];
-
-        }
-
         if ($restaurant_model) {
 
 
