@@ -50,7 +50,7 @@ You can only connect one of the two. Choose wisely.
   <div style="display:block">
     <?php
 
-          if (!$model->is_tap_enable && !$model->is_myfatoorah_enable && !$model->payment_gateway_queue_id) {
+          if (!$model->is_tap_enable && !$model->is_myfatoorah_enable) {
                 echo Html::a('Create Tap account', ['create-payment-gateway-account', 'id' => $model->restaurant_uuid,'paymentGateway' => 'tap'], ['class' => 'btn btn-success','style'=>'margin-top:10px']);
           }
     ?>
@@ -85,7 +85,6 @@ You can only connect one of the two. Choose wisely.
 
 
               if (!$model->is_tap_enable && !$model->is_myfatoorah_enable) {
-                  if (!$model->payment_gateway_queue_id)
                       echo Html::a('Create MyFatoorah account', ['create-payment-gateway-account', 'id' => $model->restaurant_uuid,'paymentGateway' => 'myfatoorah'], ['class' => 'btn btn-success','style'=>'margin-top:10px']);
               }
 

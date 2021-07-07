@@ -82,7 +82,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
           </div>
             <div class="card-body">
-              <?php if (!$model->payment_gateway_queue_id){ ?>
+              <?php    if (!$model->is_tap_enable && !$model->is_myfatoorah_enable) { ?>
 
                 <p style="color: black;">You can allow customers to make payments online to receive your money in your bank account.</p>
 
@@ -90,7 +90,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php
                   echo Html::a('Set up online payments', ['setup-online-payments', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-success']);
                  ?>
-               <?php } else if($model->payment_gateway_queue_id) { ?>
+               <?php }
+
+
+                if($model->payment_gateway_queue_id) { ?>
+                  
                  <p style="color: black;">
                    We are currently getting approvals for your account from <?= $model->paymentGatewayQueue->payment_gateway == 'tap' ? 'Tap' : 'Myfatoorah' ?>. This could take up to 24 hours. We'll email you when it's ready.
                  </p>

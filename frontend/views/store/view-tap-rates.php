@@ -20,15 +20,12 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php
 
 
-      if (!$model->is_tap_enable && !$model->is_myfatoorah_enable) {
-                  if (!$model->tap_queue_id && !$model->payment_gateway_queue_id){ ?>
+      if (!$model->is_tap_enable && !$model->is_myfatoorah_enable) {  ?>
                     <p>
                     Interested?
                     </p>
                     <?php
                     echo Html::a('Create Tap account', ['create-payment-gateway-account', 'id' => $model->restaurant_uuid,'paymentGateway' => 'tap'], ['class' => 'btn btn-success','style'=>'margin-top:10px']);
-
-                  }
       }
 ?>
 </div>
