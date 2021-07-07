@@ -67,6 +67,7 @@ AppAsset::register($this);
                   ['label' => 'Payments Method', 'url' => ['/payment-method/index']],
                   ['label' => 'Plans', 'url' => ['/plan/index']],
                   ['label' => 'Bank', 'url' => ['/bank/index']],
+                  ['label' => 'Opening Hours', 'url' => ['/opening-hour/index']],
 
                   ['label' => 'Admins', 'url' => ['/admin/index']],
 
