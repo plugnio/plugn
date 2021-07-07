@@ -1,6 +1,6 @@
 <?php
 
-$config = [
+return [
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
@@ -22,8 +22,8 @@ $config = [
             ]
         ],
     ],
-
 ];
+
 
 if (!YII_ENV_TEST) {
     // configuration adjustments for 'dev' environment
