@@ -1803,6 +1803,32 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
+     * return top 5 most sold items
+     * @param $months
+     * @return array[]
+     */
+    public function getMostSoldItems()
+    {
+        $most_sold_item_chart_data = [];
+
+        $rows = $this->getSoldOrderItems ()
+            ->innerJoinWith('item')
+            ->orderBy(['unit_sold' => 'DESC'])
+            ->limit(5)
+            ->all ();
+
+        foreach($rows as $row) {
+            $most_sold_item_chart_data[] = [
+                'item_name' => $row->item->item_name,
+                'item_name_ar' => $row->item->item_name_ar,
+                'total' => $row->item->unit_sold
+            ];
+        }
+
+        return $most_sold_item_chart_data;
+    }
+
+    /**
      * Gets query for [[Items]].
      *
      * @return \yii\db\ActiveQuery
