@@ -67,4 +67,24 @@ class BusinessLocation extends \common\models\BusinessLocation
     {
         return parent::getAreaDeliveryZones($modelClass);
     }
+
+    /**
+     * delivery zone countries
+     * @param string $modelClass
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeliveryZoneCountries($modelClass = "\agent\models\Country")
+    {
+        return parent::getDeliveryZoneCountries($modelClass);
+    }
+
+    /**
+     * return total delivery zone country count
+     * @param string $modelClass
+     * @return bool|int|string|null
+     */
+    public function getTotalDeliveryZoneCountry($modelClass = "\agent\models\Country")
+    {
+        return parent::getTotalDeliveryZoneCountry($modelClass);
+    }
 }

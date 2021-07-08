@@ -79,6 +79,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
             'deliveryZones',
             'deliveryZones.country',
             'deliveryZones.areas',
+            'totalDeliveryZoneCountry'
         ];
     }
 
@@ -144,5 +145,21 @@ class BusinessLocation extends \yii\db\ActiveRecord
     {
         return $this->hasMany($modelClass::className(), ['delivery_zone_id' => 'delivery_zone_id'])
             ->via('deliveryZones');
+    }
+
+    /**
+     * delivery zone countries
+     * @param string $modelClass
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeliveryZoneCountries($modelClass = "\common\models\Country")
+    {
+        return $this->hasMany($modelClass::className(), ['country_id' => 'country_id'])
+            ->via('deliveryZones');
+    }
+
+    public function getTotalDeliveryZoneCountry($modelClass = "\common\models\Country")
+    {
+        return $this->getDeliveryZoneCountries($modelClass)->count();
     }
 }

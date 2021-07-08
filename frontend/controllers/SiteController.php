@@ -1191,6 +1191,7 @@ class SiteController extends Controller {
         }
 
         $model = new LoginForm();
+
         if ($model->load(Yii::$app->request->post()) && $managedRestaurant = $model->login()) {
             return $this->redirect(['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
         } else {
