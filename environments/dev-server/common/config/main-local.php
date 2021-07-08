@@ -78,7 +78,7 @@ return [
             ]
         ],
         'tapPayments' => [
-            'gatewayToUse' => \common\components\TapPayments::USE_LIVE_GATEWAY,
+            'gatewayToUse' => \common\components\TapPayments::USE_TEST_GATEWAY,
         ],
         'armadaDelivery' => [
             'keyToUse' => \common\components\ArmadaDelivery::USE_LIVE_KEY,
