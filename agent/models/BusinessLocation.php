@@ -6,6 +6,16 @@ namespace agent\models;
 
 class BusinessLocation extends \common\models\BusinessLocation
 {
+
+    public function fields()
+    {
+        $field = parent::fields();
+        $field['txt_countries_count'] = function($model) {
+            return $model->getDeliveryZones()->groupby('country_id')->count();
+        };
+        return $field;
+    }
+
     /**
      * Gets query for [[Country]].
      *
