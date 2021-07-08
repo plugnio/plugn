@@ -62,27 +62,25 @@ class BusinessLocationController extends Controller
         return $actions;
     }
 
-
     /**
-     * Get all store's branches
-     * @param type $id
-     * @param type $store_uuid
-     * @return type
+     * @param $store_uuid
+     * @return ActiveDataProvider
      */
     public function actionList($store_uuid)
     {
-
         $keyword = Yii::$app->request->get ('keyword');
 
         Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
-        $query = BusinessLocation::find ()->joinWith ('country');
+        $query = BusinessLocation::find()->joinWith('country');
 
         if ($keyword) {
-            $query->where (['like', 'business_location_name', $keyword]);
-            $query->orWhere (['like', 'business_location_name_ar', $keyword]);
-            $query->orWhere (['like', 'country.country_name', $keyword]);
-            $query->orWhere (['like', 'country.country_name_ar', $keyword]);
+            $query->andWhere('or', [
+                ['like', 'business_location_name', $keyword],
+                ['like', 'business_location_name_ar', $keyword],
+                ['like', 'country.country_name', $keyword],
+                ['like', 'country.country_name_ar', $keyword]
+            ]);
         }
 
         $query->andWhere (['restaurant_uuid' => $store_uuid]);
