@@ -233,15 +233,11 @@ class StoreController extends Controller {
         $most_selling_items_chart_data = [];
         $number_of_sold_items_chart_data = [];
 
-
-
         $sold_items = \common\models\Item::find()
                 ->where(['item.restaurant_uuid' => $model->restaurant_uuid])
                 ->orderBy(['unit_sold' => SORT_DESC])
                 ->limit(5)
                 ->all();
-
-
 
         foreach ($sold_items as $key => $item) {
             array_push($most_selling_items_chart_data, $item->item_name);
