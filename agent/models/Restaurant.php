@@ -15,6 +15,10 @@ class Restaurant extends \common\models\Restaurant {
             return $model->restaurant_email;
         };
 
+        $fields['order_count'] = function($model) {
+            return $model->getOrders()->count();
+        };
+
         return $fields;
     }
 
