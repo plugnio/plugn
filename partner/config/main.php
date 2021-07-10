@@ -8,9 +8,11 @@ $params = array_merge(
 
 return [
     'id' => 'app-partner',
+    'name' => 'Plugn',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
     'controllerNamespace' => 'partner\controllers',
+    'bootstrap' => ['log'],
+    'modules' => [],
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-partner',

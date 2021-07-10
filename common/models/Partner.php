@@ -36,6 +36,11 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
    const SCENARIO_CHANGE_PASSWORD = 'change-password';
    const SCENARIO_CREATE_NEW_PARTNER = 'create';
 
+   /**
+    * Field for temporary password. If set, it will overwrite the old password on save
+    * @var string
+    */
+   public $tempPassword;
 
    /**
     * {@inheritdoc}
@@ -52,6 +57,7 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
            [[ 'username', 'partner_email','iban'], 'required'],
            [['partner_status'], 'integer'],
            ['partner_status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
+           ['tempPassword', 'required', 'on' => [self::SCENARIO_CHANGE_PASSWORD, self::SCENARIO_CREATE_NEW_PARTNER]],
 
            [['commission'], 'number'],
            [['partner_uuid'], 'string', 'max' => 60],
@@ -64,6 +70,8 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
            [['partner_created_at', 'partner_updated_at'], 'safe'],
            [['partner_password_reset_token'], 'unique'],
            [['partner_uuid'], 'unique'],
+           [['tempPassword'], 'required', 'on' => 'create'],
+           [['tempPassword'], 'safe'],
        ];
    }
 
@@ -172,6 +180,12 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
            if ($insert) {
                $this->generateAuthKey();
            }
+
+           // If tempPassword is set, save it as the new password for this user
+           if ($this->scenario == self::SCENARIO_CREATE_NEW_PARTNER && $this->tempPassword) {
+               $this->setPassword($this->tempPassword);
+           }
+
 
            return true;
        }
@@ -329,7 +343,7 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
     * {@inheritdoc}
     */
    public function getId() {
-       return $this->getPrimaryKey();
+       return $this->partner_uuid;
    }
 
    /**

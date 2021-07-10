@@ -4,29 +4,28 @@ namespace partner\models;
 
 use Yii;
 use yii\base\Model;
-use common\models\User;
+use common\models\Partner;
 
 /**
  * Password reset request form
  */
-class PasswordResetRequestForm extends Model
-{
-    public $email;
+class PasswordResetRequestForm extends Model {
 
+    public $email;
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
-    {
+    public function rules() {
         return [
             ['email', 'trim'],
             ['email', 'required'],
             ['email', 'email'],
             ['email', 'exist',
-                'targetClass' => '\common\models\User',
-                'filter' => ['status' => User::STATUS_ACTIVE],
-                'message' => 'There is no user with this email address.'
+                'targetClass' => '\common\models\Partner',
+                'targetAttribute' => 'partner_email',
+                'filter' => ['partner_status' => Partner::STATUS_ACTIVE],
+                'message' => 'There is no partner with this email address.'
             ],
         ];
     }
@@ -36,34 +35,38 @@ class PasswordResetRequestForm extends Model
      *
      * @return bool whether the email was send
      */
-    public function sendEmail()
-    {
-        /* @var $user User */
-        $user = User::findOne([
-            'status' => User::STATUS_ACTIVE,
-            'email' => $this->email,
+    public function sendEmail() {
+        /* @var $partner Partner */
+        $partner = Partner::findOne([
+                    'partner_status' => Partner::STATUS_ACTIVE,
+                    'partner_email' => $this->email,
         ]);
 
-        if (!$user) {
+        if (!$partner) {
             return false;
         }
-        
-        if (!User::isPasswordResetTokenValid($user->password_reset_token)) {
-            $user->generatePasswordResetToken();
-            if (!$user->save()) {
+
+        if (!Partner::isPasswordResetTokenValid($partner->partner_password_reset_token)) {
+            $partner->generatePasswordResetToken();
+            if (!$partner->save()) {
+              die(var_dump($partner->errors));
+
                 return false;
             }
         }
 
-        return Yii::$app
-            ->mailer
-            ->compose(
-                ['html' => 'passwordResetToken-html', 'text' => 'passwordResetToken-text'],
-                ['user' => $user]
-            )
-            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' robot'])
-            ->setTo($this->email)
-            ->setSubject('Password reset for ' . Yii::$app->name)
-            ->send();
+
+        // return Yii::$app->mailer
+        //                 ->compose(
+        //                         ['html' => 'passwordResetToken-html', 'text' => 'passwordResetToken-text'], ['partner' => $partner]
+        //                 )
+        //                 ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+        //                 ->setTo($this->email)
+        //                 ->setSubject('Reset your password')
+        //                 ->send();
+
+        
+        return true;
     }
+
 }

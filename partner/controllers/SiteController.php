@@ -13,7 +13,7 @@ use yii\filters\AccessControl;
 use partner\models\LoginForm;
 use partner\models\PasswordResetRequestForm;
 use partner\models\ResetPasswordForm;
-use partner\models\SignupForm;
+use common\models\Partner;
 use partner\models\ContactForm;
 
 /**
@@ -74,7 +74,8 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        return $this->redirect(['store/index']);
+
     }
 
     /**
@@ -153,9 +154,11 @@ class SiteController extends Controller
      */
     public function actionSignup()
     {
-        $model = new SignupForm();
-        if ($model->load(Yii::$app->request->post()) && $model->signup()) {
-            Yii::$app->session->setFlash('success', 'Thank you for registration. Please check your inbox for verification email.');
+        $model = new Partner();
+        $model->setScenario(Partner::SCENARIO_CREATE_NEW_PARTNER);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            Yii::$app->session->setFlash('success', 'Thank you for registration.');
             return $this->goHome();
         }
 
@@ -164,28 +167,34 @@ class SiteController extends Controller
         ]);
     }
 
+
     /**
      * Requests password reset.
      *
      * @return mixed
      */
-    public function actionRequestPasswordReset()
-    {
+    public function actionRequestPasswordReset() {
+
+
         $model = new PasswordResetRequestForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+        if ($model->load(Yii::$app->request->post()) ) {
+
+
             if ($model->sendEmail()) {
                 Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
 
                 return $this->goHome();
+            } else {
+                Yii::$app->session->setFlash('error', 'Sorry, we are unable to reset password for the provided email address.');
             }
-
-            Yii::$app->session->setFlash('error', 'Sorry, we are unable to reset password for the provided email address.');
         }
 
         return $this->render('requestPasswordResetToken', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
+
+
 
     /**
      * Resets password.

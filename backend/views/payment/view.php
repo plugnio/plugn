@@ -74,6 +74,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             ],
             [
+                'attribute' => 'partner_fee',
+                'format' => 'raw',
+                'value' => function ($data) {
+                    return Yii::$app->formatter->asCurrency($data->partner_fee, $data->currency->code,[ \NumberFormatter::MIN_FRACTION_DIGITS => 3, \NumberFormatter::MAX_FRACTION_DIGITS => 3 ]);
+                }
+            ],
+            [
                 'attribute' => 'payment_net_amount',
                 'format' => 'raw',
                 'value' => function ($data) {
