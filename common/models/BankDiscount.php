@@ -59,7 +59,7 @@ class BankDiscount extends \yii\db\ActiveRecord
             [['restaurant_uuid', 'discount_amount'], 'required'],
             ['bank_discount_status', 'in', 'range' => [self::BANK_DISCOUNT_STATUS_ACTIVE, self::BANK_DISCOUNT_STATUS_EXPIRED]],
             ['discount_type', 'in', 'range' => [self::DISCOUNT_TYPE_PERCENTAGE, self::DISCOUNT_TYPE_AMOUNT]],
-            [['valid_from', 'valid_until', 'bank_discount_created_at', 'bank_discount_updated_at'], 'safe'],
+            [['valid_from', 'valid_until', 'bank_discount_created_at', 'bank_discount_updated_at','duration'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['bank_id'], 'exist', 'skipOnError' => true, 'targetClass' => Bank::className(), 'targetAttribute' => ['bank_id' => 'bank_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
