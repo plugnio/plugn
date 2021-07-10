@@ -104,6 +104,8 @@ use borales\extensions\phoneInput\PhoneInputValidator;
   * @property string|null $identification_file_back_side
   * @property string|null $identification_file_id_back_side
   * @property string|null $default_language
+  * @property string|null $referral_code
+  * @property string|null $referral_code
  *
  * @property AgentAssignment[] $agentAssignments
  * @property Agent[] $agents
@@ -126,6 +128,8 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property Subscription[] $subscriptions
  * @property BusinessLocation[] $businessLocations
  * @property DeliveryZones[] $deliveryZones
+ * @property Partner $partner
+
 
  */
 class Restaurant extends \yii\db\ActiveRecord {
@@ -281,10 +285,12 @@ class Restaurant extends \yii\db\ActiveRecord {
                     return $model->schedule_order;
                 }
             ],
+            [['referral_code'], 'string', 'max' => 6],
             ['restaurant_email', 'email'],
             [['restaurant_uuid', 'restaurant_domain', 'name'], 'unique'],
             [['payment_gateway_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentGatewayQueue::className(), 'targetAttribute' => ['payment_gateway_queue_id' => 'payment_gateway_queue_id']],
             [['tap_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => TapQueue::className(), 'targetAttribute' => ['tap_queue_id' => 'tap_queue_id']],
+            [['referral_code'], 'exist', 'skipOnError' => true, 'targetClass' => Partner::className(), 'targetAttribute' => ['referral_code' => 'referral_code']],
             [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country_id' => 'country_id']],
             [['currency_id'], 'exist', 'skipOnError' => true, 'targetClass' => Currency::className(), 'targetAttribute' => ['currency_id' => 'currency_id']],
         ];
@@ -1448,6 +1454,7 @@ class Restaurant extends \yii\db\ActiveRecord {
         }
     }
 
+
     /**
      * Gets query for [[Items]].
      *
@@ -1813,22 +1820,31 @@ class Restaurant extends \yii\db\ActiveRecord {
         return $this->hasMany(AreaDeliveryZone::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
-
     /**
-     * list of all the countries around the world that store can ship orders to
+     * Gets query for [[Partner]].
      *
      * @return \yii\db\ActiveQuery
      */
-    // public function getShippingCountries()
-    // {
-    //     return $this->hasMany(Country::className(), ['country_id' => 'country_id'])
-    //     ->joinWith([
-    //         'deliveryZones' => function ($query) {
-    //             $query->onCondition(['delivery_zone.restaurant_uuid' => 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290']);
-    //         },
-    //     ]);
-    // }
+    public function getPartner()
+    {
+        return $this->hasOne(Partner::className(), ['referral_code' => 'referral_code']);
+    }
 
+
+
+      /**
+     * Gets query for [[Payments]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTotalEarnings()
+    {
+        return $this->hasMany(Payment::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+                    ->via('activeOrders')
+                    ->joinWith('order')
+                    ->filterWhere (['NOT IN', 'order.order_status', [Order::STATUS_ABANDONED_CHECKOUT, Order::STATUS_DRAFT,Order::STATUS_CANCELED,Order::STATUS_REFUNDED,Order::STATUS_PARTIALLY_REFUNDED]])
+                    ->sum('payment.partner_fee');
+    }
 
     /**
    * Gets query for [[Country]].

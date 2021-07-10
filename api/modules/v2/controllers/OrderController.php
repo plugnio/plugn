@@ -707,6 +707,7 @@ class OrderController extends Controller {
           unset($model['payment']['restaurant_uuid']);
           unset($model['payment']['payment_gateway_fee']);
           unset($model['payment']['plugn_fee']);
+          unset($model['payment']['partner_fee']);
         }
 
         return [

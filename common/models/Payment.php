@@ -23,6 +23,8 @@ use yii\web\NotFoundHttpException;
  * @property double $payment_net_amount net amount deposited into our account
  * @property double $payment_gateway_fee gateway fee charged
  * @property double $plugn_fee our commision
+ * @property double $partner_fee
+* @property double $partner_fee
  * @property double $payment_token
  * @property string $payment_udf1
  * @property string $payment_udf2
@@ -53,10 +55,10 @@ class Payment extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['customer_id', 'order_uuid', 'payment_amount_charged', 'restaurant_uuid'], 'required'],
-            [['customer_id', 'received_callback'], 'integer'],
+            [['customer_id', 'received_callback','paid_partner'], 'integer'],
             [['order_uuid'], 'string', 'max' => 40],
             [['payment_gateway_order_id', 'payment_current_status'], 'string'],
-            [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee', 'plugn_fee','payment_vat'], 'number'],
+            [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee', 'plugn_fee','partner_fee'], 'number'],
             [['payment_uuid'], 'string', 'max' => 36],
             [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'response_message','payment_token', 'payment_gateway_name'], 'string', 'max' => 255],
             [['payment_uuid'], 'unique'],
@@ -226,7 +228,7 @@ class Payment extends \yii\db\ActiveRecord {
 
             Yii::info('[Response from TAP for Failed Payment] ' .
                     print_r($responseContent, true), __METHOD__);
-                    
+
             Yii::error('[Response from TAP for Failed Payment] ' .
                     print_r($responseContent, true), __METHOD__);
         }
@@ -369,6 +371,7 @@ class Payment extends \yii\db\ActiveRecord {
         unset($fields['payment_gateway_fee']);
         unset($fields['payment_gateway_name']);
         unset($fields['plugn_fee']);
+        unset($fields['partner_fee']);
 
         return $fields;
 
@@ -386,6 +389,11 @@ class Payment extends \yii\db\ActiveRecord {
             Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $this->order->payment_method_name, __METHOD__);
 
           }
+
+          if($this->plugn_fee > 0 && $this->partner_fee == 0 && !$this->restaurant->partner_uuid){
+            $this->partner_fee = $this->plugn_fee * $this->partner->commission;
+          }
+
     }
 
     /**
@@ -401,6 +409,7 @@ class Payment extends \yii\db\ActiveRecord {
     public function getOrder() {
         return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid']);
     }
+
 
 
       /**
@@ -427,6 +436,18 @@ class Payment extends \yii\db\ActiveRecord {
     public function getRestaurant() {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
+
+    /**
+    * Gets query for [[PartnerUu]].
+    *
+    * @return \yii\db\ActiveQuery
+    */
+   public function getPartner()
+   {
+       return $this->hasOne(Partner::className(), ['partner_uuid' => 'partner_uuid'])->via('restaurant');
+   }
+
 
     /**
      * Gets query for [[Subscriptions]].
