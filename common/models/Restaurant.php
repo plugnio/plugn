@@ -1041,6 +1041,11 @@ class Restaurant extends \yii\db\ActiveRecord {
 
     public function beforeSave($insert) {
 
+        if($insert && $this->referral_code != null){
+            if(!Partner::find()->where(['referral_code' => $this->referral_code])->exists())
+              $this->referral_code = null;
+        }
+
         if ($this->scenario == self::SCENARIO_CREATE_STORE_BY_AGENT && $insert) {
 
             $store_name = strtolower(str_replace(' ', '_', $this->name));
@@ -1843,8 +1848,10 @@ class Restaurant extends \yii\db\ActiveRecord {
                     ->via('activeOrders')
                     ->joinWith('order')
                     ->filterWhere (['NOT IN', 'order.order_status', [Order::STATUS_ABANDONED_CHECKOUT, Order::STATUS_DRAFT,Order::STATUS_CANCELED,Order::STATUS_REFUNDED,Order::STATUS_PARTIALLY_REFUNDED]])
+                    ->andWhere(['payment.payout_status' => Payment::PAYOUT_STATUS_UNPAID])
                     ->sum('payment.partner_fee');
     }
+
 
     /**
    * Gets query for [[Country]].

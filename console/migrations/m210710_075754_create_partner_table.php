@@ -32,6 +32,7 @@ class m210710_075754_create_partner_table extends Migration
           'partner_email' => $this->string()->notNull()->unique(),
           'partner_status' => $this->smallInteger()->notNull()->defaultValue(10),
           'referral_code' => $this->string(6),
+          'iban' => $this->string(64),
           'commission' => $this->decimal(10,3)->unsigned()->defaultValue(0.2),
           'partner_created_at' => $this->dateTime(),
           'partner_updated_at' => $this->dateTime(),
@@ -84,9 +85,8 @@ class m210710_075754_create_partner_table extends Migration
           'partner_uuid' => $this->char(60)->notNull(),
           'payment_uuid' => $this->char(36)->notNull(),
           'amount' => $this->decimal(10,3)->unsigned()->defaultValue(0),
-          'partner_status' => $this->smallInteger()->notNull()->defaultValue(10),
-          'created_at' => $this->integer()->notNull(),
-          'updated_at' => $this->integer()->notNull(),
+          'created_at' => $this->dateTime(),
+          'updated_at' => $this->dateTime(),
       ], $tableOptions);
 
       $this->addPrimaryKey('PK', 'partner_payout', 'partner_payout_uuid');
@@ -129,7 +129,7 @@ class m210710_075754_create_partner_table extends Migration
 
 
       $this->addColumn('payment', 'partner_fee',  $this->decimal(10,3)->unsigned()->defaultValue(0));
-      $this->addColumn('payment', 'paid_partner', $this->smallInteger()->defaultValue(0));
+      $this->addColumn('payment', 'payout_status', $this->smallInteger()->defaultValue(0));
 
 
 
@@ -144,7 +144,7 @@ class m210710_075754_create_partner_table extends Migration
     {
 
       $this->dropColumn('payment', 'partner_fee');
-      $this->dropColumn('payment', 'paid_partner');
+      $this->dropColumn('payment', 'payout_status');
 
       //Drop partner_uuid field
       $this->dropForeignKey('fk-restaurant-referral_code', 'restaurant');

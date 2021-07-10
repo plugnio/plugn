@@ -60,6 +60,7 @@ AppAsset::register($this);
                   ['label' => 'Payment', 'url' => ['/payment/index']],
                   ['label' => 'Queue', 'url' => ['/queue/index']],
                   ['label' => 'Subscription', 'url' => ['/subscription/index']],
+                  ['label' => 'Partner', 'url' => ['/partner/index']],
                   ['label' => 'Country', 'url' => ['/country/index']],
                   ['label' => 'Cities', 'url' => ['/city/index']],
                   ['label' => 'Areas', 'url' => ['/area/index']],

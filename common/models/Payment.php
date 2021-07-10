@@ -42,6 +42,10 @@ use yii\web\NotFoundHttpException;
  */
 class Payment extends \yii\db\ActiveRecord {
 
+    //Values for `payout_status`
+    const PAYOUT_STATUS_UNPAID = 0;
+    const PAYOUT_STATUS_PAID = 1;
+
     /**
      * {@inheritdoc}
      */
@@ -55,7 +59,8 @@ class Payment extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['customer_id', 'order_uuid', 'payment_amount_charged', 'restaurant_uuid'], 'required'],
-            [['customer_id', 'received_callback','paid_partner'], 'integer'],
+            [['customer_id', 'received_callback','payout_status'], 'integer'],
+            ['payout_status', 'in', 'range' => [self::PAYOUT_STATUS_UNPAID, self::PAYOUT_STATUS_PAID]],
             [['order_uuid'], 'string', 'max' => 40],
             [['payment_gateway_order_id', 'payment_current_status'], 'string'],
             [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee', 'plugn_fee','partner_fee'], 'number'],

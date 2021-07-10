@@ -3,6 +3,9 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\behaviors\AttributeBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "partner_payout".
@@ -11,12 +14,11 @@ use Yii;
  * @property string $partner_uuid
  * @property string $payment_uuid
  * @property float|null $amount
- * @property int $partner_status
  * @property int $created_at
  * @property int $updated_at
  *
- * @property Partner $partnerUu
- * @property Payment $paymentUu
+ * @property Partner $partners
+ * @property Payment $payments
  */
 class PartnerPayout extends \yii\db\ActiveRecord
 {
@@ -34,12 +36,12 @@ class PartnerPayout extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['partner_payout_uuid', 'partner_uuid', 'payment_uuid', 'created_at', 'updated_at'], 'required'],
+            [['partner_uuid', 'payment_uuid'], 'required'],
             [['amount'], 'number'],
-            [['partner_status', 'created_at', 'updated_at'], 'integer'],
             [['partner_payout_uuid', 'partner_uuid'], 'string', 'max' => 60],
             [['payment_uuid'], 'string', 'max' => 36],
             [['partner_payout_uuid'], 'unique'],
+            [['created_at', 'updated_at'], 'safe'],
             [['partner_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Partner::className(), 'targetAttribute' => ['partner_uuid' => 'partner_uuid']],
             [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
         ];
@@ -55,18 +57,45 @@ class PartnerPayout extends \yii\db\ActiveRecord
             'partner_uuid' => 'Partner Uuid',
             'payment_uuid' => 'Payment Uuid',
             'amount' => 'Amount',
-            'partner_status' => 'Partner Status',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
     }
 
     /**
+     *
+     * @return type
+     */
+    public function behaviors() {
+        return [
+            [
+                'class' => AttributeBehavior::className(),
+                'attributes' => [
+                    \yii\db\ActiveRecord::EVENT_BEFORE_INSERT => 'partner_payout_uuid',
+                ],
+                'value' => function() {
+                    if (!$this->partner_payout_uuid)
+                        $this->partner_payout_uuid = 'part_payout_' . Yii::$app->db->createCommand('SELECT uuid()')->queryScalar();
+
+                    return $this->partner_payout_uuid;
+                }
+            ],
+            [
+                'class' => TimestampBehavior::className(),
+                'createdAtAttribute' => 'created_at',
+                'updatedAtAttribute' => 'updated_at',
+                'value' => new Expression('NOW()'),
+            ]
+        ];
+    }
+
+
+    /**
      * Gets query for [[PartnerUu]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPartnerUu()
+    public function getPartners()
     {
         return $this->hasOne(Partner::className(), ['partner_uuid' => 'partner_uuid']);
     }
@@ -76,7 +105,7 @@ class PartnerPayout extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPaymentUu()
+    public function getPayments()
     {
         return $this->hasOne(Payment::className(), ['payment_uuid' => 'payment_uuid']);
     }

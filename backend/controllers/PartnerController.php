@@ -3,6 +3,8 @@
 namespace backend\controllers;
 
 use Yii;
+use common\models\Payment;
+use common\models\PartnerPayout;
 use common\models\Partner;
 use backend\models\PartnerSearch;
 use yii\web\Controller;
@@ -14,16 +16,26 @@ use yii\filters\VerbFilter;
  */
 class PartnerController extends Controller
 {
+  public $enableCsrfValidation = false;
+
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                ],
+            ],
+            'access' => [
+                'class' => \yii\filters\AccessControl::className(),
+                'rules' => [
+                    [//allow authenticated users only
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
                 ],
             ],
         ];
@@ -47,14 +59,22 @@ class PartnerController extends Controller
     /**
      * Displays a single Partner model.
      * @param string $partner_uuid
-     * @param string $referral_code
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($partner_uuid, $referral_code)
+    public function actionView($partner_uuid)
     {
+      $model = $this->findModel($partner_uuid);
+
+
+        $payouts = new \yii\data\ActiveDataProvider([
+            'query' => $model->getPartnerPayouts(),
+            'pagination' => false
+        ]);
+
         return $this->render('view', [
-            'model' => $this->findModel($partner_uuid, $referral_code),
+            'model' => $model,
+            'payouts' => $payouts,
         ]);
     }
 
@@ -67,8 +87,23 @@ class PartnerController extends Controller
     {
         $model = new Partner();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'partner_uuid' => $model->partner_uuid, 'referral_code' => $model->referral_code]);
+        if ($model->load(Yii::$app->request->post())) {
+
+
+          // $password = Yii::$app->security->generateRandomString(5);
+          $password = '123456';
+
+          $model->setPassword($password);
+
+          if($model->save()){
+
+            //Send Email to Partner
+            // Partner::passwordMail($model, $password);
+
+
+            return $this->redirect(['view', 'partner_uuid' => $model->partner_uuid]);
+          }
+
         }
 
         return $this->render('create', [
@@ -76,20 +111,61 @@ class PartnerController extends Controller
         ]);
     }
 
+
+
+
+
+
+    /**
+     * Mark all payouts for that partner as paid.
+     * @param string $partner_uuid
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionMarkPaid($partner_uuid)
+    {
+          $model = $this->findModel($partner_uuid);
+
+          $payments = $model->getPayments()->all();
+
+
+          foreach ($payments as $payment) {
+
+              $partner_payout_model = new PartnerPayout;
+              $partner_payout_model->partner_uuid = $model->partner_uuid;
+              $partner_payout_model->payment_uuid = $payment->payment_uuid;
+              $partner_payout_model->amount = $payment->partner_fee;
+
+              if($partner_payout_model->save()){
+                $payment->payout_status = Payment::PAYOUT_STATUS_PAID;
+                $payment->save(false);
+              } else {
+
+                  die(json_encode($partner_payout_model->errors));
+
+              }
+          }
+
+
+        return $this->redirect(['view', 'partner_uuid' => $model->partner_uuid]);
+
+    }
+
+
+
     /**
      * Updates an existing Partner model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param string $partner_uuid
-     * @param string $referral_code
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($partner_uuid, $referral_code)
+    public function actionUpdate($partner_uuid)
     {
-        $model = $this->findModel($partner_uuid, $referral_code);
+        $model = $this->findModel($partner_uuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'partner_uuid' => $model->partner_uuid, 'referral_code' => $model->referral_code]);
+            return $this->redirect(['view', 'partner_uuid' => $model->partner_uuid]);
         }
 
         return $this->render('update', [
@@ -101,13 +177,12 @@ class PartnerController extends Controller
      * Deletes an existing Partner model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param string $partner_uuid
-     * @param string $referral_code
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($partner_uuid, $referral_code)
+    public function actionDelete($partner_uuid)
     {
-        $this->findModel($partner_uuid, $referral_code)->delete();
+        $this->findModel($partner_uuid)->delete();
 
         return $this->redirect(['index']);
     }
@@ -116,13 +191,12 @@ class PartnerController extends Controller
      * Finds the Partner model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param string $partner_uuid
-     * @param string $referral_code
      * @return Partner the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($partner_uuid, $referral_code)
+    protected function findModel($partner_uuid)
     {
-        if (($model = Partner::findOne(['partner_uuid' => $partner_uuid, 'referral_code' => $referral_code])) !== null) {
+        if (($model = Partner::find()->where(['partner_uuid' => $partner_uuid])->one() ) !== null) {
             return $model;
         }
 
