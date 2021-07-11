@@ -318,7 +318,7 @@ class OrderController extends Controller {
             $order_model->armada_qr_code_link = $createDeliveryApiResponse->data['qrCodeLink'];
             $order_model->armada_delivery_code = $createDeliveryApiResponse->data['code'];
             $order_model->armada_order_status = $createDeliveryApiResponse->data['orderStatus'];
-            
+
             $order_model->save(false);
             Yii::$app->session->setFlash('successResponse', "Your request has been successfully submitted");
 
@@ -512,12 +512,6 @@ class OrderController extends Controller {
         }
 
 
-        // order's Item
-        $ordersItemDataProvider = new \yii\data\ActiveDataProvider([
-            'query' => $model->getOrderItems()
-        ]);
-
-
 
         if ($model->validate() && $model->save())
             return $this->redirect(['update', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid]);
@@ -554,9 +548,25 @@ class OrderController extends Controller {
         ]);
 
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid]);
+        if ($model->load(Yii::$app->request->post())) {
+
+          if($model->order_mode == Order::ORDER_MODE_DELIVERY){
+            $model->pickup_location_id = null;
+            if($areaDeliveryZone = AreaDeliveryZone::find() ->where([ 'restaurant_uuid' => $restaurant_model->restaurant_uuid, 'area_id' => $model->area_id ])->one())
+               $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
+
+          } else {
+            $model->delivery_zone_id = null;
+            $model->area_id = null;
+          }
+
+
+
+          if ($model->validate() && $model->save())
+              return $this->redirect(['update', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid]);
+
         }
+
 
         return $this->render('update', [
                     'model' => $model,

@@ -52,7 +52,7 @@ $this->registerJs($js);
 
     <div class="card-body">
         <?php
-        $areaQuery = $restaurant_model->getAreas()->all();
+        $areaQuery = $restaurant_model->getAreas()->asArray()->all();
         $areaList = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
 
 
@@ -82,7 +82,7 @@ $this->registerJs($js);
             <div class="row">
                 <div class="col-12 col-sm-4  col-md-4 col-lg-4">
 
-                    <?= $form->field($model, 'area_id')->dropDownList($areaList, ['prompt' => 'Choose area name...', 'class' => 'form-control select2'])->label('Area'); ?>
+                    <?= $form->field($model, 'area_id')->dropDownList($areaList, ['prompt' => 'Choose area name...', 'class' => 'form-control select2','value'=>$model->area_id])->label('Area'); ?>
                 </div>
                 <div class="col-12 col-sm-4  col-md-4 col-lg-4">
                     <?= $form->field($model, 'unit_type')->dropDownlist(['House' => 'House', 'Office' => 'Office', 'Apartment' => 'Apartment']) ?>
