@@ -704,31 +704,38 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
   <?php }   ?>
 
-<?php if($model->is_myfatoorah_enable || ($model->is_tap_enable  && $model->currency->code != 'BHD')) { ?>
-  <div class="card">
-    <div class="card-header">
-      <h3>
+<?php
+
+    // if($model->is_myfatoorah_enable || ($model->is_tap_enable  && $model->currency->code != 'BHD')) {
+
+?>
+
+  <!-- <div class="card"> -->
+    <!-- <div class="card-header"> -->
+      <!-- <h3> -->
         <?php
-        echo $model->is_myfatoorah_enable ? 'Tap gateway' : 'MyFatoorah gateway' ;
+        // echo $model->is_myfatoorah_enable ? 'Tap gateway' : 'MyFatoorah gateway' ;
         ?>
 
-      </h3>
-    </div>
-    <div class="card-body">
+      <!-- </h3> -->
+    <!-- </div> -->
+    <!-- <div class="card-body"> -->
 
         <?php
-          echo $model->is_myfatoorah_enable ?   'You can switch from MyFatoorah to TAP payments  if you’d like.' : 'You can switch from TAP payments to MyFatoorah if you’d like.';
+          // echo $model->is_myfatoorah_enable ?   'You can switch from MyFatoorah to TAP payments  if you’d like.' : 'You can switch from TAP payments to MyFatoorah if you’d like.';
           ?>
-          <div class="switch-btn">
+        <!-- <div class="switch-btn"> -->
           <?php
-          echo Html::a('View rates', [$model->is_myfatoorah_enable ? 'view-tap-rates' : 'view-myfatoorah-rates', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=> 'margin-left: auto; margin-right: auto; display: block; width: 100%; margin-top:10px;']);
-          echo Html::a($model->is_myfatoorah_enable ? 'Switch to Tap' : 'Switch to MyFatoorah', [$model->is_myfatoorah_enable ?  'switch-to-tap' : 'switch-to-myfatoorah', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=> 'margin-left: auto; margin-right: auto; display: block; width: 100%; margin-top:10px;']);
+          // echo Html::a('View rates', [$model->is_myfatoorah_enable ? 'view-tap-rates' : 'view-myfatoorah-rates', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=> 'margin-left: auto; margin-right: auto; display: block; width: 100%; margin-top:10px;']);
+          // echo Html::a($model->is_myfatoorah_enable ? 'Switch to Tap' : 'Switch to MyFatoorah', [$model->is_myfatoorah_enable ?  'switch-to-tap' : 'switch-to-myfatoorah', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=> 'margin-left: auto; margin-right: auto; display: block; width: 100%; margin-top:10px;']);
         ?>
-      </div>
+      <!-- </div> -->
 
-    </div>
-  </div>
-<?php }   ?>
+    <!-- </div> -->
+  <!-- </div> -->
+<?php
+    // } 
+  ?>
 
 
     <!-- Cash on Delivery -->
