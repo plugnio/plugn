@@ -6,6 +6,7 @@ use common\models\ItemImage;
 use common\models\Option;
 use Yii;
 use yii\base\BaseObject;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "Item".
@@ -44,13 +45,15 @@ class Item extends \common\models\Item {
     public function saveItemImages($images)
     {
         $data = [];
-        //deleteallofThem
-//        foreach ($this->getItemImages()->all() as  $itemImage) {
-//          $itemImage->delete();
-//        }
+
         if (count($images) > 0) {
             foreach ($images as $img) {
                 if ($img['product_file_name']) {
+                    // check if same image exist then skip
+                    $exist = $this->getItemImages()->andWhere(['product_file_name'=>$img['product_file_name']])->exists();
+                    if ($exist) {
+                        continue;
+                    }
                     try {
                         $url = Yii::$app->temporaryBucketResourceManager->getUrl($img['product_file_name']);
                         $filename = Yii::$app->security->generateRandomString();
