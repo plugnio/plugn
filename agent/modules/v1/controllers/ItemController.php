@@ -74,10 +74,14 @@ class ItemController extends Controller
     public function actionList()
     {
         $keyword = Yii::$app->request->get('keyword');
+        $type = Yii::$app->request->get('type');
 
         $store = Yii::$app->accountManager->getManagedAccount();
 
         $query = Item::find();
+        if ($type != 'all') {
+            $query->andWhere(['track_quantity'=> 1]);
+        }
         $query->andWhere(['restaurant_uuid'=> $store->restaurant_uuid]);
         $query->orderBy('item_created_at DESC');
 
