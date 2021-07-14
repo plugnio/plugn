@@ -719,11 +719,8 @@ class OrderController extends Controller
     {
         $store_model = Yii::$app->accountManager->getManagedAccount ();
 
-        if ($store_model->export_sold_items_data_in_specific_date_range) {
-            list($start_date, $end_date) = explode (' - ', $store_model->export_sold_items_data_in_specific_date_range);
-        } else {
-            $start_date = $end_date = null;
-        }
+        $start_date = Yii::$app->request->get('start_date');
+        $end_date = Yii::$app->request->get('end_date');
 
         $query = \common\models\Order::find ()
             ->joinWith(['currency', 'paymentMethod', 'payment'])
@@ -732,7 +729,8 @@ class OrderController extends Controller
             ->orderBy (['order_created_at' => SORT_ASC]);
 
         if ($start_date && $end_date) {
-            $query->andWhere (['between', 'order_created_at', $start_date, $end_date]);
+            $query->andWhere (new Expression('DATE(order.order_created_at) >= DATE("'.$start_date.'") AND 
+                    DATE(order.order_created_at) <= DATE("'.$end_date.'")'));
         } else {
             $query->andWhere (new Expression('DATE(order_created_at) > DATE_SUB(now(), INTERVAL 3 MONTH)'));
         }

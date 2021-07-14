@@ -3,6 +3,7 @@
 namespace agent\modules\v1\controllers;
 
 use Yii;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
@@ -385,11 +386,8 @@ class ItemController extends Controller
     {
         $store_model = Yii::$app->accountManager->getManagedAccount();
 
-        if($store_model->export_sold_items_data_in_specific_date_range) {
-            list($start_date, $end_date) = explode(' - ', $store_model->export_sold_items_data_in_specific_date_range);
-        } else {
-            $start_date = $end_date = null;
-        }
+        $start_date = Yii::$app->request->get('start_date');
+        $end_date = Yii::$app->request->get('end_date');
 
             $query = \agent\models\Item::find()
                 ->joinWith(['orderItems', 'orderItems.order'])
@@ -401,7 +399,8 @@ class ItemController extends Controller
                 ->andWhere(['order.restaurant_uuid' => $store_model->restaurant_uuid]);
 
             if($start_date && $end_date) {
-                $query->andWhere (['between', 'order.order_created_at', $start_date, $end_date]);
+                $query->andWhere (new Expression('DATE(order.order_created_at) >= DATE("'.$start_date.'") AND 
+                    DATE(order.order_created_at) <= DATE("'.$end_date.'")'));
             }
 
             $searchResult = $query->all();
