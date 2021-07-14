@@ -9,7 +9,7 @@ class SitemapController extends Controller
 {
     public function actionIndex($storeUuid) {
         $products = Item::find()
-            ->where(['restaurant_uuid' => $storeUuid])
+            ->andWhere(['restaurant_uuid' => $storeUuid])
             ->orderBy('item_created_at DESC')
             ->limit(50)
             ->all();

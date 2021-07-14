@@ -131,7 +131,7 @@ class RestaurantDeliveryController extends Controller {
         $sotredRestaurantDeliveryAreas = RestaurantDelivery::find()
                 ->select('area_id')
                 ->asArray()
-                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere(['restaurant_uuid' => $model->restaurant_uuid])
                 ->all();
 
         $model->restaurant_delivery_area_array = ArrayHelper::getColumn($sotredRestaurantDeliveryAreas, 'area_id');

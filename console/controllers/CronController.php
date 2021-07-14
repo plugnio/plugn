@@ -47,8 +47,7 @@ class CronController extends \yii\console\Controller {
   public function actionMigrateDeliveryApiKey(){
 
     $stores = Restaurant::find()
-    ->where(['not', ['armada_api_key' => null]])
-    ->orWhere(['not', ['mashkor_branch_id' => null]])
+    ->andWhere(new Expression( 'armada_api_key IS NOT NULL OR mashkor_branch_id IS NOT NULL'))
     ->all();
 
     foreach ($stores as $key => $store) {
@@ -162,7 +161,7 @@ class CronController extends \yii\console\Controller {
                 if($lastWeekOrdersReceived > 0 || $thisWeekOrdersReceived > 0) {
 
                   $agentAssignments = $store->getAgentAssignments()
-                              ->where([
+                              ->andWhere([
                                           'role' => AgentAssignment::AGENT_ROLE_OWNER,
                                           'receive_weekly_stats' => 1
                                       ])
@@ -210,7 +209,7 @@ class CronController extends \yii\console\Controller {
     public function actionSiteStatus(){
 
             $restaurants = Restaurant::find()
-                          ->where(['has_deployed' => 0])
+                          ->andWhere(['has_deployed' => 0])
                           ->all();
 
             foreach ($restaurants as $restaurant) {
@@ -257,7 +256,7 @@ class CronController extends \yii\console\Controller {
 
       $stores = Restaurant::find()
               ->joinWith(['items','ownerAgent'])
-              ->where(' DATE(restaurant_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')
+              ->andWhere(' DATE(restaurant_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')
               ->andWhere(['retention_email_sent' => 0])
               ->all();
 
@@ -295,7 +294,7 @@ class CronController extends \yii\console\Controller {
 
       $stores = Restaurant::find()
               ->joinWith(['orders','ownerAgent'])
-              ->where(' DATE(restaurant_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')
+              ->andWhere(' DATE(restaurant_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')
               ->andWhere(['retention_email_sent' => 0])
               ->all();
 
@@ -334,7 +333,7 @@ class CronController extends \yii\console\Controller {
          $end_date =  date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d") ));
 
          $subscriptions = Subscription::find()
-                 ->where(['subscription_status' => Subscription::STATUS_ACTIVE])
+                 ->andWhere(['subscription_status' => Subscription::STATUS_ACTIVE])
                  // ->andWhere(['notified_email' => 1])
                  ->andWhere(['not', ['subscription_end_at' => null]])
                  ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])
@@ -357,7 +356,7 @@ class CronController extends \yii\console\Controller {
          $end_date =  date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d") + 5));
 
          $subscriptions = Subscription::find()
-                 ->where(['subscription_status' => Subscription::STATUS_ACTIVE])
+                 ->andWhere(['subscription_status' => Subscription::STATUS_ACTIVE])
                  ->andWhere(['notified_email' => 0])
                  ->andWhere(['not', ['subscription_end_at' => null]])
                  ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])
@@ -396,7 +395,7 @@ class CronController extends \yii\console\Controller {
     public function actionCreateTapAccount() {
 
       $queue = TapQueue::find()
-              ->where(['queue_status' => Queue::QUEUE_STATUS_PENDING])
+              ->andWhere(['queue_status' => Queue::QUEUE_STATUS_PENDING])
               ->orderBy(['queue_created_at' => SORT_ASC])
               ->one();
 
@@ -428,7 +427,7 @@ class CronController extends \yii\console\Controller {
         public function actionUpdateSitemap() {
 
           $stores = Restaurant::find()
-                  ->where(['sitemap_require_update' => 1])
+                  ->andWhere(['sitemap_require_update' => 1])
                   ->andWhere(['or',
                        ['version'=>2],
                        ['version'=>3]
@@ -561,7 +560,7 @@ class CronController extends \yii\console\Controller {
         $now = new DateTime('now');
         $payments = Payment::find()
                 ->joinWith('order')
-                ->where(['!=', 'payment.payment_current_status', 'CAPTURED'])
+                ->andWhere(['!=', 'payment.payment_current_status', 'CAPTURED'])
                 ->andWhere(['order.order_status' => Order::STATUS_ABANDONED_CHECKOUT])
                 ->andWhere(['order.items_has_been_restocked' => 0]) // if items hasnt been restocked
                 ->andWhere(['<', 'payment.payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')]);
@@ -578,7 +577,7 @@ class CronController extends \yii\console\Controller {
 
         $now = new DateTime('now');
         $payments = Payment::find()
-                ->where("received_callback = 0")
+                ->andWhere("received_callback = 0")
                 ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')])
                 ->all();
 
@@ -610,7 +609,7 @@ class CronController extends \yii\console\Controller {
 
         $now = new DateTime('now');
         $orders = Order::find()
-                ->where(['order_status' => Order::STATUS_PENDING])
+                ->andWhere(['order_status' => Order::STATUS_PENDING])
                 ->andWhere(['reminder_sent' => 0])
                 ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')])
                 ->all();

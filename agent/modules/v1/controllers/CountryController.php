@@ -97,7 +97,7 @@ class CountryController extends Controller {
       if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
         $country =  Country::find()
-                  ->where(['country_id' => $country_id])
+                  ->andWhere(['country_id' => $country_id])
                   ->with('cities','cities.areas')
                   ->asArray()
                   ->one();

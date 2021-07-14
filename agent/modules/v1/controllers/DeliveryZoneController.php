@@ -77,8 +77,10 @@ class DeliveryZoneController extends Controller
         if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
             $query = DeliveryZone::find()
-                ->where(['restaurant_uuid' => $store_uuid])
-                ->andWhere(['business_location_id' => $business_location_id]);
+                ->andWhere([
+                    'restaurant_uuid' => $store_uuid,
+                    'business_location_id' => $business_location_id
+                ]);
 
             return new ActiveDataProvider([
                 'query' => $query

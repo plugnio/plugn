@@ -42,7 +42,7 @@ class DeliveryZoneSearch extends DeliveryZone
     {
         $query = \Yii::$app->accountManager->getManagedAccount($restaurantUuid)->getDeliveryZones()
         ->with(['country','country.areas','businessLocation.country','currency'])
-        ->where(['business_location_id' => $businessLocationId]);
+        ->andWhere(['business_location_id' => $businessLocationId]);
 
 
         // add conditions that should always apply here

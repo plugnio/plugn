@@ -134,7 +134,7 @@ class RestaurantController extends Controller {
     public function actionListAllRestaurantsBranches($id) {
 
         $restaurantBranches = RestaurantBranch::find()
-                        ->where(['restaurant_uuid' => $id])->all();
+                        ->andWhere(['restaurant_uuid' => $id])->all();
 
         if ($restaurantBranches) {
             return $restaurantBranches;
@@ -152,7 +152,7 @@ class RestaurantController extends Controller {
     public function actionGetRestaurantData($branch_name) {
 
       $store = Restaurant::find()
-              ->where(['store_branch_name' => $branch_name]);
+              ->andWhere(['store_branch_name' => $branch_name]);
 
       if( $store->exists() ){
 
@@ -163,7 +163,7 @@ class RestaurantController extends Controller {
 
         $themeColor = RestaurantTheme::find()
                 ->select(['primary'])
-                ->where(['restaurant_uuid' => $restaurant->restaurant_uuid])
+                ->andWhere(['restaurant_uuid' => $restaurant->restaurant_uuid])
                 ->one();
 
         if ($restaurant && $themeColor) {

@@ -74,7 +74,7 @@ class DeliveryZoneController extends Controller {
         $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         if($business_location_model = BusinessLocation::find()
-        ->where(['restaurant_uuid' => $store_model->restaurant_uuid, 'business_location_id' => $businessLocationId])
+        ->andWhere(['restaurant_uuid' => $store_model->restaurant_uuid, 'business_location_id' => $businessLocationId])
         ->with(['country'])
         ->one()) {
 

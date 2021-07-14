@@ -209,7 +209,7 @@ class WebLinkController extends Controller
         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $model = WebLink::find ()
-            ->where ([
+            ->andWhere ([
                 'web_link_id' => $web_link_id,
                 'restaurant_uuid' => $store_model->restaurant_uuid
             ])

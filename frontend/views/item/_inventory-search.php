@@ -39,7 +39,7 @@ use common\models\CategoryItem;
                         <?php
                         $categoryQuery = CategoryItem::find()
                                 ->innerJoin('item', 'item.item_uuid = category_item.item_uuid')
-                                ->where(['item.restaurant_uuid' => $restaurant_uuid])
+                                ->andWhere(['item.restaurant_uuid' => $restaurant_uuid])
                                 ->all();
 
 

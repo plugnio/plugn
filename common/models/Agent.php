@@ -342,7 +342,11 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         if ($this->isOwner == null) {
 
             $this->isOwner = AgentAssignment::find ()
-                ->where (['agent_id' => Yii::$app->user->identity->agent_id, 'restaurant_uuid' => $storeUuid, 'role' => AgentAssignment::AGENT_ROLE_OWNER])
+                ->andWhere ([
+                    'agent_id' => Yii::$app->user->identity->agent_id,
+                    'restaurant_uuid' => $storeUuid,
+                    'role' => AgentAssignment::AGENT_ROLE_OWNER
+                ])
                 ->exists ();
         }
         return $this->isOwner;

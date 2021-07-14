@@ -764,7 +764,7 @@ class Restaurant extends \yii\db\ActiveRecord
         if ($payments_method) {
 
             $sotred_restaurant_payment_method = RestaurantPaymentMethod::find ()
-                ->where (['restaurant_uuid' => $this->restaurant_uuid])
+                ->andWhere (['restaurant_uuid' => $this->restaurant_uuid])
                 ->all ();
 
             foreach ($sotred_restaurant_payment_method as $restaurant_payment_method) {
@@ -1028,7 +1028,7 @@ class Restaurant extends \yii\db\ActiveRecord
     public function isOpen()
     {
         $opening_hour_model = OpeningHour::find ()
-            ->where (['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date ('w', strtotime ("now"))])
+            ->andWhere (['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date ('w', strtotime ("now"))])
             ->andWhere (['<=', 'open_at', date ("H:i:s", strtotime ("now"))])
             ->andWhere (['>=', 'close_at', date ("H:i:s", strtotime ("now"))])
             ->orderBy (['open_at' => SORT_ASC])
@@ -1131,7 +1131,7 @@ class Restaurant extends \yii\db\ActiveRecord
             },
             'bestSeller' => function ($model) {
                 return \common\models\Item::find ()
-                    ->where (['restaurant_uuid' => $model->restaurant_uuid])
+                    ->andWhere (['restaurant_uuid' => $model->restaurant_uuid])
                     ->orderBy (['unit_sold' => SORT_DESC])
                     ->limit (5)
                     ->select (['item_name', 'item_name_ar', 'unit_sold'])
@@ -1886,7 +1886,7 @@ class Restaurant extends \yii\db\ActiveRecord
     public function getActiveSubscription($modelClass = "\common\models\Subscription")
     {
         return $this->hasOne ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->filterWhere([
+            ->andWhere([
                 'AND',
                 ['subscription_status' => Subscription::STATUS_ACTIVE],
                 new Expression('subscription_end_at IS NULL || DATE(subscription_end_at) >= DATE(NOW())')
@@ -1923,7 +1923,7 @@ class Restaurant extends \yii\db\ActiveRecord
     public function getAvailableAreas($modelClass = "\common\models\AreaDeliveryZone")
     {
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->where (['is', 'area_delivery_zone.area_id', null]);
+            ->andWhere (['is', 'area_delivery_zone.area_id', null]);
     }
 
     /**
@@ -2157,7 +2157,7 @@ class Restaurant extends \yii\db\ActiveRecord
     public function getPickupBusinessLocations($modelClass = "\common\models\BusinessLocation")
     {
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->where (['support_pick_up' => 1]);
+            ->andWhere (['support_pick_up' => 1]);
     }
 
     /**
@@ -2190,7 +2190,7 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         return $this->hasMany ($modelClass::className (), ['delivery_zone_id' => 'delivery_zone_id'])
             ->via ('deliveryZones')
-            ->where (['delivery_zone.country_id' => $countryId])
+            ->andWhere (['delivery_zone.country_id' => $countryId])
             ->joinWith (['deliveryZone', 'city']);
     }
 
