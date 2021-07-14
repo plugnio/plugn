@@ -58,7 +58,7 @@ $this->registerJs($js);
         $agentValue = AgentAssignment::find()
                 ->select('agent_id')
                 ->asArray()
-                ->where(['agent_id' => $model->agent_id])
+                ->andWhere(['agent_id' => $model->agent_id])
                 ->one();
     }
 

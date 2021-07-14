@@ -51,7 +51,7 @@ class OpeningHourController extends Controller
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $models = OpeningHour::find()
-                      ->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
+                      ->andWhere(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
                       ->orderBy(['day_of_week' => SORT_ASC, 'open_at' => SORT_ASC])
                       ->all();
 

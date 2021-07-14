@@ -302,7 +302,7 @@ class StoreController extends Controller
         $transaction = Yii::$app->db->beginTransaction();
 
         $knet = $model->getRestaurantPaymentMethods()
-            ->where(['payment_method_id' => 1])
+            ->andWhere(['payment_method_id' => 1])
             ->one();
 
         if (!$knet) {
@@ -345,7 +345,7 @@ class StoreController extends Controller
         $model = $this->findModel($id);
 
         $payments = $model->getRestaurantPaymentMethods()
-            ->where(['<>', 'payment_method_id', 3])
+            ->andWhere(['<>', 'payment_method_id', 3])
             ->all();
 
         $transaction = Yii::$app->db->beginTransaction();
@@ -371,7 +371,7 @@ class StoreController extends Controller
         $model = $this->findModel($id);
 
         $payment_method = $model->getRestaurantPaymentMethods()
-            ->where(['payment_method_id' => 3])
+            ->andWhere(['payment_method_id' => 3])
             ->exists();
 
         if ($payment_method) {
@@ -397,7 +397,7 @@ class StoreController extends Controller
         $model = $this->findModel($id);
 
         $payment_method = $model->getRestaurantPaymentMethods()
-            ->where(['payment_method_id' => 3])
+            ->andWhere(['payment_method_id' => 3])
             ->one();
 
         if (!$payment_method) {

@@ -901,7 +901,14 @@ class OrderController extends Controller
 
         if($model->order_mode == Order::ORDER_MODE_DELIVERY){
 
-            if($areaDeliveryZone = AreaDeliveryZone::find() ->where([ 'restaurant_uuid' => $restaurant_model->restaurant_uuid, 'area_id' => $model->area_id ])->one())
+            $areaDeliveryZone = AreaDeliveryZone::find()
+                ->andWhere([
+                    'restaurant_uuid' => $restaurant_model->restaurant_uuid,
+                    'area_id' => $model->area_id
+                ])
+                ->one();
+
+            if($areaDeliveryZone)
                 $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
         }
 

@@ -321,7 +321,7 @@ class Item extends \yii\db\ActiveRecord
     public function findItemImageByFileName($file_name)
     {
         return ItemImage::find ()
-            ->where (['item_uuid' => $this->item_uuid, 'product_file_name' => $file_name])
+            ->andWhere (['item_uuid' => $this->item_uuid, 'product_file_name' => $file_name])
             ->one ();
     }
 
@@ -419,11 +419,16 @@ class Item extends \yii\db\ActiveRecord
     {
         return $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
             ->joinWith ('order')
-            ->where (['order.order_status' => Order::STATUS_PENDING])
-            ->orWhere (['order.order_status' => Order::STATUS_BEING_PREPARED])
-            ->orWhere (['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-            ->orWhere (['order.order_status' => Order::STATUS_COMPLETE])
-            ->orWhere (['order_status' => Order::STATUS_CANCELED])
+            ->andWhere ([
+                'IN',
+                'order.order_status', [
+                    Order::STATUS_PENDING,
+                    Order::STATUS_BEING_PREPARED,
+                    Order::STATUS_OUT_FOR_DELIVERY,
+                    Order::STATUS_COMPLETE,
+                    Order::STATUS_CANCELED
+                ]
+            ])
             ->sum ('qty');
     }
 
@@ -435,11 +440,16 @@ class Item extends \yii\db\ActiveRecord
     {
         $query = $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
             ->joinWith ('order')
-            ->where (['order.order_status' => Order::STATUS_PENDING])
-            ->orWhere (['order.order_status' => Order::STATUS_BEING_PREPARED])
-            ->orWhere (['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-            ->orWhere (['order.order_status' => Order::STATUS_COMPLETE])
-            ->orWhere (['order_status' => Order::STATUS_CANCELED]);
+            ->andWhere ([
+                'in',
+                'order.order_status', [
+                    Order::STATUS_PENDING,
+                    Order::STATUS_BEING_PREPARED,
+                    Order::STATUS_OUT_FOR_DELIVERY,
+                    Order::STATUS_COMPLETE,
+                    Order::STATUS_CANCELED
+                ]
+            ]);
 
         if($start_date && $end_date) {
             $query->andWhere (['between', 'order.order_created_at', $start_date, $end_date]);
@@ -456,11 +466,17 @@ class Item extends \yii\db\ActiveRecord
     {
         return $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
             ->joinWith ('order')
-            ->where (['order.order_status' => Order::STATUS_PENDING])
-            ->orWhere (['order.order_status' => Order::STATUS_BEING_PREPARED])
-            ->orWhere (['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-            ->orWhere (['order.order_status' => Order::STATUS_COMPLETE])
-            ->orWhere (['order_status' => Order::STATUS_CANCELED])
+            ->andWhere ([
+                'IN',
+                'order.order_status',
+                [
+                    Order::STATUS_PENDING,
+                    Order::STATUS_BEING_PREPARED,
+                    Order::STATUS_OUT_FOR_DELIVERY,
+                    Order::STATUS_COMPLETE,
+                    Order::STATUS_CANCELED
+                ]
+            ])
             ->andWhere (['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
             ->sum ('qty');
     }
@@ -473,11 +489,17 @@ class Item extends \yii\db\ActiveRecord
     {
         return $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
             ->joinWith ('order')
-            ->where (['order.order_status' => Order::STATUS_PENDING])
-            ->orWhere (['order.order_status' => Order::STATUS_BEING_PREPARED])
-            ->orWhere (['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-            ->orWhere (['order.order_status' => Order::STATUS_COMPLETE])
-            ->orWhere (['order_status' => Order::STATUS_CANCELED])
+            ->andWhere ([
+                'IN',
+                'order.order_status',
+                [
+                    Order::STATUS_PENDING,
+                    Order::STATUS_BEING_PREPARED,
+                    Order::STATUS_OUT_FOR_DELIVERY,
+                    Order::STATUS_COMPLETE,
+                    Order::STATUS_CANCELED
+                ]
+            ])
             ->andWhere (['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
             ->sum ('qty');
     }
@@ -490,11 +512,17 @@ class Item extends \yii\db\ActiveRecord
     {
         return $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
             ->joinWith ('order')
-            ->where (['order.order_status' => Order::STATUS_PENDING])
-            ->orWhere (['order.order_status' => Order::STATUS_BEING_PREPARED])
-            ->orWhere (['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-            ->orWhere (['order.order_status' => Order::STATUS_COMPLETE])
-            ->orWhere (['order_status' => Order::STATUS_CANCELED])
+            ->andWhere ([
+                'IN',
+                'order.order_status',
+                [
+                    Order::STATUS_PENDING,
+                    Order::STATUS_BEING_PREPARED,
+                    Order::STATUS_OUT_FOR_DELIVERY,
+                    Order::STATUS_COMPLETE,
+                    Order::STATUS_CANCELED
+                ]
+            ])
             ->andWhere ('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
             ->andWhere ('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
             ->sum ('qty');
@@ -508,11 +536,17 @@ class Item extends \yii\db\ActiveRecord
     {
         return $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
             ->joinWith ('order')
-            ->where (['order.order_status' => Order::STATUS_PENDING])
-            ->orWhere (['order.order_status' => Order::STATUS_BEING_PREPARED])
-            ->orWhere (['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-            ->orWhere (['order.order_status' => Order::STATUS_COMPLETE])
-            ->orWhere (['order_status' => Order::STATUS_CANCELED])
+            ->andWhere ([
+                'IN',
+                'order.order_status',
+                [
+                    Order::STATUS_PENDING,
+                    Order::STATUS_BEING_PREPARED,
+                    Order::STATUS_OUT_FOR_DELIVERY,
+                    Order::STATUS_COMPLETE,
+                    Order::STATUS_CANCELED
+                ]
+            ])
             ->andWhere ('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
             ->andWhere ('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
             ->sum ('qty');
@@ -526,11 +560,17 @@ class Item extends \yii\db\ActiveRecord
     {
         return $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
             ->joinWith ('order')
-            ->where (['order.order_status' => Order::STATUS_PENDING])
-            ->orWhere (['order.order_status' => Order::STATUS_BEING_PREPARED])
-            ->orWhere (['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-            ->orWhere (['order.order_status' => Order::STATUS_COMPLETE])
-            ->orWhere (['order_status' => Order::STATUS_CANCELED])
+            ->andWhere ([
+                'IN',
+                'order.order_status',
+                [
+                    Order::STATUS_PENDING,
+                    Order::STATUS_BEING_PREPARED,
+                    Order::STATUS_OUT_FOR_DELIVERY,
+                    Order::STATUS_COMPLETE,
+                    Order::STATUS_CANCELED
+                ]
+            ])
             ->andWhere ('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
             ->andWhere ('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
             ->sum ('qty');

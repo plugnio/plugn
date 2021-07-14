@@ -12,8 +12,7 @@ class Plan extends \common\models\Plan
 
         $fields['paymentMethods'] =  function ($model) {
             return PaymentMethod::find ()
-                ->where (['payment_method_id' => '1'])
-                ->orWhere (['payment_method_id' => '2'])
+                ->andWhere (['in', 'payment_method_id', ['1', '2']])
                 ->all ();
         };
 
