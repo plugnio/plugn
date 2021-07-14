@@ -3,6 +3,7 @@
 namespace agent\modules\v1\controllers;
 
 use Yii;
+use yii\db\Expression;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use agent\models\Customer;
@@ -144,10 +145,19 @@ class CustomerController extends Controller
     {
         $restaurant_model = Yii::$app->accountManager->getManagedAccount ();
 
-        $model = \common\models\Customer::find ()
+        $start_date = Yii::$app->request->get('start_date');
+        $end_date = Yii::$app->request->get('end_date');
+
+        $query = \common\models\Customer::find ()
             ->where (['restaurant_uuid' => $restaurant_model->restaurant_uuid])
-            ->orderBy (['customer_created_at' => SORT_DESC])
-            ->all ();
+            ->orderBy (['customer_created_at' => SORT_DESC]);
+
+        if($start_date && $end_date) {
+            $query->andWhere (new Expression('DATE(customer.customer_created_at) >= DATE("'.$start_date.'") AND 
+                DATE(customer.customer_created_at) <= DATE("'.$end_date.'")'));
+        }
+
+        $model = $query->all();
 
         header ('Access-Control-Allow-Origin: *');
         header ("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
