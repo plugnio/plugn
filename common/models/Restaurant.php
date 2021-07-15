@@ -1811,21 +1811,20 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         $most_sold_item_chart_data = [];
 
-        $rows = $this->getSoldOrderItems ()
-            ->innerJoinWith('item')
+        $rows = $this->getItems ()
             ->orderBy(['unit_sold' => 'DESC'])
             ->limit(5)
             ->all ();
 
-        foreach($rows as $row) {
+        foreach($rows as $item) {
             $most_sold_item_chart_data[] = [
-                'item_name' => $row->item->item_name,
-                'item_name_ar' => $row->item->item_name_ar,
-                'total' => $row->item->unit_sold
+                'item_name' => $item->item_name,
+                'item_name_ar' => $item->item_name_ar,
+                'total' => $item->unit_sold
             ];
         }
 
-        return $most_sold_item_chart_data;
+        return array_reverse ($most_sold_item_chart_data);
     }
 
     /**
