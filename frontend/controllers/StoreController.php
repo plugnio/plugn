@@ -234,7 +234,7 @@ class StoreController extends Controller {
         $number_of_sold_items_chart_data = [];
 
         $sold_items = \common\models\Item::find()
-                ->where(['item.restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere(['item.restaurant_uuid' => $model->restaurant_uuid])
                 ->orderBy(['unit_sold' => SORT_DESC])
                 ->limit(5)
                 ->all();

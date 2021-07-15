@@ -152,7 +152,7 @@ class OpeningHour extends \yii\db\ActiveRecord {
          // $selectedDate =  date('c', strtotime('+ ' . $delivery_time . ' min'   ,strtotime($currentDate)));
 
          $getWorkingHours = OpeningHour::find()
-                              ->where(['restaurant_uuid' => $store->restaurant_uuid])
+                              ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
                               ->andWhere(['day_of_week' => $currentWeekDay])
                               ->orderBy(['open_at' => SORT_ASC])
                               ->all();
@@ -240,7 +240,7 @@ class OpeningHour extends \yii\db\ActiveRecord {
 //
 //
 //         $opening_hrs = OpeningHour::find()
-//           ->where(['restaurant_uuid' => $this->restaurant_uuid])
+//           ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
 //           ->andWhere(['day_of_week' => date('w' , strtotime($startTime))])
 //           ->orderBy(['open_at' => SORT_ASC])
 //           ->all();

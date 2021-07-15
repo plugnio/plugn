@@ -31,11 +31,8 @@ class CustomerQuery extends \yii\db\ActiveQuery {
     public function customerGained($storeUuid, $start_date, $end_date )
     {
         return $this
-        ->where(['restaurant_uuid' => $storeUuid])
-        ->andWhere(['between', 'customer_created_at', $start_date, $end_date])
-        ->count();
+            ->andWhere(['restaurant_uuid' => $storeUuid])
+            ->andWhere(['between', 'customer_created_at', $start_date, $end_date])
+            ->count();
     }
-
-
-
 }

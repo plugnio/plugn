@@ -62,7 +62,10 @@ class ItemController extends Controller {
       if($restaurant_uuid){
 
         $category = Category::find()
-                    ->where(['category.restaurant_uuid' => $restaurant_uuid, 'category.category_id' => $category_id])
+                    ->andWhere([
+                        'category.restaurant_uuid' => $restaurant_uuid,
+                        'category.category_id' => $category_id
+                    ])
                     ->joinWith(['items', 'items.options', 'items.options.extraOptions','items.itemImages'])
                     ->asArray()
                     ->one();
@@ -113,7 +116,7 @@ class ItemController extends Controller {
 
         if ($restaurant) {
             $restaurantMenu = Category::find()
-                    ->where(['restaurant_uuid' => $restaurant_uuid])
+                    ->andWhere(['restaurant_uuid' => $restaurant_uuid])
                     ->with('items', 'items.options', 'items.options.extraOptions','items.itemImages')
                     ->orderBy([new \yii\db\Expression('sort_number IS NULL, sort_number ASC')])
                     ->asArray()
@@ -149,7 +152,10 @@ class ItemController extends Controller {
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
 
         $item_model = Item::find()
-                ->where(['item_uuid' => $item_uuid, 'restaurant_uuid' => $restaurant_uuid])
+                ->andWhere([
+                    'item_uuid' => $item_uuid,
+                    'restaurant_uuid' => $restaurant_uuid
+                ])
                 ->with('options', 'options.extraOptions','itemImages')
                 ->asArray()
                 ->one();

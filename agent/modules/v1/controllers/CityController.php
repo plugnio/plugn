@@ -107,7 +107,7 @@ class CityController extends Controller {
       if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
         $city =  City::find()
-                  ->where(['city_id' =>  $city_id])
+                  ->andWhere(['city_id' =>  $city_id])
                   ->one();
 
         return $city;

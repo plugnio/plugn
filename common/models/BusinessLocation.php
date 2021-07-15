@@ -133,7 +133,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
     public function getDeliveryZoneByCountryId($countryId, $modelClass = "\common\models\DeliveryZone")
     {
         return $this->hasMany($modelClass::className(), ['business_location_id' => 'business_location_id'])
-            ->where(['delivery_zone.country_id' => 1]);
+            ->andWhere(['delivery_zone.country_id' => 1]);
     }
 
      /**

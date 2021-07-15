@@ -88,8 +88,8 @@ class StoreController extends Controller
 
         $store->country_id = Yii::$app->request->getBodyParam('country_id');
         $store->restaurant_email_notification = Yii::$app->request->getBodyParam('email_notification');
-        $store->phone_number = Yii::$app->request->getBodyParam('mobile');
         $store->phone_number_country_code = (int) Yii::$app->request->getBodyParam('mobile_country_code');
+        $store->phone_number = '+ '.$store->phone_number_country_code.' '.Yii::$app->request->getBodyParam('mobile');
         $store->name = Yii::$app->request->getBodyParam('name');
         $store->name_ar = Yii::$app->request->getBodyParam('name_ar');
         $store->schedule_interval = Yii::$app->request->getBodyParam('schedule_interval');
@@ -302,7 +302,7 @@ class StoreController extends Controller
         $transaction = Yii::$app->db->beginTransaction();
 
         $knet = $model->getRestaurantPaymentMethods()
-            ->where(['payment_method_id' => 1])
+            ->andWhere(['payment_method_id' => 1])
             ->one();
 
         if (!$knet) {
@@ -345,7 +345,7 @@ class StoreController extends Controller
         $model = $this->findModel($id);
 
         $payments = $model->getRestaurantPaymentMethods()
-            ->where(['<>', 'payment_method_id', 3])
+            ->andWhere(['<>', 'payment_method_id', 3])
             ->all();
 
         $transaction = Yii::$app->db->beginTransaction();
@@ -371,7 +371,7 @@ class StoreController extends Controller
         $model = $this->findModel($id);
 
         $payment_method = $model->getRestaurantPaymentMethods()
-            ->where(['payment_method_id' => 3])
+            ->andWhere(['payment_method_id' => 3])
             ->exists();
 
         if ($payment_method) {
@@ -397,7 +397,7 @@ class StoreController extends Controller
         $model = $this->findModel($id);
 
         $payment_method = $model->getRestaurantPaymentMethods()
-            ->where(['payment_method_id' => 3])
+            ->andWhere(['payment_method_id' => 3])
             ->one();
 
         if (!$payment_method) {

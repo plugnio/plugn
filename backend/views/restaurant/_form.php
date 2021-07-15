@@ -71,7 +71,7 @@ use borales\extensions\phoneInput\PhoneInput;
         $sotredRestaurantPaymentMethod = RestaurantPaymentMethod::find()
                 ->select('payment_method_id')
                 ->asArray()
-                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere(['restaurant_uuid' => $model->restaurant_uuid])
                 ->all();
 
         $sotredRestaurantPaymentMethod = ArrayHelper::getColumn($sotredRestaurantPaymentMethod, 'payment_method_id');

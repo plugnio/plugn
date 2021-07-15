@@ -293,7 +293,7 @@ class OrderController extends Controller {
 
                                   $bank_discount_model = BankDiscount::find()
                                           ->innerJoin('bank', 'bank.bank_id = bank_discount.bank_id')
-                                          ->where(['bank.bank_name' => $bank_name])
+                                          ->andWhere(['bank.bank_name' => $bank_name])
                                           ->andWhere(['restaurant_uuid' => $order->restaurant_uuid])
                                           ->andWhere(['<=' ,'minimum_order_amount' , $order->total_price])
                                           ->one();
@@ -503,10 +503,10 @@ class OrderController extends Controller {
      * @return type
      */
     public function actionOrderDetails($id, $restaurant_uuid) {
-        $model = Order::find()
-        ->where(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])
-        ->one();
 
+        $model = Order::find()
+            ->andWhere(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])
+            ->one();
 
         if (!$model) {
             return [
@@ -578,7 +578,7 @@ class OrderController extends Controller {
 
         $bank_discount_model = BankDiscount::find()
                 ->innerJoin('bank', 'bank.bank_id = bank_discount.bank_id')
-                ->where(['bank.bank_name' => $bank_name])
+                ->andWhere(['bank.bank_name' => $bank_name])
                 ->andWhere(['restaurant_uuid' => $restaurant_uuid])
                 ->one();
 
@@ -626,7 +626,7 @@ class OrderController extends Controller {
      */
     public function actionCheckPendingOrders($restaurant_uuid) {
         return Order::find()
-                        ->where([
+                        ->andWhere([
                             'restaurant_uuid' => $restaurant_uuid,
                             'order_status' => Order::STATUS_PENDING
                         ])->exists();

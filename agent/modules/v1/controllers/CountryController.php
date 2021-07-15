@@ -73,7 +73,7 @@ class CountryController extends Controller {
         $query =  Country::find();
 
         if ($keyword){
-          $query->where(['like', 'country_name', $keyword]);
+          $query->andWhere(['like', 'country_name', $keyword]);
           $query->orWhere(['like', 'country_name_ar', $keyword]);
         }
 
@@ -97,7 +97,7 @@ class CountryController extends Controller {
       if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
         $country =  Country::find()
-                  ->where(['country_id' => $country_id])
+                  ->andWhere(['country_id' => $country_id])
                   ->with('cities','cities.areas')
                   ->asArray()
                   ->one();

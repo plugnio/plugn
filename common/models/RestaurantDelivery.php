@@ -65,7 +65,7 @@ class RestaurantDelivery extends \yii\db\ActiveRecord {
     public function saveRestaurantDeliveryArea($delivery_areas) {
         
         $stored_restaurant_delivery_areas = RestaurantDelivery::find()
-                ->where(['restaurant_uuid' => $this->restaurant_uuid])
+                ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
                 ->all();
 
         foreach ($stored_restaurant_delivery_areas as $restaurant_delivery_area) {

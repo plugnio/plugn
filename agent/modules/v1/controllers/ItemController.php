@@ -3,6 +3,7 @@
 namespace agent\modules\v1\controllers;
 
 use Yii;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
@@ -74,15 +75,19 @@ class ItemController extends Controller
     public function actionList()
     {
         $keyword = Yii::$app->request->get('keyword');
+        $type = Yii::$app->request->get('type');
 
         $store = Yii::$app->accountManager->getManagedAccount();
 
         $query = Item::find();
+        if ($type != 'all') {
+            $query->andWhere(['track_quantity'=> 1]);
+        }
         $query->andWhere(['restaurant_uuid'=> $store->restaurant_uuid]);
         $query->orderBy('item_created_at DESC');
 
         if ($keyword && $keyword != 'null') {
-            $query->filterWhere ([
+            $query->andWhere ([
                     'or',
                     ['like', 'item_name', $keyword],
                     ['like', 'item_name_ar', $keyword],
@@ -385,23 +390,26 @@ class ItemController extends Controller
     {
         $store_model = Yii::$app->accountManager->getManagedAccount();
 
-        if($store_model->export_sold_items_data_in_specific_date_range) {
-            list($start_date, $end_date) = explode(' - ', $store_model->export_sold_items_data_in_specific_date_range);
-        } else {
-            $start_date = $end_date = null;
-        }
+        $start_date = Yii::$app->request->get('start_date');
+        $end_date = Yii::$app->request->get('end_date');
 
             $query = \agent\models\Item::find()
                 ->joinWith(['orderItems', 'orderItems.order'])
-                ->where(['order.order_status' => Order::STATUS_PENDING])
-                ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-                ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-                ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                ->andWhere ([
+                    'IN',
+                    'order.order_status', [
+                        Order::STATUS_PENDING,
+                        Order::STATUS_BEING_PREPARED,
+                        Order::STATUS_OUT_FOR_DELIVERY,
+                        Order::STATUS_COMPLETE,
+                        Order::STATUS_CANCELED
+                    ]
+                ])
                 ->andWhere(['order.restaurant_uuid' => $store_model->restaurant_uuid]);
 
             if($start_date && $end_date) {
-                $query->andWhere (['between', 'order.order_created_at', $start_date, $end_date]);
+                $query->andWhere (new Expression('DATE(order.order_created_at) >= DATE("'.$start_date.'") AND 
+                    DATE(order.order_created_at) <= DATE("'.$end_date.'")'));
             }
 
             $searchResult = $query->all();

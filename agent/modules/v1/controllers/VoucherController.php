@@ -76,7 +76,7 @@ class VoucherController extends Controller {
           ->orderBy('voucher_id DESC');
 
         if ($keyword && $keyword != 'null') {
-            $query->filterWhere ([
+            $query->andWhere ([
                 'or',
                 ['like', 'code', $keyword],
                 ['like', 'description', $keyword],

@@ -121,11 +121,16 @@ class ItemController extends Controller
 
             $searchResult = Item::find()
                     ->joinWith(['orderItems', 'orderItems.order'])
-                    ->where(['order.order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere([
+                        'IN',
+                        'order.order_status', [
+                            Order::STATUS_PENDING,
+                            Order::STATUS_BEING_PREPARED,
+                            Order::STATUS_OUT_FOR_DELIVERY,
+                            Order::STATUS_COMPLETE,
+                            Order::STATUS_CANCELED
+                        ]
+                    ])
                     ->andWhere(['order.restaurant_uuid' => $store_model->restaurant_uuid])
                     ->andWhere(['between', 'order.order_created_at', $start_date, $end_date])
                     ->all();

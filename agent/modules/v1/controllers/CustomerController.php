@@ -3,6 +3,7 @@
 namespace agent\modules\v1\controllers;
 
 use Yii;
+use yii\db\Expression;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use agent\models\Customer;
@@ -102,10 +103,11 @@ class CustomerController extends Controller
         if (Yii::$app->accountManager->getManagedAccount ($store_uuid)) {
 
             $customer = Customer::find ()
-                ->where (['restaurant_uuid' => $store_uuid])
-                ->andWhere (['customer_id' => $customer_id])
+                ->andWhere ([
+                    'restaurant_uuid' => $store_uuid,
+                    'customer_id' => $customer_id
+                ])
                 ->one ();
-
 
             return $customer;
         }
@@ -124,7 +126,7 @@ class CustomerController extends Controller
         if (Yii::$app->accountManager->getManagedAccount ($store_uuid)) {
 
             $query = Order::find ()
-                ->where (['restaurant_uuid' => $store_uuid, 'customer_id' => $customer_id])
+                ->andWhere (['restaurant_uuid' => $store_uuid, 'customer_id' => $customer_id])
                 ->orderBy (['order_created_at' => SORT_DESC]);
 
             return new ActiveDataProvider([
@@ -144,10 +146,19 @@ class CustomerController extends Controller
     {
         $restaurant_model = Yii::$app->accountManager->getManagedAccount ();
 
-        $model = \common\models\Customer::find ()
-            ->where (['restaurant_uuid' => $restaurant_model->restaurant_uuid])
-            ->orderBy (['customer_created_at' => SORT_DESC])
-            ->all ();
+        $start_date = Yii::$app->request->get('start_date');
+        $end_date = Yii::$app->request->get('end_date');
+
+        $query = \common\models\Customer::find ()
+            ->andWhere (['restaurant_uuid' => $restaurant_model->restaurant_uuid])
+            ->orderBy (['customer_created_at' => SORT_DESC]);
+
+        if($start_date && $end_date) {
+            $query->andWhere (new Expression('DATE(customer.customer_created_at) >= DATE("'.$start_date.'") AND 
+                DATE(customer.customer_created_at) <= DATE("'.$end_date.'")'));
+        }
+
+        $model = $query->all();
 
         header ('Access-Control-Allow-Origin: *');
         header ("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -172,13 +183,17 @@ class CustomerController extends Controller
                     "format" => "raw",
                     "value" => function ($data) {
                         $total_spent = $data->getOrders ()
-                            ->where (['!=', 'order_status', \common\models\Order::STATUS_DRAFT])
-                            ->andWhere (['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
-                            ->andWhere (['!=', 'order_status', Order::STATUS_REFUNDED])
-                            ->andWhere (['!=', 'order_status', Order::STATUS_PARTIALLY_REFUNDED])
-                            ->andWhere (['!=', 'order_status', Order::STATUS_CANCELED])
+                            ->andWhere ([
+                                'NOT IN',
+                                'order_status', [
+                                    Order::STATUS_DRAFT,
+                                    Order::STATUS_ABANDONED_CHECKOUT,
+                                    Order::STATUS_REFUNDED,
+                                    Order::STATUS_PARTIALLY_REFUNDED,
+                                    Order::STATUS_CANCELED
+                                ]
+                            ])
                             ->sum ('total_price');
-
 
                         $total_spent = \Yii::$app->formatter->asDecimal ($total_spent ? $total_spent : 0, 3);
 
@@ -190,11 +205,16 @@ class CustomerController extends Controller
                     "format" => "raw",
                     "value" => function ($model) {
                         return $model->getOrders ()
-                            ->where (['!=', 'order_status', Order::STATUS_DRAFT])
-                            ->andWhere (['!=', 'order_status', Order::STATUS_ABANDONED_CHECKOUT])
-                            ->andWhere (['!=', 'order_status', Order::STATUS_REFUNDED])
-                            ->andWhere (['!=', 'order_status', Order::STATUS_PARTIALLY_REFUNDED])
-                            ->andWhere (['!=', 'order_status', Order::STATUS_CANCELED])
+                            ->andWhere ([
+                                'NOT IN',
+                                'order_status', [
+                                    Order::STATUS_DRAFT,
+                                    Order::STATUS_ABANDONED_CHECKOUT,
+                                    Order::STATUS_REFUNDED,
+                                    Order::STATUS_PARTIALLY_REFUNDED,
+                                    Order::STATUS_CANCELED
+                                ]
+                            ])
                             ->count ();
                     }
                 ],

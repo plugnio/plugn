@@ -13,6 +13,7 @@ return [
         //'https://api.yo3an.io/',
         //Dev Envs
         null,
+        'localhost',
         '*' //remove this once app is live
     ]
 ];

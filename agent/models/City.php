@@ -15,7 +15,7 @@ class City extends \common\models\City
             $delivery_zone_id = Yii::$app->request->get('delivery_zone_id');
 
             return $model->getAreaDeliveryZones()
-                ->filterWhere(['delivery_zone_id' => $delivery_zone_id])
+                ->andWhere(['delivery_zone_id' => $delivery_zone_id])
                 ->count();
         };
         return $fields;

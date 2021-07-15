@@ -118,7 +118,7 @@ class AreaDeliveryZoneController extends Controller
         $delivery_zone_id = Yii::$app->request->getBodyParam ("delivery_zone_id");
 
         $delivery_zone = $store->getDeliveryZones ()
-            ->filterWhere (['delivery_zone_id' => $delivery_zone_id])
+            ->andWhere (['delivery_zone_id' => $delivery_zone_id])
             ->one ();
 
         if (!$delivery_zone)
@@ -135,7 +135,7 @@ class AreaDeliveryZoneController extends Controller
         //list already added areas
 
         $addedAreas = $store->getAreaDeliveryZones ()
-            ->filterWhere (['city_id' => $city_id, 'delivery_zone_id' => $delivery_zone_id])
+            ->andWhere (['city_id' => $city_id, 'delivery_zone_id' => $delivery_zone_id])
             ->all ();
 
         $addedAreaIds = ArrayHelper::getColumn ($addedAreas, 'area_id');
