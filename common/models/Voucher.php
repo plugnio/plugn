@@ -152,7 +152,6 @@ class Voucher extends \yii\db\ActiveRecord {
         }
     }
 
-
     public function isValid($phone_number) {
         $isValid = true;
 
@@ -196,6 +195,78 @@ class Voucher extends \yii\db\ActiveRecord {
         return $isValid ? $this : false;
     }
 
+    public function extraFields()
+    {
+        $fields = parent::extraFields();
+
+        $fields['voucherChartData'] = function() {
+            return $this->voucherChartData();
+        };
+
+        return $fields;
+    }
+
+    /**
+     * return voucher usage by months
+     * @return array
+     */
+    public function voucherChartData() {
+
+        $voucher_chart_data = [];
+
+        /*$date_start = $this->valid_from;
+
+        if(strtotime($this->valid_until) < time()) {
+            $date_end = $this->valid_until;
+        } else {
+            $date_end = date('Y') . '-' . date('m') . '-1';
+        }
+
+        $months = $this->getMonthsBetween($date_start, $date_end);
+
+        for ($i = 0; $i < $months; $i++) {
+
+            $month = date('m', strtotime('-'.($months - $i).' month'));
+
+            $voucher_chart_data[$month] = array(
+                'month'   => date('F', strtotime('-'.($months - $i).' month')),
+                'total' => 0
+            );
+        }*/
+
+        $rows = $this->getOrders ()
+            ->select ('order_created_at, COUNT(*) as total')
+            //->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) < DATE("'.$date_end.'")')
+            ->groupBy (new Expression('MONTH(order_created_at), YEAR(order_created_at)'))
+            ->asArray ()
+            ->all ();
+
+        foreach ($rows as $result) {
+            $voucher_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
+                'month' => date ('F', strtotime ($result['order_created_at'])),
+                'total' => (int) $result['total']
+            );
+        }
+
+        return array_values($voucher_chart_data);
+    }
+
+    /**
+     * Function will give you the difference months between two dates
+     *
+     * @param string $start_date
+     * @param string $end_date
+     * @return int|null
+     */
+    public function getMonthsBetween($start_date, $end_date)
+    {
+        $startDate = new \DateTime($start_date);
+        $endDate = new \DateTime($end_date);
+        $interval = $startDate->diff($endDate);
+        $months = ($interval->y * 12) + $interval->m;
+
+        return $startDate > $endDate ? -$months : $months;
+    }
 
     /**
      * Gets query for [[CustomerVouchers]].
