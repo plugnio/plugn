@@ -111,8 +111,8 @@ class AuthController extends Controller {
 
         $agent = new Agent();
         $agent->setScenario(Agent::SCENARIO_CREATE_NEW_AGENT);
-        $agent->agent_name = Yii::$app->request->getBodyParam ('agent_name');
-        $agent->agent_email = Yii::$app->request->getBodyParam ('agent_email');
+        $agent->agent_name = Yii::$app->request->getBodyParam ('name');
+        $agent->agent_email = Yii::$app->request->getBodyParam ('email');
         $agent->setPassword(Yii::$app->request->getBodyParam ('password'));
         $agent->tempPassword = Yii::$app->request->getBodyParam ('password');
 
@@ -122,10 +122,10 @@ class AuthController extends Controller {
         $store->owner_number = Yii::$app->request->getBodyParam ('owner_number');
         $store->owner_phone_country_code= Yii::$app->request->getBodyParam ('owner_phone_country_code');
 
-        $store->name = Yii::$app->request->getBodyParam ('name');
+        $store->name = Yii::$app->request->getBodyParam ('restaurant_name');
         $store->restaurant_domain = Yii::$app->request->getBodyParam ('restaurant_domain');
         $store->country_id = Yii::$app->request->getBodyParam ('country_id');
-        $store->currency_id = $currency? $currency->currency_id: null;
+        $store->currency_id = Yii::$app->request->getBodyParam('currency');
 
         $store->restaurant_email = $agent->agent_email;
         $store->owner_first_name = $agent->agent_name;
@@ -153,10 +153,6 @@ class AuthController extends Controller {
 
         return $this->_loginResponse ($agent);
 
-        /*return [
-            'operation' => 'success',
-            'unVerifiedToken' => $this->_loginResponse ($agent),
-        ];*/
     }
 
     /**
