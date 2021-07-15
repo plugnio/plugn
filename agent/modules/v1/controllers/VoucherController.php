@@ -84,7 +84,7 @@ class VoucherController extends Controller {
             ]);
         }
 
-        if($status) {
+        if(in_array($status, [1,0])) {
           $query->andWhere(['voucher_status' => $status]);
         }
 

@@ -196,6 +196,7 @@ class Voucher extends \yii\db\ActiveRecord {
         return $isValid ? $this : false;
     }
 
+
     /**
      * Gets query for [[CustomerVouchers]].
      *
