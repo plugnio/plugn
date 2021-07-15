@@ -111,10 +111,13 @@ class ItemController extends Controller {
 
         $restaurant = Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->one();
 
-        if($restaurant->is_myfatoorah_enable)
-          unset($restaurant['live_public_key']);
-          
+
+
         if ($restaurant) {
+
+          if($restaurant->is_myfatoorah_enable)
+            unset($restaurant['live_public_key']);
+
             $restaurantMenu = Category::find()
                     ->where(['restaurant_uuid' => $restaurant_uuid])
                     ->with('items', 'items.options', 'items.options.extraOptions','items.itemImages')

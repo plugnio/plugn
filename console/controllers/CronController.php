@@ -369,7 +369,6 @@ class CronController extends \yii\console\Controller {
                  ->all();
 
 
-
          foreach ($subscriptions as $subscription) {
            if(date('Y-m-d',strtotime($subscription->subscription_end_at)) == date('Y-m-d')){
              $subscription->subscription_status =  Subscription::STATUS_INACTIVE;
@@ -405,6 +404,7 @@ class CronController extends \yii\console\Controller {
                      ])
                      ->setFrom([\Yii::$app->params['supportEmail']])
                      ->setTo($agent->agent_email)
+                     ->setBcc(\Yii::$app->params['supportEmail'])
                      ->setSubject('Your Subscription is Expiring')
                      ->send();
 
@@ -615,7 +615,7 @@ class CronController extends \yii\console\Controller {
 
       $refunds = Refund::find()
                   ->joinWith(['store'])
-                  ->where(['refund.refund_reference' => null])
+                  ->where(['NOT', ['refund.refund_reference' => null]])
                   ->andWhere(['restaurant.is_tap_enable' => 1])
                   ->andWhere(['NOT', ['refund.payment_uuid' => null]])
                   ->all();

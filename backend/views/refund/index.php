@@ -27,6 +27,8 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
+            'refund_id',
+
             'payment_uuid',
             [
               'attribute' => 'store_name',
@@ -44,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
             //'reason',
             //'refund_created_at',
             //'refund_updated_at',
-            //'refund_reference',
+            'refund_reference',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

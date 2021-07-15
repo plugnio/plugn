@@ -136,7 +136,7 @@ use borales\extensions\phoneInput\PhoneInput;
     ?>
 
     <?= $form->field($model, 'payment_gateway_queue_id')->textInput(['maxlength' => true]) ?>
-    
+
     <?= $form->field($model, 'version')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
@@ -258,7 +258,9 @@ use borales\extensions\phoneInput\PhoneInput;
 
     <?= $form->field($model, 'platform_fee')->textInput([ 'maxlength' => true, 'placeholder' => 'Platform fee']) ?>
 
-    <?= $form->field($model, 'warehouse_fee')->textInput([ 'maxlength' => true, 'placeholder' => 'Warehouse fee']) ?>
+    <?= $form->field($model, 'warehouse_delivery_charges')->textInput([ 'maxlength' => true, 'placeholder' => 'Delivery charges']) ?>
+
+    <?= $form->field($model, 'warehouse_fee')->textInput([ 'maxlength' => true, 'placeholder' => 'Warehouse fulfilment fee']) ?>
 
     <?= $form->field($model, 'armada_api_key')->textInput(['maxlength' => true]) ?>
 
