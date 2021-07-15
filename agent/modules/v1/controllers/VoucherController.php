@@ -67,13 +67,14 @@ class VoucherController extends Controller {
     public function actionList($store_uuid) {
 
         $keyword = Yii::$app->request->get('keyword');
+        $status = Yii::$app->request->get('status');
 
         Yii::$app->accountManager->getManagedAccount($store_uuid);
 
+        $query =  Voucher::find()
+          ->andWhere(['restaurant_uuid' => $store_uuid])
+          ->orderBy('voucher_id DESC');
 
-        $query =  Voucher::find();
-        $query->andWhere(['restaurant_uuid' => $store_uuid]);
-        $query->orderBy('voucher_id DESC');
         if ($keyword && $keyword != 'null') {
             $query->filterWhere ([
                 'or',
@@ -81,6 +82,10 @@ class VoucherController extends Controller {
                 ['like', 'description', $keyword],
                 ['like', 'description_ar', $keyword],
             ]);
+        }
+
+        if($status) {
+          $query->andWhere(['voucher_status' => $status]);
         }
 
         return new ActiveDataProvider([
