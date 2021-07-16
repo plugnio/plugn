@@ -618,6 +618,7 @@ class CronController extends \yii\console\Controller {
                   ->where(['NOT', ['refund.refund_reference' => null]])
                   ->andWhere(['restaurant.is_tap_enable' => 1])
                   ->andWhere(['NOT', ['refund.payment_uuid' => null]])
+                  ->andWhere(['NOT', ['refund.refund_status' => 'REFUNDED']])
                   ->all();
 
 
