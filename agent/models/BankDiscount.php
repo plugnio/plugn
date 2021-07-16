@@ -14,6 +14,7 @@ class BankDiscount extends \common\models\BankDiscount
         $field['redeemed'] = function ($model) {
             return $model->getCustomerBankDiscounts()->count();
         };
+
         return $field;
     }
 

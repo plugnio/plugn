@@ -15,11 +15,42 @@ class Voucher extends \common\models\Voucher
             return $model->getActiveOrders()->count();
         };
 
+        /**
+         * todo: refactor with https://www.pivotaltracker.com/story/show/178910985
+         * - should show correct value for old data
+         * @param $model
+         * @return string
+         * @throws \yii\base\InvalidConfigException
+         */
         $field['totalSpent'] = function($model) {
-            $totalSpent = $model->getOrders()->andWhere(['restaurant_uuid' => $model->restaurant_uuid])->sum('total_price');
 
-            return  \Yii::$app->formatter->asCurrency($totalSpent ? $totalSpent : 0, $model->restaurant->currency->code) ;
+            $totalSpent = 0;
+
+            if($model->discount_type == self::DISCOUNT_TYPE_PERCENTAGE)
+            {
+                $totalSpent = $model->getOrders()
+                    ->sum('subtotal_before_refund * ' . $model->discount_amount/100);
+            }
+            else if($model->discount_type == self::DISCOUNT_TYPE_AMOUNT)
+            {
+                $totalSpent = $model->discount_amount * $model->getOrders()->count();
+            }
+            else if($model->discount_type == self::DISCOUNT_TYPE_FREE_DELIVERY)
+            {
+                $totalSpent = $model->getOrders()
+                    ->sum('delivery_fee');
+            }
+
+            return  \Yii::$app->formatter->asCurrency(
+                $totalSpent,
+                $model->restaurant->currency->code,
+                [
+                    \NumberFormatter::MIN_FRACTION_DIGITS => 0,
+                    \NumberFormatter::MAX_FRACTION_DIGITS => 3  ,
+                ]
+            ) ;
         };
+
         return $field;
     }
 
