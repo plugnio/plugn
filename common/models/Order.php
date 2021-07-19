@@ -981,33 +981,55 @@ class Order extends \yii\db\ActiveRecord {
 
 
       //Update delivery area
-      if (!$insert &&  $this->order_mode == static::ORDER_MODE_DELIVERY && isset($changedAttributes['area_id']) && $changedAttributes['area_id'] != $this->getOldAttribute('area_id')  && $this->area_id) {
+      if ((!$insert &&  $this->order_mode == static::ORDER_MODE_DELIVERY && isset($changedAttributes['area_id']) && $changedAttributes['area_id'] != $this->getOldAttribute('area_id')  && $this->area_id) || ($insert && $this->order_mode == static::ORDER_MODE_DELIVERY && $this->area_id) ) {
             $area_model = Area::findOne($this->area_id);
             $this->area_name = $area_model->area_name;
             $this->area_name_ar = $area_model->area_name_ar;
+            $this->save(false);
       }
 
 
-      if (!$insert &&  $this->order_mode == static::ORDER_MODE_DELIVERY) {
+      if((!$insert &&  (isset($changedAttributes['area_id']) && ($changedAttributes['area_id'] != $this->area_id)) ||  (isset($changedAttributes['pickup_location_id']) && ($changedAttributes['pickup_location_id'] != $this->pickup_location_id) )) || $insert ) {
 
-          if($this->delivery_zone_id){
-            $this->country_name = $this->deliveryZone->country->country_name;
-            $this->country_name_ar = $this->deliveryZone->country->country_name_ar;
+          if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
 
-            if($this->deliveryZone->business_location_id)
-              $this->business_location_name = $this->deliveryZone->businessLocation->business_location_name;
+              if($this->delivery_zone_id){
 
+                $deliveryZone = DeliveryZone::findOne($this->delivery_zone_id);
+
+                if($deliveryZone){
+
+                  $this->country_name = $deliveryZone->country->country_name;
+                  $this->country_name_ar = $deliveryZone->country->country_name_ar;
+
+                  if($deliveryZone->business_location_id)
+                    $this->business_location_name = $deliveryZone->businessLocation->business_location_name;
+
+                  $this->save(false);
+
+                }
+
+              }
+
+          } else if ($this->order_mode == Order::ORDER_MODE_PICK_UP){
+
+            if ($this->pickup_location_id){
+              $pickupLocation = BusinessLocation::findOne($this->pickup_location_id);
+
+              if($pickupLocation){
+                $this->country_name = $pickupLocation->country->country_name;
+                $this->country_name_ar = $pickupLocation->country->country_name_ar;
+                $this->business_location_name = $pickupLocation->business_location_name;
+
+                $this->save(false);
+
+              }
+
+            }
           }
 
-      } else if (!$insert && $this->order_mode == Order::ORDER_MODE_PICK_UP){
 
-        if ($this->pickup_location_id){
-          $this->country_name = $this->pickupLocation->country->country_name;
-          $this->country_name_ar = $this->pickupLocation->country->country_name_ar;
-          $this->business_location_name = $this->pickupLocation->business_location_name;
         }
-
-      }
 
 
         if (!$insert && $this->payment && $this->items_has_been_restocked && isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_ABANDONED_CHECKOUT) {
@@ -1075,10 +1097,7 @@ class Order extends \yii\db\ActiveRecord {
                 $this->save(false);
             }
 
-            // else {
-            //
-            //     $this->delivery_time = $this->restaurantBranch->prep_time;
-            // }
+
 
             $this->customer_phone_number = str_replace(' ','',$this->customer_phone_number);
             //Save Customer data

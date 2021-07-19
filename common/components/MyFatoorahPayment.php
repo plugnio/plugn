@@ -370,7 +370,7 @@ class MyFatoorahPayment extends Component
     /**
    * Create a charge for redirect
    */
-  public function createCharge($currency, $amount ,$firstName, $email, $country_code ,$phone, $redirectUrl, $orderUuid, $supplierCode , $platform_fee  , $paymentMethodId, $paymentMethodCode,$warehouse_fee = 0)
+  public function createCharge($currency, $amount ,$firstName, $email, $country_code ,$phone, $redirectUrl, $orderUuid, $supplierCode , $platform_fee  , $paymentMethodId, $paymentMethodCode,$warehouse_fee = 0, $warehouse_delivery_charges =0,$country_name)
   {
 
       $chargeEndpoint = $this->apiEndpoint . "/ExecutePayment";
@@ -402,13 +402,20 @@ class MyFatoorahPayment extends Component
        if($warehouse_fee > 0)
          $platform_fee = $warehouse_fee + $platform_fee;
 
+         if($warehouse_delivery_charges > 0  && $country_name != null && $country_name == 'Kuwait')
+           $charge_amount = $warehouse_delivery_charges + $charge_amount;
+
 
        $proposedShare = $proposedShare - $platform_fee;
 
 
-       } else if ($platform_fee == 0 && $warehouse_fee > 0) {
+     } else if ($platform_fee == 0  && ($warehouse_fee > 0 || ($warehouse_delivery_charges > 0  && $country_name != null && $country_name == 'Kuwait'))) {
 
-         $proposedShare = $proposedShare - $warehouse_fee;
+         if($warehouse_fee > 0)
+          $proposedShare = $proposedShare - $warehouse_fee;
+
+         if($warehouse_delivery_charges > 0)
+          $proposedShare = $proposedShare - $warehouse_delivery_charges;
 
        }
 

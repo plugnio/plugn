@@ -31,7 +31,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'name',
             'restaurant_domain',
-            'platform_fee:percent',
             [
               'attribute' => 'country_name',
               'value' =>     'country.country_name'
@@ -41,6 +40,9 @@ $this->params['breadcrumbs'][] = $this->title;
               'attribute' => 'currency_title',
               'value' =>     'currency.title'
             ],
+            'platform_fee:percent',
+            'warehouse_fee',
+            'warehouse_delivery_charges',
             'version',
 
             'restaurant_created_at:datetime',

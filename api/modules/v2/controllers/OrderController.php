@@ -362,7 +362,9 @@ class OrderController extends Controller {
                                    $order->restaurant->platform_fee,
                                    Url::to(['order/callback'], true),
                                   $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id,
-                                  $order->restaurant->warehouse_fee
+                                  $order->restaurant->warehouse_fee,
+                                  $order->restaurant->warehouse_delivery_charges,
+                                  $order->area_id ? $order->area->country->country_name : ''
                           );
 
 
@@ -484,10 +486,12 @@ class OrderController extends Controller {
                                     Url::to(['order/my-fatoorah-callback'], true),
                                     $order->order_uuid,
                                     $restaurant_model->supplierCode,
-                                     $order->restaurant->platform_fee,
+                                    $order->restaurant->platform_fee,
                                     $paymentMethodId,
                                     $order->paymentMethod->payment_method_code,
-                                    $order->restaurant->warehouse_fee
+                                    $order->restaurant->warehouse_fee,
+                                    $order->restaurant->warehouse_delivery_charges,
+                                    $order->area_id ? $order->area->country->country_name : ''
                             );
 
                               $responseContent = json_decode($response->content);

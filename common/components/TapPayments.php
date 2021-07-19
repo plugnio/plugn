@@ -404,7 +404,7 @@ class TapPayments extends Component
 
         if(!$reason)
           $reason = "requested_by_customer";
-        
+
         $refundEndpoint = $this->apiEndpoint . "/refunds";
 
         $refundParams = [
@@ -432,7 +432,7 @@ class TapPayments extends Component
     /**
      * Create a charge for redirect
      */
-    public function createCharge($currency, $desc = "Pay", $statementDesc = "", $ref, $amount ,$firstName, $email, $country_code ,$phone,$platform_fee, $redirectUrl, $gateway, $warehouse_fee)
+    public function createCharge($currency, $desc = "Pay", $statementDesc = "", $ref, $amount ,$firstName, $email, $country_code ,$phone,$platform_fee, $redirectUrl, $gateway, $warehouse_fee = 0,$warehouse_delivery_charges = 0, $country_name = null)
     {
 
         $chargeEndpoint = $this->apiEndpoint . "/charges";
@@ -504,6 +504,9 @@ class TapPayments extends Component
           else
                $charge_amount = $platform_fee;
 
+         if($warehouse_delivery_charges > 0 && $country_name != null && $country_name == 'Kuwait')
+           $charge_amount = $warehouse_delivery_charges + $charge_amount;
+
 
            $destination = [
                "id" => $this->destinationId,
@@ -514,9 +517,15 @@ class TapPayments extends Component
 
            array_push($chargeParams['destinations']['destination'], $destination);
 
-         } else if ($platform_fee == 0 && $warehouse_fee > 0) {
+         } else if ($platform_fee == 0 && ($warehouse_fee > 0 || ($warehouse_delivery_charges > 0  && $country_name != null && $country_name == 'Kuwait'))) {
 
-           $charge_amount = $warehouse_fee;
+           $charge_amount = 0;
+
+           if($warehouse_fee > 0)
+             $charge_amount = $warehouse_fee + $charge_amount;
+
+           if($warehouse_delivery_charges > 0  && $country_name != null && $country_name == 'Kuwait')
+             $charge_amount = $warehouse_delivery_charges + $charge_amount;
 
            $destination = [
                "id" => $this->destinationId,

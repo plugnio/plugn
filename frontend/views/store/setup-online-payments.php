@@ -17,14 +17,14 @@ $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 
-<p>
+<!-- <p>
   We have payments from the following providers, check out the rates charged on each online transaction.
   <br/>
   <br/>
 
 You can only connect one of the two. Choose wisely.
 
-</p>
+</p> -->
 
 
 <div class="card">
@@ -59,8 +59,10 @@ You can only connect one of the two. Choose wisely.
   </div>
 </div>
 
-<?php if ( $model->country->iso != 'BH' && $model->currency->code != 'BHD' ){ ?>
-    <div class="card">
+<?php
+// if ( $model->country->iso != 'BH' && $model->currency->code != 'BHD' ){
+  ?>
+    <!-- <div class="card">
       <div class="card-header">
           <h3>
             MyFatoorah
@@ -76,7 +78,7 @@ You can only connect one of the two. Choose wisely.
 
       <div style="display:block">
         <?php
-          echo Html::a('View rates', ['view-myfatoorah-rates', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'margin-top:10px']);
+          // echo Html::a('View rates', ['view-myfatoorah-rates', 'storeUuid' =>  $model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'margin-top:10px']);
         ?>
       </div>
 
@@ -84,13 +86,15 @@ You can only connect one of the two. Choose wisely.
         <?php
 
 
-              if (!$model->is_tap_enable && !$model->is_myfatoorah_enable) {
-                      echo Html::a('Create MyFatoorah account', ['create-payment-gateway-account', 'id' => $model->restaurant_uuid,'paymentGateway' => 'myfatoorah'], ['class' => 'btn btn-success','style'=>'margin-top:10px']);
-              }
+              // if (!$model->is_tap_enable && !$model->is_myfatoorah_enable) {
+                      // echo Html::a('Create MyFatoorah account', ['create-payment-gateway-account', 'id' => $model->restaurant_uuid,'paymentGateway' => 'myfatoorah'], ['class' => 'btn btn-success','style'=>'margin-top:10px']);
+              // }
 
         ?>
       </div>
 
       </div>
-    </div>
-<?php } ?>
+    </div> -->
+<?php
+ // }
+?>

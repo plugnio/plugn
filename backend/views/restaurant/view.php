@@ -149,6 +149,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'restaurant_updated_at',
             'platform_fee:percent',
             'warehouse_fee',
+            'warehouse_delivery_charges',
             'facebook_pixil_id',
             'google_analytics_id',
             [
