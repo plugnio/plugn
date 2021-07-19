@@ -72,19 +72,15 @@ class StoreController extends Controller {
         $revenue_generated_chart_data = [];
         $months = [];
 
-
         $revenue_generated_last_five_months_month = Order::find()
                 ->revenueGenerated(
                 $model->restaurant_uuid, date("Y-m-d H:i:s", mktime(0, 0, 0, date("m") - 5, 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") - 4, 0)));
-
 
         $lastFiveMonths = date('M', strtotime('-5 months'));
 
         array_push($revenue_generated_chart_data, $revenue_generated_last_five_months_month ? (double) $revenue_generated_last_five_months_month : 0);
 
         array_push($months, $lastFiveMonths);
-
-
 
         $revenue_generated_last_four_months_month = Order::find()
                 ->revenueGenerated(
@@ -96,18 +92,15 @@ class StoreController extends Controller {
 
         array_push($months, $lastFoureMonths);
 
-
         $revenue_generated_last_three_months_month = Order::find()
                 ->revenueGenerated(
                 $model->restaurant_uuid, date("Y-m-d H:i:s", mktime(0, 0, 0, date("m") - 3, 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") - 2, 0)));
-
 
         $lastThreeMonths = date('M', strtotime('-3 months'));
 
         array_push($revenue_generated_chart_data, $revenue_generated_last_three_months_month ? (double) $revenue_generated_last_three_months_month : 0);
 
         array_push($months, $lastThreeMonths);
-
 
         $revenue_generated_last_two_months_month = Order::find()
                 ->revenueGenerated(
@@ -121,7 +114,8 @@ class StoreController extends Controller {
 
 
         $revenue_generated_last_month = Order::find()
-                ->revenueGenerated($model->restaurant_uuid, date("Y-m-d H:i:s", mktime(0, 0, 0, date("m") - 1, 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), 0)));
+                ->revenueGenerated($model->restaurant_uuid, date("Y-m-d H:i:s", mktime(0, 0, 0, date("m") - 1, 1)),
+                    date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), 0)));
 
 
         $lastMonth = date('M', strtotime('-1 months'));
@@ -240,15 +234,11 @@ class StoreController extends Controller {
         $most_selling_items_chart_data = [];
         $number_of_sold_items_chart_data = [];
 
-
-
         $sold_items = \common\models\Item::find()
-                ->where(['item.restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere(['item.restaurant_uuid' => $model->restaurant_uuid])
                 ->orderBy(['unit_sold' => SORT_DESC])
                 ->limit(5)
                 ->all();
-
-
 
         foreach ($sold_items as $key => $item) {
             array_push($most_selling_items_chart_data, $item->item_name);
@@ -576,7 +566,6 @@ class StoreController extends Controller {
         $model = $this->findModel($storeUuid);
 
         $store_theme_model = RestaurantTheme::findOne($model->restaurant_uuid);
-
 
         return $this->render('design-layout/view-design-layout', [
                     'model' => $model,

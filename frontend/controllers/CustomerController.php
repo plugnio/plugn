@@ -139,7 +139,7 @@ class CustomerController extends Controller {
            $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
            $model = Customer::find()
-           ->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
+           ->andWhere(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
            ->orderBy(['customer_created_at' => SORT_DESC])
            ->all();
 
@@ -165,11 +165,16 @@ class CustomerController extends Controller {
                        "format" => "raw",
                        "value" => function($data) {
                          $total_spent = $data->getOrders()
-                                         ->where([ '!=' , 'order_status' , Order::STATUS_DRAFT])
-                                         ->andWhere([ '!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
-                                         ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
-                                         ->andWhere(['!=', 'order_status', Order::STATUS_PARTIALLY_REFUNDED])
-                                         ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                                         ->andWhere([
+                                             'NOT IN',
+                                             'order_status' , [
+                                                Order::STATUS_DRAFT,
+                                                Order::STATUS_ABANDONED_CHECKOUT,
+                                                Order::STATUS_REFUNDED,
+                                                Order::STATUS_PARTIALLY_REFUNDED,
+                                                Order::STATUS_CANCELED
+                                            ]
+                                         ])
                                          ->sum('total_price');
 
 
@@ -183,11 +188,16 @@ class CustomerController extends Controller {
                        "format" => "raw",
                        "value" => function($model) {
                            return  $model->getOrders()
-                           ->where([ '!=' , 'order_status' , Order::STATUS_DRAFT])
-                           ->andWhere([ '!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT])
-                           ->andWhere(['!=', 'order_status', Order::STATUS_REFUNDED])
-                           ->andWhere(['!=', 'order_status', Order::STATUS_PARTIALLY_REFUNDED])
-                           ->andWhere(['!=', 'order_status', Order::STATUS_CANCELED])
+                               ->andWhere([
+                                   'NOT IN',
+                                   'order_status' , [
+                                       Order::STATUS_DRAFT,
+                                       Order::STATUS_ABANDONED_CHECKOUT,
+                                       Order::STATUS_REFUNDED,
+                                       Order::STATUS_PARTIALLY_REFUNDED,
+                                       Order::STATUS_CANCELED
+                                   ]
+                               ])
                            ->count();
                        }
                    ],

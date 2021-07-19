@@ -47,7 +47,6 @@ class City extends \yii\db\ActiveRecord
         ];
     }
 
-
     /**
      * @inheritdoc
      */
@@ -57,27 +56,34 @@ class City extends \yii\db\ActiveRecord
         ];
     }
 
-
-
     /**
      * Gets query for [[Country]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCountry()
+    public function getCountry($modelClass = "\common\models\Country")
     {
-        return $this->hasOne(Country::className(), ['country_id' => 'country_id']);
+        return $this->hasOne($modelClass::className(), ['country_id' => 'country_id']);
     }
-
 
     /**
      * Gets query for [[Areas]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getAreas()
+    public function getAreas($modelClass = "\common\models\Area")
     {
-        return $this->hasMany(Area::className(), ['city_id' => 'city_id']);
+        return $this->hasMany($modelClass::className(), ['city_id' => 'city_id']);
+    }
+
+    /**
+     * Gets query for [[Areas]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAreaDeliveryZones($modelClass = "\common\models\AreaDeliveryZone")
+    {
+        return $this->hasMany($modelClass::className(), ['city_id' => 'city_id']);
     }
 
         /**
@@ -85,11 +91,8 @@ class City extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantDeliveryAreas()
+    public function getRestaurantDeliveryAreas($modelClass = "\common\models\RestaurantDelivery")
     {
-        return $this->hasMany(RestaurantDelivery::className(), ['area_id' => 'area_id'])->via('areas')->with('area');
+        return $this->hasMany ($modelClass::className (), ['area_id' => 'area_id'])->via ('areas')->with ('area');
     }
-
-
-
 }

@@ -258,7 +258,7 @@ class DeliveryZoneController extends Controller {
 
 
           $countryCities = City::find()
-                  ->where(['country_id' => $country_id])
+                  ->andWhere(['country_id' => $country_id])
                   ->asArray()
                   ->all();
 

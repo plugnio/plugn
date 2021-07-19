@@ -84,7 +84,6 @@ class OrderController extends Controller {
 
             list($start_date, $end_date) = explode(' - ', $store_model->export_orders_data_in_specific_date_range);
 
-
             $searchResult = Order::find()
                     ->activeOrders($storeUuid)
                     ->with('voucher')
@@ -211,7 +210,8 @@ class OrderController extends Controller {
                     'model' => $store_model
         ]);
       }
-    /**
+
+      /**
      * Lists all draft Orders.
      * @return mixed
      */
@@ -506,7 +506,9 @@ class OrderController extends Controller {
 
         if($model->order_mode == Order::ORDER_MODE_DELIVERY){
 
-          if($areaDeliveryZone = AreaDeliveryZone::find() ->where([ 'restaurant_uuid' => $restaurant_model->restaurant_uuid, 'area_id' => $model->area_id ])->one())
+            $areaDeliveryZone = AreaDeliveryZone::find() ->andWhere([ 'restaurant_uuid' => $restaurant_model->restaurant_uuid, 'area_id' => $model->area_id ])->one();
+
+          if($areaDeliveryZone)
              $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
 
         }

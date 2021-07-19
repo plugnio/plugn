@@ -112,15 +112,13 @@ class AgentToken extends \yii\db\ActiveRecord
         }else return static::generateUniqueTokenString();
     }
 
-
     /**
      * Gets query for [[Agent]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getAgent()
+    public function getAgent($modelClass = "\common\models\Agent")
     {
-        return $this->hasOne(Agent::className(), ['agent_id' => 'agent_id']);
+        return $this->hasOne($modelClass::className(), ['agent_id' => 'agent_id']);
     }
-
 }

@@ -401,15 +401,15 @@ class Payment extends \yii\db\ActiveRecord {
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCustomer() {
-        return $this->hasOne(Customer::className(), ['customer_id' => 'customer_id']);
+    public function getCustomer($modelClass = "\common\models\Customer") {
+        return $this->hasOne($modelClass::className(), ['customer_id' => 'customer_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getOrder() {
-        return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid']);
+    public function getOrder($modelClass = "\common\models\Order") {
+        return $this->hasOne($modelClass::className(), ['order_uuid' => 'order_uuid']);
     }
 
 
@@ -428,15 +428,15 @@ class Payment extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderItems() {
-        return $this->hasMany(OrderItem::className(), ['order_uuid' => 'order_uuid'])->via('order');
+    public function getOrderItems($modelClass = "\common\models\OrderItem") {
+        return $this->hasMany($modelClass::className(), ['order_uuid' => 'order_uuid'])->via('order');
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
 
@@ -456,19 +456,17 @@ class Payment extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getActiveSubscription() {
-        return $this->hasOne(Subscription::className(), ['restaurant_uuid' => 'restaurant_uuid'])->where(['subscription_status' => Subscription::STATUS_ACTIVE])->via('restaurant');
+    public function getActiveSubscription($modelClass = "\common\models\Subscription") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])->where(['subscription_status' => Subscription::STATUS_ACTIVE])->via('restaurant');
     }
-
 
     /**
      * Gets query for [[Currency]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
+    public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])->via('restaurant');
     }
-
 }

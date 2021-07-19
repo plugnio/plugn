@@ -39,10 +39,7 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
     const SCENARIO_BATCH_UPDATE = 'batchUpdate';
 
-
     private $_updateType;
-
-
 
     /**
      * {@inheritdoc}
@@ -69,7 +66,6 @@ class OpeningHour extends \yii\db\ActiveRecord {
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
-
 
     public function getUpdateType()
     {
@@ -321,7 +317,7 @@ class OpeningHour extends \yii\db\ActiveRecord {
          // $selectedDate =  date('c', strtotime('+ ' . $delivery_time . ' min'   ,strtotime($currentDate)));
 
          $getWorkingHours = OpeningHour::find()
-                              ->where(['restaurant_uuid' => $store->restaurant_uuid])
+                              ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
                               ->andWhere(['day_of_week' => $currentWeekDay])
                               ->orderBy(['open_at' => SORT_ASC])
                               ->all();
@@ -409,7 +405,7 @@ class OpeningHour extends \yii\db\ActiveRecord {
 //
 //
 //         $opening_hrs = OpeningHour::find()
-//           ->where(['restaurant_uuid' => $this->restaurant_uuid])
+//           ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
 //           ->andWhere(['day_of_week' => date('w' , strtotime($startTime))])
 //           ->orderBy(['open_at' => SORT_ASC])
 //           ->all();
@@ -473,8 +469,7 @@ class OpeningHour extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-
 }

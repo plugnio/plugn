@@ -79,30 +79,30 @@ class BusinessLocation extends \yii\db\ActiveRecord
             'deliveryZones',
             'deliveryZones.country',
             'deliveryZones.areas',
+            'totalDeliveryZoneCountry'
         ];
     }
-
 
     /**
      * Gets query for [[Country]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCountry()
+    public function getCountry($modelClass = "\common\models\Country")
     {
-        return $this->hasOne(Country::className(), ['country_id' => 'country_id']);
+        return $this->hasOne($modelClass::className(), ['country_id' => 'country_id']);
     }
-
 
     /**
      * Gets query for [[RestaurantUu]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
+    public function getRestaurant($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
     //
     // /**
     //  * Gets query for [[DeliveryZones]].
@@ -113,24 +113,53 @@ class BusinessLocation extends \yii\db\ActiveRecord
     // {
     //     return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])->joinWith(['areas']);
     // }
-    public function getDeliveryZones()
+
+    /**
+     * Gets query for [[DeliveryZone]].
+     * @param string $modelClass
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeliveryZones($modelClass = "\common\models\DeliveryZone")
     {
-        return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id']);
+        return $this->hasMany($modelClass::className(), ['business_location_id' => 'business_location_id']);
     }
 
-    public function getDeliveryZoneByCountryId($countryId)
+    /**
+     * Gets query for [[DeliveryZone]].
+     * @param $countryId
+     * @param string $modelClass
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeliveryZoneByCountryId($countryId, $modelClass = "\common\models\DeliveryZone")
     {
-        return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])->where(['delivery_zone.country_id' => 1]);
+        return $this->hasMany($modelClass::className(), ['business_location_id' => 'business_location_id'])
+            ->andWhere(['delivery_zone.country_id' => 1]);
     }
+
      /**
      * Gets query for [[AreaDeliveryZones]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getAreaDeliveryZones()
+    public function getAreaDeliveryZones($modelClass = "\common\models\AreaDeliveryZone")
     {
-        return $this->hasMany(AreaDeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id'])->via('deliveryZones');
+        return $this->hasMany($modelClass::className(), ['delivery_zone_id' => 'delivery_zone_id'])
+            ->via('deliveryZones');
     }
 
+    /**
+     * delivery zone countries
+     * @param string $modelClass
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeliveryZoneCountries($modelClass = "\common\models\Country")
+    {
+        return $this->hasMany($modelClass::className(), ['country_id' => 'country_id'])
+            ->via('deliveryZones');
+    }
 
+    public function getTotalDeliveryZoneCountry($modelClass = "\common\models\Country")
+    {
+        return $this->getDeliveryZoneCountries($modelClass)->count();
+    }
 }

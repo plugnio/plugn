@@ -32,7 +32,7 @@ class OrderSearch extends Order {
      */
     public function scenarios() {
         // bypass scenarios() implementation in the parent class
-        return Model::scenarios();
+        return parent::scenarios();
     }
 
     /**
@@ -55,11 +55,12 @@ class OrderSearch extends Order {
 
         if($agentAssignment && $agentAssignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
             $query
-                ->andWhere([ 'delivery_zone.business_location_id' => $agentAssignment->business_location_id])
-                ->orWhere([ 'pickup_location_id' => $agentAssignment->business_location_id]);
+                ->andWhere([
+                    'OR',
+                    ['delivery_zone.business_location_id' => $agentAssignment->business_location_id],
+                    [ 'pickup_location_id' => $agentAssignment->business_location_id]
+                ]);
         }
-
-
 
         $query
             ->andWhere(['order.restaurant_uuid' => $storeUuid])
@@ -128,8 +129,11 @@ class OrderSearch extends Order {
 
         if($agentAssignment && $agentAssignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
             $query
-                ->andWhere([ 'delivery_zone.business_location_id' => $agentAssignment->business_location_id])
-                ->orWhere([ 'pickup_location_id' => $agentAssignment->business_location_id]);
+                ->andWhere([
+                    'OR',
+                    ['delivery_zone.business_location_id' => $agentAssignment->business_location_id],
+                    [ 'pickup_location_id' => $agentAssignment->business_location_id]
+                ]);
         }
 
 
@@ -200,8 +204,11 @@ class OrderSearch extends Order {
 
           if($agentAssignment && $agentAssignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
               $query
-                  ->andWhere([ 'delivery_zone.business_location_id' => $agentAssignment->business_location_id])
-                  ->orWhere([ 'pickup_location_id' => $agentAssignment->business_location_id]);
+                  ->andWhere([
+                      'OR',
+                      ['delivery_zone.business_location_id' => $agentAssignment->business_location_id],
+                      [ 'pickup_location_id' => $agentAssignment->business_location_id]
+                  ]);
           }
 
 
@@ -274,8 +281,11 @@ class OrderSearch extends Order {
         if($agentAssignment && $agentAssignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
 
             $query
-                ->andWhere([ 'delivery_zone.business_location_id' => $agentAssignment->business_location_id])
-                ->orWhere([ 'pickup_location_id' => $agentAssignment->business_location_id]);
+                ->andWhere([
+                    'OR',
+                    ['delivery_zone.business_location_id' => $agentAssignment->business_location_id],
+                    [ 'pickup_location_id' => $agentAssignment->business_location_id]
+                ]);
         }
 
         $query->andWhere(['order.restaurant_uuid' => $storeUuid])

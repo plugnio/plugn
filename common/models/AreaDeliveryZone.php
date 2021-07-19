@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $area_delivery_zone
  * @property int $delivery_zone_id
+ * @property int $city_id
  * @property int $area_id
  * @property string $restaurant_uuid
  *
@@ -60,6 +61,7 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
      * @param type $changedAttributes
      */
     public function afterSave($insert, $changedAttributes) {
+
         parent::afterSave($insert, $changedAttributes);
 
         if ($insert) {
@@ -72,7 +74,6 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
           }
 
           return $this->save();
-
         }
 
         return true;
@@ -92,57 +93,48 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getArea()
+    public function getArea($modelClass = "\common\models\Area")
     {
-        return $this->hasOne(Area::className(), ['area_id' => 'area_id']);
+        return $this->hasOne($modelClass::className(), ['area_id' => 'area_id']);
     }
-
 
       /**
        * Gets query for [[City]].
        *
        * @return \yii\db\ActiveQuery
        */
-      public function getCity()
+      public function getCity($modelClass = "\common\models\City")
       {
-          return $this->hasOne(City::className(), ['city_id' => 'city_id'])->via('area');
-
+          return $this->hasOne($modelClass::className(), ['city_id' => 'city_id'])->via('area');
       }
-
-
 
     /**
      * Gets query for [[RestaurantUu]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
+    public function getRestaurant($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-
 
     /**
      * Gets query for [[DeliveryZone]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getDeliveryZone()
+    public function getDeliveryZone($modelClass = "\common\models\DeliveryZone")
     {
-        return $this->hasOne(DeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id']);
+        return $this->hasOne($modelClass::className(), ['delivery_zone_id' => 'delivery_zone_id']);
     }
-
-
 
     /**
      * Gets query for [[BusinessLocation]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getBusinessLocation()
+    public function getBusinessLocation($modelClass = "\common\models\BusinessLocation")
     {
-        return $this->hasOne(BusinessLocation::className(), ['business_location_id' => 'business_location_id'])->via('deliveryZone');
+        return $this->hasOne($modelClass::className(), ['business_location_id' => 'business_location_id'])->via('deliveryZone');
     }
-
-
 }

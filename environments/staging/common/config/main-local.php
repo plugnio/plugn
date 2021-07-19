@@ -43,31 +43,31 @@ return [
                 ],
             ],
         ],
-        // 'mailer' => [
-        //          'class' => 'yii\swiftmailer\Mailer',
-        //          'viewPath' => '@common/mail',
-        //          // send all mails to a file by default. You have to set
-        //          // 'useFileTransport' to false and configure a transport
-        //          // for the mailer to send real emails.
-        //          'useFileTransport' => true,
-        // ],
         'mailer' => [
-            'class' => 'yii\swiftmailer\Mailer',
-            'viewPath' => '@common/mail',
-            'transport' => [
-                'class' => 'Swift_SmtpTransport',
-                'host' => 'smtp.sendgrid.net',
-                'username' => 'apikey',
-                'password' => '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',
-                'port' => '587',
-                'encryption' => 'tls',
-                // 'plugins' => [
-                //     [
-                //         'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
-                //     ],
-                // ],
-            ],
+                 'class' => 'yii\swiftmailer\Mailer',
+                 'viewPath' => '@common/mail',
+                 // send all mails to a file by default. You have to set
+                 // 'useFileTransport' to false and configure a transport
+                 // for the mailer to send real emails.
+                 'useFileTransport' => true,
         ],
+        // 'mailer' => [
+        //     'class' => 'yii\swiftmailer\Mailer',
+        //     'viewPath' => '@common/mail',
+        //     'transport' => [
+        //         'class' => 'Swift_SmtpTransport',
+        //         'host' => 'smtp.sendgrid.net',
+        //         'username' => 'apikey',
+        //         'password' => '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',
+        //         'port' => '587',
+        //         'encryption' => 'tls',
+        //         // 'plugins' => [
+        //         //     [
+        //         //         'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
+        //         //     ],
+        //         // ],
+        //     ],
+        // ],
         'cache' => [
             // Use Redis as a cache
             'class' => 'yii\redis\Cache',
@@ -78,17 +78,17 @@ return [
             ]
         ],
         'tapPayments' => [
-            'gatewayToUse' => \common\components\TapPayments::USE_LIVE_GATEWAY,
+            'gatewayToUse' => \common\components\TapPayments::USE_TEST_GATEWAY,
         ],
         'myFatoorahPayment' => [
-            'gatewayToUse' => \common\components\MyFatoorahPayment::USE_LIVE_GATEWAY
+            'gatewayToUse' => \common\components\MyFatoorahPayment::USE_TEST_GATEWAY
         ],
         'armadaDelivery' => [
-            'keyToUse' => \common\components\ArmadaDelivery::USE_LIVE_KEY,
+            'keyToUse' => \common\components\ArmadaDelivery::USE_TEST_KEY,
         ],
         'mashkorDelivery' => [
             'class' => 'common\components\MashkorDelivery',
-            'keyToUse' => \common\components\MashkorDelivery::USE_LIVE_KEY,
+            'keyToUse' => \common\components\MashkorDelivery::USE_TEST_KEY,
         ],
         'githubComponent' => [
             'class' => 'common\components\GithubComponent',

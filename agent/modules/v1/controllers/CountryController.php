@@ -5,9 +5,7 @@ namespace agent\modules\v1\controllers;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Url;
-use yii\web\NotFoundHttpException;
-use common\models\Country;
+use agent\models\Country;
 
 class CountryController extends Controller {
 
@@ -40,7 +38,7 @@ class CountryController extends Controller {
                   'class' => \yii\filters\auth\HttpBearerAuth::className(),
               ];
               // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-              $behaviors['authenticator']['except'] = ['options'];
+              $behaviors['authenticator']['except'] = ['options', 'list'];
 
               return $behaviors;
     }
@@ -66,16 +64,16 @@ class CountryController extends Controller {
      * @param type $store_uuid
      * @return type
      */
-    public function actionList($store_uuid) {
+    public function actionList() {
 
         $keyword = Yii::$app->request->get('keyword');
 
-        Yii::$app->accountManager->getManagedAccount($store_uuid);
+        //Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $query =  Country::find();
 
         if ($keyword){
-          $query->where(['like', 'country_name', $keyword]);
+          $query->andWhere(['like', 'country_name', $keyword]);
           $query->orWhere(['like', 'country_name_ar', $keyword]);
         }
 
@@ -99,7 +97,7 @@ class CountryController extends Controller {
       if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
         $country =  Country::find()
-                  ->where(['country_id' => $country_id])
+                  ->andWhere(['country_id' => $country_id])
                   ->with('cities','cities.areas')
                   ->asArray()
                   ->one();

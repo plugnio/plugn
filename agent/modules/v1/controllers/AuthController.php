@@ -2,10 +2,12 @@
 
 namespace agent\modules\v1\controllers;
 
+use agent\models\Currency;
+use agent\models\Restaurant;
 use Yii;
 use yii\rest\Controller;
 use yii\filters\auth\HttpBasicAuth;
-use common\models\Agent;
+use agent\models\Agent;
 use agent\models\PasswordResetRequestForm;
 
 /**
@@ -15,6 +17,7 @@ use agent\models\PasswordResetRequestForm;
 class AuthController extends Controller {
 
     public function behaviors() {
+
         $behaviors = parent::behaviors();
 
         // remove authentication filter for cors to work
@@ -45,6 +48,7 @@ class AuthController extends Controller {
             'auth' => function ($email, $password) {
 
                 $agent = Agent::findByEmail($email);
+
                 if ($agent && $agent->validatePassword($password)) {
                     return $agent;
                 }
@@ -58,7 +62,8 @@ class AuthController extends Controller {
         $behaviors['authenticator']['except'] = [
             'options',
             'request-reset-password',
-            'update-password'
+            'update-password',
+            'signup'
         ];
 
         return $behaviors;
@@ -94,8 +99,62 @@ class AuthController extends Controller {
         return $this->_loginResponse($agent);
     }
 
+    /**
+     * register user with store
+     * @return mixed
+     */
+    public function actionSignup() {
 
+        $currencyCode = Yii::$app->request->getBodyParam('currency');
 
+        $currency = Currency::findOne(['code' => $currencyCode]);
+
+        $agent = new Agent();
+        $agent->setScenario(Agent::SCENARIO_CREATE_NEW_AGENT);
+        $agent->agent_name = Yii::$app->request->getBodyParam ('name');
+        $agent->agent_email = Yii::$app->request->getBodyParam ('email');
+        $agent->setPassword(Yii::$app->request->getBodyParam ('password'));
+        $agent->tempPassword = Yii::$app->request->getBodyParam ('password');
+
+        $store = new Restaurant();
+        $store->version = 3;
+        $store->setScenario(Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
+        $store->owner_number = Yii::$app->request->getBodyParam ('owner_number');
+        $store->owner_phone_country_code= Yii::$app->request->getBodyParam ('owner_phone_country_code');
+
+        $store->name = Yii::$app->request->getBodyParam ('restaurant_name');
+        $store->business_type = Yii::$app->request->getBodyParam ('account_type');
+        $store->restaurant_domain = Yii::$app->request->getBodyParam ('restaurant_domain');
+        $store->country_id = Yii::$app->request->getBodyParam ('country_id');
+        $store->currency_id = Yii::$app->request->getBodyParam('currency');
+
+        $store->restaurant_email = $agent->agent_email;
+        $store->owner_first_name = $agent->agent_name;
+        $store->name_ar = $store->name;
+
+        if (!$agent->save()) {
+            return [
+                "operation" => "error",
+                "message" => $agent->errors
+            ];
+        }
+
+        if (!$store->save()) {
+            return [
+                "operation" => "error",
+                "message" => $store->errors
+            ];
+        }
+
+        $result =  $agent->afterSignUp($store);
+
+        if($result['operation'] != 'success') {
+            return $result;
+        }
+
+        return $this->_loginResponse ($agent);
+
+    }
 
     /**
      * Sends password reset email to user
@@ -117,11 +176,11 @@ class AuthController extends Controller {
 
             if ($agent) {
 
-
                 if (!$model->sendEmail($agent)) {
                     $errors = 'Sorry, we are unable to reset a password for email provided.';
                 }
             }
+
         } else if (isset($model->errors['agent_email'])) {
             $errors = $model->errors['agent_email'];
         }
@@ -137,48 +196,48 @@ class AuthController extends Controller {
         // Otherwise return success
         return [
             'operation' => 'success',
-            'message' => 'Please check the link sent to you on your email to set new password.'
+            'message' => Yii::t ('agent', 'Please check the link sent to you on your email to set new password.')
         ];
     }
-
-
 
     /**
      * Updates password based on passed token
      * @return array
      */
     public function actionUpdatePassword() {
+
         $token = Yii::$app->request->getBodyParam("token");
         $newPassword = Yii::$app->request->getBodyParam("newPassword");
-        $cPassword = Yii::$app->request->getBodyParam("cPassword");
+        //$cPassword = Yii::$app->request->getBodyParam("cPassword");
 
         $agent = Agent::findByPasswordResetToken($token);
 
         if (!$agent) {
             return [
                 'operation' => 'error',
-                'message' => 'Invalid password reset token.'
+                'message' => Yii::t ('agent', 'Invalid password reset token.')
             ];
         }
         if (!$newPassword) {
             return [
                 'operation' => 'error',
-                'message' => 'Password field required'
+                'message' => Yii::t ('agent', 'Password field required')
             ];
         }
-        if (!$cPassword) {
+        
+        /*if (!$cPassword) {
             return [
                 'operation' => 'error',
-                'message' => 'Confirm Password field required'
+                'message' => Yii::t ('agent', 'Confirm Password field required')
             ];
         }
 
         if ($cPassword != $newPassword) {
             return [
                 'operation' => 'error',
-                'message' => 'Password & Confirm Password does not match'
+                'message' => Yii::t ('agent', 'Password & Confirm Password does not match')
             ];
-        }
+        }*/
 
         $agent->setPassword($newPassword);
         $agent->removePasswordResetToken();

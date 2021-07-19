@@ -1,7 +1,10 @@
 <?php
 
 $params = array_merge(
-        require(__DIR__ . '/../../common/config/params.php'), require(__DIR__ . '/../../common/config/params-local.php'), require(__DIR__ . '/params.php'), require(__DIR__ . '/params-local.php')
+        require(__DIR__ . '/../../common/config/params.php'),
+        require(__DIR__ . '/../../common/config/params-local.php'),
+        require(__DIR__ . '/params.php'),
+        require(__DIR__ . '/params-local.php')
 );
 
 return [
@@ -49,37 +52,29 @@ return [
                     'controller' => 'v1/order',
                     'pluralize' => false,
                     'patterns' => [
-                        'GET' => 'list-pending-orders',
-                        'GET active' => 'list-active-orders',
-                        'GET draft' => 'list-draft-orders',
-                        'GET abandoned' => 'list-abandoned-orders',
                         'GET detail' => 'detail',
-
-                        'POST filter-pending' => 'filter-pending',
-                        'POST filter-abandoned' => 'filter-abandoned',
-                        'POST filter-draft' => 'filter-draft',
-                        'POST filter-active' => 'filter-active',
+                        'GET orders-report' => 'orders-report',
+                        'GET total-active' => 'total-active',
+                        'GET <type>' => 'list',
                         'POST <store_uuid>' => 'place-an-order',
                         'PATCH <order_uuid>/<store_uuid>' => 'update',
                         'PATCH update-order-status/<order_uuid>/<store_uuid>' => 'update-order-status',
                         'POST request-driver-from-armada/<order_uuid>/<store_uuid>' => 'request-driver-from-armada',
                         'POST request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'request-driver-from-mashkor',
+                        'POST create/<store_uuid>' => 'create',
                         'DELETE <order_uuid>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS active' => 'options',
-                        'OPTIONS draft' => 'options',
-                        'OPTIONS abandoned' => 'options',
+                        'OPTIONS total-active' => 'options',
+                        'OPTIONS orders-report' => 'options',
                         'OPTIONS detail' => 'options',
-                        'OPTIONS filter-pending' => 'options',
-                        'OPTIONS filter-active' => 'options',
-                        'OPTIONS filter-draft' => 'options',
-                        'OPTIONS filter-abandoned' => 'options',
                         'OPTIONS update-order-status/<order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS request-driver-from-armada/<order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS <store_uuid>' => 'options',
                         'OPTIONS <order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS <type>' => 'options',
+                        'OPTIONS create/<store_uuid>' => 'options',
                     ]
                 ],
                 [// OrderItemController
@@ -153,10 +148,20 @@ return [
                 [// CityController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/city',
-                    'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options'
+                    ]
+                ],
+                [// AreaController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/area',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET <id>' => 'detail',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options'
@@ -168,10 +173,15 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'detail',
+                        //todo: update-email
+                        'GET store-profile' => 'store-profile',
+                        'GET stores' => 'stores',
                         'PUT update' => 'update-agent-profile',
                         'POST change-password' => 'change-password',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS store-profile' => 'options',
+                        'OPTIONS stores' => 'options',
                         'OPTIONS update' => 'options',
                         'OPTIONS change-password' => 'options',
                     ]
@@ -224,11 +234,13 @@ return [
                         'POST create' => 'create',
                         'DELETE <delivery_zone_id>/<store_uuid>' => 'delete',
                         'PATCH <delivery_zone_id>/<store_uuid>' => 'update',
+                        'DELETE cancel-override/<delivery_zone_id>/<store_uuid>' => 'cancel-override',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS create' => 'options',
                         'OPTIONS <delivery_zone_id>/<store_uuid>' => 'options',
+                        'OPTIONS cancel-override/<delivery_zone_id>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// OpeningHoursController
@@ -239,24 +251,27 @@ return [
                         'GET' => 'list',
                         'GET <day_of_week>/<store_uuid>' => 'detail',
                         'POST <store_uuid>' => 'create',
-                        'PATCH <store_uuid>' => 'update',
+                        'PATCH <day_of_week>' => 'update',
                         'DELETE <opening_hour_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS <day_of_week>' => 'options',
                         'OPTIONS <opening_hour_id>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// AreaDeliveryZoneController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/area-delivery-zone',
-                    'pluralize' => false,
                     'patterns' => [
+                        'GET' => 'list',
+                        'PATCH save' => 'save',
                         'POST create' => 'create',
                         'DELETE <area_delivery_zone_id>/<store_uuid>' => 'delete',
                         'PATCH <area_delivery_zone_id>/<store_uuid>' => 'update',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS create' => 'options',
+                        'OPTIONS save' => 'options',
                         'OPTIONS <area_delivery_zone_id>/<store_uuid>' => 'options',
                     ]
                 ],
@@ -280,13 +295,25 @@ return [
                 [// ItemController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/item',
-                    'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',
-                        'GET detail' => 'detail',
+                        'GET export-to-excel' => 'export-to-excel',
+                        'GET items-report' => 'items-report',
+                        'GET <id>' => 'detail',
+                        'POST' => 'create',
+                        'POST update-stock' => 'update-stock-qty',
+                        'PATCH <id>' => 'update',
+                        'PATCH update-status/<id>/<store_uuid>' => 'change-status',
+                        'DELETE <id>' => 'delete',
+                        'DELETE delete-image/<id>/<image>' => 'delete-image',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
+                        'OPTIONS export-to-excel' => 'options',
+                        'OPTIONS items-report' => 'options',
+                        'OPTIONS <id>' => 'options',
+                        'OPTIONS update-stock' => 'options',
+                        'OPTIONS update-status/<id>/<store_uuid>' => 'options',
+                        'OPTIONS delete-image/<id>/<image>' => 'options',
                     ]
                 ],
                 [// CustomerController
@@ -295,10 +322,12 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',
+                        'GET export-to-excel' => 'export-to-excel',
                         'GET detail' => 'detail',
                         'GET orders' => 'list-all-customer-orders',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS export-to-excel' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS orders' => 'options'
                     ]
@@ -326,22 +355,76 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'detail',
+                        'POST' => 'update',
+                        'POST connect-domain' => 'connect-domain',
+                        'POST disable-payment-method/<id>/<paymentMethodId>' => 'disable-payment-method',
+                        'POST enable-payment-method/<id>/<paymentMethodId>' => 'enable-payment-method',
+                        'GET view-payment-methods/<id>' => 'view-payment-methods',
+                        'POST create-tap-account/<id>' => 'create-tap-account',
+                        'POST enable-online-payment/<id>' => 'enable-online-payment',
+                        'POST disable-online-payment/<id>' => 'disable-online-payment',
+                        'POST enable-cod/<id>' => 'enable-cod',
+                        'POST disable-cod/<id>' => 'disable-cod',
+                        'POST update-layout' => 'update-layout',
+                        'POST update-analytics-integration/<id>' => 'update-analytics-integration',
+                        'POST update-delivery-integration/<id>' => 'update-delivery-integration',
                         // OPTIONS VERBS
-                        'OPTIONS' => 'options'
+                        'OPTIONS' => 'options',
+                        'OPTIONS connect-domain' => 'options',
+                        'OPTIONS update-delivery-integration/<id>' => 'options',
+                        'OPTIONS update-analytics-integration/<id>' => 'options',
+                        'OPTIONS disable-payment-method/<id>/<paymentMethodId>' => 'options',
+                        'OPTIONS enable-payment-method/<id>/<paymentMethodId>' => 'options',
+                        'OPTIONS view-payment-methods/<id>' => 'options',
+                        'OPTIONS create-tap-account/<id>' => 'options',
+                        'OPTIONS enable-online-payment/<id>' => 'options',
+                        'OPTIONS disable-online-payment/<id>' => 'options',
+                        'OPTIONS enable-cod/<id>' => 'options',
+                        'OPTIONS disable-cod/<id>' => 'options',
+                        'OPTIONS update-layout' => 'options'
                     ]
                 ],
 
                 [ // AuthController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/auth',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET login' => 'login',
+                        'POST signup' => 'signup',
+                        'PATCH update-password' => 'update-password',
+                        'POST request-reset-password' => 'request-reset-password',
+                        // OPTIONS VERBS
+                        'OPTIONS login' => 'options',
+                        'OPTIONS update-password' => 'options',
+                        'OPTIONS request-reset-password' => 'options',
+                        'OPTIONS signup' => 'signup'
+/*todo: implement for email verification
+  public _urlresendVerificationEmail = '/auth/resend-verification-email';
+  public _urlUpdateEmail = '/auth/update-email';
+  public _urlIsEmailVerified = '/auth/is-email-verified';
+  public _urlVerifyEmail = '/auth/verify-email';*/
+                    ]
+                ],
+                [ // StatsController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/stats',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'view',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
+                    ]
+                ],
+                [ // PlanController
                    'class' => 'yii\rest\UrlRule',
-                   'controller' => 'v1/auth',
-                   'pluralize' => false,
+                   'controller' => 'v1/plan',
                    'patterns' => [
-                       'GET login' => 'login',
-                       'POST request-reset-password' => 'request-reset-password',
-
+                       'GET callback' => 'callback',
+                       'GET <id>' => 'view',
+                       'POST confirm' => 'confirm',
                        // OPTIONS VERBS
-                       'OPTIONS login' => 'options',
-                       'OPTIONS request-reset-password' => 'options',
+                       'OPTIONS <id>' => 'options'
                    ]
                ],
             ],
