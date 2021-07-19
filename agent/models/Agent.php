@@ -16,14 +16,6 @@ class Agent extends \common\models\Agent implements IdentityInterface {
     /**
      * @inheritdoc
      */
-    public function fields() {
-        $fields = parent::fields();
-        return $fields;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public static function findIdentityByAccessToken($token, $type = null, $modelClass = "\agent\models\AgentToken") {
         return parent::findIdentityByAccessToken($token, $type, $modelClass);
     }
