@@ -67,6 +67,7 @@ class CountryController extends Controller {
     public function actionList() {
 
         $keyword = Yii::$app->request->get('keyword');
+        $page = Yii::$app->request->get('page');
 
         //Yii::$app->accountManager->getManagedAccount($store_uuid);
 
@@ -77,6 +78,13 @@ class CountryController extends Controller {
           $query->orWhere(['like', 'country_name_ar', $keyword]);
         }
 
+        if($page == -1) {
+            return new ActiveDataProvider([
+                'query' => $query,
+                'pagination' => false
+            ]);
+        }
+        
         return new ActiveDataProvider([
           'query' => $query
         ]);
