@@ -89,11 +89,6 @@ class AgentAssignment extends \yii\db\ActiveRecord {
                 return $this->addError('assignment_agent_email', 'This person has already been added as an agent.');
         }
 
-
-        if($this->role != self::AGENT_ROLE_BRANCH_MANAGER){
-          $this->business_location_id = null;
-        }
-
         return parent::beforeSave($insert);
     }
 
