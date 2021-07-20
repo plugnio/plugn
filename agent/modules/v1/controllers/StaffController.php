@@ -1,5 +1,4 @@
 <?php
-
 namespace agent\modules\v1\controllers;
 
 use Yii;
@@ -36,13 +35,13 @@ class StaffController extends Controller {
         ];
 
         // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-              $behaviors['authenticator'] = [
-                  'class' => \yii\filters\auth\HttpBearerAuth::className(),
-              ];
-              // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-              $behaviors['authenticator']['except'] = ['options'];
+        $behaviors['authenticator'] = [
+          'class' => \yii\filters\auth\HttpBearerAuth::className(),
+        ];
+        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+        $behaviors['authenticator']['except'] = ['options'];
 
-              return $behaviors;
+        return $behaviors;
     }
 
     /**
@@ -59,37 +58,29 @@ class StaffController extends Controller {
         return $actions;
     }
 
-
     /**
-    * Get all store's Staff members
-     * @param type $id
-     * @param type $store_uuid
-     * @return type
+     * Get all store's Staff members
+     * @param $store_uuid
+     * @return ActiveDataProvider
      */
     public function actionList($store_uuid) {
 
-
         $keyword = Yii::$app->request->get('keyword');
-
         Yii::$app->accountManager->getManagedAccount($store_uuid);
-
         $query =  AgentAssignment::find()->joinWith('agent');
-
         if ($keyword){
-          $query->where(['like', 'agent.agent_name', $keyword]);
-          $query->orWhere(['like', 'assignment_agent_email', $keyword]);
-          $query->orWhere(['like', 'role', $keyword]);
+            $query->andWhere('or', [
+                ['like', 'agent.agent_name', $keyword],
+                ['like', 'assignment_agent_email', $keyword],
+                ['like', 'role', $keyword]
+            ]);
         }
-
         $query->andWhere(['restaurant_uuid' => $store_uuid]);
 
         return new ActiveDataProvider([
           'query' => $query
         ]);
-
-
     }
-
 
     /**
      * Create voucher
@@ -111,24 +102,26 @@ class StaffController extends Controller {
 
        $agent = Agent::findByEmail($agentEmail);
 
-       if(!$agent){
-         $agent = new Agent();
-         $agent->agent_name = Yii::$app->request->getBodyParam("agent_name");
-         $agent->agent_email = $agentEmail;
-
-         $password = Yii::$app->request->getBodyParam("password");
-
-         if($password)
-         $agent->tempPassword = $password;
-
-         if (!$agent->save()) {
-             return [
-                 "operation" => "error",
-                 "message" => $agent->errors
-             ];
-         }
+       if($agent) {
+           return [
+               'operation' => 'error',
+               'message' => Yii::t('agent', 'Email already in use'),
+           ];
        }
+        $tempPassword = Yii::$app->security->generateRandomString(12);
 
+        $agent = new Agent();
+        $agent->agent_name = Yii::$app->request->getBodyParam("agent_name");
+        $agent->agent_email = $agentEmail;
+        $agent->agent_status = Agent::STATUS_ACTIVE;
+        $agent->tempPassword = $tempPassword;
+
+        if (!$agent->save()) {
+            return [
+                "operation" => "error",
+                "message" => $agent->errors
+            ];
+        }
 
         $model = new AgentAssignment();
         $model->restaurant_uuid = $store_uuid;
@@ -137,13 +130,13 @@ class StaffController extends Controller {
         $model->role = (int) Yii::$app->request->getBodyParam("role");
         $model->assignment_agent_email =  $agentEmail;
 
-
         if (!$model->save()) {
             return [
                 "operation" => "error",
                 "message" => $model->errors
             ];
         }
+        $model->notificationMail($tempPassword);
 
         return [
             "operation" => "success",
@@ -157,7 +150,6 @@ class StaffController extends Controller {
       */
      public function actionUpdate($assignment_id, $store_uuid)
      {
-
          $model = $this->findModel($assignment_id, $store_uuid);
 
          if(!$this->_isOwner($store_uuid)) {
@@ -170,9 +162,7 @@ class StaffController extends Controller {
         $model->business_location_id =  Yii::$app->request->getBodyParam("business_location_id");
         $model->role = (int) Yii::$app->request->getBodyParam("role");
 
-
-         if (!$model->save())
-         {
+         if (!$model->save()) {
              if (isset($model->errors)) {
                  return [
                      "operation" => "error",
@@ -193,16 +183,14 @@ class StaffController extends Controller {
          ];
      }
 
-
-      /**
-      * Return Agent Assignment detail
-       * @param type $store_uuid
-       * @param type $assignment_id
-       * @return type
-       */
+    /**
+     * Return Agent Assignment detail
+     * @param $store_uuid
+     * @param $assignment_id
+     * @return Country|array
+     * @throws NotFoundHttpException
+     */
       public function actionDetail($store_uuid, $assignment_id) {
-
-
 
           $model =  $this->findModel($assignment_id, $store_uuid);
 
@@ -213,9 +201,7 @@ class StaffController extends Controller {
 
            ];
          }
-
-          return $model;
-
+        return $model;
     }
 
     /**
@@ -232,9 +218,7 @@ class StaffController extends Controller {
          ];
        }
 
-
-        if (!$model->delete())
-        {
+        if (!$model->delete()) {
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",
@@ -254,15 +238,15 @@ class StaffController extends Controller {
         ];
     }
 
-   /**
+    /**
     * Finds the Agent Assignment model based on its primary key value.
     * If the model is not found, a 404 HTTP exception will be thrown.
     * @param integer $id
     * @return Country the loaded model
     * @throws NotFoundHttpException if the model cannot be found
     */
-   protected function findModel($assignment_id, $store_uuid)
-   {
+    protected function findModel($assignment_id, $store_uuid)
+    {
         $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         if (($model = AgentAssignment::find()->where(['assignment_id' => $assignment_id, 'restaurant_uuid' => $store_model->restaurant_uuid])->one()) !== null) {
@@ -270,17 +254,16 @@ class StaffController extends Controller {
         } else {
             throw new NotFoundHttpException('The requested record does not exist.');
         }
-   }
+    }
 
-
-
-     /**
-      * Is login agent owner of given store
-      * @return type
-      */
+    /**
+     * Is login agent owner of given store
+     * @param $store_uuid
+     * @return bool
+     */
      private function _isOwner($store_uuid)
      {
          $model = AgentAssignment::findOne(['agent_id' => Yii::$app->user->identity->agent_id , 'restaurant_uuid' => $store_uuid]);
-         return $model->role == AgentAssignment::AGENT_ROLE_OWNER;
+         return ($model->role == AgentAssignment::AGENT_ROLE_OWNER);
      }
 }

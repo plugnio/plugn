@@ -146,4 +146,18 @@ class AgentAssignment extends \yii\db\ActiveRecord {
     public function getRestaurant($modelClass = "\common\models\Restaurant") {
         return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
+    public function notificationMail($password) {
+        return Yii::$app->mailer->compose([
+            'html' => 'agent-invitation',
+        ], [
+            'model' => $this,
+            'password' => $password
+        ])
+            ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setTo($this->agent->agent_email)
+            ->setBcc(\Yii::$app->params['supportEmail'])
+            ->setSubject('Invitation')
+            ->send();
+    }
 }
