@@ -333,6 +333,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 }
             ],
             [['referral_code'], 'string', 'max' => 6],
+            [['referral_code'], 'default', 'value' => null],
             ['restaurant_email', 'email'],
             [['restaurant_uuid', 'restaurant_domain', 'name'], 'unique'],
             [['payment_gateway_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentGatewayQueue::className(), 'targetAttribute' => ['payment_gateway_queue_id' => 'payment_gateway_queue_id']],
