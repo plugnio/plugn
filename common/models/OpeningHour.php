@@ -299,7 +299,7 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
       }
 
-      return $schedule_time;
+      return array_values(array_unique($schedule_time, SORT_REGULAR));
 
     }
 
