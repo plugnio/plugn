@@ -84,6 +84,7 @@ class BusinessLocationController extends Controller
         }
 
         $query->andWhere (['restaurant_uuid' => $store_uuid]);
+        $query->orderBy('business_location_id DESC');
 
         return new ActiveDataProvider([
             'query' => $query
