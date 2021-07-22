@@ -1111,7 +1111,6 @@ class Restaurant extends \yii\db\ActiveRecord
         unset($fields['supplierCode']);
         unset($fields['live_api_key']);
         unset($fields['test_api_key']);
-        // unset($fields['live_public_key']);
         unset($fields['test_public_key']);
         unset($fields['sitemap_require_update']);
         unset($fields['business_type']);
@@ -1154,6 +1153,7 @@ class Restaurant extends \yii\db\ActiveRecord
         unset($fields['identification_file_purpose']);
         unset($fields['restaurant_created_at']);
         unset($fields['restaurant_updated_at']);
+        unset($fields['referral_code']);
 
         return $fields;
     }

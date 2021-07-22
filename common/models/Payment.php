@@ -374,6 +374,8 @@ class Payment extends \yii\db\ActiveRecord {
         unset($fields['payment_gateway_name']);
         unset($fields['plugn_fee']);
         unset($fields['partner_fee']);
+        unset($fields['payment_token']);
+        unset($fields['payout_status']);
 
         return $fields;
 
