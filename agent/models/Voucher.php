@@ -41,6 +41,10 @@ class Voucher extends \common\models\Voucher
                     ->sum('delivery_fee');
             }
 
+            if(!$totalSpent) {
+                $totalSpent = 0;
+            }
+
             return  \Yii::$app->formatter->asCurrency(
                 $totalSpent,
                 $model->restaurant->currency->code,
