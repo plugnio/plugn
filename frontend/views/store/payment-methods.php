@@ -551,7 +551,7 @@ $this->params['breadcrumbs'][] = $this->title;
                               </div>
 
                             <?php } if ($model->country->iso == 'SA' && $model->currency->code == 'SAR') {
-                              if($model->business_type == 'corp' && ($model->is_myfatoorah_enable || ($model->is_tap_enable && $model->plan->plan_id == 2))){
+                              if($model->business_type == 'corp' && ($model->is_myfatoorah_enable || ($model->is_tap_enable))){
 
                                   if(RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $model->restaurant_uuid, 'payment_method_id' => 4])->exists())
                                     echo Html::a('Disable', ['disable-payment-method', 'storeUuid' =>  $model->restaurant_uuid, 'paymentMethodId' => 4], ['class' => 'btn btn-danger']);
@@ -570,15 +570,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                 <?php }
 
-                                else if($model->is_tap_enable && $model->plan->plan_id == 1) { ?>
-                                  <div style="background-color:#fff5f5; padding:16px">
-                                    <span>
-                                      This option is only available on premium plan
-                                    </span>
-                                   </div>
-
-                                <?php  }
-                            } else if ($model->country->iso != 'SA' && $model->currency->code != 'SAR') { ?>
+                              } else if ($model->country->iso != 'SA' && $model->currency->code != 'SAR') { ?>
                                       <div style="background-color:#fff5f5; padding:16px">
                                         <span>
                                           Contact us if you want to enable this option
@@ -734,7 +726,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <!-- </div> -->
   <!-- </div> -->
 <?php
-    // } 
+    // }
   ?>
 
 
