@@ -113,7 +113,8 @@ class AgentAssignment extends \yii\db\ActiveRecord {
     {
         return [
           'agent',
-          'restaurant'
+          'restaurant',
+          'businessLocation'
         ];
     }
 

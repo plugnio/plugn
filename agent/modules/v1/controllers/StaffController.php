@@ -67,6 +67,7 @@ class StaffController extends Controller {
 
         $keyword = Yii::$app->request->get('keyword');
         Yii::$app->accountManager->getManagedAccount($store_uuid);
+
         $query =  AgentAssignment::find()->joinWith('agent');
         if ($keyword){
             $query->andWhere('or', [
@@ -201,6 +202,7 @@ class StaffController extends Controller {
 
            ];
          }
+         
         return $model;
     }
 
