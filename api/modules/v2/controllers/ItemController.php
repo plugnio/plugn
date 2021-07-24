@@ -70,6 +70,10 @@ class ItemController extends Controller {
                     ->asArray()
                     ->one();
 
+          foreach ($category['items'] as $key => $item) {
+              unset($category['items'][$key]['unit_sold']);
+          }
+
         return [
             'category' => $category,
         ];
