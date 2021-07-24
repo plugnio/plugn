@@ -83,27 +83,7 @@ class ItemController extends Controller {
       }
     }
 
-    /**
-     */
-    // public function actionDeleteItemImage() {
-    //   $fullPath = Yii::$app->request->getBodyParam("file");
-    //   $file_name = Yii::$app->request->getBodyParam("name");
-    //
-    //
-    //   $restaurant_uuid = explode("restaurants/", $fullPath);
-    //   $restaurant_uuid = $restaurant_uuid[1];
-    //   $restaurant_uuid = explode("/items/" . $file_name, $restaurant_uuid);
-    //   $restaurant_uuid = $restaurant_uuid[0];
-    //
-    //
-    //   $item_image = ItemImage::find()->where(['product_file_name' => $file_name])->one();
-    //
-    //
-    //   if($item_image->item->restaurant_uuid == $restaurant_uuid && $item_image)
-    //     $item_image->delete();
-    //
-    //   return true;
-    // }
+
 
     /**
      * Return restaurant menu
@@ -129,12 +109,16 @@ class ItemController extends Controller {
                     ->all();
 
 
-            foreach ($restaurantMenu as $item) {
-                unset($item['categoryItems']);
+            foreach ($restaurantMenu as $category) {
+                unset($category['categoryItems']);
             }
 
-            foreach ($restaurantMenu as $key => $item) {
+            foreach ($restaurantMenu as $key => $category) {
                 unset($restaurantMenu[$key]['categoryItems']);
+
+                foreach ($category['items'] as $itemKey => $item) {
+                  unset($restaurantMenu[$key]['items'][$itemKey]['unit_sold']);
+                }
             }
 
             return [
@@ -166,7 +150,11 @@ class ItemController extends Controller {
                 ->asArray()
                 ->one();
 
+
         if ($item_model) {
+
+          unset($item_model['unit_sold']);
+
             return [
                 'operation' => 'success',
                 'itemData' => $item_model
