@@ -57,30 +57,6 @@ class DeliveryZoneController extends Controller {
         return $actions;
     }
 
-    /**
-     * Return Delivery zones
-     */
-    // public function actionDeliveryZone($restaurant_uuid) {
-    //
-    //     if ($store_model = Restaurant::findOne($restaurant_uuid)) {
-    //
-    //         $shipping_countries = $store_model->getShippingCountries()->asArray()->all();
-    //
-    //         foreach ($shipping_countries as $key => $shippingCountry) {
-    //           $deliveryZones = $store_model->getCountryDeliveryZones($shippingCountry['country_id'])->asArray()->all();
-    //           $shippingCountry['businessLocations'] = $deliveryZones;
-    //         }
-    //
-    //         return $shipping_countries;
-    //
-    //
-    //     } else {
-    //         return [
-    //             'operation' => 'error',
-    //             'message' => 'Store Uuid is invalid'
-    //         ];
-    //     }
-    // }
 
     /**
      * Return List of countries available for delivery
@@ -146,8 +122,15 @@ class DeliveryZoneController extends Controller {
 
         if ($store_model = Restaurant::findOne($restaurant_uuid)) {
 
+            $pickupLocations = $store_model->getPickupBusinessLocations()->asArray()->all();
 
-            return $store_model->getPickupBusinessLocations()->asArray()->all();
+            foreach ($pickupLocations as $key => $pickupLocation) {
+              
+              unset($pickupLocations[$key]['mashkor_branch_id']);
+              unset($pickupLocations[$key]['armada_api_key']);
+            }
+
+            return $pickupLocations;
 
 
         } else {
@@ -171,6 +154,9 @@ class DeliveryZoneController extends Controller {
 
 
             if( $deliveryZone = $store_model->getDeliveryZones()->where(['delivery_zone_id' => $delivery_zone_id])->asArray()->joinWith(['businessLocation'])->one() ){
+
+                unset($deliveryZone['businessLocation']['armada_api_key']);
+                unset($deliveryZone['businessLocation']['mashkor_branch_id']);
 
 
               if($area_id && !AreaDeliveryZone::find()->where(['area_id' => $area_id , 'delivery_zone_id' => $delivery_zone_id])->exists()){
@@ -232,6 +218,10 @@ class DeliveryZoneController extends Controller {
         if ($store_model = Restaurant::findOne($restaurant_uuid)) {
 
             if( $pickupLocation = $store_model->getBusinessLocations()->where(['business_location_id' => $pickup_location_id])->asArray()->one() ){
+
+              unset($pickupLocation['armada_api_key']);
+              unset($pickupLocation['mashkor_branch_id']);
+
               return $pickupLocation;
             }
             else {
