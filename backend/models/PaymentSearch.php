@@ -76,7 +76,6 @@ class PaymentSearch extends Payment
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'customer_id' => $this->customer_id,
             'payment_amount_charged' => $this->payment_amount_charged,
             'payment_net_amount' => $this->payment_net_amount,
             'payment_gateway_fee' => $this->payment_gateway_fee,
@@ -87,7 +86,8 @@ class PaymentSearch extends Payment
         ]);
 
         $query->andFilterWhere(['like', 'payment_uuid', $this->payment_uuid])
-            ->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
+            ->andFilterWhere(['like', 'restaurant.name', $this->store_name])
+            ->andFilterWhere(['like', 'customer.customer_name', $this->customer_name])
             ->andFilterWhere(['like', 'order_uuid', $this->order_uuid])
             ->andFilterWhere(['like', 'payment_gateway_order_id', $this->payment_gateway_order_id])
             ->andFilterWhere(['like', 'payment_gateway_transaction_id', $this->payment_gateway_transaction_id])
