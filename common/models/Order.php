@@ -1284,7 +1284,7 @@ class Order extends \yii\db\ActiveRecord
     public function getOrderItems($modelClass = "\common\models\OrderItem")
     {
         return $this->hasMany ($modelClass::className (), ['order_uuid' => 'order_uuid'])
-            ->with ('item', 'orderItemExtraOptions');
+            ->with ('orderItemExtraOptions');
     }
 
     /**
