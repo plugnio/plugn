@@ -452,7 +452,7 @@ class Payment extends \yii\db\ActiveRecord {
     */
    public function getPartner()
    {
-       return $this->hasOne(Partner::className(), ['partner_uuid' => 'partner_uuid'])->via('restaurant');
+       return $this->hasOne(Partner::className(), ['referral_code' => 'referral_code'])->via('restaurant');
    }
 
 
