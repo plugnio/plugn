@@ -394,7 +394,7 @@ class Payment extends \yii\db\ActiveRecord {
 
           }
 
-          if($this->plugn_fee > 0 && $this->partner_fee == 0 && !$this->restaurant->partner_uuid){
+          if($this->plugn_fee > 0 && $this->partner_fee == 0 && !$this->restaurant->referral_code){
             $this->partner_fee = $this->plugn_fee * $this->partner->commission;
           }
 
