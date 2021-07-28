@@ -394,6 +394,10 @@ class Payment extends \yii\db\ActiveRecord {
 
           }
 
+
+          Yii::info("[Referal Code : " . $this->restaurant->referral_code'] ' , __METHOD__);
+
+
           if($this->plugn_fee > 0 && $this->partner_fee == 0 && !$this->restaurant->referral_code){
             $this->partner_fee = $this->plugn_fee * $this->partner->commission;
           }
