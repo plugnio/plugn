@@ -36,6 +36,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'plugn_fee')->textInput() ?>
 
+    <?= $form->field($model, 'partner_fee')->textInput() ?>
+
     <?= $form->field($model, 'payment_udf1')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'payment_udf2')->textInput(['maxlength' => true]) ?>
