@@ -76,23 +76,25 @@ $this->params['breadcrumbs'][] = $this->title;
             'columns' => [
                 'amount',
                 'created_at:datetime',
+
                 [
-                    'header' => 'Actions',
                     'class' => 'yii\grid\ActionColumn',
-                    'template' => ' {mark-as-paid}',
+                    'template' => ' {view} ',
                     'buttons' => [
-                        'mark-as-paid' => function ($url, $model) {
-                            return Html::a(
-                                        'Deactivate' , ['mark-as-paid', 'partner_payout_uuid' => $model->partner_payout_uuid] [
-                                        'title' => 'Mark as Paid',
-                                        'data-pjax' => '0',
-                               ]
-                            );
-                        },
+                      'view' => function ($url, $model) {
+                          return Html::a(
+                                      'Mark as Paid', ['mark-as-paid','partner_payout_uuid' => $model->partner_payout_uuid] ,[
+                                      'title' => 'Mark as Paid',
+                                      'data-pjax' => '0',
+                                    ]
+                          );
+                      }
                     ],
                 ],
 
-            ]
+          ]
+
+
         ]);
         ?>
 

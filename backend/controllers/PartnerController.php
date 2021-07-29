@@ -136,12 +136,10 @@ class PartnerController extends Controller
               $partner_payout_model->partner_uuid = $model->partner_uuid;
               $partner_payout_model->payment_uuid = $payment->payment_uuid;
               $partner_payout_model->amount = $payment->partner_fee;
+              $partner_payout_model->payout_status = PartnerPayout::PAYOUT_STATUS_PENDING;
 
               if($partner_payout_model->save()){
-                $payment->payout_status = Payment::PAYOUT_STATUS_PENDING;
-                $payment->save(false);
-              } else {
-                  die(json_encode($partner_payout_model->errors));
+                return $this->redirect(['view', 'partner_uuid' => $model->partner_uuid]);
               }
           }
 

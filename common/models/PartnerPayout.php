@@ -22,6 +22,12 @@ use yii\db\Expression;
  */
 class PartnerPayout extends \yii\db\ActiveRecord
 {
+
+    //Values for `payout_status`
+    const PAYOUT_STATUS_UNPAID = 0;
+    const PAYOUT_STATUS_PAID = 1;
+    const PAYOUT_STATUS_PENDING = 2;
+
     /**
      * {@inheritdoc}
      */
@@ -38,6 +44,7 @@ class PartnerPayout extends \yii\db\ActiveRecord
         return [
             [['partner_uuid', 'payment_uuid'], 'required'],
             [['amount'], 'number'],
+            ['payout_status', 'in', 'range' => [self::PAYOUT_STATUS_UNPAID, self::PAYOUT_STATUS_PAID,self::PAYOUT_STATUS_PENDING]],
             [['partner_payout_uuid', 'partner_uuid'], 'string', 'max' => 60],
             [['payment_uuid'], 'string', 'max' => 36],
             [['partner_payout_uuid'], 'unique'],
@@ -57,9 +64,24 @@ class PartnerPayout extends \yii\db\ActiveRecord
             'partner_uuid' => 'Partner Uuid',
             'payment_uuid' => 'Payment Uuid',
             'amount' => 'Amount',
+            'payout_status' => 'Payout Status',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
+    }
+    /**
+     *
+     * @param type $insert
+     * @param type $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave ($insert, $changedAttributes);
+
+        if(isset($changedAttributes['payout_status']) && $changedAttributes['payout_status'] == self::PAYOUT_STATUS_PENDING && $this->order_status == self::PAYOUT_STATUS_PAID) {
+          $this->payment->payout_status = $this->order_status;
+          $this->payment->save(false);
+        }
     }
 
     /**
