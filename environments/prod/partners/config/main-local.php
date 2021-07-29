@@ -8,7 +8,7 @@ return [
         ],
         'urlManager' => [
             'class' => 'yii\web\UrlManager',
-            'baseUrl' => 'https://partner.plugn.io',
+            'baseUrl' => 'https://partners.plugn.io',
             'enablePrettyUrl' => true,
             'showScriptName' => false,
         ],
