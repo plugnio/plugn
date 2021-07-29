@@ -123,7 +123,7 @@ class PartnerController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionMarkPaid($partner_uuid)
+    public function actionCreatePayout($partner_uuid)
     {
           $model = $this->findModel($partner_uuid);
 
@@ -138,18 +138,36 @@ class PartnerController extends Controller
               $partner_payout_model->amount = $payment->partner_fee;
 
               if($partner_payout_model->save()){
-                $payment->payout_status = Payment::PAYOUT_STATUS_PAID;
+                $payment->payout_status = Payment::PAYOUT_STATUS_PENDING;
                 $payment->save(false);
               } else {
-
                   die(json_encode($partner_payout_model->errors));
-
               }
           }
 
 
         return $this->redirect(['view', 'partner_uuid' => $model->partner_uuid]);
 
+    }
+
+
+    /**
+     * Mark  payout as paid
+     * @param string $partner_uuid
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionMarkAsPaid($partner_payout_uuid)
+    {
+          $model = PartnerPayout::finOne($partner_payout_uuid);
+
+            $model->payout_status = Payment::PAYOUT_STATUS_PENDING;
+              if($model->save()){
+                return $this->redirect(['view', 'partner_uuid' => $model->partner_uuid]);
+              }
+          }
+
+        return $this->redirect(['view', 'partner_uuid' => $model->partner_uuid]);
     }
 
 

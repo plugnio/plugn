@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
       <?php
         if($model->getTotalEarnings() > 0){
-          echo Html::a('Mark Paid', ['mark-paid', 'partner_uuid' => $model->partner_uuid, 'referral_code' => $model->referral_code], [
+          echo Html::a('Create Payout', ['create-payout', 'partner_uuid' => $model->partner_uuid, 'referral_code' => $model->referral_code], [
             'class' => 'btn btn-success',
             'data' => [
                 'confirm' => 'Are you sure you want to mark as paid?',
@@ -75,7 +75,23 @@ $this->params['breadcrumbs'][] = $this->title;
             'dataProvider' => $payouts,
             'columns' => [
                 'amount',
-                'created_at:datetime'
+                'created_at:datetime',
+                [
+                    'header' => 'Actions',
+                    'class' => 'yii\grid\ActionColumn',
+                    'template' => ' {mark-as-paid}',
+                    'buttons' => [
+                        'mark-as-paid' => function ($url, $model) {
+                            return Html::a(
+                                        'Deactivate' , ['mark-as-paid', 'partner_payout_uuid' => $model->partner_payout_uuid] [
+                                        'title' => 'Mark as Paid',
+                                        'data-pjax' => '0',
+                               ]
+                            );
+                        },
+                    ],
+                ],
+
             ]
         ]);
         ?>

@@ -24,7 +24,7 @@ use yii\web\NotFoundHttpException;
  * @property double $payment_gateway_fee gateway fee charged
  * @property double $plugn_fee our commision
  * @property double $partner_fee
-* @property double $partner_fee
+* @property  double $partner_fee
  * @property double $payment_token
  * @property string $payment_udf1
  * @property string $payment_udf2
@@ -45,6 +45,7 @@ class Payment extends \yii\db\ActiveRecord {
     //Values for `payout_status`
     const PAYOUT_STATUS_UNPAID = 0;
     const PAYOUT_STATUS_PAID = 1;
+    const PAYOUT_STATUS_PENDING = 2;
 
     /**
      * {@inheritdoc}
@@ -60,7 +61,7 @@ class Payment extends \yii\db\ActiveRecord {
         return [
             [['customer_id', 'order_uuid', 'payment_amount_charged', 'restaurant_uuid'], 'required'],
             [['customer_id', 'received_callback','payout_status'], 'integer'],
-            ['payout_status', 'in', 'range' => [self::PAYOUT_STATUS_UNPAID, self::PAYOUT_STATUS_PAID]],
+            ['payout_status', 'in', 'range' => [self::PAYOUT_STATUS_UNPAID, self::PAYOUT_STATUS_PAID,self::PAYOUT_STATUS_PENDING]],
             [['order_uuid'], 'string', 'max' => 40],
             [['payment_gateway_order_id', 'payment_current_status'], 'string'],
             [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee', 'plugn_fee','partner_fee'], 'number'],
@@ -223,7 +224,7 @@ class Payment extends \yii\db\ActiveRecord {
               $paymentRecord->payment_gateway_order_id = $responseContent->reference->payment;
 
             // Net amount after deducting gateway fee
-            $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee; 
+            $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee;
 
         }else {
             Yii::info('[TAP Payment Issue > ' . $paymentRecord->customer->customer_name . ']'
