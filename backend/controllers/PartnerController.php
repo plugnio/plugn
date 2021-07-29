@@ -161,13 +161,12 @@ class PartnerController extends Controller
     {
           $model = PartnerPayout::finOne($partner_payout_uuid);
 
-            $model->payout_status = Payment::PAYOUT_STATUS_PENDING;
-              if($model->save()){
-                return $this->redirect(['view', 'partner_uuid' => $model->partner_uuid]);
-              }
+          $model->payout_status = Payment::PAYOUT_STATUS_PENDING;
+          if($model->save()){
+            return $this->redirect(['view', 'partner_uuid' => $model->partner_uuid]);
           }
 
-        return $this->redirect(['view', 'partner_uuid' => $model->partner_uuid]);
+         return $this->redirect(['view', 'partner_uuid' => $model->partner_uuid]);
     }
 
 
