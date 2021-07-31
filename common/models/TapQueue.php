@@ -21,13 +21,10 @@ use yii\behaviors\TimestampBehavior;
  */
 class TapQueue extends \yii\db\ActiveRecord
 {
-
-
       //Values for `queue_status`
       const QUEUE_STATUS_PENDING = 1;
       const QUEUE_STATUS_CREATING = 2;
       const QUEUE_STATUS_COMPLETE = 3;
-
 
     /**
      * {@inheritdoc}
@@ -50,8 +47,6 @@ class TapQueue extends \yii\db\ActiveRecord
         ];
     }
 
-
-
     /**
      *
      * @return type
@@ -66,7 +61,6 @@ class TapQueue extends \yii\db\ActiveRecord
             ],
         ];
     }
-
 
     public function afterSave($insert, $changedAttributes) {
 
@@ -93,7 +87,6 @@ class TapQueue extends \yii\db\ActiveRecord
           }
         }
 
-
       return parent::afterSave($insert, $changedAttributes);
 
     }
@@ -119,8 +112,8 @@ class TapQueue extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
+    public function getRestaurant($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 }

@@ -54,9 +54,9 @@ class CustomerBankDiscount extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getBankDiscount()
+    public function getBankDiscount($modelClass = "\common\models\BankDiscount")
     {
-        return $this->hasOne(BankDiscount::className(), ['bank_discount_id' => 'bank_discount_id']);
+        return $this->hasOne($modelClass::className(), ['bank_discount_id' => 'bank_discount_id']);
     }
 
     /**
@@ -64,8 +64,8 @@ class CustomerBankDiscount extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCustomer()
+    public function getCustomer($modelClass = "\common\models\Customer")
     {
-        return $this->hasOne(Customer::className(), ['customer_id' => 'customer_id']);
+        return $this->hasOne($modelClass::className(), ['customer_id' => 'customer_id']);
     }
 }

@@ -70,42 +70,29 @@ class Area extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCity()
+    public function getCity($modelClass = "\common\models\City")
     {
-        return $this->hasOne(City::className(), ['city_id' => 'city_id']);
+        return $this->hasOne($modelClass::className(), ['city_id' => 'city_id']);
     }
-
 
     /**
      * Gets query for [[Country]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCountry()
+    public function getCountry($modelClass = "\common\models\Country")
     {
-        return $this->hasOne(Country::className(), ['country_id' => 'country_id'])->via('city');
+        return $this->hasOne($modelClass::className(), ['country_id' => 'country_id'])->via('city');
     }
-
 
     /**
      * Gets query for [[Orders]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrders()
+    public function getOrders($modelClass = "\common\models\Order")
     {
-        return $this->hasMany(Order::className(), ['area_id' => 'area_id']);
-    }
-
-
-    /**
-     * Gets query for [[RestaurantDeliveryAreas]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getAreaDeliveryZones()
-    {
-        return $this->hasMany(AreaDeliveryZone::className(), ['area_id' => 'area_id']);
+        return $this->hasMany($modelClass::className(), ['area_id' => 'area_id']);
     }
 
     /**
@@ -113,9 +100,19 @@ class Area extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantDeliveryAreas()
+    public function getAreaDeliveryZones($modelClass = "\common\models\AreaDeliveryZone")
     {
-        return $this->hasMany(RestaurantDelivery::className(), ['area_id' => 'area_id']);
+        return $this->hasMany($modelClass::className(), ['area_id' => 'area_id']);
+    }
+
+    /**
+     * Gets query for [[RestaurantDeliveryAreas]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurantDeliveryAreas($modelClass = "\common\models\RestaurantDelivery")
+    {
+        return $this->hasMany($modelClass::className(), ['area_id' => 'area_id']);
     }
 
     /**
@@ -123,8 +120,8 @@ class Area extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
+    public function getRestaurant($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasMany(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->viaTable('restaurant_delivery', ['area_id' => 'area_id']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])->viaTable('area_delivery_zone', ['area_id' => 'area_id']);
     }
 }

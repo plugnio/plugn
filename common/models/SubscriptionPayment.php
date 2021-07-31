@@ -123,17 +123,18 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
      * @return self                                [description]
      */
     public static function updatePaymentStatusFromTap($id, $showUpdatedFlashNotification = false) {
+
         // Look for payment with same Payment Gateway Transaction ID
         $paymentRecord = \common\models\SubscriptionPayment::findOne(['payment_gateway_transaction_id' => $id]);
         if (!$paymentRecord) {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
-
         // Request response about it from TAP
         Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
 
         $response = Yii::$app->tapPayments->retrieveCharge($id);
+
         $responseContent = json_decode($response->content);
 
         // If there's an error from TAP, exit and display error
@@ -234,10 +235,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
                  ->setBcc(\Yii::$app->params['supportEmail'])
                  ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription_model->plan->name)
                  ->send();
-
             }
-
-
         }
 
         if ($isError) {
@@ -250,30 +248,27 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         return $paymentRecord;
     }
 
-
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getSubscription() {
-        return $this->hasOne(Subscription::className(), ['subscription_uuid' => 'subscription_uuid']);
+    public function getSubscription($modelClass = "\common\models\Subscription") {
+        return $this->hasOne($modelClass::className(), ['subscription_uuid' => 'subscription_uuid']);
     }
-
 
     /**
      * Gets query for [[Plan]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPlan() {
-        return $this->hasOne(Plan::className(), ['plan_id' => 'plan_id'])->via('subscription');
+    public function getPlan($modelClass = "\common\models\Plan") {
+        return $this->hasOne($modelClass::className(), ['plan_id' => 'plan_id'])->via('subscription');
     }
-
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -281,9 +276,9 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
+    public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])->via('restaurant');
     }
 
 }

@@ -1,14 +1,15 @@
 <?php
-
-$index1 = $index % 5;//faker->unique()->numberBetween(0, 50);
-
-$restaurant= Yii::$app->db->createCommand('SELECT restaurant_uuid from restaurant')->queryScalar();
-
-
+/**
+ * @var $faker \Faker\Generator
+ * @var $index integer
+ */
 return [
-    'category_id' => $faker->numberBetween(1, 500),
-    'restaurant_uuid' =>$restaurant,
-    'category_name' => $faker->firstname,
-    'category_name_ar' => $faker->firstname,
+    'category_id' => $index + 1,
+    'restaurant_uuid' => $index + 1,
+    'title' => $faker->word,
+    'title_ar' => $faker->word,
+    'subtitle' => $faker->words(3, true),
+    'subtitle_ar' => $faker->words(3, true),
+    'category_image' => null,//todo: sample image path
     'sort_number' => $faker->numberBetween(1, 5)
  ];

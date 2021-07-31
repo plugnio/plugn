@@ -43,62 +43,6 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-
-    public function actionMigration(){
-
-        foreach (TapQueue::find()->all() as $key => $queue) {
-          $paymentGatewayQueueModel = new PaymentGatewayQueue();
-          $paymentGatewayQueueModel->restaurant_uuid = $queue->restaurant_uuid;
-          $paymentGatewayQueueModel->payment_gateway = 'tap';
-          $paymentGatewayQueueModel->queue_status = 3;
-          $paymentGatewayQueueModel->queue_created_at = $queue->queue_created_at;
-          $paymentGatewayQueueModel->queue_updated_at = $queue->queue_updated_at;
-          $paymentGatewayQueueModel->queue_start_at = $queue->queue_start_at;
-          $paymentGatewayQueueModel->queue_end_at = $queue->queue_end_at;
-          $paymentGatewayQueueModel->save();
-        }
-
-        foreach (Payment::find()->all() as $key => $payment) {
-          $payment->payment_gateway_name = 'tap';
-          $payment->save();
-        }
-
-        $payment_method = new PaymentMethod();
-        $payment_method->payment_method_name = 'Sadad';
-        $payment_method->payment_method_name_ar = 'سداد';
-        $payment_method->payment_method_code = 's';
-        $payment_method->vat = 0.15;
-        $payment_method->save();
-
-        foreach (PaymentMethod::find()->all() as $key => $paymentMethod) {
-
-          if($paymentMethod->payment_method_id == 1){
-            $paymentMethod->payment_method_code = 'kn';
-          }
-          else if($paymentMethod->payment_method_id == 2){//Credit Card
-            $paymentMethod->payment_method_code = 'vm';
-          }
-          else if($paymentMethod->payment_method_id == 4){ //MADA
-            $paymentMethod->payment_method_code = 'md';
-            $paymentMethod->vat = 0.15;
-          }
-          else if($paymentMethod->payment_method_id == 5){
-            $paymentMethod->payment_method_code = 'b';
-          }
-
-
-          $paymentMethod->save();
-
-
-        }
-
-
-        $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-        return self::EXIT_CODE_NORMAL;
-
-    }
-
-
     /**
      * Weekly Store Summary
      */
@@ -192,7 +136,7 @@ class CronController extends \yii\console\Controller {
                 if($lastWeekOrdersReceived > 0 || $thisWeekOrdersReceived > 0) {
 
                   $agentAssignments = $store->getAgentAssignments()
-                              ->where([
+                              ->andWhere([
                                           'role' => AgentAssignment::AGENT_ROLE_OWNER,
                                           'receive_weekly_stats' => 1
                                       ])
@@ -237,7 +181,7 @@ class CronController extends \yii\console\Controller {
     public function actionSiteStatus(){
 
             $restaurants = Restaurant::find()
-                          ->where(['has_deployed' => 0])
+                          ->andWhere(['has_deployed' => 0])
                           ->all();
 
             foreach ($restaurants as $restaurant) {
@@ -284,7 +228,7 @@ class CronController extends \yii\console\Controller {
 
       $stores = Restaurant::find()
               ->joinWith(['items','ownerAgent'])
-              ->where(' DATE(restaurant_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')
+              ->andWhere(' DATE(restaurant_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')
               ->andWhere(['retention_email_sent' => 0])
               ->all();
 
@@ -322,7 +266,7 @@ class CronController extends \yii\console\Controller {
 
       $stores = Restaurant::find()
               ->joinWith(['orders','ownerAgent'])
-              ->where(' DATE(restaurant_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')
+              ->andWhere(' DATE(restaurant_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')
               ->andWhere(['retention_email_sent' => 0])
               ->all();
 
@@ -361,7 +305,7 @@ class CronController extends \yii\console\Controller {
          $end_date =  date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d") ));
 
          $subscriptions = Subscription::find()
-                 ->where(['subscription_status' => Subscription::STATUS_ACTIVE])
+                 ->andWhere(['subscription_status' => Subscription::STATUS_ACTIVE])
                  // ->andWhere(['notified_email' => 1])
                  ->andWhere(['not', ['subscription_end_at' => null]])
                  ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])
@@ -383,7 +327,7 @@ class CronController extends \yii\console\Controller {
          $end_date =  date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d") + 5));
 
          $subscriptions = Subscription::find()
-                 ->where(['subscription_status' => Subscription::STATUS_ACTIVE])
+                 ->andWhere(['subscription_status' => Subscription::STATUS_ACTIVE])
                  ->andWhere(['notified_email' => 0])
                  ->andWhere(['not', ['subscription_end_at' => null]])
                  ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])
@@ -455,7 +399,7 @@ class CronController extends \yii\console\Controller {
         public function actionUpdateSitemap() {
 
           $stores = Restaurant::find()
-                  ->where(['sitemap_require_update' => 1])
+                  ->andWhere(['sitemap_require_update' => 1])
                   ->andWhere(['or',
                        ['version'=>2],
                        ['version'=>3],
@@ -722,7 +666,7 @@ class CronController extends \yii\console\Controller {
 
         $now = new DateTime('now');
         $orders = Order::find()
-                ->where(['order_status' => Order::STATUS_PENDING])
+                ->andWhere(['order_status' => Order::STATUS_PENDING])
                 ->andWhere(['reminder_sent' => 0])
                 ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')])
                 ->all();

@@ -6,7 +6,8 @@ use Yii;
 use yii\base\BaseObject;
 use yii\base\InvalidParamException;
 use yii\web\NotFoundHttpException;
-use common\models\Restaurant;
+use agent\models\Restaurant;
+
 
 /**
  * AccountManager is a component that holds a list of Restaurants this agent owns
@@ -78,7 +79,12 @@ class AccountManager  extends BaseObject
      * @return \common\models\Restaurant  The user account
      * @throws \yii\web\NotFoundHttpException if the account isnt one this agent owns
      */
-    public function getManagedAccount($restaurantUuid){
+    public function getManagedAccount($restaurantUuid = null) {
+
+        if(!$restaurantUuid) {
+            $restaurantUuid = Yii::$app->request->headers->get('Store-Id');
+        }
+
         foreach($this->_managedAccounts as $restaurant){
             if($restaurant->restaurant_uuid == $restaurantUuid){
                 return $restaurant;
@@ -86,7 +92,7 @@ class AccountManager  extends BaseObject
         }
 
         Yii::$app->user->logout();
+
         throw new \yii\web\BadRequestHttpException('You do not own this store.');
     }
-
 }

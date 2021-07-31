@@ -100,6 +100,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                 <?= $form->field($agent_model, 'tempPassword')->passwordInput(['maxlength' => true])->label('Password *') ?>
 
+                                <?= $form->field($store_model, 'referral_code')->passwordInput(['maxlength' => true])->label('Referral Code') ?>
+
                                 <div class="form-group">
                                     <?= Html::submitButton('Create', ['class' => 'btn btn-primary  btn-inline', 'style' => 'width: 100%;',  'name' => 'register-button']) ?>
                                 </div>

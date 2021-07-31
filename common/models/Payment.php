@@ -23,6 +23,8 @@ use yii\web\NotFoundHttpException;
  * @property double $payment_net_amount net amount deposited into our account
  * @property double $payment_gateway_fee gateway fee charged
  * @property double $plugn_fee our commision
+ * @property double $partner_fee
+* @property  double $partner_fee
  * @property double $payment_token
  * @property string $payment_udf1
  * @property string $payment_udf2
@@ -40,6 +42,11 @@ use yii\web\NotFoundHttpException;
  */
 class Payment extends \yii\db\ActiveRecord {
 
+    //Values for `payout_status`
+    const PAYOUT_STATUS_UNPAID = 0;
+    const PAYOUT_STATUS_PAID = 1;
+    const PAYOUT_STATUS_PENDING = 2;
+
     /**
      * {@inheritdoc}
      */
@@ -53,10 +60,11 @@ class Payment extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['customer_id', 'order_uuid', 'payment_amount_charged', 'restaurant_uuid'], 'required'],
-            [['customer_id', 'received_callback'], 'integer'],
+            [['customer_id', 'received_callback','payout_status'], 'integer'],
+            ['payout_status', 'in', 'range' => [self::PAYOUT_STATUS_UNPAID, self::PAYOUT_STATUS_PAID,self::PAYOUT_STATUS_PENDING]],
             [['order_uuid'], 'string', 'max' => 40],
             [['payment_gateway_order_id', 'payment_current_status'], 'string'],
-            [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee', 'plugn_fee','payment_vat'], 'number'],
+            [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee', 'plugn_fee','partner_fee'], 'number'],
             [['payment_uuid'], 'string', 'max' => 36],
             [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'response_message','payment_token', 'payment_gateway_name'], 'string', 'max' => 255],
             [['payment_uuid'], 'unique'],
@@ -366,6 +374,9 @@ class Payment extends \yii\db\ActiveRecord {
         unset($fields['payment_gateway_fee']);
         unset($fields['payment_gateway_name']);
         unset($fields['plugn_fee']);
+        unset($fields['partner_fee']);
+        unset($fields['payment_token']);
+        unset($fields['payout_status']);
 
         return $fields;
 
@@ -383,21 +394,29 @@ class Payment extends \yii\db\ActiveRecord {
             Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $this->order->payment_method_name, __METHOD__);
 
           }
+
+
+          if($this->plugn_fee > 0 && $this->partner_fee == 0 && $this->restaurant->referral_code){
+            $this->partner_fee = $this->plugn_fee * $this->partner->commission;
+            $this->plugn_fee -= $this->partner_fee;
+          }
+
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCustomer() {
-        return $this->hasOne(Customer::className(), ['customer_id' => 'customer_id']);
+    public function getCustomer($modelClass = "\common\models\Customer") {
+        return $this->hasOne($modelClass::className(), ['customer_id' => 'customer_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getOrder() {
-        return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid']);
+    public function getOrder($modelClass = "\common\models\Order") {
+        return $this->hasOne($modelClass::className(), ['order_uuid' => 'order_uuid']);
     }
+
 
 
       /**
@@ -414,35 +433,45 @@ class Payment extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderItems() {
-        return $this->hasMany(OrderItem::className(), ['order_uuid' => 'order_uuid'])->via('order');
+    public function getOrderItems($modelClass = "\common\models\OrderItem") {
+        return $this->hasMany($modelClass::className(), ['order_uuid' => 'order_uuid'])->via('order');
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
+
+    /**
+    * Gets query for [[PartnerUu]].
+    *
+    * @return \yii\db\ActiveQuery
+    */
+   public function getPartner()
+   {
+       return $this->hasOne(Partner::className(), ['referral_code' => 'referral_code'])->via('restaurant');
+   }
+
 
     /**
      * Gets query for [[Subscriptions]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getActiveSubscription() {
-        return $this->hasOne(Subscription::className(), ['restaurant_uuid' => 'restaurant_uuid'])->where(['subscription_status' => Subscription::STATUS_ACTIVE])->via('restaurant');
+    public function getActiveSubscription($modelClass = "\common\models\Subscription") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])->where(['subscription_status' => Subscription::STATUS_ACTIVE])->via('restaurant');
     }
-
 
     /**
      * Gets query for [[Currency]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
+    public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])->via('restaurant');
     }
-
 }

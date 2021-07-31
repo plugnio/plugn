@@ -5,9 +5,9 @@ namespace agent\modules\v1\controllers;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use common\models\Voucher;
+use agent\models\Voucher;
+
 
 class VoucherController extends Controller {
 
@@ -61,33 +61,36 @@ class VoucherController extends Controller {
 
 
     /**
-    * Get all store's Vouchers
-     * @param type $id
-     * @param type $store_uuid
-     * @return type
+     * @param $store_uuid
+     * @return ActiveDataProvider
      */
     public function actionList($store_uuid) {
 
-      $keyword = Yii::$app->request->get('keyword');
+        $keyword = Yii::$app->request->get('keyword');
+        $status = Yii::$app->request->get('status');
 
-      Yii::$app->accountManager->getManagedAccount($store_uuid);
+        Yii::$app->accountManager->getManagedAccount($store_uuid);
 
+        $query =  Voucher::find()
+          ->andWhere(['restaurant_uuid' => $store_uuid])
+          ->orderBy('voucher_id DESC');
 
-      $query =  Voucher::find();
+        if ($keyword && $keyword != 'null') {
+            $query->andWhere ([
+                'or',
+                ['like', 'code', $keyword],
+                ['like', 'description', $keyword],
+                ['like', 'description_ar', $keyword],
+            ]);
+        }
 
-      if ($keyword){
-        $query->where(['like', 'code', $keyword]);
-        $query->orWhere(['like', 'description', $keyword]);
-        $query->orWhere(['like', 'description_ar', $keyword]);
-      }
+        if(in_array($status, [1,0])) {
+          $query->andWhere(['voucher_status' => $status]);
+        }
 
-      $query->andWhere(['restaurant_uuid' => $store_uuid]);
-
-      return new ActiveDataProvider([
+        return new ActiveDataProvider([
           'query' => $query
-      ]);
-
-
+        ]);
     }
 
 
@@ -124,22 +127,17 @@ class VoucherController extends Controller {
 
         return [
             "operation" => "success",
-            "message" => "Voucher created successfully",
+            "message" => Yii::t('agent', "Voucher created successfully"),
             "data" => Voucher::findOne($model->voucher_id)
         ];
-
     }
-
-
 
      /**
       * Update voucher
       */
      public function actionUpdate($voucher_id, $store_uuid)
      {
-
          $model = $this->findModel($voucher_id, $store_uuid);
-
          $model->code =  Yii::$app->request->getBodyParam("code");
          $model->description =  Yii::$app->request->getBodyParam("description");
          $model->description_ar =  Yii::$app->request->getBodyParam("description_ar");
@@ -163,32 +161,27 @@ class VoucherController extends Controller {
              } else {
                  return [
                      "operation" => "error",
-                     "message" => "We've faced a problem updating the voucher"
+                     "message" => Yii::t('agent', "We've faced a problem updating the voucher"),
                  ];
              }
          }
 
          return [
              "operation" => "success",
-             "message" => "Voucher updated successfully",
+             "message" => Yii::t('agent',"Voucher updated successfully"),
              "data" => $model
          ];
      }
-
-
 
       /**
        * Ability to update voucher status
        */
       public function actionUpdateVoucherStatus() {
-
-
           $store_uuid =  Yii::$app->request->getBodyParam('store_uuid');
           $voucher_id =  Yii::$app->request->getBodyParam('voucher_id');
           $voucherStatus = (int) Yii::$app->request->getBodyParam('voucherStatus');
 
           $voucher_model = $this->findModel($voucher_id, $store_uuid);
-
 
           if ($voucherStatus) {
 
@@ -203,14 +196,11 @@ class VoucherController extends Controller {
 
               return [
                   "operation" => "success",
-                  "message" => "Voucher Status updated successfully"
+                  "message" => Yii::t('agent',"Voucher Status updated successfully")
               ];
 
           }
-
       }
-
-
 
       /**
       * Return Voucher detail
@@ -218,12 +208,8 @@ class VoucherController extends Controller {
        * @param type $order_uuid
        * @return type
        */
-      public function actionDetail($store_uuid, $voucher_id) {
-
-          $voucher =  $this->findModel($voucher_id, $store_uuid);
-
-          return $voucher;
-
+    public function actionDetail($store_uuid, $voucher_id) {
+        return $this->findModel($voucher_id, $store_uuid);
     }
 
     /**
@@ -234,8 +220,7 @@ class VoucherController extends Controller {
         Yii::$app->accountManager->getManagedAccount($store_uuid);
         $model =  $this->findModel($voucher_id, $store_uuid);
 
-        if (!$model->delete())
-        {
+        if (!$model->delete()) {
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",
@@ -244,14 +229,14 @@ class VoucherController extends Controller {
             } else {
                 return [
                     "operation" => "error",
-                    "message" => "We've faced a problem deleting the voucher"
+                    "message" => Yii::t('agent',"We've faced a problem deleting the voucher")
                 ];
             }
         }
 
         return [
             "operation" => "success",
-            "message" => "Voucher deleted successfully"
+            "message" => Yii::t('agent',"Voucher deleted successfully")
         ];
     }
 
@@ -274,8 +259,4 @@ class VoucherController extends Controller {
            throw new NotFoundHttpException('The requested record does not exist.');
        }
    }
-
-
-
-
 }

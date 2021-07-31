@@ -89,11 +89,6 @@ class AgentAssignment extends \yii\db\ActiveRecord {
                 return $this->addError('assignment_agent_email', 'This person has already been added as an agent.');
         }
 
-
-        if($this->role != self::AGENT_ROLE_BRANCH_MANAGER){
-          $this->business_location_id = null;
-        }
-
         return parent::beforeSave($insert);
     }
 
@@ -118,35 +113,47 @@ class AgentAssignment extends \yii\db\ActiveRecord {
     {
         return [
           'agent',
-          'restaurant'
+          'restaurant',
+          'businessLocation'
         ];
     }
-
-
 
     /**
      * Gets query for [[BusinessLocation]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getBusinessLocation()
+    public function getBusinessLocation($modelClass = "\common\models\BusinessLocation")
     {
-        return $this->hasOne(BusinessLocation::className(), ['business_location_id' => 'business_location_id']);
+        return $this->hasOne($modelClass::className(), ['business_location_id' => 'business_location_id']);
     }
 
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getAgent() {
-        return $this->hasOne(Agent::className(), ['agent_id' => 'agent_id']);
+    public function getAgent($modelClass = "\common\models\Agent") {
+        return $this->hasOne($modelClass::className(), ['agent_id' => 'agent_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    public function notificationMail($password) {
+        return Yii::$app->mailer->compose([
+            'html' => 'agent-invitation',
+        ], [
+            'model' => $this,
+            'password' => $password
+        ])
+            ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setTo($this->agent->agent_email)
+            ->setBcc(\Yii::$app->params['supportEmail'])
+            ->setSubject('Invitation')
+            ->send();
+    }
 }

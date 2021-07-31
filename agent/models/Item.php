@@ -2,7 +2,11 @@
 
 namespace agent\models;
 
+use common\models\ItemImage;
+use common\models\Option;
 use Yii;
+use yii\base\BaseObject;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "Item".
@@ -32,4 +36,160 @@ class Item extends \common\models\Item {
         return $fields;
     }
 
+    /**
+     * Upload item image  to Cloudinary
+     * @param $images
+     * @return array|false
+     * @throws \yii\base\Exception
+     */
+    public function saveItemImages($images)
+    {
+        $data = [];
+
+        if (count($images) > 0) {
+            foreach ($images as $img) {
+                if ($img['product_file_name']) {
+                    // check if same image exist then skip
+                    $exist = $this->getItemImages()->andWhere(['product_file_name'=>$img['product_file_name']])->exists();
+                    if ($exist) {
+                        continue;
+                    }
+                    try {
+                        $url = Yii::$app->temporaryBucketResourceManager->getUrl($img['product_file_name']);
+                        $filename = Yii::$app->security->generateRandomString();
+                        $data[] = $result = Yii::$app->cloudinaryManager->upload(
+                            $url,
+                            [
+                                'public_id' => "restaurants/" . $this->restaurant_uuid . "/items/" . $filename
+                            ]
+                        );
+                        $item_image_model = new ItemImage();
+                        $item_image_model->item_uuid = $this->item_uuid;
+                        $item_image_model->product_file_name = basename($result['url']);
+                        $item_image_model->save(false);
+
+                    } catch (\Cloudinary\Error $err) {
+                        Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($images));
+                        return false;
+                    }
+                }
+            }
+        }
+        return $data;
+    }
+
+    public function extraFields()
+    {
+        return [
+            'itemImage',
+            'itemImages',
+            'options',
+            'categoryItems',
+            'extraOptions',
+            'currency'
+        ];
+    }
+
+    public function getOptions($modelClass = "\agent\models\Option")
+    {
+        return parent::getOptions($modelClass);
+    }
+
+    /**
+     * Gets query for [[ItemImages]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItemImages($model = '\agent\models\ItemImage')
+    {
+        return parent::getItemImages($model);
+    }
+
+    /**
+     * @param string $model
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItemImage($model = '\agent\models\ItemImage'){
+        return parent::getItemImage($model);
+    }
+
+    /**
+     * Gets query for [[CategoryItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCategoryItems($model = '\agent\models\CategoryItem')
+    {
+        return parent::getCategoryItems($model);
+    }
+
+    /**
+     * Gets query for [[CategoryItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCategory($modelClass = "\agent\models\Category")
+    {
+        return parent::getCategory ($modelClass);
+    }
+
+    /**
+     * Gets query for [[Categories]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCategories($modelClass = "\agent\models\Category")
+    {
+        return parent::getCategories ($modelClass);
+    }
+
+    /**
+     * Gets query for [[RestaurantUu]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurant($modelClass = "\agent\models\Restaurant")
+    {
+        return parent::getRestaurant ($modelClass);
+    }
+
+    /**
+     * Gets query for [[Currency]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency($modelClass = "\agent\models\Currency")
+    {
+        return parent::getCurrency($modelClass);
+    }
+
+    /**
+     * Gets query for [[Options]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getExtraOptions($modelClass = "\agent\models\ExtraOption")
+    {
+        return parent::getExtraOptions($modelClass);
+    }
+
+    /**
+     * Gets query for [[OrderItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrderItems($modelClass = "\agent\models\OrderItem")
+    {
+        return parent::getOrderItems($modelClass);
+    }
+
+    /**
+     * Gets query for [[OrderItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrder($modelClass = "\agent\models\Order")
+    {
+        return parent::getOrder($modelClass);
+    }
 }

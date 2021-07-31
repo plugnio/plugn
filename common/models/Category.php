@@ -19,21 +19,24 @@ use Yii;
  * @property CategoryItem[] $categoryItems
  * @property Item[] $itemUus
  */
-class Category extends \yii\db\ActiveRecord {
+class Category extends \yii\db\ActiveRecord
+{
 
     public $image;
 
     /**
      * {@inheritdoc}
      */
-    public static function tableName() {
+    public static function tableName()
+    {
         return 'category';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules() {
+    public function rules()
+    {
         return [
             [['title', 'title_ar'], 'required'],
             //Upload Category Image
@@ -44,14 +47,15 @@ class Category extends \yii\db\ActiveRecord {
             [['sort_number'], 'integer', 'min' => 0],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['title', 'title_ar', 'subtitle', 'subtitle_ar'], 'string', 'max' => 255],
-            [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
+            [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className (), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels() {
+    public function attributeLabels()
+    {
         return [
             'category_id' => 'Category ID',
             'title' => 'Title',
@@ -82,12 +86,13 @@ class Category extends \yii\db\ActiveRecord {
      * @param type $insert
      * @param type $changedAttributes
      */
-    public function afterSave($insert, $changedAttributes) {
-        parent::afterSave($insert, $changedAttributes);
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave ($insert, $changedAttributes);
 
         if (!$insert && isset($changedAttributes['category_image']) && $this->image) {
             if ($changedAttributes['category_image']) {
-                $this->deleteCategoryImage($changedAttributes['category_image']);
+                $this->deleteCategoryImage ($changedAttributes['category_image']);
             }
         }
     }
@@ -95,115 +100,157 @@ class Category extends \yii\db\ActiveRecord {
     /**
      * Delete Category Image
      */
-    public function deleteCategoryImage($category_image = null) {
+    public function deleteCategoryImage($category_image = null)
+    {
         if (!$category_image)
-          $category_image = $this->category_image;
+            $category_image = $this->category_image;
 
         $imageURL = "restaurants/" . $this->restaurant_uuid . "/category/" . $category_image;
 
         try {
-            Yii::$app->cloudinaryManager->delete($imageURL);
+            Yii::$app->cloudinaryManager->delete ($imageURL);
         } catch (\Cloudinary\Error $err) {
-            Yii::error('Error while deleting thumbnail image to Cloudinry: ' . json_encode($err));
+            Yii::error ('Error while deleting thumbnail image to Cloudinry: ' . json_encode ($err));
         }
     }
 
-    public function beforeDelete() {
-      if($this->category_image)
-        $this->deleteCategoryImage();
-        return parent::beforeDelete();
+    public function beforeDelete()
+    {
+        if ($this->category_image)
+            $this->deleteCategoryImage ();
+
+        return parent::beforeDelete ();
     }
 
 
-
-        /**
-         * Return Category Image url
-         */
-        public function getCategoryImage() {
-            return 'https://res.cloudinary.com/plugn/image/upload/c_scale,w_600/restaurants/' . $this->restaurant_uuid . "/category/" . $this->category_image;
-        }
-
+    /**
+     * Return Category Image url
+     */
+    public function getCategoryImage()
+    {
+        return 'https://res.cloudinary.com/plugn/image/upload/c_scale,w_600/restaurants/' . $this->restaurant_uuid . "/category/" . $this->category_image;
+    }
 
 
     /**
      * Upload category image to cloudinary
      * @param type $imageURL
      */
-    public function uploadCategoryImage($imageURL) {
+    public function uploadCategoryImage($imageURL)
+    {
 
-        $filename = Yii::$app->security->generateRandomString();
+        $filename = Yii::$app->security->generateRandomString ();
 
         try {
-            $result = Yii::$app->cloudinaryManager->upload(
-                    $imageURL, [
-                'public_id' => "restaurants/" . $this->restaurant_uuid . "/category/" . $filename
-                    ]
+            $result = Yii::$app->cloudinaryManager->upload (
+                $imageURL, [
+                    'public_id' => "restaurants/" . $this->restaurant_uuid . "/category/" . $filename
+                ]
             );
 
             //Delete old store's image
             if ($this->category_image) {
-                $this->deleteCategoryImage();
+                $this->deleteCategoryImage ();
             }
 
 
-            if ($result || count($result) > 0) {
-                $this->category_image = basename($result['url']);
-                $this->save();
+            if ($result || count ($result) > 0) {
+                $this->category_image = basename ($result['url']);
+                $this->save ();
             }
 
-            unlink($imageURL);
+            unlink ($imageURL);
 
 
         } catch (\Cloudinary\Error $err) {
-            Yii::error("Error when uploading category image to Cloudinry: " . json_encode($err));
-            Yii::error("Error when uploading category image to Cloudinry: ImageUrl Value " . json_encode($imageURL));
+            Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
+            Yii::error ("Error when uploading category image to Cloudinry: ImageUrl Value " . json_encode ($imageURL));
         }
     }
 
+    /**
+     * Upload category image to cloudinary
+     * @param type $imageURL
+     */
+    public function updateImage($imageURL)
+    {
+        $filename = Yii::$app->security->generateRandomString ();
 
+        try {
+            //Delete old category image
 
-  /**
-   * Upload category image to cloudinary
-   */
-  public function moveCategoryImageFromS3toCloudinary() {
+            if ($this->category_image) {
+                $this->deleteCategoryImage ();
+            }
 
-      if (!$this->category_image) {
-          $this->addError('category image', Yii::t('app', 'Image not available to save.'));
-          return false;
-      }
+            if(!$imageURL) {
+                return true;
+            }
 
-      try {
-          $url = Yii::$app->temporaryBucketResourceManager->getUrl($this->category_image);
+            $result = Yii::$app->cloudinaryManager->upload (
+                $imageURL,
+                [
+                    'public_id' => "restaurants/" . $this->restaurant_uuid . "/category/" . $filename
+                ]
+            );
 
-          $filename = Yii::$app->security->generateRandomString();
+            if ($result || count ($result) > 0) {
+                $this->category_image = basename ($result['url']);
+            }
 
-          $result = Yii::$app->cloudinaryManager->upload(
-              $url, [
-                'public_id' => "restaurants/" . $this->restaurant_uuid . "/category/" . $filename
-              ]
-          );
+            if(!str_contains ($imageURL, 'amazonaws.com'))
+                unlink ($imageURL);
 
-          if ($result) {
-              $this->category_image = basename($result['url']);
-              // $this->scenario = 'updateLogo';
-              return $this->save();
-          }
-      } catch (\Cloudinary\Error  $err) {
+            return true;
 
-          $this->addError('category_image', Yii::t('app', 'Please try again.'));
-          Yii::error("Error when uploading category image to Cloudinry: " . json_encode($err));
+        } catch (\Cloudinary\Error $err) {
+            Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
+        }
+    }
 
-          return false;
+    /**
+     * Upload category image to cloudinary
+     */
+    public function moveCategoryImageFromS3toCloudinary()
+    {
 
-      }
-  }
+        if (!$this->category_image) {
+            $this->addError ('category image', Yii::t ('app', 'Image not available to save.'));
+            return false;
+        }
 
+        try {
+            $url = Yii::$app->temporaryBucketResourceManager->getUrl ($this->category_image);
+
+            $filename = Yii::$app->security->generateRandomString ();
+
+            $result = Yii::$app->cloudinaryManager->upload (
+                $url, [
+                    'public_id' => "restaurants/" . $this->restaurant_uuid . "/category/" . $filename
+                ]
+            );
+
+            if ($result) {
+                $this->category_image = basename ($result['url']);
+                // $this->scenario = 'updateLogo';
+                return $this->save ();
+            }
+        } catch (\Cloudinary\Error  $err) {
+
+            $this->addError ('category_image', Yii::t ('app', 'Please try again.'));
+            Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
+
+            return false;
+
+        }
+    }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurant($modelClass = "\common\models\Restaurant")
+    {
+        return $this->hasOne ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -211,8 +258,9 @@ class Category extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCategoryItems() {
-        return $this->hasMany(CategoryItem::className(), ['category_id' => 'category_id']);
+    public function getCategoryItems($modelClass = "\common\models\CategoryItem")
+    {
+        return $this->hasMany ($modelClass::className (), ['category_id' => 'category_id']);
     }
 
     /**
@@ -220,11 +268,11 @@ class Category extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItems() {
-        return $this->hasMany(Item::className(), ['item_uuid' => 'item_uuid'])
-                        ->where(['item_status' => Item::ITEM_STATUS_PUBLISH])
-                        ->viaTable('category_item', ['category_id' => 'category_id'])
-                        ->orderBy([new \yii\db\Expression('item.sort_number IS NULL, item.sort_number ASC, item.sku IS NULL, item.sku ASC')]);
+    public function getItems($modelClass = "\common\models\Item")
+    {
+        return $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
+            ->andWhere (['item_status' => Item::ITEM_STATUS_PUBLISH])
+            ->viaTable ('category_item', ['category_id' => 'category_id'])
+            ->orderBy ([new \yii\db\Expression('item.sort_number IS NULL, item.sort_number ASC, item.sku IS NULL, item.sku ASC')]);
     }
-
 }

@@ -51,8 +51,8 @@ class RestaurantPaymentMethod extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPaymentMethod() {
-        return $this->hasOne(PaymentMethod::className(), ['payment_method_id' => 'payment_method_id']);
+    public function getPaymentMethod($modelClass = "\common\models\PaymentMethod") {
+        return $this->hasOne($modelClass::className(), ['payment_method_id' => 'payment_method_id']);
     }
 
     /**
@@ -60,8 +60,8 @@ class RestaurantPaymentMethod extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantUu() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
 }

@@ -5,9 +5,7 @@ namespace agent\modules\v1\controllers;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Url;
-use yii\web\NotFoundHttpException;
-use common\models\Bank;
+use agent\models\Bank;
 
 class BankController extends Controller {
 
@@ -59,12 +57,9 @@ class BankController extends Controller {
         return $actions;
     }
 
-
     /**
-    * Get all store's banks
-     * @param type $id
-     * @param type $store_uuid
-     * @return type
+     * @param $store_uuid
+     * @return ActiveDataProvider
      */
     public function actionList($store_uuid) {
 
@@ -72,15 +67,8 @@ class BankController extends Controller {
 
           $banks =  Bank::find();
 
-
           return new ActiveDataProvider([
             'query' => $banks
           ]);
-
-
-
-
     }
-
-
 }

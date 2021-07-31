@@ -7,7 +7,8 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
-use common\models\Category;
+use agent\models\Category;
+
 
 class CategoryController extends Controller {
 
@@ -64,31 +65,41 @@ class CategoryController extends Controller {
     * Get all store's categories
      * @param type $id
      * @param type $store_uuid
-     * @return type
+     * @return ActiveDataProvider
      */
      public function actionList($store_uuid) {
 
          $keyword = Yii::$app->request->get('keyword');
+         $page = Yii::$app->request->get('page');
 
          Yii::$app->accountManager->getManagedAccount($store_uuid);
 
          $query =  Category::find();
 
          if ($keyword){
-           $query->where(['like', 'title', $keyword]);
-           $query->orWhere(['like', 'title_ar', $keyword]);
-           $query->orWhere(['like', 'subtitle', $keyword]);
-           $query->orWhere(['like', 'subtitle_ar', $keyword]);
+             $query->andWhere([
+                 'or', [
+                     ['like', 'title', $keyword],
+                     ['like', 'title_ar', $keyword],
+                     ['like', 'subtitle', $keyword],
+                     ['like', 'subtitle_ar', $keyword]
+                 ]
+             ]);
          }
 
          $query->andWhere(['restaurant_uuid' => $store_uuid]);
 
+         if(!$page) {
+             return new ActiveDataProvider([
+                 'query' => $query,
+                 'pagination' => false
+             ]);
+         }
+
          return new ActiveDataProvider([
            'query' => $query
          ]);
-
      }
-
 
     /**
      * Create category
@@ -97,6 +108,7 @@ class CategoryController extends Controller {
     public function actionCreate() {
 
         $store_uuid = Yii::$app->request->getBodyParam("store_uuid");
+
         Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $model = new Category();
@@ -107,6 +119,20 @@ class CategoryController extends Controller {
         $model->subtitle_ar = Yii::$app->request->getBodyParam("subtitle_ar");
         $model->sort_number = Yii::$app->request->getBodyParam("sort_number");
 
+        //validate before uploading image
+
+        if (!$model->validate()) {
+            return [
+                "operation" => "error",
+                "message" => $model->errors
+            ];
+        }
+
+        $category_image = Yii::$app->request->getBodyParam('category_image');
+
+        if($category_image) {
+            $model->updateImage($category_image);
+        }
 
         if (!$model->save()) {
             return [
@@ -117,19 +143,16 @@ class CategoryController extends Controller {
 
         return [
             "operation" => "success",
-            "message" => "Category created successfully",
+            "message" => Yii::t('agent', "Category created successfully"),
             "model" => Category::findOne($model->category_id)
         ];
-
     }
-
 
      /**
       * Update category
       */
      public function actionUpdate($category_id, $store_uuid)
      {
-
          $model = $this->findModel($category_id, $store_uuid);
 
          $model->title = Yii::$app->request->getBodyParam("title");
@@ -138,6 +161,20 @@ class CategoryController extends Controller {
          $model->subtitle_ar = Yii::$app->request->getBodyParam("subtitle_ar");
          $model->sort_number = Yii::$app->request->getBodyParam("sort_number");
 
+         //validate before uploading image
+
+         if (!$model->validate()) {
+             return [
+                 "operation" => "error",
+                 "message" => $model->errors
+             ];
+         }
+
+         $category_image = Yii::$app->request->getBodyParam('category_image');
+
+         if($model->category_image != $category_image) {
+             $model->updateImage($category_image);
+         }
 
          if (!$model->save())
          {
@@ -149,19 +186,17 @@ class CategoryController extends Controller {
              } else {
                  return [
                      "operation" => "error",
-                     "message" => "We've faced a problem updating the category"
+                     "message" => Yii::t('agent',"We've faced a problem updating the category")
                  ];
              }
          }
 
          return [
              "operation" => "success",
-             "message" => "Category updated successfully",
+             "message" => Yii::t('agent',"Category updated successfully"),
              "model" => $model
          ];
      }
-
-
 
     /**
      * Allows agent to upload category image
@@ -177,12 +212,12 @@ class CategoryController extends Controller {
         if (!isset($model->category_id)) {
             return [
                 "operation" => "error",
-                "message" => 'Invalid Category ID'
+                "message" => Yii::t('agent','Invalid Category ID')
             ];
         }
 
-
         //Delete old category image
+
         if ($model->category_image) {
             $model->deleteCategoryImage();
         }
@@ -196,7 +231,7 @@ class CategoryController extends Controller {
                 'operation' => 'success',
                 'url' => Url::to("@categoty-image/" . 'restaurants/' . $model->restaurant_uuid . "/category/" . $model->category_image),
                 'logo' => $model->category_image,
-                'message' => Yii::t('app', 'Category Image Uploaded Successfully')
+                'message' => Yii::t('agent', 'Category Image Uploaded Successfully')
             ];
         } else {
             return [
@@ -205,8 +240,6 @@ class CategoryController extends Controller {
             ];
         }
     }
-
-
 
       /**
        * Delete Category
@@ -226,14 +259,14 @@ class CategoryController extends Controller {
               } else {
                   return [
                       "operation" => "error",
-                      "message" => "We've faced a problem deleting the category"
+                      "message" => Yii::t('agent',"We've faced a problem deleting the category")
                   ];
               }
           }
 
           return [
               "operation" => "success",
-              "message" => "Category deleted successfully"
+              "message" => Yii::t('agent',"Category deleted successfully")
           ];
       }
 
@@ -246,10 +279,7 @@ class CategoryController extends Controller {
          */
         public function actionDetail($store_uuid, $category_id) {
 
-            $model =  $this->findModel($category_id, $store_uuid);
-
-            return $model;
-
+            return $this->findModel($category_id, $store_uuid);
       }
 
 
@@ -270,7 +300,4 @@ class CategoryController extends Controller {
               throw new NotFoundHttpException('The requested record does not exist.');
           }
       }
-
-
-
 }

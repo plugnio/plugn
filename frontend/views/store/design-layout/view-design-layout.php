@@ -20,6 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
       <?= Html::a('Update', ['update-design-layout', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
 
     </p>
+
     <div class="card">
         <div class="card-body">
             <div class="box-body table-responsive no-padding">

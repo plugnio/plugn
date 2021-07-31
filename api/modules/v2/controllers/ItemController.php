@@ -62,10 +62,17 @@ class ItemController extends Controller {
       if($restaurant_uuid){
 
         $category = Category::find()
-                    ->where(['category.restaurant_uuid' => $restaurant_uuid, 'category.category_id' => $category_id])
+                    ->andWhere([
+                        'category.restaurant_uuid' => $restaurant_uuid,
+                        'category.category_id' => $category_id
+                    ])
                     ->joinWith(['items', 'items.options', 'items.options.extraOptions','items.itemImages'])
                     ->asArray()
                     ->one();
+
+          foreach ($category['items'] as $key => $item) {
+              unset($category['items'][$key]['unit_sold']);
+          }
 
         return [
             'category' => $category,
@@ -80,27 +87,7 @@ class ItemController extends Controller {
       }
     }
 
-    /**
-     */
-    // public function actionDeleteItemImage() {
-    //   $fullPath = Yii::$app->request->getBodyParam("file");
-    //   $file_name = Yii::$app->request->getBodyParam("name");
-    //
-    //
-    //   $restaurant_uuid = explode("restaurants/", $fullPath);
-    //   $restaurant_uuid = $restaurant_uuid[1];
-    //   $restaurant_uuid = explode("/items/" . $file_name, $restaurant_uuid);
-    //   $restaurant_uuid = $restaurant_uuid[0];
-    //
-    //
-    //   $item_image = ItemImage::find()->where(['product_file_name' => $file_name])->one();
-    //
-    //
-    //   if($item_image->item->restaurant_uuid == $restaurant_uuid && $item_image)
-    //     $item_image->delete();
-    //
-    //   return true;
-    // }
+
 
     /**
      * Return restaurant menu
@@ -119,19 +106,23 @@ class ItemController extends Controller {
             unset($restaurant['live_public_key']);
 
             $restaurantMenu = Category::find()
-                    ->where(['restaurant_uuid' => $restaurant_uuid])
+                    ->andWhere(['restaurant_uuid' => $restaurant_uuid])
                     ->with('items', 'items.options', 'items.options.extraOptions','items.itemImages')
                     ->orderBy([new \yii\db\Expression('sort_number IS NULL, sort_number ASC')])
                     ->asArray()
                     ->all();
 
 
-            foreach ($restaurantMenu as $item) {
-                unset($item['categoryItems']);
+            foreach ($restaurantMenu as $category) {
+                unset($category['categoryItems']);
             }
 
-            foreach ($restaurantMenu as $key => $item) {
+            foreach ($restaurantMenu as $key => $category) {
                 unset($restaurantMenu[$key]['categoryItems']);
+
+                foreach ($category['items'] as $itemKey => $item) {
+                  unset($restaurantMenu[$key]['items'][$itemKey]['unit_sold']);
+                }
             }
 
             return [
@@ -155,12 +146,19 @@ class ItemController extends Controller {
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
 
         $item_model = Item::find()
-                ->where(['item_uuid' => $item_uuid, 'restaurant_uuid' => $restaurant_uuid])
+                ->andWhere([
+                    'item_uuid' => $item_uuid,
+                    'restaurant_uuid' => $restaurant_uuid
+                ])
                 ->with('options', 'options.extraOptions','itemImages')
                 ->asArray()
                 ->one();
 
+
         if ($item_model) {
+
+          unset($item_model['unit_sold']);
+
             return [
                 'operation' => 'success',
                 'itemData' => $item_model

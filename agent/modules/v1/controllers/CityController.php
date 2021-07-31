@@ -2,12 +2,12 @@
 
 namespace agent\modules\v1\controllers;
 
+use agent\models\DeliveryZone;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Url;
-use yii\web\NotFoundHttpException;
-use common\models\City;
+use agent\models\City;
+
 
 class CityController extends Controller {
 
@@ -59,35 +59,42 @@ class CityController extends Controller {
         return $actions;
     }
 
-
     /**
     * Get all cities data
-     * @param type $country_id
-     * @param type $store_uuid
      * @return type
      */
-    public function actionList($country_id,$store_uuid) {
+    public function actionList() {
 
         $keyword = Yii::$app->request->get('keyword');
+        $country_id = Yii::$app->request->get('country_id');
+        $store_uuid = Yii::$app->request->get('store_uuid');
+        $delivery_zone_id = Yii::$app->request->get('delivery_zone_id');
 
         Yii::$app->accountManager->getManagedAccount($store_uuid);
 
+        if($delivery_zone_id) {
+            $dz = DeliveryZone::findOne(['delivery_zone_id' => $delivery_zone_id]);
+
+            if($dz)
+                $country_id = $dz->country_id;
+        }
+
         $query =  City::find();
 
-        if ($keyword){
-          $query->where(['like', 'city_name', $keyword]);
-          $query->orWhere(['like', 'city_name_ar', $keyword]);
+        if ($keyword) {
+          $query->andWhere([
+              'OR',
+              ['like', 'city_name', $keyword],
+              ['like', 'city_name_ar', $keyword]
+          ]);
         }
 
         $query->andWhere(['country_id' => $country_id]);
 
-
         return new ActiveDataProvider([
           'query' => $query
         ]);
-
     }
-
 
     /**
     * Return City detail
@@ -100,7 +107,7 @@ class CityController extends Controller {
       if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
         $city =  City::find()
-                  ->where(['city_id' =>  $city_id])
+                  ->andWhere(['city_id' =>  $city_id])
                   ->one();
 
         return $city;
@@ -108,7 +115,4 @@ class CityController extends Controller {
       }
 
   }
-
-
-
 }

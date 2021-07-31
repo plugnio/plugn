@@ -3,6 +3,9 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\AttributeBehavior;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "order_item".
@@ -15,7 +18,8 @@ use Yii;
  * @property float $item_price
  * @property int|null $qty
  * @property string|null $customer_instruction
- *
+ * @property datetime $order_item_created_at
+ * @property datetime $order_item_updated_at
  * @property Item $item
  * @property Restaurant $restaurant
  * @property Order $order
@@ -44,6 +48,20 @@ class OrderItem extends \yii\db\ActiveRecord {
             [['item_name', 'item_name_ar', 'customer_instruction'], 'string', 'max' => 255],
             [['item_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_uuid' => 'item_uuid']],
             [['order_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_uuid' => 'order_uuid']],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors() {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'createdAtAttribute' => 'order_item_created_at',
+                'updatedAtAttribute' => 'order_item_updated_at',
+                'value' => new Expression('NOW()'),
+            ]
         ];
     }
 
@@ -86,8 +104,6 @@ class OrderItem extends \yii\db\ActiveRecord {
           $totalPrice = $this->item->item_price; //5
         else
           $totalPrice = $this->item_price; //5
-
-
 
         foreach ($this->getOrderItemExtraOptions()->asArray()->all() as $extraOption)
             $totalPrice += $extraOption['extra_option_price']; //1
@@ -207,8 +223,8 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItem() {
-        return $this->hasOne(Item::className(), ['item_uuid' => 'item_uuid']);
+    public function getItem($modelClass = "\common\models\Item") {
+        return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -216,9 +232,9 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItemImage()
+    public function getItemImage($modelClass = "\common\models\ItemImage")
     {
-        return $this->hasOne(ItemImage::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -226,8 +242,8 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrder() {
-        return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid']);
+    public function getOrder($modelClass = "\common\models\Order") {
+        return $this->hasOne($modelClass::className(), ['order_uuid' => 'order_uuid']);
     }
 
     /**
@@ -235,8 +251,9 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('order');
+    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->via('order');
     }
 
     /**
@@ -244,9 +261,10 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
+    public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])
+            ->via('restaurant');
     }
 
     /**
@@ -254,8 +272,7 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderItemExtraOptions() {
-        return $this->hasMany(OrderItemExtraOption::className(), ['order_item_id' => 'order_item_id']);
+    public function getOrderItemExtraOptions($modelClass = "\common\models\OrderItemExtraOption") {
+        return $this->hasMany($modelClass::className(), ['order_item_id' => 'order_item_id']);
     }
-
 }

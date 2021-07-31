@@ -62,7 +62,7 @@ class AgentController extends Controller {
         $model = $this->findModel($storeUuid);
 
         $agentAssignment = $model->getAgentAssignments()
-                            ->where(['restaurant_uuid' => $storeUuid, 'agent_id' =>Yii::$app->user->identity->agent_id])
+                            ->andWhere(['restaurant_uuid' => $storeUuid, 'agent_id' =>Yii::$app->user->identity->agent_id])
                             ->one();
 
         if(  $agentAssignment->load(Yii::$app->request->post()) && $model->load(Yii::$app->request->post()) ){

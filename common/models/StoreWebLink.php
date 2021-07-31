@@ -53,9 +53,9 @@ class StoreWebLink extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
+    public function getRestaurant($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -63,8 +63,8 @@ class StoreWebLink extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getWebLink()
+    public function getWebLink($modelClass = "\common\models\WebLink")
     {
-        return $this->hasOne(WebLink::className(), ['web_link_id' => 'web_link_id']);
+        return $this->hasOne($modelClass::className(), ['web_link_id' => 'web_link_id']);
     }
 }
