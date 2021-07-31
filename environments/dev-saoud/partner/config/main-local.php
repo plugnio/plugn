@@ -4,7 +4,7 @@ $config = [
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
-            'cookieValidationKey' => 'ijCrn6JMNFW_Gk_4Z5I_NhFgag4m_Bg-',
+            'cookieValidationKey' => '',
         ],
         'urlManager' => [
             'class' => 'yii\web\UrlManager',
