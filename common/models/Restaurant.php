@@ -294,7 +294,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 'message' => Yii::t('app',"Please upload identification file (front side)"),
                 'resourceManager' => Yii::$app->temporaryBucketResourceManager,
                 'when' => function($model, $attribute) {
-                    return $model->{$attribute} !== $model->getOldAttribute($attribute);
+                    return $model->{$attribute} !== $model->getOldAttribute($attribute)&& $this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT;
                 }
             ],
             [
@@ -304,7 +304,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 'message' => Yii::t('app',"Please upload identification file (back side)"),
                 'resourceManager' => Yii::$app->temporaryBucketResourceManager,
                 'when' => function($model, $attribute) {
-                    return $model->{$attribute} !== $model->getOldAttribute($attribute);
+                    return $model->{$attribute} !== $model->getOldAttribute($attribute) && $this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT;
                 }
             ],
             [
