@@ -67,6 +67,7 @@ class BankDiscountController extends Controller {
     public function actionList($store_uuid) {
 
         $keyword = Yii::$app->request->get('keyword');
+        $status = Yii::$app->request->get('status');
 
         Yii::$app->accountManager->getManagedAccount($store_uuid);
 
@@ -83,6 +84,11 @@ class BankDiscountController extends Controller {
                 ]
             );
         }
+
+        if(in_array($status, [1,2])) {
+            $query->andWhere(['bank_discount_status' => $status]);
+        }
+
         $query->andWhere(['bank_discount.restaurant_uuid' => $store_uuid]);
 
         return new ActiveDataProvider([
