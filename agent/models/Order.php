@@ -50,11 +50,13 @@ class Order extends \common\models\Order
             'businessLocation',
             'payment',
             'orderItems',
+            'totalOrderItems',
             'voucher',
             'bankDiscount',
             'refunds',
             'area',
-            'currency'
+            'currency',
+            'itemImage'//first image in first order item 
         ];
     }
 
@@ -163,6 +165,17 @@ class Order extends \common\models\Order
      *
      * @return \yii\db\ActiveQuery
      */
+    public function getTotalOrderItems($modelClass = "\agent\models\OrderItem")
+    {
+        return parent::getOrderItems ($modelClass)->count();
+    }
+    
+
+    /**
+     * Gets query for [[OrderItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
     public function getSelectedItems($modelClass = "\agent\models\OrderItem")
     {
         return parent::getSelectedItems ($modelClass);
@@ -176,6 +189,11 @@ class Order extends \common\models\Order
     public function getItems($modelClass = "\agent\models\Item")
     {
         return parent::getItems ($modelClass);
+    }
+
+    public function getItemImage($modelClass = "\agent\models\ItemImage")
+    {
+        return parent::getItemImage($modelClass);
     }
 
     /**
