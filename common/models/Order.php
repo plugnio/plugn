@@ -1207,6 +1207,13 @@ class Order extends \yii\db\ActiveRecord
             ->via ('orderItems');
     }
 
+
+    public function getItemImage($modelClass = "\agent\models\ItemImage")
+    {
+        return $this->hasOne ($modelClass::className (), ['item_uuid' => 'item_uuid'])
+            ->via ('orderItems');
+    }
+
     /**
      * Gets query for [[Customer]].
      *
