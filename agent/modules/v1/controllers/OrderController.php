@@ -4,6 +4,7 @@ namespace agent\modules\v1\controllers;
 
 use common\models\AreaDeliveryZone;
 use Yii;
+use yii\base\BaseObject;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
@@ -71,7 +72,7 @@ class OrderController extends Controller
      * @param $type
      * @return ActiveDataProvider
      */
-    public function actionList($type)
+    public function actionList($type = null)
     {
         $store_uuid = Yii::$app->request->get ('store_uuid');
         $keyword = Yii::$app->request->get ('keyword');
@@ -98,16 +99,34 @@ class OrderController extends Controller
         // grid filtering conditions
         $query->orderBy (['order_created_at' => SORT_DESC]);
 
-        if ($status) {
+        if ($status !== null) {
             $query->andFilterWhere(['order_status' => $status]);
         }
 
         if ($date_range) {
             $query->filterByCreatedDate($date_range);
         }
+
         if ($customer_id) {
             $query->andFilterWhere(['customer_id' => $customer_id]);
         }
+
+        $query->andWhere(['restaurant_uuid' => $store_uuid]);
+
+        if ($keyword) {
+            $query->andWhere (
+                ['or',
+                    ['like', 'business_location_name', $keyword],
+                    ['like', 'payment_method_name', $keyword],
+                    ['like', 'order_uuid', $keyword],
+                    ['like', 'customer_name', $keyword],
+                    ['like', 'customer_phone_number', $keyword],
+                ]
+            );
+        }
+
+        $query->andWhere(['restaurant_uuid' => $store_uuid]);
+
         if ($type == 'active') {
             $query->andWhere (
                 [
@@ -128,23 +147,65 @@ class OrderController extends Controller
             $query->andWhere (['order_status' => Order::STATUS_DRAFT]);
         }
 
-        $query->andWhere(['restaurant_uuid' => $store_uuid]);
-
-        if ($keyword) {
-            $query->andWhere (
-                ['or',
-                    ['like', 'business_location_name', $keyword],
-                    ['like', 'payment_method_name', $keyword],
-                    ['like', 'order_uuid', $keyword],
-                    ['like', 'customer_name', $keyword],
-                    ['like', 'customer_phone_number', $keyword],
-                ]
-            );
-        }
-
         return new ActiveDataProvider([
             'query' => $query
         ]);
+    }
+
+    /**
+     * get order stats
+     * @return ActiveDataProvider
+     */
+    public function actionStats()
+    {
+        $store = Yii::$app->accountManager->getManagedAccount ();
+
+        $response = [];
+
+        $response['allCount'] = $store->getOrders()
+            ->count();
+
+        $response['draftCount'] = $store->getOrders()
+            ->andFilterWhere(['order_status' => Order::STATUS_DRAFT])
+            ->count();
+
+        $response['acceptedCount'] = $store->getOrders()
+            ->andFilterWhere(['order_status' => Order::STATUS_ACCEPTED])
+            ->count();
+
+        $response['pendingCount'] = $store->getOrders()
+            ->andFilterWhere(['order_status' => Order::STATUS_PENDING])
+            ->count();
+
+        $response['preparedCount'] = $store->getOrders()
+            ->andFilterWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+            ->count();
+
+        $response['outForDeliveryCount'] = $store->getOrders()
+            ->andFilterWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+            ->count();
+
+        $response['completeCount'] = $store->getOrders()
+            ->andFilterWhere(['order_status' => Order::STATUS_COMPLETE])
+            ->count();
+
+        $response['canceledCount'] = $store->getOrders()
+            ->andFilterWhere(['order_status' => Order::STATUS_CANCELED])
+            ->count();
+
+        $response['partialRefundedCount'] = $store->getOrders()
+            ->andFilterWhere(['order_status' => Order::STATUS_PARTIALLY_REFUNDED])
+            ->count();
+
+        $response['refundedCount'] = $store->getOrders()
+            ->andFilterWhere(['order_status' => Order::STATUS_REFUNDED])
+            ->count();
+
+        $response['abandonedCount'] = $store->getOrders()
+            ->andFilterWhere(['order_status' => Order::STATUS_ABANDONED_CHECKOUT])
+            ->count();
+
+        return $response;
     }
 
     /**
