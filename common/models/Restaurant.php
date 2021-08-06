@@ -1334,18 +1334,18 @@ class Restaurant extends \yii\db\ActiveRecord
     public function isOpen($asap = null) {
 
         $opening_hour_model = OpeningHour::find()
-                                ->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime($asap !== null ? $asap : "now"))])
-                                ->andWhere(['<=','open_at', date("H:i:s", strtotime($asap !== null ? $asap : "now"))])
-                                ->andWhere(['>=','close_at', date("H:i:s", strtotime($asap !== null ? $asap : "now"))])
+                                ->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])
+                                ->andWhere(['<=','open_at', date("H:i:s", strtotime("now"))])
+                                ->andWhere(['>=','close_at', date("H:i:s", strtotime("now"))])
                                 ->orderBy(['open_at' => SORT_ASC])
                                 ->one();
 
 
           if ($opening_hour_model) {
               if (
-                   date("w", strtotime($asap !== null ? $asap : "now")) == $opening_hour_model->day_of_week &&
-                   strtotime($asap !== null ? $asap : "now") > strtotime(date('c', strtotime($opening_hour_model->open_at, strtotime($asap ? $asap : "now") ))) &&
-                   strtotime($asap !== null ? $asap : "now") <  strtotime(date('c', strtotime($opening_hour_model->close_at, strtotime($asap ? $asap : "now") )) )
+                   date("w", strtotime("now")) == $opening_hour_model->day_of_week &&
+                   strtotime("now") > strtotime(date('c', strtotime($opening_hour_model->open_at, strtotime("now") ))) &&
+                   strtotime("now") <  strtotime(date('c', strtotime($opening_hour_model->close_at, strtotime("now") )) )
                   )
                   return true;
           }
