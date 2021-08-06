@@ -9,7 +9,9 @@ class City extends \common\models\City
     public function extraFields()
     {
         $fields = parent::fields();
-
+        $fields['areas'] = function ($model) {
+            return $model->areas;
+        };
         $fields['totalDeliveryAreas'] = function ($model) {
 
             $delivery_zone_id = Yii::$app->request->get('delivery_zone_id');
