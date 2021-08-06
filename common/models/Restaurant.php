@@ -2514,23 +2514,8 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getPartner()
     {
-        return $this->hasOne(Partner::className(), ['referral_code' => 'referral_code']);
-    }
-
-
-      /**
-     * Gets query for [[Payments]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTotalEarnings()
-    {
-        return $this->hasMany(Payment::className(), ['restaurant_uuid' => 'restaurant_uuid'])
-                    ->via('activeOrders')
-                    ->joinWith('order')
-                    ->filterWhere (['NOT IN', 'order.order_status', [Order::STATUS_ABANDONED_CHECKOUT, Order::STATUS_DRAFT,Order::STATUS_CANCELED,Order::STATUS_REFUNDED,Order::STATUS_PARTIALLY_REFUNDED]])
-                    ->andWhere(['payment.payout_status' => Payment::PAYOUT_STATUS_UNPAID])
-                    ->sum('payment.partner_fee');
+        return $this->hasOne(Partner::className(), ['referral_code' => 'referral_code'])
+                ->where(['partner_status' => Partner::STATUS_ACTIVE]);
     }
 
     /**

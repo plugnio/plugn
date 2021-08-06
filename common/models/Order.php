@@ -709,7 +709,7 @@ class Order extends \yii\db\ActiveRecord
 
         if($this->payment_uuid){
           if($this->currency->code == 'KWD'){
-            $plugn_fee = $this->payment->plugn_fee * 3.28;
+            $plugn_fee = ($this->payment->plugn_fee + $this->payment->partner_fee) * 3.28;
             $total_price = $total_price * 3.28;
             $delivery_fee = $delivery_fee * 3.28;
             $subtotal = $subtotal * 3.28;
@@ -717,14 +717,14 @@ class Order extends \yii\db\ActiveRecord
 
           }
           else if($this->currency->code == 'SAR'){
-            $plugn_fee = $this->payment->plugn_fee * 0.27;
+            $plugn_fee = ($this->payment->plugn_fee + $this->payment->partner_fee) * 0.27;
             $total_price = $total_price *  0.27;
             $delivery_fee = $delivery_fee * 0.27;
             $subtotal = $subtotal * 0.27;
             $payment_gateway_fee = $this->payment->payment_gateway_fee * 0.27;
           }
           else if($this->currency->code == 'BHD'){
-            $plugn_fee = $this->payment->plugn_fee * 2.65;
+            $plugn_fee = ($this->payment->plugn_fee + $this->payment->partner_fee) * 2.65;
             $total_price = $total_price  * 2.65;
             $delivery_fee = $delivery_fee * 2.65;
             $subtotal = $subtotal * 2.65;

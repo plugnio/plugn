@@ -24,7 +24,7 @@ use yii\web\NotFoundHttpException;
  * @property double $payment_gateway_fee gateway fee charged
  * @property double $plugn_fee our commision
  * @property double $partner_fee
-* @property  double $partner_fee
+ * @property  double $payout_status
  * @property double $payment_token
  * @property string $payment_udf1
  * @property string $payment_udf2
@@ -44,8 +44,8 @@ class Payment extends \yii\db\ActiveRecord {
 
     //Values for `payout_status`
     const PAYOUT_STATUS_UNPAID = 0;
-    const PAYOUT_STATUS_PAID = 1;
-    const PAYOUT_STATUS_PENDING = 2;
+    const PAYOUT_STATUS_PENDING = 1;
+    const PAYOUT_STATUS_PAID = 2;
 
     /**
      * {@inheritdoc}
@@ -242,9 +242,6 @@ class Payment extends \yii\db\ActiveRecord {
             throw new \Exception($errorMessage);
         }
 
-        // if ($showUpdatedFlashNotification)
-        //     Yii::$app->session->setFlash('success', 'Updated payment status');
-
         return $paymentRecord;
     }
 
@@ -325,6 +322,28 @@ class Payment extends \yii\db\ActiveRecord {
 
         return $paymentRecord;
     }
+
+
+    /**
+     * Returns String value of current status
+     * @return string
+     */
+    public function getStatus(){
+        switch($this->payout_status){
+            case self::PAYOUT_STATUS_UNPAID:
+                return "Unpaid";
+                break;
+            case self::PAYOUT_STATUS_PENDING:
+                return "Pending";
+                break;
+            case self::PAYOUT_STATUS_PAID:
+                return "Paid";
+                break;
+        }
+
+        return "Couldnt find a status";
+    }
+
 
     /**
      * Update Payment's Status from Myfatoorah Payments

@@ -20,6 +20,7 @@ use common\models\PartnerToken;
  * @property string $partner_email
  * @property string $referral_code
  * @property string $iban
+ * @property int $commission
  * @property int $partner_status
  * @property int $created_at
  * @property int $updated_at
@@ -28,6 +29,7 @@ use common\models\PartnerToken;
  * @property PartnerToken[] $partnerTokens
  * @property Store[] $stores
  */
+
 class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
 
    const STATUS_DELETED = 0;
@@ -297,13 +299,23 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
 
 
    /**
-    * Finds user by username
+    * Finds user by email
     *
     * @param string $email
     * @return static|null
     */
    public static function findByEmail($email) {
        return static::findOne(['partner_email' => $email, 'partner_status' => self::STATUS_ACTIVE]);
+   }
+
+   /**
+    * Finds partner ReferralCode
+    *
+    * @param string $email
+    * @return static|null
+    */
+   public static function findByReferralCode($referralCode) {
+       return static::findOne(['referral_code' => $referralCode, 'partner_status' => self::STATUS_ACTIVE]);
    }
 
    /**
@@ -456,10 +468,21 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
                       ->via('activeOrders')
                       ->joinWith('order')
                       ->filterWhere (['NOT IN', 'order.order_status', [Order::STATUS_ABANDONED_CHECKOUT, Order::STATUS_DRAFT,Order::STATUS_CANCELED,Order::STATUS_REFUNDED,Order::STATUS_PARTIALLY_REFUNDED]])
-                      ->andWhere(['payment.payout_status' => Payment::PAYOUT_STATUS_UNPAID])
-                      ->andWhere(['>','payment.partner_fee' ,0])
-                      ->andWhere(['<', 'payment.payment_created_at', new yii\db\Expression('NOW()')])
-                      ;
+                      ->andWhere(['payment.payment_current_status' => 'CAPTURED'])
+                      ->andWhere(['>','payment.partner_fee' ,0]);
+      }
+
+        /**
+       * Gets query for [[getSubscriptionPayments]].
+       *
+       * @return \yii\db\ActiveQuery
+       */
+      public function getSubscriptionPayments()
+      {
+          return $this->hasMany(SubscriptionPayment::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+                      ->andWhere(['>','subscription_payment.partner_fee' ,0])
+                      ->andWhere(['subscription_payment.payment_current_status' => 'CAPTURED'])
+                      ->via('stores');
       }
 
 
@@ -469,16 +492,31 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
        *
        * @return \yii\db\ActiveQuery
        */
-      public function getTotalEarnings()
+      public function getTotalEarningsFromOrders()
       {
           return $this->hasMany(Payment::className(), ['restaurant_uuid' => 'restaurant_uuid'])
                       ->via('activeOrders')
                       ->joinWith('order')
                       ->filterWhere (['NOT IN', 'order.order_status', [Order::STATUS_ABANDONED_CHECKOUT, Order::STATUS_DRAFT,Order::STATUS_CANCELED,Order::STATUS_REFUNDED,Order::STATUS_PARTIALLY_REFUNDED]])
                       ->andWhere(['payment.payout_status' => Payment::PAYOUT_STATUS_UNPAID])
+                      ->andWhere(['payment.payment_current_status' => 'CAPTURED'])
                       ->sum('payment.partner_fee');
       }
 
 
+
+        /**
+       * Gets query for [[Payments]].
+       *
+       * @return \yii\db\ActiveQuery
+       */
+      public function getTotalEarningsFromSubscriptions()
+      {
+          return $this->hasMany(SubscriptionPayment::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+                      ->via('stores')
+                      ->andWhere(['subscription_payment.payout_status' => Payment::PAYOUT_STATUS_UNPAID])
+                      ->andWhere(['subscription_payment.payment_current_status' => 'CAPTURED'])
+                      ->sum('subscription_payment.partner_fee');
+      }
 
 }

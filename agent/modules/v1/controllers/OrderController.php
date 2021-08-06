@@ -729,7 +729,7 @@ class OrderController extends Controller
             ->orderBy (['order_created_at' => SORT_ASC]);
 
         if ($start_date && $end_date) {
-            $query->andWhere (new Expression('DATE(order.order_created_at) >= DATE("'.$start_date.'") AND 
+            $query->andWhere (new Expression('DATE(order.order_created_at) >= DATE("'.$start_date.'") AND
                     DATE(order.order_created_at) <= DATE("'.$end_date.'")'));
         } else {
             $query->andWhere (new Expression('DATE(order_created_at) > DATE_SUB(now(), INTERVAL 3 MONTH)'));
@@ -830,8 +830,10 @@ class OrderController extends Controller
                 [
                     'header' => Yii::t('agent','Plugn fee'),
                     "value" => function ($data) {
-                        if ($data->payment_uuid && $data->payment->plugn_fee)
-                            return \Yii::$app->formatter->asCurrency ($data->payment->plugn_fee, $data->currency->code);
+                        if ($data->payment_uuid && $data->payment->plugn_fee){
+                          $plugnFee = $data->payment->plugn_fee + $data->payment->partner_fee;
+                          return \Yii::$app->formatter->asCurrency ($plugnFee, $data->currency->code);
+                        }
                         else
                             return \Yii::$app->formatter->asCurrency (0, $data->currency->code);
                     }
