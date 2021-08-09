@@ -158,52 +158,163 @@ class OrderController extends Controller
      */
     public function actionStats()
     {
+        $customer_id = Yii::$app->request->get ('customer_id');
+
         $store = Yii::$app->accountManager->getManagedAccount ();
 
         $response = [];
 
-        $response['allCount'] = $store->getOrders()
-            ->count();
+        if($customer_id) {  
+            $response['allCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id
+                ])
+                ->count();
+        } else {
+            $response['allCount'] = $store->getOrders()
+                ->count();
+        }
 
-        $response['draftCount'] = $store->getOrders()
-            ->andFilterWhere(['order_status' => Order::STATUS_DRAFT])
-            ->count();
+        if($customer_id) {          
+            $response['draftCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_DRAFT
+                ])
+                ->count();
+        } else {
+            $response['draftCount'] = $store->getOrders()
+                ->andFilterWhere(['order_status' => Order::STATUS_DRAFT])
+                ->count();
+        }
 
-        $response['acceptedCount'] = $store->getOrders()
-            ->andFilterWhere(['order_status' => Order::STATUS_ACCEPTED])
-            ->count();
+        if($customer_id) {       
+            $response['acceptedCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_ACCEPTED
+                ])
+                ->count();
+        } else {
+            $response['acceptedCount'] = $store->getOrders()
+                ->andFilterWhere(['order_status' => Order::STATUS_ACCEPTED])
+                ->count();
+        }
 
-        $response['pendingCount'] = $store->getOrders()
-            ->andFilterWhere(['order_status' => Order::STATUS_PENDING])
-            ->count();
+        if($customer_id) {           
+            $response['pendingCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_PENDING
+                ])
+                ->count();
+        } else {
+            $response['pendingCount'] = $store->getOrders()
+                ->andFilterWhere(['order_status' => Order::STATUS_PENDING])
+                ->count();
+        }
 
-        $response['preparedCount'] = $store->getOrders()
-            ->andFilterWhere(['order_status' => Order::STATUS_BEING_PREPARED])
-            ->count();
+        if($customer_id) {          
+            $response['preparedCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_BEING_PREPARED
+                ])
+                ->count();
+        } else {
+            $response['preparedCount'] = $store->getOrders()
+                ->andFilterWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                ->count();
+        }
 
-        $response['outForDeliveryCount'] = $store->getOrders()
-            ->andFilterWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-            ->count();
+        if($customer_id) {       
+            $response['outForDeliveryCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                ->count();
+        } else {
+            $response['outForDeliveryCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'order_status' => Order::STATUS_OUT_FOR_DELIVERY
+                ])
+                ->count();
+        }
 
-        $response['completeCount'] = $store->getOrders()
-            ->andFilterWhere(['order_status' => Order::STATUS_COMPLETE])
-            ->count();
+        if($customer_id) {    
+            $response['completeCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_COMPLETE
+                ])
+                ->count();
+        } else {
+            $response['completeCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'order_status' => Order::STATUS_COMPLETE
+                ])
+                ->count();
+        }
 
-        $response['canceledCount'] = $store->getOrders()
-            ->andFilterWhere(['order_status' => Order::STATUS_CANCELED])
-            ->count();
+        if($customer_id) {    
+            $response['canceledCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_CANCELED
+                ])
+                ->count();
+        } else {
+            $response['canceledCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'order_status' => Order::STATUS_CANCELED
+                ])
+                ->count();
+        }
 
-        $response['partialRefundedCount'] = $store->getOrders()
-            ->andFilterWhere(['order_status' => Order::STATUS_PARTIALLY_REFUNDED])
-            ->count();
+        if($customer_id) {        
+            $response['partialRefundedCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_PARTIALLY_REFUNDED
+                ])
+                ->count();
+        } else {
+            $response['partialRefundedCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'order_status' => Order::STATUS_PARTIALLY_REFUNDED
+                ])
+                ->count();
+        }
 
-        $response['refundedCount'] = $store->getOrders()
-            ->andFilterWhere(['order_status' => Order::STATUS_REFUNDED])
-            ->count();
+        if($customer_id) {       
+            $response['refundedCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_REFUNDED
+                ])
+                ->count();
+        } else {
+            $response['refundedCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'order_status' => Order::STATUS_REFUNDED
+                ])
+                ->count();
+        }
 
-        $response['abandonedCount'] = $store->getOrders()
-            ->andFilterWhere(['order_status' => Order::STATUS_ABANDONED_CHECKOUT])
-            ->count();
+        if($customer_id) {    
+            $response['abandonedCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_ABANDONED_CHECKOUT
+                ])
+                ->count();
+        } else {
+            $response['abandonedCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'order_status' => Order::STATUS_ABANDONED_CHECKOUT
+                ])
+                ->count();
+        } 
 
         return $response;
     }
