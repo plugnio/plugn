@@ -97,6 +97,7 @@ class StoreController extends Controller
         $store->restaurant_email = Yii::$app->request->getBodyParam('store_email');
         $store->tagline = Yii::$app->request->getBodyParam('tagline');
         $store->tagline_ar = Yii::$app->request->getBodyParam('tagline_ar');
+        $store->enable_gift_message = Yii::$app->request->getBodyParam('enable_gift_message');
 
         $currencyCode = Yii::$app->request->getBodyParam('currency');
 
