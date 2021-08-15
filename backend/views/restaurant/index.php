@@ -46,6 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'version',
 
             'restaurant_created_at:datetime',
+            'referral_code',
 
 
             [
