@@ -101,6 +101,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
     {
       return [
           'totalAreas',
+          'businessLocation',
           'areas',
           'country'
       ];

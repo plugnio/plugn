@@ -278,8 +278,10 @@ class Restaurant extends \yii\db\ActiveRecord
             [['phone_number', 'owner_number'], 'string', 'min' => 6, 'max' => 20],
             [['phone_number', 'owner_number'], 'number'],
 
+
             [['owner_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT ,self::SCENARIO_CREATE_STORE_BY_AGENT]],
             [['phone_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number'],
+
 
 
             //  ['currency_id', function ($attribute, $params, $validator) {

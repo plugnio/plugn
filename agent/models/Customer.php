@@ -1,11 +1,35 @@
 <?php
-
-
 namespace agent\models;
+
+use Yii;
 
 
 class Customer extends \common\models\Customer
 {
+    /**
+     * @return array|false
+     */
+    public function extraFields()
+    {
+        $fields = parent::extraFields();
+
+        $fields[] = 'totalOrders';
+
+        return $fields;
+    }
+
+    /**
+     * total orders in current restaturant
+     */
+    public function getTotalOrders($modelClass = "\agent\models\Order") {
+
+        $restaurant = Yii::$app->accountManager->getManagedAccount ();
+
+        return (int) parent::getOrders($modelClass)
+            ->andWhere(['restaurant_uuid' => $restaurant->restaurant_uuid])
+            ->count();
+    }
+
     /**
      * Gets query for [[Orders]].
      *

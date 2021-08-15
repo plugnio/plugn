@@ -53,6 +53,7 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET detail' => 'detail',
+                        'GET stats' => 'stats',
                         'GET orders-report' => 'orders-report',
                         'GET total-active' => 'total-active',
                         'GET <type>' => 'list',
@@ -65,6 +66,7 @@ return [
                         'DELETE <order_uuid>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS stats' => 'options',
                         'OPTIONS total-active' => 'options',
                         'OPTIONS orders-report' => 'options',
                         'OPTIONS detail' => 'options',
