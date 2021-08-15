@@ -12,7 +12,6 @@ use yii\db\Expression;
  *
  * @property string $partner_payout_uuid
  * @property string $partner_uuid
- * @property string $payment_uuid
  * @property float|null $amount
  * @property int $created_at
  * @property int $updated_at
@@ -25,8 +24,8 @@ class PartnerPayout extends \yii\db\ActiveRecord
 
     //Values for `payout_status`
     const PAYOUT_STATUS_UNPAID = 0;
-    const PAYOUT_STATUS_PAID = 1;
-    const PAYOUT_STATUS_PENDING = 2;
+    const PAYOUT_STATUS_PENDING = 1;
+    const PAYOUT_STATUS_PAID = 2;
 
     /**
      * {@inheritdoc}
@@ -42,15 +41,13 @@ class PartnerPayout extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['partner_uuid', 'payment_uuid'], 'required'],
+            [['partner_uuid'], 'required'],
             [['amount'], 'number'],
             ['payout_status', 'in', 'range' => [self::PAYOUT_STATUS_UNPAID, self::PAYOUT_STATUS_PAID,self::PAYOUT_STATUS_PENDING]],
             [['partner_payout_uuid', 'partner_uuid'], 'string', 'max' => 60],
-            [['payment_uuid'], 'string', 'max' => 36],
             [['partner_payout_uuid'], 'unique'],
             [['created_at', 'updated_at'], 'safe'],
-            [['partner_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Partner::className(), 'targetAttribute' => ['partner_uuid' => 'partner_uuid']],
-            [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
+            [['partner_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Partner::className(), 'targetAttribute' => ['partner_uuid' => 'partner_uuid']]
         ];
     }
 
@@ -62,7 +59,6 @@ class PartnerPayout extends \yii\db\ActiveRecord
         return [
             'partner_payout_uuid' => 'Partner Payout Uuid',
             'partner_uuid' => 'Partner Uuid',
-            'payment_uuid' => 'Payment Uuid',
             'amount' => 'Amount',
             'payout_status' => 'Payout Status',
             'created_at' => 'Created At',
@@ -78,10 +74,23 @@ class PartnerPayout extends \yii\db\ActiveRecord
     {
         parent::afterSave ($insert, $changedAttributes);
 
-        if(isset($changedAttributes['payout_status']) && $changedAttributes['payout_status'] == self::PAYOUT_STATUS_PENDING && $this->order_status == self::PAYOUT_STATUS_PAID) {
-          $this->payment->payout_status = $this->order_status;
-          $this->payment->save(false);
-        }
+          $payments = $this->partner->getPayments()->all();
+
+          if($payments){
+            foreach ($payments as $key => $payment) {
+              $payment->payout_status = $this->payout_status;
+              $payment->save(false);
+            }
+          }
+
+          $subscriptionPayments = $this->partner->getSubscriptionPayments()->all();
+
+          if($subscriptionPayments){
+            foreach ($subscriptionPayments as $key => $payment) {
+              $payment->payout_status = $this->payout_status;
+              $payment->save(false);
+            }
+          }
     }
 
     /**
@@ -112,23 +121,55 @@ class PartnerPayout extends \yii\db\ActiveRecord
     }
 
 
+      /**
+       * Returns String value of current status
+       * @return string
+       */
+      public function getStatus(){
+          switch($this->payout_status){
+              case self::PAYOUT_STATUS_UNPAID:
+                  return "Unpaid";
+                  break;
+              case self::PAYOUT_STATUS_PENDING:
+                  return "Pending";
+                  break;
+              case self::PAYOUT_STATUS_PAID:
+                  return "Paid";
+                  break;
+          }
+
+          return "Couldnt find a status";
+      }
+
+
     /**
      * Gets query for [[PartnerUu]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPartners()
+    public function getPartner()
     {
         return $this->hasOne(Partner::className(), ['partner_uuid' => 'partner_uuid']);
     }
 
     /**
-     * Gets query for [[PaymentUu]].
+     * Gets query for [[Payments]].
      *
      * @return \yii\db\ActiveQuery
      */
     public function getPayments()
     {
-        return $this->hasOne(Payment::className(), ['payment_uuid' => 'payment_uuid']);
+        return $this->hasMany(Payment::className(), ['partner_payout_uuid' => 'partner_payout_uuid']);
     }
+
+    /**
+     * Gets query for [[SubscriptionPayments]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSubscriptionPayments()
+    {
+        return $this->hasMany(SubscriptionPayment::className(), ['partner_payout_uuid' => 'partner_payout_uuid']);
+    }
+
 }

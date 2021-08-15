@@ -71,7 +71,6 @@ class CustomerController extends Controller
      */
     public function actionList($store_uuid)
     {
-
         $keyword = Yii::$app->request->get ('keyword');
 
         Yii::$app->accountManager->getManagedAccount ($store_uuid);

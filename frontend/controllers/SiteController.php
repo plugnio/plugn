@@ -219,7 +219,14 @@ class SiteController extends Controller {
           $payment->payment_amount_charged = $subscription_model->plan->price;
           $payment->payment_current_status = "Redirected to payment gateway";
 
+          if($managedRestaurant->referral_code){
+            $payment->partner_fee = $payment->payment_amount_charged * $managedRestaurant->partner->commission;
+          }
+
+
           if ($payment->save()) {
+
+
               //Update payment_uuid in order
               $subscription_model->payment_uuid = $payment->payment_uuid;
               $subscription_model->save(false);

@@ -6,6 +6,7 @@ use Yii;
 use common\models\Payment;
 use common\models\PartnerPayout;
 use common\models\Partner;
+use common\models\SubscriptionPayment;
 use backend\models\PartnerSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -73,9 +74,17 @@ class PartnerController extends Controller
             'pagination' => false
         ]);
 
+
+        $totalEarningsFromOrders = $model->getTotalEarningsFromOrders() ? $model->getTotalEarningsFromOrders() : 0;
+        $totalEarningsFromSubscriptions = $model->getTotalEarningsFromSubscriptions() ? $model->getTotalEarningsFromSubscriptions() : 0;
+
+        $totalEarnings = $totalEarningsFromOrders + $totalEarningsFromSubscriptions;
+
+
         return $this->render('view', [
             'model' => $model,
             'payouts' => $payouts,
+            'totalEarnings' => $totalEarnings,
         ]);
     }
 
@@ -126,25 +135,54 @@ class PartnerController extends Controller
     public function actionCreatePayout($partner_uuid)
     {
           $model = $this->findModel($partner_uuid);
+          $payments = $model->getPayments()
+                          ->andWhere(['payment.payout_status' => Payment::PAYOUT_STATUS_UNPAID])
+                          ->all();
 
-          $payments = $model->getPayments()->all();
+          $subscriptionPayments = $model->getSubscriptionPayments()
+                          ->andWhere(['subscription_payment.payout_status' => SubscriptionPayment::PAYOUT_STATUS_UNPAID])
+                          ->all();
 
-
-          foreach ($payments as $payment) {
-
-              $partner_payout_model = new PartnerPayout;
-              $partner_payout_model->partner_uuid = $model->partner_uuid;
-              $partner_payout_model->payment_uuid = $payment->payment_uuid;
-              $partner_payout_model->amount = $payment->partner_fee;
-              $partner_payout_model->payout_status = PartnerPayout::PAYOUT_STATUS_PENDING;
-
-              if($partner_payout_model->save()){
-                return $this->redirect(['view', 'partner_uuid' => $model->partner_uuid]);
-              }
-          }
+          if(sizeof($payments) > 0 || sizeof($subscriptionPayments) > 0){
 
 
-        return $this->redirect(['view', 'partner_uuid' => $model->partner_uuid]);
+
+            $partner_payout_model = new PartnerPayout;
+            $partner_payout_model->partner_uuid = $model->partner_uuid;
+            // $partner_payout_model->amount = $payment->partner_fee;
+            $partner_payout_model->payout_status = PartnerPayout::PAYOUT_STATUS_PENDING;
+            $partner_payout_model->save();
+
+            $payout_amount = 0;
+
+
+
+
+            foreach ($payments as $payment) {
+
+              $payout_amount += $payment->partner_fee;
+              $payment->partner_payout_uuid = $partner_payout_model->partner_payout_uuid;
+              $payment->save();
+            }
+
+
+
+            foreach ($subscriptionPayments as $payment) {
+              $payout_amount += $payment->partner_fee;
+
+              $payment->partner_payout_uuid = $partner_payout_model->partner_payout_uuid;
+              $payment->save();
+            }
+
+
+            $partner_payout_model->amount = $payout_amount;
+            if(!$partner_payout_model->save()){
+              Yii::error('[Error while Creating payout]' . json_encode($partner_payout_model->errors), __METHOD__);
+            }
+
+          } 
+
+         return $this->redirect(['view', 'partner_uuid' => $model->partner_uuid]);
 
     }
 
@@ -157,9 +195,9 @@ class PartnerController extends Controller
      */
     public function actionMarkAsPaid($partner_payout_uuid)
     {
-          $model = PartnerPayout::finOne($partner_payout_uuid);
+          $model = PartnerPayout::findOne($partner_payout_uuid);
 
-          $model->payout_status = Payment::PAYOUT_STATUS_PENDING;
+          $model->payout_status = Payment::PAYOUT_STATUS_PAID;
           if($model->save()){
             return $this->redirect(['view', 'partner_uuid' => $model->partner_uuid]);
           }

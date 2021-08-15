@@ -278,8 +278,10 @@ class Restaurant extends \yii\db\ActiveRecord
             [['phone_number', 'owner_number'], 'string', 'min' => 6, 'max' => 20],
             [['phone_number', 'owner_number'], 'number'],
 
+
             [['owner_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT ,self::SCENARIO_CREATE_STORE_BY_AGENT]],
             [['phone_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number'],
+
 
 
             //  ['currency_id', function ($attribute, $params, $validator) {
@@ -2542,23 +2544,8 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getPartner()
     {
-        return $this->hasOne(Partner::className(), ['referral_code' => 'referral_code']);
-    }
-
-
-      /**
-     * Gets query for [[Payments]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTotalEarnings()
-    {
-        return $this->hasMany(Payment::className(), ['restaurant_uuid' => 'restaurant_uuid'])
-                    ->via('activeOrders')
-                    ->joinWith('order')
-                    ->filterWhere (['NOT IN', 'order.order_status', [Order::STATUS_ABANDONED_CHECKOUT, Order::STATUS_DRAFT,Order::STATUS_CANCELED,Order::STATUS_REFUNDED,Order::STATUS_PARTIALLY_REFUNDED]])
-                    ->andWhere(['payment.payout_status' => Payment::PAYOUT_STATUS_UNPAID])
-                    ->sum('payment.partner_fee');
+        return $this->hasOne(Partner::className(), ['referral_code' => 'referral_code'])
+                ->where(['partner_status' => Partner::STATUS_ACTIVE]);
     }
 
     /**

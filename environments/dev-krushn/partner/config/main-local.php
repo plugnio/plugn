@@ -8,7 +8,7 @@ $config = [
         ],
         'urlManager' => [
             'class' => 'yii\web\UrlManager',
-            'baseUrl' => '/~saoud/plugn/plugn-yii2/partners/web/',
+            'baseUrl' => '/~saoud/plugn/plugn-yii2/partner/web/',
             'enablePrettyUrl' => false,
             'showScriptName' => false,
         ],

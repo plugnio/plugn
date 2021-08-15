@@ -89,7 +89,7 @@ class StoreController extends Controller
         $store->country_id = Yii::$app->request->getBodyParam('country_id');
         $store->restaurant_email_notification = Yii::$app->request->getBodyParam('email_notification');
         $store->phone_number_country_code = (int) Yii::$app->request->getBodyParam('mobile_country_code');
-        $store->phone_number = '+ '.$store->phone_number_country_code.' '.Yii::$app->request->getBodyParam('mobile');
+        $store->phone_number = Yii::$app->request->getBodyParam('mobile');
         $store->name = Yii::$app->request->getBodyParam('name');
         $store->name_ar = Yii::$app->request->getBodyParam('name_ar');
         $store->schedule_interval = Yii::$app->request->getBodyParam('schedule_interval');
@@ -97,6 +97,7 @@ class StoreController extends Controller
         $store->restaurant_email = Yii::$app->request->getBodyParam('store_email');
         $store->tagline = Yii::$app->request->getBodyParam('tagline');
         $store->tagline_ar = Yii::$app->request->getBodyParam('tagline_ar');
+        $store->enable_gift_message = Yii::$app->request->getBodyParam('enable_gift_message');
 
         $currencyCode = Yii::$app->request->getBodyParam('currency');
 

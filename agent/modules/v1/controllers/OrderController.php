@@ -4,6 +4,7 @@ namespace agent\modules\v1\controllers;
 
 use common\models\AreaDeliveryZone;
 use Yii;
+use yii\base\BaseObject;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
@@ -71,7 +72,7 @@ class OrderController extends Controller
      * @param $type
      * @return ActiveDataProvider
      */
-    public function actionList($type)
+    public function actionList($type = null)
     {
         $store_uuid = Yii::$app->request->get ('store_uuid');
         $keyword = Yii::$app->request->get ('keyword');
@@ -98,16 +99,34 @@ class OrderController extends Controller
         // grid filtering conditions
         $query->orderBy (['order_created_at' => SORT_DESC]);
 
-        if ($status) {
+        if ($status !== null) {
             $query->andFilterWhere(['order_status' => $status]);
         }
 
         if ($date_range) {
             $query->filterByCreatedDate($date_range);
         }
+
         if ($customer_id) {
             $query->andFilterWhere(['customer_id' => $customer_id]);
         }
+
+        $query->andWhere(['restaurant_uuid' => $store_uuid]);
+
+        if ($keyword) {
+            $query->andWhere (
+                ['or',
+                    ['like', 'business_location_name', $keyword],
+                    ['like', 'payment_method_name', $keyword],
+                    ['like', 'order_uuid', $keyword],
+                    ['like', 'customer_name', $keyword],
+                    ['like', 'customer_phone_number', $keyword],
+                ]
+            );
+        }
+
+        $query->andWhere(['restaurant_uuid' => $store_uuid]);
+
         if ($type == 'active') {
             $query->andWhere (
                 [
@@ -128,23 +147,176 @@ class OrderController extends Controller
             $query->andWhere (['order_status' => Order::STATUS_DRAFT]);
         }
 
-        $query->andWhere(['restaurant_uuid' => $store_uuid]);
-
-        if ($keyword) {
-            $query->andWhere (
-                ['or',
-                    ['like', 'business_location_name', $keyword],
-                    ['like', 'payment_method_name', $keyword],
-                    ['like', 'order_uuid', $keyword],
-                    ['like', 'customer_name', $keyword],
-                    ['like', 'customer_phone_number', $keyword],
-                ]
-            );
-        }
-
         return new ActiveDataProvider([
             'query' => $query
         ]);
+    }
+
+    /**
+     * get order stats
+     * @return ActiveDataProvider
+     */
+    public function actionStats()
+    {
+        $customer_id = Yii::$app->request->get ('customer_id');
+
+        $store = Yii::$app->accountManager->getManagedAccount ();
+
+        $response = [];
+
+        if($customer_id) {  
+            $response['allCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id
+                ])
+                ->count();
+        } else {
+            $response['allCount'] = $store->getOrders()
+                ->count();
+        }
+
+        if($customer_id) {          
+            $response['draftCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_DRAFT
+                ])
+                ->count();
+        } else {
+            $response['draftCount'] = $store->getOrders()
+                ->andFilterWhere(['order_status' => Order::STATUS_DRAFT])
+                ->count();
+        }
+
+        if($customer_id) {       
+            $response['acceptedCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_ACCEPTED
+                ])
+                ->count();
+        } else {
+            $response['acceptedCount'] = $store->getOrders()
+                ->andFilterWhere(['order_status' => Order::STATUS_ACCEPTED])
+                ->count();
+        }
+
+        if($customer_id) {           
+            $response['pendingCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_PENDING
+                ])
+                ->count();
+        } else {
+            $response['pendingCount'] = $store->getOrders()
+                ->andFilterWhere(['order_status' => Order::STATUS_PENDING])
+                ->count();
+        }
+
+        if($customer_id) {          
+            $response['preparedCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_BEING_PREPARED
+                ])
+                ->count();
+        } else {
+            $response['preparedCount'] = $store->getOrders()
+                ->andFilterWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                ->count();
+        }
+
+        if($customer_id) {       
+            $response['outForDeliveryCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_OUT_FOR_DELIVERY])
+                ->count();
+        } else {
+            $response['outForDeliveryCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'order_status' => Order::STATUS_OUT_FOR_DELIVERY
+                ])
+                ->count();
+        }
+
+        if($customer_id) {    
+            $response['completeCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_COMPLETE
+                ])
+                ->count();
+        } else {
+            $response['completeCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'order_status' => Order::STATUS_COMPLETE
+                ])
+                ->count();
+        }
+
+        if($customer_id) {    
+            $response['canceledCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_CANCELED
+                ])
+                ->count();
+        } else {
+            $response['canceledCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'order_status' => Order::STATUS_CANCELED
+                ])
+                ->count();
+        }
+
+        if($customer_id) {        
+            $response['partialRefundedCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_PARTIALLY_REFUNDED
+                ])
+                ->count();
+        } else {
+            $response['partialRefundedCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'order_status' => Order::STATUS_PARTIALLY_REFUNDED
+                ])
+                ->count();
+        }
+
+        if($customer_id) {       
+            $response['refundedCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_REFUNDED
+                ])
+                ->count();
+        } else {
+            $response['refundedCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'order_status' => Order::STATUS_REFUNDED
+                ])
+                ->count();
+        }
+
+        if($customer_id) {    
+            $response['abandonedCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'customer_id' => $customer_id,
+                    'order_status' => Order::STATUS_ABANDONED_CHECKOUT
+                ])
+                ->count();
+        } else {
+            $response['abandonedCount'] = $store->getOrders()
+                ->andFilterWhere([
+                    'order_status' => Order::STATUS_ABANDONED_CHECKOUT
+                ])
+                ->count();
+        } 
+
+        return $response;
     }
 
     /**
@@ -729,7 +901,7 @@ class OrderController extends Controller
             ->orderBy (['order_created_at' => SORT_ASC]);
 
         if ($start_date && $end_date) {
-            $query->andWhere (new Expression('DATE(order.order_created_at) >= DATE("'.$start_date.'") AND 
+            $query->andWhere (new Expression('DATE(order.order_created_at) >= DATE("'.$start_date.'") AND
                     DATE(order.order_created_at) <= DATE("'.$end_date.'")'));
         } else {
             $query->andWhere (new Expression('DATE(order_created_at) > DATE_SUB(now(), INTERVAL 3 MONTH)'));
@@ -830,8 +1002,10 @@ class OrderController extends Controller
                 [
                     'header' => Yii::t('agent','Plugn fee'),
                     "value" => function ($data) {
-                        if ($data->payment_uuid && $data->payment->plugn_fee)
-                            return \Yii::$app->formatter->asCurrency ($data->payment->plugn_fee, $data->currency->code);
+                        if ($data->payment_uuid && $data->payment->plugn_fee){
+                          $plugnFee = $data->payment->plugn_fee + $data->payment->partner_fee;
+                          return \Yii::$app->formatter->asCurrency ($plugnFee, $data->currency->code);
+                        }
                         else
                             return \Yii::$app->formatter->asCurrency (0, $data->currency->code);
                     }
