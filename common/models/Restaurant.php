@@ -1994,10 +1994,9 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getOrderItems($modelClass = "\common\models\OrderItem")
     {
-        return $this->hasMany ($modelClass::className (), ['order_uuid' => 'order_uuid'])
-            //->via('orders');
-            ->via ('activeOrders')
-            ->joinWith ('order');
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->joinWith ('order')
+            ->activeOrders ();
     }
 
     /**
@@ -2007,9 +2006,9 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getSoldOrderItems($modelClass = "\common\models\OrderItem")
     {
-        return $this->hasMany ($modelClass::className (), ['order_uuid' => 'order_uuid'])
-            //->via('orders');
-            ->via ('activeOrders');
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->joinWith ('order')
+            ->activeOrders ();
     }
 
     /**
