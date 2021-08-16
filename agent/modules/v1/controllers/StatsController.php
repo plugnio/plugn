@@ -88,9 +88,13 @@ class StatsController extends Controller
             ->andWhere(new Expression("date(customer_created_at) = date(NOW())"))
             ->count();
 
-        $today_sold_items = $store->getOrderItems()
+        /*$today_sold_items = OrderItem::find()
             ->joinWith('order')
-            //->activeOrders($store->restaurant_uuid)
+            ->activeOrders($store->restaurant_uuid)
+            ->andWhere(new Expression("date(order_created_at) = date(NOW())"))
+            ->sum('order_item.qty');*/
+
+        $today_sold_items = $store->getSoldOrderItems()
             ->andWhere(new Expression("date(order_created_at) = date(NOW())"))
             ->sum('order_item.qty');
 

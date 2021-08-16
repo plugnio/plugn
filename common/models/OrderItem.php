@@ -48,6 +48,7 @@ class OrderItem extends \yii\db\ActiveRecord {
             [['item_name', 'item_name_ar', 'customer_instruction'], 'string', 'max' => 255],
             [['item_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_uuid' => 'item_uuid']],
             [['order_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_uuid' => 'order_uuid']],
+            [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
 
@@ -72,6 +73,7 @@ class OrderItem extends \yii\db\ActiveRecord {
         return [
             'order_item_id' => 'Order Item ID',
             'order_uuid' => 'Order ID',
+            'restaurant_uuid' => 'Store ID',
             'item_uuid' => 'Item Uuid',
             'item_name' => 'Item Name',
             'item_name_ar' => 'Item Name in Arabic',
@@ -113,6 +115,12 @@ class OrderItem extends \yii\db\ActiveRecord {
         return $totalPrice;
     }
 
+    /**
+     * delete related data before delete
+     * @return bool
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
     public function beforeDelete() {
 
         if ($this->item)
@@ -127,9 +135,6 @@ class OrderItem extends \yii\db\ActiveRecord {
              $orderItemExtraOption->delete();
 
         }
-
-
-
 
         return parent::beforeDelete();
     }
@@ -153,6 +158,10 @@ class OrderItem extends \yii\db\ActiveRecord {
         //Update order total price
         $order_model->updateOrderTotalPrice();
 
+        if(!$this->restaurant_uuid && $this->order) {
+            $this->restaurant_uuid = $this->order->restaurant_uuid;
+        }
+
         if ($insert) {
 
             if ($this->item->track_quantity && $this->qty  > $this->item->stock_qty)
@@ -167,10 +176,6 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         if ($this->qty == 0)
             return $this->addError('qty', "Invalid input");
-
-
-
-
 
         //Update product inventory
         if ($insert){
@@ -254,8 +259,7 @@ class OrderItem extends \yii\db\ActiveRecord {
      * @return \yii\db\ActiveQuery
      */
     public function getRestaurant($modelClass = "\common\models\Restaurant") {
-        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->via('order');
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -276,5 +280,10 @@ class OrderItem extends \yii\db\ActiveRecord {
      */
     public function getOrderItemExtraOptions($modelClass = "\common\models\OrderItemExtraOption") {
         return $this->hasMany($modelClass::className(), ['order_item_id' => 'order_item_id']);
+    }
+
+    public static function find()
+    {
+        return new query\OrderItemQuery(get_called_class ());
     }
 }
