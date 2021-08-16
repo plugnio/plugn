@@ -3,16 +3,16 @@
 use yii\db\Migration;
 
 /**
- * Class m210816_135803_report
+ * Class m210816_135804_report
  */
-class m210816_135803_report extends Migration
+class m210816_135804_report extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        /*$this->addColumn ('order_item', 'restaurant_uuid', $this->char (60)->after ('order_uuid'));
+        $this->addColumn ('order_item', 'restaurant_uuid', $this->char (60)->after ('order_uuid'));
 
         // creates index for column `restaurant_uuid`in table `order_item`
         $this->createIndex(
@@ -29,7 +29,7 @@ class m210816_135803_report extends Migration
             'restaurant',
             'restaurant_uuid',
             'CASCADE'
-        );*/
+        );
     }
 
     /**
