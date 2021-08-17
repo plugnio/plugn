@@ -617,104 +617,28 @@ class OrderController extends Controller
             $order->pickup_location_id = Yii::$app->request->getBodyParam ("business_location_id");
         }
 
-        $response = [];
-
-        if ($order->save ()) {
-
-
-            $items = Yii::$app->request->getBodyParam ("items");
-
-
-            if ($items) {
-
-                foreach ($items as $item) {
-
-                    //Save items to the above order
-                    $orderItem = new OrderItem;
-
-                    $orderItem->order_uuid = $order->order_uuid;
-                    $orderItem->item_uuid = $item["item_uuid"];
-                    $orderItem->qty = (int)$item["qty"];
-
-
-                    //optional field
-                    if (array_key_exists ("customer_instructions", $item) && $item["customer_instructions"] != null)
-                        $orderItem->customer_instruction = $item["customer_instructions"];
-
-                    if ($orderItem->save ()) {
-
-                        // There seems to be an issue with your payment, please try again.
-                        if (array_key_exists ('extraOptions', $item)) {
-
-
-                            $extraOptionsArray = $item['extraOptions'];
-
-
-                            if (isset($extraOptionsArray) && count ($extraOptionsArray) > 0) {
-
-                                foreach ($extraOptionsArray as $key => $extraOption) {
-
-                                    $orderItemExtraOption = new OrderItemExtraOption;
-                                    $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
-                                    $orderItemExtraOption->extra_option_id = $extraOption['extra_option_id'];
-                                    $orderItemExtraOption->qty = (int)$item["qty"];
-
-                                    if (!$orderItemExtraOption->save ()) {
-
-                                        $response = [
-                                            'operation' => 'error',
-                                            'message' => $orderItemExtraOption->errors,
-                                        ];
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-
-                        $response = [
-                            'operation' => 'error',
-                            'message' => $orderItem->getErrors ()
-                        ];
-                    }
-                }
-            } else {
-                $response = [
-                    'operation' => 'error',
-                    'message' => Yii::t('agent', 'Item Uuid is invalid.')
-                ];
-            }
-        } else {
-            $response = [
+        if (!$order->save ()) {
+            return [
                 'operation' => 'error',
                 'message' => $order->getErrors (),
             ];
         }
 
-
-        if ($response == null) {
-
             $order->updateOrderTotalPrice ();
 
             if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
-                $response = [
+                return [
                     'operation' => 'error',
                     'message' => Yii::t('agent', 'Minimum order amount {amount}', [
                         'amount' => Yii::$app->formatter->asCurrency ($order->deliveryZone->min_charge, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
                     ])
                 ];
             }
-
-            if ($response == null) {
-
-                $response = [
-                    'operation' => 'success',
-                    'message' => Yii::t('agent','Order updated successfully'),
-                    "model" => $order
-                ];
-            }
-        }
-
-        return $response;
+            return [
+                'operation' => 'success',
+                'message' => Yii::t('agent','Order updated successfully'),
+                "model" => $order
+            ];
     }
 
     /**
