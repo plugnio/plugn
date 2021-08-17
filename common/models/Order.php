@@ -512,8 +512,18 @@ class Order extends \yii\db\ActiveRecord
      */
     public function validateMinCharge($attribute)
     {
-        if ($this->deliveryZone->min_charge > $this->$attribute)
+        if (!$this->deliveryZone) {
+            return $this->addError (
+                $attribute,
+                Yii::t('yii', "{attribute} is invalid.", [
+                    'attribute' => Yii::t('app', 'Delivery Zone')
+                ])
+            );
+        }
+
+        if ($this->deliveryZone->min_charge > $this->$attribute) {
             $this->addError ($attribute, "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency ($this->deliveryZone->min_charge, $this->currency->code));
+        }
     }
 
 
