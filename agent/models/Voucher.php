@@ -15,14 +15,29 @@ class Voucher extends \common\models\Voucher
             return $model->getActiveOrders()->count();
         };
 
+        $field['totalSpent'] = function($model) {
+            $totalSpent = (float) $model->getOrders()
+                ->activeOrders()
+                ->sum('total_price');
+
+            return  \Yii::$app->formatter->asCurrency(
+                $totalSpent,
+                $model->restaurant->currency->code,
+                [
+                    \NumberFormatter::MIN_FRACTION_DIGITS => 0,
+                    \NumberFormatter::MAX_FRACTION_DIGITS => 3  ,
+                ]
+            ) ;
+        };
+
         /**
          * todo: refactor with https://www.pivotaltracker.com/story/show/178910985
          * - should show correct value for old data
          * @param $model
          * @return string
          * @throws \yii\base\InvalidConfigException
-         */
-        $field['totalSpent'] = function($model) {
+         *
+        $field['totalDiscount'] = function($model) {
 
             $totalSpent = 0;
 
@@ -53,7 +68,7 @@ class Voucher extends \common\models\Voucher
                     \NumberFormatter::MAX_FRACTION_DIGITS => 3  ,
                 ]
             ) ;
-        };
+        };*/
 
         return $field;
     }
