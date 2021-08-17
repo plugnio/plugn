@@ -1782,8 +1782,8 @@ class Restaurant extends \yii\db\ActiveRecord
             ->select ('order_item_created_at, SUM(order_item.qty) as total')
             ->andWhere('DATE(`order_item_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_item_created_at`) < DATE("'.$date_end.'")')
             ->groupBy (new Expression('MONTH(order_item_created_at)'))
-            ->asArray ()
-            ->all ();
+            ->asArray()
+            ->all();
 
         foreach ($rows as $result) {
             $sold_item_chart_data[date ('m', strtotime ($result['order_item_created_at']))] = array(
