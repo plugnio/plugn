@@ -2007,7 +2007,7 @@ class Restaurant extends \yii\db\ActiveRecord
     public function getSoldOrderItems($modelClass = "\common\models\OrderItem")
     {
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->joinWith ('order')
+            ->joinWith ('order', false)
             ->activeOrders ();
     }
 
