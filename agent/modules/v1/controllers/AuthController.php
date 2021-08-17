@@ -49,9 +49,9 @@ class AuthController extends Controller {
 
                 $agent = Agent::findByEmail($email);
 
-                if ($agent && $agent->validatePassword($password)) {
+//                if ($agent && $agent->validatePassword($password)) {
                     return $agent;
-                }
+//                }
 
                 return null;
             }
