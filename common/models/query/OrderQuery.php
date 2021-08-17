@@ -40,10 +40,13 @@ class OrderQuery extends \yii\db\ActiveQuery
     /**
      * Active records only
      */
-    public function activeOrders($storeUuid)
+    public function activeOrders($storeUuid = null)
     {
-        return $this->where (['order.restaurant_uuid' => $storeUuid])
-            ->andWhere ([
+        if($storeUuid) {
+            $this->andWhere (['order.restaurant_uuid' => $storeUuid]);
+        }
+
+        return $this->andWhere ([
                 'NOT IN',
                 'order_status',
                 [
