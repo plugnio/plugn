@@ -442,8 +442,8 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
 
                                     <?=
                                     Html::a(
-                                            Html::img($managedRestaurant->getRestaurantLogoUrl(), ['class' => 'round', 'style' => 'opacity: .8; margin-right: .5rem; margin-top: -3px; max-height: 33px; width: auto;']) .
-                                            Html::tag('span', $managedRestaurant->name), ['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid], ['class' => 'menu-title']
+                                            Html::img($managedRestaurant->restaurant->getRestaurantLogoUrl(), ['class' => 'round', 'style' => 'opacity: .8; margin-right: .5rem; margin-top: -3px; max-height: 33px; width: auto;']) .
+                                            Html::tag('span', $managedRestaurant->restaurant->name), ['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid], ['class' => 'menu-title']
                                     )
                                     ?>
                                 </li>
