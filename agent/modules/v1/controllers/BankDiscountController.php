@@ -85,9 +85,7 @@ class BankDiscountController extends Controller {
             );
         }
 
-        if(in_array($status, [1,2])) {
-            $query->andWhere(['bank_discount_status' => $status]);
-        }
+        $query->andWhere(['bank_discount_status' => $status]);
 
         $query->andWhere(['bank_discount.restaurant_uuid' => $store_uuid]);
 
@@ -145,7 +143,6 @@ class BankDiscountController extends Controller {
          $model->bank_id = Yii::$app->request->getBodyParam("bank_id");
          $model->discount_type = (int) Yii::$app->request->getBodyParam("discount_type");
          $model->discount_amount = (int) Yii::$app->request->getBodyParam("discount_amount");
-         $model->bank_discount_status =  Yii::$app->request->getBodyParam("bank_discount_status");
          $model->valid_from = Yii::$app->request->getBodyParam("valid_from");
          $model->valid_until = Yii::$app->request->getBodyParam("valid_until");
          $model->max_redemption = Yii::$app->request->getBodyParam("max_redemption") ? Yii::$app->request->getBodyParam("max_redemption") : 0;
