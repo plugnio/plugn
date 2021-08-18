@@ -815,10 +815,13 @@ class OrderController extends Controller
     {
         $store_model = Yii::$app->accountManager->getManagedAccount ();
 
-        $start_date = Yii::$app->request->get('start_date');
-        $end_date = Yii::$app->request->get('end_date');
+        $start_date = Yii::$app->request->get('from');
+        $end_date = Yii::$app->request->get('to');
+
+        //todo: partial order as not active?
 
         $query = \common\models\Order::find ()
+            //->andWhere(['order.restaurant_uuid' => $store_model->restaurant_uuid])
             ->joinWith(['currency', 'paymentMethod', 'payment'])
             ->activeOrders ($store_model->restaurant_uuid)
             ->with ('voucher')
