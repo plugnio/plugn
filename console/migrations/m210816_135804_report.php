@@ -12,6 +12,10 @@ class m210816_135804_report extends Migration
      */
     public function safeUp()
     {
+        if ($this->db->getTableSchema('{{%order_item}}')->getColumn('restaurant_uuid') !== null) {
+            return true;
+        }
+
         $this->addColumn ('order_item', 'restaurant_uuid', $this->char (60)->after ('order_uuid'));
 
         // creates index for column `restaurant_uuid`in table `order_item`
