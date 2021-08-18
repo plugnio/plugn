@@ -566,9 +566,9 @@ class OrderController extends Controller
 
         //Save Customer Info
         $order->customer_name = Yii::$app->request->getBodyParam ("customer_name");
-        $order->customer_phone_number = str_replace (' ', '', strval (Yii::$app->request->getBodyParam ("phone_number")));
-        $order->customer_phone_country_code = Yii::$app->request->getBodyParam ("country_code") ? Yii::$app->request->getBodyParam ("country_code") : 965;
-        $order->customer_email = Yii::$app->request->getBodyParam ("email"); //optional
+        $order->customer_phone_number = str_replace (' ', '', strval (Yii::$app->request->getBodyParam ("customer_phone_number")));
+        $order->customer_phone_country_code = Yii::$app->request->getBodyParam ("country_code") ? Yii::$app->request->getBodyParam ("customer_phone_country_code") : 965;
+        $order->customer_email = Yii::$app->request->getBodyParam ("customer_email"); //optional
 
         $order->order_mode = Yii::$app->request->getBodyParam ("order_mode");
 
@@ -614,7 +614,7 @@ class OrderController extends Controller
 
 
         } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
-            $order->pickup_location_id = Yii::$app->request->getBodyParam ("business_location_id");
+            $order->pickup_location_id = Yii::$app->request->getBodyParam ("pickup_location_id");
         }
 
         if (!$order->save ()) {
