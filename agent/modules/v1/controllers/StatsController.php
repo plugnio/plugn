@@ -123,13 +123,13 @@ class StatsController extends Controller
 
             case 'last-5-months':
                 #https://www.pivotaltracker.com/story/show/179023519
-                $customer_data = $store->getTotalCustomersByMonths(6);
+                $customer_data = $store->getTotalCustomersByMonths(5);
 
-                $revenue_data = $store->getTotalRevenueByMonths(6);
+                $revenue_data = $store->getTotalRevenueByMonths(5);
 
-                $orders_data = $store->getTotalOrdersByMonths(6);
+                $orders_data = $store->getTotalOrdersByMonths(5);
 
-                $sold_item_data = $store->getTotalSoldItemsByMonths(6);
+                $sold_item_data = $store->getTotalSoldItemsByMonths(5);
 
                 break;
 
