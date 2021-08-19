@@ -251,7 +251,7 @@ class Order extends \yii\db\ActiveRecord
                     'building', 'apartment', 'city', 'address_1', 'address_2', 'postalcode', 'floor', 'office',
                     'recipient_name', 'recipient_phone_number', 'gift_message'
                 ],
-                'string', 'max' => 255],
+                'safe'],
             [['postalcode'], 'string', 'max' => 10],
 
             [['mashkor_order_number', 'mashkor_tracking_link', 'mashkor_driver_name', 'mashkor_driver_phone'], 'string', 'max' => 255],

@@ -569,8 +569,14 @@ class OrderController extends Controller
         $order->customer_phone_number = str_replace (' ', '', strval (Yii::$app->request->getBodyParam ("customer_phone_number")));
         $order->customer_phone_country_code = Yii::$app->request->getBodyParam ("country_code") ? Yii::$app->request->getBodyParam ("customer_phone_country_code") : 965;
         $order->customer_email = Yii::$app->request->getBodyParam ("customer_email"); //optional
-
+        $order->estimated_time_of_arrival = date ("Y-m-d H:i:s", strtotime (Yii::$app->request->getBodyParam('estimated_time_of_arrival')));
         $order->order_mode = Yii::$app->request->getBodyParam ("order_mode");
+        $order->area_id = Yii::$app->request->getBodyParam ("area_id");
+        $order->unit_type = Yii::$app->request->getBodyParam ("unit_type");
+        $order->block = Yii::$app->request->getBodyParam ("block");
+        $order->street = Yii::$app->request->getBodyParam ("street");
+        $order->avenue = Yii::$app->request->getBodyParam ("avenue"); //optional
+        $order->house_number = Yii::$app->request->getBodyParam ("building");
 
         //Apply promo code
         if (Yii::$app->request->getBodyParam ("voucher_id")) {
@@ -578,17 +584,11 @@ class OrderController extends Controller
         }
 
         //if the order mode = 1 => Delivery
+        #todo below code need to remove if not in use
         if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
-
             //Deliver to Kuwait - GCC
             if (Yii::$app->request->getBodyParam ("area_id") && Yii::$app->request->getBodyParam ("area_delivery_zone")) {
                 $order->delivery_zone_id = Yii::$app->request->getBodyParam ("delivery_zone_id");
-                $order->area_id = Yii::$app->request->getBodyParam ("area_id");
-                $order->unit_type = Yii::$app->request->getBodyParam ("unit_type");
-                $order->block = Yii::$app->request->getBodyParam ("block");
-                $order->street = Yii::$app->request->getBodyParam ("street");
-                $order->avenue = Yii::$app->request->getBodyParam ("avenue"); //optional
-                $order->house_number = Yii::$app->request->getBodyParam ("house_number");
 
                 if (Yii::$app->request->getBodyParam ("floor") != null && ($order->unit_type == 'Apartment' || $order->unit_type == 'Office'))
                     $order->floor = Yii::$app->request->getBodyParam ("floor");
@@ -651,7 +651,7 @@ class OrderController extends Controller
         //Update order status
         $model->order_status = Yii::$app->request->getBodyParam ("order_status");
 
-        if (!$model->save ()) {
+        if (!$model->save (false)) {
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",
