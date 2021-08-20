@@ -3,5 +3,9 @@ return [
   'apiEndpoint' => 'http://localhost:8888/plugn/api/web',
   'frontendUrl' => 'http://localhost:8888/plugn/frontend/web',
   'dashboardAppUrl' => 'http://localhost:8100',
-  'dashboardCookieDomain' => 'localhost'
+  'dashboardCookieDomain' => 'localhost',
+    'oneSignalStoreAPPID' => '',
+    'oneSignalStoreAPIKey' => '',
+    'oneSignalAgentAPPID' => '81208dad-babc-4c82-98eb-b67fcbdee8fd',
+    'oneSignalAgentAPIKey' => 'N2M5NTY4NTUtNWI1Yy00Y2M4LTg0NGMtMjZiNGZjNmU2Mzky'
 ];

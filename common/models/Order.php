@@ -7,6 +7,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use yii\behaviors\AttributeBehavior;
 use borales\extensions\phoneInput\PhoneInputValidator;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "order".
@@ -692,7 +693,6 @@ class Order extends \yii\db\ActiveRecord
         $this->order_status = self::STATUS_PENDING;
         $this->save (false);
 
-
         $productsList = null;
 
         foreach ($this->orderItems as $orderedItem) {
@@ -728,9 +728,9 @@ class Order extends \yii\db\ActiveRecord
                     'products' => $productsList ? $productsList : null
                 ]
             ]);
+
+            $this->sendOrderNotification();
         }
-
-
     }
 
     /**
@@ -866,7 +866,6 @@ class Order extends \yii\db\ActiveRecord
             //     }
             //   }
             // }
-
 
             if ($this->orderItems) {
 
@@ -1083,6 +1082,47 @@ class Order extends \yii\db\ActiveRecord
                 $customer_model->customer_email = $this->customer_email;
 
             $customer_model->save (false);
+        }
+
+        //todo : notification based on order status
+
+        //if (isset($changedAttributes['order_status']) && $this->order_status != self::STATUS_PENDING)
+
+    }
+
+    /**
+     * mobile notification on order marked as paid
+     */
+    public function sendOrderNotification()
+    {
+        $itemNames = ArrayHelper::getColumn ($this->orderItems, 'item_name');
+
+        $heading = "New order received";
+        $subtitle = "@ " . $this->restaurant->name;
+        $content = "For " . implode (", ", $itemNames);
+
+        /*Yii::t('app', "{currency} {amount}", [
+            "amount" => number_format($this->total_price, 3),
+            "currency" => $this->currency->code
+        ]);*/
+
+        foreach($this->restaurant->agentAssignments as $agentAssignment) {
+
+            $filters = [
+                [
+                    "field" => "tag",
+                    "key" => "agent_id",
+                    "relation" => "=",
+                    "value" => $agentAssignment->agent_id
+            ]
+            ];
+
+            $data = [
+                'subject' => 'order_uuid',
+                'transfer_id' => $this->order_uuid
+            ];
+
+            MobileNotification::notifyAgent ($heading, $data, $filters, $subtitle, $content);
         }
     }
 

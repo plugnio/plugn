@@ -40,7 +40,6 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-
   /**
    *
    */
