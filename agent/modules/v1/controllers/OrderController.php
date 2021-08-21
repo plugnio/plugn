@@ -164,7 +164,7 @@ class OrderController extends Controller
 
         $response = [];
 
-        if($customer_id) {  
+        if($customer_id) {
             $response['allCount'] = $store->getOrders()
                 ->andFilterWhere([
                     'customer_id' => $customer_id
@@ -175,7 +175,7 @@ class OrderController extends Controller
                 ->count();
         }
 
-        if($customer_id) {          
+        if($customer_id) {
             $response['draftCount'] = $store->getOrders()
                 ->andFilterWhere([
                     'customer_id' => $customer_id,
@@ -188,7 +188,7 @@ class OrderController extends Controller
                 ->count();
         }
 
-        if($customer_id) {       
+        if($customer_id) {
             $response['acceptedCount'] = $store->getOrders()
                 ->andFilterWhere([
                     'customer_id' => $customer_id,
@@ -201,7 +201,7 @@ class OrderController extends Controller
                 ->count();
         }
 
-        if($customer_id) {           
+        if($customer_id) {
             $response['pendingCount'] = $store->getOrders()
                 ->andFilterWhere([
                     'customer_id' => $customer_id,
@@ -214,7 +214,7 @@ class OrderController extends Controller
                 ->count();
         }
 
-        if($customer_id) {          
+        if($customer_id) {
             $response['preparedCount'] = $store->getOrders()
                 ->andFilterWhere([
                     'customer_id' => $customer_id,
@@ -227,7 +227,7 @@ class OrderController extends Controller
                 ->count();
         }
 
-        if($customer_id) {       
+        if($customer_id) {
             $response['outForDeliveryCount'] = $store->getOrders()
                 ->andFilterWhere([
                     'customer_id' => $customer_id,
@@ -241,7 +241,7 @@ class OrderController extends Controller
                 ->count();
         }
 
-        if($customer_id) {    
+        if($customer_id) {
             $response['completeCount'] = $store->getOrders()
                 ->andFilterWhere([
                     'customer_id' => $customer_id,
@@ -256,7 +256,7 @@ class OrderController extends Controller
                 ->count();
         }
 
-        if($customer_id) {    
+        if($customer_id) {
             $response['canceledCount'] = $store->getOrders()
                 ->andFilterWhere([
                     'customer_id' => $customer_id,
@@ -271,7 +271,7 @@ class OrderController extends Controller
                 ->count();
         }
 
-        if($customer_id) {        
+        if($customer_id) {
             $response['partialRefundedCount'] = $store->getOrders()
                 ->andFilterWhere([
                     'customer_id' => $customer_id,
@@ -286,7 +286,7 @@ class OrderController extends Controller
                 ->count();
         }
 
-        if($customer_id) {       
+        if($customer_id) {
             $response['refundedCount'] = $store->getOrders()
                 ->andFilterWhere([
                     'customer_id' => $customer_id,
@@ -301,7 +301,7 @@ class OrderController extends Controller
                 ->count();
         }
 
-        if($customer_id) {    
+        if($customer_id) {
             $response['abandonedCount'] = $store->getOrders()
                 ->andFilterWhere([
                     'customer_id' => $customer_id,
@@ -314,52 +314,32 @@ class OrderController extends Controller
                     'order_status' => Order::STATUS_ABANDONED_CHECKOUT
                 ])
                 ->count();
-        } 
+        }
 
         return $response;
     }
 
     /**
-     * return active order count
+     * return pending order count
      * @return ActiveDataProvider
      */
-    public function actionTotalActive()
+    public function actionTotalPending()
     {
         $store = Yii::$app->accountManager->getManagedAccount ();
 
-        $totalActiveOrders = Order::find ()
-            ->andWhere ([
-                'in',
-                'order_status',
-                [
-                    Order::STATUS_PENDING,
-                    Order::STATUS_BEING_PREPARED,
-                    Order::STATUS_OUT_FOR_DELIVERY,
-                    Order::STATUS_COMPLETE,
-                    Order::STATUS_ACCEPTED
-                ]
-            ])
+        $totalPendingOrders = Order::find ()
+            ->andWhere (['order_status' => Order::STATUS_PENDING ])
             ->andWhere (['restaurant_uuid' => $store->restaurant_uuid])
             ->count();
 
         $latestOrder = Order::find ()
-            ->andWhere ([
-                'in',
-                'order_status',
-                [
-                    Order::STATUS_PENDING,
-                    Order::STATUS_BEING_PREPARED,
-                    Order::STATUS_OUT_FOR_DELIVERY,
-                    Order::STATUS_COMPLETE,
-                    Order::STATUS_ACCEPTED
-                ]
-            ])
+            ->andWhere (['order_status' => Order::STATUS_PENDING ])
             ->andWhere (['restaurant_uuid' => $store->restaurant_uuid])
             ->orderBy (['order_created_at' => SORT_DESC])
             ->one();
 
         return [
-            'totalActiveOrders' => (int) $totalActiveOrders,
+            'totalPendingOrders' => (int) $totalPendingOrders,
             'latestOrderId' => $latestOrder? $latestOrder->order_uuid: null
         ];
     }
@@ -828,7 +808,7 @@ class OrderController extends Controller
             ->orderBy (['order_created_at' => SORT_ASC]);
 
         if ($start_date && $end_date) {
-            $query->andWhere (new Expression('DATE(order.order_created_at) >= DATE("'.$start_date.'") AND 
+            $query->andWhere (new Expression('DATE(order.order_created_at) >= DATE("'.$start_date.'") AND
                     DATE(order.order_created_at) <= DATE("'.$end_date.'")'));
         } else {
             $query->andWhere (new Expression('DATE(order_created_at) > DATE_SUB(now(), INTERVAL 3 MONTH)'));
