@@ -7,8 +7,8 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use common\models\RestaurantPaymentMethod;
 use common\models\PaymentMethod;
-use common\models\Payment;
-use common\models\Restaurant;
+use api\models\Payment;
+use api\models\Restaurant;
 
 class PaymentController extends Controller {
 
