@@ -124,11 +124,11 @@ class ItemController extends Controller
                     ->andWhere([
                         'IN',
                         'order.order_status', [
+                            Order::STATUS_ACCEPTED,
                             Order::STATUS_PENDING,
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
-                            Order::STATUS_COMPLETE,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_COMPLETE
                         ]
                     ])
                     ->andWhere(['order.restaurant_uuid' => $store_model->restaurant_uuid])
