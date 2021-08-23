@@ -29,7 +29,10 @@ class Restaurant extends \common\models\Restaurant {
         return array_merge ($fields, [
             'restaurantPaymentMethods',
             'activeSubscription',
-            'restaurantTheme'
+            'restaurantTheme',
+            'restaurantTheme',
+            'countryByOwnerCountryCode',
+            'countryByPhoneCountryCode'
         ]);
     }
 
@@ -408,6 +411,16 @@ class Restaurant extends \common\models\Restaurant {
     public function getCountry($modelClass = "\agent\models\Country")
     {
         return parent::getCountry($modelClass);
+    }
+
+    public function getCountryByOwnerCountryCode($modelClass = "\agent\models\Country")
+    {
+        return $this->hasOne ($modelClass::className (), ['country_code' => 'owner_phone_country_code']);
+    }
+
+    public function getCountryByPhoneCountryCode($modelClass = "\agent\models\Country")
+    {
+        return $this->hasOne ($modelClass::className (), ['country_code' => 'phone_number_country_code']);
     }
 
     /**
