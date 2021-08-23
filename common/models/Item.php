@@ -178,19 +178,19 @@ class Item extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
-    public function fields()
-    {
-        $fields = parent::fields ();
-
-        // remove fields that contain sensitive information
-        unset($fields['item_created_at']);
-        unset($fields['item_updated_at']);
-        unset($fields['unit_sold']);
-        unset($fields['barcode']);
-        unset($fields['sku']);
-
-        return $fields;
-    }
+    // public function fields()
+    // {
+    //     $fields = parent::fields ();
+    //
+    //     // remove fields that contain sensitive information
+    //     unset($fields['item_created_at']);
+    //     unset($fields['item_updated_at']);
+    //     unset($fields['unit_sold']);
+    //     unset($fields['barcode']);
+    //     unset($fields['sku']);
+    //
+    //     return $fields;
+    // }
 
 
     /**

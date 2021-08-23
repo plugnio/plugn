@@ -7,13 +7,13 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use common\models\Voucher;
 use common\models\Bank;
-use common\models\Order;
+use api\models\Order;
 use common\models\OrderItem;
 use common\models\CustomerBankDiscount;
 use common\models\OrderItemExtraOption;
-use common\models\Restaurant;
+use api\models\Restaurant;
 use common\models\BankDiscount;
-use common\models\Payment;
+use api\models\Payment;
 use common\components\TapPayments;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
@@ -165,7 +165,7 @@ class OrderController extends Controller {
                   $order->recipient_name = Yii::$app->request->getBodyParam("recipient_name");
                   $order->recipient_phone_number = Yii::$app->request->getBodyParam("recipient_phone_number");
                   $order->gift_message = Yii::$app->request->getBodyParam("gift_message");
-                  
+
                 }
 
                 $items = Yii::$app->request->getBodyParam("items");
