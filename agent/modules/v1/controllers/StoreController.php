@@ -218,6 +218,7 @@ class StoreController extends Controller
         $model->owner_last_name = Yii::$app->request->getBodyParam('owner_last_name');
         $model->owner_email = Yii::$app->request->getBodyParam('owner_email');
         $model->owner_number = Yii::$app->request->getBodyParam('owner_number');
+        $model->owner_phone_country_code = Yii::$app->request->getBodyParam('owner_phone_country_code');
         $model->company_name = Yii::$app->request->getBodyParam('company_name');
         $model->vendor_sector = Yii::$app->request->getBodyParam('vendor_sector');
         $model->business_type = Yii::$app->request->getBodyParam('business_type');
