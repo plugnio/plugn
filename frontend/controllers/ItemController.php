@@ -153,7 +153,8 @@ class ItemController extends Controller
                         'label' => 'Sold items',
                         'format' => 'html',
                         'value' => function ($data)  use ($start_date,$end_date) {
-                            return $data->getSoldUnitsInSpecifcDate($start_date,$end_date);
+                            $unitSold = $data->getSoldUnitsInSpecifcDate($start_date,$end_date);
+                            return $unitSold ? $unitSold : 0;
                         },
                     ],
                 ],
