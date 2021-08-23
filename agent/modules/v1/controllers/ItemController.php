@@ -266,7 +266,7 @@ class ItemController extends Controller
                             $extraOptionModel->extra_option_name = $extraOption['extra_option_name'];
                             $extraOptionModel->extra_option_name_ar = $extraOption['extra_option_name_ar'];
                             $extraOptionModel->extra_option_price = $extraOption['extra_option_price'];
-                            $extraOptionModel->stock_qty = $extraOption['stock_qty'];
+                            $extraOptionModel->stock_qty = (isset($extraOption['stock_qty']))?$extraOption['stock_qty'] :0;
                             if (!$extraOptionModel->save()) {
                                 $transaction->rollBack();
                                 return [
