@@ -123,6 +123,7 @@ class StaffController extends Controller {
        //          "message" => $agent->errors
        //      ];
        //  }
+       $tempPassword = null;
 
        if(!$agent) {
 
@@ -155,8 +156,11 @@ class StaffController extends Controller {
                 "operation" => "error",
                 "message" => $model->errors
             ];
+        } else {
+          if($tempPassword)
+            $model->notificationMail($tempPassword);
         }
-        $model->notificationMail($tempPassword);
+
 
         return [
             "operation" => "success",
