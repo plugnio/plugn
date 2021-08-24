@@ -103,25 +103,44 @@ class StaffController extends Controller {
 
        $agent = Agent::findByEmail($agentEmail);
 
-       if($agent) {
-           return [
-               'operation' => 'error',
-               'message' => Yii::t('agent', 'Email already in use'),
-           ];
-       }
-        $tempPassword = Yii::$app->security->generateRandomString(12);
+       // if($agent) {
+       //     return [
+       //         'operation' => 'error',
+       //         'message' => Yii::t('agent', 'Email already in use'),
+       //     ];
+       // }
+       //  $tempPassword = Yii::$app->security->generateRandomString(12);
+       //
+       //  $agent = new Agent();
+       //  $agent->agent_name = Yii::$app->request->getBodyParam("agent_name");
+       //  $agent->agent_email = $agentEmail;
+       //  $agent->agent_status = Agent::STATUS_ACTIVE;
+       //  $agent->tempPassword = $tempPassword;
+       //
+       //  if (!$agent->save()) {
+       //      return [
+       //          "operation" => "error",
+       //          "message" => $agent->errors
+       //      ];
+       //  }
 
-        $agent = new Agent();
-        $agent->agent_name = Yii::$app->request->getBodyParam("agent_name");
-        $agent->agent_email = $agentEmail;
-        $agent->agent_status = Agent::STATUS_ACTIVE;
-        $agent->tempPassword = $tempPassword;
+       if(!$agent) {
 
-        if (!$agent->save()) {
-            return [
-                "operation" => "error",
-                "message" => $agent->errors
-            ];
+          $tempPassword = Yii::$app->security->generateRandomString(12);
+
+          $agent = new Agent();
+          $agent->agent_name = Yii::$app->request->getBodyParam("agent_name");
+          $agent->agent_email = $agentEmail;
+          $agent->agent_status = Agent::STATUS_ACTIVE;
+          $agent->tempPassword = $tempPassword;
+
+          if (!$agent->save()) {
+              return [
+                  "operation" => "error",
+                  "message" => $agent->errors
+              ];
+          }
+
         }
 
         $model = new AgentAssignment();
@@ -202,7 +221,7 @@ class StaffController extends Controller {
 
            ];
          }
-         
+
         return $model;
     }
 
