@@ -370,7 +370,7 @@ $frontendUrl = Yii::$app->params['frontendUrl'];
              align="center" bgcolor="#2B546A" role="presentation" style="border:none;border-radius:5px;cursor:auto;padding:10px 25px;background:#2B546A;" valign="middle"
           >
             <a
-               href="<? = $frontendUrl ?>" style="background:#2B546A;color:#ffffff;font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;font-weight:bold;line-height:120%;Margin:0;text-decoration:none;text-transform:none;" target="_blank"
+               href="<?= $frontendUrl ?>" style="background:#2B546A;color:#ffffff;font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;font-weight:bold;line-height:120%;Margin:0;text-decoration:none;text-transform:none;" target="_blank"
             >
               Log in to your account
             </a>
