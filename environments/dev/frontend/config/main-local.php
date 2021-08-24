@@ -24,12 +24,12 @@ $config = [
     ],
 ];
 
-if (!YII_ENV_TEST) {
+if (YII_DEBUG) {
     // configuration adjustments for 'dev' environment
-      $config['bootstrap'][] = 'debug';
-      $config['modules']['debug'] = [
-          'class' => 'yii\debug\Module',
-      ];
+    $config['bootstrap'][] = 'debug';
+    $config['modules']['debug'] = [
+        'class' => 'yii\debug\Module',
+    ];
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [

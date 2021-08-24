@@ -122,11 +122,14 @@ class AuthController extends Controller {
         $store->owner_number = Yii::$app->request->getBodyParam ('owner_number');
         $store->owner_phone_country_code= Yii::$app->request->getBodyParam ('owner_phone_country_code');
 
+
         $store->name = Yii::$app->request->getBodyParam ('restaurant_name');
         $store->business_type = Yii::$app->request->getBodyParam ('account_type');
         $store->restaurant_domain = Yii::$app->request->getBodyParam ('restaurant_domain');
         $store->country_id = Yii::$app->request->getBodyParam ('country_id');
         $store->currency_id = Yii::$app->request->getBodyParam('currency');
+
+        $store->annual_revenue= Yii::$app->request->getBodyParam ('annual_revenue');
 
         $store->restaurant_email = $agent->agent_email;
         $store->owner_first_name = $agent->agent_name;
@@ -224,7 +227,7 @@ class AuthController extends Controller {
                 'message' => Yii::t ('agent', 'Password field required')
             ];
         }
-        
+
         /*if (!$cPassword) {
             return [
                 'operation' => 'error',

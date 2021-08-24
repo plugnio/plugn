@@ -245,8 +245,6 @@ class StoreController extends Controller {
             array_push($number_of_sold_items_chart_data, $item->unit_sold ? $item->unit_sold : 0);
         }
 
-
-
         return $this->render('statistics', [
                     'model' => $model,
                     'months' => $months,

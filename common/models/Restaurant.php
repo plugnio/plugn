@@ -94,7 +94,6 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property string|null $identification_file_id_back_side
  * @property float|null $warehouse_fee
  * @property float $warehouse_delivery_charges
- * @property string $default_language
  * @property int|null $hide_request_driver_button
  * @property int|null $version
  * @property int|null $sitemap_require_update
@@ -102,6 +101,8 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property int|null $retention_email_sent
  * @property int|null $enable_gift_message
  * @property int|null $payment_gateway_queue_id
+ * @property string|null $default_language
+ * @property string|null $annual_revenue
  *
  * @property AgentAssignment[] $agentAssignments
  * @property AreaDeliveryZone[] $areaDeliveryZones
@@ -228,7 +229,7 @@ class Restaurant extends \yii\db\ActiveRecord
                     'identification_issuing_date', 'identification_title',
                     'identification_expiry_date', 'identification_file_back_side', 'identification_file_front_side', 'identification_file_purpose',
                     'business_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
-                    'live_api_key', 'test_api_key', 'developer_id', 'live_public_key', 'test_public_key'
+                    'live_api_key', 'test_api_key', 'developer_id', 'live_public_key', 'test_public_key','annual_revenue'
                 ],
                 'string', 'max' => 255
             ],
@@ -1923,9 +1924,9 @@ class Restaurant extends \yii\db\ActiveRecord
         $customer_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
-        $date_end = date('Y') . '-' . date('m') . '-1';
+        $date_end = date('Y-m-d');//date('Y') . '-' . date('m') . '-1';
 
-        for ($i = 0; $i < $months; $i++) {
+        for ($i = 0; $i <= $months; $i++) {
 
             $month = date('m', strtotime('-'.($months - $i).' month'));
 
@@ -1937,7 +1938,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $rows = $this->getCustomers()
             ->select(new Expression('customer_created_at, COUNT(*) as total'))
-            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) < DATE("'.$date_end.'")')
+            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
             ->groupBy(new Expression('MONTH(customer_created_at)'))
             ->asArray()
             ->all();
@@ -1950,7 +1951,7 @@ class Restaurant extends \yii\db\ActiveRecord
         }
 
         $number_of_all_customer_gained = $this->getCustomers()
-            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) < DATE("'.$date_end.'")')
+            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
             ->count();
 
         return [
@@ -1961,12 +1962,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalRevenueByMonths($months)
     {
+
+
         $revenue_generated_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
-        $date_end = date('Y') . '-' . date('m') . '-1';
+        $date_end = date('Y-m-d');//date('Y') . '-' . date('m') . '-1';
 
-        for ($i = 0; $i < $months; $i++) {
+        for ($i = 0; $i <= $months; $i++) {
 
             $month = date('m', strtotime('-'.($months - $i).' month'));
 
@@ -1979,7 +1982,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $rows = $this->getOrders ()
             ->activeOrders ($this->restaurant_uuid)
             ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
-            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) < DATE("'.$date_end.'")')
+            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) <= DATE("'.$date_end.'")')
             ->groupBy (new Expression('MONTH(order.order_created_at)'))
             ->asArray ()
             ->all ();
@@ -1993,7 +1996,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $number_of_all_revenue_generated = $this->getOrders()
             ->activeOrders($this->restaurant_uuid)
-            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) < DATE("'.$date_end.'")')
+            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) <= DATE("'.$date_end.'")')
             ->sum('total_price');
 
         return [
@@ -2004,12 +2007,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalOrdersByMonths($months)
     {
+
+
         $orders_received_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
-        $date_end = date('Y') . '-' . date('m') . '-1';
+        $date_end = date('Y-m-d');//date('Y') . '-' . date('m') . '-1';
 
-        for ($i = 0; $i < $months; $i++) {
+        for ($i = 0; $i <= $months; $i++) {
 
             $month = date('m', strtotime('-'.($months - $i).' month'));
 
@@ -2022,7 +2027,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $rows = $this->getOrders ()
             ->activeOrders ($this->restaurant_uuid)
             ->select (new Expression('order_created_at, COUNT(*) as total'))
-            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) < DATE("'.$date_end.'")')
+            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) <= DATE("'.$date_end.'")')
             ->groupBy (new Expression('MONTH(order.order_created_at)'))
             ->asArray ()
             ->all ();
@@ -2036,7 +2041,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $number_of_all_orders_received = $this->getOrders()
             ->activeOrders($this->restaurant_uuid)
-            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) < DATE("'.$date_end.'")')
+            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) <= DATE("'.$date_end.'")')
             ->count();
 
         return [
@@ -2047,12 +2052,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalSoldItemsByMonths($months)
     {
+
+
         $sold_item_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
-        $date_end = date('Y') . '-' . date('m') . '-1';
+        $date_end = date('Y-m-d');//date('Y') . '-' . date('m') . '-1';
 
-        for ($i = 0; $i < $months; $i++) {
+        for ($i = 0; $i <= $months; $i++) {
 
             $month = date('m', strtotime('-'.($months - $i).' month'));
 
@@ -2064,10 +2071,10 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $rows = $this->getSoldOrderItems ()
             ->select ('order_item_created_at, SUM(order_item.qty) as total')
-            ->andWhere('DATE(`order_item_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_item_created_at`) < DATE("'.$date_end.'")')
+            ->andWhere('DATE(`order_item_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_item_created_at`) <= DATE("'.$date_end.'")')
             ->groupBy (new Expression('MONTH(order_item_created_at)'))
-            ->asArray ()
-            ->all ();
+            ->asArray()
+            ->all();
 
         foreach ($rows as $result) {
             $sold_item_chart_data[date ('m', strtotime ($result['order_item_created_at']))] = array(
@@ -2077,7 +2084,7 @@ class Restaurant extends \yii\db\ActiveRecord
         }
 
         $number_of_all_sold_item = $this->getSoldOrderItems()
-            ->andWhere('DATE(`order_item_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_item_created_at`) < DATE("'.$date_end.'")')
+            ->andWhere('DATE(`order_item_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_item_created_at`) <= DATE("'.$date_end.'")')
             ->sum('order_item.qty');
 
         return [
@@ -2096,7 +2103,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $most_sold_item_chart_data = [];
 
         $rows = $this->getItems ()
-            ->orderBy(['unit_sold' => 'DESC'])
+            ->orderBy(['unit_sold' => SORT_DESC])
             ->limit(5)
             ->all ();
 
@@ -2279,10 +2286,9 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getOrderItems($modelClass = "\common\models\OrderItem")
     {
-        return $this->hasMany ($modelClass::className (), ['order_uuid' => 'order_uuid'])
-            //->via('orders');
-            ->via ('activeOrders')
-            ->joinWith ('order');
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->joinWith ('order')
+            ->activeOrders ();
     }
 
     /**
@@ -2292,9 +2298,9 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getSoldOrderItems($modelClass = "\common\models\OrderItem")
     {
-        return $this->hasMany ($modelClass::className (), ['order_uuid' => 'order_uuid'])
-            //->via('orders');
-            ->via ('activeOrders');
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->joinWith ('order', false)
+            ->activeOrders ();
     }
 
     /**
