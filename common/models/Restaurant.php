@@ -100,6 +100,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property string|null $identification_file_back_side
  * @property string|null $identification_file_id_back_side
  * @property string|null $default_language
+ * @property string|null $annual_revenue
  *
  * @property AgentAssignment[] $agentAssignments
  * @property Agent[] $agents
@@ -200,7 +201,7 @@ class Restaurant extends \yii\db\ActiveRecord
                     'identification_issuing_date', 'identification_title',
                     'identification_expiry_date', 'identification_file_back_side', 'identification_file_front_side', 'identification_file_purpose',
                     'business_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
-                    'live_api_key', 'test_api_key', 'developer_id', 'live_public_key', 'test_public_key'
+                    'live_api_key', 'test_api_key', 'developer_id', 'live_public_key', 'test_public_key','annual_revenue'
                 ],
                 'string', 'max' => 255
             ],
