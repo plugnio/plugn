@@ -33,7 +33,7 @@ class RestaurantTheme extends \yii\db\ActiveRecord {
         return [
             [['restaurant_uuid'], 'required'],
             [['restaurant_uuid', 'primary', 'secondary', 'tertiary', 'light', 'medium', 'dark'], 'string', 'max' => 60],
-            [['primary' , 'secondary', 'tertiary', 'light', 'medium', 'dark'], 'validateColorFormat'],
+            [['primary'], 'validateColorFormat'],//, 'secondary', 'tertiary', 'light', 'medium', 'dark'
             [['restaurant_uuid'], 'unique'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];

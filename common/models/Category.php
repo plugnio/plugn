@@ -109,6 +109,9 @@ class Category extends \yii\db\ActiveRecord
 
         try {
             Yii::$app->cloudinaryManager->delete ($imageURL);
+
+            $this->category_image = null;
+
         } catch (\Cloudinary\Error $err) {
             Yii::error ('Error while deleting thumbnail image to Cloudinry: ' . json_encode ($err));
         }
@@ -138,7 +141,6 @@ class Category extends \yii\db\ActiveRecord
      */
     public function uploadCategoryImage($imageURL)
     {
-
         $filename = Yii::$app->security->generateRandomString ();
 
         try {
@@ -153,14 +155,12 @@ class Category extends \yii\db\ActiveRecord
                 $this->deleteCategoryImage ();
             }
 
-
             if ($result || count ($result) > 0) {
                 $this->category_image = basename ($result['url']);
-                $this->save ();
+                //$this->save ();
             }
 
-            unlink ($imageURL);
-
+            //unlink ($imageURL);
 
         } catch (\Cloudinary\Error $err) {
             Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
