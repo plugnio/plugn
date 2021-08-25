@@ -160,7 +160,8 @@ class Category extends \yii\db\ActiveRecord
                 //$this->save ();
             }
 
-            //unlink ($imageURL);
+            if(!str_contains ($imageURL, 'amazonaws.com'))
+                unlink ($imageURL);
 
         } catch (\Cloudinary\Error $err) {
             Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));

@@ -1233,7 +1233,6 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function deleteRestaurantLogo($logo = null)
     {
-
         if (!$logo)
             $logo = $this->logo;
 
@@ -1241,6 +1240,9 @@ class Restaurant extends \yii\db\ActiveRecord
 
         try {
             Yii::$app->cloudinaryManager->delete ($imageURL);
+
+            $this->logo = null;
+
         } catch (\Cloudinary\Error $err) {
             Yii::error ('Error while deleting logo photos to Cloudinry: ' . json_encode ($err));
         }
@@ -1259,6 +1261,9 @@ class Restaurant extends \yii\db\ActiveRecord
 
         try {
             Yii::$app->cloudinaryManager->delete ($imageURL);
+
+            $this->thumbnail_image = null;
+
         } catch (\Cloudinary\Error $err) {
             Yii::error ('Error while deleting thumbnail image to Cloudinry: ' . json_encode ($err));
         }
