@@ -738,8 +738,20 @@ class Order extends \yii\db\ActiveRecord
      */
     public function updateOrderTotalPrice()
     {
-        if ($this->order_mode == static::ORDER_MODE_DELIVERY)
-            $this->delivery_fee = $this->deliveryZone->delivery_fee;
+        if ($this->order_mode == static::ORDER_MODE_DELIVERY){
+
+          if (!$this->deliveryZone) {
+              return $this->addError (
+                  $attribute,
+                  Yii::t('yii', "{attribute} is invalid.", [
+                      'attribute' => Yii::t('app', 'Delivery zone is invalid')
+                  ])
+              );
+          }
+
+          $this->delivery_fee = $this->deliveryZone->delivery_fee;
+
+        }
 
 
         if ($this->order_status != Order::STATUS_REFUNDED && $this->order_status != Order::STATUS_PARTIALLY_REFUNDED) {
@@ -964,6 +976,15 @@ class Order extends \yii\db\ActiveRecord
                                 if ($orderItemExtraOption->extraOption && $orderItemExtraOption->extraOption->stock_qty >= $orderItemExtraOption->qty)
                                     $orderItemExtraOption->extraOption->decreaseStockQty ($orderItemExtraOption->qty);
                                 else {
+
+                                  if (!$orderItemExtraOption->extraOption) {
+                                      return $this->addError (
+                                          $attribute,
+                                          Yii::t('yii', "{attribute} is invalid.", [
+                                              'attribute' => Yii::t('app', 'Product Variant is not available anymore')
+                                          ])
+                                      );
+                                  }
 
                                     if ($orderItemExtraOption->extraOption->stock_qty !== null) {
                                         \Yii::$app->mailer->compose ([
