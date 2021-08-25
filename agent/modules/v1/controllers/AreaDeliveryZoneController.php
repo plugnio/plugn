@@ -78,10 +78,11 @@ class AreaDeliveryZoneController extends Controller
         Yii::$app->accountManager->getManagedAccount ();
 
         $query = AreaDeliveryZone::find ()
-            ->andWhere ([
-                'city_id' => $city_id,
-                'delivery_zone_id' => $delivery_zone_id
-            ]);
+            ->andWhere (['delivery_zone_id' => $delivery_zone_id]);
+
+        if ($city_id) {
+            $query->andWhere(['city_id' => $city_id]);
+        }
 
         if ($keyword) {
             $query->andWhere ([
@@ -114,7 +115,6 @@ class AreaDeliveryZoneController extends Controller
         $store = Yii::$app->accountManager->getManagedAccount ();
 
         $areas = Yii::$app->request->getBodyParam ("areas");
-        $city_id = Yii::$app->request->getBodyParam ("city_id");
         $delivery_zone_id = Yii::$app->request->getBodyParam ("delivery_zone_id");
 
         $delivery_zone = $store->getDeliveryZones ()
@@ -125,17 +125,17 @@ class AreaDeliveryZoneController extends Controller
             throw new NotFoundHttpException('The requested record does not exist.');
 
         //delete extra areas saved before
-
+        $area_id = array_column($areas, 'area_id');
         AreaDeliveryZone::deleteAll ([
             'AND',
-            ['delivery_zone_id' => $delivery_zone_id, 'city_id' => $city_id],
-            ['NOT IN', 'area_id', $areas]
+            ['delivery_zone_id' => $delivery_zone_id],
+            ['NOT IN', 'area_id', array_values($area_id)]
         ]);
 
         //list already added areas
 
         $addedAreas = $store->getAreaDeliveryZones ()
-            ->andWhere (['city_id' => $city_id, 'delivery_zone_id' => $delivery_zone_id])
+            ->andWhere (['delivery_zone_id' => $delivery_zone_id])
             ->all ();
 
         $addedAreaIds = ArrayHelper::getColumn ($addedAreas, 'area_id');
@@ -151,8 +151,8 @@ class AreaDeliveryZoneController extends Controller
                     'restaurant_uuid' => $store->restaurant_uuid,
                     'delivery_zone_id' => $delivery_zone_id,
                     'country_id' => $delivery_zone->country_id,
-                    'city_id' => $city_id,
-                    'area_id' => $area
+                    'city_id' => $area['city_id'],
+                    'area_id' => $area['area_id']
                 ];
             }
         }
