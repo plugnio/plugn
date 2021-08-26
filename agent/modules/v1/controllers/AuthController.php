@@ -4,6 +4,10 @@ namespace agent\modules\v1\controllers;
 
 use agent\models\Currency;
 use agent\models\Restaurant;
+use common\models\AgentAssignment;
+use common\models\BusinessLocation;
+use common\models\Category;
+use common\models\RestaurantPaymentMethod;
 use Yii;
 use yii\rest\Controller;
 use yii\filters\auth\HttpBasicAuth;
@@ -122,34 +126,123 @@ class AuthController extends Controller {
         $store->owner_number = Yii::$app->request->getBodyParam ('owner_number');
         $store->owner_phone_country_code= Yii::$app->request->getBodyParam ('owner_phone_country_code');
 
+
         $store->name = Yii::$app->request->getBodyParam ('restaurant_name');
         $store->business_type = Yii::$app->request->getBodyParam ('account_type');
         $store->restaurant_domain = Yii::$app->request->getBodyParam ('restaurant_domain');
         $store->country_id = Yii::$app->request->getBodyParam ('country_id');
         $store->currency_id = Yii::$app->request->getBodyParam('currency');
 
+        $store->annual_revenue= Yii::$app->request->getBodyParam ('annual_revenue');
+
         $store->restaurant_email = $agent->agent_email;
         $store->owner_first_name = $agent->agent_name;
         $store->name_ar = $store->name;
 
-        if (!$agent->save()) {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            if (!$agent->save()) {
+                $transaction->rollBack();
+                return [
+                    "operation" => "error",
+                    "message" => $agent->errors
+                ];
+            }
+
+            if (!$store->save()) {
+                return [
+                    "operation" => "error",
+                    "message" => $store->errors
+                ];
+            }
+
+            //Create a catrgory for a store by default named "Products". so they can get started adding products without having to add category first
+            $category_model = new Category();
+            $category_model->restaurant_uuid = $store->restaurant_uuid;
+            $category_model->title = 'Products';
+            $category_model->title_ar = 'منتجات';
+            if (!$category_model->save()) {
+                $transaction->rollBack();
+                return [
+                    "operation" => "error",
+                    "message" => $category_model->errors
+                ];
+            }
+
+            //Create a business Location for a store by default named "Main Branch".
+            $business_location_model = new BusinessLocation();
+            $business_location_model->restaurant_uuid = $store->restaurant_uuid;
+            $business_location_model->country_id = $store->country_id;
+            $business_location_model->support_pick_up = 1;
+            $business_location_model->business_location_name = 'Main Branch';
+            $business_location_model->business_location_name_ar = 'الفرع الرئيسي';
+            if (!$business_location_model->save()) {
+                $transaction->rollBack();
+                return [
+                    "operation" => "error",
+                    "message" => $business_location_model->errors
+                ];
+            }
+
+            //Enable cash by default
+            $payments_method = new RestaurantPaymentMethod();
+            $payments_method->payment_method_id = 3; //Cash
+            $payments_method->restaurant_uuid = $store->restaurant_uuid;
+            if (!$payments_method->save()) {
+                $transaction->rollBack();
+                return [
+                    "operation" => "error",
+                    "message" => $payments_method->errors
+                ];
+            }
+
+            $assignment_agent_model = new AgentAssignment();
+            $assignment_agent_model->agent_id = $agent->agent_id;
+            $assignment_agent_model->assignment_agent_email = $agent->agent_email;
+            $assignment_agent_model->role = AgentAssignment::AGENT_ROLE_OWNER;
+            $assignment_agent_model->restaurant_uuid = $store->restaurant_uuid;
+            if (!$assignment_agent_model->save()) {
+                $transaction->rollBack();
+                return [
+                    "operation" => "error",
+                    "message" => $assignment_agent_model->errors
+                ];
+            }
+
+            \Yii::info("[New Store Signup] " . $store->name . " has just joined Plugn", __METHOD__);
+
+            if (YII_ENV == 'prod') {
+
+                $full_name = explode(' ', $agent->agent_name);
+                $firstname = $full_name[0];
+                $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
+
+                \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+                \Segment::track([
+                    'userId' => $store->restaurant_uuid,
+                    'event' => 'Store Created',
+                    'type' => 'track',
+                    'properties' => [
+                        'first_name' => trim($firstname),
+                        'last_name' => trim($lastname),
+                        'store_name' => $store->name,
+                        'phone_number' => $store->owner_number,
+                        'email' => $agent->agent_email,
+                        'store_url' => $store->restaurant_domain
+                    ]
+                ]);
+            }
+
             return [
-                "operation" => "error",
-                "message" => $agent->errors
+                'operation' => 'success',
+                'message' => Yii::t ('agent', 'Registration completed successfully')
             ];
-        }
-
-        if (!$store->save()) {
+        } catch (\Exception $e) {
+            $transaction->rollBack();
             return [
-                "operation" => "error",
-                "message" => $store->errors
+                "operation" => 'error',
+                "message" => $e->getMessage()
             ];
-        }
-
-        $result =  $agent->afterSignUp($store);
-
-        if($result['operation'] != 'success') {
-            return $result;
         }
 
         return $this->_loginResponse ($agent);
@@ -224,7 +317,7 @@ class AuthController extends Controller {
                 'message' => Yii::t ('agent', 'Password field required')
             ];
         }
-        
+
         /*if (!$cPassword) {
             return [
                 'operation' => 'error',

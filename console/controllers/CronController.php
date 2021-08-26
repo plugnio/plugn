@@ -40,6 +40,24 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
+  public function actionIndex(){
+
+    $agentAssignment = \common\models\AgentAssignment::findOne('2');
+    $password = '123456';
+
+    return Yii::$app->mailer->compose([
+        'html' => 'agent-invitation',
+    ], [
+        'model' => $agentAssignment,
+        'password' => $password
+    ])
+        ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+        ->setTo($agentAssignment->agent->agent_email)
+        ->setBcc(\Yii::$app->params['supportEmail'])
+        ->setSubject("You've been invited to manage" .  $agentAssignment->restaurant->name )
+        ->send();
+  }
+
   /**
    *
    */

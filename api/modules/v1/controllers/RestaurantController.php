@@ -7,7 +7,7 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use common\models\City;
 use common\models\RestaurantBranch;
-use common\models\Restaurant;
+use api\models\Restaurant;
 use common\models\RestaurantTheme;
 use common\models\OpeningHour;
 use common\models\RestaurantDelivery;

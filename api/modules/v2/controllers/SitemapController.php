@@ -1,7 +1,7 @@
 <?php
 namespace api\modules\v2\controllers;
 use yii\web\Controller;
-use common\models\Item;
+use api\models\Item;
 /**
  * Sitemap controller
  */
