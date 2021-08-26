@@ -49,6 +49,7 @@ class AccountManager  extends BaseObject
             // SUM of agent_status is to bust the cache when status changes
         ]);
 //
+        //todo: increase on production?
         $cacheDuration = 60*1; //1 minute then delete from cache
 
         $this->_managedAccounts = Restaurant::getDb()->cache(function($db) {
@@ -88,6 +89,23 @@ class AccountManager  extends BaseObject
         foreach($this->_managedAccounts as $managedAccount) {
             if($managedAccount->restaurant_uuid == $restaurantUuid) {
                 return $managedAccount->restaurant;
+            }
+        }
+
+        Yii::$app->user->logout();
+
+        throw new \yii\web\BadRequestHttpException('You do not own this store.');
+    }
+
+    public function getAssignment($restaurantUuid = null) {
+
+        if(!$restaurantUuid) {
+            $restaurantUuid = Yii::$app->request->headers->get('Store-Id');
+        }
+
+        foreach($this->_managedAccounts as $managedAccount) {
+            if($managedAccount->restaurant_uuid == $restaurantUuid) {
+                return $managedAccount;
             }
         }
 

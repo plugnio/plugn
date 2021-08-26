@@ -69,12 +69,10 @@ class OrderItemController extends Controller {
         $order_item_id = Yii::$app->request->getBodyParam('order_item_id');
 
         $model = $this->findModel($order_item_id, $order_uuid ,$store_uuid);
-
-
+        
         $model->qty = Yii::$app->request->getBodyParam("qty");
         $model->customer_instruction = Yii::$app->request->getBodyParam("customer_instructions");
-
-
+        
           if (!$model->save()) {
               return [
                   "operation" => "error",
@@ -120,7 +118,6 @@ class OrderItemController extends Controller {
         ];
     }
 
-
     /**
      * Finds the Order model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
@@ -130,19 +127,28 @@ class OrderItemController extends Controller {
      */
     protected function findModel($order_item_id, $order_uuid ,$store_uuid)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
-        $order_model = Order::findOne(['restaurant_uuid' => $store_model->restaurant_uuid, 'order_uuid' => $order_uuid]);
+        $order = Order::find()
+            ->filterBusinessLocationIfManager ($store_uuid)
+            ->andWhere([
+                'restaurant_uuid' => $store_uuid,
+                'order_uuid' => $order_uuid
+            ])
+            ->one();
 
-        if(!$order_model)
+        if(!$order)
           throw new NotFoundHttpException('The requested record does not exist.');
-
-
-        if (($model = OrderItem::find()->where(['order_item_id' => $order_item_id, 'order_uuid' => $order_model->order_uuid])->one()) !== null) {
+        
+        $model = OrderItem::find()
+            ->where([
+                'order_item_id' => $order_item_id, 
+                'order_uuid' => $order->order_uuid
+            ])
+            ->one();
+        
+        if ($model !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested record does not exist.');
         }
     }
-
-
 }
