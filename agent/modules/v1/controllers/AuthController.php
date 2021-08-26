@@ -232,6 +232,11 @@ class AuthController extends Controller {
                     ]
                 ]);
             }
+
+            return [
+                'operation' => 'success',
+                'message' => Yii::t ('agent', 'Registration completed successfully')
+            ];
         } catch (\Exception $e) {
             $transaction->rollBack();
             return [
