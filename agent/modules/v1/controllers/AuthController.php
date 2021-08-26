@@ -269,6 +269,8 @@ class AuthController extends Controller {
 
         $accessToken = $agent->accessToken->token_value;
 
+        $assignment = $agent->getAgentAssignments()->one();
+
         return [
             "operation" => "success",
             "token" => $accessToken,
@@ -276,7 +278,8 @@ class AuthController extends Controller {
             "username" => $agent->agent_id,
             "agent_name" => $agent->agent_name,
             "agent_email" => $agent->agent_email,
-            "selectedStore" => $agent->getAccountsManaged()
+            "role" => (int) $assignment->role,
+            "selectedStore" => $assignment->getRestaurant()
             ->select([
               'restaurant_uuid',
               'name',
