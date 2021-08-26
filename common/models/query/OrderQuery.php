@@ -2,6 +2,9 @@
 
 namespace common\models\query;
 
+use Yii;
+use agent\models\AgentAssignment;
+use agent\models\DeliveryZone;
 use yii\db\Expression;
 use common\models\Order;
 
@@ -10,7 +13,6 @@ use common\models\Order;
  */
 class OrderQuery extends \yii\db\ActiveQuery
 {
-
     /**
      * @inheritdoc
      * @return Agent[]|array
@@ -27,6 +29,27 @@ class OrderQuery extends \yii\db\ActiveQuery
     public function one($db = null)
     {
         return parent::one ($db);
+    }
+
+    /**
+     * if branch manager show order only of that branch
+     * @param $store_uuid
+     * @return $this
+     */
+    public function filterBusinessLocationIfManager($store_uuid) {
+
+        $assignment = Yii::$app->accountManager->getAssignment ($store_uuid);
+
+        $deliveryZoneQuery = DeliveryZone::find()
+            ->select('delivery_zone_id')
+            ->where(['business_location_id' => $assignment->business_location_id]);
+
+        if($assignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER)
+        {
+            $this->andWhere(['in', 'delivery_zone_id', $deliveryZoneQuery]);
+        }
+
+        return $this;
     }
 
     /**
