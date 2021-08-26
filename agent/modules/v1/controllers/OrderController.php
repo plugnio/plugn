@@ -545,6 +545,7 @@ class OrderController extends Controller
         $order = $this->findModel ($order_uuid, $store_uuid);
 
         //Save Customer Info
+        $order->scenario = \common\models\Order::SCENARIO_CREATE_ORDER_BY_ADMIN;
         $order->customer_name = Yii::$app->request->getBodyParam ("customer_name");
         $order->customer_phone_number = str_replace (' ', '', strval (Yii::$app->request->getBodyParam ("customer_phone_number")));
         $order->customer_phone_country_code = Yii::$app->request->getBodyParam ("country_code") ? Yii::$app->request->getBodyParam ("customer_phone_country_code") : 965;
@@ -557,7 +558,6 @@ class OrderController extends Controller
         $order->street = Yii::$app->request->getBodyParam ("street");
         $order->avenue = Yii::$app->request->getBodyParam ("avenue"); //optional
         $order->house_number = Yii::$app->request->getBodyParam ("building");
-
         //Apply promo code
         if (Yii::$app->request->getBodyParam ("voucher_id")) {
             $order->voucher_id = Yii::$app->request->getBodyParam ("voucher_id");
