@@ -159,6 +159,8 @@ class StaffController extends Controller {
         } else {
           if($tempPassword)
             $model->notificationMail($tempPassword);
+          else
+            $model->inviteAgent();
         }
 
 
