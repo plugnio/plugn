@@ -2,6 +2,7 @@
 
 namespace agent\models;
 
+use yii;
 
 class Restaurant extends \common\models\Restaurant {
 
@@ -27,6 +28,7 @@ class Restaurant extends \common\models\Restaurant {
         $fields = parent::extraFields ();
 
         return array_merge ($fields, [
+            'role',
             'restaurantPaymentMethods',
             'activeSubscription',
             'restaurantTheme',
@@ -44,6 +46,26 @@ class Restaurant extends \common\models\Restaurant {
     public function getItems($modelClass = "\agent\models\Item")
     {
         return parent::getItems($modelClass);
+    }
+
+    /**
+     * role in this restaurant
+     * @param string $modelClass
+     * @return mixed
+     */
+    public function getRole($modelClass = "\agent\models\AgentAssignment")
+    {
+        if(Yii::$app->user->isGuest) {
+            return null;
+        }
+
+        $model = $this->getAgentAssignments($modelClass)
+            ->andWhere(['agent_id' => Yii::$app->user->getId()])
+            ->one();
+
+        if($model) {
+            return $model->role;
+        }
     }
 
     /**
