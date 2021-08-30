@@ -12,7 +12,7 @@ class Category extends \common\models\Category {
       $fields = parent::extraFields();
 
       $fields['items'] = function ($model) {
-          return $model->getItems()->with('itemImages');
+          return $model->getItems()->with('itemImages')->all();
       };
 
       return $fields;
