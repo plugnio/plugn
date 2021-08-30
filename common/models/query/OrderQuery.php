@@ -40,13 +40,17 @@ class OrderQuery extends \yii\db\ActiveQuery
 
         $assignment = Yii::$app->accountManager->getAssignment ($store_uuid);
 
-        $deliveryZoneQuery = DeliveryZone::find()
-            ->select('delivery_zone_id')
-            ->where(['business_location_id' => $assignment->business_location_id]);
-
         if($assignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER)
         {
-            $this->andWhere(['in', 'delivery_zone_id', $deliveryZoneQuery]);
+            $deliveryZoneQuery = DeliveryZone::find()
+                ->select('delivery_zone_id')
+                ->where(['business_location_id' => $assignment->business_location_id]);
+
+            $this->andWhere([
+                'OR',
+                ['in', 'delivery_zone_id', $deliveryZoneQuery],
+                ['pickup_location_id' => $assignment->business_location_id]
+            ]);
         }
 
         return $this;
