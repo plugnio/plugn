@@ -9,9 +9,13 @@ class Category extends \common\models\Category {
 
   public function extraFields()
   {
-      return [
-          'items',
-      ];
+      $fields = parent::extraFields();
+
+      $fields['items'] = function ($model) {
+          return $model->getItems()->with('itemImages');
+      };
+
+      return $fields;
   }
 
 
