@@ -7,13 +7,14 @@ use Yii;
 class Category extends \common\models\Category {
 
 
+  /**
+   * @return array|false
+   */
   public function extraFields()
   {
       $fields = parent::extraFields();
 
-      $fields['items'] = function ($model) {
-          return $model->getItems()->with('itemImages')->all();
-      };
+      $fields[] = 'items';
 
       return $fields;
   }
