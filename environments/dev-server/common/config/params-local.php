@@ -2,7 +2,7 @@
 return [
   'apiEndpoint' => 'https://api.dev.plugn.io',
   'frontendUrl' => 'http://dashboard.dev.plugn.io',
-  'dashboardAppUrl' => 'https://dash.staging.plugn.io',
+  'dashboardAppUrl' => 'https://dash.dev.plugn.io',
   'dashboardCookieDomain' => 'dash.staging.plugn.io',
     'oneSignalStoreAPPID' => '',
     'oneSignalStoreAPIKey' => '',

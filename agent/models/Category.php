@@ -6,6 +6,15 @@ use Yii;
 
 class Category extends \common\models\Category {
 
+
+  public function extraFields()
+  {
+      return [
+          'items',
+      ];
+  }
+
+
     /**
      * @return \yii\db\ActiveQuery
      */
