@@ -76,6 +76,7 @@ class StaffController extends Controller {
                 ['like', 'role', $keyword]
             ]);
         }
+        $query->andWhere(['!=', 'agent.agent_id', Yii::$app->user->getId()]);
         $query->andWhere(['restaurant_uuid' => $store_uuid]);
 
         return new ActiveDataProvider([
