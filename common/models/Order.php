@@ -798,11 +798,11 @@ class Order extends \yii\db\ActiveRecord
         }
 
 
-        $this->subtotal = $this->calculateOrderItemsTotalPrice ();
-        $this->total_price = $this->calculateOrderTotalPrice ();
+        $this->subtotal = $this->calculateOrderItemsTotalPrice();
+        $this->total_price = $this->calculateOrderTotalPrice();
 
 
-        $this->save (false);
+        $this->save(false);
     }
 
     /**
