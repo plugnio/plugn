@@ -80,7 +80,7 @@ class StoreController extends Controller {
 
         array_push($revenue_generated_chart_data, $revenue_generated_last_five_months_month ? (double) $revenue_generated_last_five_months_month : 0);
 
-        array_push($months, $lastFiveMonths);
+        // array_push($months, $lastFiveMonths);
 
         $revenue_generated_last_four_months_month = Order::find()
                 ->revenueGenerated(
@@ -90,7 +90,7 @@ class StoreController extends Controller {
 
         array_push($revenue_generated_chart_data, $revenue_generated_last_four_months_month ? (double) $revenue_generated_last_four_months_month : 0);
 
-        array_push($months, $lastFoureMonths);
+        // array_push($months, $lastFoureMonths);
 
         $revenue_generated_last_three_months_month = Order::find()
                 ->revenueGenerated(
@@ -100,7 +100,7 @@ class StoreController extends Controller {
 
         array_push($revenue_generated_chart_data, $revenue_generated_last_three_months_month ? (double) $revenue_generated_last_three_months_month : 0);
 
-        array_push($months, $lastThreeMonths);
+        // array_push($months, $lastThreeMonths);
 
         $revenue_generated_last_two_months_month = Order::find()
                 ->revenueGenerated(
@@ -110,7 +110,7 @@ class StoreController extends Controller {
 
         array_push($revenue_generated_chart_data, $revenue_generated_last_two_months_month ? (double) $revenue_generated_last_two_months_month : 0 );
 
-        array_push($months, $lastTwoMonths);
+        // array_push($months, $lastTwoMonths);
 
 
         $revenue_generated_last_month = Order::find()
@@ -120,7 +120,7 @@ class StoreController extends Controller {
 
         $lastMonth = date('M', strtotime('-1 months'));
         array_push($revenue_generated_chart_data, $revenue_generated_last_month ? (double) $revenue_generated_last_month : 0);
-        array_push($months, $lastMonth);
+        // array_push($months, $lastMonth);
 
 
         $revenue_generated_current_month = Order::find()
@@ -130,7 +130,7 @@ class StoreController extends Controller {
 
         array_push($revenue_generated_chart_data, $revenue_generated_current_month ? (double) $revenue_generated_current_month : 0);
 
-        array_push($months, $currentMonth);
+        // array_push($months, $currentMonth);
 
 
         $order_recevied_chart_data = [];
@@ -244,6 +244,12 @@ class StoreController extends Controller {
             array_push($most_selling_items_chart_data, $item->item_name);
             array_push($number_of_sold_items_chart_data, $item->unit_sold ? $item->unit_sold : 0);
         }
+
+
+            for ($i = 5; $i >= 0; $i--) {
+                 $months[] = date("F", strtotime( date( 'Y-m-01' )." -$i months"));
+          }
+
 
         return $this->render('statistics', [
                     'model' => $model,

@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
             //'payment_gateway_transaction_id',
             //'payment_gateway_payment_id',
             //'payment_gateway_invoice_id',
-            //'payment_mode',
+            'payment_mode',
             //'payment_current_status:ntext',
             //'payment_amount_charged',
             //'payment_net_amount',

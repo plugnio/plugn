@@ -14,20 +14,30 @@ use yii\filters\VerbFilter;
  */
 class CountryController extends Controller
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
+  public $enableCsrfValidation = false;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function behaviors() {
+      return [
+          'verbs' => [
+              'class' => VerbFilter::className(),
+              'actions' => [
+                  'delete' => ['POST'],
+              ],
+          ],
+          'access' => [
+              'class' => \yii\filters\AccessControl::className(),
+              'rules' => [
+                  [//allow authenticated users only
+                      'allow' => true,
+                      'roles' => ['@'],
+                  ],
+              ],
+          ],
+      ];
+  }
 
     /**
      * Lists all Country models.

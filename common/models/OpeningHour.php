@@ -243,7 +243,7 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
 
 
-                if($minDate > $startAt){
+                if($minDate > $endAt){
 
                   $startAt = $endAt;
 
@@ -252,9 +252,9 @@ class OpeningHour extends \yii\db\ActiveRecord {
                 }
 
 
-                if ($workingHours->day_of_week == date('w', strtotime("today")) && date('c', strtotime("now")) < date('c', strtotime($startAt))) {
+                if ($workingHours->day_of_week == date('w', strtotime("today")) && date('c', strtotime("now")) < date('c', strtotime($endAt))) {
 
-                  if( date('c',strtotime($startAt))  >  date('c', strtotime("now") + (intval($delivery_time) * 60)) ){
+                  if( date('c',strtotime($endAt))  >  date('c', strtotime("now") + (intval($delivery_time) * 60)) ){
 
                   array_push($timeSlots, [
                       'date' =>  date('Y-m-d', strtotime($startAt) ),

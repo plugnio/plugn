@@ -78,7 +78,7 @@ class CronController extends \yii\console\Controller {
           // Revenue Generated
           $revenuePercentage = 0;
 
-
+      if($lastWeekRevenue > 0) {
           if($thisWeekRevenue > $lastWeekRevenue) { //inc
                if($lastWeekRevenue > 0){
                  $increase = $thisWeekRevenue - $lastWeekRevenue;
@@ -93,6 +93,7 @@ class CronController extends \yii\console\Controller {
                $decrease = $lastWeekRevenue - $thisWeekRevenue;
                $revenuePercentage = $decrease / $lastWeekRevenue * -100;
              }
+          }
 
           // Orders received
           $ordersReceivedPercentage = 0;
