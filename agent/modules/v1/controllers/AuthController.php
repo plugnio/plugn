@@ -232,7 +232,7 @@ class AuthController extends Controller {
                     ]
                 ]);
             }
-
+            $transaction->commit();
             return [
                 'operation' => 'success',
                 'message' => Yii::t ('agent', 'Registration completed successfully')
@@ -245,7 +245,7 @@ class AuthController extends Controller {
             ];
         }
 
-        return $this->_loginResponse ($agent);
+//        return $this->_loginResponse ($agent);
 
     }
 
