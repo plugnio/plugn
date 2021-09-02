@@ -126,11 +126,7 @@ class AreaDeliveryZoneController extends Controller
 
         //delete extra areas saved before
         $area_id = array_column($areas, 'area_id');
-        AreaDeliveryZone::deleteAll ([
-            'AND',
-            ['delivery_zone_id' => $delivery_zone_id],
-            ['NOT IN', 'area_id', array_values($area_id)]
-        ]);
+        AreaDeliveryZone::deleteAll(['delivery_zone_id' => $delivery_zone_id]);
 
         //list already added areas
 
