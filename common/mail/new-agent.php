@@ -9,11 +9,12 @@ $frontendUrl = Yii::$app->params['frontendUrl'];
 ?>
 
 
+
     <!doctype html>
     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
       <head>
         <title>
-          <?= $model->restaurant->name ?> has added you as a team member on their Plugn store
+          You've been invited to manage <?= $model->restaurant->name ?>
         </title>
         <!--[if !mso]><!-- -->
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -216,13 +217,13 @@ $frontendUrl = Yii::$app->params['frontendUrl'];
 
                     <tr>
                       <td
-                         align="left" style="font-size:0px;padding:20px;padding-top:40px;padding-left:30px;word-break:break-word;"
+                         align="left" style="font-size:0px;padding:20px;padding-top:40px;padding-bottom:0;padding-left:26px;word-break:break-word;"
                       >
 
       <div
          style="font-family:Helvetica;font-size:21px;font-weight:900;line-height:24px;text-align:left;color:#ffffff;"
       >
-        Welcome to the team
+        Welcome to the team!
       </div>
 
                       </td>
@@ -273,7 +274,7 @@ $frontendUrl = Yii::$app->params['frontendUrl'];
           <tbody>
             <tr>
               <td
-                 style="direction:ltr;font-size:0px;padding:20px;padding-top:25px;text-align:center;vertical-align:top;"
+                 style="direction:ltr;font-size:0px;padding:0px;text-align:center;vertical-align:top;"
               >
                 <!--[if mso | IE]>
                   <table role="presentation" border="0" cellpadding="0" cellspacing="0">
@@ -281,7 +282,7 @@ $frontendUrl = Yii::$app->params['frontendUrl'];
         <tr>
 
             <td
-               class="" style="vertical-align:top;width:558px;"
+               class="" style="vertical-align:top;width:598px;"
             >
           <![endif]-->
 
@@ -295,13 +296,13 @@ $frontendUrl = Yii::$app->params['frontendUrl'];
 
             <tr>
               <td
-                 align="left" style="font-size:0px;padding:10px 25px;padding-bottom:10px;word-break:break-word;"
+                 align="left" style="font-size:0px;padding:10px 25px;padding-top:25px;padding-bottom:0;word-break:break-word;"
               >
 
       <div
          style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;line-height:24px;text-align:left;color:#000000;"
       >
-        Hi <?= $model->agent->agent_name ?>,
+        Hello <?= $model->agent->agent_name ?>,
       </div>
 
               </td>
@@ -309,13 +310,13 @@ $frontendUrl = Yii::$app->params['frontendUrl'];
 
             <tr>
               <td
-                 align="left" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-bottom:10px;word-break:break-word;"
+                 align="left" style="font-size:0px;padding:10px 25px;padding-bottom:0px;word-break:break-word;"
               >
 
       <div
          style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;line-height:24px;text-align:left;color:#000000;"
       >
-        You have been added as a team member for the store <a href='<?= $model->restaurant->restaurant_domain ?>' style='color:#2F80ED; text-decoration:none;'><?= $model->restaurant->name ?></a>.
+        An account has been created for you on Plugn to manage <a href='<?= $model->restaurant->restaurant_domain ?>' style='color:#2F80ED; text-decoration:none;'><?= $model->restaurant->name ?></a>.
       </div>
 
               </td>
@@ -323,13 +324,13 @@ $frontendUrl = Yii::$app->params['frontendUrl'];
 
             <tr>
               <td
-                 align="left" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-bottom:10px;word-break:break-word;"
+                 align="left" style="font-size:0px;padding:10px 25px;padding-top:0;padding-bottom:10px;word-break:break-word;"
               >
 
       <div
          style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;line-height:24px;text-align:left;color:#000000;"
       >
-        You can now log in to manage the store.
+        You may log into your account using the following credentials:
       </div>
 
               </td>
@@ -337,7 +338,28 @@ $frontendUrl = Yii::$app->params['frontendUrl'];
 
             <tr>
               <td
-                 align="left" vertical-align="middle" style="font-size:0px;padding:10px 25px;padding-top:10px;word-break:break-word;"
+                 align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"
+              >
+
+      <table
+         cellpadding="0" cellspacing="0" width="100%" border="0" style="cellspacing:0;color:#000000;font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:13px;line-height:22px;table-layout:auto;width:100%;"
+      >
+        <tr style="border-bottom:1px solid #ecedee;text-align:left;padding:15px 0;">
+                           <th>Email</th>
+                           <th>Password</th>
+                         </tr>
+                         <tr>
+                           <td><?= $model->assignment_agent_email ?></td>
+                           <td><?= $password ?></td>
+                         </tr>
+      </table>
+
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                 align="left" vertical-align="middle" style="font-size:0px;padding:10px 25px;padding-top:15px;word-break:break-word;"
               >
 
       <table
@@ -350,7 +372,7 @@ $frontendUrl = Yii::$app->params['frontendUrl'];
             <a
                href="<?= $frontendUrl ?>" style="background:#2B546A;color:#ffffff;font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;font-weight:bold;line-height:120%;Margin:0;text-decoration:none;text-transform:none;" target="_blank"
             >
-              Manage Store
+              Log in to your account
             </a>
           </td>
         </tr>

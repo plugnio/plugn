@@ -13,6 +13,17 @@ use yii\web\IdentityInterface;
  */
 class Agent extends \common\models\Agent implements IdentityInterface {
 
+
+    public function fields()
+    {
+        $fields = parent::fields();
+        $fields['agentAssignment'] = function($model) {
+            $agent = \Yii::$app->accountManager->getManagedAccount ();
+            return $this->getAgentAssignments()->andWhere(['restaurant_uuid'=>$agent['restaurant_uuid']])->one();
+        };
+        return $fields;
+    }
+
     /**
      * @inheritdoc
      */

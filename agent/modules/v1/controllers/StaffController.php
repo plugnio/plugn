@@ -76,6 +76,7 @@ class StaffController extends Controller {
                 ['like', 'role', $keyword]
             ]);
         }
+        $query->andWhere(['!=', 'agent.agent_id', Yii::$app->user->getId()]);
         $query->andWhere(['restaurant_uuid' => $store_uuid]);
 
         return new ActiveDataProvider([
@@ -103,25 +104,45 @@ class StaffController extends Controller {
 
        $agent = Agent::findByEmail($agentEmail);
 
-       if($agent) {
-           return [
-               'operation' => 'error',
-               'message' => Yii::t('agent', 'Email already in use'),
-           ];
-       }
-        $tempPassword = Yii::$app->security->generateRandomString(12);
+       // if($agent) {
+       //     return [
+       //         'operation' => 'error',
+       //         'message' => Yii::t('agent', 'Email already in use'),
+       //     ];
+       // }
+       //  $tempPassword = Yii::$app->security->generateRandomString(12);
+       //
+       //  $agent = new Agent();
+       //  $agent->agent_name = Yii::$app->request->getBodyParam("agent_name");
+       //  $agent->agent_email = $agentEmail;
+       //  $agent->agent_status = Agent::STATUS_ACTIVE;
+       //  $agent->tempPassword = $tempPassword;
+       //
+       //  if (!$agent->save()) {
+       //      return [
+       //          "operation" => "error",
+       //          "message" => $agent->errors
+       //      ];
+       //  }
+       $tempPassword = null;
 
-        $agent = new Agent();
-        $agent->agent_name = Yii::$app->request->getBodyParam("agent_name");
-        $agent->agent_email = $agentEmail;
-        $agent->agent_status = Agent::STATUS_ACTIVE;
-        $agent->tempPassword = $tempPassword;
+       if(!$agent) {
 
-        if (!$agent->save()) {
-            return [
-                "operation" => "error",
-                "message" => $agent->errors
-            ];
+          $tempPassword = Yii::$app->security->generateRandomString(12);
+
+          $agent = new Agent();
+          $agent->agent_name = Yii::$app->request->getBodyParam("agent_name");
+          $agent->agent_email = $agentEmail;
+          $agent->agent_status = Agent::STATUS_ACTIVE;
+          $agent->tempPassword = $tempPassword;
+
+          if (!$agent->save()) {
+              return [
+                  "operation" => "error",
+                  "message" => $agent->errors
+              ];
+          }
+
         }
 
         $model = new AgentAssignment();
@@ -136,8 +157,13 @@ class StaffController extends Controller {
                 "operation" => "error",
                 "message" => $model->errors
             ];
+        } else {
+          if($tempPassword)
+            $model->notificationMail($tempPassword);
+          else
+            $model->inviteAgent();
         }
-        $model->notificationMail($tempPassword);
+
 
         return [
             "operation" => "success",
@@ -202,7 +228,7 @@ class StaffController extends Controller {
 
            ];
          }
-         
+
         return $model;
     }
 

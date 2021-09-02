@@ -145,7 +145,7 @@ class AgentAssignment extends \yii\db\ActiveRecord {
 
     public function notificationMail($password) {
         return Yii::$app->mailer->compose([
-            'html' => 'agent-invitation',
+            'html' => 'new-agent',
         ], [
             'model' => $this,
             'password' => $password
@@ -153,7 +153,20 @@ class AgentAssignment extends \yii\db\ActiveRecord {
             ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
             ->setTo($this->agent->agent_email)
             ->setBcc(\Yii::$app->params['supportEmail'])
-            ->setSubject('Invitation')
+            ->setSubject("You've been invited to manage " . $this->restaurant->name)
+            ->send();
+    }
+
+    public function inviteAgent() {
+        return Yii::$app->mailer->compose([
+            'html' => 'agent-invitation',
+        ], [
+            'model' => $this
+        ])
+            ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setTo($this->agent->agent_email)
+            ->setBcc(\Yii::$app->params['supportEmail'])
+            ->setSubject( $this->restaurant->name  . " has added you as a team member on their Plugn store")
             ->send();
     }
 }

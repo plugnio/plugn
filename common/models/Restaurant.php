@@ -1517,7 +1517,6 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function deleteRestaurantLogo($logo = null)
     {
-
         if (!$logo)
             $logo = $this->logo;
 
@@ -1525,6 +1524,9 @@ class Restaurant extends \yii\db\ActiveRecord
 
         try {
             Yii::$app->cloudinaryManager->delete ($imageURL);
+
+            $this->logo = null;
+
         } catch (\Cloudinary\Error $err) {
             Yii::error ('Error while deleting logo photos to Cloudinry: ' . json_encode ($err));
         }
@@ -1543,6 +1545,9 @@ class Restaurant extends \yii\db\ActiveRecord
 
         try {
             Yii::$app->cloudinaryManager->delete ($imageURL);
+
+            $this->thumbnail_image = null;
+
         } catch (\Cloudinary\Error $err) {
             Yii::error ('Error while deleting thumbnail image to Cloudinry: ' . json_encode ($err));
         }
@@ -1924,7 +1929,8 @@ class Restaurant extends \yii\db\ActiveRecord
         $customer_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
-        $date_end = date('Y-m-d');//date('Y') . '-' . date('m') . '-1';
+        $date_end = date('Y-m-d', strtotime('last day of previous month'));
+        //date('Y-m-d');//date('Y') . '-' . date('m') . '-1';
 
         for ($i = 0; $i <= $months; $i++) {
 
@@ -1967,7 +1973,8 @@ class Restaurant extends \yii\db\ActiveRecord
         $revenue_generated_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
-        $date_end = date('Y-m-d');//date('Y') . '-' . date('m') . '-1';
+        $date_end = date('Y-m-d', strtotime('last day of previous month'));
+        //date('Y-m-d');//date('Y') . '-' . date('m') . '-1';
 
         for ($i = 0; $i <= $months; $i++) {
 
@@ -2012,7 +2019,8 @@ class Restaurant extends \yii\db\ActiveRecord
         $orders_received_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
-        $date_end = date('Y-m-d');//date('Y') . '-' . date('m') . '-1';
+        $date_end = date('Y-m-d', strtotime('last day of previous month'));
+        //date('Y') . '-' . date('m') . '-1';
 
         for ($i = 0; $i <= $months; $i++) {
 
@@ -2057,7 +2065,8 @@ class Restaurant extends \yii\db\ActiveRecord
         $sold_item_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
-        $date_end = date('Y-m-d');//date('Y') . '-' . date('m') . '-1';
+        $date_end = date('Y-m-d', strtotime('last day of previous month'));
+        //date('Y-m-d');//date('Y') . '-' . date('m') . '-1';
 
         for ($i = 0; $i <= $months; $i++) {
 

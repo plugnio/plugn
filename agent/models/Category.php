@@ -6,6 +6,20 @@ use Yii;
 
 class Category extends \common\models\Category {
 
+
+  /**
+   * @return array|false
+   */
+  public function extraFields()
+  {
+      $fields = parent::extraFields();
+
+      $fields[] = 'items';
+
+      return $fields;
+  }
+
+
     /**
      * @return \yii\db\ActiveQuery
      */
