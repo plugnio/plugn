@@ -127,15 +127,14 @@ class AgentController extends Controller
                 "operation" => "error",
                 "message" => $model->errors
             ];
-        } else {
-
-            $agentAssignment->assignment_agent_email = Yii::$app->request->getBodyParam ("agent_email");
-            $agentAssignment->email_notification = Yii::$app->request->getBodyParam ("email_notification");
-            $agentAssignment->reminder_email = Yii::$app->request->getBodyParam ("reminder_email");
-            $agentAssignment->receive_weekly_stats = Yii::$app->request->getBodyParam ("receive_weekly_stats");
-
-            $agentAssignment->save (false);
         }
+
+        $agentAssignment->assignment_agent_email = Yii::$app->request->getBodyParam ("agent_email");
+        $agentAssignment->email_notification = (int) Yii::$app->request->getBodyParam ("email_notification");
+        $agentAssignment->reminder_email = (int) Yii::$app->request->getBodyParam ("reminder_email");
+        $agentAssignment->receive_weekly_stats = (int) Yii::$app->request->getBodyParam ("receive_weekly_stats");
+
+        $agentAssignment->save (false);
 
         return [
             'model' => $model,

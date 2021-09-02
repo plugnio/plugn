@@ -7,6 +7,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use yii\behaviors\AttributeBehavior;
 use borales\extensions\phoneInput\PhoneInputValidator;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "order".
@@ -327,28 +328,27 @@ class Order extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
-    public function fields()
-    {
-        $fields = parent::fields ();
-
-        // remove fields that contain sensitive information
-        unset($fields['armada_order_status']);
-        unset($fields['armada_delivery_code']);
-        unset($fields['mashkor_order_number']);
-        unset($fields['mashkor_tracking_link']);
-        unset($fields['mashkor_driver_name']);
-        unset($fields['mashkor_driver_phone']);
-        unset($fields['mashkor_order_status']);
-        unset($fields['armada_tracking_link']);
-        unset($fields['reminder_sent']);
-        unset($fields['sms_sent']);
-        unset($fields['items_has_been_restocked']);
-        unset($fields['subtotal_before_refund']);
-        unset($fields['total_price_before_refund']);
-
-        return $fields;
-
-    }
+    // public function fields()
+    // {
+    //     $fields = parent::fields ();
+    //
+    //     // remove fields that contain sensitive information
+    //     unset($fields['armada_delivery_code']);
+    //     unset($fields['mashkor_order_number']);
+    //     unset($fields['mashkor_tracking_link']);
+    //     unset($fields['mashkor_driver_name']);
+    //     unset($fields['mashkor_driver_phone']);
+    //     unset($fields['mashkor_order_status']);
+    //     unset($fields['armada_tracking_link']);
+    //     unset($fields['reminder_sent']);
+    //     unset($fields['sms_sent']);
+    //     unset($fields['items_has_been_restocked']);
+    //     unset($fields['subtotal_before_refund']);
+    //     unset($fields['total_price_before_refund']);
+    //
+    //     return $fields;
+    //
+    // }
 
     /**
      * @inheritdoc
@@ -514,8 +514,18 @@ class Order extends \yii\db\ActiveRecord
      */
     public function validateMinCharge($attribute)
     {
-        if ($this->deliveryZone->min_charge > $this->$attribute)
+        if (!$this->deliveryZone) {
+            return $this->addError (
+                $attribute,
+                Yii::t('yii', "{attribute} is invalid.", [
+                    'attribute' => Yii::t('app', 'Delivery Zone')
+                ])
+            );
+        }
+
+        if ($this->deliveryZone->min_charge > $this->$attribute) {
             $this->addError ($attribute, "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency ($this->deliveryZone->min_charge, $this->currency->code));
+        }
     }
 
 
@@ -685,7 +695,6 @@ class Order extends \yii\db\ActiveRecord
         $this->order_status = self::STATUS_PENDING;
         $this->save (false);
 
-
         $productsList = null;
 
         foreach ($this->orderItems as $orderedItem) {
@@ -758,6 +767,8 @@ class Order extends \yii\db\ActiveRecord
         }
 
 
+            $this->sendOrderNotification();
+        }
     }
 
     /**
@@ -765,8 +776,20 @@ class Order extends \yii\db\ActiveRecord
      */
     public function updateOrderTotalPrice()
     {
-        if ($this->order_mode == static::ORDER_MODE_DELIVERY)
-            $this->delivery_fee = $this->deliveryZone->delivery_fee;
+        if ($this->order_mode == static::ORDER_MODE_DELIVERY){
+
+          if (!$this->deliveryZone) {
+              return $this->addError (
+                  $attribute,
+                  Yii::t('yii', "{attribute} is invalid.", [
+                      'attribute' => Yii::t('app', 'Delivery zone is invalid')
+                  ])
+              );
+          }
+
+          $this->delivery_fee = $this->deliveryZone->delivery_fee;
+
+        }
 
 
         if ($this->order_status != Order::STATUS_REFUNDED && $this->order_status != Order::STATUS_PARTIALLY_REFUNDED) {
@@ -1060,6 +1083,15 @@ class Order extends \yii\db\ActiveRecord
                                     $orderItemExtraOption->extraOption->decreaseStockQty ($orderItemExtraOption->qty);
                                 else {
 
+                                  if (!$orderItemExtraOption->extraOption) {
+                                      return $this->addError (
+                                          $attribute,
+                                          Yii::t('yii', "{attribute} is invalid.", [
+                                              'attribute' => Yii::t('app', 'Product Variant is not available anymore')
+                                          ])
+                                      );
+                                  }
+
                                     if ($orderItemExtraOption->extraOption->stock_qty !== null) {
                                         \Yii::$app->mailer->compose ([
                                             'html' => 'out-of-stock-order-html',
@@ -1174,6 +1206,47 @@ class Order extends \yii\db\ActiveRecord
                 $customer_model->customer_email = $this->customer_email;
 
             $customer_model->save (false);
+        }
+
+        //todo : notification based on order status
+
+        //if (isset($changedAttributes['order_status']) && $this->order_status != self::STATUS_PENDING)
+
+    }
+
+    /**
+     * mobile notification on order marked as paid
+     */
+    public function sendOrderNotification()
+    {
+        $itemNames = ArrayHelper::getColumn ($this->orderItems, 'item_name');
+
+        $heading = "New order received";
+        $subtitle = "@ " . $this->restaurant->name;
+        $content = "For " . implode (", ", $itemNames);
+
+        /*Yii::t('app', "{currency} {amount}", [
+            "amount" => number_format($this->total_price, 3),
+            "currency" => $this->currency->code
+        ]);*/
+
+        foreach($this->restaurant->agentAssignments as $agentAssignment) {
+
+            $filters = [
+                [
+                    "field" => "tag",
+                    "key" => "agent_id",
+                    "relation" => "=",
+                    "value" => $agentAssignment->agent_id
+            ]
+            ];
+
+            $data = [
+                'subject' => 'order_uuid',
+                'transfer_id' => $this->order_uuid
+            ];
+
+            MobileNotification::notifyAgent ($heading, $data, $filters, $subtitle, $content);
         }
     }
 

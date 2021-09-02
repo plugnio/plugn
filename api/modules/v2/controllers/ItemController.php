@@ -5,9 +5,9 @@ namespace api\modules\v2\controllers;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
-use common\models\Item;
+use api\models\Item;
 use common\models\Category;
-use common\models\Restaurant;
+use api\models\Restaurant;
 use common\models\ItemImage;
 
 class ItemController extends Controller {

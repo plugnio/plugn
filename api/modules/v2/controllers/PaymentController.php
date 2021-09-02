@@ -7,9 +7,9 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use common\models\RestaurantPaymentMethod;
 use common\models\PaymentMethod;
-use common\models\Payment;
+use api\models\Payment;
 use common\models\Refund;
-use common\models\Restaurant;
+use api\models\Restaurant;
 use yii\web\ForbiddenHttpException;
 
 class PaymentController extends Controller {

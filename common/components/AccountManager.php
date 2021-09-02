@@ -8,7 +8,7 @@ use yii\base\InvalidParamException;
 use yii\web\NotFoundHttpException;
 use agent\models\Restaurant;
 
-
+//55, 61
 /**
  * AccountManager is a component that holds a list of Restaurants this agent owns
  * The purpose of this component is to reduce the stress incurred on the database
@@ -49,16 +49,17 @@ class AccountManager  extends BaseObject
             // SUM of agent_status is to bust the cache when status changes
         ]);
 //
+        //todo: increase on production?
         $cacheDuration = 60*1; //1 minute then delete from cache
 
         $this->_managedAccounts = Restaurant::getDb()->cache(function($db) {
-            return Yii::$app->user->identity->getAccountsManaged()->all();
+            return Yii::$app->user->identity->getAgentAssignments()->all();
         }, $cacheDuration, $cacheDependency);
 
 
          // Getting a list of Restaurants this agent manages
         // No cache
-        $this->_managedAccounts = Yii::$app->user->identity->getAccountsManaged()->all();
+        $this->_managedAccounts = Yii::$app->user->identity->getAgentAssignments()->all();
 
         parent::__construct($config);
     }
@@ -68,7 +69,7 @@ class AccountManager  extends BaseObject
      *
      * @return \common\models\Restaurant    Records of Restaurants managed by this agent
      */
-    public function getManagedAccounts(){
+    public function getManagedAccounts() {
         return $this->_managedAccounts;
     }
 
@@ -85,9 +86,26 @@ class AccountManager  extends BaseObject
             $restaurantUuid = Yii::$app->request->headers->get('Store-Id');
         }
 
-        foreach($this->_managedAccounts as $restaurant){
-            if($restaurant->restaurant_uuid == $restaurantUuid){
-                return $restaurant;
+        foreach($this->_managedAccounts as $managedAccount) {
+            if($managedAccount->restaurant_uuid == $restaurantUuid) {
+                return $managedAccount->restaurant;
+            }
+        }
+
+        Yii::$app->user->logout();
+
+        throw new \yii\web\BadRequestHttpException('You do not own this store.');
+    }
+
+    public function getAssignment($restaurantUuid = null) {
+
+        if(!$restaurantUuid) {
+            $restaurantUuid = Yii::$app->request->headers->get('Store-Id');
+        }
+
+        foreach($this->_managedAccounts as $managedAccount) {
+            if($managedAccount->restaurant_uuid == $restaurantUuid) {
+                return $managedAccount;
             }
         }
 

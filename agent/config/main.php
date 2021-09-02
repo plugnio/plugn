@@ -55,7 +55,7 @@ return [
                         'GET detail' => 'detail',
                         'GET stats' => 'stats',
                         'GET orders-report' => 'orders-report',
-                        'GET total-active' => 'total-active',
+                        'GET total-pending' => 'total-pending',
                         'GET <type>' => 'list',
                         'POST <store_uuid>' => 'place-an-order',
                         'PATCH <order_uuid>/<store_uuid>' => 'update',

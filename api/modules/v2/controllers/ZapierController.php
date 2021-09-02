@@ -5,12 +5,12 @@ namespace api\modules\v2\controllers;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
-use common\models\Order;
+use api\models\Order;
 use common\models\Agent;
 use common\models\OrderItem;
 use common\models\OrderItemExtraOption;
-use common\models\Restaurant;
-use common\models\Payment;
+use api\models\Restaurant;
+use api\models\Payment;
 use common\components\TapPayments;
 use yii\helpers\Url;
 use yii\helpers\ArrayHelper;
@@ -82,10 +82,12 @@ class ZapierController extends Controller {
 
       $storeList = [];
 
-        foreach (Yii::$app->accountManager->getManagedAccounts() as $key => $store) {
-          $storeList[$key]['id'] = $store['restaurant_uuid'];
-          $storeList[$key]['store_name'] = $store['name'];
+        foreach (Yii::$app->accountManager->getManagedAccounts() as $key => $managedAccount) {
+            if(!$managedAccount->restaurant)
+                continue;
 
+            $storeList[$key]['id'] = $managedAccount->restaurant_uuid;
+          $storeList[$key]['store_name'] = $managedAccount->restaurant->name;
       }
 
       return $storeList;

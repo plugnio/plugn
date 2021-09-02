@@ -171,7 +171,7 @@ class ItemController extends Controller
                             $extraOptionModel->extra_option_name = $extraOption['extra_option_name'];
                             $extraOptionModel->extra_option_name_ar = $extraOption['extra_option_name_ar'];
                             $extraOptionModel->extra_option_price = (isset($extraOption['extra_option_price'])) ? $extraOption['extra_option_price'] : 0;
-                            $extraOptionModel->stock_qty = (isset($extraOption['stock_qty']))?$extraOption['stock_qty'] :0;
+                            $extraOptionModel->stock_qty = (isset($extraOption['stock_qty']))?$extraOption['stock_qty'] : null;
                             if (!$extraOptionModel->save()) {
                                 $transaction->rollBack();
                                 return [
@@ -266,7 +266,7 @@ class ItemController extends Controller
                             $extraOptionModel->extra_option_name = $extraOption['extra_option_name'];
                             $extraOptionModel->extra_option_name_ar = $extraOption['extra_option_name_ar'];
                             $extraOptionModel->extra_option_price = $extraOption['extra_option_price'];
-                            $extraOptionModel->stock_qty = $extraOption['stock_qty'];
+                            $extraOptionModel->stock_qty = (isset($extraOption['stock_qty']))?$extraOption['stock_qty'] : null;
                             if (!$extraOptionModel->save()) {
                                 $transaction->rollBack();
                                 return [
@@ -408,7 +408,7 @@ class ItemController extends Controller
                 ->andWhere(['order.restaurant_uuid' => $store_model->restaurant_uuid]);
 
             if($start_date && $end_date) {
-                $query->andWhere (new Expression('DATE(order.order_created_at) >= DATE("'.$start_date.'") AND 
+                $query->andWhere (new Expression('DATE(order.order_created_at) >= DATE("'.$start_date.'") AND
                     DATE(order.order_created_at) <= DATE("'.$end_date.'")'));
             }
 

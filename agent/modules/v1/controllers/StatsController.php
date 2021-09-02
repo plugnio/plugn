@@ -88,9 +88,13 @@ class StatsController extends Controller
             ->andWhere(new Expression("date(customer_created_at) = date(NOW())"))
             ->count();
 
-        $today_sold_items = $store->getOrderItems()
+        /*$today_sold_items = OrderItem::find()
             ->joinWith('order')
-            //->activeOrders($store->restaurant_uuid)
+            ->activeOrders($store->restaurant_uuid)
+            ->andWhere(new Expression("date(order_created_at) = date(NOW())"))
+            ->sum('order_item.qty');*/
+
+        $today_sold_items = $store->getSoldOrderItems()
             ->andWhere(new Expression("date(order_created_at) = date(NOW())"))
             ->sum('order_item.qty');
 
@@ -103,6 +107,17 @@ class StatsController extends Controller
                 $orders_data = $store->getTotalOrdersByMonth();
 
                 $sold_item_data = $store->getTotalSoldItemsByMonth();
+
+                break;
+
+            case 'last-2-months':
+                $customer_data = $store->getTotalCustomersByMonths(2);
+
+                $revenue_data = $store->getTotalRevenueByMonths(2);
+
+                $orders_data = $store->getTotalOrdersByMonths(2);
+
+                $sold_item_data = $store->getTotalSoldItemsByMonths(2);
 
                 break;
 
@@ -119,13 +134,13 @@ class StatsController extends Controller
 
             case 'last-5-months':
                 #https://www.pivotaltracker.com/story/show/179023519
-                $customer_data = $store->getTotalCustomersByMonths(6);
+                $customer_data = $store->getTotalCustomersByMonths(5);
 
-                $revenue_data = $store->getTotalRevenueByMonths(6);
+                $revenue_data = $store->getTotalRevenueByMonths(5);
 
-                $orders_data = $store->getTotalOrdersByMonths(6);
+                $orders_data = $store->getTotalOrdersByMonths(5);
 
-                $sold_item_data = $store->getTotalSoldItemsByMonths(6);
+                $sold_item_data = $store->getTotalSoldItemsByMonths(5);
 
                 break;
 

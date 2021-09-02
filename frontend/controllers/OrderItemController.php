@@ -49,15 +49,16 @@ class OrderItemController extends Controller {
      */
     public function actionCreate($id, $storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         if (Order::find()->where(['order_uuid' => $id])->exists()) {
 
             $model = new OrderItem();
             $model->order_uuid = $id;
+            $model->restaurant_uuid = $store->restaurant_uuid;
 
             //Get restaurant's items to retrieve it on create-form page
-            $itemQuery = Item::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->asArray()->all();
+            $itemQuery = Item::find()->where(['restaurant_uuid' => $store->restaurant_uuid])->asArray()->all();
             $restaurantsItems = ArrayHelper::map($itemQuery, 'item_uuid', 'item_name');
 
 
@@ -67,7 +68,8 @@ class OrderItemController extends Controller {
 
             return $this->render('create', [
                         'model' => $model,
-                        'restaurantsItems' => $restaurantsItems
+                        'restaurantsItems' => $restaurantsItems,
+                        'store' => $store,
             ]);
         } else {
             return $this->redirect(Yii::$app->request->referrer);

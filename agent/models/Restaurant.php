@@ -2,6 +2,7 @@
 
 namespace agent\models;
 
+use yii;
 
 class Restaurant extends \common\models\Restaurant {
 
@@ -27,9 +28,13 @@ class Restaurant extends \common\models\Restaurant {
         $fields = parent::extraFields ();
 
         return array_merge ($fields, [
+            'role',
             'restaurantPaymentMethods',
             'activeSubscription',
-            'restaurantTheme'
+            'restaurantTheme',
+            'restaurantTheme',
+            'countryByOwnerCountryCode',
+            'countryByPhoneCountryCode'
         ]);
     }
 
@@ -41,6 +46,26 @@ class Restaurant extends \common\models\Restaurant {
     public function getItems($modelClass = "\agent\models\Item")
     {
         return parent::getItems($modelClass);
+    }
+
+    /**
+     * role in this restaurant
+     * @param string $modelClass
+     * @return mixed
+     */
+    public function getRole($modelClass = "\agent\models\AgentAssignment")
+    {
+        if(Yii::$app->user->isGuest) {
+            return null;
+        }
+
+        $model = $this->getAgentAssignments($modelClass)
+            ->andWhere(['agent_id' => Yii::$app->user->getId()])
+            ->one();
+
+        if($model) {
+            return $model->role;
+        }
     }
 
     /**
@@ -408,6 +433,16 @@ class Restaurant extends \common\models\Restaurant {
     public function getCountry($modelClass = "\agent\models\Country")
     {
         return parent::getCountry($modelClass);
+    }
+
+    public function getCountryByOwnerCountryCode($modelClass = "\agent\models\Country")
+    {
+        return $this->hasOne ($modelClass::className (), ['country_code' => 'owner_phone_country_code']);
+    }
+
+    public function getCountryByPhoneCountryCode($modelClass = "\agent\models\Country")
+    {
+        return $this->hasOne ($modelClass::className (), ['country_code' => 'phone_number_country_code']);
     }
 
     /**
