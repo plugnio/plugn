@@ -63,6 +63,32 @@ class BusinessLocationController extends Controller
     }
 
     /**
+     * only owner will have access
+     */
+    public function beforeAction($action)
+    {
+        parent::beforeAction ($action);
+
+        if($action->id == 'options') {
+            return true;
+        }
+
+        if(!Yii::$app->accountManager->isOwner()) {
+            throw new \yii\web\BadRequestHttpException(
+                Yii::t('agent', 'You are not allowed to manage business locations. Please contact with store owner')
+            );
+
+            return false;
+        }
+
+        //should have access to store
+
+        Yii::$app->accountManager->getManagedAccount();
+
+        return true;
+    }
+
+    /**
      * @param $store_uuid
      * @return ActiveDataProvider
      */
