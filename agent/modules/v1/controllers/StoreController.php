@@ -251,6 +251,7 @@ class StoreController extends Controller
         $model->iban = Yii::$app->request->getBodyParam('iban');
         $model->identification_file_front_side = Yii::$app->request->getBodyParam('identification_file_front_side');
         $model->identification_file_back_side = Yii::$app->request->getBodyParam('identification_file_back_side');
+
         $model->commercial_license_file = Yii::$app->request->getBodyParam('commercial_license_file');
         $model->authorized_signature_file = Yii::$app->request->getBodyParam('authorized_signature_file');
 
@@ -259,6 +260,7 @@ class StoreController extends Controller
         }
 
         $transaction = Yii::$app->db->beginTransaction();
+
         try {
             if (!$model->save()) {
                 $transaction->rollBack();
@@ -266,32 +268,46 @@ class StoreController extends Controller
             }
 
             /*-------- uploading documents-------*/
+
             if (
-            !$model->uploadFileToCloudinary(
-                $model->identification_file_front_side, 'identification_file_front_side')
+                $model->identification_file_front_side &&
+                !$model->uploadFileToCloudinary(
+                    $model->identification_file_front_side,
+                    'identification_file_front_side'
+                )
             ) {
                 $transaction->rollBack();
                 return self::message("error",$model->errors);
             }
 
             if (
-            !$model->uploadFileToCloudinary(
-                $model->identification_file_back_side, 'identification_file_back_side')
+                $model->identification_file_back_side &&
+                !$model->uploadFileToCloudinary(
+                    $model->identification_file_back_side,
+                    'identification_file_back_side'
+                )
             ) {
                 $transaction->rollBack();
                 return self::message("error",$model->errors);
             }
 
             if (
-            !$model->uploadFileToCloudinary(
-                $model->commercial_license_file, 'commercial_license_file')
+                $model->commercial_license_file &&
+                !$model->uploadFileToCloudinary(
+                    $model->commercial_license_file,
+                    'commercial_license_file'
+                )
             ) {
                 $transaction->rollBack();
                 return self::message("error",$model->errors);
             }
+
             if (
-            !$model->uploadFileToCloudinary(
-                $model->authorized_signature_file, 'authorized_signature_file')
+                $model->authorized_signature_file &&
+                !$model->uploadFileToCloudinary(
+                    $model->authorized_signature_file,
+                    'authorized_signature_file'
+                )
             ) {
                 $transaction->rollBack();
                 return self::message("error",$model->errors);
@@ -302,6 +318,7 @@ class StoreController extends Controller
             $tap_queue_model = new TapQueue;
             $tap_queue_model->queue_status = TapQueue::QUEUE_STATUS_PENDING;
             $tap_queue_model->restaurant_uuid = $model->restaurant_uuid;
+
             if (!$tap_queue_model->save()) {
                 $transaction->rollBack();
                 return self::message("error",$model->errors);
@@ -313,7 +330,9 @@ class StoreController extends Controller
             $transaction->commit();
 
             return self::message("success","Files & data saved successfully");
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e)
+        {
             $transaction->rollBack();
             return self::message("error",$e->getMessage());
         }
