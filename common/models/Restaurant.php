@@ -503,6 +503,7 @@ class Restaurant extends \yii\db\ActiveRecord
     public function uploadFileToCloudinary($file, $attribute)
     {
         $url = Yii::$app->temporaryBucketResourceManager->getUrl($file);
+
         try {
             $filename = Yii::$app->security->generateRandomString();
             $result = Yii::$app->cloudinaryManager->upload (
