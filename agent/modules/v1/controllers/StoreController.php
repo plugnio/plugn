@@ -16,7 +16,6 @@ use agent\models\TapQueue;
 
 class StoreController extends Controller
 {
-
     public function behaviors()
     {
         $behaviors = parent::behaviors();
@@ -65,6 +64,32 @@ class StoreController extends Controller
             'resourceOptions' => ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
         ];
         return $actions;
+    }
+
+    /**
+     * only owner will have access
+     */
+    public function beforeAction($action)
+    {
+        parent::beforeAction ($action);
+
+        if($action->id == 'options') {
+            return true;
+        }
+
+        if(!Yii::$app->accountManager->isOwner() && !in_array ($action->id, ['detail'])) {
+            throw new \yii\web\BadRequestHttpException(
+                Yii::t('agent', 'You are not allowed to manage store. Please contact with store owner')
+            );
+
+            return false;
+        }
+
+        //should have access to store
+
+        Yii::$app->accountManager->getManagedAccount();
+
+        return true;
     }
 
     /**
@@ -487,6 +512,12 @@ class StoreController extends Controller
         return self::message("success","Layout updated successfully");
     }
 
+    /**
+     * update delivery API keys
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
     public function actionUpdateDeliveryIntegration($id) {
 
         $model = $this->findModel($id);
