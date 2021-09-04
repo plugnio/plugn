@@ -381,8 +381,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                             [
                                 'label' => 'Subtotal',
                                 'value' => function ($orderItem) {
-                                    return Yii::$app->formatter->asCurrency($orderItem->item_price,
-                                        $orderItem->currency->code);
+                                    return Yii::$app->formatter->asCurrency($orderItem->item_price,'KWD');
                                 }
                             ],
                         ],
