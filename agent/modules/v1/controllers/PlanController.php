@@ -64,6 +64,32 @@ class PlanController extends Controller
     }
 
     /**
+     * only owner will have access
+     */
+    public function beforeAction($action)
+    {
+        parent::beforeAction ($action);
+
+        if($action->id == 'options') {
+            return true;
+        }
+
+        if(!Yii::$app->accountManager->isOwner() && !in_array ($action->id, ['view'])) {
+            throw new \yii\web\BadRequestHttpException(
+                Yii::t('agent', 'You are not allowed to manage plan. Please contact with store owner')
+            );
+
+            return false;
+        }
+
+        //should have access to store
+
+        Yii::$app->accountManager->getManagedAccount();
+
+        return true;
+    }
+
+    /**
      * return plan detail
      * @param $id
      * @return Plan|null

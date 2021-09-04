@@ -541,36 +541,34 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
-     * Upload a File to cloudinary
+     * Upload a File from AWS to cloudinary
      * @param $file_path
      * @param $attribute
      * @return bool
      * @throws \yii\base\Exception
      */
-    // public function uploadFileToCloudinary($file, $attribute)
-    // {
-    //     $url = Yii::$app->temporaryBucketResourceManager->getUrl($file);
-    //     try {
-    //         $filename = Yii::$app->security->generateRandomString();
-    //         $result = Yii::$app->cloudinaryManager->upload (
-    //             $url, [
-    //                 'public_id' => "restaurants/" . $this->restaurant_uuid . "/private_documents/" . $filename
-    //             ]
-    //         );
-    //
-    //         if ($result || count ($result) > 0) {
-    //             //delete the file from temp folder
-    //             $this[$attribute] = basename ($result['url']);
-    //             $this->$attribute = basename ($result['url']);
-    //             return true;
-    //         }
-    //     } catch (\Cloudinary\Error $err) {
-    //         Yii::error ('Error when uploading restaurant document to Cloudinary: ' . json_encode ($err));
-    //         $this->addError($attribute, $err->getMessage());
-    //         return false;
-    //     }
-    //
-    // }
+    public function uploadFileFromAwsToCloudinary($file, $attribute)
+    {
+        $url = Yii::$app->temporaryBucketResourceManager->getUrl($file);
+        try {
+            $filename = Yii::$app->security->generateRandomString();
+            $result = Yii::$app->cloudinaryManager->upload (
+                $url, [
+                    'public_id' => "restaurants/" . $this->restaurant_uuid . "/private_documents/" . $filename
+                        ]
+                );
+
+                if ($result || count($result) > 0) {
+
+                    //delete the file from temp folder
+                    unlink($file_path);
+                    $this[$attribute] = basename($result['url']);
+                }
+            } catch (\Cloudinary\Error $err) {
+                Yii::error('Error when uploading restaurant document to Cloudinary: ' . json_encode($err));
+            }
+
+    }
 
     /**
      * Upload a File to cloudinary
@@ -598,7 +596,6 @@ class Restaurant extends \yii\db\ActiveRecord
             }
 
     }
-
 
     public function uploadDocumentsToTap()
     {

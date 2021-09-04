@@ -16,7 +16,6 @@ use agent\models\TapQueue;
 
 class StoreController extends Controller
 {
-
     public function behaviors()
     {
         $behaviors = parent::behaviors();
@@ -65,6 +64,32 @@ class StoreController extends Controller
             'resourceOptions' => ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
         ];
         return $actions;
+    }
+
+    /**
+     * only owner will have access
+     */
+    public function beforeAction($action)
+    {
+        parent::beforeAction ($action);
+
+        if($action->id == 'options') {
+            return true;
+        }
+
+        if(!Yii::$app->accountManager->isOwner() && !in_array ($action->id, ['detail'])) {
+            throw new \yii\web\BadRequestHttpException(
+                Yii::t('agent', 'You are not allowed to manage store. Please contact with store owner')
+            );
+
+            return false;
+        }
+
+        //should have access to store
+
+        Yii::$app->accountManager->getManagedAccount();
+
+        return true;
     }
 
     /**
@@ -226,6 +251,7 @@ class StoreController extends Controller
         $model->iban = Yii::$app->request->getBodyParam('iban');
         $model->identification_file_front_side = Yii::$app->request->getBodyParam('identification_file_front_side');
         $model->identification_file_back_side = Yii::$app->request->getBodyParam('identification_file_back_side');
+
         $model->commercial_license_file = Yii::$app->request->getBodyParam('commercial_license_file');
         $model->authorized_signature_file = Yii::$app->request->getBodyParam('authorized_signature_file');
 
@@ -234,6 +260,7 @@ class StoreController extends Controller
         }
 
         $transaction = Yii::$app->db->beginTransaction();
+
         try {
             if (!$model->save()) {
                 $transaction->rollBack();
@@ -241,32 +268,46 @@ class StoreController extends Controller
             }
 
             /*-------- uploading documents-------*/
+
             if (
-            !$model->uploadFileToCloudinary(
-                $model->identification_file_front_side, 'identification_file_front_side')
+                $model->identification_file_front_side &&
+                !$model->uploadFileFromAwsToCloudinary(
+                    $model->identification_file_front_side,
+                    'identification_file_front_side'
+                )
             ) {
                 $transaction->rollBack();
                 return self::message("error",$model->errors);
             }
 
             if (
-            !$model->uploadFileToCloudinary(
-                $model->identification_file_back_side, 'identification_file_back_side')
+                $model->identification_file_back_side &&
+                !$model->uploadFileFromAwsToCloudinary(
+                    $model->identification_file_back_side,
+                    'identification_file_back_side'
+                )
             ) {
                 $transaction->rollBack();
                 return self::message("error",$model->errors);
             }
 
             if (
-            !$model->uploadFileToCloudinary(
-                $model->commercial_license_file, 'commercial_license_file')
+                $model->commercial_license_file &&
+                !$model->uploadFileFromAwsToCloudinary(
+                    $model->commercial_license_file,
+                    'commercial_license_file'
+                )
             ) {
                 $transaction->rollBack();
                 return self::message("error",$model->errors);
             }
+
             if (
-            !$model->uploadFileToCloudinary(
-                $model->authorized_signature_file, 'authorized_signature_file')
+                $model->authorized_signature_file &&
+                !$model->uploadFileFromAwsToCloudinary(
+                    $model->authorized_signature_file,
+                    'authorized_signature_file'
+                )
             ) {
                 $transaction->rollBack();
                 return self::message("error",$model->errors);
@@ -274,21 +315,26 @@ class StoreController extends Controller
 
             /*-------- uploading documents-------*/
 
-            $tap_queue_model = new TapQueue;
-            $tap_queue_model->queue_status = TapQueue::QUEUE_STATUS_PENDING;
-            $tap_queue_model->restaurant_uuid = $model->restaurant_uuid;
-            if (!$tap_queue_model->save()) {
+            $payment_gateway_queue_model = new PaymentGatewayQueue;
+            $payment_gateway_queue_model->queue_status = PaymentGatewayQueue::QUEUE_STATUS_PENDING;
+            $payment_gateway_queue_model->restaurant_uuid = $model->restaurant_uuid;
+            $payment_gateway_queue_model->payment_gateway =  'tap';
+
+
+            if (!$payment_gateway_queue_model->save()) {
                 $transaction->rollBack();
                 return self::message("error",$model->errors);
             }
 
-            $model->tap_queue_id = $tap_queue_model->tap_queue_id;
+            $model->payment_gateway_queue_id = $payment_gateway_queue_model->payment_gateway_queue_id;
             $model->save(false);
 
             $transaction->commit();
 
             return self::message("success","Files & data saved successfully");
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e)
+        {
             $transaction->rollBack();
             return self::message("error",$e->getMessage());
         }
@@ -455,7 +501,7 @@ class StoreController extends Controller
             ];
         }
 
-        //theme 
+        //theme
 
         $restaurantTheme = $model->restaurantTheme;
 
@@ -487,6 +533,12 @@ class StoreController extends Controller
         return self::message("success","Layout updated successfully");
     }
 
+    /**
+     * update delivery API keys
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
     public function actionUpdateDeliveryIntegration($id) {
 
         $model = $this->findModel($id);
