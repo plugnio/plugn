@@ -271,7 +271,7 @@ class StoreController extends Controller
 
             if (
                 $model->identification_file_front_side &&
-                !$model->uploadFileToCloudinary(
+                !$model->uploadFileFromAwsToCloudinary(
                     $model->identification_file_front_side,
                     'identification_file_front_side'
                 )
@@ -282,7 +282,7 @@ class StoreController extends Controller
 
             if (
                 $model->identification_file_back_side &&
-                !$model->uploadFileToCloudinary(
+                !$model->uploadFileFromAwsToCloudinary(
                     $model->identification_file_back_side,
                     'identification_file_back_side'
                 )
@@ -293,7 +293,7 @@ class StoreController extends Controller
 
             if (
                 $model->commercial_license_file &&
-                !$model->uploadFileToCloudinary(
+                !$model->uploadFileFromAwsToCloudinary(
                     $model->commercial_license_file,
                     'commercial_license_file'
                 )
@@ -304,7 +304,7 @@ class StoreController extends Controller
 
             if (
                 $model->authorized_signature_file &&
-                !$model->uploadFileToCloudinary(
+                !$model->uploadFileFromAwsToCloudinary(
                     $model->authorized_signature_file,
                     'authorized_signature_file'
                 )
@@ -315,16 +315,18 @@ class StoreController extends Controller
 
             /*-------- uploading documents-------*/
 
-            $tap_queue_model = new TapQueue;
-            $tap_queue_model->queue_status = TapQueue::QUEUE_STATUS_PENDING;
-            $tap_queue_model->restaurant_uuid = $model->restaurant_uuid;
+            $payment_gateway_queue_model = new PaymentGatewayQueue;
+            $payment_gateway_queue_model->queue_status = PaymentGatewayQueue::QUEUE_STATUS_PENDING;
+            $payment_gateway_queue_model->restaurant_uuid = $model->restaurant_uuid;
+            $payment_gateway_queue_model->payment_gateway =  'tap';
 
-            if (!$tap_queue_model->save()) {
+
+            if (!$payment_gateway_queue_model->save()) {
                 $transaction->rollBack();
                 return self::message("error",$model->errors);
             }
 
-            $model->tap_queue_id = $tap_queue_model->tap_queue_id;
+            $model->payment_gateway_queue_id = $payment_gateway_queue_model->payment_gateway_queue_id;
             $model->save(false);
 
             $transaction->commit();
@@ -499,7 +501,7 @@ class StoreController extends Controller
             ];
         }
 
-        //theme 
+        //theme
 
         $restaurantTheme = $model->restaurantTheme;
 

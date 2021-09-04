@@ -494,16 +494,15 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
-     * Upload a File to cloudinary
+     * Upload a File from AWS to cloudinary
      * @param $file_path
      * @param $attribute
      * @return bool
      * @throws \yii\base\Exception
      */
-    public function uploadFileToCloudinary($file, $attribute)
+    public function uploadFileFromAwsToCloudinary($file, $attribute)
     {
         $url = Yii::$app->temporaryBucketResourceManager->getUrl($file);
-
         try {
             $filename = Yii::$app->security->generateRandomString();
             $result = Yii::$app->cloudinaryManager->upload (
@@ -523,6 +522,33 @@ class Restaurant extends \yii\db\ActiveRecord
             $this->addError($attribute, $err->getMessage());
             return false;
         }
+
+    }
+
+    /**
+     * Upload a File to cloudinary
+     * @param type $imageURL
+     */
+    public function uploadFileToCloudinary($file_path, $attribute) {
+        $filename = Yii::$app->security->generateRandomString();
+
+            try {
+
+                $result = Yii::$app->cloudinaryManager->upload(
+                        $file_path, [
+                    'public_id' => "restaurants/" . $this->restaurant_uuid . "/private_documents/" . $filename
+                        ]
+                );
+
+                if ($result || count($result) > 0) {
+
+                    //delete the file from temp folder
+                    unlink($file_path);
+                    $this[$attribute] = basename($result['url']);
+                }
+            } catch (\Cloudinary\Error $err) {
+                Yii::error('Error when uploading restaurant document to Cloudinary: ' . json_encode($err));
+            }
 
     }
 
@@ -1489,7 +1515,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $rows = $this->getCustomers()
             ->select(new Expression('customer_created_at, COUNT(*) as total'))
             ->andWhere('
-                YEAR(customer_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND 
+                YEAR(customer_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
                 MONTH(customer_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
             ->groupBy(new Expression('DAY(customer_created_at)'))
             ->asArray()
@@ -1504,7 +1530,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $number_of_all_customer_gained = $this->getCustomers()
             ->andWhere('
-                YEAR(customer_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND 
+                YEAR(customer_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
                 MONTH(customer_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
             ->count();
 
@@ -1531,7 +1557,7 @@ class Restaurant extends \yii\db\ActiveRecord
             ->activeOrders ($this->restaurant_uuid)
             ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
             ->andWhere('
-                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND 
+                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
                 MONTH(order.order_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
             ->groupBy (new Expression('DAY(order.order_created_at)'))
             ->asArray ()
@@ -1547,7 +1573,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $number_of_all_revenue_generated = $this->getOrders()
             ->activeOrders($this->restaurant_uuid)
             ->andWhere('
-                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND 
+                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
                 MONTH(order.order_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
             ->sum('total_price');
 
@@ -1574,7 +1600,7 @@ class Restaurant extends \yii\db\ActiveRecord
             ->activeOrders ($this->restaurant_uuid)
             ->select (new Expression('order_created_at, COUNT(*) as total'))
             ->andWhere('
-                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND 
+                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
                 MONTH(order.order_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
             ->groupBy (new Expression('DAY(order.order_created_at)'))
             ->asArray ()
@@ -1590,7 +1616,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $number_of_all_orders_received = $this->getOrders()
             ->activeOrders($this->restaurant_uuid)
             ->andWhere('
-                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND 
+                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
                 MONTH(order.order_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
             ->count();
 
@@ -1616,7 +1642,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $rows = $this->getSoldOrderItems ()
             ->select ('order_item_created_at, SUM(order_item.qty) as total')
             ->andWhere('
-                YEAR(`order_item_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND 
+                YEAR(`order_item_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
                 MONTH(`order_item_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
             ->groupBy (new Expression('DATE(order_item_created_at)'))
             ->asArray ()
@@ -1631,7 +1657,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $number_of_all_sold_item = $this->getSoldOrderItems()
             ->andWhere('
-                YEAR(`order_item_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND 
+                YEAR(`order_item_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
                 MONTH(`order_item_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
             ->sum('order_item.qty');
 
@@ -1642,7 +1668,7 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     public function getTotalCustomersByMonths($months)
-    {   
+    {
         $customer_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
