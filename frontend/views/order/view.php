@@ -453,7 +453,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
             [
                 'label' => 'Subtotal',
                 'value' => function ($orderItem) {
-                    return Yii::$app->formatter->asCurrency($orderItem->item_price, $orderItem->currency->code);
+                    return Yii::$app->formatter->asCurrency($orderItem->item_price, 'KWD');
                 }
             ],
         ],
