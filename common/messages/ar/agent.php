@@ -1,5 +1,11 @@
 <?php
 return [
+    "You are not allowed to manage plan. Please contact with store owner" => "لا يسمح لك بإدارة الخطة. يرجى التواصل مع صاحب المتجر",
+    "You are not allowed to manage opening hours. Please contact with store owner" => "لا يسمح لك بإدارة ساعات العمل. يرجى التواصل مع صاحب المتجر",
+    "You are not allowed to manage business locations. Please contact with store owner" => "غير مسموح لك بإدارة مواقع العمل. يرجى التواصل مع صاحب المتجر",
+    "You are not allowed to manage discounts. Please contact with store owner" => "لا يسمح لك بإدارة الخصومات. يرجى التواصل مع صاحب المتجر",
+    "You are not allowed to view stats. Please contact with store owner" => "لا يسمح لك لعرض الإحصائيات. يرجى التواصل مع صاحب المتجر",
+    "You are not allowed to manage staff member. Please contact with store owner" => "لا يسمح لك بإدارة الموظف. يرجى التواصل مع صاحب المتجر",
     "Invalid Agent ID" => "معرف الوكيل غير صالح",
     "You do not own this store." => "أنت لا تملك هذا المتجر.",
     "Agent profile updated successfully" => "تم تحديث ملف تعريف الوكيل بنجاح",

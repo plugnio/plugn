@@ -2,13 +2,15 @@
 
 namespace common\components;
 
+use common\models\Agent;
+use common\models\AgentAssignment;
 use Yii;
 use yii\base\BaseObject;
 use yii\base\InvalidParamException;
 use yii\web\NotFoundHttpException;
 use agent\models\Restaurant;
 
-//55, 61
+
 /**
  * AccountManager is a component that holds a list of Restaurants this agent owns
  * The purpose of this component is to reduce the stress incurred on the database
@@ -33,7 +35,7 @@ class AccountManager  extends BaseObject
     public function __construct($config = [])
     {
         // This component must only be usable if agent is logged in
-        if(Yii::$app->user->isGuest){
+        if(Yii::$app->user->isGuest) {
             throw new \yii\web\BadRequestHttpException('ILLEGAL USAGE OF ACCOUNT OWNERSHIP MANAGER');
         }
 
@@ -112,5 +114,16 @@ class AccountManager  extends BaseObject
         Yii::$app->user->logout();
 
         throw new \yii\web\BadRequestHttpException('You do not own this store.');
+    }
+
+    /**
+     * Am I owner?
+     * @param string $restaurantUuid
+     * @return boolean
+     */
+    public function isOwner($restaurantUuid = null) {
+        $assignment = $this->getAssignment($restaurantUuid);
+
+        return $assignment && $assignment->role == AgentAssignment::AGENT_ROLE_OWNER;
     }
 }

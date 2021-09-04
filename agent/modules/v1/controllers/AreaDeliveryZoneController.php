@@ -14,7 +14,6 @@ use agent\models\AreaDeliveryZone;
 
 class AreaDeliveryZoneController extends Controller
 {
-
     public function behaviors()
     {
         $behaviors = parent::behaviors ();
@@ -65,9 +64,34 @@ class AreaDeliveryZoneController extends Controller
         return $actions;
     }
 
+    /**
+     * only owner will have access
+     */
+    public function beforeAction($action)
+    {
+        parent::beforeAction ($action);
+
+        if($action->id == 'options') {
+            return true;
+        }
+
+        if(!Yii::$app->accountManager->isOwner() && !in_array ($action->id, ['list'])) {
+            throw new \yii\web\BadRequestHttpException(
+                Yii::t('agent', 'You are not allowed to manage business locations. Please contact with store owner')
+            );
+
+            return false;
+        }
+
+        //should have access to store
+
+        Yii::$app->accountManager->getManagedAccount();
+
+        return true;
+    }
+
     public function actionList()
     {
-
         $page = Yii::$app->request->get ('page');
         $keyword = Yii::$app->request->get ('keyword');
         $city_id = Yii::$app->request->get ('city_id');
@@ -111,7 +135,6 @@ class AreaDeliveryZoneController extends Controller
      */
     public function actionSave()
     {
-
         $store = Yii::$app->accountManager->getManagedAccount ();
 
         $areas = Yii::$app->request->getBodyParam ("areas");
@@ -172,7 +195,6 @@ class AreaDeliveryZoneController extends Controller
      */
     public function actionCreate()
     {
-
         $store_uuid = Yii::$app->request->getBodyParam ("store_uuid");
         $area_id = Yii::$app->request->getBodyParam ("area_id");
         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
