@@ -198,7 +198,7 @@ return [
                         'POST create' => 'create',
                         'PATCH <voucher_id>/<store_uuid>' => 'update',
                         'PATCH update-status' => 'update-voucher-status',
-                        'DELETE <voucher_id>/<store_uuid>' => 'delete',
+                        'DELETE <voucher_id>/<store_uuid>' => 'remove',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',

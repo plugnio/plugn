@@ -620,7 +620,7 @@ class Order extends \yii\db\ActiveRecord
                 ->send ();
         }
 
-        foreach ($this->restaurant->getAgentAssignments ()->all () as $agentAssignment) {
+        foreach ($this->restaurant->getAgentAssignments()->all () as $agentAssignment) {
 
 
             if ($agentAssignment->email_notification) {
@@ -639,7 +639,7 @@ class Order extends \yii\db\ActiveRecord
         }
 
 
-        if ($this->restaurant->restaurant_email_notification) {
+        if ($this->restaurant->restaurant_email_notification && $this->restaurant->restaurant_email) {
 
             \Yii::$app->mailer->compose ([
                 'html' => 'payment-confirm-html',
