@@ -67,29 +67,41 @@ class DeliveryZoneController extends Controller
     /**
      * only owner will have access
      */
-    public function beforeAction($action)
+//    public function beforeAction($action)
+//    {
+//        parent::beforeAction ($action);
+//
+//        if($action->id == 'options') {
+//            return true;
+//        }
+//
+//        if(!Yii::$app->accountManager->isOwner()) {
+//            throw new \yii\web\BadRequestHttpException(
+//                Yii::t('agent', 'You are not allowed to manage business locations. Please contact with store owner')
+//            );
+//
+//            return false;
+//        }
+//
+//        //should have access to store
+//
+//        Yii::$app->accountManager->getManagedAccount();
+//
+//        return true;
+//    }
+
+    private function ownerCheck()
     {
-        parent::beforeAction ($action);
-
-        if($action->id == 'options') {
-            return true;
-        }
-
-        if(!Yii::$app->accountManager->isOwner()) {
+        if (!Yii::$app->accountManager->isOwner()) {
             throw new \yii\web\BadRequestHttpException(
-                Yii::t('agent', 'You are not allowed to manage business locations. Please contact with store owner')
+                Yii::t('agent', 'You are not allowed to manage discounts. Please contact with store owner')
             );
-
-            return false;
         }
 
         //should have access to store
-
         Yii::$app->accountManager->getManagedAccount();
-
         return true;
     }
-
     /**
      * Get all delivery zones
      * @param type $id
@@ -98,6 +110,7 @@ class DeliveryZoneController extends Controller
      */
     public function actionList($store_uuid, $business_location_id)
     {
+        $this->ownerCheck();
         if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
             $query = DeliveryZone::find()
@@ -118,6 +131,7 @@ class DeliveryZoneController extends Controller
      */
     public function actionCreate()
     {
+        $this->ownerCheck();
         $store_uuid = Yii::$app->request->getBodyParam("store_uuid");
         Yii::$app->accountManager->getManagedAccount($store_uuid);
 
@@ -162,6 +176,7 @@ class DeliveryZoneController extends Controller
      */
     public function actionUpdate($delivery_zone_id, $store_uuid)
     {
+        $this->ownerCheck();
         $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
         $business_location_id = Yii::$app->request->getBodyParam("business_location_id");
         $business_location_model = BusinessLocation::findOne(['business_location_id' => $business_location_id, 'restaurant_uuid' => $store_model->restaurant_uuid]);
@@ -209,6 +224,7 @@ class DeliveryZoneController extends Controller
      */
     public function actionDetail($store_uuid, $delivery_zone_id)
     {
+        $this->ownerCheck();
         return $this->findModel($delivery_zone_id, $store_uuid);
     }
 
@@ -217,7 +233,7 @@ class DeliveryZoneController extends Controller
      */
     public function actionDelete($delivery_zone_id, $store_uuid)
     {
-
+        $this->ownerCheck();
         $model = $this->findModel($delivery_zone_id, $store_uuid);
 
         if (!$model->delete()) {
@@ -245,6 +261,7 @@ class DeliveryZoneController extends Controller
      */
     public function actionCancelOverride($delivery_zone_id, $store_uuid)
     {
+        $this->ownerCheck();
         $model = $this->findModel($delivery_zone_id, $store_uuid);
         $model->delivery_zone_tax = null;
         if (!$model->save()) {
