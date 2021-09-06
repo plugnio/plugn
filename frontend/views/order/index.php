@@ -72,6 +72,11 @@ white-space: nowrap !important;
                 <div class="btn-group dropdown actions-dropodown">
                     <?= Html::a('Create order ', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
                 </div>
+                <?php if(\Yii::$app->user->identity->agent_id == 404 || \Yii::$app->user->identity->agent_id == 1){  ?>
+                <div class="btn-group dropdown actions-dropodown">
+                    <?= Html::a('Print Pending Orders For Mashkor', ['download-pending-orders-for-mashkor', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+                </div>
+              <?php } ?>
             </div>
         </div>
 

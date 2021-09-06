@@ -69,6 +69,110 @@ class OrderController extends Controller {
         ]);
     }
 
+
+  public function actionDownloadPendingOrdersForMashkor($storeUuid) {
+        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+            $orders = Order::find()
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->andWhere(['<>', 'payment_method_id', 3 ])
+                    ->andWhere([ 'restaurant_uuid' =>  $store_model->restaurant_uuid ])
+                    ->andWhere([ 'country_name' => 'Kuwait' ])
+                    ->orderBy(['order_created_at' => SORT_ASC])
+                    ->all();
+
+            header('Access-Control-Allow-Origin: *');
+            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            header("Content-Disposition: attachment;filename=\"orders.xlsx\"");
+            header("Cache-Control: max-age=0");
+
+            \moonland\phpexcel\Excel::export([
+                'isMultipleSheet' => false,
+                'models' => $orders,
+                'columns' => [
+
+                    [
+                        'attribute' => 'customer_name',
+                        'format' => 'raw',
+                        'value' => function ($data) {
+                            return $data->customer_name;
+                        },
+                    ],
+
+                    [
+                        'header' => 'Customer Phone number',
+                        'attribute' => 'customer_phone_number',
+                        "format" => "raw",
+                        "value" => function($model) {
+                            return $model->customer_phone_number;
+                        }
+                    ],
+                    [
+                        'header' => 'Vendor Order ID',
+                        'attribute' => 'order_uuid',
+                        "format" => "raw",
+                        "value" => function($model) {
+                            return '#' . $model->order_uuid;
+                        }
+                    ],
+                    [
+                        'header' => 'COD',
+                        'attribute' => 'order_uuid',
+                        "format" => "raw",
+                        "value" => function($model) {
+                            return 'No';
+                        }
+                    ],
+
+                    [
+                        'header' => 'Area',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                            if($data->area_id)
+                              return $data->area_name;
+                        }
+                    ],
+                    [
+                        'header' => 'Block',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                            if($data->block)
+                              return $data->block;
+                        }
+                    ],
+                    [
+                        'header' => 'Street',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                            if($data->street)
+                              return $data->street;
+                        }
+                    ],
+                    [
+                        'header' => 'House number/Building',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                            if($data->house_number)
+                              return $data->house_number;
+                        }
+                    ],
+                    [
+                        'header' => 'Extra Instruction',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                            if($data->house_number)
+                              return $data->special_directions;
+                        }
+                    ],
+
+                ]
+            ]);
+
+        return $this->redirect(['index', 'storeUuid' =>  $store_model->restaurant_uuid]);
+
+      }
+
+
     /**
      * Lists all Order models.
      * @return mixed
