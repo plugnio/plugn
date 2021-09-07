@@ -78,12 +78,11 @@ class CategoryController extends Controller {
 
          if ($keyword){
              $query->andWhere([
-                 'or', [
+                 'OR',
                      ['like', 'title', $keyword],
                      ['like', 'title_ar', $keyword],
                      ['like', 'subtitle', $keyword],
                      ['like', 'subtitle_ar', $keyword]
-                 ]
              ]);
          }
 

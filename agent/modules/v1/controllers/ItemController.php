@@ -197,7 +197,7 @@ class ItemController extends Controller
 
             return [
                 "operation" => "success",
-                "message" => Yii::t('translate', "Item created successfully"),
+                "message" => Yii::t('agent', "Item created successfully"),
             ];
         } catch (\Exception $e) {
             $transaction->rollBack();
@@ -292,7 +292,7 @@ class ItemController extends Controller
 
             return [
                 "operation" => "success",
-                "message" => Yii::t('translate',"Item updated successfully")
+                "message" => Yii::t('agent',"Item updated successfully")
             ];
         } catch (\Exception $e) {
             $transaction->rollBack();
