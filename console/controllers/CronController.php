@@ -326,7 +326,29 @@ class CronController extends \yii\console\Controller {
 
 
          foreach ($subscriptions as $subscription) {
-           if(date('Y-m-d',strtotime($subscription->subscription_end_at)) == date('Y-m-d')){
+
+
+
+           foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
+             $result = \Yii::$app->mailer->compose([
+                         'html' => 'subscription-expired',
+                             ], [
+                         'subscription' => $subscription,
+                         'store' => $subscription->restaurant,
+                         'plan' => $subscription->plan->name,
+                         'agent_name' => $agent->agent_name,
+                     ])
+                     ->setFrom([\Yii::$app->params['supportEmail']])
+                     ->setTo($agent->agent_email)
+                     ->setBcc(\Yii::$app->params['supportEmail'])
+                     ->setSubject($subscription->restaurant->name . ' has been downgraded to our free plan')
+                     ->send();
+
+           }
+
+
+           if(date('Y-m-d',strtotime($subscription->subscription_end_at)) == date('Y-m-d') ){
+
              $subscription->subscription_status =  Subscription::STATUS_INACTIVE;
              $subscription->save();
            }
