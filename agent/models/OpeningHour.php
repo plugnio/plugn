@@ -16,7 +16,21 @@ class OpeningHour extends \common\models\OpeningHour
     public function rules()
     {
         return array_merge (parent::rules (), [
-            [['open_at', 'close_at'], 'date', 'format' => 'H:m:s'],
+            [['open_at', 'close_at'], 'date', 'format' => 'H:i:s'],
+        ]);
+    }
+
+    public function fields() {
+
+        $fields = parent::fields();
+
+        return array_merge($fields, [
+            'open_at_am_pm' => function($model) {
+                return date('h:i A', strtotime($model->open_at));
+            },
+            'close_at_am_pm' => function($model) {
+                return date('h:i A', strtotime($model->close_at));
+            }
         ]);
     }
 
