@@ -244,7 +244,7 @@ class Voucher extends \yii\db\ActiveRecord {
 
         foreach ($rows as $result) {
             $voucher_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
-                'month' => date ('F', strtotime ($result['order_created_at'])),
+                'month' => date ('M', strtotime ($result['order_created_at'])),
                 'total' => (int) $result['total']
             );
         }
