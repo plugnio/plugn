@@ -181,7 +181,7 @@ class SiteController extends Controller {
                                  'old_domain' => $old_domain
                              ])
                              ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-                             ->setTo(Yii::$app->params['supportEmail'])
+                             ->setTo(Yii::$app->params['adminEmail'])
                              ->setSubject('[Plugn] Agent updated DN')
                              ->send();
 

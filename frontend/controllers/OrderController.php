@@ -149,6 +149,35 @@ class OrderController extends Controller {
                         }
                     ],
                     [
+                        'header' => 'Unit Type',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                            if($data->unit_type)
+                              return $data->unit_type;
+                        }
+                    ],
+                    [
+                        'header' => 'Floor',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                              return $data->floor ? $data->floor  : '-----';
+                        }
+                    ],
+                    [
+                        'header' => 'Apartment',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                              return $data->apartment ? $data->apartment  : '-----';
+                        }
+                    ],
+                    [
+                        'header' => 'Office',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                              return $data->office ? $data->office  : '-----';
+                        }
+                    ],
+                    [
                         'header' => 'House number/Building',
                         // 'format' => 'html',
                         'value' => function ($data) {

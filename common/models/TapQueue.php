@@ -78,7 +78,6 @@ class TapQueue extends \yii\db\ActiveRecord
                    ])
                    ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                    ->setTo([$agent->agent_email])
-                   ->setBcc(\Yii::$app->params['supportEmail'])
                    ->setSubject('Your TAP Payments account has been approved')
                    ->send();
 
