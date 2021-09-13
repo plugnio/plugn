@@ -13,13 +13,6 @@ use Yii;
 class OpeningHour extends \common\models\OpeningHour
 {
 
-    public function rules()
-    {
-        return array_merge (parent::rules (), [
-            [['open_at', 'close_at'], 'date', 'format' => 'H:i:s'],
-        ]);
-    }
-
     public function fields() {
 
         $fields = parent::fields();

@@ -146,7 +146,7 @@ class OpeningHoursController extends Controller
      */
     public function actionUpdate($day_of_week)
     {
-        $this->ownerCheck();
+//        $this->ownerCheck();
         $opening_hours = Yii::$app->request->getBodyParam ("opening_hours");
 
         //validate
@@ -161,33 +161,31 @@ class OpeningHoursController extends Controller
         ]);
 
         //add new timeslots
-
         foreach ($opening_hours as $key => $opening_hour) {
 
-            $model = new OpeningHour;
-            $model->restaurant_uuid = $store_model->restaurant_uuid;
-            $model->day_of_week = $day_of_week;
-            $model->open_at = date ('H:i:s', strtotime ($opening_hour['open_at']));
-            $model->close_at = date ('H:i:s', strtotime ($opening_hour['close_at']));
-            if (!$model->save ()) {
-                if (isset($model->errors)) {
-                    return [
-                        "operation" => "error",
-                        "message" => $model->errors
-                    ];
-                } else {
-                    return [
-                        "operation" => "error",
-                        "message" => Yii::t ('agent', "We've faced a problem updating the Opening Hour")
-                    ];
-                }
-            }
+             $model = new OpeningHour;
+             $model->restaurant_uuid = $store_model->restaurant_uuid;
+             $model->day_of_week = $day_of_week;
+             $model->open_at = date('H:i:s', strtotime($opening_hour['open_at']));
+             $model->close_at = date('H:i:s', strtotime($opening_hour['close_at']));
+             if (!$model->save ()) {
+                 if (isset($model->errors)) {
+                     return [
+                         "operation" => "error",
+                         "message" => $model->errors
+                     ];
+                 } else {
+                     return [
+                         "operation" => "error",
+                         "message" => Yii::t ('agent', "We've faced a problem updating the Opening Hour")
+                     ];
+                 }
+             }
         }
-
-        return [
-            "operation" => "success",
-            "message" => Yii::t ('agent', "Opening Hour updated successfully")
-        ];
+         return [
+             "operation" => "success",
+             "message" => Yii::t ('agent', "Opening Hour updated successfully")
+         ];
     }
 
     /**
