@@ -107,7 +107,7 @@ class BusinessLocationController extends Controller
      */
     public function actionList($store_uuid)
     {
-        $this->ownerCheck();
+//        $this->ownerCheck();
         $keyword = Yii::$app->request->get ('keyword');
 
         Yii::$app->accountManager->getManagedAccount ($store_uuid);
@@ -138,7 +138,7 @@ class BusinessLocationController extends Controller
      */
     public function actionCreate()
     {
-        $this->ownerCheck();
+//        $this->ownerCheck();
         $store = Yii::$app->accountManager->getManagedAccount ();
 
         $model = new BusinessLocation();
@@ -173,7 +173,7 @@ class BusinessLocationController extends Controller
      */
     public function actionUpdate($business_location_id, $store_uuid)
     {
-        $this->ownerCheck();
+//        $this->ownerCheck();
         $model = $this->findModel ($business_location_id, $store_uuid);
 
         $model->country_id = Yii::$app->request->getBodyParam ("country_id");
@@ -216,7 +216,7 @@ class BusinessLocationController extends Controller
      */
     public function actionDetail($store_uuid, $business_location_id)
     {
-        $this->ownerCheck();
+//        $this->ownerCheck();
         return $this->findModel ($business_location_id, $store_uuid);
     }
 

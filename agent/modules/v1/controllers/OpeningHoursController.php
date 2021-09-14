@@ -104,7 +104,7 @@ class OpeningHoursController extends Controller
      */
     public function actionCreate($store_uuid)
     {
-        $this->ownerCheck();
+//        $this->ownerCheck();
         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
         $opening_hours = Yii::$app->request->getBodyParam ("opening_hours");
 
@@ -196,7 +196,7 @@ class OpeningHoursController extends Controller
      */
     public function actionDetail($store_uuid, $day_of_week)
     {
-        $this->ownerCheck();
+//        $this->ownerCheck();
         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         if (($model = OpeningHour::find ()->where (['day_of_week' => $day_of_week, 'restaurant_uuid' => $store_model->restaurant_uuid])) !== null) {

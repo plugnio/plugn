@@ -110,7 +110,7 @@ class DeliveryZoneController extends Controller
      */
     public function actionList($store_uuid, $business_location_id)
     {
-        $this->ownerCheck();
+//        $this->ownerCheck();
         if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
 
             $query = DeliveryZone::find()
@@ -131,7 +131,7 @@ class DeliveryZoneController extends Controller
      */
     public function actionCreate()
     {
-        $this->ownerCheck();
+//        $this->ownerCheck();
         $store_uuid = Yii::$app->request->getBodyParam("store_uuid");
         Yii::$app->accountManager->getManagedAccount($store_uuid);
 
@@ -176,7 +176,7 @@ class DeliveryZoneController extends Controller
      */
     public function actionUpdate($delivery_zone_id, $store_uuid)
     {
-        $this->ownerCheck();
+//        $this->ownerCheck();
         $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
         $business_location_id = Yii::$app->request->getBodyParam("business_location_id");
         $business_location_model = BusinessLocation::findOne(['business_location_id' => $business_location_id, 'restaurant_uuid' => $store_model->restaurant_uuid]);
@@ -224,7 +224,7 @@ class DeliveryZoneController extends Controller
      */
     public function actionDetail($store_uuid, $delivery_zone_id)
     {
-        $this->ownerCheck();
+//        $this->ownerCheck();
         return $this->findModel($delivery_zone_id, $store_uuid);
     }
 
