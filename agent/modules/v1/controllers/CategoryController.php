@@ -88,12 +88,12 @@ class CategoryController extends Controller {
 
          $query->andWhere(['restaurant_uuid' => $store_uuid]);
 
-         if(!$page) {
-             return new ActiveDataProvider([
-                 'query' => $query,
-                 'pagination' => false
-             ]);
-         }
+//         if(!$page) {
+//             return new ActiveDataProvider([
+//                 'query' => $query,
+//                 'pagination' => false
+//             ]);
+//         }
 
          return new ActiveDataProvider([
            'query' => $query
