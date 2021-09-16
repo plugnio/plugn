@@ -41,8 +41,8 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
 
     //Values for `payout_status`
-    const PAYOUT_STATUS_UNPAID = 0;
-    const PAYOUT_STATUS_PENDING = 1;
+    const PAYOUT_STATUS_PENDING = 0;
+    const PAYOUT_STATUS_UNPAID = 1;
     const PAYOUT_STATUS_PAID = 2;
 
 

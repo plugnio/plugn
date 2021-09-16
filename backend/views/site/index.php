@@ -36,5 +36,20 @@ $this->title = 'Admin dashboard';
 
         </div>
 
+        <div class="row">
+            <div class="col-12 col-lg-4">
+                <h2>Partners</h2>
+
+                  <?= Html::a('Go &raquo', ['partner/index'], ['class' => 'btn btn-default']) ?>
+            </div>
+            <div class="col-12 col-lg-4">
+                <h2>Payable Partners</h2>
+
+                  <?= Html::a('Go &raquo', ['partner-payout/index'], ['class' => 'btn btn-default']) ?>
+            </div>
+
+
+        </div>
+
     </div>
 </div>

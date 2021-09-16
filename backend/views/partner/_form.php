@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
@@ -10,13 +11,25 @@ use yii\widgets\ActiveForm;
 
 <div class="partner-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+  <?php
+
+  $form = ActiveForm::begin();
+
+
+          $bankQuery = common\models\Bank::find()->asArray()->all();
+          $bankArray = ArrayHelper::map($bankQuery, 'bank_id', 'bank_name');
+
+  ?>
 
     <?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'partner_email')->textInput(['maxlength' => true]) ?>
-    
-    <?= $form->field($model, 'iban')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'bank_id')->dropDownList($bankArray, ['prompt' => 'Choose your bank...'])->label('Bank name'); ?>
+
+    <?= $form->field($model, 'benef_name')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'partner_iban')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'commission')->textInput(['maxlength' => true]) ?>
 

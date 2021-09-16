@@ -12,6 +12,7 @@ use agent\models\Restaurant;
 use common\components\FileUploader;
 use agent\models\RestaurantPaymentMethod;
 use agent\models\TapQueue;
+use common\models\PaymentGatewayQueue;
 
 
 class StoreController extends Controller

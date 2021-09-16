@@ -26,7 +26,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'partner_uuid',
             'username',
             // 'partner_auth_key',
             // 'partner_password_hash',
@@ -39,10 +38,52 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'referral_code',
             'commission',
+            [
+                'label' => 'IN PROGRESS',
+                'value' => function ($data) {
+                    return Yii::$app->formatter->asCurrency($data->totalEarnings ? $data->totalEarnings : 0, 'KWD',[ \NumberFormatter::MIN_FRACTION_DIGITS => 4, \NumberFormatter::MAX_FRACTION_DIGITS => 4 ]);
+                }
+            ],
+            [
+                'label' => 'Pending Payouts',
+                'value' => function ($data) {
+                    return Yii::$app->formatter->asCurrency($data->pendingPayouts ? $data->pendingPayouts : 0, 'KWD',[ \NumberFormatter::MIN_FRACTION_DIGITS => 4, \NumberFormatter::MAX_FRACTION_DIGITS => 4 ]);
+                }
+            ],
             //'partner_created_at',
             //'partner_updated_at',
 
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'controller' => 'option',
+                'template' => '{create-payout}',
+                'buttons' => [
+                    'create-payout' => function ($url, $model) {
+
+                        if($model->pendingPayouts > 0 && $model->bank_id && $model->benef_name && $model->partner_iban){
+
+                                  return   Html::a('Create Payout', ['create-payout', 'partner_uuid' => $model->partner_uuid, 'referral_code' => $model->referral_code], [
+                                    'class' => 'btn btn-success',
+                                    'data' => [
+                                        'confirm' => 'Are you sure you want to create a payout?',
+                                        'method' => 'post',
+                                    ],
+                                ]) ;
+
+                        }
+
+
+
+                    },
+                ],
+            ],
+
+
             ['class' => 'yii\grid\ActionColumn'],
+
+
+
+
         ],
     ]); ?>
 
