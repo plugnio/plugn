@@ -147,69 +147,150 @@ class CustomerController extends Controller {
            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
            header("Content-Disposition: attachment;filename=\"customers.xlsx\"");
            header("Cache-Control: max-age=0");
-           \moonland\phpexcel\Excel::export([
-               'isMultipleSheet' => false,
-               'models' => $model,
-               'columns' => [
-                   'customer_name',
-                   'customer_email',
-                   [
-                       'attribute' => 'customer_phone_number',
-                       "format" => "raw",
-                       "value" => function($model) {
-                           return str_replace(' ','',  strval($model->customer_phone_number));
-                       }
-                   ],
-                   [
-                       'attribute' => 'Total spent',
-                       "format" => "raw",
-                       "value" => function($data) {
-                         $total_spent = $data->getOrders()
-                                         ->andWhere([
-                                             'NOT IN',
-                                             'order_status' , [
-                                                Order::STATUS_DRAFT,
-                                                Order::STATUS_ABANDONED_CHECKOUT,
-                                                Order::STATUS_REFUNDED,
-                                                Order::STATUS_PARTIALLY_REFUNDED,
-                                                Order::STATUS_CANCELED
-                                            ]
-                                         ])
-                                         ->sum('total_price');
+
+           if($restaurant_model->restaurant_uuid == 'rest_fe5b6a72-18a7-11ec-973b-069e9504599a'){
+             \moonland\phpexcel\Excel::export([
+                 'isMultipleSheet' => false,
+                 'models' => $model,
+                 'columns' => [
+                     'customer_name',
+                     'customer_email',
+                     [
+                         'attribute' => 'customer_phone_number',
+                         "format" => "raw",
+                         "value" => function($model) {
+                             return str_replace(' ','',  strval($model->customer_phone_number));
+                         }
+                     ],
+                     [
+                         'attribute' => 'civil_id',
+                         "format" => "raw",
+                         "value" => function($data) {
+                           return  $data->civil_id ;
+                         }
+                     ],
+                     [
+                         'attribute' => 'section',
+                         "format" => "raw",
+                         "value" => function($data) {
+                           return  $data->section ;
+                         }
+                     ],
+                     [
+                         'attribute' => 'Total spent',
+                         "format" => "raw",
+                         "value" => function($data) {
+                           $total_spent = $data->getOrders()
+                                           ->andWhere([
+                                               'NOT IN',
+                                               'order_status' , [
+                                                  Order::STATUS_DRAFT,
+                                                  Order::STATUS_ABANDONED_CHECKOUT,
+                                                  Order::STATUS_REFUNDED,
+                                                  Order::STATUS_PARTIALLY_REFUNDED,
+                                                  Order::STATUS_CANCELED
+                                              ]
+                                           ])
+                                           ->sum('total_price');
 
 
-                         $total_spent = \Yii::$app->formatter->asDecimal($total_spent ? $total_spent : 0 , 3);
+                           $total_spent = \Yii::$app->formatter->asDecimal($total_spent ? $total_spent : 0 , 3);
 
-                         return  Yii::$app->formatter->asCurrency($total_spent ? $total_spent : 0, $data->currency->code);
-                       }
-                   ],
-                   [
-                       'attribute' => 'Number of orders',
-                       "format" => "raw",
-                       "value" => function($model) {
-                           return  $model->getOrders()
-                               ->andWhere([
-                                   'NOT IN',
-                                   'order_status' , [
-                                       Order::STATUS_DRAFT,
-                                       Order::STATUS_ABANDONED_CHECKOUT,
-                                       Order::STATUS_REFUNDED,
-                                       Order::STATUS_PARTIALLY_REFUNDED,
-                                       Order::STATUS_CANCELED
-                                   ]
-                               ])
-                           ->count();
-                       }
-                   ],
-                   [
-                       'header' => 'Account created at',
-                       "format" => "raw",
-                       "value" => function($data) {
-                         return  $data->customer_created_at ;
-                       }
-                   ]
-               ]
-           ]);
+                           return  Yii::$app->formatter->asCurrency($total_spent ? $total_spent : 0, $data->currency->code);
+                         }
+                     ],
+                     [
+                         'attribute' => 'Number of orders',
+                         "format" => "raw",
+                         "value" => function($model) {
+                             return  $model->getOrders()
+                                 ->andWhere([
+                                     'NOT IN',
+                                     'order_status' , [
+                                         Order::STATUS_DRAFT,
+                                         Order::STATUS_ABANDONED_CHECKOUT,
+                                         Order::STATUS_REFUNDED,
+                                         Order::STATUS_PARTIALLY_REFUNDED,
+                                         Order::STATUS_CANCELED
+                                     ]
+                                 ])
+                             ->count();
+                         }
+                     ],
+                     [
+                         'header' => 'Account created at',
+                         "format" => "raw",
+                         "value" => function($data) {
+                           return  $data->customer_created_at ;
+                         }
+                     ]
+                 ]
+             ]);
+           } else {
+             \moonland\phpexcel\Excel::export([
+                 'isMultipleSheet' => false,
+                 'models' => $model,
+                 'columns' => [
+                     'customer_name',
+                     'customer_email',
+                     [
+                         'attribute' => 'customer_phone_number',
+                         "format" => "raw",
+                         "value" => function($model) {
+                             return str_replace(' ','',  strval($model->customer_phone_number));
+                         }
+                     ],
+                     [
+                         'attribute' => 'Total spent',
+                         "format" => "raw",
+                         "value" => function($data) {
+                           $total_spent = $data->getOrders()
+                                           ->andWhere([
+                                               'NOT IN',
+                                               'order_status' , [
+                                                  Order::STATUS_DRAFT,
+                                                  Order::STATUS_ABANDONED_CHECKOUT,
+                                                  Order::STATUS_REFUNDED,
+                                                  Order::STATUS_PARTIALLY_REFUNDED,
+                                                  Order::STATUS_CANCELED
+                                              ]
+                                           ])
+                                           ->sum('total_price');
+
+
+                           $total_spent = \Yii::$app->formatter->asDecimal($total_spent ? $total_spent : 0 , 3);
+
+                           return  Yii::$app->formatter->asCurrency($total_spent ? $total_spent : 0, $data->currency->code);
+                         }
+                     ],
+                     [
+                         'attribute' => 'Number of orders',
+                         "format" => "raw",
+                         "value" => function($model) {
+                             return  $model->getOrders()
+                                 ->andWhere([
+                                     'NOT IN',
+                                     'order_status' , [
+                                         Order::STATUS_DRAFT,
+                                         Order::STATUS_ABANDONED_CHECKOUT,
+                                         Order::STATUS_REFUNDED,
+                                         Order::STATUS_PARTIALLY_REFUNDED,
+                                         Order::STATUS_CANCELED
+                                     ]
+                                 ])
+                             ->count();
+                         }
+                     ],
+                     [
+                         'header' => 'Account created at',
+                         "format" => "raw",
+                         "value" => function($data) {
+                           return  $data->customer_created_at ;
+                         }
+                     ]
+                 ]
+             ]);
+           }
     }
 
 

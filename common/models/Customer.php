@@ -16,6 +16,8 @@ use yii\db\Expression;
  * @property string|null $customer_email
  * @property string $customer_created_at
  * @property string $customer_updated_at
+ * @property string $civil_id
+ * @property string $section
  *
  * @property Order[] $orders
  * @property CustomerVoucher[] $customerVouchers
@@ -43,6 +45,7 @@ class Customer extends \yii\db\ActiveRecord {
             [['customer_phone_number'], 'string', 'min' => 5, 'max' => 20],
             [['customer_created_at','customer_updated_at'], 'safe'],
             [['customer_name', 'customer_email'], 'string', 'max' => 255],
+            [['civil_id', 'section'], 'string', 'max' => 255], //Temp fields
         ];
     }
 

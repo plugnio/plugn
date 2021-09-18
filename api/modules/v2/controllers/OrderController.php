@@ -80,6 +80,17 @@ class OrderController extends Controller {
             $order->customer_phone_number = str_replace(' ','',strval(Yii::$app->request->getBodyParam("phone_number")));
             $order->customer_phone_country_code = Yii::$app->request->getBodyParam("country_code") ? Yii::$app->request->getBodyParam("country_code") : 965;
             $order->customer_email = Yii::$app->request->getBodyParam("email"); //optional
+
+            if($order->restaurant_uuid == 'rest_fe5b6a72-18a7-11ec-973b-069e9504599a'){
+
+              if(Yii::$app->request->getBodyParam("civil_id"))
+                $order->civil_id = Yii::$app->request->getBodyParam("civil_id");
+              if(Yii::$app->request->getBodyParam("section"))
+                $order->section = Yii::$app->request->getBodyParam("section");
+
+            }
+
+
             //payment method
             $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
 

@@ -123,6 +123,11 @@ class Order extends \yii\db\ActiveRecord
     const SCENARIO_CREATE_ORDER_BY_ADMIN = 'manual';
     const SCENARIO_OLD_VERSION = 'old_version';
 
+
+    public $civil_id = null;
+    public $section = null;
+
+
     /**
      * {@inheritdoc}
      */
@@ -255,6 +260,10 @@ class Order extends \yii\db\ActiveRecord
              ],
              'string', 'max' => 255],
              [['postalcode'], 'string', 'max' => 10],
+
+
+             [['civil_id', 'section'], 'string', 'max' => 255], //Temp var
+
 
             [['mashkor_order_number' , 'mashkor_tracking_link' ,'mashkor_driver_name','mashkor_driver_phone'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
@@ -1146,8 +1155,21 @@ class Order extends \yii\db\ActiveRecord
                 $customer_model->customer_name = $this->customer_name;
                 $customer_model->country_code = $this->customer_phone_country_code;
                 $customer_model->customer_phone_number = $this->customer_phone_number;
+
+                if($this->restaurant_uuid == 'rest_fe5b6a72-18a7-11ec-973b-069e9504599a' && $this->civil_id && $this->section){
+                  $customer_model->civil_id = $this->civil_id;
+                  $customer_model->section = $this->section;
+                }
+
+
             } else {
                 $customer_model->customer_name = $this->customer_name;
+
+                if($this->restaurant_uuid == 'rest_fe5b6a72-18a7-11ec-973b-069e9504599a' && $this->civil_id && $this->section){
+                  $customer_model->civil_id = $this->civil_id;
+                  $customer_model->section = $this->section;
+                }
+
             }
 
 
