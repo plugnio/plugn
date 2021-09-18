@@ -70,15 +70,15 @@ class PartnerController extends Controller
       $model = $this->findModel($partner_uuid);
 
 
-        $payouts = new \yii\data\ActiveDataProvider([
-            'query' => $model->getPartnerPayouts(),
+        $payments = new \yii\data\ActiveDataProvider([
+            'query' => $model->getPayments(),
             'pagination' => false
         ]);
 
 
         return $this->render('view', [
             'model' => $model,
-            'payouts' => $payouts
+            'payments' => $payments
         ]);
     }
 
@@ -145,6 +145,8 @@ class PartnerController extends Controller
                           ->andWhere (new Expression('DATE(subscription_payment.payment_created_at) >= DATE(partner.partner_created_at) '))
                           ->andWhere (['>' , 'subscription_payment.partner_fee', 0])
                           ->all();
+
+
 
           if(sizeof($payments) > 0 || sizeof($subscriptionPayments) > 0){
 

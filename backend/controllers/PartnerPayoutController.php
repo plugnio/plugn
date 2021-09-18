@@ -182,6 +182,7 @@ class PartnerPayoutController extends Controller
                                 'errorCode' => 2
                             ];
                         } else if ($transferPartner && $transferPartner->partner){
+
                           $transferPartner->payout_status = PartnerPayout::PAYOUT_STATUS_PAID;
                           $transferPartner->transfer_file = $transferFilePath ;
                           if(!$transferPartner->save(false)){

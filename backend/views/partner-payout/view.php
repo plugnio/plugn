@@ -58,13 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                   return $data->restaurant->name ;
                               }
                           ],
-                          [
-                              'label' => 'Customer Name',
-                              'format' => 'raw',
-                              'value' => function ($data) {
-                                  return $data->customer->customer_name ;
-                              }
-                          ],
+                  
                           'order_uuid',
                           'payment_mode',
                           'payment_current_status:ntext',
@@ -103,7 +97,16 @@ $this->params['breadcrumbs'][] = $this->title;
                                   return Yii::$app->formatter->asCurrency($data->payment_net_amount, $data->currency->code,[ \NumberFormatter::MIN_FRACTION_DIGITS => 4, \NumberFormatter::MAX_FRACTION_DIGITS => 4 ]);
                               }
                           ],
-                          'payment_created_at'
+                          'payment_created_at',
+                          [
+                              'label' => 'Status',
+                              'attribute' => 'partner_payout_uuid',
+                              'format' => 'raw',
+                              'value' => function ($data) {
+                                if($data->partner_payout_uuid)
+                                  return $data->partnerPayout->status;
+                              }
+                          ]
                       ],
                   ]) ?>
         </div>

@@ -49,7 +49,7 @@ class PartnerPayoutController extends Controller
         return $this->render('index', [
             'dataProvider' => $dataProvider,
             'partner' => $partner_model,
-            'totalEarnings' => $partner_model->totalEarnings,
+            'totalEarnings' => $partner_model->totalEarnings + $partner_model->pendingPayouts ,
         ]);
     }
 

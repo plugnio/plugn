@@ -88,12 +88,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="card">
 
-        <?=
-        GridView::widget([
+        <?php
+
+        if($payments && $payments->totalCount) {
+        echo GridView::widget([
             'dataProvider' => $payments,
             'columns' => [
               'payment_uuid',
-              'restaurant_uuid',
               [
                   'label' => 'Store Name',
                   'format' => 'raw',
@@ -109,34 +110,10 @@ $this->params['breadcrumbs'][] = $this->title;
                   }
               ],
               'order_uuid',
-              'payment_gateway_order_id',
-              'payment_gateway_transaction_id',
-              'payment_gateway_payment_id',
-              'payment_gateway_invoice_id',
               'payment_mode',
               'payment_current_status:ntext',
               [
-                  'attribute' => 'payment_amount_charged',
-                  'format' => 'raw',
-                  'value' => function ($data) {
-                      return Yii::$app->formatter->asCurrency($data->payment_amount_charged, $data->currency->code,[ \NumberFormatter::MIN_FRACTION_DIGITS => 4, \NumberFormatter::MAX_FRACTION_DIGITS => 4 ]);
-                  }
-              ],
-              [
-                  'attribute' => 'payment_gateway_fee',
-                  'format' => 'raw',
-                  'value' => function ($data) {
-                      return Yii::$app->formatter->asCurrency($data->payment_gateway_fee, $data->currency->code,[ \NumberFormatter::MIN_FRACTION_DIGITS => 4, \NumberFormatter::MAX_FRACTION_DIGITS => 4 ]);
-                  }
-              ],
-              [
-                  'attribute' => 'plugn_fee',
-                  'format' => 'raw',
-                  'value' => function ($data) {
-                      return Yii::$app->formatter->asCurrency($data->plugn_fee, $data->currency->code,[ \NumberFormatter::MIN_FRACTION_DIGITS => 4, \NumberFormatter::MAX_FRACTION_DIGITS => 4 ]);
-                  }
-              ],
-              [
+                  'label' => 'Referral commission ',
                   'attribute' => 'partner_fee',
                   'format' => 'raw',
                   'value' => function ($data) {
@@ -144,21 +121,20 @@ $this->params['breadcrumbs'][] = $this->title;
                   }
               ],
               [
-                  'attribute' => 'payment_net_amount',
+                  'label' => 'Status',
+                  'attribute' => 'partner_payout_uuid',
                   'format' => 'raw',
                   'value' => function ($data) {
-                      return Yii::$app->formatter->asCurrency($data->payment_net_amount, $data->currency->code,[ \NumberFormatter::MIN_FRACTION_DIGITS => 4, \NumberFormatter::MAX_FRACTION_DIGITS => 4 ]);
+                    if($data->partner_payout_uuid)
+                      return $data->partnerPayout->status;
                   }
               ],
-              'payment_created_at',
-              'payment_updated_at',
-              'payment_token',
-              'payment_gateway_name',
 
           ]
 
 
         ]);
+        }
         ?>
 
     </div>

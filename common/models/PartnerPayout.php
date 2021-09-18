@@ -103,8 +103,7 @@ class PartnerPayout extends \yii\db\ActiveRecord
     {
         parent::afterSave ($insert, $changedAttributes);
 
-
-          $payments = $this->partner->getPayments()->all();
+          $payments = $this->partner->getPayments()->where(['partner_payout_uuid' => $this->partner_payout_uuid])->all();
 
           if($payments){
             foreach ($payments as $key => $payment) {
@@ -113,7 +112,7 @@ class PartnerPayout extends \yii\db\ActiveRecord
             }
           }
 
-          $subscriptionPayments = $this->partner->getSubscriptionPayments()->all();
+          $subscriptionPayments = $this->partner->getSubscriptionPayments()->where(['partner_payout_uuid' => $this->partner_payout_uuid])->all();
 
           if($subscriptionPayments){
             foreach ($subscriptionPayments as $key => $payment) {
