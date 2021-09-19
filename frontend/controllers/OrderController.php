@@ -149,6 +149,13 @@ class OrderController extends Controller {
                         }
                     ],
                     [
+                        'header' => 'Avenue',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                              return $data->avenue ? $data->avenue  : '-----';
+                        }
+                    ],
+                    [
                         'header' => 'Unit Type',
                         // 'format' => 'html',
                         'value' => function ($data) {

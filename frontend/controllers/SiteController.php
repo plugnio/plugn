@@ -1457,6 +1457,7 @@ class SiteController extends Controller {
                 $assignment_agent_model->assignment_agent_email = $agent_model->agent_email;
                 $assignment_agent_model->role = AgentAssignment::AGENT_ROLE_OWNER;
                 $assignment_agent_model->restaurant_uuid = $store_model->restaurant_uuid;
+                $assignment_agent_model->email_notification = 1;
 
                 if ($assignment_agent_model->save()) {
                     $model = new LoginForm();
