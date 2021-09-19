@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use borales\extensions\phoneInput\PhoneInputValidator;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\AttributeBehavior;
 use yii\db\Expression;
@@ -26,6 +27,8 @@ use common\models\PartnerToken;
  * @property int $partner_status
  * @property int $created_at
  * @property int $updated_at
+ * @property int $partner_phone_number_country_code
+ * @property string $partner_phone_number
  *
  * @property PartnerPayout[] $partnerPayouts
  * @property PartnerToken[] $partnerTokens
@@ -58,7 +61,7 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
     */
    public function rules() {
        return [
-           [[ 'username', 'partner_email','partner_iban','benef_name','bank_id'], 'required'],
+           [[ 'username', 'partner_email','partner_iban','benef_name','bank_id','partner_phone_number'], 'required'],
            [['partner_status'], 'integer'],
            ['partner_status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
            ['tempPassword', 'required', 'on' => [self::SCENARIO_CHANGE_PASSWORD, self::SCENARIO_CREATE_NEW_PARTNER]],
@@ -75,6 +78,12 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
            [['partner_uuid'], 'unique'],
            [['tempPassword'], 'required', 'on' => 'create'],
            [['tempPassword'], 'safe'],
+
+           [['partner_phone_number_country_code'], 'integer'],
+           [['partner_phone_number'], 'string', 'min' => 6, 'max' => 20],
+           [['partner_phone_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number'],
+
+
            [['bank_id'], 'exist', 'skipOnError' => true, 'targetClass' => Bank::className(), 'targetAttribute' => ['bank_id' => 'bank_id']],
        ];
    }
@@ -138,7 +147,16 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
                'createdAtAttribute' => 'partner_created_at',
                'updatedAtAttribute' => 'partner_updated_at',
                'value' => new Expression('NOW()'),
-           ]
+           ],
+            [
+                'class' => \borales\extensions\phoneInput\PhoneInputBehavior::className (),
+                // 'attributes' => [
+                //           ActiveRecord::EVENT_BEFORE_INSERT => ['phone_number_country_code', 'phone_number'],
+                //       ],
+                'countryCodeAttribute' => 'partner_phone_number_country_code',
+                'phoneAttribute' => 'partner_phone_number',
+            ]
+
        ];
    }
 

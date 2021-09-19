@@ -41,23 +41,14 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     <div style="float:right; margin-bottom: 20px;">
         <?php
-          if($model->totalEarnings > 0){ ?>
+          if($pendingAmount > 0){ ?>
 
             <h1><?= 'Pending ' ?></h1>
             <h1>
-              <?=  Yii::$app->formatter->asCurrency($model->totalEarnings ? $model->totalEarnings : 0, 'KWD',[ \NumberFormatter::MIN_FRACTION_DIGITS => 4, \NumberFormatter::MAX_FRACTION_DIGITS => 4 ]) ?>
+              <?=  Yii::$app->formatter->asCurrency($pendingAmount ? $pendingAmount : 0, 'KWD',[ \NumberFormatter::MIN_FRACTION_DIGITS => 4, \NumberFormatter::MAX_FRACTION_DIGITS => 4 ]) ?>
             </h1>
 
-            <?=  Html::a('Create Payout', ['create-payout', 'partner_uuid' => $model->partner_uuid, 'referral_code' => $model->referral_code], [
-              'class' => 'btn btn-success',
-              'data' => [
-                'confirm' => 'Are you sure you want to create a payout?',
-                  'method' => 'post',
-              ],
-          ]) ;
-          }
-
-        ?>
+            <?php   }   ?>
       </div>
 
 
@@ -71,6 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'partner_auth_key',
             // 'partner_password_hash',
             // 'partner_password_reset_token',
+            'partner_phone_number',
             'partner_email:email',
             [
               'label' => 'Status',
@@ -84,13 +76,16 @@ $this->params['breadcrumbs'][] = $this->title;
     ]) ?>
 
 
-    <h2>Payments</h2>
 
     <div class="card">
 
         <?php
 
         if($payments && $payments->totalCount) {
+
+        echo '<h2>Payments</h2>';
+
+
         echo GridView::widget([
             'dataProvider' => $payments,
             'columns' => [
@@ -110,6 +105,58 @@ $this->params['breadcrumbs'][] = $this->title;
                   }
               ],
               'order_uuid',
+              'payment_mode',
+              'payment_current_status:ntext',
+              [
+                  'label' => 'Referral commission ',
+                  'attribute' => 'partner_fee',
+                  'format' => 'raw',
+                  'value' => function ($data) {
+                      return Yii::$app->formatter->asCurrency($data->partner_fee, $data->currency->code,[ \NumberFormatter::MIN_FRACTION_DIGITS => 3, \NumberFormatter::MAX_FRACTION_DIGITS => 3 ]);
+                  }
+              ],
+              [
+                  'label' => 'Status',
+                  'attribute' => 'partner_payout_uuid',
+                  'format' => 'raw',
+                  'value' => function ($data) {
+                    if($data->partner_payout_uuid)
+                      return $data->partnerPayout->status;
+                  }
+              ],
+
+          ]
+
+
+        ]);
+        }
+        ?>
+
+    </div>
+
+
+
+
+    <div class="card">
+
+        <?php
+
+        if($subscriptionPayments && $subscriptionPayments->totalCount) {
+
+        echo '<h2>Subscription Payment</h2>';
+
+
+        echo GridView::widget([
+            'dataProvider' => $subscriptionPayments,
+            'columns' => [
+              'payment_uuid',
+              [
+                  'label' => 'Store Name',
+                  'format' => 'raw',
+                  'value' => function ($data) {
+                      return $data->restaurant->name ;
+                  }
+              ],
               'payment_mode',
               'payment_current_status:ntext',
               [

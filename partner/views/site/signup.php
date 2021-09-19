@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
+use borales\extensions\phoneInput\PhoneInput;
 
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap4\ActiveForm */
@@ -39,6 +40,16 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?= $form->field($model, 'benef_name')->textInput(['maxlength' => true]) ?>
 
                 <?= $form->field($model, 'partner_iban')->textInput() ?>
+
+
+                    <?=
+                       $form->field($model, 'partner_phone_number',['labelOptions' => ['style' => 'display: block;']])->widget(PhoneInput::className(), [
+                          'jsOptions' => [
+                              'preferredCountries' => ['kw', 'sa', 'aed','qa','bh','om'],
+                          ]
+                      ]);
+                    ?>
+
 
                 <?= $form->field($model, 'tempPassword')->passwordInput(['maxlength' => true])->label('Password *') ?>
 

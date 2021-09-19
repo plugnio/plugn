@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
     <p>
-        <?= Html::a('Download Transfer Excel', ['create'], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Download Transfer File', ['download-transfer-file'], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Upload Tranfer File', ['import-excel'], ['class' => 'btn btn-success']) ?>
     </p>
 

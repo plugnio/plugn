@@ -50,7 +50,8 @@ class PartnerPayout extends \yii\db\ActiveRecord
             [['partner_uuid','transfer_benef_iban','transfer_benef_name','bank_id'], 'required'],
             [['amount'], 'number'],
             ['payout_status', 'in', 'range' => [self::PAYOUT_STATUS_UNPAID, self::PAYOUT_STATUS_PAID,self::PAYOUT_STATUS_PENDING]],
-            [['partner_payout_uuid', 'partner_uuid'], 'string', 'max' => 60],
+            [['partner_uuid'], 'string', 'max' => 60],
+            [['partner_payout_uuid'], 'string', 'max' => 35],
             [['transfer_file'], 'string', 'max' => 255],
             [['partner_payout_uuid'], 'unique'],
             [['created_at', 'updated_at'], 'safe'],
@@ -136,7 +137,7 @@ class PartnerPayout extends \yii\db\ActiveRecord
                 ],
                 'value' => function() {
                     if (!$this->partner_payout_uuid)
-                        $this->partner_payout_uuid = 'part_payout_' . Yii::$app->db->createCommand('SELECT uuid()')->queryScalar();
+                        $this->partner_payout_uuid = 'pyt_' . Yii::$app->db->createCommand('SELECT UUID_SHORT()')->queryScalar();
 
                     return $this->partner_payout_uuid;
                 }

@@ -75,10 +75,17 @@ class PartnerController extends Controller
             'pagination' => false
         ]);
 
+        $subscriptionPayments = new \yii\data\ActiveDataProvider([
+            'query' => $model->getSubscriptionPayments(),
+            'pagination' => false
+        ]);
+
 
         return $this->render('view', [
             'model' => $model,
-            'payments' => $payments
+            'payments' => $payments,
+            'subscriptionPayments' => $subscriptionPayments,
+            'pendingAmount' => $model->totalEarnings + $model->pendingPayouts
         ]);
     }
 
@@ -118,10 +125,8 @@ class PartnerController extends Controller
 
 
 
-
-
     /**
-     * Mark all payouts for that partner as paid.
+     * Create payout
      * @param string $partner_uuid
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
