@@ -177,6 +177,13 @@ class CustomerController extends Controller {
                          }
                      ],
                      [
+                         'attribute' => 'class',
+                         "format" => "raw",
+                         "value" => function($data) {
+                           return  $data->class ;
+                         }
+                     ],
+                     [
                          'attribute' => 'Total spent',
                          "format" => "raw",
                          "value" => function($data) {

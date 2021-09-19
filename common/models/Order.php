@@ -126,6 +126,7 @@ class Order extends \yii\db\ActiveRecord
 
     public $civil_id = null;
     public $section = null;
+    public $class = null;
 
 
     /**
@@ -262,7 +263,7 @@ class Order extends \yii\db\ActiveRecord
              [['postalcode'], 'string', 'max' => 10],
 
 
-             [['civil_id', 'section'], 'string', 'max' => 255], //Temp var
+             [['civil_id', 'section','class'], 'string', 'max' => 255], //Temp var
 
 
             [['mashkor_order_number' , 'mashkor_tracking_link' ,'mashkor_driver_name','mashkor_driver_phone'], 'string', 'max' => 255],
@@ -1156,18 +1157,20 @@ class Order extends \yii\db\ActiveRecord
                 $customer_model->country_code = $this->customer_phone_country_code;
                 $customer_model->customer_phone_number = $this->customer_phone_number;
 
-                if($this->restaurant_uuid == 'rest_fe5b6a72-18a7-11ec-973b-069e9504599a' && $this->civil_id && $this->section){
+                if($this->restaurant_uuid == 'rest_fe5b6a72-18a7-11ec-973b-069e9504599a' && $this->civil_id && $this->section && $this->class){
                   $customer_model->civil_id = $this->civil_id;
                   $customer_model->section = $this->section;
+                  $customer_model->class = $this->class;
                 }
 
 
             } else {
                 $customer_model->customer_name = $this->customer_name;
 
-                if($this->restaurant_uuid == 'rest_fe5b6a72-18a7-11ec-973b-069e9504599a' && $this->civil_id && $this->section){
+                if($this->restaurant_uuid == 'rest_fe5b6a72-18a7-11ec-973b-069e9504599a' && $this->civil_id && $this->section && $this->class){
                   $customer_model->civil_id = $this->civil_id;
                   $customer_model->section = $this->section;
+                  $customer_model->class = $this->class;
                 }
 
             }

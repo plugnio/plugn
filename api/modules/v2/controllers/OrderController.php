@@ -87,6 +87,8 @@ class OrderController extends Controller {
                 $order->civil_id = Yii::$app->request->getBodyParam("civil_id");
               if(Yii::$app->request->getBodyParam("section"))
                 $order->section = Yii::$app->request->getBodyParam("section");
+              if(Yii::$app->request->getBodyParam("class"))
+                $order->class = Yii::$app->request->getBodyParam("class");
 
             }
 
