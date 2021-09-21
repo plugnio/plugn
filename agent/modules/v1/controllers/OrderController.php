@@ -2,11 +2,10 @@
 
 namespace agent\modules\v1\controllers;
 
-use agent\models\AgentAssignment;
-use agent\models\DeliveryZone;
+
 use common\models\AreaDeliveryZone;
 use Yii;
-use yii\base\BaseObject;
+use yii\helpers\Url;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
@@ -14,6 +13,7 @@ use agent\models\Order;
 use agent\models\OrderItem;
 use agent\models\OrderItemExtraOption;
 use yii\db\Expression;
+use kartik\mpdf\Pdf;
 
 
 class OrderController extends Controller
@@ -49,7 +49,7 @@ class OrderController extends Controller
             'class' => \yii\filters\auth\HttpBearerAuth::className (),
         ];
         // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-        $behaviors['authenticator']['except'] = ['options'];
+        $behaviors['authenticator']['except'] = ['options', 'download-invoice'];
 
         return $behaviors;
     }
@@ -1035,19 +1035,114 @@ class OrderController extends Controller
     }
 
     /**
+     * Download invoice as PDF
+     * @param $id
+     * @param $type
+     * @return array|mixed
+     */
+    public function actionDownloadInvoice($id)
+    {
+        $order = $this->findModel($id);
+
+        $voucherDiscount = $bankDiscount = 0;
+
+        if($order->voucher) {
+            $voucherDiscount = $order->voucher->discount_type == 1 ?
+                $order->subtotal * ($order->voucher->discount_amount / 100) : $order->voucher->discount_amount;
+        }
+
+        if($order->bankDiscount) {
+            $bankDiscount = $order->bankDiscount->discount_type == 1 ?
+                $order->subtotal * ($order->bankDiscount->discount_amount / 100) : $order->bankDiscount->discount_amount;
+        }
+
+        // Item extra optn
+        // $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
+        //     'query' => $order_model->getOrderItemExtraOptions()
+        // ]);
+
+        $this->layout = 'pdf';
+
+        $defaultLogo = Url::to('@web/images/icon-128x128.png', true);
+
+        $content = $this->render('invoice', [
+            'order' => $order,
+            'defaultLogo' => $defaultLogo,
+            'bankDiscount' => $bankDiscount,
+            'voucherDiscount' => $voucherDiscount,
+        ]);
+
+        $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+        $fontDirs = $defaultConfig['fontDir'];
+
+        $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
+        $fontData = $defaultFontConfig['fontdata'];
+
+        //echo  __DIR__ . '/../../../web/fonts/Nunito';
+        //die();
+        $pdf = new Pdf([
+            'options' => [
+                'defaultheaderline' => 0,  //for header
+                'defaulfooterline' => 0,  //for footer
+                'title' => 'Invoice #' . $order->order_uuid,
+                'fontDir' => array_merge($fontDirs, [
+                    __DIR__ . '/Nunito',
+                   // __DIR__ . '/../../../web/fonts/Nunito/'
+                ]),
+                'fontdata' => array_merge ($fontData, [
+                    "Nunito" => [
+                        'R' => 'Nunito-Regular.ttf',
+                        'B' => 'Nunito-Bold.ttf',
+                        'B' => 'Nunito-Italic.ttf',
+                    ],
+                    "NunitoSans" => [
+                        'R' => 'NunitoSans-Regular.ttf',
+                        'I' => "NunitoSans-Italic.ttf", // Italic  - OPTIONAL
+                        'B' => 'NunitoSans-Bold.ttf' // Bold    - OPTIONAL
+                    ],
+                ])
+            ],
+            'defaultFont' => "Nunito",
+            'mode' => Pdf::MODE_UTF8,
+            // A4 paper format
+            'format' => Pdf::FORMAT_A4,
+            'marginTop' => 5,
+            // portrait orientation
+            'orientation' => Pdf::ORIENT_PORTRAIT,
+            // stream to browser inline
+            'destination' => Pdf::DEST_BROWSER,
+            // your html content input
+            'content' => $content,
+            // format content from your own css file if needed or use the
+            // enhanced bootstrap css built by Krajee for mPDF formatting
+            'cssFile' =>  __DIR__ . '/../../../web/css/invoice.css',
+            //Url::to('@web/css/invoice.css', true),
+            //'@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
+            // any css to be embedded if required
+//            'methods' => [
+//                'SetHeader'=>[$candidate->employeeId .'<br/>'. 'Prepared by '.Yii::$app->user->identity->staff_name],
+//                'SetHeader'=>[$candidate->employeeId .'<br/>'. 'Prepared by Khalid'],
+//            ]
+        ]);
+
+        header('Access-Control-Allow-Origin: *');
+        return $pdf->render();
+    }
+
+    /**
      * Finds the Order model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
      * @return Order the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($order_uuid, $store_uuid)
+    protected function findModel($order_uuid, $store_uuid = null)
     {
         $model = Order::find ()
-            ->filterBusinessLocationIfManager ($store_uuid)
+           // ->filterBusinessLocationIfManager ($store_uuid)
             ->andWhere ([
                 'order_uuid' => $order_uuid,
-                'restaurant_uuid' => $store_uuid
+           //     'restaurant_uuid' => $store_uuid
             ])
             ->one ();
 
