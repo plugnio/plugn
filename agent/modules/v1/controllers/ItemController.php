@@ -326,6 +326,28 @@ class ItemController extends Controller
     }
 
     /**
+     * Update Stock Qty
+     * @param type $itemUuid
+     * @return boolean
+     */
+    public function actionChangePosition(){
+
+        return Yii::$app->request->getBodyParam('items');
+//        $model = $this->findModel($id);
+//        $model->sort_number =+ Yii::$app->request->getBodyParam('items');
+//        if (!$model->save(false)){
+//            return [
+//                "operation" => "error",
+//                "message" => $model->errors
+//            ];
+//        }
+//        return [
+//            "operation" => "success",
+//            "message" => Yii::t('agent', "Item quantity updated successfully")
+//        ];
+    }
+
+    /**
      * @param $id
      * @return array|string[]
      * @throws NotFoundHttpException
