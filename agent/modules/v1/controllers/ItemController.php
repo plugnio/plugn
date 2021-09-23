@@ -312,7 +312,7 @@ class ItemController extends Controller
 
         $id = Yii::$app->request->getBodyParam('item_uuid');
         $model = $this->findModel($id);
-        $model->stock_qty = Yii::$app->request->getBodyParam('stock_qty');
+        $model->stock_qty = (int)Yii::$app->request->getBodyParam('stock_qty');
         if (!$model->save(false)){
             return [
                 "operation" => "error",
