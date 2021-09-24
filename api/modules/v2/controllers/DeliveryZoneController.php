@@ -7,7 +7,7 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 use api\models\Item;
-use common\models\Category;
+use api\models\Category;
 use common\models\City;
 use api\models\Restaurant;
 use common\models\ItemImage;
