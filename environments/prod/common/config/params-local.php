@@ -6,6 +6,6 @@ return [
   'dashboardCookieDomain' => 'dash.plugn.io',
     'oneSignalStoreAPPID' => '',
     'oneSignalStoreAPIKey' => '',
-    'oneSignalAgentAPPID' => '81208dad-babc-4c82-98eb-b67fcbdee8fd',
-    'oneSignalAgentAPIKey' => 'N2M5NTY4NTUtNWI1Yy00Y2M4LTg0NGMtMjZiNGZjNmU2Mzky'
+    'oneSignalAgentAPPID' => '78f3d05b-168f-4a37-9154-af8522c58ad5',
+    'oneSignalAgentAPIKey' => 'NzFlMmUzMjAtMjIyZC00MzEwLTljMzgtNzY2NGM3MGExNDQ1'
 ];
