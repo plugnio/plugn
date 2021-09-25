@@ -91,7 +91,7 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
         ?>
 
         <?php
-        if (  Yii::$app->user->identity->isOwner($model->restaurant_uuid)  && ($model->delivery_zone_id || $model->pickup_location_id)) {
+        if (  Yii::$app->user->identity->agent_id == 1  && ($model->delivery_zone_id || $model->pickup_location_id)) {
             echo Html::a('Delete', ['delete', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid], [
                 'class' => 'btn btn-danger mr-1 mb-1',
                 'data' => [
