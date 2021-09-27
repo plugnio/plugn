@@ -332,19 +332,17 @@ class ItemController extends Controller
      */
     public function actionChangePosition(){
 
-        return Yii::$app->request->getBodyParam('items');
-//        $model = $this->findModel($id);
-//        $model->sort_number =+ Yii::$app->request->getBodyParam('items');
-//        if (!$model->save(false)){
-//            return [
-//                "operation" => "error",
-//                "message" => $model->errors
-//            ];
-//        }
-//        return [
-//            "operation" => "success",
-//            "message" => Yii::t('agent', "Item quantity updated successfully")
-//        ];
+        $items = Yii::$app->request->getBodyParam('items');
+        foreach ($items as $key => $value) {
+            $model = $this->findModel($value);
+            $model->sort_number = $key;
+            $model->save(false);
+        }
+
+        return [
+            "operation" => "success",
+            "message" => Yii::t('agent', "Item position changed successfully")
+        ];
     }
 
     /**
