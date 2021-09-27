@@ -728,9 +728,10 @@ class Order extends \yii\db\ActiveRecord
                     'products' => $productsList ? $productsList : null
                 ]
             ]);
-
-            $this->sendOrderNotification();
         }
+
+
+        $this->sendOrderNotification();
     }
 
     /**
