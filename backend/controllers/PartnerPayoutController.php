@@ -16,20 +16,30 @@ use yii\web\UploadedFile;
  */
 class PartnerPayoutController extends Controller
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
+  public $enableCsrfValidation = false;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function behaviors() {
+      return [
+          'verbs' => [
+              'class' => VerbFilter::className(),
+              'actions' => [
+                  'delete' => ['POST'],
+              ],
+          ],
+          'access' => [
+              'class' => \yii\filters\AccessControl::className(),
+              'rules' => [
+                  [//allow authenticated users only
+                      'allow' => true,
+                      'roles' => ['@'],
+                  ],
+              ],
+          ],
+      ];
+  }
 
     /**
      * Lists all PartnerPayout models.
@@ -122,7 +132,6 @@ class PartnerPayoutController extends Controller
                   {
                     $data[] = array_combine($keys, $values);
                   }
-
                   //no need file anymore
 
                   @unlink($tmpFile);
@@ -175,12 +184,10 @@ class PartnerPayoutController extends Controller
                     if($value['Status'] == 'SUCCESS')  {
                         $transferPartner = PartnerPayout::find()->andWhere(['partner_payout_uuid' => $value['Credit Narrative']])->one();
 
-                        if(!$transferPartner && !$transferPartner->partner) {
-                            return [
-                                'operation' => 'error',
-                                'message' => 'Invalid excel',
-                                'errorCode' => 2
-                            ];
+
+                        if(!$transferPartner || !$transferPartner->partner) {
+                          Yii::$app->session->setFlash('error', 'Invalid excel');
+
                         } else if ($transferPartner && $transferPartner->partner){
 
                           $transferPartner->payout_status = PartnerPayout::PAYOUT_STATUS_PAID;
@@ -234,10 +241,16 @@ class PartnerPayoutController extends Controller
             'pagination' => false
         ]);
 
+        $subscriptionPayments = new \yii\data\ActiveDataProvider([
+            'query' => $model->getSubscriptionPayments(),
+            'pagination' => false
+        ]);
+
 
         return $this->render('view', [
             'model' => $model,
-            'payments' => $payments
+            'payments' => $payments,
+            'subscriptionPayments' => $subscriptionPayments,
         ]);
     }
 

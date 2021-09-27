@@ -18,6 +18,7 @@ use yii\db\Expression;
  */
 class PartnerController extends Controller
 {
+
   public $enableCsrfValidation = false;
 
   /**
@@ -42,7 +43,6 @@ class PartnerController extends Controller
           ],
       ];
   }
-
 
     /**
      * Lists all Partner models.

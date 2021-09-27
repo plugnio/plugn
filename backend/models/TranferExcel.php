@@ -37,7 +37,8 @@ class TranferExcel extends Model
                 $result = Yii::$app->cloudinaryManager->upload(
                         $fileUrl , [
                     'public_id' => "transfer-files/"  . $filename,
-                    "resource_type" => "auto"
+                    "resource_type" => "auto",
+                    "type" => "authenticated"
                         ]
                 );
 
@@ -53,7 +54,7 @@ class TranferExcel extends Model
                 Yii::error('Error when uploading restaurant document to Cloudinary: ' . json_encode($err));
                 die('Error when uploading restaurant document to Cloudinary: ' . json_encode($err));
             }
-
+            
             return basename($result['url']);
     }
 

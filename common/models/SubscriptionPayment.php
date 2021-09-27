@@ -32,10 +32,12 @@ use yii\web\NotFoundHttpException;
  * @property boolean $received_callback
  * @property double $partner_fee
  * @property  double $payout_status
+ * @property string|null $partner_payout_uuid
  *
  * @property Subscription $subscription
  * @property Plan $plan
  * @property Restaurant $restaurant
+ * @property PartnerPayout $partnerPayout
  */
 class SubscriptionPayment extends \yii\db\ActiveRecord {
 
@@ -69,6 +71,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
             [['payment_uuid'], 'unique'],
             [['subscription_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Subscription::className(), 'targetAttribute' => ['subscription_uuid' => 'subscription_uuid']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
+            [['partner_payout_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => PartnerPayout::className(), 'targetAttribute' => ['partner_payout_uuid' => 'partner_payout_uuid']]
         ];
     }
 
@@ -317,6 +320,18 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
     public function getRestaurant($modelClass = "\common\models\Restaurant") {
         return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
+
+    /**
+     * Gets query for [[PartnerPayout]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+     public function getPartnerPayout(){
+           return $this->hasOne(PartnerPayout::className(), ['partner_payout_uuid' => 'partner_payout_uuid']);
+     }
+
+
 
     /**
      * Gets query for [[Currency]].

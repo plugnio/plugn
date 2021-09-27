@@ -58,7 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                   return $data->restaurant->name ;
                               }
                           ],
-                  
+
                           'order_uuid',
                           'payment_mode',
                           'payment_current_status:ntext',
@@ -81,6 +81,66 @@ $this->params['breadcrumbs'][] = $this->title;
                               'format' => 'raw',
                               'value' => function ($data) {
                                   return Yii::$app->formatter->asCurrency($data->plugn_fee, $data->currency->code,[ \NumberFormatter::MIN_FRACTION_DIGITS => 4, \NumberFormatter::MAX_FRACTION_DIGITS => 4 ]);
+                              }
+                          ],
+                          [
+                              'attribute' => 'partner_fee',
+                              'format' => 'raw',
+                              'value' => function ($data) {
+                                  return Yii::$app->formatter->asCurrency($data->partner_fee, $data->currency->code,[ \NumberFormatter::MIN_FRACTION_DIGITS => 3, \NumberFormatter::MAX_FRACTION_DIGITS => 3 ]);
+                              }
+                          ],
+                          [
+                              'attribute' => 'payment_net_amount',
+                              'format' => 'raw',
+                              'value' => function ($data) {
+                                  return Yii::$app->formatter->asCurrency($data->payment_net_amount, $data->currency->code,[ \NumberFormatter::MIN_FRACTION_DIGITS => 4, \NumberFormatter::MAX_FRACTION_DIGITS => 4 ]);
+                              }
+                          ],
+                          'payment_created_at',
+                          [
+                              'label' => 'Status',
+                              'attribute' => 'partner_payout_uuid',
+                              'format' => 'raw',
+                              'value' => function ($data) {
+                                if($data->partner_payout_uuid)
+                                  return $data->partnerPayout->status;
+                              }
+                          ]
+                      ],
+                  ]) ?>
+        </div>
+
+        <h2>Subscription Payment</h2>
+
+        <div class="card">
+
+
+              <?=  GridView::widget([
+                          'dataProvider' => $subscriptionPayments,
+                          'columns' => [
+                          'payment_uuid',
+                          [
+                              'label' => 'Store Name',
+                              'format' => 'raw',
+                              'value' => function ($data) {
+                                  return $data->restaurant->name ;
+                              }
+                          ],
+                          'payment_mode',
+                          'payment_current_status:ntext',
+                          [
+                              'attribute' => 'payment_amount_charged',
+                              'format' => 'raw',
+                              'value' => function ($data) {
+                                  return Yii::$app->formatter->asCurrency($data->payment_amount_charged, $data->currency->code,[ \NumberFormatter::MIN_FRACTION_DIGITS => 4, \NumberFormatter::MAX_FRACTION_DIGITS => 4 ]);
+                              }
+                          ],
+                          [
+                              'attribute' => 'payment_gateway_fee',
+                              'format' => 'raw',
+                              'value' => function ($data) {
+                                  return Yii::$app->formatter->asCurrency($data->payment_gateway_fee, $data->currency->code,[ \NumberFormatter::MIN_FRACTION_DIGITS => 4, \NumberFormatter::MAX_FRACTION_DIGITS => 4 ]);
                               }
                           ],
                           [
