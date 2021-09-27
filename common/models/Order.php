@@ -728,9 +728,10 @@ class Order extends \yii\db\ActiveRecord
                     'products' => $productsList ? $productsList : null
                 ]
             ]);
-
-            $this->sendOrderNotification();
         }
+
+
+        $this->sendOrderNotification();
     }
 
     /**
@@ -1119,8 +1120,16 @@ class Order extends \yii\db\ActiveRecord
         $itemNames = ArrayHelper::getColumn ($this->orderItems, 'item_name');
 
         $heading = "New order received";
-        $subtitle = "@ " . $this->restaurant->name;
-        $content = "For " . implode (", ", $itemNames);
+        
+        $subtitle = '';
+
+        if($this->restaurant->name) {
+            $content = "@ " . $this->restaurant->name;
+        } else {
+            $content = "@ " . $this->restaurant->name_ar;
+        }
+
+        //$content = "For " . implode (", ", $itemNames);
 
         /*Yii::t('app', "{currency} {amount}", [
             "amount" => number_format($this->total_price, 3),
