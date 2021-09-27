@@ -71,7 +71,7 @@ class ArmadaDelivery extends Component {
       $phone =  str_replace('+', '00', $phone);
 
         $deliveryParams = [
-            "platformName" => "pos",
+            "platformName" => "plugn",
             "platformData" => [
                     "orderId" => $model->order_uuid,
                     "name" => $model->customer_name,
