@@ -12,7 +12,11 @@ class m210816_140328_order_item extends Migration
      */
     public function safeUp()
     {
-        $orders = Yii::$app->db->createCommand('select order_uuid,restaurant_uuid from `order`')->queryAll();
+        $sql = 'select o.order_uuid, o.restaurant_uuid from `order` o 
+            inner join restaurant r on r.restaurant_uuid = o.restaurant_uuid';
+
+        $orders = Yii::$app->db->createCommand($sql)
+            ->queryAll();
 
         foreach($orders as $order) {
             Yii::$app->db->createCommand('UPDATE `order_item` set restaurant_uuid="'.$order['restaurant_uuid'].'" 
