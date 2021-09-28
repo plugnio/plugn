@@ -234,7 +234,8 @@ class Voucher extends \yii\db\ActiveRecord {
             );
         }*/
 
-        $rows = $this->getOrders ()
+        $rows = $this->getOrders()
+            ->activeOrders()
             ->select ('order_created_at, COUNT(*) as total')
             //->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) < DATE("'.$date_end.'")')
             ->groupBy (new Expression('MONTH(order_created_at), YEAR(order_created_at)'))
