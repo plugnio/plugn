@@ -335,7 +335,7 @@ class ItemController extends Controller
         $items = Yii::$app->request->getBodyParam('items');
         foreach ($items as $key => $value) {
             $model = $this->findModel($value);
-            $model->sort_number = $key;
+            $model->sort_number = (int)$key+1;
             $model->save(false);
         }
 
