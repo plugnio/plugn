@@ -87,6 +87,7 @@ class CategoryController extends Controller {
          }
 
          $query->andWhere(['restaurant_uuid' => $store_uuid]);
+         $query->orderBy ([new \yii\db\Expression('sort_number ASC')]);
 
 //         if(!$page) {
 //             return new ActiveDataProvider([
@@ -269,6 +270,26 @@ class CategoryController extends Controller {
           ];
       }
 
+
+    /**
+     * Update Stock Qty
+     * @param type $itemUuid
+     * @return boolean
+     */
+    public function actionChangePosition(){
+
+        $items = Yii::$app->request->getBodyParam('items');
+        foreach ($items as $key => $value) {
+            $model = Category::findOne($value);
+            $model->sort_number = (int)$key+1;
+            $model->save(false);
+        }
+
+        return [
+            "operation" => "success",
+            "message" => Yii::t('agent', "Item position changed successfully")
+        ];
+    }
 
         /**
         * Return Category detail
