@@ -19,6 +19,15 @@ class Category extends \common\models\Category {
       return $fields;
   }
 
+  public function fields()
+  {
+      $field = parent::fields();
+      $field['isChecked'] = function ($model) {
+          return false;
+      };
+      return $field;
+  }
+
 
     /**
      * @return \yii\db\ActiveQuery

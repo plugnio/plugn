@@ -6,7 +6,7 @@ use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use api\models\Item;
-use common\models\Category;
+use api\models\Category;
 use api\models\Restaurant;
 use common\models\ItemImage;
 

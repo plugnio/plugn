@@ -62,7 +62,7 @@ class BankDiscountController extends Controller {
     /**
      * only owner will have access
      */
-    private function authCheck()
+    private function ownerCheck()
     {
         if(!Yii::$app->accountManager->isOwner()) {
             throw new \yii\web\BadRequestHttpException(
@@ -81,7 +81,7 @@ class BankDiscountController extends Controller {
      */
     public function actionList($store_uuid) {
 
-        $this->authCheck();
+        $this->ownerCheck();
         $keyword = Yii::$app->request->get('keyword');
         $status = Yii::$app->request->get('status');
 
@@ -115,7 +115,7 @@ class BankDiscountController extends Controller {
      * @return array
      */
     public function actionCreate() {
-        $this->authCheck();
+        $this->ownerCheck();
         $store_uuid = Yii::$app->request->getBodyParam("store_uuid");
         Yii::$app->accountManager->getManagedAccount($store_uuid);
 
@@ -159,7 +159,7 @@ class BankDiscountController extends Controller {
      */
      public function actionUpdate($bank_discount_id, $store_uuid)
      {
-         $this->authCheck();
+         $this->ownerCheck();
          $model = $this->findModel($bank_discount_id, $store_uuid);
 
          $model->bank_id = Yii::$app->request->getBodyParam("bank_id");
@@ -199,7 +199,7 @@ class BankDiscountController extends Controller {
      * @throws NotFoundHttpException
      */
      public function actionUpdateBankDiscountStatus() {
-         $this->authCheck();
+         $this->ownerCheck();
          $store_uuid =  Yii::$app->request->getBodyParam('store_uuid');
          $bank_discount_id =  Yii::$app->request->getBodyParam('bank_discount_id');
          $bankDiscountStatus = (int) Yii::$app->request->getBodyParam('bankDiscountStatus');
@@ -230,7 +230,7 @@ class BankDiscountController extends Controller {
      * @throws NotFoundHttpException
      */
     public function actionDetail($store_uuid, $bank_discount_id) {
-        $this->authCheck();
+        $this->ownerCheck();
         return $this->findModel($bank_discount_id, $store_uuid);
     }
 
@@ -239,7 +239,7 @@ class BankDiscountController extends Controller {
       */
      public function actionDelete($bank_discount_id, $store_uuid)
      {
-         $this->authCheck();
+         $this->ownerCheck();
          Yii::$app->accountManager->getManagedAccount($store_uuid);
          $model =  $this->findModel($bank_discount_id, $store_uuid);
 

@@ -6,6 +6,6 @@ return [
   'dashboardCookieDomain' => 'localhost',
     'oneSignalStoreAPPID' => '',
     'oneSignalStoreAPIKey' => '',
-    'oneSignalAgentAPPID' => '81208dad-babc-4c82-98eb-b67fcbdee8fd',
-    'oneSignalAgentAPIKey' => 'N2M5NTY4NTUtNWI1Yy00Y2M4LTg0NGMtMjZiNGZjNmU2Mzky'
+    'oneSignalAgentAPPID' => '83eb72f3-98c8-48a7-8b40-57736914f1cb',
+    'oneSignalAgentAPIKey' => 'MmVhMTNhZTUtMmY1Zi00Y2YyLWEzNWYtZjYyMWIxNTk1YzUx'
 ];

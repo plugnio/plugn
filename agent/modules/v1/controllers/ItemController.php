@@ -197,7 +197,7 @@ class ItemController extends Controller
 
             return [
                 "operation" => "success",
-                "message" => Yii::t('translate', "Item created successfully"),
+                "message" => Yii::t('agent', "Item created successfully"),
             ];
         } catch (\Exception $e) {
             $transaction->rollBack();
@@ -292,7 +292,7 @@ class ItemController extends Controller
 
             return [
                 "operation" => "success",
-                "message" => Yii::t('translate',"Item updated successfully")
+                "message" => Yii::t('agent',"Item updated successfully")
             ];
         } catch (\Exception $e) {
             $transaction->rollBack();
@@ -312,7 +312,7 @@ class ItemController extends Controller
 
         $id = Yii::$app->request->getBodyParam('item_uuid');
         $model = $this->findModel($id);
-        $model->stock_qty = Yii::$app->request->getBodyParam('stock_qty');
+        $model->stock_qty = (int)Yii::$app->request->getBodyParam('stock_qty');
         if (!$model->save(false)){
             return [
                 "operation" => "error",
@@ -322,6 +322,26 @@ class ItemController extends Controller
         return [
             "operation" => "success",
             "message" => Yii::t('agent', "Item quantity updated successfully")
+        ];
+    }
+
+    /**
+     * Update Stock Qty
+     * @param type $itemUuid
+     * @return boolean
+     */
+    public function actionChangePosition(){
+
+        $items = Yii::$app->request->getBodyParam('items');
+        foreach ($items as $key => $value) {
+            $model = $this->findModel($value);
+            $model->sort_number = (int)$key+1;
+            $model->save(false);
+        }
+
+        return [
+            "operation" => "success",
+            "message" => Yii::t('agent', "Item position changed successfully")
         ];
     }
 
