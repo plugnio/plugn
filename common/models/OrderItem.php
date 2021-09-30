@@ -192,7 +192,6 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         $this->item_price = $this->calculateOrderItemPrice();
 
-
         return true;
     }
 

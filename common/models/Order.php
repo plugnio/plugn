@@ -121,6 +121,7 @@ class Order extends \yii\db\ActiveRecord
 
     const SCENARIO_CREATE_ORDER_BY_ADMIN = 'manual';
     const SCENARIO_OLD_VERSION = 'old_version';
+    const SCENARIO_UPDATE_STATUS = 'updateStatus';
 
     /**
      * {@inheritdoc}
@@ -831,7 +832,6 @@ class Order extends \yii\db\ActiveRecord
 
     public function beforeDelete()
     {
-
         if (!$this->items_has_been_restocked) {
             $orderItems = OrderItem::find ()->where (['order_uuid' => $this->order_uuid])->all ();
 
@@ -1110,6 +1110,18 @@ class Order extends \yii\db\ActiveRecord
 
         //if (isset($changedAttributes['order_status']) && $this->order_status != self::STATUS_PENDING)
 
+    }
+
+    /**
+     * @return array|array[]
+     */
+    public function scenarios()
+    {
+        $scenarios =  parent::scenarios ();
+
+        $scenarios['updateStatus'] = ['order_status'];
+
+        return $scenarios;
     }
 
     /**
