@@ -3,6 +3,8 @@
 namespace agent\modules\v1\controllers;
 
 
+use agent\models\Refund;
+use agent\models\RefundedItem;
 use common\models\AreaDeliveryZone;
 use Yii;
 use yii\helpers\Url;
@@ -644,6 +646,179 @@ class OrderController extends Controller
     }
 
     /**
+     * try to initiate refund
+     * @param $order_uuid
+     * @throws NotFoundHttpException
+     */
+    public function actionRefund($order_uuid)
+    {
+        $model = $this->findModel ($order_uuid);
+
+        $refund_amount = Yii::$app->request->getBodyParams('refund_amount');
+
+        $itemsToRefund = Yii::$app->request->getBodyParams('itemsToRefund');
+
+        //validate order status for refund
+
+        if(!in_array ($model->order_status, [Order::STATUS_COMPLETE, Order::STATUS_PARTIALLY_REFUNDED])) {
+            return [
+                "operation" => "error",
+                "message" => Yii::t('agent',"Invalid order status to process refund!")
+            ];
+        }
+
+        //validate refund qty less than or equals to current qty
+
+        $maxRefundAmount = 0;
+
+        foreach($itemsToRefund as $key => $qty) {
+
+            $orderItem = OrderItem::find ()
+                ->andWhere ([
+                    'order_uuid' => $order_uuid,
+                    'order_item_id' => $key
+                ])
+                ->one ();
+
+            $refundedQty = RefundedItem::find()
+                ->andWhere ([
+                    'order_uuid' => $order_uuid,
+                    'order_item_id' => $key
+                ])
+                ->total('qty');
+
+            if($orderItem->qty - $refundedQty < $qty) {
+                return [
+                    "operation" => "error",
+                    "message" => Yii::t('agent',"Max {qty} {item} available for refund!", [
+                        'qty' => $orderItem->qty - $refundedQty,
+                        'item' => Yii::$app->language == 'ar' && $orderItem->item_name_ar ?
+                            $orderItem->item_name_ar: $orderItem->item_name
+                    ])
+                ];
+            }
+
+            //calculate refund total
+
+            $unitPrice = $orderItem->price / $orderItem->qty;
+
+            $maxRefundAmount += $qty * $unitPrice;
+        }
+
+        //refund_amount should be less than or equal to itemsToRefund's total refund amount
+
+        if($refund_amount > $maxRefundAmount) {
+            return [
+                "operation" => "error",
+                "message" => Yii::t('agent',"{amount} available for refund!", [
+                    'amount' => \Yii::$app->formatter->asCurrency ($maxRefundAmount, $model->currency->code)
+                ])
+            ];
+        }
+
+        $transaction = Yii::$app->db->beginTransaction ();
+
+        $refund = new Refund();
+        $refund->restaurant_uuid = $model->restaurant_uuid;
+        $refund->order_uuid = $order_uuid;
+        $refund->refund_amount = $refund_amount;
+        $refund->reason = Yii::$app->request->getBodyParams ('reason');
+
+        if(!$refund->save()) {
+
+            $transaction->rollBack ();
+
+            return [
+                "operation" => "error",
+                "message" => $refund->errors
+            ];
+        }
+
+        foreach($itemsToRefund as $key => $qty) {
+
+            $orderItem = OrderItem::find()
+                ->andWhere ([
+                    'order_uuid' => $order_uuid,
+                    'order_item_id' => $key
+                ])
+                ->one();
+
+            if(!$orderItem) {
+                $transaction->rollBack ();
+
+                return [
+                    "operation" => "error",
+                    "message" => Yii::t('agent',"Item not found in order!")
+                ];
+            }
+
+            $unitPrice = $orderItem->price / $orderItem->qty;
+
+            $refundItem = new RefundedItem();
+            $refundItem->refund_id = $refund->refund_id;
+            $refundItem->order_item_id = $key;
+            $refundItem->order_uuid = $order_uuid;
+            $refundItem->item_uuid = $orderItem->item_uuid;
+            $refundItem->item_name = $orderItem->item_name;
+            $refundItem->item_name_ar = $orderItem->item_name_ar;
+            $refundItem->item_price = $unitPrice * $qty;
+            $refundItem->qty = $qty;
+
+            if(!$refundItem->save()) {
+                $transaction->rollBack ();
+
+                return [
+                    "operation" => "error",
+                    "message" => $refundItem->errors
+                ];
+            }
+        }
+
+        //todo: update refund qty ? and total ? in order_item and order?
+
+        //update order status? if all item refunded mark as refunded as partially refunded
+
+        $remainingQty = 0;
+
+        foreach($model->orderItems as $orderItem) {
+
+            $refundedQty = RefundedItem::find()
+                ->andWhere ([
+                    'order_uuid' => $order_uuid,
+                    'order_item_id' => $orderItem->order_item_id
+                ])
+                ->total('qty');
+
+            $remainingQty += $orderItem->qty - $refundedQty;
+        }
+
+        if($remainingQty > 0) {
+            $model->order_status = Order::STATUS_PARTIALLY_REFUNDED;
+        } else {
+            $model->order_status = Order::STATUS_REFUNDED;
+        }
+
+        $model->setScenario (Order::SCENARIO_UPDATE_STATUS);
+
+        if(!$model->save()) {
+
+            $transaction->rollBack ();
+
+            return [
+                "operation" => "error",
+                "message" => $model->errors
+            ];
+        }
+
+        $transaction->commit ();
+
+        return [
+            "operation" => "success",
+            "message" => Yii::t('agent',"Refund initiated successfully")
+        ];
+    }
+
+    /**
      * Update Order Status
      */
     public function actionUpdateOrderStatus($order_uuid, $store_uuid)
@@ -1139,10 +1314,10 @@ class OrderController extends Controller
     protected function findModel($order_uuid, $store_uuid = null)
     {
         $model = Order::find ()
-           // ->filterBusinessLocationIfManager ($store_uuid)
+            ->filterBusinessLocationIfManager ($store_uuid)
             ->andWhere ([
                 'order_uuid' => $order_uuid,
-           //     'restaurant_uuid' => $store_uuid
+                'restaurant_uuid' => $store_uuid
             ])
             ->one ();
 
