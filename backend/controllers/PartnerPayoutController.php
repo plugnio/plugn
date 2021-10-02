@@ -41,6 +41,7 @@ class PartnerPayoutController extends Controller
       ];
   }
 
+
     /**
      * Lists all PartnerPayout models.
      * @return mixed

@@ -44,6 +44,7 @@ class PartnerController extends Controller
       ];
   }
 
+
     /**
      * Lists all Partner models.
      * @return mixed

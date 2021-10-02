@@ -17,30 +17,31 @@ use yii\data\ActiveDataProvider;
  */
 class ReferralController extends Controller {
 
-    public $enableCsrfValidation = false;
+  public $enableCsrfValidation = false;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors() {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-            'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'rules' => [
-                    [//allow authenticated users only
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
-        ];
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function behaviors() {
+      return [
+          'verbs' => [
+              'class' => VerbFilter::className(),
+              'actions' => [
+                  'delete' => ['POST'],
+              ],
+          ],
+          'access' => [
+              'class' => \yii\filters\AccessControl::className(),
+              'rules' => [
+                  [//allow authenticated users only
+                      'allow' => true,
+                      'roles' => ['@'],
+                  ],
+              ],
+          ],
+      ];
+  }
+
 
 
     /**
