@@ -47,26 +47,16 @@ class StaffController extends Controller {
     /**
      * only owner will have access
      */
-    public function beforeAction($action)
+    private function ownerCheck()
     {
-        parent::beforeAction ($action);
-
-        if($action->id == 'options') {
-            return true;
-        }
-
         if(!Yii::$app->accountManager->isOwner()) {
             throw new \yii\web\BadRequestHttpException(
-                Yii::t('agent', 'You are not allowed to manage staff member. Please contact with store owner')
+                Yii::t('agent', 'You are not allowed to view discounts. Please contact with store owner')
             );
-
-            return false;
         }
 
         //should have access to store
-
         Yii::$app->accountManager->getManagedAccount();
-
         return true;
     }
 
@@ -90,7 +80,7 @@ class StaffController extends Controller {
      * @return ActiveDataProvider
      */
     public function actionList() {
-
+        $this->ownerCheck();
         $keyword = Yii::$app->request->get('keyword');
 
         $restaurantUuid = Yii::$app->request->headers->get('Store-Id');
@@ -122,7 +112,7 @@ class StaffController extends Controller {
      * @return array
      */
     public function actionCreate() {
-
+        $this->ownerCheck();
         $store_uuid = Yii::$app->request->getBodyParam("store_uuid");
 
         /*if(!$this->_isOwner($store_uuid)) {
@@ -209,6 +199,7 @@ class StaffController extends Controller {
       */
      public function actionUpdate($assignment_id, $store_uuid)
      {
+         $this->ownerCheck();
          $model = $this->findModel($assignment_id);
 
          /*if(!$this->_isOwner($store_uuid)) {
@@ -250,7 +241,7 @@ class StaffController extends Controller {
      * @throws NotFoundHttpException
      */
       public function actionDetail($store_uuid, $assignment_id) {
-
+          $this->ownerCheck();
           return $this->findModel($assignment_id);
 
           /*if(!$this->_isOwner($store_uuid)) {
@@ -267,14 +258,8 @@ class StaffController extends Controller {
      */
     public function actionDelete($assignment_id, $store_uuid)
     {
+        $this->ownerCheck();
         $model =  $this->findModel($assignment_id);
-
-        /*if(!$this->_isOwner($store_uuid)) {
-         return [
-             'operation' => 'error',
-             'message' => Yii::t('agent', 'You are not allowed to delete staff access. Please contact with store owner'),
-         ];
-       }*/
 
         if (!$model->delete()) {
             if (isset($model->errors)) {

@@ -74,8 +74,12 @@ class m210803_132951_add_partner_fee_field_to_subscription_payment_table extends
 
 
       //Drop subscription_payment_uuid field
-      $this->dropForeignKey('fk-partner_payout-subscription_payment_uuid', 'subscription_payment');
-      $this->dropIndex('idx-partner_payout-subscription_payment_uuid', 'subscription_payment');
+      $this->dropForeignKey('fk-subscription_payment-partner_payout_uuid', 'subscription_payment');
+      $this->dropIndex('idx-subscription_payment-partner_payout_uuid', 'subscription_payment');
+
+      //Drop payment_uuid field
+      $this->dropForeignKey('fk-payment-partner_payout_uuid', 'payment');
+      $this->dropIndex('idx-payment-partner_payout_uuid', 'payment');
 
       $this->dropColumn('partner_payout', 'subscription_payment_uuid');
     }

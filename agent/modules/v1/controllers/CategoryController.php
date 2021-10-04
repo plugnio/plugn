@@ -78,23 +78,22 @@ class CategoryController extends Controller {
 
          if ($keyword){
              $query->andWhere([
-                 'or', [
+                 'OR',
                      ['like', 'title', $keyword],
                      ['like', 'title_ar', $keyword],
                      ['like', 'subtitle', $keyword],
                      ['like', 'subtitle_ar', $keyword]
-                 ]
              ]);
          }
 
          $query->andWhere(['restaurant_uuid' => $store_uuid]);
 
-         if(!$page) {
-             return new ActiveDataProvider([
-                 'query' => $query,
-                 'pagination' => false
-             ]);
-         }
+//         if(!$page) {
+//             return new ActiveDataProvider([
+//                 'query' => $query,
+//                 'pagination' => false
+//             ]);
+//         }
 
          return new ActiveDataProvider([
            'query' => $query

@@ -35,16 +35,19 @@ use yii\web\NotFoundHttpException;
  * @property string $payment_updated_at
  * @property boolean $received_callback
  * @property string $payment_gateway_name
- *
+ * @property string|null $partner_payout_uuid
+
+
  * @property Customer $customer
  * @property Order $order
  * @property Restaurant $restaurant
+ 	* @property PartnerPayout $partnerPayout
  */
 class Payment extends \yii\db\ActiveRecord {
 
     //Values for `payout_status`
-    const PAYOUT_STATUS_UNPAID = 0;
-    const PAYOUT_STATUS_PENDING = 1;
+    const PAYOUT_STATUS_PENDING = 0;
+    const PAYOUT_STATUS_UNPAID = 1;
     const PAYOUT_STATUS_PAID = 2;
 
     /**
@@ -70,6 +73,8 @@ class Payment extends \yii\db\ActiveRecord {
             [['payment_uuid'], 'unique'],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
+            [['order_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_uuid' => 'order_uuid']],
+            [['partner_payout_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => PartnerPayout::className(), 'targetAttribute' => ['partner_payout_uuid' => 'partner_payout_uuid']],
         ];
     }
 
@@ -442,6 +447,17 @@ class Payment extends \yii\db\ActiveRecord {
       public function getPaymentMethod() {
           return $this->hasOne(PaymentMethod::className(), ['payment_method_id' => 'payment_method_id'])->via('order');
       }
+
+
+    /**
+     * Gets query for [[PartnerPayout]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+     public function getPartnerPayout(){
+           return $this->hasOne(PartnerPayout::className(), ['partner_payout_uuid' => 'partner_payout_uuid']);
+     }
+
 
     /**
      * Gets query for [[OrderItems]].

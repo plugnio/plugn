@@ -234,16 +234,18 @@ class Voucher extends \yii\db\ActiveRecord {
             );
         }*/
 
-        $rows = $this->getOrders ()
+        $rows = $this->getOrders()
+            ->activeOrders()
             ->select ('order_created_at, COUNT(*) as total')
             //->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) < DATE("'.$date_end.'")')
             ->groupBy (new Expression('MONTH(order_created_at), YEAR(order_created_at)'))
-            ->asArray ()
-            ->all ();
+            ->orderBy('order_created_at')
+            ->asArray()
+            ->all();
 
         foreach ($rows as $result) {
             $voucher_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
-                'month' => date ('F', strtotime ($result['order_created_at'])),
+                'month' => date ('M', strtotime ($result['order_created_at'])),
                 'total' => (int) $result['total']
             );
         }

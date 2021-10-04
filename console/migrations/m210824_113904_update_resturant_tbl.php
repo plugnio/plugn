@@ -12,7 +12,11 @@ class m210824_113904_update_resturant_tbl extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn ('restaurant', 'annual_revenue', $this->char (60)->after ('payment_gateway_queue_id'));
+        $this->addColumn (
+            'restaurant', 
+            'annual_revenue', 
+            $this->char (60)->after ('tap_queue_id')
+        );
     }
 
     /**

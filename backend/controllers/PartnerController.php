@@ -11,12 +11,14 @@ use backend\models\PartnerSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\db\Expression;
 
 /**
  * PartnerController implements the CRUD actions for Partner model.
  */
 class PartnerController extends Controller
 {
+
   public $enableCsrfValidation = false;
 
   /**
@@ -69,22 +71,22 @@ class PartnerController extends Controller
       $model = $this->findModel($partner_uuid);
 
 
-        $payouts = new \yii\data\ActiveDataProvider([
-            'query' => $model->getPartnerPayouts(),
+        $payments = new \yii\data\ActiveDataProvider([
+            'query' => $model->getPayments(),
+            'pagination' => false
+        ]);
+
+        $subscriptionPayments = new \yii\data\ActiveDataProvider([
+            'query' => $model->getSubscriptionPayments(),
             'pagination' => false
         ]);
 
 
-        $totalEarningsFromOrders = $model->getTotalEarningsFromOrders() ? $model->getTotalEarningsFromOrders() : 0;
-        $totalEarningsFromSubscriptions = $model->getTotalEarningsFromSubscriptions() ? $model->getTotalEarningsFromSubscriptions() : 0;
-
-        $totalEarnings = $totalEarningsFromOrders + $totalEarningsFromSubscriptions;
-
-
         return $this->render('view', [
             'model' => $model,
-            'payouts' => $payouts,
-            'totalEarnings' => $totalEarnings,
+            'payments' => $payments,
+            'subscriptionPayments' => $subscriptionPayments,
+            'pendingAmount' => $model->totalEarnings + $model->pendingPayouts
         ]);
     }
 
@@ -124,10 +126,8 @@ class PartnerController extends Controller
 
 
 
-
-
     /**
-     * Mark all payouts for that partner as paid.
+     * Create payout
      * @param string $partner_uuid
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -136,25 +136,39 @@ class PartnerController extends Controller
     {
           $model = $this->findModel($partner_uuid);
           $payments = $model->getPayments()
-                          ->andWhere(['payment.payout_status' => Payment::PAYOUT_STATUS_UNPAID])
+                          ->joinWith(['partner'])
+                          ->andWhere(['payment.payout_status' => Payment::PAYOUT_STATUS_PENDING])
+                          ->andWhere(['payment.partner_payout_uuid' => null])
+                          ->andWhere (new Expression('DATE(payment.payment_created_at) >= DATE(partner.partner_created_at) '))
+                          ->andWhere (['>' , 'payment.partner_fee', 0])
                           ->all();
 
+
           $subscriptionPayments = $model->getSubscriptionPayments()
-                          ->andWhere(['subscription_payment.payout_status' => SubscriptionPayment::PAYOUT_STATUS_UNPAID])
+                          ->joinWith(['restaurant','restaurant.partner'])
+                          ->andWhere(['subscription_payment.payout_status' => Payment::PAYOUT_STATUS_PENDING])
+                          ->andWhere(['subscription_payment.partner_payout_uuid' => null])
+                          ->andWhere (new Expression('DATE(subscription_payment.payment_created_at) >= DATE(partner.partner_created_at) '))
+                          ->andWhere (['>' , 'subscription_payment.partner_fee', 0])
                           ->all();
+
+
 
           if(sizeof($payments) > 0 || sizeof($subscriptionPayments) > 0){
 
 
-
             $partner_payout_model = new PartnerPayout;
             $partner_payout_model->partner_uuid = $model->partner_uuid;
-            // $partner_payout_model->amount = $payment->partner_fee;
+            $partner_payout_model->transfer_benef_iban = $model->partner_iban;
+            $partner_payout_model->transfer_benef_name = $model->benef_name;
+            $partner_payout_model->bank_id = $model->bank_id;
+
             $partner_payout_model->payout_status = PartnerPayout::PAYOUT_STATUS_PENDING;
-            $partner_payout_model->save();
+
+            if(!$partner_payout_model->save())
+              Yii::$app->session->setFlash('error', print_r($partner_payout_model->errors, true));
 
             $payout_amount = 0;
-
 
 
 
@@ -162,7 +176,9 @@ class PartnerController extends Controller
 
               $payout_amount += $payment->partner_fee;
               $payment->partner_payout_uuid = $partner_payout_model->partner_payout_uuid;
-              $payment->save();
+              if(!$payment->save())
+                Yii::$app->session->setFlash('error', print_r($payment->errors, true));
+
             }
 
 
@@ -171,18 +187,20 @@ class PartnerController extends Controller
               $payout_amount += $payment->partner_fee;
 
               $payment->partner_payout_uuid = $partner_payout_model->partner_payout_uuid;
-              $payment->save();
+              if(!$payment->save())
+                Yii::$app->session->setFlash('error', print_r($payment->errors, true));
             }
 
 
             $partner_payout_model->amount = $payout_amount;
             if(!$partner_payout_model->save()){
+              Yii::$app->session->setFlash('error', print_r($partner_payout_model->errors, true));
               Yii::error('[Error while Creating payout]' . json_encode($partner_payout_model->errors), __METHOD__);
             }
 
-          } 
+          }
 
-         return $this->redirect(['view', 'partner_uuid' => $model->partner_uuid]);
+         return $this->redirect(['index', 'partner_uuid' => $model->partner_uuid]);
 
     }
 

@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use borales\extensions\phoneInput\PhoneInputValidator;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\AttributeBehavior;
 use yii\db\Expression;
@@ -19,11 +20,15 @@ use common\models\PartnerToken;
  * @property string|null $password_reset_token
  * @property string $partner_email
  * @property string $referral_code
- * @property string $iban
+ * @property string $partner_iban
+ * @property string $benef_name
+ * @property integer $bank_id
  * @property int $commission
  * @property int $partner_status
  * @property int $created_at
  * @property int $updated_at
+ * @property int $partner_phone_number_country_code
+ * @property string $partner_phone_number
  *
  * @property PartnerPayout[] $partnerPayouts
  * @property PartnerToken[] $partnerTokens
@@ -56,15 +61,14 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
     */
    public function rules() {
        return [
-           [[ 'username', 'partner_email','iban'], 'required'],
+           [[ 'username', 'partner_email','partner_iban','benef_name','bank_id','partner_phone_number'], 'required'],
            [['partner_status'], 'integer'],
            ['partner_status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
            ['tempPassword', 'required', 'on' => [self::SCENARIO_CHANGE_PASSWORD, self::SCENARIO_CREATE_NEW_PARTNER]],
-
            [['commission'], 'number'],
            [['partner_uuid'], 'string', 'max' => 60],
-           [['iban'], 'string', 'max' => 64],
-           [['username', 'partner_password_hash', 'partner_password_reset_token', 'partner_email'], 'string', 'max' => 255],
+           [['partner_iban'], 'string', 'max' => 100],
+           [['username', 'partner_password_hash', 'partner_password_reset_token', 'partner_email','benef_name'], 'string', 'max' => 255],
            [['partner_auth_key'], 'string', 'max' => 32],
            [['referral_code'], 'string', 'max' => 6],
            [['username'], 'unique'],
@@ -74,6 +78,13 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
            [['partner_uuid'], 'unique'],
            [['tempPassword'], 'required', 'on' => 'create'],
            [['tempPassword'], 'safe'],
+
+           [['partner_phone_number_country_code'], 'integer'],
+           [['partner_phone_number'], 'string', 'min' => 6, 'max' => 20],
+           [['partner_phone_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number'],
+
+
+           [['bank_id'], 'exist', 'skipOnError' => true, 'targetClass' => Bank::className(), 'targetAttribute' => ['bank_id' => 'bank_id']],
        ];
    }
 
@@ -94,6 +105,8 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
            'created_at' => 'Created At',
            'updated_at' => 'Updated At',
            'referral_code' => 'Referral Code',
+           'benef_name' => 'Beneficiary Name',
+           'bank_id' => 'Bank ID'
        ];
    }
 
@@ -134,7 +147,16 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
                'createdAtAttribute' => 'partner_created_at',
                'updatedAtAttribute' => 'partner_updated_at',
                'value' => new Expression('NOW()'),
-           ]
+           ],
+            [
+                'class' => \borales\extensions\phoneInput\PhoneInputBehavior::className (),
+                // 'attributes' => [
+                //           ActiveRecord::EVENT_BEFORE_INSERT => ['phone_number_country_code', 'phone_number'],
+                //       ],
+                'countryCodeAttribute' => 'partner_phone_number_country_code',
+                'phoneAttribute' => 'partner_phone_number',
+            ]
+
        ];
    }
 
@@ -193,6 +215,32 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
        }
    }
 
+
+
+   public function afterSave($insert, $changedAttributes) {
+
+       parent::afterSave($insert, $changedAttributes);
+       if (
+          !$insert &&
+           array_key_exists('partner_iban', $changedAttributes) ||
+           array_key_exists('benef_name', $changedAttributes) ||
+           array_key_exists('bank_id', $changedAttributes)
+       ) {
+
+               PartnerPayout::updateAll([
+                 'bank_id' => $this->bank_id,
+                 'transfer_benef_name' => $this->benef_name,
+                 'transfer_benef_iban' => $this->partner_iban
+             ], [
+                 'payout_status' => PartnerPayout::PAYOUT_STATUS_UNPAID,
+                 'partner_uuid' => $this->partner_uuid
+             ]);
+       }
+
+       return true;
+
+    }
+
    /**
     * Returns String value of current status
     * @return string
@@ -208,6 +256,30 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
        }
 
        return "Couldnt find a status";
+   }
+
+
+   public function getTotalEarnings() {
+
+     $totalEarningsFromOrders = $this->getTotalEarningsFromOrders() ? $this->getTotalEarningsFromOrders() : 0;
+     $totalEarningsFromSubscriptions = $this->getTotalEarningsFromSubscriptions() ? $this->getTotalEarningsFromSubscriptions() : 0;
+
+     $totalEarnings = $totalEarningsFromOrders + $totalEarningsFromSubscriptions;
+
+       return $totalEarnings;
+   }
+
+
+   public function getPendingPayouts() {
+
+     $totalPendingPayoutsFromOrders = $this->getPendingPayoutsFromOrders() ? $this->getPendingPayoutsFromOrders() : 0;
+
+
+     $totalPendingPayoutsFromSubscriptions = $this->getPendingPayoutsFromSubscriptions() ? $this->getPendingPayoutsFromSubscriptions() : 0;
+
+     $totalPendingPayouts = $totalPendingPayoutsFromOrders + $totalPendingPayoutsFromSubscriptions;
+
+       return $totalPendingPayouts;
    }
 
 
@@ -434,6 +506,17 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
     }
 
     /**
+     * Gets query for [[Bank]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBank()
+    {
+        return $this->hasOne(Bank::className(), ['bank_id' => 'bank_id']);
+    }
+
+
+    /**
      * Gets query for [[Restaurants]].
      *
      * @return \yii\db\ActiveQuery
@@ -485,7 +568,36 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
                       ->via('stores');
       }
 
+        /**
+       * Gets query for [[Payments]].
+       *
+       * @return \yii\db\ActiveQuery
+       */
+      public function getPendingPayoutsFromOrders()
+      {
+          return $this->hasMany(Payment::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+                      ->via('activeOrders')
+                      ->joinWith(['order','partner'])
+                      ->andWhere(['payment.partner_payout_uuid' => null])
+                      ->andWhere (new Expression('DATE(payment.payment_created_at) >= DATE(partner.partner_created_at) '))
+                      ->sum('payment.partner_fee');
 
+      }
+
+      /**
+       * Gets query for [[Payments]].
+       *
+       * @return \yii\db\ActiveQuery
+       */
+      public function getPendingPayoutsFromSubscriptions()
+      {
+          return $this->hasMany(SubscriptionPayment::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+                      ->via('stores')
+                      ->joinWith(['restaurant','restaurant.partner'])
+                      ->andWhere(['subscription_payment.partner_payout_uuid' => null])
+                      ->andWhere (new Expression('DATE(subscription_payment.payment_created_at) >= DATE(partner.partner_created_at) '))
+                      ->sum('subscription_payment.partner_fee');
+      }
 
         /**
        * Gets query for [[Payments]].
@@ -498,7 +610,8 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
                       ->via('activeOrders')
                       ->joinWith('order')
                       ->filterWhere (['NOT IN', 'order.order_status', [Order::STATUS_ABANDONED_CHECKOUT, Order::STATUS_DRAFT,Order::STATUS_CANCELED,Order::STATUS_REFUNDED,Order::STATUS_PARTIALLY_REFUNDED]])
-                      ->andWhere(['payment.payout_status' => Payment::PAYOUT_STATUS_UNPAID])
+                      ->andWhere(['IN', 'payment.payout_status', [Payment::PAYOUT_STATUS_UNPAID, Payment::PAYOUT_STATUS_PENDING]])
+                      ->andWhere(['not', ['payment.partner_payout_uuid' => null]])
                       ->andWhere(['payment.payment_current_status' => 'CAPTURED'])
                       ->sum('payment.partner_fee');
       }
@@ -514,7 +627,8 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
       {
           return $this->hasMany(SubscriptionPayment::className(), ['restaurant_uuid' => 'restaurant_uuid'])
                       ->via('stores')
-                      ->andWhere(['subscription_payment.payout_status' => Payment::PAYOUT_STATUS_UNPAID])
+                      ->andWhere(['IN', 'subscription_payment.payout_status', [SubscriptionPayment::PAYOUT_STATUS_UNPAID, SubscriptionPayment::PAYOUT_STATUS_PENDING]])
+                      ->andWhere(['not', ['subscription_payment.partner_payout_uuid' => null]])
                       ->andWhere(['subscription_payment.payment_current_status' => 'CAPTURED'])
                       ->sum('subscription_payment.partner_fee');
       }

@@ -1,6 +1,6 @@
 <?php
 
-namespace partner\models;
+namespace common\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -11,14 +11,20 @@ use common\models\PartnerPayout;
  */
 class PartnerPayoutSearch extends PartnerPayout
 {
+
+    public $partner_username;
+
+
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['partner_payout_uuid', 'partner_uuid', 'payment_uuid', 'created_at', 'updated_at'], 'safe'],
+            [['partner_payout_uuid', 'partner_uuid', 'created_at', 'updated_at','partner_username'], 'safe'],
             [['amount'], 'number'],
+            [['payout_status'], 'integer'],
         ];
     }
 
@@ -40,13 +46,20 @@ class PartnerPayoutSearch extends PartnerPayout
      */
     public function search($params)
     {
-        $query = PartnerPayout::find();
+        $query = PartnerPayout::find()->joinWith(['partner'])->orderBy(['created_at' => SORT_DESC]);
+
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
+
+        $dataProvider->sort->attributes['partner_username'] = [
+            'asc' => ['partner.username' => SORT_ASC],
+            'desc' => ['partner.username' => SORT_DESC],
+        ];
+
 
         $this->load($params);
 
@@ -61,11 +74,13 @@ class PartnerPayoutSearch extends PartnerPayout
             'amount' => $this->amount,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'payout_status' => $this->payout_status,
         ]);
 
-        $query->andFilterWhere(['like', 'partner_payout_uuid', $this->partner_payout_uuid])
-            ->andFilterWhere(['like', 'partner_uuid', $this->partner_uuid])
-            ->andFilterWhere(['like', 'payment_uuid', $this->payment_uuid]);
+        $query
+            ->andFilterWhere(['like', 'partner_payout_uuid', $this->partner_payout_uuid])
+            ->andFilterWhere(['like', 'partner.username', $this->partner_username])
+            ->andFilterWhere(['like', 'partner_uuid', $this->partner_uuid]);
 
         return $dataProvider;
     }

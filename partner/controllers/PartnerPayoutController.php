@@ -7,7 +7,7 @@ use common\models\PartnerPayout;
 use common\models\Partner;
 use common\models\SubscriptionPayment;
 use common\models\Payment;
-use partner\models\PartnerPayoutSearch;
+use common\models\PartnerPayoutSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -17,20 +17,31 @@ use yii\filters\VerbFilter;
  */
 class PartnerPayoutController extends Controller
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
+  public $enableCsrfValidation = false;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function behaviors() {
+      return [
+          'verbs' => [
+              'class' => VerbFilter::className(),
+              'actions' => [
+                  'delete' => ['POST'],
+              ],
+          ],
+          'access' => [
+              'class' => \yii\filters\AccessControl::className(),
+              'rules' => [
+                  [//allow authenticated users only
+                      'allow' => true,
+                      'roles' => ['@'],
+                  ],
+              ],
+          ],
+      ];
+  }
+
 
     /**
      * Lists all PartnerPayout models.
@@ -41,13 +52,6 @@ class PartnerPayoutController extends Controller
         $query = PartnerPayout::find()->where(['partner_uuid' =>  Yii::$app->user->identity->partner_uuid]);
         $partner_model = Partner::find()->where(['partner_uuid' =>  Yii::$app->user->identity->partner_uuid ])->one();
 
-        $totalEarningsFromOrders = $partner_model->getTotalEarningsFromOrders() ? $partner_model->getTotalEarningsFromOrders() : 0;
-        $totalEarningsFromSubscriptions = $partner_model->getTotalEarningsFromSubscriptions() ? $partner_model->getTotalEarningsFromSubscriptions() : 0;
-
-        $totalEarnings = $totalEarningsFromOrders + $totalEarningsFromSubscriptions;
-
-
-
         $dataProvider = new  \yii\data\ActiveDataProvider([
             'query' =>  $query,
         ]);
@@ -56,7 +60,7 @@ class PartnerPayoutController extends Controller
         return $this->render('index', [
             'dataProvider' => $dataProvider,
             'partner' => $partner_model,
-            'totalEarnings' => $totalEarnings,
+            'totalEarnings' => $partner_model->totalEarnings + $partner_model->pendingPayouts ,
         ]);
     }
 

@@ -11,6 +11,7 @@ Yii::setAlias('categoty-image','https://res.cloudinary.com/plugn/image/upload/')
 
 //Image Upload Paths
 Yii::setAlias('projectFiles','@backend/web/uploads/project-files');
+Yii::setAlias('transferFiles','@backend/web/uploads');
 
 
 //Image Upload Paths
