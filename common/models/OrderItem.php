@@ -220,8 +220,28 @@ class OrderItem extends \yii\db\ActiveRecord {
             'currency',
             'orderItemExtraOptions',
             'itemImage',
-            'item'
+            'item',
+            'refundedQty'
         ];
+    }
+
+    /**
+     * Gets query for [[RefundedItem]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRefundedQty($modelClass = "\common\models\RefundedItem") {
+        return $this->getRefundedItem($modelClass)
+            ->sum('qty');
+    }
+
+    /**
+     * Gets query for [[RefundedItem]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRefundedItem($modelClass = "\common\models\RefundedItem") {
+        return $this->hasMany($modelClass::className(), ['order_item_id' => 'order_item_id']);
     }
 
     /**

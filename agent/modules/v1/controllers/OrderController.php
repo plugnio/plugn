@@ -654,9 +654,9 @@ class OrderController extends Controller
     {
         $model = $this->findModel ($order_uuid);
 
-        $refund_amount = Yii::$app->request->getBodyParams('refund_amount');
+        $refund_amount = Yii::$app->request->getBodyParam('refund_amount');
 
-        $itemsToRefund = Yii::$app->request->getBodyParams('itemsToRefund');
+        $itemsToRefund = Yii::$app->request->getBodyParam('itemsToRefund');
 
         //validate order status for refund
 
@@ -685,7 +685,7 @@ class OrderController extends Controller
                     'order_uuid' => $order_uuid,
                     'order_item_id' => $key
                 ])
-                ->total('qty');
+                ->sum('qty');
 
             if($orderItem->qty - $refundedQty < $qty) {
                 return [
@@ -700,7 +700,7 @@ class OrderController extends Controller
 
             //calculate refund total
 
-            $unitPrice = $orderItem->price / $orderItem->qty;
+            $unitPrice = $orderItem->item_price / $orderItem->qty;
 
             $maxRefundAmount += $qty * $unitPrice;
         }
@@ -722,7 +722,7 @@ class OrderController extends Controller
         $refund->restaurant_uuid = $model->restaurant_uuid;
         $refund->order_uuid = $order_uuid;
         $refund->refund_amount = $refund_amount;
-        $refund->reason = Yii::$app->request->getBodyParams ('reason');
+        $refund->reason = Yii::$app->request->getBodyParam('reason');
 
         if(!$refund->save()) {
 
@@ -752,7 +752,7 @@ class OrderController extends Controller
                 ];
             }
 
-            $unitPrice = $orderItem->price / $orderItem->qty;
+            $unitPrice = $orderItem->item_price / $orderItem->qty;
 
             $refundItem = new RefundedItem();
             $refundItem->refund_id = $refund->refund_id;
@@ -787,7 +787,7 @@ class OrderController extends Controller
                     'order_uuid' => $order_uuid,
                     'order_item_id' => $orderItem->order_item_id
                 ])
-                ->total('qty');
+                ->sum('qty');
 
             $remainingQty += $orderItem->qty - $refundedQty;
         }
@@ -1313,6 +1313,10 @@ class OrderController extends Controller
      */
     protected function findModel($order_uuid, $store_uuid = null)
     {
+        if(!$store_uuid) {
+            $store_uuid = Yii::$app->request->headers->get('Store-Id');
+        }
+
         $model = Order::find ()
             ->filterBusinessLocationIfManager ($store_uuid)
             ->andWhere ([
