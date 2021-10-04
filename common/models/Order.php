@@ -366,7 +366,8 @@ class Order extends \yii\db\ActiveRecord
             'deliveryZone',
             'pickupLocation',
             'payment',
-            'currency'
+            'currency',
+            'refundedTotal'
         ];
     }
 
@@ -738,7 +739,7 @@ class Order extends \yii\db\ActiveRecord
     /**
      * Update order total price and items total price
      */
-    public function updateOrderTotalPrice()
+    public function updateOrderTotalPrice($attribute)
     {
         if ($this->order_mode == static::ORDER_MODE_DELIVERY){
 
@@ -980,7 +981,7 @@ class Order extends \yii\db\ActiveRecord
 
                                   if (!$orderItemExtraOption->extraOption) {
                                       return $this->addError (
-                                          $attribute,
+                                          'extraOption',
                                           Yii::t('yii', "{attribute} is invalid.", [
                                               'attribute' => Yii::t('app', 'Product Variant is not available anymore')
                                           ])
@@ -1337,6 +1338,27 @@ class Order extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[RefundedTotal]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRefundedTotal($modelClass = "\common\models\RefundedItem")
+    {
+        return $this->getRefundedItems($modelClass)
+            ->sum('item_price');
+    }
+
+    /**
+     * Gets query for [[RefundedItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRefundedItems($modelClass = "\common\models\RefundedItem")
+    {
+        return $this->hasMany ($modelClass::className (), ['order_uuid' => 'order_uuid']);
+    }
+
+    /**
      * Gets query for [[Refunds]].
      *
      * @return \yii\db\ActiveQuery
@@ -1374,15 +1396,5 @@ class Order extends \yii\db\ActiveRecord
     public function getVoucher($modelClass = "\common\models\Voucher")
     {
         return $this->hasOne ($modelClass::className (), ['voucher_id' => 'voucher_id']);
-    }
-
-    /**
-     * Gets query for [[RefundedItems]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getRefundedItems($modelClass = "\common\models\RefundedItem")
-    {
-        return $this->hasMany ($modelClass::className (), ['order_uuid' => 'order_uuid']);
     }
 }
