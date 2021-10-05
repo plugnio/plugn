@@ -3,7 +3,7 @@
 namespace frontend\controllers;
 
 use Yii;
-use common\models\Restaurant;
+use frontend\models\Restaurant;
 use common\models\RestaurantPaymentMethod;
 use common\models\Order;
 use common\models\Item;
