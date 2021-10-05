@@ -76,7 +76,7 @@ class QueueSearch extends Queue
             'queue_end_at' => $this->queue_end_at,
         ]);
 
-        $query->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
+        $query->andFilterWhere(['like', 'restaurant.restaurant_uuid', $this->restaurant_uuid])
                   ->andFilterWhere(['like', 'restaurant.name', $this->store_name]);
 
         return $dataProvider;
