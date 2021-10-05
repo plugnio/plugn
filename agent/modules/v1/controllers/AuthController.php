@@ -226,7 +226,7 @@ class AuthController extends Controller {
                         'first_name' => trim($firstname),
                         'last_name' => trim($lastname),
                         'store_name' => $store->name,
-                        'phone_number' => $store->owner_number,
+                        'phone_number' => $store->owner_phone_country_code . $store->owner_number,
                         'email' => $agent->agent_email,
                         'store_url' => $store->restaurant_domain
                     ]
