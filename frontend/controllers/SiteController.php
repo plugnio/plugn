@@ -16,7 +16,7 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use common\models\Agent;
 use common\models\BusinessLocation;
-use common\models\Restaurant;
+use frontend\models\Restaurant;
 use common\models\OrderItem;
 use common\models\Category;
 use common\models\Order;
