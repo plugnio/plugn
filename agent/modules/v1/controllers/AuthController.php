@@ -218,7 +218,7 @@ class AuthController extends Controller {
                 $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
 
                 \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-                \Segment::track([
+                $result =  \Segment::track([
                     'userId' => $store->restaurant_uuid,
                     'event' => 'Store Created',
                     'type' => 'track',
@@ -231,6 +231,9 @@ class AuthController extends Controller {
                         'store_url' => $store->restaurant_domain
                     ]
                 ]);
+
+                \Yii::info("[result] " . print_r($result), __METHOD__);
+
             }
             $transaction->commit();
             return [
