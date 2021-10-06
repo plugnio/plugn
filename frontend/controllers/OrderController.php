@@ -253,6 +253,47 @@ class OrderController extends Controller {
         ]);
     }
 
+
+    /**
+    * Request fulfillment
+    * @param type $order_uuid
+    * @param type $storeUuid
+    * @param type $customerId
+    */
+   public function actionRequestFulfillment($order_uuid, $storeUuid) {
+
+       $order_model = $this->findModel($order_uuid, $storeUuid);
+
+       $requestFulfillmentApiResponse = Yii::$app->diggipacksWarehouseComponent->createOrder($order_model, $order_model->orderItems);
+
+
+       if ($requestFulfillmentApiResponse->isOk) {
+
+           $order_model->diggipack_awb_no = $requestFulfillmentApiResponse->data['awb_no'];
+
+           $order_model->save(false);
+           Yii::$app->session->setFlash('successResponse', "Fulfillment requested");
+
+       } else {
+
+           if ($requestFulfillmentApiResponse->content){
+             Yii::$app->session->setFlash('errorResponse', json_encode($requestFulfillmentApiResponse->content));
+             Yii::error('Error while requesting fulfillment  [' . $order_model->restaurant->name . '] ' . json_encode($requestFulfillmentApiResponse->content));
+
+           } else {
+
+             Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
+             Yii::error('Error while requesting fulfillment  [' . $order_model->restaurant->name . '] ' . json_encode($requestFulfillmentApiResponse));
+
+           }
+
+           return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
+       }
+
+       return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
+   }
+
+
     /**
      * Request a driver from Mashkor
      * @param type $order_uuid

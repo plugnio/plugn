@@ -75,6 +75,7 @@ use yii\helpers\ArrayHelper;
  * @property string $gift_message
  * @property boolean $reminder_sent
  * @property boolean estimated_time_of_arrival
+ * @property string $diggipack_awb_no
  *
  * @property Area
  * @property BankDiscount $bankDiscount
@@ -251,7 +252,7 @@ class Order extends \yii\db\ActiveRecord
                  'armada_tracking_link', 'armada_qr_code_link', 'armada_delivery_code',
                  'country_name','country_name_ar', 'business_location_name',
                  'building', 'apartment', 'city',  'address_1' , 'address_2','postalcode', 'floor', 'office',
-                 'recipient_name', 'recipient_phone_number', 'gift_message', 'sender_name','armada_order_status'
+                 'recipient_name', 'recipient_phone_number', 'gift_message', 'sender_name','armada_order_status', 'diggipack_awb_no'
              ],
              'string', 'max' => 255],
              [['postalcode'], 'string', 'max' => 10],
