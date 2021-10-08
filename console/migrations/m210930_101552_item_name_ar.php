@@ -29,9 +29,9 @@ class m210930_101552_item_name_ar extends Migration
             ]);*/
 
             \common\models\RefundedItem::updateAll ([
-                'item_name_ar' => $orderedItem->item_name_ar,
+                'item_name_ar' => $orderedItem['item_name_ar'],
             ], [
-                'item_uuid' => $orderedItem->item_uuid
+                'item_uuid' => $orderedItem['item_uuid']
             ]);
         }
     }
