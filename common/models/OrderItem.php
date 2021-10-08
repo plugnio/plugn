@@ -39,7 +39,7 @@ class OrderItem extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['order_uuid', 'item_uuid', 'qty'], 'required'],
+            [['order_uuid', 'qty'], 'required'],
             [['qty'], 'integer', 'min' => 0],
             [['order_uuid'], 'string', 'max' => 40],
             [['item_price'], 'number', 'min' => 0],
@@ -152,6 +152,7 @@ class OrderItem extends \yii\db\ActiveRecord {
     public function beforeSave($insert) {
 
         parent::beforeSave($insert);
+
         $item_model = Item::findOne($this->item_uuid);
         $order_model = Order::findOne($this->order_uuid);
 
@@ -160,6 +161,15 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         if(!$this->restaurant_uuid && $this->order) {
             $this->restaurant_uuid = $this->order->restaurant_uuid;
+        }
+
+        if ($this->qty == 0)
+            return $this->addError('qty', "Invalid input");
+
+        //if custom item
+
+        if(!$item_model && $this->item_price) {
+            return true;
         }
 
         if ($insert) {
@@ -174,9 +184,6 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         }
 
-        if ($this->qty == 0)
-            return $this->addError('qty', "Invalid input");
-
         //Update product inventory
         if ($insert){
           if ($item_model) {
@@ -185,12 +192,12 @@ class OrderItem extends \yii\db\ActiveRecord {
           } else
               return false;
 
-
           $this->item->decreaseStockQty($this->qty);
-
         }
 
         $this->item_price = $this->calculateOrderItemPrice();
+
+        //$this->item_unit_price = $this->item_price / $this->qty;
 
         return true;
     }
@@ -200,11 +207,9 @@ class OrderItem extends \yii\db\ActiveRecord {
         $item_model = Item::findOne($this->item_uuid);
 
         if (!$insert && isset($changedAttributes['qty'])) {
-
             $item_model->increaseStockQty($changedAttributes['qty']);
             $item_model->decreaseStockQty($this->qty);
         }
-
 
         $order_model = Order::findOne($this->order_uuid);
 

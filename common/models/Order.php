@@ -742,7 +742,7 @@ class Order extends \yii\db\ActiveRecord
     /**
      * Update order total price and items total price
      */
-    public function updateOrderTotalPrice($attribute)
+    public function updateOrderTotalPrice($attribute = 'delivery_zone_id')
     {
         if ($this->order_mode == static::ORDER_MODE_DELIVERY){
 
@@ -850,6 +850,20 @@ class Order extends \yii\db\ActiveRecord
     {
         if (!parent::beforeSave ($insert)) {
             return false;
+        }
+
+        if(!$this->currency_code) {
+
+            if(!$this->restaurant || !$this->restaurant->currency) {
+                return $this->addError (
+                    'currency_code',
+                    Yii::t('yii', "{attribute} is invalid.", [
+                        'attribute' => Yii::t('app', 'Currency code')
+                    ])
+                );
+            }
+
+            $this->currency_code = $this->restaurant->currency->code;
         }
 
         if ($insert && $this->scenario == self::SCENARIO_CREATE_ORDER_BY_ADMIN) {
