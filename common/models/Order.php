@@ -43,6 +43,7 @@ use yii\helpers\ArrayHelper;
  * @property int $payment_method_id
  * @property string $payment_method_name
  * @property string $payment_method_name_ar
+ * @property string $currency_code
  * @property int|null $order_status
  * @property int $order_mode
  * @property int $subtotal
@@ -251,9 +252,11 @@ class Order extends \yii\db\ActiveRecord
                     'armada_tracking_link', 'armada_qr_code_link', 'armada_delivery_code',
                     'country_name', 'country_name_ar', 'business_location_name',
                     'building', 'apartment', 'city', 'address_1', 'address_2', 'postalcode', 'floor', 'office',
-                    'recipient_name', 'recipient_phone_number', 'gift_message'
+                    'recipient_name', 'recipient_phone_number', 'gift_message', 'currency_code'
                 ],
-                'safe'],
+                'safe'
+            ],
+
             [['postalcode'], 'string', 'max' => 10],
 
             [['mashkor_order_number', 'mashkor_tracking_link', 'mashkor_driver_name', 'mashkor_driver_phone'], 'string', 'max' => 255],
@@ -568,6 +571,7 @@ class Order extends \yii\db\ActiveRecord
             'payment_method_id' => 'Payment method ID',
             'payment_method_name' => 'Payment method name',
             'payment_method_name_ar' => 'Payment method name [Arabic]',
+            'currency_code' => 'Currency Code',
             'order_status' => 'Status',
             'total_price' => 'Price',
             'total_price_before_refund' => 'Total price before refund',
@@ -725,13 +729,12 @@ class Order extends \yii\db\ActiveRecord
                     'gateway' => $this->payment_uuid ? 'Tap' : null,
                     'shipping' => ($this->delivery_fee * 3.28),
                     'subtotal' => ($this->subtotal * 3.28),
-                    'currency' => 'USD',
+                    'currency' => $this->currency_code,
                     'coupon' => $this->voucher && $this->voucher->code ? $this->voucher->code : null,
                     'products' => $productsList ? $productsList : null
                 ]
             ]);
         }
-
 
         $this->sendOrderNotification();
     }
@@ -1081,7 +1084,6 @@ class Order extends \yii\db\ActiveRecord
                     $this->area_name_ar = $area_model->area_name_ar;
                 }
 
-
             }
 
             $payment_method_model = PaymentMethod::findOne ($this->payment_method_id);
@@ -1089,6 +1091,10 @@ class Order extends \yii\db\ActiveRecord
             if ($payment_method_model) {
                 $this->payment_method_name = $payment_method_model->payment_method_name;
                 $this->payment_method_name_ar = $payment_method_model->payment_method_name_ar;
+            }
+
+            if(!$this->currency_code && $this->restaurant && $this->restaurant->currency) {
+                $this->currency_code = $this->restaurant->currency->code;
             }
 
             $this->save (false);
@@ -1221,8 +1227,7 @@ class Order extends \yii\db\ActiveRecord
      */
     public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne ($modelClass::className (), ['currency_id' => 'currency_id'])
-            ->via ('restaurant');
+        return $this->hasOne ($modelClass::className (), ['code' => 'currency_code']);
     }
 
     /**
