@@ -55,18 +55,69 @@ class DiggipacksWarehouseComponent extends Component {
         }
 
 
+        $area = '';
+        $street = '';
+        $block = '';
+        $avenue = '';
+        $floor = '';
+        $apartment = '';
+        $office = '';
+        $city = '';
+        $country = '';
+        $fullAddress = '';
+
+        if($model->country_name )
+          $fullAddress .= 'Country: ' . $model->country_name;
+
+        if($model->area_id && $model->area->city_id && $model->area->city->city_name)
+          $fullAddress .= ', City: ' . $model->area->city->city_name;
+
+        if($model->area_id)
+          $fullAddress .=  ', Area: ' $model->area_name;
+
+        if($model->street)
+          $fullAddress .=  ', Street: ' $model->street;
+
+        if($model->block)
+          $fullAddress .=  ', Block: ' $model->block;
+
+        if($model->avenue)
+          $fullAddress .=  ', Avenue: ' $model->avenue;
+
+        if($model->floor)
+          $fullAddress .=  ', Floor: ' $model->floor;
+
+        if($model->apartment)
+          $fullAddress .=  ', Apartment No. ' $model->apartment;
+
+        if($model->office)
+          $fullAddress .=  ', Office No. ' $model->office;
+
+        if($model->house_number)
+          $fullAddress .=  ', House No. ' $model->house_number;
+
+
         $params = [
           "customerId" => "163180339531",
           "verify" => "false",
           "param" => [
+              "origin" => "Riyadh",
               "BookingMode" => $model->payment_method_id == 3 ? 'COD' : 'CC',
               "codValue" => $model->total_price,
               "reference_id" => $model->order_uuid, //ORDER UUID
               "service" => 3,
               "productType" => "parcel",
               "destination" => $model->area_id ? $model->area->city->city_name : $model->city,
+
+              "sender_name" => $model->restaurant->name,
+              "sender_address" => "Riyadh", //TODO need to adjust
+              "sender_phone" => $model->restaurant->phone_number ? $model->restaurant->phone_number : '',
+              "sender_email" => $model->restaurant->restaurant_email ? $model->restaurant->restaurant_email : '',
+
+
+
               "receiver_name" => $model->customer_name,
-              "receiver_address" => $model->area->city->city_name . ' ' . $model->area_name . ' ' . $model->street. ' ' .  $model->block .' '. $model->avenue .' '. $model->house_number . ' ' . $model->country_name, //TODO need to adjust
+              "receiver_address" => $fullAddress, 
               "receiver_phone" => $phone,
               "receiver_email" => $model->customer_email ? $model->customer_email : '',
               "skudetails" => $itemsArray

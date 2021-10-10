@@ -340,6 +340,14 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                             'visible' => $model->diggipack_awb_no != null,
                         ],
                         [
+                            'label' => 'DiggiPacks tracking link',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return Html::a('https://track.diggipacks.com/result_detailfm/' . $data->diggipack_awb_no, \yii\helpers\Url::to('https://track.diggipacks.com/result_detailfm/' . $data->diggipack_awb_no, true), ['target' => '_blank']);
+                            },
+                            'visible' => $model->diggipack_awb_no != null,
+                        ],
+                        [
                             'attribute' => 'armada_tracking_link',
                             'format' => 'raw',
                             'value' => function ($data) {
