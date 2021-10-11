@@ -558,14 +558,16 @@ class Restaurant extends \yii\db\ActiveRecord
                         ]
                 );
 
-                if ($result || count($result) > 0) {
-
+                if ($result || count ($result) > 0) {
                     //delete the file from temp folder
-                    unlink($file_path);
-                    $this[$attribute] = basename($result['url']);
+                    $this[$attribute] = basename ($result['url']);
+                    $this->$attribute = basename ($result['url']);
+                    return true;
                 }
             } catch (\Cloudinary\Error $err) {
-                Yii::error('Error when uploading restaurant document to Cloudinary: ' . json_encode($err));
+              Yii::error ('Error when uploading restaurant document to Cloudinary: ' . json_encode ($err));
+              $this->addError($attribute, $err->getMessage());
+              return false;
             }
 
     }
