@@ -87,6 +87,9 @@ return [
         'fileGeneratorComponent' => [
             'class' => 'common\components\FileGeneratorComponent'
         ],
+        'diggipacksWarehouseComponent' => [
+            'class' => 'common\components\DiggipacksWarehouseComponent'
+        ],
         'mashkorDelivery' => [
             'class' => 'common\components\MashkorDelivery',
             'keyToUse' => \common\components\MashkorDelivery::USE_LIVE_KEY

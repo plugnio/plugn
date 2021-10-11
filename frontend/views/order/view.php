@@ -57,6 +57,9 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
 if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $model->deliveryZone->businessLocation->mashkor_branch_id != null)
   $mashkorBranchId = $model->deliveryZone->businessLocation->mashkor_branch_id;
 
+if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $model->deliveryZone->businessLocation->diggipack_customer_id != null)
+  $diggipack_customer_id = $model->deliveryZone->businessLocation->diggipack_customer_id;
+
 
 ?>
 
@@ -101,6 +104,20 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
                 'style' => 'margin-right: 7px;'
             ]);
         }
+
+
+        if (  ($model->delivery_zone_id) && !$model->diggipack_awb_no) {
+            echo Html::a('Request fulfillment', ['request-fulfillment', 'order_uuid' => $model->order_uuid, 'storeUuid' => $storeUuid], [
+                'class' => 'btn btn-dark mr-1 mb-1',
+                'data' => [
+                    'confirm' => 'Are you sure you want to request fulfillment?',
+                    'method' => 'post',
+                ],
+                'style' => 'margin-right: 7px;'
+            ]);
+        }
+
+
         ?>
 
     <div style="display: block">
@@ -313,6 +330,22 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                                 else
                                   return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival));
                             }
+                        ],
+                        [
+                            'attribute' => 'diggipack_awb_no',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return $data->diggipack_awb_no;
+                            },
+                            'visible' => $model->diggipack_awb_no != null,
+                        ],
+                        [
+                            'label' => 'DiggiPacks tracking link',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return Html::a('https://track.diggipacks.com/result_detailfm/' . $data->diggipack_awb_no, \yii\helpers\Url::to('https://track.diggipacks.com/result_detailfm/' . $data->diggipack_awb_no, true), ['target' => '_blank']);
+                            },
+                            'visible' => $model->diggipack_awb_no != null,
                         ],
                         [
                             'attribute' => 'armada_tracking_link',
