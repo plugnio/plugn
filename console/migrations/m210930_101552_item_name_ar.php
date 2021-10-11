@@ -12,7 +12,16 @@ class m210930_101552_item_name_ar extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn ('refunded_item', 'item_name_ar', $this->string ()->after('item_name')->null ());
+        $columnData = $this
+            ->getDb()
+            ->getSchema()
+            ->getTableSchema('refunded_item')
+            ->getColumn('item_name_ar');
+
+        if (!$columnData) {
+            $this->addColumn('refunded_item', 'item_name_ar', $this->string ()->after('item_name')->null ());
+        }
+
         //$this->addColumn ('order_item', 'item_name_ar', $this->string ()->after('item_name')->null ());
 
         //update item_name_ar
