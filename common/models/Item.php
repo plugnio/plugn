@@ -595,4 +595,8 @@ class Item extends \yii\db\ActiveRecord
     {
         return $this->hasMany ($modelClass::className (), ['order_uuid' => 'order_uuid'])->via ('orderItems');
     }
+
+    public static function find() {
+        return new query\ItemQuery(get_called_class());
+    }
 }
