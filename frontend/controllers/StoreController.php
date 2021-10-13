@@ -333,7 +333,7 @@ class StoreController extends Controller {
         if( $model->currency->code == 'BHD'  && $paymentGateway == 'myfatoorah')
           return $this->redirect(['setup-online-payments', 'storeUuid' => $model->restaurant_uuid]);
 
-          if($model->currency->code != 'KWD')
+          if($model->currency->code != 'KWD' && $model->currency->code != 'OMR')
                 $model->business_type = 'corp';
 
 
