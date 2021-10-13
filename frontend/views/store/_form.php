@@ -62,9 +62,6 @@ $this->registerJs($js);
     ]);
 
     $countryQuery = Country::find()
-                    ->where(['iso' => 'KW'])
-                    ->orWhere(['iso' => 'BH'])
-                    ->orWhere(['iso' => 'SA'])
                     ->asArray()->all();
 
     $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
