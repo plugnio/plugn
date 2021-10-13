@@ -16,16 +16,16 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use common\models\Agent;
 use common\models\BusinessLocation;
-use common\models\Restaurant;
+use frontend\models\Restaurant;
 use common\models\OrderItem;
 use common\models\Category;
-use common\models\RestaurantPaymentMethod;
 use common\models\Order;
 use common\models\Plan;
 use common\models\PaymentMethod;
 use common\models\Subscription;
 use common\models\AgentAssignment;
 use common\models\Item;
+use common\models\RestaurantPaymentMethod;
 use common\models\Customer;
 use common\models\SubscriptionPayment;
 use yii\db\Expression;
@@ -181,7 +181,7 @@ class SiteController extends Controller {
                                  'old_domain' => $old_domain
                              ])
                              ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-                             ->setTo(Yii::$app->params['supportEmail'])
+                             ->setTo(Yii::$app->params['adminEmail'])
                              ->setSubject('[Plugn] Agent updated DN')
                              ->send();
 
@@ -219,7 +219,14 @@ class SiteController extends Controller {
           $payment->payment_amount_charged = $subscription_model->plan->price;
           $payment->payment_current_status = "Redirected to payment gateway";
 
+          if($managedRestaurant->referral_code){
+            $payment->partner_fee = $payment->payment_amount_charged * $managedRestaurant->partner->commission;
+          }
+
+
           if ($payment->save()) {
+
+
               //Update payment_uuid in order
               $subscription_model->payment_uuid = $payment->payment_uuid;
               $subscription_model->save(false);
@@ -386,8 +393,7 @@ class SiteController extends Controller {
                                 Order::STATUS_BEING_PREPARED,
                                 Order::STATUS_OUT_FOR_DELIVERY,
                                 Order::STATUS_COMPLETE,
-                                Order::STATUS_ACCEPTED,
-                                Order::STATUS_CANCELED
+                                Order::STATUS_ACCEPTED
                             ]
                         ])
                         ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -403,8 +409,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -422,8 +427,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -440,8 +444,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -458,8 +461,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -476,8 +478,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -514,8 +515,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -534,8 +534,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -562,8 +561,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -579,8 +577,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -598,8 +595,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -623,8 +619,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -657,8 +652,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -676,8 +670,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -696,8 +689,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -715,8 +707,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -734,8 +725,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -753,8 +743,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -772,8 +761,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -791,8 +779,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -811,8 +798,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -837,8 +823,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -855,8 +840,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -875,8 +859,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -899,8 +882,7 @@ class SiteController extends Controller {
                             Order::STATUS_BEING_PREPARED,
                             Order::STATUS_OUT_FOR_DELIVERY,
                             Order::STATUS_COMPLETE,
-                            Order::STATUS_ACCEPTED,
-                            Order::STATUS_CANCELED
+                            Order::STATUS_ACCEPTED
                         ]
                     ])
                         ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
@@ -1456,6 +1438,12 @@ class SiteController extends Controller {
                 $business_location_model->business_location_name_ar = 'الفرع الرئيسي';
                 $business_location_model->save();
 
+                //Enable cash by default
+                $payments_method = new RestaurantPaymentMethod();
+                $payments_method->payment_method_id = 3; //Cash
+                $payments_method->restaurant_uuid = $store_model->restaurant_uuid;
+                $payments_method->save();
+
 
                 //Enable cash by default
                 $payments_method = new RestaurantPaymentMethod();
@@ -1469,6 +1457,7 @@ class SiteController extends Controller {
                 $assignment_agent_model->assignment_agent_email = $agent_model->agent_email;
                 $assignment_agent_model->role = AgentAssignment::AGENT_ROLE_OWNER;
                 $assignment_agent_model->restaurant_uuid = $store_model->restaurant_uuid;
+                $assignment_agent_model->email_notification = 1;
 
                 if ($assignment_agent_model->save()) {
                     $model = new LoginForm();
@@ -1492,6 +1481,8 @@ class SiteController extends Controller {
                                'first_name' => trim($firstname),
                                'last_name' => trim($lastname),
                                'store_name' => $store_model->name,
+                               'country' => $store_model->country_id ? $store_model->country->country_name : '',
+                               'currency' => $store_model->currency_id ? $store_model->currency->title : '',
                                'phone_number' => $store_model->owner_number,
                                'email' => $agent_model->agent_email,
                                'store_url' => $store_model->restaurant_domain

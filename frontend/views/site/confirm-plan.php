@@ -61,7 +61,7 @@ $this->title = "Confirm " . $selectedPlan->name;
 
 
         <div class="form-group">
-            <?= Html::submitButton('Make Payment ('.  \Yii::$app->formatter->asCurrency($selectedPlan->price,$restaurant_model->currency->code) .')', ['class' => 'btn btn-success', 'style' => '    float: left;']) ?>
+            <?= Html::submitButton('Make Payment ('.  \Yii::$app->formatter->asCurrency($selectedPlan->price, 'KWD') .')', ['class' => 'btn btn-success', 'style' => '    float: left;']) ?>
         </div>
 
 

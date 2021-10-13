@@ -21,6 +21,8 @@ use borales\extensions\phoneInput\PhoneInput;
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 $this->title = 'Create Tap account';
+$this->params['breadcrumbs'][] = ['label' => 'Payment Settings', 'url' => ['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]];
+$this->params['breadcrumbs'][] = ['label' => 'Online Payments', 'url' => ['setup-online-payments', 'storeUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 
@@ -59,14 +61,11 @@ $( window ).on( 'load', function() {
 
 
 let businessTypeInput = $('#businessTypeInput');
-let companyName = $('#company_name')[0];
 businessTypeInput.change(function(e){
 	let selection = businessTypeInput.is(':checked');
 
 
 	if (e.target.defaultValue == 'corp'){
-    companyName.placeholder = 'official business name if license available';
-    companyName.value = '';
     $('#legal_info').show();
   }
 
@@ -180,7 +179,7 @@ $this->registerJs($js);
 
             <div class="row">
               <div class="col-12">
-                  <?= $form->field($model, 'company_name')->textInput(['maxlength' => true, 'id' => 'company_name','placeholder'=>'official business name if license available'])->label('Business name *') ?>
+                  <?= $form->field($model, 'company_name')->textInput(['maxlength' => true, 'placeholder' => 'official business name if license available'])->label('Business name *') ?>
               </div>
             </div>
 
@@ -205,7 +204,6 @@ $this->registerJs($js);
 
             </div>
             <div class="row">
-
               <div class="col-12 col-sm-6 col-lg-6">
 
                 <?=
@@ -232,32 +230,30 @@ $this->registerJs($js);
 
               <div class="col-12 col-sm-6 col-lg-6">
 
-                  <?php
-                      if($model->country->iso == 'KW'){
-                        echo  $form->field($model, 'business_type')->radioList(['ind' => 'Individual', 'corp' => 'Company',], [
-                              'style' => 'display:grid',
-                              'id' => 'businessTypeInput',
-                              'item' => function($index, $label, $name, $checked, $value) {
+                          <?php
+                              if($model->currency->code == 'KWD'){
+                                echo  $form->field($model, 'business_type')->radioList(['ind' => 'Individual', 'corp' => 'Company',], [
+                                      'style' => 'display:grid',
+                                      'id' => 'businessTypeInput',
+                                      'item' => function($index, $label, $name, $checked, $value) {
 
-                                  $return = '<label class="vs-radio-con">';
-                                  /* -----> */ if ($checked)
-                                      $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                                  /* -----> */
-                                  else
-                                      $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
-                                  $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
-                                  $return .= '<span>' . ucwords($label) . '</span>';
-                                  $return .= '</label>';
+                                          $return = '<label class="vs-radio-con">';
+                                          /* -----> */ if ($checked)
+                                              $return .= '<input checked  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                                          /* -----> */
+                                          else
+                                              $return .= '<input  type="radio" name="' . $name . '"value="' . $value . '" tabindex="3">';
+                                          $return .= '<span class="vs-radio"> <span class="vs-radio--border"></span> <span class="vs-radio--circle"></span> </span>';
+                                          $return .= '<span>' . ucwords($label) . '</span>';
+                                          $return .= '</label>';
 
-                                  return $return;
+                                          return $return;
+                                      }
+                                  ])->label('Account type *');
                               }
-                          ])->label('Account type *');
-                      }
-                  ?>
+                          ?>
 
-              </div>
-
-
+                  </div>
 
             </div>
         </div>
@@ -270,22 +266,12 @@ $this->registerJs($js);
 
         <div class="card-body">
 
-            <p>Enable it if your store operations is formally licensed.</p>
-
             <div class="row">
-                <div class="col-12 col-sm-6 col-lg-6">
-                    <?= $form->field($model, 'license_number')->textInput(['maxlength' => true]) ?>
-                </div>
-            </div>
-
-            <div class="row">
-
-
 
                 <div class="col-12">
 
                     <?=
-                    $form->field($model, 'restaurant_commercial_license_file')->fileinput(['name' => 'commercial_license', 'class' => 'document-upload'])->label('License copy *');
+                      $form->field($model, 'restaurant_commercial_license_file')->fileinput(['name' => 'commercial_license', 'class' => 'document-upload'])->label('License copy *');
                     ?>
 
                 </div>
@@ -328,9 +314,24 @@ $this->registerJs($js);
         </div>
     </div>
 
+
+
+    <span>
+      By signing up you agree with Tap's <a href="https://www.tap.company/kw/en/terms-conditions" target="_blank">Terms And Conditions</a>
+    </span>
+
     <div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px;  margin-top: 20px; padding-bottom: 15px; background:#f4f6f9 ">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'id' =>'submitBtn', 'style' => 'width: 100%;height: 50px;']) ?>
 
+
+				<button class="btn btn-success" type="button" id="loading" disabled style="width: 100%;height: 50px; display:none">
+					<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+					<span class="ml-25 align-middle">Loading...</span>
+				</button>
+
+
+
+    </div>
 
 				<button class="btn btn-success" type="button" id="loading" disabled style="width: 100%;height: 50px; display:none">
 					<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>

@@ -13,6 +13,16 @@ class BusinessLocation extends \common\models\BusinessLocation
         $field['txt_countries_count'] = function($model) {
             return $model->getDeliveryZones()->groupby('country_id')->count();
         };
+
+        $fields['mashkor_branch_id'] = function($model) {
+         return $model->mashkor_branch_id;
+        };
+
+        $fields['armada_api_key'] = function($model) {
+         return $model->armada_api_key;
+        };
+
+        
         return $field;
     }
 

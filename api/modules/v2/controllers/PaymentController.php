@@ -8,7 +8,9 @@ use yii\data\ActiveDataProvider;
 use common\models\RestaurantPaymentMethod;
 use common\models\PaymentMethod;
 use api\models\Payment;
+use common\models\Refund;
 use api\models\Restaurant;
+use yii\web\ForbiddenHttpException;
 
 class PaymentController extends Controller {
 
@@ -57,12 +59,64 @@ class PaymentController extends Controller {
     /**
      *  Return Payment details
      */
-    // public function actionPaymentDetail($id) {
-    //
-    //     $model = Payment::find()->where(['payment_uuid' => $id])->with('order')->asArray()->one();
-    //
-    //     return $model;
-    // }
+    public function actionMyFatoorahWebhook() {
+
+      $data = Yii::$app->request->getBodyParam("Data");
+      $eventType = Yii::$app->request->getBodyParam("EventType");
+
+
+      $headers = Yii::$app->request->headers;
+
+      $headerSignature = $headers->get('MyFatoorah-Signature');
+
+
+    $countryIsoCode = Yii::$app->request->getBodyParam("CountryIsoCode");;
+
+
+      if($countryIsoCode == 'KWT')
+        $secretKey = \Yii::$app->params['myfatoorah.kuwaitSecretKey']; // from portal
+      else if ($countryIsoCode == 'SA')
+        $secretKey = \Yii::$app->params['myfatoorah.saudiSecretKey'];// from portal
+
+
+      $isValidSignature = true;
+
+       //Check If Enabled Secret Key and If The header has request
+      if ($headerSignature != null)  {
+        $isValidSignature = false;
+
+        $data = Yii::$app->request->getBodyParam("Data");
+
+
+        if( $eventType && $data){
+
+          if (!$isValidSignature) {
+                 $isValidSignature = Yii::$app->myFatoorahPayment->checkMyFatoorahSignature($data, $secretKey, $headerSignature);
+                 if (!$isValidSignature) throw new ForbiddenHttpException('Invalid Signature');
+
+          }
+
+          switch ($eventType) {
+            case 1: //1 For Transaction Status Changed
+                Payment::updatePaymentStatusFromMyFatoorahWebhook($data['InvoiceId'], $data);
+            break;
+
+            case 2: //2 For Refund Status Changed
+                Refund::updateRefundStatus($data['RefundReference'], $data);
+            break;
+
+            }
+
+          }
+
+        return [
+          'message' => 'success'
+        ];
+    }
+
+
+
+    }
 
 
     /**

@@ -71,7 +71,7 @@ class ArmadaDelivery extends Component {
       $phone =  str_replace('+', '00', $phone);
 
         $deliveryParams = [
-            "platformName" => "pos",
+            "platformName" => "plugn",
             "platformData" => [
                     "orderId" => $model->order_uuid,
                     "name" => $model->customer_name,
@@ -88,16 +88,17 @@ class ArmadaDelivery extends Component {
             ],
         ];
 
-        $client = new Client();
-        $response = $client->createRequest()
-                ->setMethod('POST')
-                ->setUrl($this->apiEndpoint)
-                ->setData($deliveryParams)
-                ->addHeaders([
-                    'authorization' => 'Key ' . $armadaApiKey,
-                    'content-type' => 'application/json',
-                ])
-                ->send();
+
+      $client = new Client();
+      $response = $client->createRequest()
+              ->setMethod('POST')
+              ->setUrl($this->apiEndpoint)
+              ->setData($deliveryParams)
+              ->addHeaders([
+                  'authorization' => 'Key ' . $armadaApiKey,
+                  'content-type' => 'application/json',
+              ])
+              ->send();
 
         return $response;
     }

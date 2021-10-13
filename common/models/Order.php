@@ -71,10 +71,12 @@ use yii\helpers\ArrayHelper;
  * @property string $mashkor_driver_phone
  * @property string $mashkor_order_status
  * @property string $recipient_name
+ * @property string $sender_name
  * @property string $recipient_phone_number
  * @property string $gift_message
  * @property boolean $reminder_sent
  * @property boolean estimated_time_of_arrival
+ * @property string $diggipack_awb_no
  *
  * @property Area
  * @property BankDiscount $bankDiscount
@@ -123,6 +125,12 @@ class Order extends \yii\db\ActiveRecord
     const SCENARIO_CREATE_ORDER_BY_ADMIN = 'manual';
     const SCENARIO_OLD_VERSION = 'old_version';
     const SCENARIO_UPDATE_STATUS = 'updateStatus';
+
+
+    public $civil_id = null;
+    public $section = null;
+    public $class = null;
+
 
     /**
      * {@inheritdoc}
@@ -214,17 +222,17 @@ class Order extends \yii\db\ActiveRecord
                 return $model->order_mode == static::ORDER_MODE_DELIVERY;
             }
             ],
-            [['floor'], 'required', 'when' => function ($model) {
-                return ($model->unit_type == 'Office' || $model->unit_type == 'Apartment') && ($model->restaurant->version == 2 || $model->restaurant->version == 3);
-            }
+            [['floor'], 'required', 'when' => function($model) {
+                    return ($model->unit_type == 'Office' ||  $model->unit_type == 'Apartment') && ($model->restaurant->version == 2 || $model->restaurant->version == 3 || $model->restaurant->version == 4);
+                }
             ],
-            [['office'], 'required', 'when' => function ($model) {
-                return $model->unit_type == 'Office' && ($model->restaurant->version == 2 || $model->restaurant->version == 3);
-            }
+            [['office'], 'required', 'when' => function($model) {
+                    return $model->unit_type == 'Office' && ($model->restaurant->version == 2 || $model->restaurant->version == 3 || $model->restaurant->version == 4);
+                }
             ],
-            [['apartment'], 'required', 'when' => function ($model) {
-                return $model->unit_type == 'Apartment' && ($model->restaurant->version == 2 || $model->restaurant->version == 3);
-            }
+            [['apartment'], 'required', 'when' => function($model) {
+                    return $model->unit_type == 'Apartment' && ($model->restaurant->version == 2 || $model->restaurant->version == 3 || $model->restaurant->version == 4);
+                }
             ],
             [['postalcode', 'city', 'address_1', 'address_2'], 'required', 'when' => function ($model) {
                 return $model->shipping_country_id;
@@ -252,12 +260,14 @@ class Order extends \yii\db\ActiveRecord
                     'armada_tracking_link', 'armada_qr_code_link', 'armada_delivery_code',
                     'country_name', 'country_name_ar', 'business_location_name',
                     'building', 'apartment', 'city', 'address_1', 'address_2', 'postalcode', 'floor', 'office',
-                    'recipient_name', 'recipient_phone_number', 'gift_message', 'currency_code'
+                    'recipient_name', 'recipient_phone_number', 'gift_message', 'currency_code', 'sender_name','armada_order_status', 'diggipack_awb_no'
                 ],
                 'safe'
             ],
 
             [['postalcode'], 'string', 'max' => 10],
+
+            [['civil_id', 'section','class'], 'string', 'max' => 255], //Temp var
 
             [['mashkor_order_number', 'mashkor_tracking_link', 'mashkor_driver_name', 'mashkor_driver_phone'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className (), 'targetAttribute' => ['area_id' => 'area_id']],
@@ -588,6 +598,7 @@ class Order extends \yii\db\ActiveRecord
             'voucher_id' => 'Voucher ID',
             'tax' => 'Tax',
             'recipient_name' => 'Recipient name',
+            'sender_name' => 'Sender name',
             'recipient_phone_number' => 'Recipient phone number',
             'gift_message' => 'Gift Message',
             'bank_discount_id' => 'Bank discount ID',
@@ -674,10 +685,10 @@ class Order extends \yii\db\ActiveRecord
 
                     $orderItemExtraOptions = $orderItem->getOrderItemExtraOptions ();
 
-                    if ($orderItemExtraOptions->count () > 0) {
-                        foreach ($orderItemExtraOptions->all () as $orderItemExtraOption) {
-                            if ($orderItemExtraOption->order_item_extra_option_id && $orderItemExtraOption->extra_option_id)
-                                $orderItemExtraOption->extraOption->increaseStockQty ($orderItem->qty);
+                    if ($orderItemExtraOptions->count() > 0) {
+                        foreach ($orderItemExtraOptions->all() as $orderItemExtraOption){
+                          if ($orderItemExtraOption->order_item_extra_option_id && $orderItemExtraOption->order_item_extra_option_id && $orderItemExtraOption->extra_option_id)
+                              $orderItemExtraOption->extraOption->increaseStockQty($orderItem->qty);
                         }
                     }
 
@@ -747,12 +758,7 @@ class Order extends \yii\db\ActiveRecord
         if ($this->order_mode == static::ORDER_MODE_DELIVERY){
 
           if (!$this->deliveryZone) {
-              return $this->addError (
-                  $attribute,
-                  Yii::t('yii', "{attribute} is invalid.", [
-                      'attribute' => Yii::t('app', 'Delivery zone is invalid')
-                  ])
-              );
+              return $this->addError ('delivery_zone_id', Yii::t('app', 'Delivery zone is invalid'));
           }
 
           $this->delivery_fee = $this->deliveryZone->delivery_fee;
@@ -766,11 +772,11 @@ class Order extends \yii\db\ActiveRecord
         }
 
 
-        $this->subtotal = $this->calculateOrderItemsTotalPrice ();
-        $this->total_price = $this->calculateOrderTotalPrice ();
+        $this->subtotal = $this->calculateOrderItemsTotalPrice();
+        $this->total_price = $this->calculateOrderTotalPrice();
 
 
-        $this->save (false);
+        $this->save(false);
     }
 
     /**
@@ -898,32 +904,64 @@ class Order extends \yii\db\ActiveRecord
             //   }
             // }
 
-            if ($this->orderItems) {
 
-                $maxPrepTime = 0;
+        if($this->restaurant->version == 4){
+          if(!$this->is_order_scheduled && $this->orderItems){
 
-                foreach ($this->orderItems as $key => $orderItem) {
+              $maxPrepTime = 0;
 
-                    if ($orderItem->item_uuid && $orderItem->item->prep_time) {
+              foreach ($this->orderItems as $key => $orderItem) {
 
-                        if ($orderItem->item->prep_time_unit == Item::TIME_UNIT_MIN)
-                            $prep_time = intval ($orderItem->item->prep_time);
-                        else if ($orderItem->item->prep_time_unit == Item::TIME_UNIT_HRS)
-                            $prep_time = intval ($orderItem->item->prep_time) * 60;
-                        else if ($orderItem->item->prep_time_unit == Item::TIME_UNIT_DAY)
-                            $prep_time = intval ($orderItem->item->prep_time) * 24 * 60;
+                  if($orderItem->item_uuid && $orderItem->item->prep_time){
 
-                        if ($prep_time >= $maxPrepTime)
-                            $maxPrepTime = $prep_time;
-                    }
+                      if($orderItem->item->prep_time_unit == Item::TIME_UNIT_MIN)
+                        $prep_time  = intval($orderItem->item->prep_time) ;
+                      else if($orderItem->item->prep_time_unit == Item::TIME_UNIT_HRS)
+                        $prep_time =  intval($orderItem->item->prep_time) * 60;
+                      else if($orderItem->item->prep_time_unit == Item::TIME_UNIT_DAY)
+                        $prep_time =  intval($orderItem->item->prep_time) * 24 * 60;
 
-                }
+                        if($prep_time  >=  $maxPrepTime)
+                          $maxPrepTime = $prep_time;
+                  }
 
-                $this->estimated_time_of_arrival = date ('Y-m-d H:i:s', strtotime ('+' . $maxPrepTime . ' min', Yii::$app->formatter->asTimestamp (date ('Y-m-d H:i:s', strtotime ($this->estimated_time_of_arrival)))));
+              }
 
-            }
 
+              $this->estimated_time_of_arrival = date("c", strtotime('+' . $maxPrepTime  . ' min' ,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+
+          }
+        } else {
+          if( $this->orderItems ){
+
+              $maxPrepTime = 0;
+
+              foreach ($this->orderItems as $key => $orderItem) {
+
+                  if($orderItem->item_uuid && $orderItem->item->prep_time){
+
+                      if($orderItem->item->prep_time_unit == Item::TIME_UNIT_MIN)
+                        $prep_time  = intval($orderItem->item->prep_time) ;
+                      else if($orderItem->item->prep_time_unit == Item::TIME_UNIT_HRS)
+                        $prep_time =  intval($orderItem->item->prep_time) * 60;
+                      else if($orderItem->item->prep_time_unit == Item::TIME_UNIT_DAY)
+                        $prep_time =  intval($orderItem->item->prep_time) * 24 * 60;
+
+                        if($prep_time  >=  $maxPrepTime)
+                          $maxPrepTime = $prep_time;
+                  }
+
+              }
+
+
+              $this->estimated_time_of_arrival = date("c", strtotime('+' . $maxPrepTime  . ' min' ,  Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+
+          }
         }
+
+
+      }
+
 
         return true;
     }
@@ -946,37 +984,73 @@ class Order extends \yii\db\ActiveRecord
                     $this->save (false);
                 }
 
-            } catch (\Exception $err) {
-                Yii::error ('Error while Sending SMS.' . json_encode ($err));
+            if(!$response->isOk)
+              Yii::error('Error while Sending SMS' . json_encode($response->data));
+            else {
+              $this->sms_sent = 1;
+              $this->save(false);
             }
-        }
+        } catch (\Exception $err) {
+            Yii::error('Error while Sending SMS.' . json_encode($err));
+          }
 
-        //Update delivery area
-        if (!$insert && $this->order_mode == static::ORDER_MODE_DELIVERY && isset($changedAttributes['area_id']) && $changedAttributes['area_id'] != $this->getOldAttribute ('area_id') && $this->area_id) {
-            $area_model = Area::findOne ($this->area_id);
+
+      }
+
+
+
+
+      //Update delivery area
+      if ((!$insert &&  $this->order_mode == static::ORDER_MODE_DELIVERY && isset($changedAttributes['area_id']) && $changedAttributes['area_id'] != $this->getOldAttribute('area_id')  && $this->area_id) || ($insert && $this->order_mode == static::ORDER_MODE_DELIVERY && $this->area_id) ) {
+            $area_model = Area::findOne($this->area_id);
             $this->area_name = $area_model->area_name;
             $this->area_name_ar = $area_model->area_name_ar;
-        }
+            $this->save(false);
+      }
 
-        if (!$insert && $this->order_mode == static::ORDER_MODE_DELIVERY) {
 
-            if ($this->delivery_zone_id) {
-                $this->country_name = $this->deliveryZone->country->country_name;
-                $this->country_name_ar = $this->deliveryZone->country->country_name_ar;
+      if((!$insert &&  (isset($changedAttributes['area_id']) && ($changedAttributes['area_id'] != $this->area_id)) ||  (isset($changedAttributes['pickup_location_id']) && ($changedAttributes['pickup_location_id'] != $this->pickup_location_id) )) || $insert ) {
 
-                if ($this->deliveryZone->business_location_id)
-                    $this->business_location_name = $this->deliveryZone->businessLocation->business_location_name;
+          if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
+
+              if($this->delivery_zone_id){
+
+                $deliveryZone = DeliveryZone::findOne($this->delivery_zone_id);
+
+                if($deliveryZone){
+
+                  $this->country_name = $deliveryZone->country->country_name;
+                  $this->country_name_ar = $deliveryZone->country->country_name_ar;
+
+                  if($deliveryZone->business_location_id)
+                    $this->business_location_name = $deliveryZone->businessLocation->business_location_name;
+
+                  $this->save(false);
+
+                }
+
+              }
+
+          } else if ($this->order_mode == Order::ORDER_MODE_PICK_UP){
+
+            if ($this->pickup_location_id){
+              $pickupLocation = BusinessLocation::findOne($this->pickup_location_id);
+
+              if($pickupLocation){
+                $this->country_name = $pickupLocation->country->country_name;
+                $this->country_name_ar = $pickupLocation->country->country_name_ar;
+                $this->business_location_name = $pickupLocation->business_location_name;
+
+                $this->save(false);
+
+              }
 
             }
+          }
 
-        } else if (!$insert && $this->order_mode == Order::ORDER_MODE_PICK_UP) {
 
-            if ($this->pickup_location_id) {
-                $this->country_name = $this->pickupLocation->country->country_name;
-                $this->country_name_ar = $this->pickupLocation->country->country_name_ar;
-                $this->business_location_name = $this->pickupLocation->business_location_name;
-            }
         }
+
 
         if (!$insert && $this->payment && $this->items_has_been_restocked && isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_ABANDONED_CHECKOUT) {
 
@@ -1048,10 +1122,7 @@ class Order extends \yii\db\ActiveRecord
                 $this->save (false);
             }
 
-            // else {
-            //
-            //     $this->delivery_time = $this->restaurantBranch->prep_time;
-            // }
+
 
             $this->customer_phone_number = str_replace (' ', '', $this->customer_phone_number);
             //Save Customer data
@@ -1064,8 +1135,23 @@ class Order extends \yii\db\ActiveRecord
                 $customer_model->customer_name = $this->customer_name;
                 $customer_model->country_code = $this->customer_phone_country_code;
                 $customer_model->customer_phone_number = $this->customer_phone_number;
+
+                if($this->restaurant_uuid == 'rest_fe5b6a72-18a7-11ec-973b-069e9504599a' && $this->civil_id && $this->section && $this->class){
+                  $customer_model->civil_id = $this->civil_id;
+                  $customer_model->section = $this->section;
+                  $customer_model->class = $this->class;
+                }
+
+
             } else {
                 $customer_model->customer_name = $this->customer_name;
+
+                if($this->restaurant_uuid == 'rest_fe5b6a72-18a7-11ec-973b-069e9504599a' && $this->civil_id && $this->section && $this->class){
+                  $customer_model->civil_id = $this->civil_id;
+                  $customer_model->section = $this->section;
+                  $customer_model->class = $this->class;
+                }
+
             }
 
 
@@ -1153,7 +1239,7 @@ class Order extends \yii\db\ActiveRecord
         $itemNames = ArrayHelper::getColumn ($this->orderItems, 'item_name');
 
         $heading = "New order received";
-        
+
         $subtitle = '';
 
         if($this->restaurant->name) {
@@ -1295,7 +1381,7 @@ class Order extends \yii\db\ActiveRecord
     public function getOrderItems($modelClass = "\common\models\OrderItem")
     {
         return $this->hasMany ($modelClass::className (), ['order_uuid' => 'order_uuid'])
-            ->with ('item', 'orderItemExtraOptions');
+            ->with ('orderItemExtraOptions');
     }
 
     /**

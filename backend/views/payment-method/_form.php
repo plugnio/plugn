@@ -15,6 +15,11 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'payment_method_name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'payment_method_name_ar')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'payment_method_code')->textInput(['maxlength' => true]) ?>
+
+
+    <?= $form->field($model, 'vat')->textInput(['maxlength' => true]) ?>
     
     <?= $form->field($model, 'source_id')->textInput(['maxlength' => true]) ?>
 

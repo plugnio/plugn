@@ -83,6 +83,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
         ];
     }
 
+
     /**
      * Gets query for [[Country]].
      *

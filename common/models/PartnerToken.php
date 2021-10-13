@@ -1,0 +1,75 @@
+<?php
+
+namespace common\models;
+
+use Yii;
+
+/**
+ * This is the model class for table "partner_token".
+ *
+ * @property string $token_uuid
+ * @property string $partner_uuid
+ * @property string|null $token_value
+ * @property string|null $token_device
+ * @property string|null $token_device_id
+ * @property int|null $token_status
+ * @property string|null $token_last_used_datetime
+ * @property string|null $token_expiry_datetime
+ * @property string|null $token_created_datetime
+ *
+ * @property Partner $partnerUu
+ */
+class PartnerToken extends \yii\db\ActiveRecord
+{
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'partner_token';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['token_uuid', 'partner_uuid'], 'required'],
+            [['token_status'], 'integer'],
+            [['token_last_used_datetime', 'token_expiry_datetime', 'token_created_datetime'], 'safe'],
+            [['token_uuid', 'partner_uuid'], 'string', 'max' => 60],
+            [['token_value', 'token_device', 'token_device_id'], 'string', 'max' => 255],
+            [['token_uuid'], 'unique'],
+            [['partner_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Partner::className(), 'targetAttribute' => ['partner_uuid' => 'partner_uuid']],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'token_uuid' => 'Token Uuid',
+            'partner_uuid' => 'Partner Uuid',
+            'token_value' => 'Token Value',
+            'token_device' => 'Token Device',
+            'token_device_id' => 'Token Device ID',
+            'token_status' => 'Token Status',
+            'token_last_used_datetime' => 'Token Last Used Datetime',
+            'token_expiry_datetime' => 'Token Expiry Datetime',
+            'token_created_datetime' => 'Token Created Datetime',
+        ];
+    }
+
+    /**
+     * Gets query for [[PartnerUu]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPartnerUu()
+    {
+        return $this->hasOne(Partner::className(), ['partner_uuid' => 'partner_uuid']);
+    }
+}

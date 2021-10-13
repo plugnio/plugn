@@ -31,7 +31,7 @@ return [
                     ],
                     'clientOptions' => [
                         //which environment are we running this on?
-                        'environment' => 'dev',
+                        'environment' => 'develop',
                     ],
                     'context' => true // Write the context information. The default is true.
                 ],
@@ -39,7 +39,7 @@ return [
                     'class' => 'common\components\SlackLogger',
                     'logVars' => [],
                     'levels' => ['info', 'warning','error'],
-                    'categories' => ['backend\*', 'frontend\*', 'common\*', 'console\*','api\*'],
+                    'categories' => ['backend\*', 'frontend\*', 'common\*', 'console\*','api\*','agent\*'],
                 ],
             ],
         ],
@@ -79,6 +79,9 @@ return [
         ],
         'tapPayments' => [
             'gatewayToUse' => \common\components\TapPayments::USE_TEST_GATEWAY,
+        ],
+        'myFatoorahPayment' => [
+            'gatewayToUse' => \common\components\MyFatoorahPayment::USE_TEST_GATEWAY
         ],
         'armadaDelivery' => [
             'keyToUse' => \common\components\ArmadaDelivery::USE_LIVE_KEY,

@@ -1109,8 +1109,10 @@ class OrderController extends Controller
                 [
                     'header' => Yii::t ('agent', 'Plugn fee'),
                     "value" => function ($data) {
-                        if ($data->payment_uuid && $data->payment->plugn_fee)
-                            return \Yii::$app->formatter->asCurrency ($data->payment->plugn_fee, $data->currency->code);
+                        if ($data->payment_uuid && $data->payment->plugn_fee){
+                          $plugnFee = $data->payment->plugn_fee + $data->payment->partner_fee;
+                          return \Yii::$app->formatter->asCurrency ($plugnFee, $data->currency->code);
+                        }
                         else
                             return \Yii::$app->formatter->asCurrency (0, $data->currency->code);
                     }
