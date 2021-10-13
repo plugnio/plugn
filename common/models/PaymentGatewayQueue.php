@@ -96,7 +96,6 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
                      ])
                      ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                      ->setTo([$this->restaurant->restaurant_email])
-                     ->setBcc(\Yii::$app->params['supportEmail'])
                      ->setSubject($subject)
                      ->send();
                 }

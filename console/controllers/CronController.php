@@ -43,6 +43,17 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
+
+    public function actionOrderItem(){
+
+      $orders = Yii::$app->db->createCommand('select order_uuid,restaurant_uuid from `order`')->queryAll();
+
+      foreach($orders as $order) {
+          Yii::$app->db->createCommand('UPDATE `order_item` set restaurant_uuid="'.$order['restaurant_uuid'].'"
+              where order_uuid="'.$order['order_uuid'].'"')->execute();
+      }
+    }
+
     /**
      * Weekly Store Summary
      */
@@ -203,7 +214,6 @@ class CronController extends \yii\console\Controller {
                        ])
                        ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                        ->setTo([$restaurant->restaurant_email])
-                       ->setBcc(\Yii::$app->params['supportEmail'])
                        ->setSubject('Your store ' . $restaurant->name .' is now ready')
                        ->send();
 
@@ -248,7 +258,6 @@ class CronController extends \yii\console\Controller {
                     ])
                      ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                     ->setTo($agent->agent_email)
-                    ->setBcc(\Yii::$app->params['supportEmail'])
                     ->setSubject('Is there anything we can help with?')
                     ->send();
           }
@@ -285,7 +294,6 @@ class CronController extends \yii\console\Controller {
                     ])
                     ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                     ->setTo($agent->agent_email)
-                    ->setBcc(\Yii::$app->params['supportEmail'])
                     ->setSubject('Is there anything we can help with?')
                     ->send();
           }
@@ -315,7 +323,32 @@ class CronController extends \yii\console\Controller {
 
 
          foreach ($subscriptions as $subscription) {
-           if(date('Y-m-d',strtotime($subscription->subscription_end_at)) == date('Y-m-d')){
+
+
+           if(date('Y-m-d',strtotime($subscription->subscription_end_at)) == date('Y-m-d') ){
+
+             foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
+
+               $result = \Yii::$app->mailer->compose([
+                           'html' => 'subscription-expired',
+                               ], [
+                           'subscription' => $subscription,
+                           'store' => $subscription->restaurant,
+                           'plan' => $subscription->plan->name,
+                           'agent_name' => $agent->agent_name,
+                       ])
+                       ->setFrom([\Yii::$app->params['supportEmail']])
+                       ->setTo($agent->agent_email)
+                       ->setBcc(\Yii::$app->params['supportEmail'])
+                       ->setSubject($subscription->restaurant->name . ' has been downgraded to our free plan')
+                       ->send();
+
+                  if(!$result)
+                    Yii::error('[Error while sending email]' . json_encode($result), __METHOD__);
+
+             }
+
+
              $subscription->subscription_status =  Subscription::STATUS_INACTIVE;
              $subscription->save();
            }
