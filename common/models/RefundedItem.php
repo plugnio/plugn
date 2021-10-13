@@ -13,6 +13,7 @@ use Yii;
  * @property string $order_uuid
  * @property string|null $item_uuid
  * @property string $item_name
+ * @property string $item_name_ar
  * @property float $item_price
  * @property int $qty
  *
@@ -46,7 +47,7 @@ class RefundedItem extends \yii\db\ActiveRecord
             [['refund_id'], 'string', 'max' => 60],
             [['order_uuid'], 'string', 'max' => 40],
             [['item_uuid'], 'string', 'max' => 300],
-            [['item_name'], 'string', 'max' => 255],
+            [['item_name', 'item_name_ar'], 'string', 'max' => 255],
             [['item_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_uuid' => 'item_uuid']],
             [['order_item_id'], 'exist', 'skipOnError' => true, 'targetClass' => OrderItem::className(), 'targetAttribute' => ['order_item_id' => 'order_item_id']],
             [['order_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_uuid' => 'order_uuid']],
@@ -62,18 +63,19 @@ class RefundedItem extends \yii\db\ActiveRecord
 
     }
 
-    public function beforeSave($insert) {
+    /*public function beforeSave($insert) {
 
-        if($insert){
+        if($insert) {
+
           $this->order_uuid = $this->order->order_uuid;
           $this->item_uuid = $this->orderItem->item_uuid;
           $this->item_name = $this->orderItem->item_name;
+          $this->item_name_ar = $this->orderItem->item_name_ar;
           $this->item_price = $this->orderItem->item_price;
         }
 
         return parent::beforeSave($insert);
-
-    }
+    }*/
 
     /**
      * @param type $insert
@@ -109,6 +111,7 @@ class RefundedItem extends \yii\db\ActiveRecord
           'order_uuid' => 'Order Uuid',
           'item_uuid' => 'Item Uuid',
           'item_name' => 'Item Name',
+          'item_name_ar' => 'Item Name - Arabic',
           'item_price' => 'Item Price',
           'qty' => 'Qty',
         ];

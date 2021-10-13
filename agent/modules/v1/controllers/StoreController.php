@@ -332,7 +332,7 @@ class StoreController extends Controller
 
             $transaction->commit();
 
-            return self::message("success","Files & data saved successfully");
+            return self::message("success","Your request has been successfully submitted");
         }
         catch (\Exception $e)
         {

@@ -171,8 +171,33 @@ class Refund extends \yii\db\ActiveRecord
     public function beforeSave($insert)
     {
         if ($insert) {
+            if ($this->payment && $this->payment->payment_current_status == 'CAPTURED') {
+
+                // Set api keys
+
+                Yii::$app->tapPayments->setApiKeys(
+                    $this->order->restaurant->live_api_key,
+                    $this->order->restaurant->test_api_key
+                );
+
+                $tapPaymentResponse = Yii::$app->tapPayments->createRefund(
+                    $this->payment->payment_gateway_transaction_id,
+                    $this->refund_amount,
+                    $this->order->currency->code,
+                    $this->reason
+                );
+
+                if ($tapPaymentResponse->isOk) {
+                    $this->refund_id = $tapPaymentResponse->data['id'];
+                    $this->refund_status = $tapPaymentResponse->data['status'];
+                } else {
+                    return $this->addError('', print_r(json_encode($tapPaymentResponse->data['errors'][0]['description']), true));
+                }
+            }
 
             $order_model = Order::findOne($this->order_uuid);
+
+            //todo: will not work for multiple refund in same order?
 
             if ($this->order->total_price == $this->refund_amount) {
                 $order_model->order_status = Order::STATUS_REFUNDED ;
@@ -180,8 +205,8 @@ class Refund extends \yii\db\ActiveRecord
                 $order_model->order_status = Order::STATUS_PARTIALLY_REFUNDED ;
             }
 
+             //if($this->getRefundedItems()->count() == 0 ) {
 
-             if($this->getRefundedItems()->count() == 0 ) {
                $order_model->subtotal_before_refund = $order_model->subtotal;
                $order_model->total_price_before_refund = $order_model->total_price;
 
@@ -191,7 +216,7 @@ class Refund extends \yii\db\ActiveRecord
                 $order_model->subtotal -= $this->refund_amount;
 
                $order_model->total_price -= $this->refund_amount;
-             }
+             //}
 
              $order_model->save(false);
         }

@@ -39,7 +39,7 @@ class OrderItem extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['order_uuid', 'item_uuid', 'qty'], 'required'],
+            [['order_uuid', 'qty'], 'required'],
             [['qty'], 'integer', 'min' => 0],
             [['order_uuid'], 'string', 'max' => 40],
             [['item_price'], 'number', 'min' => 0],
@@ -152,6 +152,7 @@ class OrderItem extends \yii\db\ActiveRecord {
     public function beforeSave($insert) {
 
         parent::beforeSave($insert);
+
         $item_model = Item::findOne($this->item_uuid);
         $order_model = Order::findOne($this->order_uuid);
 
@@ -160,6 +161,15 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         if(!$this->restaurant_uuid && $this->order) {
             $this->restaurant_uuid = $this->order->restaurant_uuid;
+        }
+
+        if ($this->qty == 0)
+            return $this->addError('qty', "Invalid input");
+
+        //if custom item
+
+        if(!$item_model && $this->item_price) {
+            return true;
         }
 
         if ($insert) {
@@ -174,11 +184,6 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         }
 
-        if ($this->qty == 0)
-            return $this->addError('qty', "Invalid input");
-
-
-
         //Update product inventory
         if ($insert){
           if ($item_model) {
@@ -187,13 +192,12 @@ class OrderItem extends \yii\db\ActiveRecord {
           } else
               return false;
 
-
           $this->item->decreaseStockQty($this->qty);
-
         }
 
         $this->item_price = $this->calculateOrderItemPrice();
 
+        //$this->item_unit_price = $this->item_price / $this->qty;
 
         return true;
     }
@@ -203,11 +207,9 @@ class OrderItem extends \yii\db\ActiveRecord {
         $item_model = Item::findOne($this->item_uuid);
 
         if (!$insert && isset($changedAttributes['qty'])) {
-
             $item_model->increaseStockQty($changedAttributes['qty']);
             $item_model->decreaseStockQty($this->qty);
         }
-
 
         $order_model = Order::findOne($this->order_uuid);
 
@@ -223,8 +225,28 @@ class OrderItem extends \yii\db\ActiveRecord {
             'currency',
             'orderItemExtraOptions',
             'itemImage',
-            'item'
+            'item',
+            'refundedQty'
         ];
+    }
+
+    /**
+     * Gets query for [[RefundedItem]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRefundedQty($modelClass = "\common\models\RefundedItem") {
+        return $this->getRefundedItem($modelClass)
+            ->sum('qty');
+    }
+
+    /**
+     * Gets query for [[RefundedItem]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRefundedItem($modelClass = "\common\models\RefundedItem") {
+        return $this->hasMany($modelClass::className(), ['order_item_id' => 'order_item_id']);
     }
 
     /**
@@ -271,8 +293,8 @@ class OrderItem extends \yii\db\ActiveRecord {
      */
     public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])
-            ->via('restaurant');
+        return $this->hasOne($modelClass::className(), ['code' => 'currency_code'])
+            ->via('order');
     }
 
     /**

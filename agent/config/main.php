@@ -59,6 +59,7 @@ return [
                         'GET download-invoice/<id>' => 'download-invoice',
                         'GET <type>' => 'list',
                         'POST <store_uuid>' => 'place-an-order',
+                        'PATCH refund/<order_uuid>' => 'refund',
                         'PATCH <order_uuid>/<store_uuid>' => 'update',
                         'PATCH update-order-status/<order_uuid>/<store_uuid>' => 'update-order-status',
                         'POST request-driver-from-armada/<order_uuid>/<store_uuid>' => 'request-driver-from-armada',
@@ -72,6 +73,7 @@ return [
                         'OPTIONS orders-report' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS download-invoice/<id>' => 'options',
+                        'OPTIONS refund/<order_uuid>' => 'options',
                         'OPTIONS update-order-status/<order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS request-driver-from-armada/<order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'options',
@@ -101,6 +103,7 @@ return [
                         'GET detail' => 'detail',
                         'POST create' => 'create',
                         'POST upload-image' => 'upload-category-image',
+                        'POST update-position' => 'change-position',
                         'PATCH <category_id>/<store_uuid>' => 'update',
                         'DELETE <category_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
@@ -108,6 +111,7 @@ return [
                         'OPTIONS detail' => 'options',
                         'OPTIONS create' => 'options',
                         'OPTIONS <category_id>/<store_uuid>' => 'options',
+                        'OPTIONS update-position' => 'options',
                     ]
                 ],
                 [// StaffController

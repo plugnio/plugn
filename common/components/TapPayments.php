@@ -181,8 +181,6 @@ class TapPayments extends Component
      */
     public function uploadFileToTap($file_path, $purpose, $title)
     {
-
-
         $fileEndpoint = $this->apiEndpoint . "/files";
 
         $fileParams = [
@@ -191,8 +189,8 @@ class TapPayments extends Component
             "file_link_create" => '0'
         ];
 
-
         $client = new Client();
+
         $response = $client->createRequest()
                 ->setMethod('POST')
                 ->setUrl($fileEndpoint)
@@ -214,7 +212,6 @@ class TapPayments extends Component
      */
     public function createBussiness($restaurant)
     {
-
         $bussinessEndpoint = $this->apiEndpoint . "/business";
 
         $bussinessParams = [
@@ -275,13 +272,9 @@ class TapPayments extends Component
             ],
         ];
 
-
-
         if (
-
-                $restaurant->authorized_signature_file_id &&
-
-                $restaurant->commercial_license_file_id
+            $restaurant->authorized_signature_file_id &&
+            $restaurant->commercial_license_file_id
         ) {
             $authorizedSignatureDocument = [
                 "type" => "Authorized Signature",
@@ -400,10 +393,12 @@ class TapPayments extends Component
     /**
      * Create a refund for a customer
      */
-    public function createRefund($chargeId, $amount, $currency , $reason)  {
-
-        if(!$reason)
-          $reason = "requested_by_customer";
+    public function createRefund(
+        $chargeId,
+        $amount,
+        $currency,
+        $reason="requested_by_customer"
+    ) {
 
         $refundEndpoint = $this->apiEndpoint . "/refunds";
 
@@ -412,10 +407,10 @@ class TapPayments extends Component
           "amount" => $amount,
           "currency" => $currency,
           "reason" => $reason,
-      ];
-
+        ];
 
         $client = new Client();
+
         $response = $client->createRequest()
                       ->setMethod('POST')
                       ->setUrl($refundEndpoint)

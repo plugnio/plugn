@@ -1,5 +1,10 @@
 <?php
 return [
+    "{amount} available for refund!" => "",
+    "Item not found in order!" => "",
+    "Invalid order status to process refund!" => "",
+    "Max {qty} {item} available for refund!" => "",
+    "Refund initiated successfully" => "",
     "You are not allowed to manage plan. Please contact with store owner" => "لا يسمح لك بإدارة الخطة. يرجى التواصل مع صاحب المتجر",
     "You are not allowed to manage opening hours. Please contact with store owner" => "لا يسمح لك بإدارة ساعات العمل. يرجى التواصل مع صاحب المتجر",
     "You are not allowed to manage business locations. Please contact with store owner" => "غير مسموح لك بإدارة مواقع العمل. يرجى التواصل مع صاحب المتجر",
