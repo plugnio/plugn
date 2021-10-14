@@ -41,6 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
             ],
             'status',
+            'notified_email',
             'subscription_start_at',
             'subscription_end_at',
         ],

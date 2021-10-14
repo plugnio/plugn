@@ -401,7 +401,7 @@ $this->registerJs($js);
     }
 
 
-   if( !$restaurant_model->tap_queue_id && !$restaurant_model->is_tap_enable ){ ?>
+   if( !$restaurant_model->is_myfatoorah_enable && !$restaurant_model->is_tap_enable ){ ?>
 
   <div class="card">
       <div class="card-body">
@@ -540,7 +540,7 @@ $this->registerJs($js);
                         <div>
                             <div>
                                 <?php
-                                // Html::a('View orders', ['site/real-time-orders', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) 
+                                // Html::a('View orders', ['site/real-time-orders', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary'])
                                 ?>
                             </div>
                         </div>

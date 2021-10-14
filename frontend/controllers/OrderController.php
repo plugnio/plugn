@@ -69,6 +69,146 @@ class OrderController extends Controller {
         ]);
     }
 
+
+  public function actionDownloadPendingOrdersForMashkor($storeUuid) {
+        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+            $orders = Order::find()
+                    ->where(['order_status' => Order::STATUS_PENDING])
+                    ->andWhere(['<>', 'payment_method_id', 3 ])
+                    ->andWhere([ 'restaurant_uuid' =>  $store_model->restaurant_uuid ])
+                    ->andWhere([ 'country_name' => 'Kuwait' ])
+                    ->orderBy(['order_created_at' => SORT_ASC])
+                    ->all();
+
+            header('Access-Control-Allow-Origin: *');
+            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            header("Content-Disposition: attachment;filename=\"orders.xlsx\"");
+            header("Cache-Control: max-age=0");
+
+            \moonland\phpexcel\Excel::export([
+                'isMultipleSheet' => false,
+                'models' => $orders,
+                'columns' => [
+
+                    [
+                        'attribute' => 'customer_name',
+                        'format' => 'raw',
+                        'value' => function ($data) {
+                            return $data->customer_name;
+                        },
+                    ],
+
+                    [
+                        'header' => 'Customer Phone number',
+                        'attribute' => 'customer_phone_number',
+                        "format" => "raw",
+                        "value" => function($model) {
+                            return $model->customer_phone_number;
+                        }
+                    ],
+                    [
+                        'header' => 'Vendor Order ID',
+                        'attribute' => 'order_uuid',
+                        "format" => "raw",
+                        "value" => function($model) {
+                            return '#' . $model->order_uuid;
+                        }
+                    ],
+                    [
+                        'header' => 'COD',
+                        'attribute' => 'order_uuid',
+                        "format" => "raw",
+                        "value" => function($model) {
+                            return 'No';
+                        }
+                    ],
+
+                    [
+                        'header' => 'Area',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                            if($data->area_id)
+                              return $data->area_name;
+                        }
+                    ],
+                    [
+                        'header' => 'Block',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                            if($data->block)
+                              return $data->block;
+                        }
+                    ],
+                    [
+                        'header' => 'Street',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                            if($data->street)
+                              return $data->street;
+                        }
+                    ],
+                    [
+                        'header' => 'Avenue',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                              return $data->avenue ? $data->avenue  : '-----';
+                        }
+                    ],
+                    [
+                        'header' => 'Unit Type',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                            if($data->unit_type)
+                              return $data->unit_type;
+                        }
+                    ],
+                    [
+                        'header' => 'Floor',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                              return $data->floor ? $data->floor  : '-----';
+                        }
+                    ],
+                    [
+                        'header' => 'Apartment',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                              return $data->apartment ? $data->apartment  : '-----';
+                        }
+                    ],
+                    [
+                        'header' => 'Office',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                              return $data->office ? $data->office  : '-----';
+                        }
+                    ],
+                    [
+                        'header' => 'House number/Building',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                            if($data->house_number)
+                              return $data->house_number;
+                        }
+                    ],
+                    [
+                        'header' => 'Extra Instruction',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                            if($data->house_number)
+                              return $data->special_directions;
+                        }
+                    ],
+
+                ]
+            ]);
+
+        return $this->redirect(['index', 'storeUuid' =>  $store_model->restaurant_uuid]);
+
+      }
+
+
     /**
      * Lists all Order models.
      * @return mixed
@@ -184,8 +324,10 @@ class OrderController extends Controller {
                     [
                         'header' => 'Plugn fee',
                         "value" => function($data) {
-                              if($data->payment_uuid && $data->payment->plugn_fee)
-                                  return \Yii::$app->formatter->asCurrency($data->payment->plugn_fee , $data->currency->code);
+                              if($data->payment_uuid && $data->payment->plugn_fee){
+                                  $plugnFee = $data->payment->plugn_fee + $data->payment->partner_fee;
+                                  return \Yii::$app->formatter->asCurrency($plugnFee, $data->currency->code);
+                              }
                               else
                                   return \Yii::$app->formatter->asCurrency(0 , $data->currency->code);
                         }
@@ -250,6 +392,47 @@ class OrderController extends Controller {
                     'restaurant_model' => $restaurant_model
         ]);
     }
+
+
+    /**
+    * Request fulfillment
+    * @param type $order_uuid
+    * @param type $storeUuid
+    * @param type $customerId
+    */
+   public function actionRequestFulfillment($order_uuid, $storeUuid) {
+
+       $order_model = $this->findModel($order_uuid, $storeUuid);
+
+       $requestFulfillmentApiResponse = Yii::$app->diggipacksWarehouseComponent->createOrder($order_model, $order_model->orderItems);
+
+
+       if ($requestFulfillmentApiResponse->isOk) {
+
+           $order_model->diggipack_awb_no = $requestFulfillmentApiResponse->data['awb_no'];
+
+           $order_model->save(false);
+           Yii::$app->session->setFlash('successResponse', "Fulfillment requested");
+
+       } else {
+
+           if ($requestFulfillmentApiResponse->content){
+             Yii::$app->session->setFlash('errorResponse', json_encode($requestFulfillmentApiResponse->content));
+             Yii::error('Error while requesting fulfillment  [' . $order_model->restaurant->name . '] ' . json_encode($requestFulfillmentApiResponse->content));
+
+           } else {
+
+             Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
+             Yii::error('Error while requesting fulfillment  [' . $order_model->restaurant->name . '] ' . json_encode($requestFulfillmentApiResponse));
+
+           }
+
+           return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
+       }
+
+       return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
+   }
+
 
     /**
      * Request a driver from Mashkor
@@ -317,6 +500,8 @@ class OrderController extends Controller {
             $order_model->armada_tracking_link = $createDeliveryApiResponse->data['trackingLink'];
             $order_model->armada_qr_code_link = $createDeliveryApiResponse->data['qrCodeLink'];
             $order_model->armada_delivery_code = $createDeliveryApiResponse->data['code'];
+            $order_model->armada_order_status = $createDeliveryApiResponse->data['orderStatus'];
+
             $order_model->save(false);
             Yii::$app->session->setFlash('successResponse', "Your request has been successfully submitted");
 
@@ -354,8 +539,15 @@ class OrderController extends Controller {
             $payment = Payment::findOne($id);
 
             if (($payment = Payment::find()->where(['payment_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->one()) !== null) {
-              $transaction_id = $payment->payment_gateway_transaction_id;
-              Payment::updatePaymentStatusFromTap($transaction_id, true);
+
+              if($payment->payment_gateway_name == 'tap'){
+                $transaction_id = $payment->payment_gateway_transaction_id;
+                Payment::updatePaymentStatusFromTap($transaction_id, true);
+              } else if ($payment->payment_gateway_name == 'myfatoorah'){
+                $invoice_id = $payment->payment_gateway_invoice_id;
+                Payment::updatePaymentStatusFromMyFatoorah($invoice_id, true);
+              }
+
               return $this->redirect(['view', 'id' => $payment->order_uuid, 'storeUuid' => $storeUuid]);
             }
 
@@ -448,9 +640,25 @@ class OrderController extends Controller {
            //     'pagination' => false
            // ]);
 
+           // order's Item
+           $refundDataProvider = new \yii\data\ActiveDataProvider([
+               'query' => $order_model->getRefunds(),
+               'sort' =>false
+          ]);
+
+           // order's Item
+           $refundItemsDataProvider = new \yii\data\ActiveDataProvider([
+               'query' => $order_model->getRefundedItems()->with('item'),
+               'sort' =>false
+          ]);
+
+
+
            return $this->render('view', [
                        'model' => $order_model,
+                       'refundDataProvider' => $refundDataProvider,
                        'storeUuid' => $storeUuid,
+                       'refundItemsDataProvider' => $refundItemsDataProvider,
                        'orderItems' => $orderItems
            ]);
 
@@ -489,12 +697,6 @@ class OrderController extends Controller {
         }
 
 
-        // order's Item
-        $ordersItemDataProvider = new \yii\data\ActiveDataProvider([
-            'query' => $model->getOrderItems()
-        ]);
-
-
 
         if ($model->validate() && $model->save())
             return $this->redirect(['update', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid]);
@@ -531,9 +733,25 @@ class OrderController extends Controller {
         ]);
 
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid]);
+        if ($model->load(Yii::$app->request->post())) {
+
+          if($model->order_mode == Order::ORDER_MODE_DELIVERY){
+            $model->pickup_location_id = null;
+            if($areaDeliveryZone = AreaDeliveryZone::find() ->where([ 'restaurant_uuid' => $restaurant_model->restaurant_uuid, 'area_id' => $model->area_id ])->one())
+               $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
+
+          } else {
+            $model->delivery_zone_id = null;
+            $model->area_id = null;
+          }
+
+
+
+          if ($model->validate() && $model->save())
+              return $this->redirect(['update', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid]);
+
         }
+
 
         return $this->render('update', [
                     'model' => $model,
@@ -554,10 +772,9 @@ class OrderController extends Controller {
 
       $order_model = $this->findModel($order_uuid, $storeUuid);
 
-      // foreach ($order_model->getOrderItems()->all() as $orderItem) {
-      //    $refunded_items_model = new RefundedItem();
-      //    $refunded_items_model->order_item_id = $orderItem->order_item_id;
-      // }
+      if(($order_model->payment_uuid && !$order_model->payment->payment_gateway_invoice_id && !$order_model->payment->payment_gateway_transaction_id) || !$order_model->payment_uuid ){
+        return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
+      }
 
       $refunded_items_model = [new RefundedItem()];
 
@@ -569,20 +786,21 @@ class OrderController extends Controller {
 
 
       $model = new Refund();
+      $model->setScenario('create');
       $model->restaurant_uuid = $order_model->restaurant_uuid;
+      $model->payment_uuid = $order_model->payment_uuid;
       $model->order_uuid = $order_model->order_uuid;
 
-      if(Model::loadMultiple($refunded_items_model, Yii::$app->request->post())  && $model->load(Yii::$app->request->post())){
+      if(Model::loadMultiple($refunded_items_model, Yii::$app->request->post())  && $model->load(Yii::$app->request->post()) && $model->save()){
 
 
           foreach ($refunded_items_model as  $key => $refunded_item_model) {
             if($refunded_item_model->qty > 0){
               $refunded_item_model->refund_id = $model->refund_id;
               $refunded_item_model->save();
+
             }
 
-
-          if($model->save())
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
         }
      }
@@ -590,6 +808,7 @@ class OrderController extends Controller {
 
       return $this->render('refund-order', [
                   'model' => $model,
+                  'order_model' => $order_model,
                   'refunded_items_model' => $refunded_items_model
       ]);
     }

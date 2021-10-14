@@ -12,6 +12,7 @@ use agent\models\Restaurant;
 use common\components\FileUploader;
 use agent\models\RestaurantPaymentMethod;
 use agent\models\TapQueue;
+use common\models\PaymentGatewayQueue;
 
 
 class StoreController extends Controller
@@ -172,7 +173,7 @@ class StoreController extends Controller
             'old_domain' => $old_domain
         ])
             ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-            ->setTo(Yii::$app->params['supportEmail'])
+            ->setTo(Yii::$app->params['adminEmail'])
             ->setSubject('[Plugn] Agent updated DN')
             ->send();
 
@@ -331,7 +332,7 @@ class StoreController extends Controller
 
             $transaction->commit();
 
-            return self::message("success","Files & data saved successfully");
+            return self::message("success","Your request has been successfully submitted");
         }
         catch (\Exception $e)
         {

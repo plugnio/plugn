@@ -341,7 +341,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                     ?>
                                 </li>
 
-                              <?php if ($restaurant_model->version == 2 || $restaurant_model->version == 3) { ?>
+                              <?php if ($restaurant_model->version == 2 || $restaurant_model->version == 3 || $restaurant_model->version == 4) { ?>
 
                                 <li class=" nav-item <?= $this->context->route == 'business-location/index'  ? 'active' : '' ?> ">
                                     <?=

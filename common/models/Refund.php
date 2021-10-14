@@ -4,7 +4,12 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\AttributeBehavior;
-
+use common\models\Order;
+use common\models\Payment;
+use common\models\OrderItem;
+use common\models\Restaurant;
+use yii\helpers\Html;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "refund".
@@ -12,6 +17,7 @@ use yii\behaviors\AttributeBehavior;
  * @property int $refund_id
  * @property string $restaurant_uuid
  * @property string $order_uuid
+ * @property string $refund_reference
  * @property float $refund_amount
 
  * @property string $refund_status
@@ -38,15 +44,14 @@ class Refund extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['restaurant_uuid', 'order_uuid', 'refund_amount'], 'required'],
-            [['refund_amount'], 'number','min' => 0.1 , 'max' => $this->order->total_price,
-            'tooSmall' => '{attribute} must be greater than zero.',
-            'tooBig' => '{attribute} cannot exceed amount available for refund'],
-            [['refund_amount'], 'validateRefundAmount'],
+            [['restaurant_uuid', 'order_uuid', 'refund_amount', 'payment_uuid'], 'required'],
+            [['refund_amount'], 'validateRefundAmount','on' =>'create'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['order_uuid'], 'string', 'max' => 40],
-            [['refund_status', 'reason'], 'string', 'max' => 255],
+            [['payment_uuid'], 'string', 'max' => 36],
+            [['refund_status', 'reason', 'refund_reference'], 'string', 'max' => 255],
             [['order_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_uuid' => 'order_uuid']],
+            [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
@@ -71,8 +76,44 @@ class Refund extends \yii\db\ActiveRecord
                     return $this->refund_id;
                 }
             ],
+            [
+                'class' => \yii\behaviors\TimestampBehavior::className(),
+                'createdAtAttribute' => 'refund_created_at',
+                'updatedAtAttribute' => 'refund_updated_at',
+                'value' => new Expression('NOW()'),
+            ],
         ];
     }
+
+
+
+
+    /**
+     * Update refund's Status from Myfatoorah Payments
+     * @param  [type]  $id                           [description]
+     * @param  string $responseContent [description]
+     * @return self                                [description]
+     */
+    public static function updateRefundStatus($refundReference, $responseContent) {
+
+        // Look for refund with same refund_reference
+        $refundRecord = \common\models\Refund::findOne(['refund_reference' => $refundReference]);
+        if (!$refundRecord) {
+            throw new yii\web\NotFoundHttpException('The requested refund does not exist in our database.');
+        }
+
+        $refundRecord->refund_status = $responseContent['RefundStatus'];
+
+        if(!$refundRecord->save()){
+           Yii::error("Error when updating refund status" . json_encode($refundRecord->errors));
+        }
+
+        return true;
+    }
+
+
+
+
 
     /**
      * {@inheritdoc}
@@ -81,8 +122,10 @@ class Refund extends \yii\db\ActiveRecord
     {
         return [
             'refund_id' => 'Refund ID',
+            'payment_uuid' => 'Payment UUID',
             'restaurant_uuid' => 'Restaurant Uuid',
             'order_uuid' => 'Order Uuid',
+            'refund_reference' => 'Refund Reference',
             'refund_amount' => 'Refund amount',
             'refund_status' => 'Refund Status',
             'reason' => 'Reason for refund',
@@ -92,9 +135,37 @@ class Refund extends \yii\db\ActiveRecord
 
     public function validateRefundAmount($attribute, $params, $validator)
     {
-        if ($this->refund_amount > $this->order->total_price) {
-            $this->addError($attribute, 'Can’t refund more than available');
-        }
+
+      if ($this->refund_amount < 0 )
+        return  $this->addError($attribute, 'Refund amount must be greater than zero.');
+      else if ($this->refund_amount > $this->order->total_price)
+        return  $this->addError($attribute, 'Refund amount cannot exceed amount available for refund.');
+
+      if($this->store->is_myfatoorah_enable){
+
+        Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
+
+        $totalAwaitingBalanceResponse = Yii::$app->myFatoorahPayment->getSupplierDashboard($this->store->supplierCode);
+
+        $responseContent = json_decode($totalAwaitingBalanceResponse->content);
+
+          if ( !$totalAwaitingBalanceResponse->isOk && !$responseContent->IsSuccess){
+              $errorMessage = "Error: " . $responseContent->Message;
+              Yii::error('Refund Error (#'. $this->order_uuid .'): ' . $errorMessage);
+              return $this->addError($attribute, 'Refund amount cannot exceed amount available for refund.');
+
+          }else if ($totalAwaitingBalanceResponse->isOk){
+            if($responseContent->TotalAwaitingBalance < $this->refund_amount)
+              return  $this->addError($attribute, 'Insufficcent Balance');
+
+
+          } else {
+            return $this->addError($attribute, 'Refund amount cannot exceed amount available for refund.');
+          }
+
+      }
+
+
     }
 
     public function beforeSave($insert)
@@ -179,10 +250,21 @@ class Refund extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant($modelClass = "\common\models\Restaurant")
+    public function getStore($modelClass = "\common\models\Restaurant")
     {
         return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
+    /**
+     * Gets query for [[Currency]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('store');
+    }
+
 
     /**
      * Gets query for [[RefundedItems]].

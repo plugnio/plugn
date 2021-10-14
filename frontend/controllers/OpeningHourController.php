@@ -204,7 +204,7 @@ class OpeningHourController extends Controller
 
         if (Model::loadMultiple($openingHours, Yii::$app->request->post()) ) {
 
-            // if (Model::validateMultiple($openingHours)) { //todo
+            // if (Model::validateMultiple($openingHours)) {
                 foreach($openingHours as $modelDetail) {
                     //details that has been flagged for deletion will be deleted
                     if ($modelDetail->updateType == OpeningHour::UPDATE_TYPE_DELETE) {

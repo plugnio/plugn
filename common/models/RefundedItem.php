@@ -84,7 +84,14 @@ class RefundedItem extends \yii\db\ActiveRecord
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
 
-        $this->orderItem->delete();
+        $order_item_model = $this->orderItem;
+
+        if($this->qty == $order_item_model->qty)
+          $order_item_model->delete();
+        else {
+          $order_item_model->qty -= $this->qty;
+          $order_item_model->save(false);
+        }
         // foreach ($this->getOrderItem()->all() as   $orderItem)
         //   $orderItem->delete();
 
@@ -125,7 +132,7 @@ class RefundedItem extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant($modelClass = "\common\models\Restaurant")
+    public function getStore($modelClass = "\common\models\Restaurant")
     {
         return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('order');
     }
@@ -159,6 +166,17 @@ class RefundedItem extends \yii\db\ActiveRecord
     {
         return $this->hasOne($modelClass::className(), ['order_uuid' => 'order_uuid']);
     }
+
+    /**
+     * Gets query for [[Currency]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('store');
+    }
+
 
     /**
      * Gets query for [[Refund]].

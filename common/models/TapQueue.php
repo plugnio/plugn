@@ -65,7 +65,7 @@ class TapQueue extends \yii\db\ActiveRecord
     public function afterSave($insert, $changedAttributes) {
 
         if ($this->queue_status == self::QUEUE_STATUS_CREATING) {
-          if($this->restaurant->createAnAccountOnTap()){
+          if($this->restaurant->createTapAccount()){
             $this->queue_status = self::QUEUE_STATUS_COMPLETE;
             if($this->save()){
 
@@ -78,7 +78,6 @@ class TapQueue extends \yii\db\ActiveRecord
                    ])
                    ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                    ->setTo([$agent->agent_email])
-                   ->setBcc(\Yii::$app->params['supportEmail'])
                    ->setSubject('Your TAP Payments account has been approved')
                    ->send();
 

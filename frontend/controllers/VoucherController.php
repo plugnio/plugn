@@ -84,17 +84,32 @@ class VoucherController extends Controller
               if($model->save()){
 
               if(YII_ENV == 'prod') {
+
+                 $discount_amount = $model->discount_amount;
+
+                  if($model->currency->code == 'KWD'){
+                    $discount_amount = $discount_amount * 3.28;
+                  }
+                  if($model->currency->code == 'SAR'){
+                    $discount_amount = $discount_amount * 0.27;
+                  }
+                  if($model->currency->code == 'BHD'){
+                    $discount_amount = $discount_amount *  2.65;
+                  }
+
+
+
                   \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
                   \Segment::track([
                       'userId' => $storeUuid,
                       'event' => 'Voucher Created',
                       'properties' => [
                           'type' => $model->discountType,
-                           'discountAmount' => ($model->discount_amount * 3.28)
+                          'discountAmount' => $model->discount_amount ? ((float) $model->discount_amount * 3.28) : 0
                       ]
                   ]);
                 }
-                
+
                 return $this->redirect(['index',  'storeUuid' => $storeUuid]);
 
               }

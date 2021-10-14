@@ -426,11 +426,11 @@ class Item extends \yii\db\ActiveRecord
             ->andWhere ([
                 'IN',
                 'order.order_status', [
+                    Order::STATUS_ACCEPTED,
                     Order::STATUS_PENDING,
                     Order::STATUS_BEING_PREPARED,
                     Order::STATUS_OUT_FOR_DELIVERY,
-                    Order::STATUS_COMPLETE,
-                    Order::STATUS_CANCELED
+                    Order::STATUS_COMPLETE
                 ]
             ])
             ->sum ('qty');
@@ -445,13 +445,14 @@ class Item extends \yii\db\ActiveRecord
         $query = $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
             ->joinWith ('order')
             ->andWhere ([
-                'in',
-                'order.order_status', [
+                'IN',
+                'order.order_status',
+                [
+                    Order::STATUS_ACCEPTED,
                     Order::STATUS_PENDING,
                     Order::STATUS_BEING_PREPARED,
                     Order::STATUS_OUT_FOR_DELIVERY,
-                    Order::STATUS_COMPLETE,
-                    Order::STATUS_CANCELED
+                    Order::STATUS_COMPLETE
                 ]
             ]);
 
@@ -474,11 +475,11 @@ class Item extends \yii\db\ActiveRecord
                 'IN',
                 'order.order_status',
                 [
+                    Order::STATUS_ACCEPTED,
                     Order::STATUS_PENDING,
                     Order::STATUS_BEING_PREPARED,
                     Order::STATUS_OUT_FOR_DELIVERY,
-                    Order::STATUS_COMPLETE,
-                    Order::STATUS_CANCELED
+                    Order::STATUS_COMPLETE
                 ]
             ])
             ->andWhere (['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
@@ -497,11 +498,11 @@ class Item extends \yii\db\ActiveRecord
                 'IN',
                 'order.order_status',
                 [
+                    Order::STATUS_ACCEPTED,
                     Order::STATUS_PENDING,
                     Order::STATUS_BEING_PREPARED,
                     Order::STATUS_OUT_FOR_DELIVERY,
-                    Order::STATUS_COMPLETE,
-                    Order::STATUS_CANCELED
+                    Order::STATUS_COMPLETE
                 ]
             ])
             ->andWhere (['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
@@ -520,11 +521,11 @@ class Item extends \yii\db\ActiveRecord
                 'IN',
                 'order.order_status',
                 [
+                    Order::STATUS_ACCEPTED,
                     Order::STATUS_PENDING,
                     Order::STATUS_BEING_PREPARED,
                     Order::STATUS_OUT_FOR_DELIVERY,
-                    Order::STATUS_COMPLETE,
-                    Order::STATUS_CANCELED
+                    Order::STATUS_COMPLETE
                 ]
             ])
             ->andWhere ('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
@@ -544,11 +545,11 @@ class Item extends \yii\db\ActiveRecord
                 'IN',
                 'order.order_status',
                 [
+                    Order::STATUS_ACCEPTED,
                     Order::STATUS_PENDING,
                     Order::STATUS_BEING_PREPARED,
                     Order::STATUS_OUT_FOR_DELIVERY,
-                    Order::STATUS_COMPLETE,
-                    Order::STATUS_CANCELED
+                    Order::STATUS_COMPLETE
                 ]
             ])
             ->andWhere ('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
@@ -568,11 +569,11 @@ class Item extends \yii\db\ActiveRecord
                 'IN',
                 'order.order_status',
                 [
+                    Order::STATUS_ACCEPTED,
                     Order::STATUS_PENDING,
                     Order::STATUS_BEING_PREPARED,
                     Order::STATUS_OUT_FOR_DELIVERY,
-                    Order::STATUS_COMPLETE,
-                    Order::STATUS_CANCELED
+                    Order::STATUS_COMPLETE
                 ]
             ])
             ->andWhere ('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')

@@ -30,12 +30,24 @@ use yii\web\NotFoundHttpException;
  * @property string $payment_created_at
  * @property string $payment_updated_at
  * @property boolean $received_callback
+ * @property double $partner_fee
+ * @property  double $payout_status
+ * @property string|null $partner_payout_uuid
  *
  * @property Subscription $subscription
  * @property Plan $plan
  * @property Restaurant $restaurant
+ * @property PartnerPayout $partnerPayout
  */
 class SubscriptionPayment extends \yii\db\ActiveRecord {
+
+
+    //Values for `payout_status`
+    const PAYOUT_STATUS_PENDING = 0;
+    const PAYOUT_STATUS_UNPAID = 1;
+    const PAYOUT_STATUS_PAID = 2;
+
+
 
     /**
      * {@inheritdoc}
@@ -50,14 +62,16 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['subscription_uuid', 'payment_amount_charged', 'restaurant_uuid'], 'required'],
-            [['received_callback'], 'integer'],
+            [['received_callback','payout_status'], 'integer'],
+            ['payout_status', 'in', 'range' => [self::PAYOUT_STATUS_UNPAID, self::PAYOUT_STATUS_PAID,self::PAYOUT_STATUS_PENDING]],
             [['payment_gateway_order_id', 'payment_current_status'], 'string'],
-            [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee'], 'number'],
+            [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee','partner_fee'], 'number'],
             [['payment_uuid'], 'string', 'max' => 36],
             [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'response_message', 'payment_token'], 'string', 'max' => 255],
             [['payment_uuid'], 'unique'],
             [['subscription_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Subscription::className(), 'targetAttribute' => ['subscription_uuid' => 'subscription_uuid']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
+            [['partner_payout_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => PartnerPayout::className(), 'targetAttribute' => ['partner_payout_uuid' => 'partner_payout_uuid']]
         ];
     }
 
@@ -88,6 +102,26 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Returns String value of current status
+     * @return string
+     */
+    public function getStatus(){
+        switch($this->payout_status){
+            case self::PAYOUT_STATUS_UNPAID:
+                return "Unpaid";
+                break;
+            case self::PAYOUT_STATUS_PENDING:
+                return "Pending";
+                break;
+            case self::PAYOUT_STATUS_PAID:
+                return "Paid";
+                break;
+        }
+
+        return "Couldnt find a status";
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function attributeLabels() {
@@ -112,7 +146,24 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
             'payment_updated_at' => Yii::t('app', 'Last activity'),
             'received_callback' => Yii::t('app', 'Received Callback'),
             'response_message' => Yii::t('app', 'Response Message'),
+            'partner_fee' => Yii::t('app', 'Plugn fee'),
+            'payout_status' => Yii::t('app', 'Payout status'),
         ];
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function fields() {
+        $fields = parent::fields();
+
+        // remove fields that contain sensitive information
+        unset($fields['partner_fee']);
+        unset($fields['payout_status']);
+
+        return $fields;
+
     }
 
 
@@ -269,6 +320,18 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
     public function getRestaurant($modelClass = "\common\models\Restaurant") {
         return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
+
+    /**
+     * Gets query for [[PartnerPayout]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+     public function getPartnerPayout(){
+           return $this->hasOne(PartnerPayout::className(), ['partner_payout_uuid' => 'partner_payout_uuid']);
+     }
+
+
 
     /**
      * Gets query for [[Currency]].

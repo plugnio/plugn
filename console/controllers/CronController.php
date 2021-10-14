@@ -8,12 +8,15 @@ use common\models\OrderItem;
 use common\models\Queue;
 use common\models\TapQueue;
 use common\models\AgentAssignment;
+use common\models\PaymentGatewayQueue;
 use common\models\Voucher;
 use common\models\BankDiscount;
 use common\models\Payment;
 use common\models\Item;
 use common\models\Customer;
 use common\models\City;
+use common\models\PaymentMethod;
+use common\models\Refund;
 use common\models\Plan;
 use common\models\Area;
 use common\models\Order;
@@ -40,32 +43,16 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-  /**
-   *
-   */
-  public function actionMigrateDeliveryApiKey(){
 
-    $stores = Restaurant::find()
-    ->andWhere(new Expression( 'armada_api_key IS NOT NULL OR mashkor_branch_id IS NOT NULL'))
-    ->all();
+    public function actionOrderItem(){
 
-    foreach ($stores as $key => $store) {
+      $orders = Yii::$app->db->createCommand('select order_uuid,restaurant_uuid from `order`')->queryAll();
 
-      foreach ($store->getBusinessLocations()->all() as $key => $branch) {
-        // code...
-        $branch->armada_api_key = $store->armada_api_key;
-        $branch->mashkor_branch_id = $store->mashkor_branch_id;
-
-        if(!$branch->save())
-          die('error');
+      foreach($orders as $order) {
+          Yii::$app->db->createCommand('UPDATE `order_item` set restaurant_uuid="'.$order['restaurant_uuid'].'"
+              where order_uuid="'.$order['order_uuid'].'"')->execute();
       }
-
     }
-
-    $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
-    return self::EXIT_CODE_NORMAL;
-  }
-
 
     /**
      * Weekly Store Summary
@@ -102,7 +89,7 @@ class CronController extends \yii\console\Controller {
           // Revenue Generated
           $revenuePercentage = 0;
 
-
+      if($lastWeekRevenue > 0) {
           if($thisWeekRevenue > $lastWeekRevenue) { //inc
                if($lastWeekRevenue > 0){
                  $increase = $thisWeekRevenue - $lastWeekRevenue;
@@ -117,6 +104,7 @@ class CronController extends \yii\console\Controller {
                $decrease = $lastWeekRevenue - $thisWeekRevenue;
                $revenuePercentage = $decrease / $lastWeekRevenue * -100;
              }
+          }
 
           // Orders received
           $ordersReceivedPercentage = 0;
@@ -202,9 +190,6 @@ class CronController extends \yii\console\Controller {
 
     }
 
-
-
-
     public function actionSiteStatus(){
 
             $restaurants = Restaurant::find()
@@ -229,7 +214,6 @@ class CronController extends \yii\console\Controller {
                        ])
                        ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                        ->setTo([$restaurant->restaurant_email])
-                       ->setBcc(\Yii::$app->params['supportEmail'])
                        ->setSubject('Your store ' . $restaurant->name .' is now ready')
                        ->send();
 
@@ -274,7 +258,6 @@ class CronController extends \yii\console\Controller {
                     ])
                      ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                     ->setTo($agent->agent_email)
-                    ->setBcc(\Yii::$app->params['supportEmail'])
                     ->setSubject('Is there anything we can help with?')
                     ->send();
           }
@@ -311,7 +294,6 @@ class CronController extends \yii\console\Controller {
                     ])
                     ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                     ->setTo($agent->agent_email)
-                    ->setBcc(\Yii::$app->params['supportEmail'])
                     ->setSubject('Is there anything we can help with?')
                     ->send();
           }
@@ -340,9 +322,33 @@ class CronController extends \yii\console\Controller {
                  ->all();
 
 
-
          foreach ($subscriptions as $subscription) {
-           if(date('Y-m-d',strtotime($subscription->subscription_end_at)) == date('Y-m-d')){
+
+
+           if(date('Y-m-d',strtotime($subscription->subscription_end_at)) == date('Y-m-d') ){
+
+             foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
+
+               $result = \Yii::$app->mailer->compose([
+                           'html' => 'subscription-expired',
+                               ], [
+                           'subscription' => $subscription,
+                           'store' => $subscription->restaurant,
+                           'plan' => $subscription->plan->name,
+                           'agent_name' => $agent->agent_name,
+                       ])
+                       ->setFrom([\Yii::$app->params['supportEmail']])
+                       ->setTo($agent->agent_email)
+                       ->setBcc(\Yii::$app->params['supportEmail'])
+                       ->setSubject($subscription->restaurant->name . ' has been downgraded to our free plan')
+                       ->send();
+
+                  if(!$result)
+                    Yii::error('[Error while sending email]' . json_encode($result), __METHOD__);
+
+             }
+
+
              $subscription->subscription_status =  Subscription::STATUS_INACTIVE;
              $subscription->save();
            }
@@ -376,6 +382,7 @@ class CronController extends \yii\console\Controller {
                      ])
                      ->setFrom([\Yii::$app->params['supportEmail']])
                      ->setTo($agent->agent_email)
+                     ->setBcc(\Yii::$app->params['supportEmail'])
                      ->setSubject('Your Subscription is Expiring')
                      ->send();
 
@@ -391,15 +398,15 @@ class CronController extends \yii\console\Controller {
 
     }
 
-    public function actionCreateTapAccount() {
+    public function actionCreatePaymentGatewayAccount() {
 
-      $queue = TapQueue::find()
-              ->andWhere(['queue_status' => Queue::QUEUE_STATUS_PENDING])
+      $queue = PaymentGatewayQueue::find()
+              ->where(['queue_status' => Queue::QUEUE_STATUS_PENDING])
               ->orderBy(['queue_created_at' => SORT_ASC])
               ->one();
 
       if($queue && $queue->restaurant_uuid){
-        $queue->queue_status = TapQueue::QUEUE_STATUS_CREATING;
+        $queue->queue_status = PaymentGatewayQueue::QUEUE_STATUS_CREATING;
         $queue->save();
       }
 
@@ -429,7 +436,8 @@ class CronController extends \yii\console\Controller {
                   ->andWhere(['sitemap_require_update' => 1])
                   ->andWhere(['or',
                        ['version'=>2],
-                       ['version'=>3]
+                       ['version'=>3],
+                       ['version'=>4]
                    ])
                   ->andWhere(['!=', 'restaurant_uuid', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])
                   ->all();
@@ -506,27 +514,108 @@ class CronController extends \yii\console\Controller {
 
 
     /**
+     * make the Refund Request from the API directly without the need of login into MyFatoorah dashboard
+     */
+    public function actionMakeRefund() {
+
+        $refunds = Refund::find()
+                    ->joinWith(['store','payment','currency'])
+                    ->where(['refund.refund_reference' => null])
+                    ->andWhere(['NOT', ['refund.payment_uuid' => null]])
+                    ->all();
+
+        foreach ($refunds as $refund) {
+
+                if($refund->store->is_myfatoorah_enable) {
+
+                  Yii::$app->myFatoorahPayment->setApiKeys($refund->currency->code);
+
+                  $response = Yii::$app->myFatoorahPayment->makeRefund($refund->payment->payment_gateway_payment_id, $refund->refund_amount, $refund->reason, $refund->store->supplierCode);
+
+                  $responseContent = json_decode($response->content);
+
+                  if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
+                      $refund->refund_status = 'REJECTED';
+                      $refund->save(false);
+                      $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
+                      return Yii::error('Refund Error ('. $refund->refund_id .'): ' . $errorMessage);
+                  } else {
+
+                    $refund->refund_reference = $responseContent->Data->RefundReference;
+                    $refund->refund_status = 'Pending';
+                    $refund->save(false);
+
+                    $this->stdout("Your refund request has been initiated successfully  \n", Console::FG_RED, Console::BOLD);
+                    return self::EXIT_CODE_NORMAL;
+                  }
+
+                } else if($refund->store->is_tap_enable) {
+
+                  Yii::$app->tapPayments->setApiKeys($refund->store->live_api_key, $refund->store->test_api_key);
+
+
+                  $response = Yii::$app->tapPayments->createRefund(
+                          $refund->payment->payment_gateway_transaction_id, $refund->refund_amount, $refund->currency->code, $refund->reason
+                  );
+
+                  if (array_key_exists('errors', $response->data)) {
+
+                      $errorMessage = $response->data['errors'][0]['description'];
+
+                      Yii::error('Refund Error ('. $refund->refund_id .'): ' . $errorMessage);
+
+                      return $refund->addError('refund_amount', $response->data['errors'][0]['description']);
+
+                  } else if ($response->data) {
+                      $refund->refund_reference = $response->data['id'];
+                      $refund->refund_status = $response->data['status'];
+                      $refund->save(false);
+
+                      $this->stdout("Your refund request has been initiated successfully  \n", Console::FG_RED, Console::BOLD);
+                      return self::EXIT_CODE_NORMAL;
+
+                  }
+
+                }
+
+        }
+
+        $this->stdout("No refund requests available \n", Console::FG_RED, Console::BOLD);
+        return self::EXIT_CODE_NORMAL;
+
+    }
+
+
+    /**
      * Update refund status  for all refunds record
      */
     public function actionUpdateRefundStatusMessage() {
 
-        $restaurants = Restaurant::find()->all();
-        foreach ($restaurants as $restaurant) {
+      $refunds = Refund::find()
+                  ->joinWith(['store'])
+                  ->where(['NOT', ['refund.refund_reference' => null]])
+                  ->andWhere(['restaurant.is_tap_enable' => 1])
+                  ->andWhere(['NOT', ['refund.payment_uuid' => null]])
+                  ->andWhere(['NOT', ['refund.refund_status' => 'REFUNDED']])
+                  ->all();
 
-            foreach ($restaurant->getRefunds()->all() as $refund) {
 
-                Yii::$app->tapPayments->setApiKeys($restaurant->live_api_key, $restaurant->test_api_key);
-                $response = Yii::$app->tapPayments->retrieveRefund($refund->refund_id);
+        foreach ($refunds as $refund) {
 
-                if (!array_key_exists('errors', $response->data)) {
-                    if ($refund->refund_status != $response->data['status']) {
-                        $refund->refund_status = $response->data['status'];
-                        $refund->save(false);
-                    }
-                }
-            }
+          Yii::$app->tapPayments->setApiKeys($refund->store->live_api_key, $refund->store->test_api_key);
+          $response = Yii::$app->tapPayments->retrieveRefund($refund->refund_reference);
+
+          if (!array_key_exists('errors', $response->data)) {
+              if ($refund->refund_status != $response->data['status']) {
+                  $refund->refund_status = $response->data['status'];
+                  $refund->save(false);
+              }
+          }
+
         }
     }
+
+
 
     /**
      * Update voucher status
@@ -559,7 +648,8 @@ class CronController extends \yii\console\Controller {
         $now = new DateTime('now');
         $payments = Payment::find()
                 ->joinWith('order')
-                ->andWhere(['!=', 'payment.payment_current_status', 'CAPTURED'])
+                ->where(['!=', 'payment.payment_current_status', 'CAPTURED'])
+                ->andWhere(['!=', 'payment.payment_current_status', 'Paid'])
                 ->andWhere(['order.order_status' => Order::STATUS_ABANDONED_CHECKOUT])
                 ->andWhere(['order.items_has_been_restocked' => 0]) // if items hasnt been restocked
                 ->andWhere(['<', 'payment.payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')]);
@@ -576,14 +666,16 @@ class CronController extends \yii\console\Controller {
 
         $now = new DateTime('now');
         $payments = Payment::find()
-                ->andWhere("received_callback = 0")
+                ->where("received_callback = 0")
+                ->andWhere(['payment_gateway_name' => 'tap'])
                 ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')])
                 ->all();
 
         if ($payments) {
             foreach ($payments as $payment) {
                 try {
-                    if ($payment->payment_gateway_transaction_id) {
+
+                    if ( $payment->payment_gateway_transaction_id ) {
                         $payment = Payment::updatePaymentStatusFromTap($payment->payment_gateway_transaction_id);
                         $payment->received_callback = true;
                         $payment->save(false);
