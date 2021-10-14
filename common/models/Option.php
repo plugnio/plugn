@@ -96,6 +96,13 @@ class Option extends \yii\db\ActiveRecord {
         ];
     }
 
+    public function extraFields()
+    {
+        return [
+            'extraOptions'
+        ];
+    }
+
     /**
      * Gets query for [[ExtraOptions]].
      *
@@ -113,12 +120,4 @@ class Option extends \yii\db\ActiveRecord {
     public function getItem($modelClass = "\common\models\Item") {
         return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid']);
     }
-
-    public function extraFields()
-    {
-        return [
-            'extraOptions'
-        ];
-    }
-
 }
