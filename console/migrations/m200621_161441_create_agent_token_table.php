@@ -11,6 +11,16 @@ class m200621_161441_create_agent_token_table extends Migration {
      * {@inheritdoc}
      */
     public function safeUp() {
+        
+        $tableData = $this
+            ->getDb()
+            ->getSchema()
+            ->getTableSchema('agent_token');
+
+        if ($tableData) {
+            return true;
+        }
+        
         //agent token
         Yii::$app->db->createCommand('SET foreign_key_checks = 0')->execute();
 
@@ -18,7 +28,6 @@ class m200621_161441_create_agent_token_table extends Migration {
         if ($this->db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
         }
-
 
         $this->createTable('{{%agent_token}}', [
             'token_uuid' => $this->char(60),
@@ -30,7 +39,7 @@ class m200621_161441_create_agent_token_table extends Migration {
             'token_last_used_datetime' => $this->dateTime(),
             'token_expiry_datetime' => $this->dateTime(),
             'token_created_datetime' => $this->dateTime(),
-                ], $tableOptions);
+        ], $tableOptions);
 
         $this->addPrimaryKey('PK', 'agent_token', 'token_uuid');
 
