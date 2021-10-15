@@ -1245,7 +1245,7 @@ class OrderController extends Controller
                 continue;
             }
 
-            foreach ($item['extraOptions'] as $key => $extraOption) {
+            foreach ($item['orderItemExtraOptions'] as $key => $extraOption) {
 
                 $orderItemExtraOption = new \common\models\OrderItemExtraOption;
                 $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
