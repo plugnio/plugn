@@ -1,5 +1,6 @@
 <?php
 return [
+    "Account created successfully" => "",
     "{amount} available for refund!" => "",
     "Item not found in order!" => "",
     "Invalid order status to process refund!" => "",
