@@ -1250,7 +1250,7 @@ class OrderController extends Controller
                 $orderItemExtraOption = new \common\models\OrderItemExtraOption;
                 $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
                 $orderItemExtraOption->extra_option_id = $extraOption['extra_option_id'];
-                $orderItemExtraOption->qty = (int)$item["qty"];
+                $orderItemExtraOption->qty = (int) $item["qty"];
 
                 if (!$orderItemExtraOption->save ()) {
 
