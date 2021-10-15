@@ -7,6 +7,7 @@ use agent\models\Refund;
 use agent\models\RefundedItem;
 use common\models\AreaDeliveryZone;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
@@ -390,19 +391,15 @@ class OrderController extends Controller
         //payment method => cash
         $order->payment_method_id = 3;
 
-
         $order->order_mode = Yii::$app->request->getBodyParam ("order_mode");
-
 
         //Delivery the order ASAP
         $order->is_order_scheduled = Yii::$app->request->getBodyParam ("is_order_scheduled") ? Yii::$app->request->getBodyParam ("is_order_scheduled") : 0;
-
 
         //Apply promo code
         if (Yii::$app->request->getBodyParam ("voucher_id")) {
             $order->voucher_id = Yii::$app->request->getBodyParam ("voucher_id");
         }
-
 
         //if the order mode = 1 => Delivery
         if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
@@ -566,17 +563,27 @@ class OrderController extends Controller
      */
     public function actionUpdate($order_uuid, $store_uuid)
     {
+        $transaction = Yii::$app->db->beginTransaction ();
+
         $order = $this->findModel ($order_uuid, $store_uuid);
 
         //Save Customer Info
         $order->scenario = \common\models\Order::SCENARIO_CREATE_ORDER_BY_ADMIN;
 
         $order->currency_code = Yii::$app->request->getBodyParam ('currency_code');
+
+        //todo: what if change customer
         $order->customer_name = Yii::$app->request->getBodyParam ("customer_name");
         $order->customer_phone_number = str_replace (' ', '', strval (Yii::$app->request->getBodyParam ("customer_phone_number")));
         $order->customer_phone_country_code = Yii::$app->request->getBodyParam ("country_code") ? Yii::$app->request->getBodyParam ("customer_phone_country_code") : 965;
         $order->customer_email = Yii::$app->request->getBodyParam ("customer_email"); //optional
-        $order->estimated_time_of_arrival = date ("Y-m-d H:i:s", strtotime (Yii::$app->request->getBodyParam ('estimated_time_of_arrival')));
+
+        $order->estimated_time_of_arrival =
+            date (
+                "Y-m-d H:i:s",
+                strtotime (Yii::$app->request->getBodyParam ('estimated_time_of_arrival'))
+            );
+
         $order->order_mode = Yii::$app->request->getBodyParam ("order_mode");
         $order->area_id = Yii::$app->request->getBodyParam ("area_id");
         $order->unit_type = Yii::$app->request->getBodyParam ("unit_type");
@@ -584,6 +591,7 @@ class OrderController extends Controller
         $order->street = Yii::$app->request->getBodyParam ("street");
         $order->avenue = Yii::$app->request->getBodyParam ("avenue"); //optional
         $order->house_number = Yii::$app->request->getBodyParam ("building");
+
         //Apply promo code
         if (Yii::$app->request->getBodyParam ("voucher_id")) {
             $order->voucher_id = Yii::$app->request->getBodyParam ("voucher_id");
@@ -624,6 +632,9 @@ class OrderController extends Controller
         }
 
         if (!$order->save ()) {
+
+            $transaction->rollBack ();
+
             return [
                 'operation' => 'error',
                 'message' => $order->getErrors (),
@@ -640,11 +651,97 @@ class OrderController extends Controller
                 ])
             ];
         }
+
+        $orderItems = Yii::$app->request->getBodyParam ('orderItems');
+
+        //delete order items not available in input but in db
+
+        OrderItem::deleteAll ([
+            'AND',
+            ['order_uuid' => $order_uuid],
+            [
+                'NOT IN',
+                'order_item_id',
+                ArrayHelper::getColumn ($orderItems, 'order_item_id')
+            ]
+        ]);
+
+        //update order items
+
+        foreach ($orderItems as $item) {
+
+            if(isset($item["order_item_id"])) {
+                $orderItem = $this->findOrderItem ($order_uuid, $item["order_item_id"]);
+            } else {
+                $orderItem = new \common\models\OrderItem;
+            }
+
+            $orderItem->order_uuid = $order->order_uuid;
+            $orderItem->item_uuid = isset($item["item_uuid"]) ? $item["item_uuid"] : null;
+            $orderItem->item_name = $item["item_name"];
+            $orderItem->item_name_ar = $item["item_name_ar"];
+            $orderItem->qty = (int)$item["qty"];
+            $orderItem->item_price = $item["item_price"];
+
+            if (isset($item["customer_instructions"]))
+                $orderItem->customer_instruction = $item["customer_instructions"];
+
+            if (!$orderItem->save ()) {
+
+                $transaction->rollBack ();
+
+                return [
+                    'operation' => 'error',
+                    'message' => $orderItem->getErrors ()
+                ];
+            }
+
+            if (!isset($item['extraOptions']) || !is_array($item['extraOptions'])) {
+                continue;
+            }
+
+            foreach ($item['orderItemExtraOptions'] as $key => $extraOption) {
+
+                //if item update
+
+                if(isset($extraOption['order_item_extra_option_id'])) {
+                    continue;//as we not updating order item options
+                }
+
+                $orderItemExtraOption = new \common\models\OrderItemExtraOption;
+                $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
+                $orderItemExtraOption->extra_option_id = $extraOption['extra_option_id'];
+                $orderItemExtraOption->qty = (int) $item["qty"];
+
+                if (!$orderItemExtraOption->save ()) {
+
+                    $transaction->rollBack ();
+
+                    return [
+                        'operation' => 'error',
+                        'message' => $orderItemExtraOption->errors,
+                    ];
+                }
+            }
+        }
+
+        $transaction->commit();
+
         return [
             'operation' => 'success',
             'message' => Yii::t ('agent', 'Order updated successfully'),
             "model" => $order
         ];
+    }
+
+    /**
+     *  find oreder item if exists
+     */
+    public function findOrderItem($order_uuid, $order_item_id) {
+        return OrderItem::findOne([
+            'order_uuid' => $order_uuid,
+            'order_item_id' => $order_item_id
+        ]);
     }
 
     /**
@@ -1241,7 +1338,7 @@ class OrderController extends Controller
                 ];
             }
 
-            if (!isset($item['extraOptions'])) {
+            if (!isset($item['extraOptions']) || !is_array($item['extraOptions'])) {
                 continue;
             }
 
