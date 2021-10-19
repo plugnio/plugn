@@ -231,7 +231,7 @@ $this->registerJs($js);
               <div class="col-12 col-sm-6 col-lg-6">
 
                           <?php
-                              if($model->currency->code == 'KWD'){
+                              if($model->currency->code == 'KWD' || $model->currency->code == 'OMR'){
                                 echo  $form->field($model, 'business_type')->radioList(['ind' => 'Individual', 'corp' => 'Company',], [
                                       'style' => 'display:grid',
                                       'id' => 'businessTypeInput',
