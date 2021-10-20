@@ -52,7 +52,7 @@ class OrderController extends Controller
             'class' => \yii\filters\auth\HttpBearerAuth::className (),
         ];
         // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-        $behaviors['authenticator']['except'] = ['options', 'download-invoice'];
+        $behaviors['authenticator']['except'] = ['options'];//, 'download-invoice'
 
         return $behaviors;
     }
@@ -1450,7 +1450,10 @@ class OrderController extends Controller
             'content' => $content,
             // format content from your own css file if needed or use the
             // enhanced bootstrap css built by Krajee for mPDF formatting
-            'cssFile' => __DIR__ . '/../../../web/css/invoice.css',
+            'cssFile' => [
+                __DIR__ . '/../../../web/css/invoice.css',
+                '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css'
+            ]
             //Url::to('@web/css/invoice.css', true),
             //'@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
             // any css to be embedded if required
