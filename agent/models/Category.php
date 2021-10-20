@@ -15,6 +15,7 @@ class Category extends \common\models\Category {
       $fields = parent::extraFields();
 
       $fields[] = 'items';
+      $fields[] = 'itemQuantity';
 
       return $fields;
   }
@@ -54,6 +55,15 @@ class Category extends \common\models\Category {
      */
     public function getItems($modelClass = "\agent\models\Item")
     {
-        return parent::getItems ($modelClass);
+        return parent::getItems ($modelClass)->limit(5);
+    }
+
+    /**
+     * @param string $modelClass
+     * @return bool|int|string|null
+     */
+    public function getItemQuantity($modelClass = "\agent\models\Item")
+    {
+        return parent::getItems ($modelClass)->count();
     }
 }
