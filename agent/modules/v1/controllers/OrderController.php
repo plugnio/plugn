@@ -117,15 +117,7 @@ class OrderController extends Controller
         }
 
         if ($keyword) {
-            $query->andWhere (
-                ['or',
-                    ['like', 'business_location_name', $keyword],
-                    ['like', 'payment_method_name', $keyword],
-                    ['like', 'order_uuid', $keyword],
-                    ['like', 'customer_name', $keyword],
-                    ['like', 'customer_phone_number', $keyword],
-                ]
-            );
+            $query->filterByKeyword($keyword);
         }
 
         $query->andWhere (['restaurant_uuid' => $store_uuid]);
@@ -162,6 +154,7 @@ class OrderController extends Controller
     public function actionStats()
     {
         $customer_id = Yii::$app->request->get ('customer_id');
+        $keyword = Yii::$app->request->get ('query');
 
         $store = Yii::$app->accountManager->getManagedAccount ();
 
@@ -169,6 +162,7 @@ class OrderController extends Controller
 
         if ($customer_id) {
             $response['allCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id
@@ -176,12 +170,14 @@ class OrderController extends Controller
                 ->count ();
         } else {
             $response['allCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->count ();
         }
 
         if ($customer_id) {
             $response['draftCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -190,6 +186,7 @@ class OrderController extends Controller
                 ->count ();
         } else {
             $response['draftCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere (['order_status' => Order::STATUS_DRAFT])
                 ->count ();
@@ -197,6 +194,7 @@ class OrderController extends Controller
 
         if ($customer_id) {
             $response['acceptedCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -205,6 +203,7 @@ class OrderController extends Controller
                 ->count ();
         } else {
             $response['acceptedCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere (['order_status' => Order::STATUS_ACCEPTED])
                 ->count ();
@@ -212,6 +211,7 @@ class OrderController extends Controller
 
         if ($customer_id) {
             $response['pendingCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -220,6 +220,7 @@ class OrderController extends Controller
                 ->count ();
         } else {
             $response['pendingCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere (['order_status' => Order::STATUS_PENDING])
                 ->count ();
@@ -227,6 +228,7 @@ class OrderController extends Controller
 
         if ($customer_id) {
             $response['preparedCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -235,6 +237,7 @@ class OrderController extends Controller
                 ->count ();
         } else {
             $response['preparedCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere (['order_status' => Order::STATUS_BEING_PREPARED])
                 ->count ();
@@ -242,6 +245,7 @@ class OrderController extends Controller
 
         if ($customer_id) {
             $response['outForDeliveryCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -249,6 +253,7 @@ class OrderController extends Controller
                 ->count ();
         } else {
             $response['outForDeliveryCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'order_status' => Order::STATUS_OUT_FOR_DELIVERY
@@ -258,6 +263,7 @@ class OrderController extends Controller
 
         if ($customer_id) {
             $response['completeCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -266,6 +272,7 @@ class OrderController extends Controller
                 ->count ();
         } else {
             $response['completeCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'order_status' => Order::STATUS_COMPLETE
@@ -275,6 +282,7 @@ class OrderController extends Controller
 
         if ($customer_id) {
             $response['canceledCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -283,6 +291,7 @@ class OrderController extends Controller
                 ->count ();
         } else {
             $response['canceledCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'order_status' => Order::STATUS_CANCELED
@@ -292,6 +301,7 @@ class OrderController extends Controller
 
         if ($customer_id) {
             $response['partialRefundedCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -300,6 +310,7 @@ class OrderController extends Controller
                 ->count ();
         } else {
             $response['partialRefundedCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'order_status' => Order::STATUS_PARTIALLY_REFUNDED
@@ -309,6 +320,7 @@ class OrderController extends Controller
 
         if ($customer_id) {
             $response['refundedCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -317,6 +329,7 @@ class OrderController extends Controller
                 ->count ();
         } else {
             $response['refundedCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'order_status' => Order::STATUS_REFUNDED
@@ -326,6 +339,7 @@ class OrderController extends Controller
 
         if ($customer_id) {
             $response['abandonedCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -334,6 +348,7 @@ class OrderController extends Controller
                 ->count ();
         } else {
             $response['abandonedCount'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'order_status' => Order::STATUS_ABANDONED_CHECKOUT
