@@ -335,6 +335,7 @@ return [
                         'GET export-to-excel' => 'export-to-excel',
                         'GET detail' => 'detail',
                         'GET orders' => 'list-all-customer-orders',
+                        'POST' => 'create',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS export-to-excel' => 'options',

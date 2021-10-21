@@ -17,8 +17,8 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Note:' => '',
-    'Your browser does not support {validation}. Try an alternative or more recent browser to access these features.' => '',
-    'file preview and multiple file upload' => '',
-    'multiple file upload' => '',
+    'Note:' => 'ملاحظة:',
+    'Your browser does not support {validation}. Try an alternative or more recent browser to access these features.' => "متصفحك لا يدعم {validation}. جرب متصفحًا بديلاً أو أحدث للوصول إلى هذه الميزات.",
+    'file preview and multiple file upload' => "معاينة الملف وتحميل ملفات متعددة",
+    'multiple file upload' => "تحميل ملفات متعددة",
 ];

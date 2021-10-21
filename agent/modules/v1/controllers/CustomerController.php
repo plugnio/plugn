@@ -2,12 +2,14 @@
 
 namespace agent\modules\v1\controllers;
 
+use agent\models\Item;
 use Yii;
 use yii\db\Expression;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use agent\models\Customer;
 use agent\models\Order;
+use yii\web\NotFoundHttpException;
 
 class CustomerController extends Controller
 {
@@ -226,5 +228,58 @@ class CustomerController extends Controller
                 ]
             ]
         ]);
+    }
+
+    /**
+     * add new customer
+     */
+    public function actionCreate() {
+
+        $restaurant = Yii::$app->accountManager->getManagedAccount ();
+
+        $model = new Customer();
+
+        $model->restaurant_uuid = $restaurant->restaurant_uuid;
+        $model->customer_name = Yii::$app->request->getBodyParam ('customer_name');
+        $model->customer_phone_number = Yii::$app->request->getBodyParam ('customer_phone_number');
+        $model->country_code = Yii::$app->request->getBodyParam ('country_code');
+        $model->customer_email = Yii::$app->request->getBodyParam ('customer_email');
+
+        if(!$model->save()) {
+            return [
+                'operation' => 'error',
+                'message' => $model->getErrors ()
+            ];
+        }
+
+        return [
+            'operation' => 'success',
+            'message' =>  Yii::t('agent', 'Account created successfully'),
+            'customer' => $model
+        ];
+    }
+
+    /**
+     * Finds the Customer model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $customer_id
+     * @return Item the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($customer_id)
+    {
+        $store = Yii::$app->accountManager->getManagedAccount();
+
+        $model = Customer::findOne([
+            'customer_id' => $customer_id,
+            //todo: what if customer register from other store?
+            'restaurant_uuid' => $store->restaurant_uuid
+        ]);
+
+        if ($model !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested record does not exist.');
+        }
     }
 }

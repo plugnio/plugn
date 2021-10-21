@@ -77,12 +77,27 @@ td[align=\"end\"] {
     font-weight: 800;
 }
 
+.col-sm {
+    width: 45%;
+    display: inline-block;
+}
+
 .invoice-total-table {
     border-top: 1px solid rgba(34, 41, 47, 0.1);
     padding-top: 0;
-    float: right;
-    width: 50%;
+    /*float: right;
+    width: 50%;*/
     display: block;
+}
+
+.row {
+    padding: 0px !important;
+    margin: 0px !important;
+}
+
+.row > div {
+    margin: 0px !important;
+    padding: 0px !important;
 }
 
 .invoice-total-table  tr td:first-child {
