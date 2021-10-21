@@ -89,7 +89,8 @@ class StaffController extends Controller {
             ->joinWith('agent');
 
         if ($keyword) {
-            $query->andWhere('or', [
+            $query->andWhere([
+                'or', 
                 ['like', 'agent.agent_name', $keyword],
                 ['like', 'assignment_agent_email', $keyword],
                 ['like', 'role', $keyword]
