@@ -70,11 +70,12 @@ class CategoryController extends Controller {
      public function actionList($store_uuid) {
 
          $keyword = Yii::$app->request->get('keyword');
-         $page = Yii::$app->request->get('page');
 
          Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-         $query =  Category::find();
+         $query =  Category::find()
+             ->andWhere(['category.restaurant_uuid' => $store_uuid])
+             ->joinWith(['items']);
 
          if ($keyword){
              $query->andWhere([
@@ -82,11 +83,12 @@ class CategoryController extends Controller {
                      ['like', 'title', $keyword],
                      ['like', 'title_ar', $keyword],
                      ['like', 'subtitle', $keyword],
-                     ['like', 'subtitle_ar', $keyword]
+                     ['like', 'subtitle_ar', $keyword],
+                 ['like', 'items.item_name', $keyword],
+                 ['like', 'items.item_name_ar', $keyword],
              ]);
          }
 
-         $query->andWhere(['restaurant_uuid' => $store_uuid]);
          $query->orderBy ([new \yii\db\Expression('sort_number ASC')]);
 
 //         if(!$page) {

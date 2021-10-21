@@ -65,6 +65,29 @@ class OrderQuery extends \yii\db\ActiveQuery
     }
 
     /**
+     * filter by keyword
+     * @param $keyword
+     * @return OrderQuery
+     */
+    public function filterByKeyword($keyword)
+    {
+        if(!$keyword) {
+            return $this;
+        }
+
+        return $this->andWhere (
+            [
+                'or',
+                ['like', 'business_location_name', $keyword],
+                ['like', 'payment_method_name', $keyword],
+                ['like', 'order_uuid', $keyword],
+                ['like', 'customer_name', $keyword],
+                ['like', 'customer_phone_number', $keyword],
+            ]
+        );
+    }
+
+    /**
      * Active records only
      */
     public function activeOrders($storeUuid = null)
