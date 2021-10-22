@@ -165,7 +165,10 @@ class Order extends \yii\db\ActiveRecord
             ]],
 
             [['customer_phone_number'], 'required', 'on' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
-            [['customer_phone_number'], PhoneInputValidator::className (), 'message' => 'Please insert a valid phone number', 'except' => self::SCENARIO_OLD_VERSION],
+            
+            //todo: not accepting indian number 8758702738
+            //[['customer_phone_number'], PhoneInputValidator::className (), 'message' => 'Please insert a valid phone number', 'except' => self::SCENARIO_OLD_VERSION],
+
             ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_PARTIALLY_REFUNDED, self::STATUS_CANCELED, self::STATUS_DRAFT, self::STATUS_ABANDONED_CHECKOUT, self::STATUS_ACCEPTED]],
 
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
