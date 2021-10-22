@@ -11,6 +11,7 @@ class CategoryItem extends \common\models\CategoryItem
     {
         return [
             'category',
+            'item',
         ];
     }
 

@@ -2,6 +2,7 @@
 
 namespace agent\modules\v1\controllers;
 
+use agent\models\CategoryItem;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
@@ -101,6 +102,20 @@ class CategoryController extends Controller {
          return new ActiveDataProvider([
            'query' => $query
          ]);
+     }
+
+     public function actionItemList($store_uuid) {
+
+         $category_id = Yii::$app->request->get('category_id');
+         Yii::$app->accountManager->getManagedAccount($store_uuid);
+
+        $query =  CategoryItem::find();
+        $query->joinWith('item');
+        $query->andWhere(['category_id'=>$category_id]);
+        $query->orderBy ([new \yii\db\Expression('item.sort_number ASC')]);
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
      }
 
     /**

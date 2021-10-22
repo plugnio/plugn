@@ -87,8 +87,7 @@ class ItemController extends Controller
         }
 
         $query->andWhere(['restaurant_uuid'=> $store->restaurant_uuid]);
-        $query->orderBy('item_created_at DESC');
-
+        $query->orderBy ([new \yii\db\Expression('item.sort_number ASC')]);
         if ($keyword && $keyword != 'null') {
             $query->andWhere ([
                     'or',

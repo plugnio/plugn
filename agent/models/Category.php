@@ -7,6 +7,7 @@ use Yii;
 class Category extends \common\models\Category {
 
 
+    public $itemPerPageLimit = 5;
   /**
    * @return array|false
    */
@@ -14,9 +15,15 @@ class Category extends \common\models\Category {
   {
       $fields = parent::extraFields();
 
-      $fields[] = 'items';
-      $fields[] = 'itemQuantity';
-
+      $fields[] = 'allItems';
+      $fields['pagination'] = function($model) {
+          return [
+              'totalPage' => ceil($this->itemQuantity/$this->itemPerPageLimit),
+              'totalCount' => $this->itemQuantity,
+              'currentPage' => 1,
+              'pagePage' => $this->itemPerPageLimit,
+          ];
+      };
       return $fields;
   }
 
@@ -49,13 +56,16 @@ class Category extends \common\models\Category {
     }
 
     /**
-     * Gets query for [[ItemUus]].
-     *
-     * @return \yii\db\ActiveQuery
+     * @param string $modelClass
+     * @return array|\common\models\query\Agent[]|\yii\db\ActiveRecord[]
      */
-    public function getItems($modelClass = "\agent\models\Item")
+    public function getAllItems()
     {
-        return parent::getItems ($modelClass)->limit(5);
+        $model = $this->getCategoryItems()
+                ->joinWith('item')
+                ->orderBy ([new \yii\db\Expression('item.sort_number ASC')])
+                ->limit($this->itemPerPageLimit);
+        return $model->all();
     }
 
     /**
