@@ -26,6 +26,7 @@ use yii\behaviors\TimestampBehavior;
  * @property int|null $unit_sold
  * @property string|null $item_image
  * @property float|null $item_price
+ * @property float|null $compare_at_price
  * @property string|null $item_created_at
  * @property string|null $item_updated_at
  *
@@ -69,10 +70,10 @@ class Item extends \yii\db\ActiveRecord
         return [
             [['item_name', 'prep_time_unit', 'prep_time'], 'required', 'on' => 'create'],
             ['prep_time_unit', 'in', 'range' => [self::TIME_UNIT_MIN, self::TIME_UNIT_HRS, self::TIME_UNIT_DAY]],
-            [['item_name', 'item_name_ar', 'item_price', 'items_category'], 'required'],
+            [['item_name', 'item_name_ar', 'item_price','items_category'], 'required'],
             [['sort_number', 'stock_qty'], 'integer', 'min' => 0],
             [['unit_sold'], 'integer', 'min' => 0],
-            [['item_price'], 'number', 'min' => 0],
+            [['item_price','compare_at_price'], 'number', 'min' => 0],
             [['track_quantity', 'prep_time'], 'integer'],
             ['item_status', 'in', 'range' => [self::ITEM_STATUS_PUBLISH, self::ITEM_STATUS_UNPUBLISH]],
             ['stock_qty', 'required', 'when' => function ($model) {
@@ -118,6 +119,7 @@ class Item extends \yii\db\ActiveRecord
             'sku' => 'SKU (Stock Keeping Unit)',
             'item_image' => 'Item image',
             'item_price' => 'Price',
+            'compare_at_price' => 'Compare at price',
             'prep_time' => 'Preparation time',
             'prep_time_unit' => 'Preparation time unit',
             'item_status' => 'Item status',
