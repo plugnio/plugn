@@ -80,14 +80,14 @@ class Item extends \common\models\Item {
 
     public function extraFields()
     {
-        return [
+        $fields = parent::extraFields ();
+
+        return array_merge ($fields, [
             'itemImage',
             'itemImages',
-            'options',
             'categoryItems',
-            'extraOptions',
             'currency'
-        ];
+        ]);
     }
 
     public function getOptions($modelClass = "\agent\models\Option")

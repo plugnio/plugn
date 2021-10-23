@@ -2,6 +2,7 @@
 
 namespace agent\modules\v1\controllers;
 
+use agent\models\CategoryItem;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
@@ -70,11 +71,12 @@ class CategoryController extends Controller {
      public function actionList($store_uuid) {
 
          $keyword = Yii::$app->request->get('keyword');
-         $page = Yii::$app->request->get('page');
 
          Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-         $query =  Category::find();
+         $query =  Category::find()
+             ->andWhere(['category.restaurant_uuid' => $store_uuid])
+             ->joinWith(['items']);
 
          if ($keyword){
              $query->andWhere([
@@ -82,11 +84,12 @@ class CategoryController extends Controller {
                      ['like', 'title', $keyword],
                      ['like', 'title_ar', $keyword],
                      ['like', 'subtitle', $keyword],
-                     ['like', 'subtitle_ar', $keyword]
+                     ['like', 'subtitle_ar', $keyword],
+                 ['like', 'items.item_name', $keyword],
+                 ['like', 'items.item_name_ar', $keyword],
              ]);
          }
 
-         $query->andWhere(['restaurant_uuid' => $store_uuid]);
          $query->orderBy ([new \yii\db\Expression('sort_number ASC')]);
 
 //         if(!$page) {
@@ -99,6 +102,20 @@ class CategoryController extends Controller {
          return new ActiveDataProvider([
            'query' => $query
          ]);
+     }
+
+     public function actionItemList($store_uuid) {
+
+         $category_id = Yii::$app->request->get('category_id');
+         Yii::$app->accountManager->getManagedAccount($store_uuid);
+
+        $query =  CategoryItem::find();
+        $query->joinWith('item');
+        $query->andWhere(['category_id'=>$category_id]);
+        $query->orderBy ([new \yii\db\Expression('item.sort_number ASC')]);
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
      }
 
     /**

@@ -101,6 +101,7 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'GET item-list' => 'item-list',
                         'POST create' => 'create',
                         'POST upload-image' => 'upload-category-image',
                         'POST update-position' => 'change-position',
@@ -112,6 +113,7 @@ return [
                         'OPTIONS create' => 'options',
                         'OPTIONS <category_id>/<store_uuid>' => 'options',
                         'OPTIONS update-position' => 'options',
+                        'OPTIONS item-list' => 'options',
                     ]
                 ],
                 [// StaffController
@@ -335,6 +337,7 @@ return [
                         'GET export-to-excel' => 'export-to-excel',
                         'GET detail' => 'detail',
                         'GET orders' => 'list-all-customer-orders',
+                        'POST' => 'create',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS export-to-excel' => 'options',

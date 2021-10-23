@@ -68,9 +68,9 @@
 
             <!-- Invoice Recipient Details -->
 
-            <ion-row style="font-family: Nunito" id="invoice-company-details" class="row">
-
-                <ion-col size-xs="12" size-sm="12" size-md="6" size="6" class="text-left" >
+            <table style="width: 100%">
+                <tr style="font-family: Nunito" id="invoice-company-details" class="row">
+                    <td style="width:50%" class="text-left">
 
                     <h3 class="invoice-logo"><?= $order->restaurant->name ?></h3>
                     <!-- <p class="card-text mb-25">Office 149, 450 South Brand Brooklyn</p>
@@ -186,9 +186,9 @@
                         </p>
                     <?php } ?>
 
-                </ion-col>
+                    </td>
 
-                <ion-col size-xs="12" size-sm="12" size-md="6" size="6" class="text-left">
+                    <td style="width:50%" class="text-left">
 
                     <h5 class="txt-customer">Customer</h5>
 
@@ -211,9 +211,9 @@
                         </ion-col>
                       </ion-row>
                     </div>-->
-
-                </ion-col>
-            </ion-row>
+                    </td>
+                </tr>
+            </table>
 
             <!-- END recipient detail -->
 
@@ -223,7 +223,7 @@
                 <ion-row class="row">
                     <ion-col class="col-12">
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table-hover">
                                 <thead>
                                 <tr>
                                     <th align="start">Items</th>
@@ -253,157 +253,168 @@
                                 <?php } ?>
                                 </tbody>
                             </table>
-                            <table style="position: relative; right: 0" class="table table-hover invoice-total-table">
+
+                            <table style="width: 100%">
                                 <tr>
-                                    <td align="start" colspan="3">Subtotal</td>
-                                    <TD align="end">
-                                        <?= Yii::$app->formatter->asCurrency(
-                                                $order->subtotal,
-                                                $order->currency->code,
-                                                [
-                                                    NumberFormatter::MIN_FRACTION_DIGITS => 3,
-                                                    NumberFormatter::MAX_FRACTION_DIGITS => 3
-                                                ]
-                                        )
-                                        ?>
-                                    </TD>
-                                </tr>
+                                    <td style="width:50%"></td>
+                                    <td style="width:50%">
 
-                                <?php if($order->voucher && $order->voucher->discount_type !== 3) { ?>
-                                <tr>
-                                    <td align="start" colspan="3">Voucher Discount (<?= $order->voucher->code ?>)</td>
-                                    <td align="end">
-                                         <?= Yii::$app->formatter->asCurrency(
-                                                $voucherDiscount,
-                                                $order->currency->code,
-                                                [
-                                                    NumberFormatter::MIN_FRACTION_DIGITS => 3,
-                                                    NumberFormatter::MAX_FRACTION_DIGITS => 3
-                                                ]
-                                        )
-                                        ?>
+                                        <table style="position: relative; right: 0" class="invoice-total-table">
+                                            <tbody>
+                                            <tr>
+                                                <td align="start" colspan="3">Subtotal</td>
+                                                <TD align="end">
+                                                    <?= Yii::$app->formatter->asCurrency(
+                                                        $order->subtotal,
+                                                        $order->currency->code,
+                                                        [
+                                                            NumberFormatter::MIN_FRACTION_DIGITS => 3,
+                                                            NumberFormatter::MAX_FRACTION_DIGITS => 3
+                                                        ]
+                                                    )
+                                                    ?>
+                                                </TD>
+                                            </tr>
+
+                                            <?php if($order->voucher && $order->voucher->discount_type !== 3) { ?>
+                                                <tr>
+                                                    <td align="start" colspan="3">Voucher Discount (<?= $order->voucher->code ?>)</td>
+                                                    <td align="end">
+                                                        <?= Yii::$app->formatter->asCurrency(
+                                                            $voucherDiscount,
+                                                            $order->currency->code,
+                                                            [
+                                                                NumberFormatter::MIN_FRACTION_DIGITS => 3,
+                                                                NumberFormatter::MAX_FRACTION_DIGITS => 3
+                                                            ]
+                                                        )
+                                                        ?>
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td align="start" colspan="3">Subtotal After Voucher</td>
+                                                    <td align="end">
+                                                        <?= Yii::$app->formatter->asCurrency(
+                                                            $order->subtotal - $voucherDiscount,
+                                                            $order->currency->code,
+                                                            [
+                                                                NumberFormatter::MIN_FRACTION_DIGITS => 3,
+                                                                NumberFormatter::MAX_FRACTION_DIGITS => 3
+                                                            ]
+                                                        )
+                                                        ?>
+                                                    </td>
+                                                </tr>
+
+                                            <?php } ?>
+
+                                            <?php if($order->bankDiscount) { ?>
+
+                                                <tr>
+                                                    <td align="start" colspan="3">Bank Discount</td>
+                                                    <td align="end">
+                                                        <?= Yii::$app->formatter->asCurrency(
+                                                            $bankDiscount,
+                                                            $order->currency->code,
+                                                            [
+                                                                NumberFormatter::MIN_FRACTION_DIGITS => 3,
+                                                                NumberFormatter::MAX_FRACTION_DIGITS => 3
+                                                            ]
+                                                        )
+                                                        ?>
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td align="start" colspan="3">Subtotal After Bank Discount</td>
+                                                    <td align="end">
+                                                        <?= Yii::$app->formatter->asCurrency(
+                                                            $order->subtotal - $bankDiscount,
+                                                            $order->currency->code,
+                                                            [
+                                                                NumberFormatter::MIN_FRACTION_DIGITS => 3,
+                                                                NumberFormatter::MAX_FRACTION_DIGITS => 3
+                                                            ]
+                                                        )
+                                                        ?>
+                                                    </td>
+                                                </tr>
+
+                                            <?php } ?>
+
+                                            <tr>
+                                                <td align="start" colspan="3">Delivery fee</td>
+                                                <td align="end">
+                                                    <?= Yii::$app->formatter->asCurrency(
+                                                        $order->delivery_fee,
+                                                        $order->currency->code,
+                                                        [
+                                                            NumberFormatter::MIN_FRACTION_DIGITS => 3,
+                                                            NumberFormatter::MAX_FRACTION_DIGITS => 3
+                                                        ]
+                                                    )
+                                                    ?>
+                                                </td>
+                                            </tr>
+                                            <?php if($order->voucher && $order->voucher->discount_type == 3) { ?>
+
+                                                <tr>
+                                                    <td align="start" colspan="3">Voucher Discount (<?= $order->voucher->code ?>)</td>
+                                                    <td align="end">
+                                                        <?= Yii::$app->formatter->asCurrency(
+                                                            $order->delivery_fee,
+                                                            $order->currency->code,
+                                                            [
+                                                                NumberFormatter::MIN_FRACTION_DIGITS => 3,
+                                                                NumberFormatter::MAX_FRACTION_DIGITS => 3
+                                                            ]
+                                                        )
+                                                        ?>
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td align="start" colspan="3">Delivery fee After Voucher</td>
+                                                    <td align="end"><?= $order->currency->code ?> 0.000</td>
+                                                </tr>
+
+                                            <?php } ?>
+
+                                            <tr *ngIf="order.tax > 0">
+                                                <td align="start" colspan="3">Tax</td>
+                                                <td align="end">
+                                                    <?= Yii::$app->formatter->asCurrency(
+                                                        $order->tax,
+                                                        $order->currency->code,
+                                                        [
+                                                            NumberFormatter::MIN_FRACTION_DIGITS => 3,
+                                                            NumberFormatter::MAX_FRACTION_DIGITS => 3
+                                                        ]
+                                                    )
+                                                    ?>
+                                                </td>
+                                            </tr>
+
+                                            <tr style="background: #f4f4f4;">
+                                                <td align="start" colspan="3">Amount</td>
+                                                <td style="text-align: right;align-content: end;" align="end">
+                                                    <?= Yii::$app->formatter->asCurrency(
+                                                        $order->total_price,
+                                                        $order->currency->code,
+                                                        [
+                                                            NumberFormatter::MIN_FRACTION_DIGITS => 3,
+                                                            NumberFormatter::MAX_FRACTION_DIGITS => 3
+                                                        ]
+                                                    )
+                                                    ?>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
                                     </td>
                                 </tr>
-
-                                <tr>
-                                    <td align="start" colspan="3">Subtotal After Voucher</td>
-                                    <td align="end">
-                                        <?= Yii::$app->formatter->asCurrency(
-                                            $order->subtotal - $voucherDiscount,
-                                            $order->currency->code,
-                                            [
-                                                NumberFormatter::MIN_FRACTION_DIGITS => 3,
-                                                NumberFormatter::MAX_FRACTION_DIGITS => 3
-                                            ]
-                                        )
-                                        ?>
-                                    </td>
-                                </tr>
-
-                                <?php } ?>
-
-                                <?php if($order->bankDiscount) { ?>
-
-                                    <tr>
-                                        <td align="start" colspan="3">Bank Discount</td>
-                                        <td align="end">
-                                            <?= Yii::$app->formatter->asCurrency(
-                                                $bankDiscount,
-                                                $order->currency->code,
-                                                [
-                                                    NumberFormatter::MIN_FRACTION_DIGITS => 3,
-                                                    NumberFormatter::MAX_FRACTION_DIGITS => 3
-                                                ]
-                                            )
-                                            ?>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td align="start" colspan="3">Subtotal After Bank Discount</td>
-                                        <td align="end">
-                                            <?= Yii::$app->formatter->asCurrency(
-                                            $order->subtotal - $bankDiscount,
-                                                $order->currency->code,
-                                                [
-                                                    NumberFormatter::MIN_FRACTION_DIGITS => 3,
-                                                    NumberFormatter::MAX_FRACTION_DIGITS => 3
-                                                ]
-                                            )
-                                            ?>
-                                        </td>
-                                    </tr>
-
-                                <?php } ?>
-
-                                <tr>
-                                    <td align="start" colspan="3">Delivery fee</td>
-                                    <td align="end">
-                                        <?= Yii::$app->formatter->asCurrency(
-                                            $order->delivery_fee,
-                                                $order->currency->code,
-                                                [
-                                                    NumberFormatter::MIN_FRACTION_DIGITS => 3,
-                                                    NumberFormatter::MAX_FRACTION_DIGITS => 3
-                                                ]
-                                            )
-                                            ?>
-                                    </td>
-                                </tr>
-                                <?php if($order->voucher && $order->voucher->discount_type == 3) { ?>
-
-                                    <tr>
-                                        <td align="start" colspan="3">Voucher Discount (<?= $order->voucher->code ?>)</td>
-                                        <td align="end">
-                                            <?= Yii::$app->formatter->asCurrency(
-                                                $order->delivery_fee,
-                                                $order->currency->code,
-                                                [
-                                                    NumberFormatter::MIN_FRACTION_DIGITS => 3,
-                                                    NumberFormatter::MAX_FRACTION_DIGITS => 3
-                                                ]
-                                            )
-                                            ?>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td align="start" colspan="3">Delivery fee After Voucher</td>
-                                        <td align="end"><?= $order->currency->code ?> 0.000</td>
-                                    </tr>
-
-                                <?php } ?>
-
-                                <tr *ngIf="order.tax > 0">
-                                    <td align="start" colspan="3">Tax</td>
-                                    <td align="end">
-                                        <?= Yii::$app->formatter->asCurrency(
-                                                $order->tax,
-                                                $order->currency->code,
-                                                [
-                                                    NumberFormatter::MIN_FRACTION_DIGITS => 3,
-                                                    NumberFormatter::MAX_FRACTION_DIGITS => 3
-                                                ]
-                                        )
-                                        ?>
-                                    </td>
-                                </tr>
-
-                                <tr style="background: #f4f4f4;">
-                                    <td align="start" colspan="3">Amount</td>
-                                    <td style="text-align: right;align-content: end;" align="end">
-                                        <?= Yii::$app->formatter->asCurrency(
-                                                $order->total_price,
-                                                $order->currency->code,
-                                                [
-                                                        NumberFormatter::MIN_FRACTION_DIGITS => 3,
-                                                        NumberFormatter::MAX_FRACTION_DIGITS => 3
-                                                ]
-                                            )
-                                        ?>
-                                    </td>
-                                </tr>
-
                             </table>
 
                         </div>

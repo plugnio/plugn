@@ -122,15 +122,14 @@ class Order extends \yii\db\ActiveRecord
     const MASHKOR_ORDER_STATUS_DELIVERED = 10;
     const MASHKOR_ORDER_STATUS_CANCELED = 11;
 
+    const SCENARIO_UPDATE_TOTAL = 'updateTotal';
     const SCENARIO_CREATE_ORDER_BY_ADMIN = 'manual';
     const SCENARIO_OLD_VERSION = 'old_version';
     const SCENARIO_UPDATE_STATUS = 'updateStatus';
 
-
     public $civil_id = null;
     public $section = null;
     public $class = null;
-
 
     /**
      * {@inheritdoc}
@@ -166,7 +165,10 @@ class Order extends \yii\db\ActiveRecord
             ]],
 
             [['customer_phone_number'], 'required', 'on' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
-            [['customer_phone_number'], PhoneInputValidator::className (), 'message' => 'Please insert a valid phone number', 'except' => self::SCENARIO_OLD_VERSION],
+
+            //todo: not accepting indian number 8758702738
+            //[['customer_phone_number'], PhoneInputValidator::className (), 'message' => 'Please insert a valid phone number', 'except' => self::SCENARIO_OLD_VERSION],
+
             ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_PARTIALLY_REFUNDED, self::STATUS_CANCELED, self::STATUS_DRAFT, self::STATUS_ABANDONED_CHECKOUT, self::STATUS_ACCEPTED]],
 
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
@@ -755,28 +757,26 @@ class Order extends \yii\db\ActiveRecord
      */
     public function updateOrderTotalPrice($attribute = 'delivery_zone_id')
     {
-        if ($this->order_mode == static::ORDER_MODE_DELIVERY){
+        if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
 
           if (!$this->deliveryZone) {
-              return $this->addError ('delivery_zone_id', Yii::t('app', 'Delivery zone is invalid'));
+              return $this->addError ($attribute, Yii::t('app', 'Delivery zone is invalid'));
           }
 
           $this->delivery_fee = $this->deliveryZone->delivery_fee;
-
         }
-
 
         if ($this->order_status != Order::STATUS_REFUNDED && $this->order_status != Order::STATUS_PARTIALLY_REFUNDED) {
             $this->subtotal_before_refund = $this->calculateOrderItemsTotalPrice ();
             $this->total_price_before_refund = $this->calculateOrderTotalPrice ();
         }
 
-
         $this->subtotal = $this->calculateOrderItemsTotalPrice();
         $this->total_price = $this->calculateOrderTotalPrice();
 
+        $this->setScenario (self::SCENARIO_UPDATE_TOTAL);
 
-        $this->save(false);
+        $this->save();
     }
 
     /**
@@ -876,8 +876,16 @@ class Order extends \yii\db\ActiveRecord
             $this->order_status = self::STATUS_DRAFT;
         }
 
-        if ($this->scenario != self::SCENARIO_CREATE_ORDER_BY_ADMIN) {
+        if (
+            !in_array(
+                $this->scenario, [
+                    self::SCENARIO_UPDATE_TOTAL,
+                    self::SCENARIO_CREATE_ORDER_BY_ADMIN
+                ]
+            )
+        ) {
             if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
+
                 //set ETA value
                 \Yii::$app->timeZone = 'Asia/Kuwait';
 
@@ -886,9 +894,17 @@ class Order extends \yii\db\ActiveRecord
                 else {
                     if ($this->delivery_zone_id) {
                         $this->estimated_time_of_arrival =
-                            date ("Y-m-d H:i:s", strtotime ('+' . $this->deliveryZone->delivery_time . ' ' . $this->deliveryZone->timeUnit, Yii::$app->formatter->asTimestamp (!$insert ? date ('Y-m-d H:i:s', strtotime ($this->order_created_at)) : date ('Y-m-d H:i:s'))));
+                            date (
+                                "Y-m-d H:i:s",
+                                strtotime (
+                                    '+' . $this->deliveryZone->delivery_time . ' ' . $this->deliveryZone->timeUnit,
+                                    Yii::$app->formatter->asTimestamp (
+                                        !$insert ? date ('Y-m-d H:i:s', strtotime ($this->order_created_at)) :
+                                                date ('Y-m-d H:i:s')
+                                    )
+                                )
+                            );
                     }
-
                 }
 
             } else {
@@ -1227,6 +1243,14 @@ class Order extends \yii\db\ActiveRecord
         $scenarios =  parent::scenarios ();
 
         $scenarios['updateStatus'] = ['order_status'];
+
+        $scenarios[self::SCENARIO_UPDATE_TOTAL] = [
+            'delivery_fee',
+            'subtotal_before_refund',
+            'total_price_before_refund',
+            'subtotal',
+            'total_price'
+        ];
 
         return $scenarios;
     }

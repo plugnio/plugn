@@ -184,7 +184,7 @@ class Refund extends \yii\db\ActiveRecord
                     $this->payment->payment_gateway_transaction_id,
                     $this->refund_amount,
                     $this->order->currency->code,
-                    $this->reason
+                    $this->reason ? $this->reason : 'requested_by_customer'
                 );
 
                 if ($tapPaymentResponse->isOk) {

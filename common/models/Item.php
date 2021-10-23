@@ -200,9 +200,13 @@ class Item extends \yii\db\ActiveRecord
      */
     public function extraFields()
     {
-        return [
-            'currency'
-        ];
+        $fields = parent::fields();
+
+        return array_merge ($fields, [
+            'currency',
+            'options',
+            'extraOptions'
+        ]);
     }
 
     /**
