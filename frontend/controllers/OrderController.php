@@ -779,9 +779,13 @@ class OrderController extends Controller {
       $refunded_items_model = [new RefundedItem()];
 
       foreach ($order_model->getOrderItems()->all() as $key => $orderItem) {
-           $refunded_items_model[$key] = new RefundedItem();
-           $refunded_items_model[$key]->order_item_id = $orderItem->order_item_id;
-           $refunded_items_model[$key]->order_uuid = $orderItem->order_uuid;
+        $refunded_items_model[$key] = new RefundedItem();
+        $refunded_items_model[$key]->order_item_id = $orderItem->order_item_id;
+        $refunded_items_model[$key]->order_uuid = $orderItem->order_uuid;
+        $refunded_items_model[$key]->item_uuid = $orderItem->item_uuid;
+        $refunded_items_model[$key]->item_name = $orderItem->item_name;
+        $refunded_items_model[$key]->item_name_ar = $orderItem->item_name_ar;
+        $refunded_items_model[$key]->item_price = $orderItem->item_price;
        }
 
 
@@ -801,8 +805,10 @@ class OrderController extends Controller {
 
             }
 
-            return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
         }
+
+        return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
+
      }
 
 

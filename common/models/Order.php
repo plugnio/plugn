@@ -165,7 +165,7 @@ class Order extends \yii\db\ActiveRecord
             ]],
 
             [['customer_phone_number'], 'required', 'on' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
-            
+
             //todo: not accepting indian number 8758702738
             //[['customer_phone_number'], PhoneInputValidator::className (), 'message' => 'Please insert a valid phone number', 'except' => self::SCENARIO_OLD_VERSION],
 
@@ -760,7 +760,7 @@ class Order extends \yii\db\ActiveRecord
         if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
 
           if (!$this->deliveryZone) {
-              return $this->addError ('delivery_zone_id', Yii::t('app', 'Delivery zone is invalid'));
+              return $this->addError ($attribute, Yii::t('app', 'Delivery zone is invalid'));
           }
 
           $this->delivery_fee = $this->deliveryZone->delivery_fee;
