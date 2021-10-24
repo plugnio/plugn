@@ -135,14 +135,18 @@ class AreaDeliveryZoneController extends Controller
      */
     public function actionSave()
     {
-        $store = Yii::$app->accountManager->getManagedAccount ();
 
+        $store_uuid = Yii::$app->request->getBodyParam ("store_uuid");
         $areas = Yii::$app->request->getBodyParam ("areas");
         $delivery_zone_id = Yii::$app->request->getBodyParam ("delivery_zone_id");
 
-        $delivery_zone = $store->getDeliveryZones ()
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid );
+
+
+        $delivery_zone = $store->getDeliveryZones()
             ->andWhere (['delivery_zone_id' => $delivery_zone_id])
-            ->one ();
+            ->one();
+
 
         if (!$delivery_zone)
             throw new NotFoundHttpException('The requested record does not exist.');

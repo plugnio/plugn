@@ -272,7 +272,6 @@ return [
                 [// AreaDeliveryZoneController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/area-delivery-zone',
-                    'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',
                         'PATCH save' => 'save',
