@@ -94,6 +94,23 @@ return [
                         'OPTIONS' => 'options'
                     ]
                 ],
+                [// AreaDeliveryZoneController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/area-delivery-zone',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'POST create' => 'create',
+                        'PATCH save' => 'save',
+                        'PATCH <area_delivery_zone_id>/<store_uuid>' => 'update',
+                        'DELETE <area_delivery_zone_id>/<store_uuid>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS save' => 'options',
+                        'OPTIONS <area_delivery_zone_id>/<store_uuid>' => 'options',
+                    ]
+                ],
                 [// CategoryController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/category',
@@ -267,22 +284,6 @@ return [
                         'OPTIONS' => 'options',
                         'OPTIONS <day_of_week>' => 'options',
                         'OPTIONS <opening_hour_id>/<store_uuid>' => 'options',
-                    ]
-                ],
-                [// AreaDeliveryZoneController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/area-delivery-zone',
-                    'patterns' => [
-                        'GET' => 'list',
-                        'PATCH save' => 'save',
-                        'POST create' => 'create',
-                        'PATCH <area_delivery_zone_id>/<store_uuid>' => 'update',
-                        'DELETE <area_delivery_zone_id>/<store_uuid>' => 'delete',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options',
-                        'OPTIONS create' => 'options',
-                        'OPTIONS save' => 'options',
-                        'OPTIONS <area_delivery_zone_id>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// WebLinkController
