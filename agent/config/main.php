@@ -242,8 +242,8 @@ return [
                         'GET' => 'list',
                         'GET detail' => 'detail',
                         'POST create' => 'create',
-                        'DELETE <delivery_zone_id>/<store_uuid>' => 'delete',
                         'PATCH <delivery_zone_id>/<store_uuid>' => 'update',
+                        'DELETE <delivery_zone_id>/<store_uuid>' => 'delete',
                         'DELETE cancel-override/<delivery_zone_id>/<store_uuid>' => 'cancel-override',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
@@ -272,12 +272,13 @@ return [
                 [// AreaDeliveryZoneController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/area-delivery-zone',
+                    'pluralize' => false,
                     'patterns' => [
                         'GET' => 'list',
                         'PATCH save' => 'save',
                         'POST create' => 'create',
-                        'DELETE <area_delivery_zone_id>/<store_uuid>' => 'delete',
                         'PATCH <area_delivery_zone_id>/<store_uuid>' => 'update',
+                        'DELETE <area_delivery_zone_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS create' => 'options',
