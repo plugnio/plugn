@@ -955,8 +955,7 @@ class Order extends \yii\db\ActiveRecord
                                 strtotime (
                                     '+' . $this->deliveryZone->delivery_time . ' ' . $this->deliveryZone->timeUnit,
                                     Yii::$app->formatter->asTimestamp (
-                                        !$insert ? date ('Y-m-d H:i:s', strtotime ($this->order_created_at)) :
-                                                date ('Y-m-d H:i:s')
+                                      ((!$insert && $this->order_created_at == 'NOW()') || $insert) ? date ('Y-m-d H:i:s') : date ('Y-m-d H:i:s', strtotime ($this->order_created_at))
                                     )
                                 )
                             );
