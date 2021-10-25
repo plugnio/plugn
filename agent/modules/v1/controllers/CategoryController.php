@@ -75,10 +75,10 @@ class CategoryController extends Controller {
          Yii::$app->accountManager->getManagedAccount($store_uuid);
 
          $query =  Category::find()
-             ->andWhere(['category.restaurant_uuid' => $store_uuid])
-             ->joinWith(['items']);
+             ->andWhere(['category.restaurant_uuid' => $store_uuid]);
 
          if ($keyword){
+             $query->joinWith(['items']);
              $query->andWhere([
                  'OR',
                      ['like', 'title', $keyword],
@@ -91,13 +91,6 @@ class CategoryController extends Controller {
          }
 
          $query->orderBy ([new \yii\db\Expression('sort_number ASC')]);
-
-//         if(!$page) {
-//             return new ActiveDataProvider([
-//                 'query' => $query,
-//                 'pagination' => false
-//             ]);
-//         }
 
          return new ActiveDataProvider([
            'query' => $query
