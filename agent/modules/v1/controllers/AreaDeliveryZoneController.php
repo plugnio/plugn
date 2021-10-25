@@ -67,31 +67,45 @@ class AreaDeliveryZoneController extends Controller
     /**
      * only owner will have access
      */
-    public function beforeAction($action)
+//    public function beforeAction($action)
+//    {
+//        parent::beforeAction ($action);
+//
+//        if($action->id == 'options') {
+//            return true;
+//        }
+//
+//        if(!Yii::$app->accountManager->isOwner() && !in_array ($action->id, ['list'])) {
+//            throw new \yii\web\BadRequestHttpException(
+//                Yii::t('agent', 'You are not allowed to manage business locations. Please contact with store owner')
+//            );
+//
+//            return false;
+//        }
+//
+//        //should have access to store
+//
+//        Yii::$app->accountManager->getManagedAccount();
+//
+//        return true;
+//    }
+
+    private function ownerCheck()
     {
-        parent::beforeAction ($action);
-
-        if($action->id == 'options') {
-            return true;
-        }
-
-        if(!Yii::$app->accountManager->isOwner() && !in_array ($action->id, ['list'])) {
+        if (!Yii::$app->accountManager->isOwner()) {
             throw new \yii\web\BadRequestHttpException(
-                Yii::t('agent', 'You are not allowed to manage business locations. Please contact with store owner')
+                Yii::t('agent', 'You are not allowed to manage discounts. Please contact with store owner')
             );
-
-            return false;
         }
 
         //should have access to store
-
         Yii::$app->accountManager->getManagedAccount();
-
         return true;
     }
 
     public function actionList()
     {
+        $this->ownerCheck();
         $page = Yii::$app->request->get ('page');
         $keyword = Yii::$app->request->get ('keyword');
         $city_id = Yii::$app->request->get ('city_id');
@@ -133,9 +147,9 @@ class AreaDeliveryZoneController extends Controller
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionSave()
+    public function actionSaveDetails()
     {
-
+        $this->ownerCheck();
         $store_uuid = Yii::$app->request->getBodyParam ("store_uuid");
         $areas = Yii::$app->request->getBodyParam ("areas");
         $delivery_zone_id = Yii::$app->request->getBodyParam ("delivery_zone_id");
@@ -199,6 +213,7 @@ class AreaDeliveryZoneController extends Controller
      */
     public function actionCreate()
     {
+        $this->ownerCheck();
         $store_uuid = Yii::$app->request->getBodyParam ("store_uuid");
         $area_id = Yii::$app->request->getBodyParam ("area_id");
         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
@@ -240,7 +255,7 @@ class AreaDeliveryZoneController extends Controller
      */
     public function actionUpdate($area_delivery_zone_id, $store_uuid)
     {
-
+        $this->ownerCheck();
         $store_uuid = Yii::$app->request->getBodyParam ("store_uuid");
         $area_id = Yii::$app->request->getBodyParam ("area_id");
         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
@@ -290,7 +305,7 @@ class AreaDeliveryZoneController extends Controller
      */
     public function actionDelete($area_delivery_zone_id, $store_uuid)
     {
-
+        $this->ownerCheck();
         $model = $this->findModel ($area_delivery_zone_id, $store_uuid);
         if (!$model->delete ()) {
             if (isset($model->errors)) {

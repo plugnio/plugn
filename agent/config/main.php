@@ -101,7 +101,7 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'POST create' => 'create',
-                        'PATCH save' => 'save',
+                        'PATCH save' => 'save-details',
                         'PATCH <area_delivery_zone_id>/<store_uuid>' => 'update',
                         'DELETE <area_delivery_zone_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
