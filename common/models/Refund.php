@@ -171,29 +171,29 @@ class Refund extends \yii\db\ActiveRecord
     public function beforeSave($insert)
     {
         if ($insert) {
-            if ($this->payment && $this->payment->payment_current_status == 'CAPTURED') {
-
-                // Set api keys
-
-                Yii::$app->tapPayments->setApiKeys(
-                    $this->order->restaurant->live_api_key,
-                    $this->order->restaurant->test_api_key
-                );
-
-                $tapPaymentResponse = Yii::$app->tapPayments->createRefund(
-                    $this->payment->payment_gateway_transaction_id,
-                    $this->refund_amount,
-                    $this->order->currency->code,
-                    $this->reason ? $this->reason : 'requested_by_customer'
-                );
-
-                if ($tapPaymentResponse->isOk) {
-                    $this->refund_id = $tapPaymentResponse->data['id'];
-                    $this->refund_status = $tapPaymentResponse->data['status'];
-                } else {
-                    return $this->addError('', print_r(json_encode($tapPaymentResponse->data['errors'][0]['description']), true));
-                }
-            }
+            // if ($this->payment && $this->payment->payment_current_status == 'CAPTURED') {
+            //
+            //     // Set api keys
+            //
+            //     Yii::$app->tapPayments->setApiKeys(
+            //         $this->order->restaurant->live_api_key,
+            //         $this->order->restaurant->test_api_key
+            //     );
+            //
+            //     $tapPaymentResponse = Yii::$app->tapPayments->createRefund(
+            //         $this->payment->payment_gateway_transaction_id,
+            //         $this->refund_amount,
+            //         $this->order->currency->code,
+            //         $this->reason ? $this->reason : 'requested_by_customer'
+            //     );
+            //
+            //     if ($tapPaymentResponse->isOk) {
+            //         $this->refund_id = $tapPaymentResponse->data['id'];
+            //         $this->refund_status = $tapPaymentResponse->data['status'];
+            //     } else {
+            //         return $this->addError('', print_r(json_encode($tapPaymentResponse->data['errors'][0]['description']), true));
+            //     }
+            // }
 
             $order_model = Order::findOne($this->order_uuid);
 

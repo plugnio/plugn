@@ -727,6 +727,62 @@ class Order extends \yii\db\ActiveRecord
 
         if (YII_ENV == 'prod') {
 
+            $plugn_fee = 0;
+            $payment_gateway_fee = 0;
+            $total_price = $this->total_price;
+            $delivery_fee = $this->delivery_fee;
+            $subtotal = $this->subtotal;
+            $currency = $this->currency_code;
+
+            if($this->payment_uuid){
+              if($this->currency->code == 'KWD'){
+                $plugn_fee = ($this->payment->plugn_fee + $this->payment->partner_fee) * 3.28;
+                $total_price = $total_price * 3.28;
+                $delivery_fee = $delivery_fee * 3.28;
+                $subtotal = $subtotal * 3.28;
+                $payment_gateway_fee = $this->payment->payment_gateway_fee * 3.28;
+                $currency = 'USD';
+
+              }
+              else if($this->currency->code == 'QAR'){
+                $plugn_fee = ($this->payment->plugn_fee + $this->payment->partner_fee) * 0.27;
+                $total_price = $total_price *  0.27;
+                $delivery_fee = $delivery_fee * 0.27;
+                $subtotal = $subtotal * 0.27;
+                $payment_gateway_fee = $this->payment->payment_gateway_fee * 0.27;
+                $currency = 'USD';
+              }
+              else if($this->currency->code == 'OMR'){
+                $plugn_fee = ($this->payment->plugn_fee + $this->payment->partner_fee) * 2.60;
+                $total_price = $total_price *  2.60;
+                $delivery_fee = $delivery_fee * 2.60;
+                $subtotal = $subtotal * 2.60;
+                $payment_gateway_fee = $this->payment->payment_gateway_fee * 2.60;
+                $currency = 'USD';
+              }
+              else if($this->currency->code == 'JOD'){
+                $plugn_fee = ($this->payment->plugn_fee + $this->payment->partner_fee) * 1.41;
+                $total_price = $total_price *  1.41;
+                $delivery_fee = $delivery_fee * 1.41;
+                $subtotal = $subtotal * 1.41;
+                $payment_gateway_fee = $this->payment->payment_gateway_fee * 1.41;
+                $currency = 'USD';
+              }
+              else if($this->currency->code == 'BHD'){
+                $plugn_fee = ($this->payment->plugn_fee + $this->payment->partner_fee) * 2.65;
+                $total_price = $total_price  * 2.65;
+                $delivery_fee = $delivery_fee * 2.65;
+                $subtotal = $subtotal * 2.65;
+                $payment_gateway_fee = $this->payment->payment_gateway_fee * 2.65;
+                $currency = 'USD';
+              } else {
+                $plugn_fee = $this->payment->plugn_fee + $this->payment->partner_fee;
+                $payment_gateway_fee = $this->payment->payment_gateway_fee;
+              }
+            }
+
+
+
             \Segment::init ('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
             \Segment::track ([
                 'userId' => $this->restaurant_uuid,
@@ -736,8 +792,8 @@ class Order extends \yii\db\ActiveRecord
                     'checkout_id' => $this->order_uuid,
                     'order_id' => $this->order_uuid,
                     'total' => ($this->total_price * 3.28),
-                    'revenue' => $this->payment_uuid ? ($this->payment->plugn_fee * 3.28) : 0,
-                    'gateway_fee' => $this->payment_uuid ? ($this->payment->payment_gateway_fee * 3.28) : 0,
+                    'revenue' => $plugn_fee,
+                    'gateway_fee' => $payment_gateway_fee,
                     'payment_method' => $this->payment_method_name,
                     'gateway' => $this->payment_uuid ? 'Tap' : null,
                     'shipping' => ($this->delivery_fee * 3.28),

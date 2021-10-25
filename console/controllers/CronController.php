@@ -521,8 +521,10 @@ class CronController extends \yii\console\Controller {
         $refunds = Refund::find()
                     ->joinWith(['store','payment','currency'])
                     ->where(['refund.refund_reference' => null])
+                    ->where(['payment.payment_current_status' => 'CAPTURED'])
                     ->andWhere(['NOT', ['refund.payment_uuid' => null]])
                     ->all();
+
 
         foreach ($refunds as $refund) {
 
@@ -549,7 +551,9 @@ class CronController extends \yii\console\Controller {
                     return self::EXIT_CODE_NORMAL;
                   }
 
-                } else if($refund->store->is_tap_enable) {
+                }
+
+                else if($refund->store->is_tap_enable) {
 
                   Yii::$app->tapPayments->setApiKeys($refund->store->live_api_key, $refund->store->test_api_key);
 
