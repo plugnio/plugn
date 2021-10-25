@@ -75,7 +75,6 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
         $order_item_model->item_price = $order_item_model->calculateOrderItemPrice();
         $order_item_model->save(false);
 
-
         return parent::afterSave($insert, $changedAttributes);
     }
 

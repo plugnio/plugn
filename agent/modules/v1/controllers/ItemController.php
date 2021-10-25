@@ -76,16 +76,18 @@ class ItemController extends Controller
     {
         $keyword = Yii::$app->request->get('keyword');
         $type = Yii::$app->request->get('type');
+        $category_id = Yii::$app->request->get('category_id');
 
         $store = Yii::$app->accountManager->getManagedAccount();
 
         $query = Item::find();
+
         if ($type != 'all') {
             $query->andWhere(['track_quantity'=> 1]);
         }
-        $query->andWhere(['restaurant_uuid'=> $store->restaurant_uuid]);
-        $query->orderBy('item_created_at DESC');
 
+        $query->andWhere(['restaurant_uuid'=> $store->restaurant_uuid]);
+        $query->orderBy ([new \yii\db\Expression('item.sort_number ASC')]);
         if ($keyword && $keyword != 'null') {
             $query->andWhere ([
                     'or',
@@ -94,6 +96,10 @@ class ItemController extends Controller
                     ['like', 'item_description', $keyword],
                     ['like', 'item_description_ar', $keyword]
                 ]);
+        }
+
+        if($category_id) {
+            $query->filterByCategory($category_id);
         }
 
         return new ActiveDataProvider([

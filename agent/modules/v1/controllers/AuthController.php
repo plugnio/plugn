@@ -140,6 +140,7 @@ class AuthController extends Controller {
         $store->name_ar = $store->name;
 
         $transaction = Yii::$app->db->beginTransaction();
+
         try {
             if (!$agent->save()) {
                 $transaction->rollBack();
@@ -235,10 +236,14 @@ class AuthController extends Controller {
 
             }
             $transaction->commit();
-            return [
+            
+            /*return [
                 'operation' => 'success',
                 'message' => Yii::t ('agent', 'Registration completed successfully')
-            ];
+            ];*/
+
+            return $this->_loginResponse($agent);
+
         } catch (\Exception $e) {
             $transaction->rollBack();
             return [

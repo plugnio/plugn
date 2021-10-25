@@ -59,6 +59,7 @@ return [
                         'GET download-invoice/<id>' => 'download-invoice',
                         'GET <type>' => 'list',
                         'POST <store_uuid>' => 'place-an-order',
+                        'PATCH refund/<order_uuid>' => 'refund',
                         'PATCH <order_uuid>/<store_uuid>' => 'update',
                         'PATCH update-order-status/<order_uuid>/<store_uuid>' => 'update-order-status',
                         'POST request-driver-from-armada/<order_uuid>/<store_uuid>' => 'request-driver-from-armada',
@@ -72,6 +73,7 @@ return [
                         'OPTIONS orders-report' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS download-invoice/<id>' => 'options',
+                        'OPTIONS refund/<order_uuid>' => 'options',
                         'OPTIONS update-order-status/<order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS request-driver-from-armada/<order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'options',
@@ -92,6 +94,23 @@ return [
                         'OPTIONS' => 'options'
                     ]
                 ],
+                [// AreaDeliveryZoneController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/area-delivery-zone',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'POST create' => 'create',
+                        'PATCH save' => 'save-details',
+                        'PATCH <area_delivery_zone_id>/<store_uuid>' => 'update',
+                        'DELETE <area_delivery_zone_id>/<store_uuid>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS save' => 'options',
+                        'OPTIONS <area_delivery_zone_id>/<store_uuid>' => 'options',
+                    ]
+                ],
                 [// CategoryController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/category',
@@ -99,8 +118,10 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'GET item-list' => 'item-list',
                         'POST create' => 'create',
                         'POST upload-image' => 'upload-category-image',
+                        'POST update-position' => 'change-position',
                         'PATCH <category_id>/<store_uuid>' => 'update',
                         'DELETE <category_id>/<store_uuid>' => 'delete',
                         // OPTIONS VERBS
@@ -108,6 +129,8 @@ return [
                         'OPTIONS detail' => 'options',
                         'OPTIONS create' => 'options',
                         'OPTIONS <category_id>/<store_uuid>' => 'options',
+                        'OPTIONS update-position' => 'options',
+                        'OPTIONS item-list' => 'options',
                     ]
                 ],
                 [// StaffController
@@ -236,8 +259,8 @@ return [
                         'GET' => 'list',
                         'GET detail' => 'detail',
                         'POST create' => 'create',
-                        'DELETE <delivery_zone_id>/<store_uuid>' => 'delete',
                         'PATCH <delivery_zone_id>/<store_uuid>' => 'update',
+                        'DELETE <delivery_zone_id>/<store_uuid>' => 'delete',
                         'DELETE cancel-override/<delivery_zone_id>/<store_uuid>' => 'cancel-override',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
@@ -261,22 +284,6 @@ return [
                         'OPTIONS' => 'options',
                         'OPTIONS <day_of_week>' => 'options',
                         'OPTIONS <opening_hour_id>/<store_uuid>' => 'options',
-                    ]
-                ],
-                [// AreaDeliveryZoneController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/area-delivery-zone',
-                    'patterns' => [
-                        'GET' => 'list',
-                        'PATCH save' => 'save',
-                        'POST create' => 'create',
-                        'DELETE <area_delivery_zone_id>/<store_uuid>' => 'delete',
-                        'PATCH <area_delivery_zone_id>/<store_uuid>' => 'update',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options',
-                        'OPTIONS create' => 'options',
-                        'OPTIONS save' => 'options',
-                        'OPTIONS <area_delivery_zone_id>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// WebLinkController
@@ -331,6 +338,7 @@ return [
                         'GET export-to-excel' => 'export-to-excel',
                         'GET detail' => 'detail',
                         'GET orders' => 'list-all-customer-orders',
+                        'POST' => 'create',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS export-to-excel' => 'options',
