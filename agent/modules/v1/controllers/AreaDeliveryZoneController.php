@@ -94,7 +94,7 @@ class AreaDeliveryZoneController extends Controller
     {
         if (!Yii::$app->accountManager->isOwner()) {
             throw new \yii\web\BadRequestHttpException(
-                Yii::t('agent', 'You are not allowed to manage discounts. Please contact with store owner')
+                Yii::t('agent', 'You are not allowed to manage delivery zone. Please contact with store owner')
             );
         }
 
