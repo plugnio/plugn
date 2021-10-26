@@ -963,7 +963,8 @@ class Order extends \yii\db\ActiveRecord
                 }
 
             } else {
-                $this->estimated_time_of_arrival = !$insert ? date ('Y-m-d H:i:s', strtotime ($this->order_created_at)) : date ('Y-m-d H:i:s');
+                $this->estimated_time_of_arrival = ((!$insert && $this->order_created_at == 'NOW()') || $insert) ? date ('Y-m-d H:i:s') : date ('Y-m-d H:i:s', strtotime ($this->order_created_at)) ;
+
             }
 
             // if($this->orderItems){
