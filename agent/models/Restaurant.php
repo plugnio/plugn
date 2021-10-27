@@ -20,6 +20,10 @@ class Restaurant extends \common\models\Restaurant {
             return $model->getOrders()->count();
         };
 
+        $fields['item_count'] = function($model) {
+            return $model->getItems()->count();
+        };
+
         return $fields;
     }
 
