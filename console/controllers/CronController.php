@@ -559,7 +559,8 @@ class CronController extends \yii\console\Controller {
 
 
                   $response = Yii::$app->tapPayments->createRefund(
-                          $refund->payment->payment_gateway_transaction_id, $refund->refund_amount, $refund->currency->code, $refund->reason
+                          $refund->payment->payment_gateway_transaction_id, $refund->refund_amount, $refund->currency->code, $refund->reason ? $refund->reason : 'requested_by_customer'
+
                   );
 
                   if (array_key_exists('errors', $response->data)) {
