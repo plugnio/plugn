@@ -521,7 +521,7 @@ class CronController extends \yii\console\Controller {
         $refunds = Refund::find()
                     ->joinWith(['store','payment','currency'])
                     ->where(['refund.refund_reference' => null])
-                    ->where(['payment.payment_current_status' => 'CAPTURED'])
+                    ->andWhere(['payment.payment_current_status' => 'CAPTURED'])
                     ->andWhere(['NOT', ['refund.payment_uuid' => null]])
                     ->all();
 
