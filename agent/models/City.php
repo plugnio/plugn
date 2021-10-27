@@ -10,7 +10,16 @@ class City extends \common\models\City
     {
         $fields = parent::fields();
         $fields['areas'] = function ($model) {
-            return $model->areas;
+            $delivery_zone_id = Yii::$app->request->get('delivery_zone_id');
+            $store_uuid = Yii::$app->request->get('store_uuid');
+            $allAreas = AreaDeliveryZone::find()
+                ->select('area_id')
+                ->andWhere(['restaurant_uuid' => $store_uuid])
+                ->andWhere(['!=','delivery_zone_id',$delivery_zone_id])
+                ->all();
+            return $model->getAreas()
+                ->andWhere(['NOT IN','area_id',$allAreas])
+                ->all();
         };
         $fields['totalDeliveryAreas'] = function ($model) {
 
