@@ -24,6 +24,40 @@ class Restaurant extends \common\models\Restaurant {
             return $model->getItems()->count();
         };
 
+        $fields['is_cash_enabled'] = function($model) {
+            return $model->getPaymentMethods()->where(['payment_method_id' => 3])->exists();
+        };
+
+        $fields['is_knet_enabled'] = function($model) {
+            return $model->getPaymentMethods()->where(['payment_method_id' => 1])->exists();
+        };
+
+        $fields['is_credit_card_enabled'] = function($model) {
+            return $model->getPaymentMethods()->where(['payment_method_id' => 2])->exists();
+        };
+
+        $fields['is_mada_enabled'] = function($model) {
+            return $model->getPaymentMethods()->where(['payment_method_id' => 4])->exists();
+        };
+
+        $fields['is_benefit_enabled'] = function($model) {
+            return $model->getPaymentMethods()->where(['payment_method_id' => 5])->exists();
+        };
+
+        $fields['is_armada_enabled'] = function($model) {
+            return $model->getBusinessLocations()
+            ->where(['not', ['armada_api_key' => null]])
+            ->andWhere(['not', ['armada_api_key' => '']])
+            ->exists();
+        };
+
+        $fields['is_mashkor_enabled'] = function($model) {
+            return $model->getBusinessLocations()
+            ->where(['not', ['mashkor_branch_id' => null]])
+            ->andWhere(['not', ['mashkor_branch_id' => '']])
+            ->exists();
+        };
+
         return $fields;
     }
 
