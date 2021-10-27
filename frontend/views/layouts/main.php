@@ -111,7 +111,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
 
 
         <!-- BEGIN: Main Menu-->
-        
+
         <div class="main-menu menu-fixed menu-light menu-accordion menu-shadow" data-scroll-to-active="true">
             <div class="navbar-header">
                 <ul class="nav navbar-nav flex-row">
@@ -530,6 +530,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
         $storeLogo = $restaurant_model->logo ? $restaurant_model->getRestaurantLogoUrl() : 'false';
 
         $segmentScript = "analytics.identify('". $restaurant_model->restaurant_uuid."', {
+            newDashboard: false,
             name: '". $storeName ."',
             domain:'". $restaurant_model->restaurant_domain  ."',
             phone:'". $ownerPhoneNumber  ."',
