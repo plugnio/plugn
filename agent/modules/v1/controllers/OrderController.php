@@ -3,6 +3,7 @@
 namespace agent\modules\v1\controllers;
 
 
+use agent\models\Item;
 use agent\models\Refund;
 use agent\models\RefundedItem;
 use common\models\AreaDeliveryZone;
@@ -141,7 +142,7 @@ class OrderController extends Controller
         } else if ($type == 'draft') {
             $query->andWhere (['order_status' => Order::STATUS_DRAFT]);
         }
-
+        $query->andWhere (['is_deleted' => 0]);
         return new ActiveDataProvider([
             'query' => $query
         ]);
@@ -1092,6 +1093,50 @@ class OrderController extends Controller
             }
         }
 
+        return [
+            "operation" => "success",
+            "message" => Yii::t ('agent', "Order deleted successfully")
+        ];
+    }
+
+
+    /**
+     * Delete Order
+     */
+    public function actionSoftDelete($order_uuid, $store_uuid)
+    {
+        $model = $this->findModel ($order_uuid, $store_uuid);
+        $transaction = Yii::$app->db->beginTransaction();
+        if ($model->orderItems) {
+            foreach ($model->orderItems as $item) {
+                $itemsModel = Item::findOne(['item_uuid'=>$item->item_uuid]);
+                if ($itemsModel) {
+                    $itemsModel->unit_sold -= $item->qty;
+                    $itemsModel->stock_qty += $item->qty;
+                    if (!$itemsModel->save(false)) {
+                        $transaction->rollBack();
+                    }
+                }
+            }
+        }
+
+
+        $model->is_deleted = 1;
+        if (!$model->save ()) {
+            $transaction->rollBack();
+            if (isset($model->errors)) {
+                return [
+                    "operation" => "error",
+                    "message" => $model->errors
+                ];
+            } else {
+                return [
+                    "operation" => "error",
+                    "message" => Yii::t ('agent', "We've faced a problem deleting the order")
+                ];
+            }
+        }
+        $transaction->commit();
         return [
             "operation" => "success",
             "message" => Yii::t ('agent', "Order deleted successfully")

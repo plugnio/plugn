@@ -66,6 +66,7 @@ return [
                         'POST request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'request-driver-from-mashkor',
                         'POST create/<store_uuid>' => 'create',
                         'DELETE <order_uuid>/<store_uuid>' => 'delete',
+                        'DELETE soft-delete/<order_uuid>/<store_uuid>' => 'soft-delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS stats' => 'options',
@@ -81,6 +82,7 @@ return [
                         'OPTIONS <order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS <type>' => 'options',
                         'OPTIONS create/<store_uuid>' => 'options',
+                        'OPTIONS soft-delete/<order_uuid>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// OrderItemController
