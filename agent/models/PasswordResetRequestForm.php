@@ -50,12 +50,12 @@ class PasswordResetRequestForm extends Model {
 
           if ($agent->save(false)) {
 
-              $resetLink = Yii::$app->params['dashboardAppUrl'] . '/update-password/' . $agent->agent_password_reset_token;
+              $resetLink = Yii::$app->params['newDashboardAppUrl'] . '/update-password/' . $agent->agent_password_reset_token;
 
               return Yii::$app->mailer
                               ->compose(
                                 [
-                                  'html' => 'passwordResetToken-html', 
+                                  'html' => 'passwordResetToken-html',
                                   'text' => 'passwordResetToken-text'
                                 ], [
                                   'resetLink' => $resetLink,

@@ -236,7 +236,7 @@ class AuthController extends Controller {
 
             }
             $transaction->commit();
-            
+
             /*return [
                 'operation' => 'success',
                 'message' => Yii::t ('agent', 'Registration completed successfully')
@@ -370,6 +370,14 @@ class AuthController extends Controller {
         $accessToken = $agent->accessToken->token_value;
 
         $assignment = $agent->getAgentAssignments()->one();
+
+        if(!$assignment){
+          return [
+              "operation" => "error",
+              'message' => Yii::t ('agent', "You're not assigned to any store")
+          ];
+        }
+
 
         return [
             "operation" => "success",
