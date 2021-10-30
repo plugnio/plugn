@@ -85,8 +85,8 @@ class CategoryController extends Controller {
                      ['like', 'title_ar', $keyword],
                      ['like', 'subtitle', $keyword],
                      ['like', 'subtitle_ar', $keyword],
-                 ['like', 'items.item_name', $keyword],
-                 ['like', 'items.item_name_ar', $keyword],
+                 ['like', 'item.item_name', $keyword],
+                 ['like', 'item.item_name_ar', $keyword],
              ]);
          }
 
