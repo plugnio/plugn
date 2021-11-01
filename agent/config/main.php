@@ -125,11 +125,12 @@ return [
                         'POST upload-image' => 'upload-category-image',
                         'POST update-position' => 'change-position',
                         'PATCH <category_id>/<store_uuid>' => 'update',
-                        'DELETE <category_id>/<store_uuid>' => 'delete',
+                        'DELETE <category_id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS create' => 'options',
+                        'OPTIONS <category_id>' => 'options',
                         'OPTIONS <category_id>/<store_uuid>' => 'options',
                         'OPTIONS update-position' => 'options',
                         'OPTIONS item-list' => 'options',
