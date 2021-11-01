@@ -163,7 +163,7 @@ class CategoryController extends Controller {
       */
      public function actionUpdate($category_id, $store_uuid)
      {
-         $model = $this->findModel($category_id, $store_uuid);
+         $model = $this->findModel($category_id);
 
          $model->title = Yii::$app->request->getBodyParam("title");
          $model->title_ar = Yii::$app->request->getBodyParam("title_ar");
@@ -217,7 +217,7 @@ class CategoryController extends Controller {
         $store_uuid = Yii::$app->request->getBodyParam('store_uuid');
         $category_id = Yii::$app->request->getBodyParam('category_id');
 
-        $model = $this->findModel($category_id, $store_uuid);
+        $model = $this->findModel($category_id);
 
         if (!isset($model->category_id)) {
             return [
@@ -254,10 +254,9 @@ class CategoryController extends Controller {
       /**
        * Delete Category
        */
-      public function actionDelete($category_id, $store_uuid)
+      public function actionDelete($category_id)
       {
-          Yii::$app->accountManager->getManagedAccount($store_uuid);
-          $model =  $this->findModel($category_id, $store_uuid);
+          $model =  $this->findModel($category_id);
 
           if (!$model->delete())
           {
@@ -309,22 +308,27 @@ class CategoryController extends Controller {
          */
         public function actionDetail($store_uuid, $category_id) {
 
-            return $this->findModel($category_id, $store_uuid);
+            return $this->findModel($category_id);
       }
 
 
       /**
        * Finds the Category model based on its primary key value.
        * If the model is not found, a 404 HTTP exception will be thrown.
-       * @param integer $id
+       * @param integer $category_id
        * @return Category the loaded model
        * @throws NotFoundHttpException if the model cannot be found
        */
-      protected function findModel($category_id, $store_uuid)
+      protected function findModel($category_id)
       {
-          $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
+          $store = Yii::$app->accountManager->getManagedAccount();
 
-          if (($model = Category::find()->where(['category_id' => $category_id, 'restaurant_uuid' => $store_model->restaurant_uuid])->one()) !== null) {
+          $model = Category::find()->where([
+              'category_id' => $category_id,
+              'restaurant_uuid' => $store->restaurant_uuid
+          ])->one();
+
+          if ($model !== null) {
               return $model;
           } else {
               throw new NotFoundHttpException('The requested record does not exist.');

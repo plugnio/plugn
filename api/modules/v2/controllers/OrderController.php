@@ -600,7 +600,7 @@ class OrderController extends Controller {
 
             if (array_key_exists('operation', $response) && $response['operation'] == 'error') {
 
-                //either object of payment result or not stock validation error 
+                //either object of payment result or not stock validation error
 
               if(!is_array($response['message']) || !isset($response['message']['qty']))
                  \Yii::error(json_encode($response['message']), __METHOD__); // Log error faced by user
