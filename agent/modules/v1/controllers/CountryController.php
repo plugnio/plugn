@@ -91,31 +91,24 @@ class CountryController extends Controller {
 
     }
 
-
-
-
     /**
     * Return Country detail
      * @param type $store_uuid
      * @param type $order_uuid
      * @return type
      */
-    public function actionDetail($store_uuid, $country_id) {
+    public function actionDetail() {
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+        $country_id = Yii::$app->request->get('country_id');
 
-        $country =  Country::find()
+      //validate
+
+      Yii::$app->accountManager->getManagedAccount();
+
+      return Country::find()
                   ->andWhere(['country_id' => $country_id])
                   ->with('cities','cities.areas')
                   ->asArray()
                   ->one();
-
-          return $country;
-
-      }
-
   }
-
-
-
 }
