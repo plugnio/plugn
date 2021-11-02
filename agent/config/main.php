@@ -58,6 +58,8 @@ return [
                         'GET total-pending' => 'total-pending',
                         'GET download-invoice/<id>' => 'download-invoice',
                         'GET <type>' => 'list',
+                        'GET archive-orders' => 'archive-orders',
+                        'GET live-orders' => 'live-orders',
                         'POST <store_uuid>' => 'place-an-order',
                         'PATCH refund/<order_uuid>' => 'refund',
                         'PATCH <order_uuid>/<store_uuid>' => 'update',
@@ -81,6 +83,8 @@ return [
                         'OPTIONS <store_uuid>' => 'options',
                         'OPTIONS <order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS <type>' => 'options',
+                        'OPTIONS archive-orders' => 'options',
+                        'OPTIONS live-orders' => 'options',
                         'OPTIONS create/<store_uuid>' => 'options',
                         'OPTIONS soft-delete/<order_uuid>/<store_uuid>' => 'options',
                     ]

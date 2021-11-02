@@ -74,6 +74,66 @@ class OrderController extends Controller
     }
 
     /**
+     * list all orders where status = pending or being prepared
+     * @param $type
+     * @return ActiveDataProvider
+     */
+    public function actionLiveOrders()
+    {
+        $store_uuid = Yii::$app->request->get ('store_uuid');
+
+        $query = Order::find ()
+            ->filterBusinessLocationIfManager ($store_uuid)
+            ->andWhere (['restaurant_uuid' => $store_uuid])
+            ->andWhere (
+                [
+                    'order_status' => [
+                        Order::STATUS_PENDING,
+                        Order::STATUS_ACCEPTED,
+                        Order::STATUS_BEING_PREPARED
+                    ]
+                ]
+            )
+            ->andWhere (['is_deleted' => 0])
+            ->orderBy (['order_created_at' => SORT_DESC]);
+
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
+    /**
+     * list all order that has been completed order out for delivery
+     * @param $type
+     * @return ActiveDataProvider
+     */
+    public function actionArchiveOrders()
+    {
+        $store_uuid = Yii::$app->request->get ('store_uuid');
+
+        $query = Order::find ()
+            ->filterBusinessLocationIfManager ($store_uuid)
+            ->andWhere (['restaurant_uuid' => $store_uuid])
+            ->andWhere (
+                [
+                    'order_status' => [
+                      Order::STATUS_OUT_FOR_DELIVERY,
+                      Order::STATUS_COMPLETE,
+
+                    ]
+                ]
+            )
+            ->andWhere (['is_deleted' => 0])
+            ->orderBy (['order_created_at' => SORT_DESC]);
+
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
+    /**
      * list orders
      * @param $type
      * @return ActiveDataProvider
