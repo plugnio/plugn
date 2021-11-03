@@ -389,6 +389,7 @@ return [
                         'POST update-layout' => 'update-layout',
                         'POST update-analytics-integration/<id>' => 'update-analytics-integration',
                         'POST update-delivery-integration/<id>' => 'update-delivery-integration',
+                        'PATCH update-status/<id>/<status>' => 'update-store-status',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS connect-domain' => 'options',
@@ -402,7 +403,8 @@ return [
                         'OPTIONS disable-online-payment/<id>' => 'options',
                         'OPTIONS enable-cod/<id>' => 'options',
                         'OPTIONS disable-cod/<id>' => 'options',
-                        'OPTIONS update-layout' => 'options'
+                        'OPTIONS update-layout' => 'options',
+                        'OPTIONS update-status/<id>/<status>' => 'options'
                     ]
                 ],
 
