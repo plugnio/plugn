@@ -165,7 +165,11 @@ class OrderController extends Controller
         // grid filtering conditions
         $query->orderBy (['order_created_at' => SORT_DESC]);
 
-        if ($status !== null) {
+        if ($status == '11') {
+            $query->liveOrders();
+        } else if ($status == '12') {
+            $query->archiveOrders();
+        } else if ($status !== null) {
             $query->andFilterWhere (['order_status' => $status]);
         }
 
@@ -414,6 +418,40 @@ class OrderController extends Controller
                 ->andFilterWhere ([
                     'order_status' => Order::STATUS_ABANDONED_CHECKOUT
                 ])
+                ->count ();
+        }
+
+        if ($customer_id) {
+            $response['liveOrders'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
+                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
+                ->andFilterWhere ([
+                    'customer_id' => $customer_id
+                ])
+                ->liveOrders()
+                ->count ();
+        } else {
+            $response['liveOrders'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
+                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
+                ->liveOrders()
+                ->count ();
+        }
+
+        if ($customer_id) {
+            $response['archiveOrders'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
+                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
+                ->andFilterWhere ([
+                    'customer_id' => $customer_id
+                ])
+                ->archiveOrders()
+                ->count ();
+        } else {
+            $response['archiveOrders'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
+                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
+                ->archiveOrders()
                 ->count ();
         }
 
