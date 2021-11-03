@@ -123,4 +123,5 @@ return [
     "Net Amount" => "كمية الشبكة",
     "Plugn fee" => "رسوم Plugn",
     "Payment Gateway fee" => "رسوم بوابة الدفع",
+    "Status changed successfully" => "تم تغيير الوضع بنجاح"
 ];
