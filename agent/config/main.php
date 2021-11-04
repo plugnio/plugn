@@ -58,6 +58,8 @@ return [
                         'GET total-pending' => 'total-pending',
                         'GET download-invoice/<id>' => 'download-invoice',
                         'GET <type>' => 'list',
+                        'GET archive-orders' => 'archive-orders',
+                        'GET live-orders' => 'live-orders',
                         'POST <store_uuid>' => 'place-an-order',
                         'PATCH refund/<order_uuid>' => 'refund',
                         'PATCH <order_uuid>/<store_uuid>' => 'update',
@@ -66,6 +68,7 @@ return [
                         'POST request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'request-driver-from-mashkor',
                         'POST create/<store_uuid>' => 'create',
                         'DELETE <order_uuid>/<store_uuid>' => 'delete',
+                        'DELETE soft-delete/<order_uuid>/<store_uuid>' => 'soft-delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS stats' => 'options',
@@ -80,7 +83,10 @@ return [
                         'OPTIONS <store_uuid>' => 'options',
                         'OPTIONS <order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS <type>' => 'options',
+                        'OPTIONS archive-orders' => 'options',
+                        'OPTIONS live-orders' => 'options',
                         'OPTIONS create/<store_uuid>' => 'options',
+                        'OPTIONS soft-delete/<order_uuid>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// OrderItemController
@@ -123,11 +129,12 @@ return [
                         'POST upload-image' => 'upload-category-image',
                         'POST update-position' => 'change-position',
                         'PATCH <category_id>/<store_uuid>' => 'update',
-                        'DELETE <category_id>/<store_uuid>' => 'delete',
+                        'DELETE <category_id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS create' => 'options',
+                        'OPTIONS <category_id>' => 'options',
                         'OPTIONS <category_id>/<store_uuid>' => 'options',
                         'OPTIONS update-position' => 'options',
                         'OPTIONS item-list' => 'options',
@@ -382,6 +389,7 @@ return [
                         'POST update-layout' => 'update-layout',
                         'POST update-analytics-integration/<id>' => 'update-analytics-integration',
                         'POST update-delivery-integration/<id>' => 'update-delivery-integration',
+                        'PATCH update-status/<id>/<status>' => 'update-store-status',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS connect-domain' => 'options',
@@ -395,7 +403,8 @@ return [
                         'OPTIONS disable-online-payment/<id>' => 'options',
                         'OPTIONS enable-cod/<id>' => 'options',
                         'OPTIONS disable-cod/<id>' => 'options',
-                        'OPTIONS update-layout' => 'options'
+                        'OPTIONS update-layout' => 'options',
+                        'OPTIONS update-status/<id>/<status>' => 'options'
                     ]
                 ],
 

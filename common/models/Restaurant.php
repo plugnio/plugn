@@ -1256,6 +1256,27 @@ class Restaurant extends \yii\db\ActiveRecord
         return $photo_url;
     }
 
+    // public function isOpen($asap = null) {
+    //
+    //     $restaurant = self::findOne(['restaurant_uuid'=>$this->restaurant_uuid]);
+    //     $opening_hour_model = OpeningHour::find()
+    //                             ->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])
+    //                             ->andWhere(['<=','open_at', date("H:i:s", strtotime("now"))])
+    //                             ->andWhere(['>=','close_at', date("H:i:s", strtotime("now"))])
+    //                             ->orderBy(['open_at' => SORT_ASC])
+    //                             ->one();
+    //
+    //       if ($opening_hour_model && (
+    //                date("w", strtotime("now")) == $opening_hour_model->day_of_week &&
+    //                strtotime("now") > strtotime(date('c', strtotime($opening_hour_model->open_at, strtotime("now") ))) &&
+    //                strtotime("now") <  strtotime(date('c', strtotime($opening_hour_model->close_at, strtotime("now") )) )
+    //               ) && $restaurant->restaurant_status == self::RESTAURANT_STATUS_OPEN
+    //       ) {
+    //           return true;
+    //       }
+    //     return false;
+    // }
+
     public function isOpen($asap = null) {
 
         $opening_hour_model = OpeningHour::find()

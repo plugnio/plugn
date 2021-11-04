@@ -45,6 +45,7 @@ use yii\helpers\ArrayHelper;
  * @property string $payment_method_name_ar
  * @property string $currency_code
  * @property int|null $order_status
+ * @property int is_deleted
  * @property int $order_mode
  * @property int $subtotal
  * @property int $tax
@@ -150,7 +151,7 @@ class Order extends \yii\db\ActiveRecord
             [['payment_method_id'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
-            [['area_id', 'payment_method_id', 'order_status', 'mashkor_order_status', 'customer_id'], 'integer', 'min' => 0],
+            [['area_id', 'payment_method_id', 'order_status', 'mashkor_order_status', 'customer_id','is_deleted'], 'integer', 'min' => 0],
             [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id', 'reminder_sent', 'sms_sent', 'customer_phone_country_code', 'delivery_zone_id', 'shipping_country_id', 'pickup_location_id'], 'integer'],
             ['mashkor_order_status', 'in', 'range' => [
                 self::MASHKOR_ORDER_STATUS_NEW,

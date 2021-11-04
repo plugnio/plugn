@@ -719,6 +719,16 @@ class CronController extends \yii\console\Controller {
 
 
                     if ($agentAssignment && $agentAssignment->agent) {
+
+                        if($agentAssignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
+                          if($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->delivery_zone_id && $order->deliveryZone->business_location_id != $agentAssignment->business_location_id){
+                             continue;
+                          } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP && $order->pickup_location_id  != $agentAssignment->business_location_id){
+                            continue;
+                          }
+                        }
+
+
                         $result = \Yii::$app->mailer->compose([
                                     'html' => 'order-reminder-html',
                                         ], [

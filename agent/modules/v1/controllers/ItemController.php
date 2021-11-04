@@ -80,14 +80,14 @@ class ItemController extends Controller
 
         $store = Yii::$app->accountManager->getManagedAccount();
 
-        $query = Item::find();
-
+        $query = Item::find()
+            ->andWhere(['restaurant_uuid'=> $store->restaurant_uuid])
+            ->orderBy ([new \yii\db\Expression('item.sort_number ASC')]);
+        
         if ($type != 'all') {
             $query->andWhere(['track_quantity'=> 1]);
         }
 
-        $query->andWhere(['restaurant_uuid'=> $store->restaurant_uuid]);
-        $query->orderBy ([new \yii\db\Expression('item.sort_number ASC')]);
         if ($keyword && $keyword != 'null') {
             $query->andWhere ([
                     'or',

@@ -137,4 +137,36 @@ class OrderQuery extends \yii\db\ActiveQuery
         }
     }
 
+    /**
+     * live orders records only
+     */
+    public function liveOrders()
+    {
+        return $this->andWhere ([
+            'IN',
+            'order_status',
+            [
+                Order::STATUS_PENDING,
+                Order::STATUS_ACCEPTED,
+                Order::STATUS_BEING_PREPARED
+            ]
+        ]);
+    }
+
+    /**
+     * archive orders
+     * @return OrderQuery
+     */
+    public function archiveOrders()
+    {
+        return $this->andWhere ([
+            'IN',
+            'order_status',
+            [
+                Order::STATUS_OUT_FOR_DELIVERY,
+                Order::STATUS_COMPLETE
+            ]
+        ]);
+    }
+
 }
