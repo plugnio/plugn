@@ -164,6 +164,7 @@ class Restaurant extends \yii\db\ActiveRecord
     const SCENARIO_UPDATE_LAYOUT = 'layout';
     const SCENARIO_UPDATE_ANALYTICS = 'update_analytics';
     const SCENARIO_UPDATE_DELIVERY = 'update_delivery';
+    const SCENARIO_CURRENCY = 'currency';
 
     public $restaurant_delivery_area;
     public $restaurant_payments_method;
@@ -385,6 +386,9 @@ class Restaurant extends \yii\db\ActiveRecord
             ],
             self::SCENARIO_UPDATE_DELIVERY => [
                 'armada_api_key', 'mashkor_branch_id'
+            ],
+            self::SCENARIO_CURRENCY => [
+                'currency_id'
             ]
         ]);
     }
@@ -2502,5 +2506,24 @@ class Restaurant extends \yii\db\ActiveRecord
         return $this->hasOne ($modelClass::className (), ['currency_id' => 'currency_id']);
     }
 
+    /**
+     * Gets query for [[Currencies]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrencies($modelClass = "\common\models\Currency")
+    {
+        return $this->hasOne ($modelClass::className (), ['currency_id' => 'currency_id'])
+            ->via('restaurantCurrencies');
+    }
 
+    /**
+     * Gets query for [[RestaurantCurrencies]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurantCurrencies($modelClass = "\common\models\RestaurantCurrency")
+    {
+        return $this->hasOne ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
 }

@@ -1,5 +1,6 @@
 <?php
 return [
+    "Currencies updated successfully" => "",
     "Account created successfully" => "",
     "{amount} available for refund!" => "",
     "Item not found in order!" => "",

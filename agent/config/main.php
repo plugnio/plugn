@@ -167,6 +167,18 @@ return [
                         'OPTIONS' => 'options'
                     ]
                 ],
+                [// CurrencyController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/currency',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET store-currencies' => 'store-currencies',
+                        'PATCH' => 'update',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS store-currencies' => 'options'
+                    ]
+                ],
                 [// CountryController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/country',
