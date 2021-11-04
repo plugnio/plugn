@@ -588,6 +588,30 @@ class StoreController extends Controller
         return self::message("success","Analytics integration updated successfully");
     }
 
+
+    /**
+     * @param $store_uuid
+     * @param $status
+     * @return array
+     * @throws NotFoundHttpException
+     * update store status
+     */
+    public function actionUpdateStoreStatus($id,$status) {
+
+        $model = $this->findModel($id);
+
+        if ($status == Restaurant::RESTAURANT_STATUS_OPEN) {
+            $model->markAsOpen();
+        } else if ($status == Restaurant::RESTAURANT_STATUS_BUSY) {
+            $model->markAsBusy();
+        } else  {
+            $model->restaurant_status = Restaurant::RESTAURANT_STATUS_CLOSED;
+            $model->save(false);
+        }
+
+        return self::message("success","Status changed successfully");
+    }
+
     /**
      * Finds the Restaurant model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

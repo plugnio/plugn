@@ -3,6 +3,7 @@
 namespace agent\modules\v1\controllers;
 
 
+use agent\models\Item;
 use agent\models\Refund;
 use agent\models\RefundedItem;
 use common\models\AreaDeliveryZone;
@@ -73,6 +74,66 @@ class OrderController extends Controller
     }
 
     /**
+     * list all orders where status = pending or being prepared
+     * @param $type
+     * @return ActiveDataProvider
+     */
+    public function actionLiveOrders()
+    {
+        $store_uuid = Yii::$app->request->get ('store_uuid');
+
+        $query = Order::find ()
+            ->filterBusinessLocationIfManager ($store_uuid)
+            ->andWhere (['restaurant_uuid' => $store_uuid])
+            ->andWhere (
+                [
+                    'order_status' => [
+                        Order::STATUS_PENDING,
+                        Order::STATUS_ACCEPTED,
+                        Order::STATUS_BEING_PREPARED
+                    ]
+                ]
+            )
+            ->andWhere (['is_deleted' => 0])
+            ->orderBy (['order_created_at' => SORT_DESC]);
+
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
+    /**
+     * list all order that has been completed order out for delivery
+     * @param $type
+     * @return ActiveDataProvider
+     */
+    public function actionArchiveOrders()
+    {
+        $store_uuid = Yii::$app->request->get ('store_uuid');
+
+        $query = Order::find ()
+            ->filterBusinessLocationIfManager ($store_uuid)
+            ->andWhere (['restaurant_uuid' => $store_uuid])
+            ->andWhere (
+                [
+                    'order_status' => [
+                      Order::STATUS_OUT_FOR_DELIVERY,
+                      Order::STATUS_COMPLETE,
+
+                    ]
+                ]
+            )
+            ->andWhere (['is_deleted' => 0])
+            ->orderBy (['order_created_at' => SORT_DESC]);
+
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
+    /**
      * list orders
      * @param $type
      * @return ActiveDataProvider
@@ -104,7 +165,11 @@ class OrderController extends Controller
         // grid filtering conditions
         $query->orderBy (['order_created_at' => SORT_DESC]);
 
-        if ($status !== null) {
+        if ($status == '11') {
+            $query->liveOrders();
+        } else if ($status == '12') {
+            $query->archiveOrders();
+        } else if ($status !== null) {
             $query->andFilterWhere (['order_status' => $status]);
         }
 
@@ -141,7 +206,7 @@ class OrderController extends Controller
         } else if ($type == 'draft') {
             $query->andWhere (['order_status' => Order::STATUS_DRAFT]);
         }
-
+        $query->andWhere (['is_deleted' => 0]);
         return new ActiveDataProvider([
             'query' => $query
         ]);
@@ -353,6 +418,40 @@ class OrderController extends Controller
                 ->andFilterWhere ([
                     'order_status' => Order::STATUS_ABANDONED_CHECKOUT
                 ])
+                ->count ();
+        }
+
+        if ($customer_id) {
+            $response['liveOrders'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
+                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
+                ->andFilterWhere ([
+                    'customer_id' => $customer_id
+                ])
+                ->liveOrders()
+                ->count ();
+        } else {
+            $response['liveOrders'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
+                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
+                ->liveOrders()
+                ->count ();
+        }
+
+        if ($customer_id) {
+            $response['archiveOrders'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
+                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
+                ->andFilterWhere ([
+                    'customer_id' => $customer_id
+                ])
+                ->archiveOrders()
+                ->count ();
+        } else {
+            $response['archiveOrders'] = $store->getOrders ()
+                ->filterByKeyword($keyword)
+                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
+                ->archiveOrders()
                 ->count ();
         }
 
@@ -1092,6 +1191,50 @@ class OrderController extends Controller
             }
         }
 
+        return [
+            "operation" => "success",
+            "message" => Yii::t ('agent', "Order deleted successfully")
+        ];
+    }
+
+
+    /**
+     * Delete Order
+     */
+    public function actionSoftDelete($order_uuid, $store_uuid)
+    {
+        $model = $this->findModel ($order_uuid, $store_uuid);
+        $transaction = Yii::$app->db->beginTransaction();
+        if ($model->orderItems) {
+            foreach ($model->orderItems as $item) {
+                $itemsModel = Item::findOne(['item_uuid'=>$item->item_uuid]);
+                if ($itemsModel) {
+                    $itemsModel->unit_sold -= $item->qty;
+                    $itemsModel->stock_qty += $item->qty;
+                    if (!$itemsModel->save(false)) {
+                        $transaction->rollBack();
+                    }
+                }
+            }
+        }
+
+
+        $model->is_deleted = 1;
+        if (!$model->save ()) {
+            $transaction->rollBack();
+            if (isset($model->errors)) {
+                return [
+                    "operation" => "error",
+                    "message" => $model->errors
+                ];
+            } else {
+                return [
+                    "operation" => "error",
+                    "message" => Yii::t ('agent', "We've faced a problem deleting the order")
+                ];
+            }
+        }
+        $transaction->commit();
         return [
             "operation" => "success",
             "message" => Yii::t ('agent', "Order deleted successfully")

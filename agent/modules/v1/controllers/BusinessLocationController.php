@@ -229,7 +229,11 @@ class BusinessLocationController extends Controller
         Yii::$app->accountManager->getManagedAccount ($store_uuid);
         $model = $this->findModel ($business_location_id, $store_uuid);
 
-        if (!$model->delete ()) {
+        $model->setScenario(BusinessLocation::SCENARIO_DELETE);
+
+        $model->is_deleted = 1;
+
+        if (!$model->save ()) {
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",

@@ -19,14 +19,15 @@ use Yii;
  * @property string $armada_api_key
  * @property float|null $latitude
  * @property float|null $longitude
-
-
+ * @property boolean $is_deleted
  * @property Restaurant $restaurant
-  * @property Country $country
+ * @property Country $country
  * @property DeliveryZone[] $deliveryZones
  */
 class BusinessLocation extends \yii\db\ActiveRecord
 {
+    const SCENARIO_DELETE = 'delete';
+
     /**
      * {@inheritdoc}
      */
@@ -42,7 +43,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
     {
         return [
             [['restaurant_uuid', 'country_id', 'business_location_name', 'business_location_name_ar'], 'required'],
-            [['country_id' , 'support_pick_up'], 'integer'],
+            [['country_id' , 'support_pick_up', 'is_deleted'], 'integer'],
             [['support_pick_up'], 'default', 'value' => 0],
             [['latitude', 'longitude'], 'number'],
             [['business_location_tax'], 'default', 'value' => 0],
@@ -68,6 +69,14 @@ class BusinessLocation extends \yii\db\ActiveRecord
             'support_pick_up' => 'Support Pick Up',
             'business_location_tax' => 'Tax / VAT',
         ];
+    }
+
+    public function scenarios() {
+        $scenarios = parent::scenarios();
+    
+        $scenarios['delete'] = ['is_deleted'];
+    
+        return $scenarios;
     }
 
     /**
@@ -162,5 +171,9 @@ class BusinessLocation extends \yii\db\ActiveRecord
     public function getTotalDeliveryZoneCountry($modelClass = "\common\models\Country")
     {
         return $this->getDeliveryZoneCountries($modelClass)->count();
+    }
+
+    public static function find() {
+        return new query\BusinessLocationQuery(get_called_class());
     }
 }

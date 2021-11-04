@@ -19,6 +19,7 @@ return [
     "Confirm Password field required" => "مطلوب حقل تأكيد كلمة المرور",
     "Password field required" => "حقل كلمة المرور مطلوب",
     "Password not matching" => "كلمة المرور غير متطابقة",
+    "You're not assigned to any store" => "لم يتم تعيينك إلى أي متجر",
     "Old Password not valid" => "كلمة المرور القديمة غير صالحة",
     "Account Password Updated Successfully" => "تم تحديث كلمة مرور الحساب بنجاح",
     "Delivery areas updated successfully" => "تم تحديث مناطق التوصيل بنجاح",
@@ -122,5 +123,5 @@ return [
     "Net Amount" => "كمية الشبكة",
     "Plugn fee" => "رسوم Plugn",
     "Payment Gateway fee" => "رسوم بوابة الدفع",
+    "Status changed successfully" => "تم تغيير الوضع بنجاح"
 ];
-
