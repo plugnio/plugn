@@ -17,6 +17,7 @@ class m211103_105549_currency_conversion_table extends Migration
         $this->addColumn('currency','rate',$this->double()->after('currency_symbol'));
         $this->addColumn('currency','sort_order',$this->smallInteger(3)->defaultValue(0)->notNull()->after('rate'));
         $this->addColumn('currency','datetime',$this->dateTime()->after('sort_order'));
+
         Currency::getDataFromApi();
     }
 

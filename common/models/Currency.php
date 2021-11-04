@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\AttributeBehavior;
+use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 
 /**
@@ -11,6 +13,10 @@ use yii\db\Expression;
  * @property int $currency_id
  * @property string $title
  * @property string $code
+ * @property string $currency_symbol
+ * @property string $rate
+ * @property integer $sort_order
+ * @property string $datetime
  *
  * @property Restaurant[] $restaurants
  */
@@ -25,34 +31,91 @@ class Currency extends \yii\db\ActiveRecord
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function rules()
-    {
+    public function rules() {
         return [
-            [['title', 'code'], 'required'],
-            [['title', 'code'], 'string', 'max' => 255],
+            [['title', 'code', 'rate'], 'required'],
+            [['rate'], 'number'],
+            [['sort_order'], 'number', 'max' => 100],
+            [['title', 'code'], 'string']
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function fields() {
+        $fields = parent::fields();
+
+        $fields['symbol'] = function($model) {
+            return $this->currencySymbol($model->currency);
+        };
+
+        $fields['currency_name'] = function($model) {
+            return mb_convert_encoding($model->currency_name, 'UTF-8', 'UTF-8');
+        };
+
+        $fields['currency_symbol'] = function($model) {
+            return mb_convert_encoding($model->currency_symbol, 'UTF-8', 'UTF-8');
+        };
+
+        return $fields;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function extraFields() {
+        return array_merge(
+            parent::extraFields(),
+            [
+                'sign'
+            ]
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels() {
+        return [
+            'title' => Yii::t('app', 'Title'),
+            'code' => Yii::t('app', 'Code'),
+            'rate' => Yii::t('app', 'Rate'),
+            'sort_order' => Yii::t('app', 'Sort Order'),
+            'datetime' => Yii::t('app', 'Date Time'),
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function behaviors()
     {
         return [
-            'currency_id' => 'Currency ID',
-            'title' => 'Title',
-            'code' => 'Code',
+            [
+                'class' => TimestampBehavior::className (),
+                'createdAtAttribute' => null,
+                'updatedAtAttribute' => 'datetime',
+                'value' => new Expression('NOW()'),
+            ]
         ];
     }
 
+    /**
+     * update currency rates
+     * @param bool $useTransaction
+     * @return string
+     * @throws \yii\db\Exception
+     */
     public static function getDataFromApi($useTransaction = true) {
 
         if($useTransaction)
             $transaction = Yii::$app->db->beginTransaction();
 
         $api_key = Yii::$app->params['currencylayer_api_key'];
+
         $response = file_get_contents('http://apilayer.net/api/live?access_key=' . $api_key . '&source=USD');
 
         $data = json_decode($response);
@@ -64,7 +127,6 @@ class Currency extends \yii\db\ActiveRecord
         $arrCurrencyName = \yii\helpers\ArrayHelper::map($currentData, 'code', 'title');
         $arrCurrencySymbol = \yii\helpers\ArrayHelper::map($currentData, 'code', 'currency_symbol');
 
-
         if (isset($data->quotes)) {
 
             foreach ($data->quotes as $label => $rate) {
@@ -75,28 +137,17 @@ class Currency extends \yii\db\ActiveRecord
                     continue;
                 }
 
+                $model = Currency::findOne(['code' => $currency]);
 
-                $insertData[] = [
-                    $currency,
-                    isset($arrCurrencyName[$currency]) ? $arrCurrencyName[$currency] : null,
-                    isset($arrCurrencySymbol[$currency]) ? $arrCurrencySymbol[$currency] : null,
-                    $rate,
-                    isset($arrSortOrder[$currency]) ? $arrSortOrder[$currency] : null,
-                    new Expression('NOW()')
-                ];
+                if(!$model) {
+                    $model = new Currency();
+                }
+
+                $model->title = isset($arrCurrencyName[$currency]) ? $arrCurrencyName[$currency] : null;
+                $model->currency_symbol = isset($arrCurrencySymbol[$currency]) ? $arrCurrencySymbol[$currency] : null;
+                $model->rate = $rate;
+                $model->save();
             }
-
-            Currency::deleteAll();
-
-            Yii::$app->db->createCommand()->batchInsert('currency', [
-                'code',
-                'title',
-                'currency_symbol',
-                'rate',
-                'sort_order',
-                'datetime'
-            ], $insertData
-            )->execute();
 
             if ($useTransaction)
                 $transaction->commit();
@@ -144,7 +195,7 @@ class Currency extends \yii\db\ActiveRecord
             'ZAR' => 'R'
         ];
 
-        return isset($arr[$this->currency])? $arr[$this->currency]: $this->currency;
+        return isset($arr[$this->code])? $arr[$this->code]: $this->code;
     }
 
     /**
