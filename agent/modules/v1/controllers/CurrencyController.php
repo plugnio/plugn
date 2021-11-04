@@ -2,9 +2,11 @@
 
 namespace agent\modules\v1\controllers;
 
+use Yii;
 use agent\models\Currency;
 use common\models\Restaurant;
 use common\models\RestaurantCurrency;
+use yii\data\ActiveDataProvider;
 use yii\rest\Controller;
 
 
@@ -59,10 +61,42 @@ class CurrencyController extends Controller {
     }
 
     /**
+     * only owner will have access
+     */
+    public function beforeAction($action)
+    {
+        parent::beforeAction ($action);
+
+        if(in_array ($action->id, ['options', 'list'])) {
+            return true;
+        }
+
+        if(!Yii::$app->accountManager->isOwner() && !in_array ($action->id, ['store-currencies'])) {
+            throw new \yii\web\BadRequestHttpException(
+                Yii::t('agent', 'You are not allowed to manage currency. Please contact with store owner')
+            );
+
+            return false;
+        }
+
+        //should have access to store
+
+        Yii::$app->accountManager->getManagedAccount();
+
+        return true;
+    }
+
+    /**
      * Get all currency data
      * @return type
      */
     public function actionList() {
+
+        //to fix : hide apply button for jobs already applied
+        $authHeader = Yii::$app->request->getHeaders()->get('Authorization');
+        if ($authHeader !== null && preg_match('/^Bearer\s+(.*?)$/', $authHeader, $matches)) {
+            Yii::$app->user->loginByAccessToken($matches[1]);
+        }
 
         $keyword = Yii::$app->request->get('keyword');
         $page = Yii::$app->request->get('page');

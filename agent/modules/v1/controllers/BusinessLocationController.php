@@ -98,6 +98,7 @@ class BusinessLocationController extends Controller
 
         //should have access to store
         Yii::$app->accountManager->getManagedAccount();
+
         return true;
     }
 

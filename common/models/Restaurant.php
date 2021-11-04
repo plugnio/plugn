@@ -1299,6 +1299,7 @@ class Restaurant extends \yii\db\ActiveRecord
             'country' => function ($restaurant) {
                 return $restaurant->getCountry ()->one ();
             },
+            'currencies',
             'currency' => function ($restaurant) {
                 return $restaurant->getCurrency ()->one ();
             },
@@ -2513,7 +2514,7 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getCurrencies($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne ($modelClass::className (), ['currency_id' => 'currency_id'])
+        return $this->hasMany($modelClass::className (), ['currency_id' => 'currency_id'])
             ->via('restaurantCurrencies');
     }
 
@@ -2524,6 +2525,6 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getRestaurantCurrencies($modelClass = "\common\models\RestaurantCurrency")
     {
-        return $this->hasOne ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 }

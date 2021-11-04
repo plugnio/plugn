@@ -173,7 +173,7 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET store-currencies' => 'store-currencies',
-                        'PATCH' => 'update',
+                        'POST' => 'update',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS store-currencies' => 'options'
