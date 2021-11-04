@@ -111,9 +111,6 @@ class Currency extends \yii\db\ActiveRecord
      */
     public static function getDataFromApi($useTransaction = true) {
 
-        if($useTransaction)
-            $transaction = Yii::$app->db->beginTransaction();
-
         $api_key = Yii::$app->params['currencylayer_api_key'];
 
         $response = file_get_contents('http://apilayer.net/api/live?access_key=' . $api_key . '&source=USD');
@@ -129,6 +126,9 @@ class Currency extends \yii\db\ActiveRecord
 
         if (isset($data->quotes)) {
 
+            if($useTransaction)
+                $transaction = Yii::$app->db->beginTransaction();
+
             foreach ($data->quotes as $label => $rate) {
 
                 $currency = substr($label, 3);
@@ -141,12 +141,19 @@ class Currency extends \yii\db\ActiveRecord
 
                 if(!$model) {
                     $model = new Currency();
+                    $model->code = $currency;
                 }
 
                 $model->title = isset($arrCurrencyName[$currency]) ? $arrCurrencyName[$currency] : null;
                 $model->currency_symbol = isset($arrCurrencySymbol[$currency]) ? $arrCurrencySymbol[$currency] : null;
                 $model->rate = $rate;
-                $model->save();
+
+                if(!$model->save()) {
+                    
+                    $transaction->rollBack();
+
+                    return $model->errors;
+                }
             }
 
             if ($useTransaction)
