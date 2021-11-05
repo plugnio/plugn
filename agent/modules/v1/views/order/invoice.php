@@ -91,7 +91,7 @@
                         </p>
                         <?php } ?>
 
-                        <?php if(($order->unit_type == 'Apartment' || $order->unit_type == 'Office') || $order->avenue) { ?>
+                        <?php if((strtolower($order->unit_type) == 'apartment' || strtolower($order->unit_type) == 'office')) { ?>
 
                             <?php if($order->avenue) { ?>
                                 <p style="font-family: Nunito"  class="txt-avenue">
@@ -105,19 +105,19 @@
                                 </p>
                             <?php } ?>
 
-                            <?php if($order->unit_type == 'Apartment' && $order->apartment) { ?>
+                            <?php if(strtolower($order->unit_type) == 'apartment' && $order->apartment) { ?>
                                 <p style="font-family: Nunito"  class="txt-building">
                                     Apartment No. <?= $order->apartment ?>
                                 </p>
                             <?php } ?>
 
-                            <?php if($order->unit_type == 'Office' && $order->office) { ?>
+                            <?php if(strtolower($order->unit_type) == 'office' && $order->office) { ?>
                                 <p style="font-family: Nunito"  class="txt-building">
                                     Office No. <?= $order->office ?>
                                 </p>
                             <?php } ?>
 
-                            <?php if($order->unit_type != 'House' && $order->house_number) { ?>
+                            <?php if(strtolower($order->unit_type) != 'house' && $order->house_number) { ?>
                                 <p style="font-family: Nunito"  class="txt-building">
                                     Building <?= $order->house_number ?>
                                 </p>
@@ -125,7 +125,7 @@
 
                         <?php } ?>
 
-                        <?php if($order->unit_type != 'Apartment' && $order->unit_type != 'Office') { ?>
+                        <?php if(strtolower($order->unit_type) != 'apartment' && strtolower($order->unit_type) != 'office') { ?>
 
                             <?php if($order->avenue) { ?>
                             <p class="txt-avenue">
@@ -133,13 +133,13 @@
                             </p>
                             <?php } ?>
 
-                            <?php if($order->unit_type == 'House') { ?>
+                            <?php if(strtolower($order->unit_type) == 'house') { ?>
                             <p class="txt-house-number">
                                 House No. <?= $order->house_number ?>
                             </p>
                             <?php } ?>
 
-                            <?php if($order->unit_type != 'House') { ?>
+                            <?php if(strtolower($order->unit_type) != 'house') { ?>
                             <p class="txt-building">
                                 Building <?= $order->house_number ?>
                             </p>
