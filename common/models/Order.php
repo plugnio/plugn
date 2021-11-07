@@ -1338,6 +1338,17 @@ class Order extends \yii\db\ActiveRecord
 
         foreach($this->restaurant->agentAssignments as $agentAssignment) {
 
+            if($agentAssignment->role  == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
+
+              if($this->order_mode == Order::ORDER_MODE_DELIVERY){
+                if($this->delivery_zone_id && $this->businessLocation && $this->businessLocation->business_location_id != $agentAssignment->business_location_id)
+                  continue;
+              } else {
+                if($this->pickup_location_id && $this->pickup_location_id != $agentAssignment->business_location_id)
+                  continue;
+              }
+            }
+
             $filters = [
                 [
                     "field" => "tag",
