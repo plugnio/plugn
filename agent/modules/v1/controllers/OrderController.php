@@ -127,7 +127,6 @@ class OrderController extends Controller
             ->andWhere (['is_deleted' => 0])
             ->orderBy (['order_created_at' => SORT_DESC]);
 
-
         return new ActiveDataProvider([
             'query' => $query
         ]);
@@ -502,6 +501,9 @@ class OrderController extends Controller
         $order->customer_phone_number = str_replace (' ', '', strval (Yii::$app->request->getBodyParam ("phone_number")));
         $order->customer_phone_country_code = Yii::$app->request->getBodyParam ("country_code") ? Yii::$app->request->getBodyParam ("country_code") : 965;
         $order->customer_email = Yii::$app->request->getBodyParam ("email"); //optional
+
+        $order->currency_code = Yii::$app->request->getBodyParam ("currency_code");
+
         //payment method => cash
         $order->payment_method_id = 3;
 
@@ -527,7 +529,6 @@ class OrderController extends Controller
                 $order->street = Yii::$app->request->getBodyParam ("street");
                 $order->avenue = Yii::$app->request->getBodyParam ("avenue"); //optional
                 $order->house_number = Yii::$app->request->getBodyParam ("house_number");
-
 
                 if (Yii::$app->request->getBodyParam ("floor") != null && ($order->unit_type == 'Apartment' || $order->unit_type == 'Office'))
                     $order->floor = Yii::$app->request->getBodyParam ("floor");
@@ -555,7 +556,6 @@ class OrderController extends Controller
         } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
             $order->pickup_location_id = Yii::$app->request->getBodyParam ("business_location_id");
         }
-
 
         $response = [];
 
