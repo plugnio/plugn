@@ -1204,11 +1204,9 @@ class Restaurant extends \yii\db\ActiveRecord
             $subscription->subscription_status = Subscription::STATUS_ACTIVE; //Free plan by default
             $subscription->save ();
 
-
             $restaurant_theme = new RestaurantTheme();
             $restaurant_theme->restaurant_uuid = $this->restaurant_uuid;
             $restaurant_theme->save ();
-
 
             //Add opening hrs
             for ($i = 0; $i < 7; ++$i) {
@@ -1219,6 +1217,11 @@ class Restaurant extends \yii\db\ActiveRecord
                 $opening_hour->close_at = '23:59:59';
                 $opening_hour->save ();
             }
+
+            $currecy = new RestaurantCurrency();
+            $currecy->restaurant_uuid = $this->restaurant_uuid;
+            $currecy->currency_id = $this->currency_id;
+            $currecy->save();
         }
     }
 

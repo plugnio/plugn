@@ -49,11 +49,11 @@ class Currency extends \yii\db\ActiveRecord
         $fields = parent::fields();
 
         $fields['symbol'] = function($model) {
-            return $this->currencySymbol($model->currency);
+            return $this->currencySymbol($model->code);
         };
 
-        $fields['currency_name'] = function($model) {
-            return mb_convert_encoding($model->currency_name, 'UTF-8', 'UTF-8');
+        $fields['title'] = function($model) {
+            return mb_convert_encoding($model->title, 'UTF-8', 'UTF-8');
         };
 
         $fields['currency_symbol'] = function($model) {
