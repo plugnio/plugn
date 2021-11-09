@@ -112,6 +112,13 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         $totalPrice *= $this->qty; //6*5
 
+        //convert from store currency to order currency if not same
+
+        if($this->restaurant->currency->code != $this->order->currency_code)
+        {
+            return ($totalPrice / $this->restaurant->currency->rate) * $this->order->currency->rate;
+        }
+
         return $totalPrice;
     }
 
@@ -125,7 +132,6 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         if ($this->item)
             $this->item->increaseStockQty($this->qty);
-
 
         $orderItemsExtraOption = OrderItemExtraOption::find()->where(['order_item_id' => $this->order_item_id])->all();
 

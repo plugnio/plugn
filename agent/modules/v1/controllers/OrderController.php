@@ -647,7 +647,11 @@ class OrderController extends Controller
                 $response = [
                     'operation' => 'error',
                     'message' => Yii::t ('agent', 'Minimum order amount {amount}', [
-                        'amount' => Yii::$app->formatter->asCurrency ($order->deliveryZone->min_charge, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
+                        'amount' => Yii::$app->formatter->asCurrency (
+                            $order->deliveryZone->min_charge,
+                            $order->currency->code,
+                            [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]
+                        )
                     ])
                 ];
             }

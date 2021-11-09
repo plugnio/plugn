@@ -929,6 +929,14 @@ class Order extends \yii\db\ActiveRecord
             $this->currency_code = $this->restaurant->currency->code;
         }
 
+        //currency rate from store currency to order currency
+
+        if(!$this->currency_rate)
+        {
+            $this->store_currency_code = $this->restaurant->currency->code;
+            $this->currency_rate = $this->currency->rate / $this->restaurant->currency->rate;
+        }
+
         if ($insert && $this->scenario == self::SCENARIO_CREATE_ORDER_BY_ADMIN) {
             $this->order_status = self::STATUS_DRAFT;
         }
