@@ -205,7 +205,8 @@ class Item extends \yii\db\ActiveRecord
         return array_merge ($fields, [
             'currency',
             'options',
-            'extraOptions'
+            'extraOptions',
+            'itemImages'
         ]);
     }
 

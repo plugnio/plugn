@@ -152,35 +152,35 @@ class ItemController extends Controller {
 
       $restaurant = Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->one();
 
-
               if ($restaurant) {
 
-                if($restaurant->is_myfatoorah_enable)
-                  unset($restaurant['live_public_key']);
-
-                  $restaurantMenu = Category::find()
+                  $query = Category::find()
                           ->andWhere(['restaurant_uuid' => $restaurant_uuid])
-                          ->with('items', 'items.options', 'items.options.extraOptions','items.itemImages')
-                          ->orderBy([new \yii\db\Expression('sort_number IS NULL, sort_number ASC')])
-                          ->asArray()
-                          ->all();
+                          // ->with('items', 'items.options', 'items.options.extraOptions','items.itemImages')
+                          ->orderBy([new \yii\db\Expression('sort_number IS NULL, sort_number ASC')]);
+                          // ->all();
 
 
-                  foreach ($restaurantMenu as $category) {
-                      unset($category['categoryItems']);
-                  }
+                  // foreach ($restaurantMenu as $category) {
+                  //     unset($category['categoryItems']);
+                  // }
+                  //
+                  // foreach ($restaurantMenu as $key => $category) {
+                  //     unset($restaurantMenu[$key]['categoryItems']);
+                  //
+                  //     foreach ($category['items'] as $itemKey => $item) {
+                  //       unset($restaurantMenu[$key]['items'][$itemKey]['unit_sold']);
+                  //     }
+                  // }
 
-                  foreach ($restaurantMenu as $key => $category) {
-                      unset($restaurantMenu[$key]['categoryItems']);
+                  // return [
+                  //     'restaurantMenu' => $restaurantMenu
+                  // ];
 
-                      foreach ($category['items'] as $itemKey => $item) {
-                        unset($restaurantMenu[$key]['items'][$itemKey]['unit_sold']);
-                      }
-                  }
+                  return new ActiveDataProvider([
+                      'query' => $query
+                  ]);
 
-                  return [
-                      'restaurantMenu' => $restaurantMenu
-                  ];
               } else {
                   return [
                       'operation' => 'error',
