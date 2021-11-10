@@ -12,8 +12,17 @@ class m211109_112639_store_currency extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('order', 'store_currency_code', $this->char(3)->after('currency_code'));
-        $this->addColumn('order', 'currency_rate', $this->double(15,8)->after('store_currency_code'));
+        $table = $this
+            ->getDb()
+            ->getSchema()
+            ->getTableSchema('order');
+
+        if (!isset($table->columns['store_currency_code'])) {
+            $this->addColumn('order', 'store_currency_code', $this->char(3)->after('currency_code'));
+        }
+        if (!isset($table->columns['currency_rate'])) {
+            $this->addColumn('order', 'currency_rate', $this->double(15,8)->after('store_currency_code'));
+        }
     }
 
     /**
@@ -23,7 +32,7 @@ class m211109_112639_store_currency extends Migration
     {
         echo "m211109_112639_store_currency cannot be reverted.\n";
 
-        return false;
+        return true;
     }
 
     /*
