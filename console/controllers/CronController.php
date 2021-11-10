@@ -521,7 +521,7 @@ class CronController extends \yii\console\Controller {
         $refunds = Refund::find()
                     ->joinWith(['store','payment','currency'])
                     ->where(['refund.refund_reference' => null])
-                    ->where(['payment.payment_current_status' => 'CAPTURED'])
+                    ->andWhere(['payment.payment_current_status' => 'CAPTURED'])
                     ->andWhere(['NOT', ['refund.payment_uuid' => null]])
                     ->all();
 
@@ -559,7 +559,8 @@ class CronController extends \yii\console\Controller {
 
 
                   $response = Yii::$app->tapPayments->createRefund(
-                          $refund->payment->payment_gateway_transaction_id, $refund->refund_amount, $refund->currency->code, $refund->reason
+                          $refund->payment->payment_gateway_transaction_id, $refund->refund_amount, $refund->currency->code, $refund->reason ? $refund->reason : 'requested_by_customer'
+
                   );
 
                   if (array_key_exists('errors', $response->data)) {

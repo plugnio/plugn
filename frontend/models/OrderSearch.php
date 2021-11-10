@@ -71,7 +71,9 @@ class OrderSearch extends Order {
         // add conditions that should always apply here
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-                'pagination' => false
+            'pagination' => [
+                'pageSize' => 50,
+             ],
         ]);
 
         $this->load($params);
@@ -145,7 +147,9 @@ class OrderSearch extends Order {
         // add conditions that should always apply here
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-                'pagination' => false
+            'pagination' => [
+                'pageSize' => 50,
+             ],
         ]);
 
         $this->load($params);
@@ -277,7 +281,7 @@ class OrderSearch extends Order {
             ->joinWith('pickupLocation', true)
             ->joinWith('customer', true)
             ->orderBy(['order_created_at' => SORT_DESC]);
-  
+
         if($agentAssignment && $agentAssignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
 
             $query

@@ -79,10 +79,12 @@ return [
                     'patterns' => [
                         'GET detail' => 'item-data',
                         'GET' => 'restaurant-menu',
+                        'GET store-catalog' => 'get-store-catalog',
                         'GET <category_id>' => 'category-products',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
+                        'OPTIONS store-catalog' => 'options',
                         'OPTIONS <category_id>' => 'options',
                     ]
                 ],
@@ -127,10 +129,12 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET get-opening-hours' => 'get-opening-hours',
+                        'GET store-data' => 'store-data',
                         'POST get-delivery-time' => 'get-delivery-time',
                         'GET locations/<id>' => 'list-all-stores-locations',
                         'GET get-restaurant-data/<branch_name>' => 'get-restaurant-data',
                         // OPTIONS VERBS
+                        'OPTIONS store-data' => 'options',
                         'OPTIONS get-opening-hours' => 'options',
                         'OPTIONS get-delivery-time' => 'options',
                         'OPTIONS locations/<id>' => 'options',
