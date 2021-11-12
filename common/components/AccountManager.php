@@ -126,4 +126,6 @@ class AccountManager  extends BaseObject
 
         return $assignment && $assignment->role == AgentAssignment::AGENT_ROLE_OWNER;
     }
+
+
 }

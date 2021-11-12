@@ -44,6 +44,8 @@ use yii\helpers\ArrayHelper;
  * @property string $payment_method_name
  * @property string $payment_method_name_ar
  * @property string $currency_code
+ * @property string $store_currency_code
+ * @property string $currency_rate
  * @property int|null $order_status
  * @property int is_deleted
  * @property int $order_mode
@@ -263,7 +265,9 @@ class Order extends \yii\db\ActiveRecord
                     'armada_tracking_link', 'armada_qr_code_link', 'armada_delivery_code',
                     'country_name', 'country_name_ar', 'business_location_name',
                     'building', 'apartment', 'city', 'address_1', 'address_2', 'postalcode', 'floor', 'office',
-                    'recipient_name', 'recipient_phone_number', 'gift_message', 'currency_code', 'sender_name','armada_order_status', 'diggipack_awb_no'
+                    'recipient_name', 'recipient_phone_number', 'gift_message',
+                    'currency_code',  'store_currency_code', 'currency_rate', 'sender_name',
+                    'armada_order_status', 'diggipack_awb_no'
                 ],
                 'safe'
             ],
@@ -494,20 +498,17 @@ class Order extends \yii\db\ActiveRecord
             $this->addError ($attribute, "Store does not deliver to this delivery zone.");
     }
 
-
     /**
      * Check if  store deliver to the selected country
      * @param type $attribute
      */
     public function validateCountry($attribute)
     {
-
         $areaDeliveryZone = AreaDeliveryZone::find ()->where (['country_id' => $this->shipping_country_id, 'delivery_zone_id' => $this->delivery_zone_id])->one ();
 
         if (!$areaDeliveryZone || $areaDeliveryZone->area_id != null || ($areaDeliveryZone && $areaDeliveryZone->businessLocation->restaurant_uuid != $this->restaurant_uuid))
             $this->addError ($attribute, "Store does not deliver to this area. ");
     }
-
 
     /**
      * Validate order mode attribute
@@ -515,7 +516,6 @@ class Order extends \yii\db\ActiveRecord
      */
     public function validateOrderMode($attribute)
     {
-
         if ($this->$attribute == static::ORDER_MODE_DELIVERY && !$this->delivery_zone_id)
             $this->addError ($attribute, "Store doesn't accept delviery");
 
@@ -544,7 +544,6 @@ class Order extends \yii\db\ActiveRecord
             $this->addError ($attribute, "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency ($this->deliveryZone->min_charge, $this->currency->code));
         }
     }
-
 
     /**
      * {@inheritdoc}
@@ -585,6 +584,8 @@ class Order extends \yii\db\ActiveRecord
             'payment_method_name' => 'Payment method name',
             'payment_method_name_ar' => 'Payment method name [Arabic]',
             'currency_code' => 'Currency Code',
+            'store_currency_code' => 'Store Currency Code',
+            'currency_rate' => 'Currency Rate',
             'order_status' => 'Status',
             'total_price' => 'Price',
             'total_price_before_refund' => 'Total price before refund',
@@ -623,7 +624,6 @@ class Order extends \yii\db\ActiveRecord
             ];
         }
 
-
         if ($this->customer_email) {
 
             \Yii::$app->mailer->compose ([
@@ -655,7 +655,6 @@ class Order extends \yii\db\ActiveRecord
                     ->send ();
             }
         }
-
 
         if ($this->restaurant->restaurant_email_notification && $this->restaurant->restaurant_email) {
 
@@ -927,6 +926,14 @@ class Order extends \yii\db\ActiveRecord
             }
 
             $this->currency_code = $this->restaurant->currency->code;
+        }
+
+        //currency rate from store currency to order currency
+
+        if(!$this->currency_rate)
+        {
+            $this->store_currency_code = $this->restaurant->currency->code;
+            $this->currency_rate = $this->currency->rate / $this->restaurant->currency->rate;
         }
 
         if ($insert && $this->scenario == self::SCENARIO_CREATE_ORDER_BY_ADMIN) {

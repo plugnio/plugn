@@ -13,12 +13,27 @@ class m211103_105549_currency_conversion_table extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('currency','currency_symbol',$this->string()->after('code'));
-        $this->addColumn('currency','rate',$this->double()->after('currency_symbol'));
-        $this->addColumn('currency','sort_order',$this->smallInteger(3)->defaultValue(0)->notNull()->after('rate'));
-        $this->addColumn('currency','datetime',$this->dateTime()->after('sort_order'));
+        $table = $this
+            ->getDb()
+            ->getSchema()
+            ->getTableSchema('currency');
 
-        Currency::getDataFromApi();
+            if (!isset($table->columns['currency_symbol'])) {
+                $this->addColumn('currency','currency_symbol',$this->string()->after('code'));
+            }
+            if (!isset($table->columns['rate'])) {
+                $this->addColumn('currency','rate',$this->double()->after('currency_symbol'));
+            }
+
+            if (!isset($table->columns['sort_order'])) {
+                $this->addColumn('currency','sort_order',$this->smallInteger(3)->defaultValue(0)->notNull()->after('rate'));
+            }
+
+            if (!isset($table->columns['datetime'])) {
+                $this->addColumn('currency','datetime',$this->dateTime()->after('sort_order'));
+            }
+
+        Currency::getDataFromApi(false);
     }
 
     /**
