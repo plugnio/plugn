@@ -355,6 +355,7 @@ class Currency extends \yii\db\ActiveRecord
         }
         return $cur;
     }
+    
     /**
      * Gets query for [[Restaurants]].
      *
@@ -364,5 +365,4 @@ class Currency extends \yii\db\ActiveRecord
     {
         return $this->hasMany($modelClass::className(), ['currency_id' => 'currency_id']);
     }
-
 }
