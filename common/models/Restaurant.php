@@ -2510,7 +2510,7 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getCategories($modelClass = "\common\models\Category")
     {
-        return $this->hasOne ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
