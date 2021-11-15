@@ -58,6 +58,7 @@ return [
                         'GET <category_id>' => 'category-products',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS items' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS <category_id>' => 'options',
                     ]
@@ -79,10 +80,12 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET detail' => 'item-data',
+                        'GET items' => 'items',
                         'GET' => 'restaurant-menu',
                         'GET <category_id>' => 'category-products',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS items' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS <category_id>' => 'options',
                     ]
