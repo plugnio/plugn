@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use api\models\Item;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
@@ -848,7 +849,6 @@ class Restaurant extends \yii\db\ActiveRecord
         return $photo_url;
     }
 
-
     /**
      * Return authorized_signature_file
      * @return string
@@ -1290,6 +1290,8 @@ class Restaurant extends \yii\db\ActiveRecord
     public function extraFields()
     {
         return [
+            'noOfItems',
+            'categories',
             'isOpen' => function ($restaurant) {
                 return $restaurant->isOpen ();
             },
@@ -2082,6 +2084,17 @@ class Restaurant extends \yii\db\ActiveRecord
         return array_reverse ($most_sold_item_chart_data);
     }
 
+    /**
+     * Gets query for [[NoOfItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getNoOfItems($modelClass = "\common\models\Item")
+    {
+        return $this->getItems ($modelClass)
+            ->andWhere (['item_status' => Item::ITEM_STATUS_PUBLISH])
+            ->count();
+    }
 
     /**
      * Gets query for [[Items]].
@@ -2488,6 +2501,16 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Partner::className(), ['referral_code' => 'referral_code'])
                 ->where(['partner_status' => Partner::STATUS_ACTIVE]);
+    }
+
+    /**
+     * Gets query for [[Country]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCategories($modelClass = "\common\models\Category")
+    {
+        return $this->hasOne ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**

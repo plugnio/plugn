@@ -358,7 +358,8 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getCategories($modelClass = "\common\models\Category")
     {
-        return $this->hasMany ($modelClass::className (), ['category_id' => 'category_id'])->viaTable ('category_item', ['item_uuid' => 'item_uuid']);
+        return $this->hasMany ($modelClass::className (), ['category_id' => 'category_id'])
+            ->viaTable ('category_item', ['item_uuid' => 'item_uuid']);
     }
 
     /**
