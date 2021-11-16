@@ -234,7 +234,7 @@ class Payment extends \yii\db\ActiveRecord {
         }else {
             Yii::info('[TAP Payment Issue > ' . $paymentRecord->customer->customer_name . ']'
                     . $paymentRecord->customer->customer_name .
-                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) .
+                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]) .
                     ' and has failed at gateway. Maybe card issue.', __METHOD__);
 
             Yii::info('[Response from TAP for Failed Payment] ' .
@@ -268,7 +268,6 @@ class Payment extends \yii\db\ActiveRecord {
 
         $responseContent = json_decode($response->content);
 
-
         // If there's an error from MYFATOORAH, exit and display error
 
         if (!$responseContent->IsSuccess) {
@@ -281,7 +280,7 @@ class Payment extends \yii\db\ActiveRecord {
             return $paymentRecord;
         }
 
-            $paymentRecord->payment_current_status = $responseContent->Data->InvoiceTransactions[0]->TransactionStatus; // 'CAPTURED' ?
+        $paymentRecord->payment_current_status = $responseContent->Data->InvoiceTransactions[0]->TransactionStatus; // 'CAPTURED' ?
 
         $isError = false;
         $errorMessage = "";
@@ -295,8 +294,6 @@ class Payment extends \yii\db\ActiveRecord {
           $paymentRecord->plugn_fee = (float) $responseContent->Data->Suppliers[0]->InvoiceShare - (float) $responseContent->Data->Suppliers[0]->ProposedShare;
         else
           $paymentRecord->plugn_fee = 0;
-
-
 
         // Update payment method used and the order id assigned to it
         if( isset($responseContent->Data->InvoiceTransactions[0]->PaymentGateway) && $responseContent->Data->InvoiceTransactions[0]->PaymentGateway )
@@ -312,7 +309,7 @@ class Payment extends \yii\db\ActiveRecord {
 
             Yii::info('[MyFatoorah Payment Issue > ' . $paymentRecord->customer->customer_name . ']'
                     . $paymentRecord->customer->customer_name .
-                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) .
+                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]) .
                     ' and has failed at gateway. Maybe card issue.', __METHOD__);
 
             Yii::info('[Response from MyFatoorah for Failed Payment] ' .
@@ -364,14 +361,11 @@ class Payment extends \yii\db\ActiveRecord {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
-
         $paymentRecord->payment_current_status = $responseContent['TransactionStatus']; // 'SUCCESS' ?
         $paymentRecord->received_callback = 1;
 
-
         // On Successful Payments
         if ($responseContent['TransactionStatus'] != 'SUCCESS') {
-
             $paymentRecord->order->restockItems();
         }
 
@@ -411,7 +405,7 @@ class Payment extends \yii\db\ActiveRecord {
             $this->order->changeOrderStatusToPending();
             $this->order->sendPaymentConfirmationEmail();
 
-            Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]). '] ' . 'Paid with ' . $this->order->payment_method_name, __METHOD__);
+            Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $this->currency->decimal_place]). '] ' . 'Paid with ' . $this->order->payment_method_name, __METHOD__);
 
           }
 
