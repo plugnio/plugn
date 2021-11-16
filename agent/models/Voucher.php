@@ -25,7 +25,7 @@ class Voucher extends \common\models\Voucher
                 $model->restaurant->currency->code,
                 [
                     \NumberFormatter::MIN_FRACTION_DIGITS => 0,
-                    \NumberFormatter::MAX_FRACTION_DIGITS => 3  ,
+                    \NumberFormatter::MAX_FRACTION_DIGITS => $model->restaurant->currency->decimal_place,
                 ]
             ) ;
         };
@@ -65,7 +65,7 @@ class Voucher extends \common\models\Voucher
                 $model->restaurant->currency->code,
                 [
                     \NumberFormatter::MIN_FRACTION_DIGITS => 0,
-                    \NumberFormatter::MAX_FRACTION_DIGITS => 3  ,
+                    \NumberFormatter::MAX_FRACTION_DIGITS => $model->restaurant->currency->code,
                 ]
             ) ;
         };*/

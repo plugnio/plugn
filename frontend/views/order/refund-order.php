@@ -234,7 +234,12 @@ z-index: 2;
                                                   </div>
                                                   <!-- Product price -->
                                                   <div>
-                                                      <?= Yii::$app->formatter->asCurrency($refundedItem->orderItem->item_price, $refundedItem->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
+                                                      <?= Yii::$app->formatter->asCurrency(
+                                                              $refundedItem->orderItem->item_price,
+                                                              $refundedItem->currency->code, [
+                                                                  NumberFormatter::MIN_FRACTION_DIGITS => $refundedItem->currency->decimal_place,
+                                                                  NumberFormatter::MAX_FRACTION_DIGITS => $refundedItem->currency->decimal_place
+                                                              ]) ?>
                                                   </div>
                                               </div>
                                           <?php } ?>
@@ -420,7 +425,10 @@ z-index: 2;
 
                                 if($refundedItem->orderItem){
 
-                                  echo Yii::$app->formatter->asCurrency($order_model->total_price, $refundedItem->currency->code , [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]);
+                                  echo Yii::$app->formatter->asCurrency($order_model->total_price, $refundedItem->currency->code , [
+                                          NumberFormatter::MIN_FRACTION_DIGITS => $refundedItem->currency->decimal_place,
+                                          NumberFormatter::MAX_FRACTION_DIGITS => $refundedItem->currency->decimal_place
+                                  ]);
                                 }
                                ?>
                                available for refund

@@ -116,13 +116,17 @@ $this->params['breadcrumbs'][] = $this->title;
                       [
                           'attribute' => 'delivery_fee',
                           "value" => function($data) {
-                                  return Yii::$app->formatter->asCurrency($data->delivery_fee, $data->currency->code);
+                                  return Yii::$app->formatter->asCurrency($data->delivery_fee, $data->currency->code, [
+                                      NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                  ]);
                           },
                       ],
                       [
                           'attribute' => 'total_price',
                           "value" => function($data) {
-                                  return Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code);
+                                  return Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code, [
+                                      NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                  ]);
                           },
                       ],
                       [
