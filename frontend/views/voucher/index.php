@@ -63,7 +63,7 @@ $this->registerJs($js);
                         $totalSpent = $model->getOrders()->where(['restaurant_uuid' => $model->restaurant_uuid])->sum('total_price');
 
                         return  Yii::$app->formatter->asCurrency($totalSpent ? $totalSpent : 0, $model->restaurant->currency->code, [
-                            NumberFormatter::MAX_FRACTION_DIGITS => $model->restaurant->currency->decimal_place
+                            \NumberFormatter::MAX_FRACTION_DIGITS => $model->restaurant->currency->decimal_place
                         ]) ;
 
                     }

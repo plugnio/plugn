@@ -541,7 +541,7 @@ class Order extends \yii\db\ActiveRecord
         }
 
         if ($this->deliveryZone->min_charge > $this->$attribute) {
-            $this->addError ($attribute, "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency ($this->deliveryZone->min_charge, $this->currency->code, [NumberFormatter::MAX_FRACTION_DIGITS => $this->currency->decimal_place]));
+            $this->addError ($attribute, "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency ($this->deliveryZone->min_charge, $this->currency->code, [\NumberFormatter::MAX_FRACTION_DIGITS => $this->currency->decimal_place]));
         }
     }
 

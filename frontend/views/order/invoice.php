@@ -382,7 +382,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                 'label' => 'Subtotal',
                                 'value' => function ($orderItem) {
                                     return Yii::$app->formatter->asCurrency($orderItem->item_price, $orderItem->currency->code, [
-                                            NumberFormatter::MAX_FRACTION_DIGITS => $orderItem->currency->decimal_place
+                                            \NumberFormatter::MAX_FRACTION_DIGITS => $orderItem->currency->decimal_place
                                         ]);
                                 }
                             ],
@@ -406,7 +406,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                 <tr>
                                     <th>Subtotal</th>
                                     <td><?= \Yii::$app->formatter->asCurrency($model->subtotal, $model->currency->code, [
-                                            NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                                            \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                         ]) ?></td>
                                 </tr>
                                 <?php
@@ -417,8 +417,8 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                     <tr>
                                         <th>Voucher Discount</th>
                                         <td><?= Yii::$app->formatter->asCurrency($voucherDiscount, $model->currency->code, [
-                                                NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
-                                                NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                                                \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
+                                                \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                             ]) ?></td>
                                     </tr>
                                     <tr>
@@ -428,8 +428,8 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                             $subtotalAfterDiscount = $subtotalAfterDiscount > 0 ? $subtotalAfterDiscount : 0;
 
                                             echo Yii::$app->formatter->asCurrency($subtotalAfterDiscount, $model->currency->code, [
-                                                    NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
-                                                    NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                                                    \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
+                                                    \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                             ])
                                           ?>
                                         </td>
@@ -446,16 +446,16 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                     <tr>
                                         <th>Bank Discount</th>
                                         <td>-<?= Yii::$app->formatter->asCurrency($bankDiscount, $model->currency->code, [
-                                                NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
-                                                NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                                                \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
+                                                \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                             ]) ?></td>
                                     </tr>
                                 <tbody>
                                     <tr>
                                         <th>Subtotal After Bank Discount</th>
                                         <td><?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, $model->currency->code, [
-                                                NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
-                                                NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                                                \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
+                                                \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                             ]) ?></td>
                                     </tr>
                                 </tbody>
@@ -466,7 +466,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                 <tr>
                                     <th>Delivery fee</th>
                                     <td><?= \Yii::$app->formatter->asCurrency($model->delivery_fee, $model->currency->code, [
-                                            NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                                            \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                         ]) ?></td>
                                 </tr>
 
@@ -474,8 +474,8 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                     <tr>
                                         <th>Voucher Discount</th>
                                         <td>-<?= Yii::$app->formatter->asCurrency($model->delivery_fee, $model->currency->code, [
-                                                NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
-                                                NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                                                \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
+                                                \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                             ]) ?></td>
 
                                     </tr>
@@ -483,8 +483,8 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                     <tr>
                                         <th>Delivery fee After Voucher</th>
                                         <td><?= Yii::$app->formatter->asCurrency(0, $model->currency->code, [
-                                                NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
-                                                NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                                                \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
+                                                \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                             ]) ?></td>
                                     </tr>
                                 <?php } ?>
@@ -494,16 +494,16 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                             <tr>
                                 <th>Tax</th>
                                 <td><?= Yii::$app->formatter->asCurrency($model->tax, $model->currency->code, [
-                                        NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
-                                        NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                                        \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
+                                        \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                     ]) ?></td>
                             </tr>
                           <?php } ?>
                             <tr>
                                 <th><b>Total Price</b></th>
                                 <td><?= Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code, [
-                                        NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
-                                        NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                                        \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
+                                        \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                     ]) ?></td>
                             </tr>
                             </tbody>
