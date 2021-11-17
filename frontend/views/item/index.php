@@ -140,7 +140,7 @@ $this->registerJs($js);
                           return 'Price on selection';
                         else
                         return Yii::$app->formatter->asCurrency($model->item_price, $model->currency->code, [
-                            NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                            \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                         ]);
                     }
                 ],

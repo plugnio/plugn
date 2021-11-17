@@ -495,7 +495,7 @@ class ItemController extends Controller
                     "format" => "raw",
                     "value" => function($data) {
                         return Yii::$app->formatter->asCurrency($data->item_price, $data->currency->code, [
-                            NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                            \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                         ]);
                     }
                 ]

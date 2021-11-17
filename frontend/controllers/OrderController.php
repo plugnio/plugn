@@ -301,7 +301,7 @@ class OrderController extends Controller {
                         'attribute' => 'delivery_fee',
                         "value" => function($data) {
                           return \Yii::$app->formatter->asCurrency($data->delivery_fee, $data->currency->code, [
-                              NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                              \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                           ]);
                         },
                     ],
@@ -311,7 +311,7 @@ class OrderController extends Controller {
                         'attribute' => 'total_price',
                         "value" => function($data) {
                             return \Yii::$app->formatter->asCurrency($data->payment_uuid ? $data->payment->payment_amount_charged : $data->total_price, $data->currency->code,[
-                                NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                             ]);
                         }
                     ],
@@ -321,11 +321,11 @@ class OrderController extends Controller {
                         "value" => function($data) {
                           if($data->payment_uuid )
                             return \Yii::$app->formatter->asCurrency($data->payment->payment_net_amount, $data->currency->code, [
-                                NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                             ]);
                           else
                             return \Yii::$app->formatter->asCurrency( $data->total_price, $data->currency->code, [
-                                NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                             ]);
                         }
                     ],
@@ -335,12 +335,12 @@ class OrderController extends Controller {
                               if($data->payment_uuid && $data->payment->plugn_fee){
                                   $plugnFee = $data->payment->plugn_fee + $data->payment->partner_fee;
                                   return \Yii::$app->formatter->asCurrency($plugnFee, $data->currency->code, [
-                                      NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                      \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                                   ]);
                               }
                               else
                                   return \Yii::$app->formatter->asCurrency(0 , $data->currency->code, [
-                                      NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                      \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                                   ]);
                         }
                     ],
@@ -351,7 +351,7 @@ class OrderController extends Controller {
                               return \Yii::$app->formatter->asCurrency($data->payment->payment_gateway_fee, $data->currency->code);
                             else
                               return \Yii::$app->formatter->asCurrency(0 , $data->currency->code, [
-                                  NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                  \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                               ]);
 
                         }

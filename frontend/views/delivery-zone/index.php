@@ -128,8 +128,8 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
                 </h5>
                 <p>
                   <?= Yii::$app->formatter->asCurrency($deliveryZone->delivery_fee, $deliveryZone->currency->code, [
-                          NumberFormatter::MIN_FRACTION_DIGITS => $deliveryZone->currency->decimal_place,
-                            NumberFormatter::MAX_FRACTION_DIGITS => $deliveryZone->currency->decimal_place
+                          \NumberFormatter::MIN_FRACTION_DIGITS => $deliveryZone->currency->decimal_place,
+                            \NumberFormatter::MAX_FRACTION_DIGITS => $deliveryZone->currency->decimal_place
                   ]) ?>
                 </p>
 
@@ -139,8 +139,8 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
                 </h5>
                 <p style=" margin: 0px;">
                   <?= Yii::$app->formatter->asCurrency($deliveryZone->min_charge, $deliveryZone->currency->code, [
-                          NumberFormatter::MIN_FRACTION_DIGITS => $deliveryZone->currency->decimal_place,
-                          NumberFormatter::MAX_FRACTION_DIGITS => $deliveryZone->currency->decimal_place
+                          \NumberFormatter::MIN_FRACTION_DIGITS => $deliveryZone->currency->decimal_place,
+                          \NumberFormatter::MAX_FRACTION_DIGITS => $deliveryZone->currency->decimal_place
                   ]) ?>
                 </p>
 

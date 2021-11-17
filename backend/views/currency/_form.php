@@ -16,6 +16,12 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'code')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'currency_symbol')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'rate')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'sort_order')->textInput(['maxlength' => true]) ?>
+    
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>

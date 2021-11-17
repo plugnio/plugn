@@ -263,8 +263,8 @@
                                                         $order->subtotal,
                                                         $order->currency->code,
                                                         [
-                                                            NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
-                                                            NumberFormatter::MAX_FRACTION_DIGITS => $order->currency->decimal_place
+                                                            \NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
+                                                            \NumberFormatter::MAX_FRACTION_DIGITS => $order->currency->decimal_place
                                                         ]
                                                     )
                                                     ?>
@@ -279,8 +279,8 @@
                                                             $voucherDiscount,
                                                             $order->currency->code,
                                                             [
-                                                                NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
-                                                                NumberFormatter::MAX_FRACTION_DIGITS => $order->currency->decimal_place
+                                                                \NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
+                                                                \NumberFormatter::MAX_FRACTION_DIGITS => $order->currency->decimal_place
                                                             ]
                                                         )
                                                         ?>
@@ -294,8 +294,8 @@
                                                             $order->subtotal - $voucherDiscount,
                                                             $order->currency->code,
                                                             [
-                                                                NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
-                                                                NumberFormatter::MAX_FRACTION_DIGITS => $order->currency->decimal_place
+                                                                \NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
+                                                                \NumberFormatter::MAX_FRACTION_DIGITS => $order->currency->decimal_place
                                                             ]
                                                         )
                                                         ?>
@@ -313,8 +313,8 @@
                                                             $bankDiscount,
                                                             $order->currency->code,
                                                             [
-                                                                NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
-                                                                NumberFormatter::MAX_FRACTION_DIGITS => $order->currency->decimal_place
+                                                                \NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
+                                                                \NumberFormatter::MAX_FRACTION_DIGITS => $order->currency->decimal_place
                                                             ]
                                                         )
                                                         ?>
@@ -328,8 +328,8 @@
                                                             $order->subtotal - $bankDiscount,
                                                             $order->currency->code,
                                                             [
-                                                                NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
-                                                                NumberFormatter::MAX_FRACTION_DIGITS => $order->currency->decimal_place
+                                                                \NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
+                                                                \NumberFormatter::MAX_FRACTION_DIGITS => $order->currency->decimal_place
                                                             ]
                                                         )
                                                         ?>
@@ -345,8 +345,8 @@
                                                         $order->delivery_fee,
                                                         $order->currency->code,
                                                         [
-                                                            NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
-                                                            NumberFormatter::MAX_FRACTION_DIGITS => $order->currency->decimal_place
+                                                            \NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
+                                                            \NumberFormatter::MAX_FRACTION_DIGITS => $order->currency->decimal_place
                                                         ]
                                                     )
                                                     ?>
@@ -361,8 +361,8 @@
                                                             $order->delivery_fee,
                                                             $order->currency->code,
                                                             [
-                                                                NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
-                                                                NumberFormatter::MAX_FRACTION_DIGITS => $order->currency->decimal_place
+                                                                \NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
+                                                                \NumberFormatter::MAX_FRACTION_DIGITS => $order->currency->decimal_place
                                                             ]
                                                         )
                                                         ?>
@@ -383,8 +383,8 @@
                                                         $order->tax,
                                                         $order->currency->code,
                                                         [
-                                                            NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
-                                                            NumberFormatter::MAX_FRACTION_DIGITS => $order->currency->decimal_place
+                                                            \NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
+                                                            \NumberFormatter::MAX_FRACTION_DIGITS => $order->currency->decimal_place
                                                         ]
                                                     )
                                                     ?>
@@ -398,8 +398,8 @@
                                                         $order->total_price,
                                                         $order->currency->code,
                                                         [
-                                                            NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
-                                                            NumberFormatter::MAX_FRACTION_DIGITS => $order->currency->decimal_place
+                                                            \NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
+                                                            \NumberFormatter::MAX_FRACTION_DIGITS => $order->currency->decimal_place
                                                         ]
                                                     )
                                                     ?>

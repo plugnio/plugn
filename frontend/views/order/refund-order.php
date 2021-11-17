@@ -237,8 +237,8 @@ z-index: 2;
                                                       <?= Yii::$app->formatter->asCurrency(
                                                               $refundedItem->orderItem->item_price,
                                                               $refundedItem->currency->code, [
-                                                                  NumberFormatter::MIN_FRACTION_DIGITS => $refundedItem->currency->decimal_place,
-                                                                  NumberFormatter::MAX_FRACTION_DIGITS => $refundedItem->currency->decimal_place
+                                                                  \NumberFormatter::MIN_FRACTION_DIGITS => $refundedItem->currency->decimal_place,
+                                                                  \NumberFormatter::MAX_FRACTION_DIGITS => $refundedItem->currency->decimal_place
                                                               ]) ?>
                                                   </div>
                                               </div>
@@ -426,8 +426,8 @@ z-index: 2;
                                 if($refundedItem->orderItem){
 
                                   echo Yii::$app->formatter->asCurrency($order_model->total_price, $refundedItem->currency->code , [
-                                          NumberFormatter::MIN_FRACTION_DIGITS => $refundedItem->currency->decimal_place,
-                                          NumberFormatter::MAX_FRACTION_DIGITS => $refundedItem->currency->decimal_place
+                                          \NumberFormatter::MIN_FRACTION_DIGITS => $refundedItem->currency->decimal_place,
+                                          \NumberFormatter::MAX_FRACTION_DIGITS => $refundedItem->currency->decimal_place
                                   ]);
                                 }
                                ?>

@@ -117,7 +117,7 @@ $this->params['breadcrumbs'][] = $this->title;
                           'attribute' => 'delivery_fee',
                           "value" => function($data) {
                                   return Yii::$app->formatter->asCurrency($data->delivery_fee, $data->currency->code, [
-                                      NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                      \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                                   ]);
                           },
                       ],
@@ -125,7 +125,7 @@ $this->params['breadcrumbs'][] = $this->title;
                           'attribute' => 'total_price',
                           "value" => function($data) {
                                   return Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code, [
-                                      NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                      \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                                   ]);
                           },
                       ],

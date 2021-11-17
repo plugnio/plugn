@@ -21,13 +21,13 @@ class Order extends \common\models\Order
         };
         $fields['total_price_txt'] = function($model) {
             return Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code,[
-                NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
             ]);
         };
 
         $fields['delivery_fee_txt'] = function($model) {
             return Yii::$app->formatter->asCurrency($model->delivery_fee, $model->currency->code, [
-                NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
             ]);
         };
 

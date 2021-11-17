@@ -59,7 +59,7 @@ $this->registerJs($js);
                         'attribute' => 'item_price',
                         "value" => function($data) {
                                 return Yii::$app->formatter->asCurrency($data->item_price, $data->currency->code, [
-                                    NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                    \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                                 ]);
                         },
                     ],
@@ -104,7 +104,7 @@ $this->registerJs($js);
                            'attribute' => 'extra_option_price',
                            "value" => function($data) {
                                    return Yii::$app->formatter->asCurrency($data->extra_option_price, $data->currency->code, [
-                                       NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                       \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                                    ]);
                            },
                        ],

@@ -435,7 +435,7 @@ use common\components\TapPayments;
       <div
          style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;line-height:24px;text-align:left;color:#000000;"
       >
-        <?= \Yii::$app->formatter->asCurrency($subscription->plan->price, $store->currency->code, [NumberFormatter::MAX_FRACTION_DIGITS => $store->currency->decimal_place]); ?>
+        <?= \Yii::$app->formatter->asCurrency($subscription->plan->price, $store->currency->code, [\NumberFormatter::MAX_FRACTION_DIGITS => $store->currency->decimal_place]); ?>
       </div>
 
               </td>
