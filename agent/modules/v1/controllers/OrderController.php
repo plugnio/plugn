@@ -840,7 +840,7 @@ class OrderController extends Controller
                 ];
             }
 
-            if (!isset($item['extraOptions']) || !is_array($item['extraOptions'])) {
+            if (!isset($item['orderItemExtraOptions']) || !is_array($item['orderItemExtraOptions'])) {
                 continue;
             }
 
@@ -1526,7 +1526,7 @@ class OrderController extends Controller
                 ];
             }
 
-            if (!isset($item['extraOptions']) || !is_array($item['extraOptions'])) {
+            if (!isset($item['orderItemExtraOptions']) || !is_array($item['orderItemExtraOptions'])) {
                 continue;
             }
 
