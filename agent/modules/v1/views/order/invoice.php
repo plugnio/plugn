@@ -184,18 +184,18 @@
                         </p>
                     </td>
                     <td>
-                            <table>
-                                <tr>
-                                    <td><strong>Invoice Date</strong></td>
-                                    <td><?= \Yii::$app->formatter->asDatetime($order->order_created_at, 'MMM dd, yyyy h:mm a') ?></td>
+                            <table style="padding: 0;">
+                                <tr  style="padding: 0;">
+                                    <td  style="padding: 0;"><strong>Invoice Date</strong></td>
+                                    <td  style="padding: 0;"><?= \Yii::$app->formatter->asDatetime($order->order_created_at, 'MMM dd, yyyy h:mm a') ?></td>
+                                </tr >
+                                <tr  style="padding: 0;">
+                                    <td style="padding: 0;"><strong>Estimated Delivery</strong></td>
+                                    <td style="padding: 0;"><?= \Yii::$app->formatter->asDatetime($order->estimated_time_of_arrival, 'MMM dd, yyyy h:mm a') ?></td>
                                 </tr>
-                                <tr>
-                                    <td><strong>Estimated Delivery</strong></td>
-                                    <td><?= \Yii::$app->formatter->asDatetime($order->estimated_time_of_arrival, 'MMM dd, yyyy h:mm a') ?></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>When</strong></td>
-                                    <td><?= $order->is_order_scheduled ? 'Scheduled' : 'As soon as possible' ?></td>
+                                <tr  style="padding: 0;">
+                                    <td style="padding: 0;"><strong>When</strong></td>
+                                    <td style="padding: 0;"><?= $order->is_order_scheduled ? 'Scheduled' : 'As soon as possible' ?></td>
                                 </tr>
 
                             <?php if($order->special_directions) { ?>
@@ -222,7 +222,9 @@
                                 <tr>
                                     <th align="start">Items</th>
                                     <th align="center">SKU</th>
+                                    <th align="center">Instruction</th>
                                     <th align="center">QTY</th>
+                                    <th align="end">Extra Options</th>
                                     <th align="end">Total</th>
                                 </tr>
                                 </thead>
@@ -234,11 +236,11 @@
                                             <?= $orderItem->item_name ?>
                                             <!-- todo: extraOptionsToText(orderItem.orderItemExtraOptions)  -->
                                         </b>
-
-                                        <?= $orderItem->customer_instruction ?>
                                     </td>
                                     <td align="center"><?= $orderItem->item? $orderItem->item->sku: '' ?></td>
+                                    <td align="center"><?= $orderItem->customer_instruction ?></td>
                                     <td align="center"><?= $orderItem->qty ?></td>
+                                    <td align="start"><?= $orderItem->getOrderExtraOptionsText() ?></td>
                                     <td align="end">
                                         <!-- currency rate calculation? -->
                                         <?= $orderItem->currency? $orderItem->currency->code: '' ?> <?= $orderItem->item_price ?>
