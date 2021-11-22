@@ -933,14 +933,16 @@ class Order extends \yii\db\ActiveRecord
             $this->order_status = self::STATUS_DRAFT;
         }
 
-        if (
-            !in_array(
-                $this->scenario, [
-                    self::SCENARIO_UPDATE_TOTAL,
-                    self::SCENARIO_CREATE_ORDER_BY_ADMIN
-                ]
-            )
-        ) {
+        // if (
+        //     !in_array(
+        //         $this->scenario, [
+        //             self::SCENARIO_UPDATE_TOTAL,
+        //             self::SCENARIO_CREATE_ORDER_BY_ADMIN
+        //         ]
+        //     )
+        // ) {
+        if ( $this->scenario == self::SCENARIO_UPDATE_TOTAL) {
+
             if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
 
                 //set ETA value
