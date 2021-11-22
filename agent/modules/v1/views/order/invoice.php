@@ -197,11 +197,10 @@
                                     <td style="padding: 0;"><strong>When</strong></td>
                                     <td style="padding: 0;"><?= $order->is_order_scheduled ? 'Scheduled' : 'As soon as possible' ?></td>
                                 </tr>
-
                             <?php if($order->special_directions) { ?>
-                                <tr>
-                                    <td><strong>Special Direction</strong></td>
-                                    <td><?= $order->special_directions ?></td>
+                                <tr style="padding: 0;">
+                                    <td style="padding: 0;"><strong>Special Direction</strong></td>
+                                    <td style="padding: 0;"><?=$order->special_directions ?></td>
                                 </tr>
                             <?php } ?>
                             </table>
@@ -376,9 +375,10 @@
                                                     <td align="end"><?= $order->currency->code ?> 0.000</td>
                                                 </tr>
 
-                                            <?php } ?>
+                                            <?php }
+                                            if($order->tax > 0) { ?>
 
-                                            <tr *ngIf="order.tax > 0">
+                                            <tr>
                                                 <td align="start" colspan="3">Tax</td>
                                                 <td align="end">
                                                     <?= Yii::$app->formatter->asCurrency(
@@ -392,6 +392,7 @@
                                                     ?>
                                                 </td>
                                             </tr>
+                                            <?php } ?>
 
                                             <tr style="background: #f4f4f4;">
                                                 <td align="start" colspan="3">Amount</td>
