@@ -42,6 +42,9 @@ return [
                 ],
             ],
         ],
+        'currency' => [
+            'class' => 'api\components\Currency',
+        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => false,
