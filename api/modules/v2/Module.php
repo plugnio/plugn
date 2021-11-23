@@ -29,7 +29,7 @@ class Module extends \yii\base\Module
 
         if ($currency && $currency != \Yii::$app->currency)
         {
-            \Yii::$app->currency = $currency;
+            \Yii::$app->currency->setCode($currency);
         }
     }
 }

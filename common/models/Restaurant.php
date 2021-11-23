@@ -1264,7 +1264,7 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     public function isOpen($asap = null) {
-
+    
         $restaurant = self::findOne(['restaurant_uuid'=>$this->restaurant_uuid]);
         $opening_hour_model = OpeningHour::find()
                                 ->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])
