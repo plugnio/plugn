@@ -95,7 +95,7 @@ class OrderController extends Controller {
             //save Customer address
             $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
 
-            $order->currency_code = Yii::$app->currency;
+            $order->currency_code = Yii::$app->currency->getCode();
                 ///Yii::$app->request->getBodyParam ("currency_code");
 
             //Preorder
