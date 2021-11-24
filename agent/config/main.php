@@ -388,6 +388,7 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'detail',
+                        'GET status' => 'status',
                         'POST' => 'update',
                         'POST connect-domain' => 'connect-domain',
                         'POST disable-payment-method/<id>/<paymentMethodId>' => 'disable-payment-method',
@@ -416,7 +417,8 @@ return [
                         'OPTIONS enable-cod/<id>' => 'options',
                         'OPTIONS disable-cod/<id>' => 'options',
                         'OPTIONS update-layout' => 'options',
-                        'OPTIONS update-status/<id>/<status>' => 'options'
+                        'OPTIONS update-status/<id>/<status>' => 'options',
+                        'OPTIONS status' => 'options'
                     ]
                 ],
 

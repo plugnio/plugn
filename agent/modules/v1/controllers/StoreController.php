@@ -589,6 +589,18 @@ class StoreController extends Controller
     }
 
 
+    public function actionStatus($store_uuid) {
+
+        $model = $this->findModel($store_uuid);
+
+        return [
+            'itemQuantity'=>count($model->items),
+            'payment'=>count($model->paymentMethods),
+            'shipping'=>count($model->businessLocations)
+        ];
+    }
+
+
     /**
      * @param $store_uuid
      * @param $status
