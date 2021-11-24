@@ -176,33 +176,29 @@
 
                 <tr>
                     <td>
-
-                        <h4 class="txt-customer-name"><strong>Customer</strong> <?= $order->customer_name ?></h4>
-
-                        <p style="font-family: Nunito" class="txt-payment-method">
-                            <strong>Payment Method</strong> <?= $order->payment_method_name ?>
-                        </p>
+                        <table>
+                            <tr>
+                                <td><strong>Customer</strong> : <?= $order->customer_name ?></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Payment Method</strong> : <?= $order->payment_method_name ?></td>
+                            </tr>
+                                <tr>
+                                    <td><strong>Special Direction</strong>:<?=($order->special_directions) ? $order->special_directions : '';?></td>
+                                </tr>
+                        </table>
                     </td>
                     <td>
-                            <table style="padding: 0;">
-                                <tr  style="padding: 0;">
-                                    <td  style="padding: 0;"><strong>Invoice Date</strong></td>
-                                    <td  style="padding: 0;"><?= \Yii::$app->formatter->asDatetime($order->order_created_at, 'MMM dd, yyyy h:mm a') ?></td>
-                                </tr >
-                                <tr  style="padding: 0;">
-                                    <td style="padding: 0;"><strong>Estimated Delivery</strong></td>
-                                    <td style="padding: 0;"><?= \Yii::$app->formatter->asDatetime($order->estimated_time_of_arrival, 'MMM dd, yyyy h:mm a') ?></td>
+                            <table>
+                                <tr>
+                                    <td><strong>Invoice Date</strong> : <?= \Yii::$app->formatter->asDatetime($order->order_created_at, 'MMM dd, yyyy h:mm a') ?></td>
                                 </tr>
-                                <tr  style="padding: 0;">
-                                    <td style="padding: 0;"><strong>When</strong></td>
-                                    <td style="padding: 0;"><?= $order->is_order_scheduled ? 'Scheduled' : 'As soon as possible' ?></td>
+                                <tr>
+                                    <td><strong>Estimated Delivery</strong> : <?= \Yii::$app->formatter->asDatetime($order->estimated_time_of_arrival, 'MMM dd, yyyy h:mm a') ?></td>
                                 </tr>
-                            <?php if($order->special_directions) { ?>
-                                <tr style="padding: 0;">
-                                    <td style="padding: 0;"><strong>Special Direction</strong></td>
-                                    <td style="padding: 0;"><?=$order->special_directions ?></td>
+                                <tr>
+                                    <td><strong>When</strong> : <?= $order->is_order_scheduled ? 'Scheduled' : 'As soon as possible' ?></td>
                                 </tr>
-                            <?php } ?>
                             </table>
                     </td>
                 </tr>
@@ -219,12 +215,12 @@
                             <table class="table-hover">
                                 <thead>
                                 <tr>
-                                    <th align="start">Items</th>
-                                    <th align="center">SKU</th>
-                                    <th align="center">Instruction</th>
-                                    <th align="center">QTY</th>
-                                    <th align="end">Extra Options</th>
-                                    <th align="end">Total</th>
+                                    <th align="start" style="background:#000;color: #fff;">Item name</th>
+                                    <th align="center" style="background:#000;color: #fff;">SKU</th>
+                                    <th align="center" style="background:#000;color: #fff;">Instruction</th>
+                                    <th align="center" style="background:#000;color: #fff;">QTY</th>
+                                    <th align="end" style="background:#000;color: #fff;">Extra Options</th>
+                                    <th align="end" style="background:#000;color: #fff;">Total</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -417,7 +413,7 @@
 
                         </div>
 
-                    </divion-col>
+                    </div>
                 </div>
             </div>
 
