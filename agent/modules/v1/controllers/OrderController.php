@@ -767,13 +767,11 @@ class OrderController extends Controller
                 $order->postalcode = Yii::$app->request->getBodyParam ('postal_code');
                 $order->city = Yii::$app->request->getBodyParam ("city");
             }
-
-            $order->special_directions = Yii::$app->request->getBodyParam ("special_directions"); //optional
-
-
         } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
             $order->pickup_location_id = Yii::$app->request->getBodyParam ("pickup_location_id");
         }
+
+        $order->special_directions = Yii::$app->request->getBodyParam ("special_directions"); //optional
 
         if (!$order->save ()) {
 
