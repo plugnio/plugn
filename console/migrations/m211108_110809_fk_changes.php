@@ -36,8 +36,8 @@ class m211108_110809_fk_changes extends Migration
             $action
         );
 
-
         $this->dropForeignKey('fk-agent_assignment-business_location_id', 'agent_assignment');
+
         $this->addForeignKey(
             'fk-agent_assignment-business_location_id',
             'agent_assignment',

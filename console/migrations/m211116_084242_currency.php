@@ -14,14 +14,22 @@ class m211116_084242_currency extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn(
-            'currency',
-            'decimal_place',
-            $this->tinyInteger(1)
-                ->defaultValue(2)
-                ->after('rate')
-        );
+        $table = $this
+            ->getDb()
+            ->getSchema()
+            ->getTableSchema('currency');
 
+            if (!isset($table->columns['decimal_place'])) {
+
+                $this->addColumn(
+                    'currency',
+                    'decimal_place',
+                    $this->tinyInteger(1)
+                        ->defaultValue(2)
+                        ->after('rate')
+                );
+            }
+            
         Currency::updateAll(['decimal_place' => 8], ['code' => 'BTC']);
 
         Currency::updateAll(['decimal_place' => 3], ['code' => 'BHD']);
