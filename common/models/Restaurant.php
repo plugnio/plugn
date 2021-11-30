@@ -1717,7 +1717,7 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         $customer_data = [];
 
-        $date_start = date('Y') . '-' . date('m', strtotime('-1 month')) . '-1';
+        $date_start = date('Y') . '-' . date('m', strtotime('-1 month')).'-1';
 
         for ($i = 1; $i <= date('t', strtotime($date_start)); $i++) {
             $customer_data[$i] = array(
@@ -1728,9 +1728,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $rows = $this->getCustomers()
             ->select(new Expression('customer_created_at, COUNT(*) as total'))
-            ->andWhere('
-                YEAR(customer_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
-                MONTH(customer_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL 1 MONTH)')
             ->groupBy(new Expression('DAY(customer_created_at)'))
             ->asArray()
             ->all();
@@ -1743,9 +1741,7 @@ class Restaurant extends \yii\db\ActiveRecord
         }
 
         $number_of_all_customer_gained = $this->getCustomers()
-            ->andWhere('
-                YEAR(customer_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
-                MONTH(customer_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL 1 MONTH)')
             ->count();
 
         return [
@@ -1770,9 +1766,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $rows = $this->getOrders ()
             ->activeOrders ($this->restaurant_uuid)
             ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
-            ->andWhere('
-                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
-                MONTH(order.order_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
             ->groupBy (new Expression('DAY(order.order_created_at)'))
             ->asArray ()
             ->all ();
@@ -1786,9 +1780,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $number_of_all_revenue_generated = $this->getOrders()
             ->activeOrders($this->restaurant_uuid)
-            ->andWhere('
-                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
-                MONTH(order.order_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
             ->sum('total_price');
 
         return [
@@ -1813,9 +1805,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $rows = $this->getOrders ()
             ->activeOrders ($this->restaurant_uuid)
             ->select (new Expression('order_created_at, COUNT(*) as total'))
-            ->andWhere('
-                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
-                MONTH(order.order_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
             ->groupBy (new Expression('DAY(order.order_created_at)'))
             ->asArray ()
             ->all ();
@@ -1829,9 +1819,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $number_of_all_orders_received = $this->getOrders()
             ->activeOrders($this->restaurant_uuid)
-            ->andWhere('
-                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
-                MONTH(order.order_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
             ->count();
 
         return [
@@ -1855,9 +1843,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $rows = $this->getSoldOrderItems ()
             ->select ('order_item_created_at, SUM(order_item.qty) as total')
-            ->andWhere('
-                YEAR(`order_item_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
-                MONTH(`order_item_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
             ->groupBy (new Expression('DATE(order_item_created_at)'))
             ->asArray ()
             ->all ();
@@ -1870,9 +1856,7 @@ class Restaurant extends \yii\db\ActiveRecord
         }
 
         $number_of_all_sold_item = $this->getSoldOrderItems()
-            ->andWhere('
-                YEAR(`order_item_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
-                MONTH(`order_item_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
             ->sum('order_item.qty');
 
         return [
@@ -1901,7 +1885,8 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $rows = $this->getCustomers()
             ->select(new Expression('customer_created_at, COUNT(*) as total'))
-            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
+            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
+//            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
             ->groupBy(new Expression('MONTH(customer_created_at)'))
             ->asArray()
             ->all();
@@ -1914,7 +1899,8 @@ class Restaurant extends \yii\db\ActiveRecord
         }
 
         $number_of_all_customer_gained = $this->getCustomers()
-            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
+            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
+//            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
             ->count();
 
         return [
@@ -1925,8 +1911,6 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalRevenueByMonths($months)
     {
-
-
         $revenue_generated_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
@@ -1946,7 +1930,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $rows = $this->getOrders ()
             ->activeOrders ($this->restaurant_uuid)
             ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
-            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) <= DATE("'.$date_end.'")')
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
             ->groupBy (new Expression('MONTH(order.order_created_at)'))
             ->asArray ()
             ->all ();
@@ -1960,7 +1944,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $number_of_all_revenue_generated = $this->getOrders()
             ->activeOrders($this->restaurant_uuid)
-            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) <= DATE("'.$date_end.'")')
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
             ->sum('total_price');
 
         return [
@@ -1971,8 +1955,6 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalOrdersByMonths($months)
     {
-
-
         $orders_received_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
@@ -1992,7 +1974,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $rows = $this->getOrders ()
             ->activeOrders ($this->restaurant_uuid)
             ->select (new Expression('order_created_at, COUNT(*) as total'))
-            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) <= DATE("'.$date_end.'")')
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
             ->groupBy (new Expression('MONTH(order.order_created_at)'))
             ->asArray ()
             ->all ();
@@ -2006,7 +1988,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $number_of_all_orders_received = $this->getOrders()
             ->activeOrders($this->restaurant_uuid)
-            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) <= DATE("'.$date_end.'")')
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
             ->count();
 
         return [
@@ -2017,8 +1999,6 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalSoldItemsByMonths($months)
     {
-
-
         $sold_item_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
@@ -2037,7 +2017,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $rows = $this->getSoldOrderItems ()
             ->select ('order_item_created_at, SUM(order_item.qty) as total')
-            ->andWhere('DATE(`order_item_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_item_created_at`) <= DATE("'.$date_end.'")')
+            ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
             ->groupBy (new Expression('MONTH(order_item_created_at)'))
             ->asArray()
             ->all();
@@ -2050,7 +2030,7 @@ class Restaurant extends \yii\db\ActiveRecord
         }
 
         $number_of_all_sold_item = $this->getSoldOrderItems()
-            ->andWhere('DATE(`order_item_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_item_created_at`) <= DATE("'.$date_end.'")')
+            ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
             ->sum('order_item.qty');
 
         return [
