@@ -266,31 +266,25 @@ class AuthController extends Controller {
         $model = new PasswordResetRequestForm();
         $model->email = $emailInput;
 
-        $errors = false;
-
-        if ($model->validate()) {
-
-            $agent = Agent::findOne([
-               'agent_email' => $model->email,
-            ]);
-
-            if ($agent) {
-
-                if (!$model->sendEmail($agent)) {
-                    $errors = 'Sorry, we are unable to reset a password for email provided.';
-                }
-            }
-
-        } else if (isset($model->errors['agent_email'])) {
-            $errors = $model->errors['agent_email'];
-        }
-
-        // If errors exist show them
-        if ($errors) {
+        if (!$model->validate()) {
             return [
                 'operation' => 'error',
-                'message' => $errors
+                'message' => $model->getErrors()
             ];
+        }
+
+        $agent = Agent::findOne([
+           'agent_email' => $model->email,
+        ]);
+
+        if ($agent) {
+
+            if (!$model->sendEmail($agent)) {
+                return [
+                    'operation' => 'error',
+                    'message' => 'Sorry, we are unable to reset a password for email provided.'
+                ];
+            }
         }
 
         // Otherwise return success
