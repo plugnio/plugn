@@ -40,7 +40,9 @@ class AuthController extends Controller {
                     'X-Pagination-Current-Page',
                     'X-Pagination-Page-Count',
                     'X-Pagination-Per-Page',
-                    'X-Pagination-Total-Count'
+                    'X-Pagination-Total-Count',
+                    'X-Error-Email',
+                    'X-Error-Password'
                 ],
             ],
         ];
@@ -53,9 +55,23 @@ class AuthController extends Controller {
 
                 $agent = Agent::findByEmail($email);
 
-                if ($agent && $agent->validatePassword($password)) {
+                if(!$agent) {
+                    Yii::$app->response->headers->set (
+                        'X-Error-Email', 
+                        Yii::t('agent', 'Email not found')
+                    );
+                    
+                    return null;
+                }
+
+                if ($agent->validatePassword($password)) {
                     return $agent;
                 }
+
+                Yii::$app->response->headers->set (
+                    'X-Error-Password', 
+                    Yii::t('agent', 'Password not matching')
+                );
 
                 return null;
             }
