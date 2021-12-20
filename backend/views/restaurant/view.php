@@ -41,6 +41,35 @@ $this->params['breadcrumbs'][] = $this->title;
         ])
         ?>
 
+        <br/>
+        <br/>
+
+        <?php if ($model->restaurant_status == Restaurant::RESTAURANT_STATUS_BUSY || $model->restaurant_status == Restaurant::RESTAURANT_STATUS_CLOSED ) { ?>
+          <?=
+          Html::a('Open', ['promote-to-open', 'id' => $model->restaurant_uuid], [
+              'class' => 'btn btn-success',
+              'data' => [
+                  'confirm' => 'Are you sure you want to change store status to open?',
+                  'method' => 'post',
+              ],
+          ])
+          ?>
+        <?php } ?>
+
+        <?php if ($model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) { ?>
+          <?=
+          Html::a('Busy', ['promote-to-busy', 'id' => $model->restaurant_uuid], [
+              'class' => 'btn btn-danger',
+              'data' => [
+                  'confirm' => 'Are you sure you want to change store status to busy?',
+                  'method' => 'post',
+              ],
+          ])
+          ?>
+        <?php } ?>
+
+
+
         <?= Html::a('Update sitemap', ['update-sitemap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>
 
     </p>
