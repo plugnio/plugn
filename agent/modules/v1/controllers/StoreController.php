@@ -650,7 +650,7 @@ class StoreController extends Controller
     public static function message($type = "success", $message) {
         return [
             "operation" => $type,
-            "message" => Yii::t('agent', $message)
+            "message" => is_string ($message)? Yii::t('agent', $message): $message
         ];
     }
 }
