@@ -4,20 +4,20 @@ html, body {
     margin: 0;
 }
 
-ion-content {
+.ion-content {
     background: #F8F8F8;
 //padding: 32px;
     display: block;
 }
 
-ion-card-content h3, ion-card-content h4, ion-card-content h5, ion-card-content h6 {
+.ion-card-content h3, .ion-card-content h4, .ion-card-content h5, .ion-card-content h6 {
     margin-left: 0;
     margin-right: 0;
     margin-top: 2px;
     margin-bottom: 2px;
 }
 
-ion-card-content p {
+.ion-card-content p {
     margin-left: 0;
     margin-right: 0;
     margin-top: 0;
@@ -28,7 +28,7 @@ html, body, h1, p, div {
     font-family: 'NunitoSans', sans-serif;
 }
 
-ion-card {
+.ion-card {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -36,11 +36,11 @@ ion-card {
     word-wrap: break-word;
     background-color: #ffffff;
     background-clip: border-box;
-    box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.1);
+    /*box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.1);*/
 }
 
-ion-card-header,
-ion-card-content {
+.ion-card-header,
+.ion-card-content {
     display: block;
 }
 
@@ -83,7 +83,7 @@ td[align=\"end\"] {
 }
 
 .invoice-total-table {
-    border-top: 1px solid rgba(34, 41, 47, 0.1);
+    /*border-top: 1px solid rgba(34, 41, 47, 0.1);*/
     padding-top: 0;
     /*float: right;
     width: 50%;*/
@@ -119,7 +119,7 @@ td[align=\"end\"] {
 }
 
 .card-invoice {
-    border: solid 1px #eaeae7;
+    /*border: solid 1px #eaeae7;*/
     background-color: #fff;
     border-radius: 0;
     margin: 0;
@@ -172,7 +172,7 @@ td[align=\"end\"] {
 
 .invoice-details {
     padding: 0 0 20px;
-    box-shadow: inset 0 -1px 0 0 #eaeae7;
+    /*box-shadow: inset 0 -1px 0 0 #eaeae7;*/
     margin-bottom: 4px;
 }
 
@@ -192,7 +192,7 @@ td[align=\"end\"] {
     color: #393f3e;
 }
 
-ion-badge {
+.ion-badge {
     width: 79px;
     height: 32px;
     flex-grow: 0;
@@ -257,22 +257,22 @@ ion-badge {
     height: 75px;
 }
 
-ion-card {
+.ion-card {
     min-height: 100% !important;
 }
 
-ion-card  ion-card-header{
+.ion-card  .ion-card-header{
     padding: 0px;
     margin-top: 32px;
     margin-left: 32px;
     margin-right: 32px;
 }
 
-ion-card {
+.ion-card {
     height: 100% !important;
 }
 
-.card-invoice ion-card-content table th {
+.card-invoice .ion-card-content table th {
     white-space: nowrap;
 }
 
@@ -280,7 +280,7 @@ ion-card {
     background-color: #f4f4f4 !important;
 }
 
-ion-badge {
+.ion-badge {
     background-color: #f4f4f4 !important;
 }
 
@@ -290,9 +290,9 @@ table th {
 
 .invoice-details {
     box-shadow: none;
-    border-bottom: 1px solid #eaeae7;
+    /*border-bottom: 1px solid #eaeae7;*/
 }
 
-ion-card ion-col {
+.ion-card .ion-col {
      padding: 14px;
  }
