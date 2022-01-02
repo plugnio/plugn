@@ -101,7 +101,7 @@
 
                             <?php if($order->floor) { ?>
                                 <p style="font-family: Nunito"  class="txt-building">
-                                    Floor <?= $order->apartment ?>
+                                    Floor <?= $order->floor ?>
                                 </p>
                             <?php } ?>
 
@@ -429,4 +429,3 @@
 
     </ion-card>
 </ion-content>
-
