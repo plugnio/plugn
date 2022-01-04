@@ -63,6 +63,7 @@ class OrderSearch extends Order {
         }
 
         $query
+            ->andWhere (['order.is_deleted' => 0])
             ->andWhere(['order.restaurant_uuid' => $storeUuid])
             ->andWhere(['order_status' => Order::STATUS_ABANDONED_CHECKOUT]);
 
@@ -141,6 +142,7 @@ class OrderSearch extends Order {
 
 
         $query
+            ->andWhere (['order.is_deleted' => 0])
             ->andWhere(['order.restaurant_uuid' => $storeUuid])
             ->andWhere(['order.order_status' => Order::STATUS_DRAFT]);
 
@@ -218,6 +220,7 @@ class OrderSearch extends Order {
 
 
           $query
+              ->andWhere (['order.is_deleted' => 0])
               ->andWhere(['order.restaurant_uuid' => $storeUuid])
               ->andWhere(['order.order_status' => Order::STATUS_PENDING]);
 
@@ -293,6 +296,7 @@ class OrderSearch extends Order {
         }
 
         $query->andWhere(['order.restaurant_uuid' => $storeUuid])
+                    ->andWhere (['order.is_deleted' => 0])
                     ->andWhere(['!=' , 'order_status' , Order::STATUS_DRAFT])
                     ->andWhere(['!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT]);
 
