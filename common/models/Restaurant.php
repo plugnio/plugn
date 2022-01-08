@@ -2245,7 +2245,7 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getOrders($modelClass = "\common\models\Order")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])->andWhere (['is_deleted' => 0]);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
