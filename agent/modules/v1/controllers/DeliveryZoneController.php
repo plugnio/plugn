@@ -9,6 +9,7 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use agent\models\DeliveryZone;
+use agent\models\AreaDeliveryZone;
 use agent\models\BusinessLocation;
 
 
@@ -156,11 +157,24 @@ class DeliveryZoneController extends Controller
         $model->delivery_zone_tax = (float)Yii::$app->request->getBodyParam("delivery_zone_tax");
 
 
-        if (!$model->save()) {
-            return [
-                "operation" => "error",
-                "message" => $model->errors
-            ];
+        if ($model->save()) {
+
+          if($model->country->getAreas()->count() == 0){
+
+            $area_delivery_zone_model = new AreaDeliveryZone();
+            $area_delivery_zone_model->delivery_zone_id = $model->delivery_zone_id;
+            $area_delivery_zone_model->country_id = $model->country_id;
+            $area_delivery_zone_model->restaurant_uuid = $store_uuid;
+            $area_delivery_zone_model->save(false);
+
+          }
+
+
+        } else {
+          return [
+              "operation" => "error",
+              "message" => $model->errors
+          ];
         }
 
         return [

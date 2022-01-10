@@ -47,16 +47,6 @@ return [
             'enableStrictParsing' => false,
             'showScriptName' => false,
             'rules' => [
-                [// TestController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/test',
-                    'pluralize' => false,
-                    'patterns' => [
-                        'GET' => 'null',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options',
-                    ]
-                ],
                 [// ItemController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/item',
