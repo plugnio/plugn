@@ -147,7 +147,7 @@
 
                         <?php if(($order->area && $order->area->city) || $order->city) { ?>
                         <p style="font-family: Nunito" >
-                            <?= $order->area->city ? $order->area->city->city_name : $order->city ?> <?= $order->postalcode ?>
+                            <?= $order->area_id && $order->area->city ? $order->area->city->city_name : $order->city ?> <?= $order->postalcode ?>
                         </p>
                         <?php } ?>
 
@@ -183,9 +183,15 @@
                             <tr>
                                 <td><strong>Payment Method</strong> : <?= $order->payment_method_name ?></td>
                             </tr>
+
                                 <tr>
-                                    <td><strong>Special Direction</strong>:<?=($order->special_directions) ? $order->special_directions : '';?></td>
+                                    <td>
+                                      <?php if($order->special_directions) { ?>
+                                        <strong>Special Direction</strong>:<?=($order->special_directions) ? $order->special_directions : '';?>
+                                      <?php } ?>
+                                    </td>
                                 </tr>
+
                         </table>
                     </td>
                     <td>
