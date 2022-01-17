@@ -33,12 +33,15 @@ return [
     'building' => 'A4',
     'office' => 412,
     'city' => $faker->city,
+    'postalcode' => $faker->postcode(),
     'address_1' => $faker->address,
     'address_2' => $faker->address,
     'special_directions' => $faker->sentence,
     'payment_method_id' => $paymentMethod['payment_method_id'],
     'payment_method_name' => $paymentMethod['payment_method_name'],
     'payment_method_name_ar' => $paymentMethod['payment_method_name_ar'],
+    'currency_code' => 'KWD',
+    'store_currency_code' => 'KWD',
     'total_price' => $faker->numberBetween (10, 100),
     'subtotal' => $faker->numberBetween (10, 100),
     'subtotal_before_refund' => $faker->numberBetween (10, 100),
@@ -79,7 +82,11 @@ return [
     'tax' => $faker->numberBetween (10, 20),
     'recipient_name' => $faker->firstName,
     'recipient_phone_number' => $faker->phoneNumber,
-    'gift_message' => $faker->sentence
+    'gift_message' => $faker->sentence,
+    'is_deleted' => 1,
+    'sender_name' => $faker->name(),
+    'diggipack_awb_no' => 'AWS234234234',
+    'diggipack_order_status' => '1'
 ];
 
 

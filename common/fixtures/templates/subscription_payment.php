@@ -26,5 +26,8 @@ return [
     'payment_updated_at' => null,
     'received_callback' => 1,
     'response_message' => $faker->sentence,
-    'payment_token' => $faker->word
+    'payment_token' => $faker->word,
+    'partner_fee' => $faker->numberBetween(10, 20),
+    'payout_status' => 1,
+    'partner_payout_uuid' => $faker->uuid()
 ];
