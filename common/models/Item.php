@@ -442,7 +442,6 @@ class Item extends \yii\db\ActiveRecord
 
     /**
      * Gets query for [[Options]].
-     *
      */
     public function getSoldUnitsInSpecifcDate($start_date = null, $end_date = null, $modelClass = "\common\models\OrderItem")
     {

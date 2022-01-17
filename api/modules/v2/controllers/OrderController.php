@@ -844,6 +844,10 @@ class OrderController extends Controller {
                     'operation' => 'success'
                 ];
             } else {
+
+              Yii::error('[Mashkor (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
+
+
               return [
                   'operation' => 'error',
                   'message' => $order_model->getErrors(),
@@ -851,6 +855,10 @@ class OrderController extends Controller {
             }
 
           } else {
+
+            Yii::error('[Mashkor (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
+
+
             return [
                 'operation' => 'error',
                 'message' => 'Invalid Order id',
@@ -858,6 +866,10 @@ class OrderController extends Controller {
           }
 
         } else {
+
+          Yii::error('[Mashkor (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
+
+          
           return [
               'operation' => 'error',
               'message' => 'Failed to authorize the request.',
@@ -904,6 +916,9 @@ class OrderController extends Controller {
                     'operation' => 'success'
                 ];
             } else {
+              Yii::error('[Armada (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
+
+
               return [
                   'operation' => 'error',
                   'message' => $order_model->getErrors(),
@@ -911,6 +926,10 @@ class OrderController extends Controller {
             }
 
           } else {
+
+            Yii::error('[Armada (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
+
+
             return [
                 'operation' => 'error',
                 'message' => 'Invalid Delivery code',

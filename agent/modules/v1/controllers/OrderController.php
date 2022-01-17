@@ -901,66 +901,75 @@ class OrderController extends Controller
 
         //validate order status for refund
 
-        if (!in_array ($model->order_status, [Order::STATUS_COMPLETE, Order::STATUS_PARTIALLY_REFUNDED])) {
-            return [
-                "operation" => "error",
-                "message" => Yii::t ('agent', "Invalid order status to process refund!")
-            ];
-        }
+        // if (!in_array ($model->order_status, [Order::STATUS_COMPLETE, Order::STATUS_PARTIALLY_REFUNDED])) {
+        //     return [
+        //         "operation" => "error",
+        //         "message" => Yii::t ('agent', "Invalid order status to process refund!")
+        //     ];
+        // }
 
         //validate refund qty less than or equals to current qty
 
-        $maxRefundAmount = 0;
+        // $maxRefundAmount = 0;
+        //
+        // foreach ($itemsToRefund as $key => $qty) {
+        //
+        //     $orderItem = OrderItem::find ()
+        //         ->andWhere ([
+        //             'order_uuid' => $order_uuid,
+        //             'order_item_id' => $key
+        //         ])
+        //         ->one ();
+        //
+        //     $refundedQty = RefundedItem::find ()
+        //         ->andWhere ([
+        //             'order_uuid' => $order_uuid,
+        //             'order_item_id' => $key
+        //         ])
+        //         ->sum ('qty');
+        //
+        //     if ($orderItem->qty - $refundedQty < $qty) {
+        //         return [
+        //             "operation" => "error",
+        //             "message" => Yii::t ('agent', "Max {qty} {item} available for refund!", [
+        //                 'qty' => $orderItem->qty - $refundedQty,
+        //                 'item' => Yii::$app->language == 'ar' && $orderItem->item_name_ar ?
+        //                     $orderItem->item_name_ar : $orderItem->item_name
+        //             ])
+        //         ];
+        //     }
+        //
+        //     //calculate refund total
+        //
+        //     $unitPrice = $orderItem->item_price / $orderItem->qty;
+        //
+        //     $maxRefundAmount += $qty * $unitPrice;
+        // }
+        //
+        // //refund_amount should be less than or equal to itemsToRefund's total refund amount
+        //
+        // if ($refund_amount > $maxRefundAmount) {
+        //     return [
+        //         "operation" => "error",
+        //         "message" => Yii::t ('agent', "{amount} available for refund!", [
+        //             'amount' => \Yii::$app->formatter->asCurrency ($maxRefundAmount, $model->currency->code)
+        //         ])
+        //     ];
+        // }
 
-        foreach ($itemsToRefund as $key => $qty) {
-
-            $orderItem = OrderItem::find ()
-                ->andWhere ([
-                    'order_uuid' => $order_uuid,
-                    'order_item_id' => $key
-                ])
-                ->one ();
-
-            $refundedQty = RefundedItem::find ()
-                ->andWhere ([
-                    'order_uuid' => $order_uuid,
-                    'order_item_id' => $key
-                ])
-                ->sum ('qty');
-
-            if ($orderItem->qty - $refundedQty < $qty) {
-                return [
-                    "operation" => "error",
-                    "message" => Yii::t ('agent', "Max {qty} {item} available for refund!", [
-                        'qty' => $orderItem->qty - $refundedQty,
-                        'item' => Yii::$app->language == 'ar' && $orderItem->item_name_ar ?
-                            $orderItem->item_name_ar : $orderItem->item_name
-                    ])
-                ];
-            }
-
-            //calculate refund total
-
-            $unitPrice = $orderItem->item_price / $orderItem->qty;
-
-            $maxRefundAmount += $qty * $unitPrice;
+        if( $refund_amount > $model->total_price ){
+              return [
+                  "operation" => "error",
+                  "message" => Yii::t ('agent', "{amount} available for refund!", [
+                      'amount' => \Yii::$app->formatter->asCurrency ($model->total_price, $model->currency->code)
+                  ])
+              ];
         }
-
-        //refund_amount should be less than or equal to itemsToRefund's total refund amount
-
-        if ($refund_amount > $maxRefundAmount) {
-            return [
-                "operation" => "error",
-                "message" => Yii::t ('agent', "{amount} available for refund!", [
-                    'amount' => \Yii::$app->formatter->asCurrency ($maxRefundAmount, $model->currency->code)
-                ])
-            ];
-        }
-
         $transaction = Yii::$app->db->beginTransaction ();
 
         $refund = new Refund();
         $refund->restaurant_uuid = $model->restaurant_uuid;
+        $refund->payment_uuid = $model->payment_uuid;
         $refund->order_uuid = $order_uuid;
         $refund->refund_amount = $refund_amount;
         $refund->reason = Yii::$app->request->getBodyParam ('reason');
@@ -1232,6 +1241,8 @@ class OrderController extends Controller
     public function actionSoftDelete($order_uuid, $store_uuid)
     {
         $model = $this->findModel ($order_uuid, $store_uuid);
+        $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
+
         $transaction = Yii::$app->db->beginTransaction();
         if ($model->orderItems) {
             foreach ($model->orderItems as $item) {

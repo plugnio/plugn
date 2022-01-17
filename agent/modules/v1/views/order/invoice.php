@@ -31,6 +31,7 @@
                 <td align="right">
                     <h2 class="txt-invoice-heading">
                         <b>Invoice</b> <br/>#<?= $order->order_uuid ?>
+
                         <?php if($order->payment && $order->payment->received_callback && $order->payment->payment_current_status == 'CAPTURED') { ?>
                             <div class="ion-badge status-paid">
                                 Paid
@@ -147,7 +148,7 @@
 
                         <?php if(($order->area && $order->area->city) || $order->city) { ?>
                         <p style="font-family: Nunito" >
-                            <?= $order->area->city ? $order->area->city->city_name : $order->city ?> <?= $order->postalcode ?>
+                            <?= $order->area_id && $order->area->city ? $order->area->city->city_name : $order->city ?> <?= $order->postalcode ?>
                         </p>
                         <?php } ?>
 
@@ -183,9 +184,15 @@
                             <tr>
                                 <td><strong>Payment Method</strong> : <?= $order->payment_method_name ?></td>
                             </tr>
+
                                 <tr>
-                                    <td><strong>Special Direction</strong>:<?=($order->special_directions) ? $order->special_directions : '';?></td>
+                                    <td>
+                                      <?php if($order->special_directions) { ?>
+                                        <strong>Special Direction</strong>:<?=($order->special_directions) ? $order->special_directions : '';?>
+                                      <?php } ?>
+                                    </td>
                                 </tr>
+
                         </table>
                     </td>
                     <td>
@@ -256,6 +263,7 @@
                                             <tr>
                                                 <td align="start" colspan="3">Subtotal</td>
                                                 <TD align="end">
+
                                                     <?= Yii::$app->formatter->asCurrency(
                                                         $order->subtotal,
                                                         $order->currency->code,
@@ -265,6 +273,7 @@
                                                         ]
                                                     )
                                                     ?>
+
                                                 </TD>
                                             </tr>
 
@@ -272,6 +281,7 @@
                                                 <tr>
                                                     <td align="start" colspan="3">Voucher Discount (<?= $order->voucher->code ?>)</td>
                                                     <td align="end">
+
                                                         <?= Yii::$app->formatter->asCurrency(
                                                             $voucherDiscount,
                                                             $order->currency->code,
@@ -281,12 +291,14 @@
                                                             ]
                                                         )
                                                         ?>
+
                                                     </td>
                                                 </tr>
 
                                                 <tr>
                                                     <td align="start" colspan="3">Subtotal After Voucher</td>
                                                     <td align="end">
+
                                                         <?= Yii::$app->formatter->asCurrency(
                                                             $order->subtotal - $voucherDiscount,
                                                             $order->currency->code,
@@ -296,6 +308,7 @@
                                                             ]
                                                         )
                                                         ?>
+
                                                     </td>
                                                 </tr>
 
@@ -306,6 +319,7 @@
                                                 <tr>
                                                     <td align="start" colspan="3">Bank Discount</td>
                                                     <td align="end">
+
                                                         <?= Yii::$app->formatter->asCurrency(
                                                             $bankDiscount,
                                                             $order->currency->code,
@@ -315,12 +329,14 @@
                                                             ]
                                                         )
                                                         ?>
+
                                                     </td>
                                                 </tr>
 
                                                 <tr>
                                                     <td align="start" colspan="3">Subtotal After Bank Discount</td>
                                                     <td align="end">
+
                                                         <?= Yii::$app->formatter->asCurrency(
                                                             $order->subtotal - $bankDiscount,
                                                             $order->currency->code,
@@ -330,6 +346,7 @@
                                                             ]
                                                         )
                                                         ?>
+
                                                     </td>
                                                 </tr>
 
@@ -338,6 +355,7 @@
                                             <tr>
                                                 <td align="start" colspan="3">Delivery fee</td>
                                                 <td align="end">
+
                                                     <?= Yii::$app->formatter->asCurrency(
                                                         $order->delivery_fee,
                                                         $order->currency->code,
@@ -347,6 +365,7 @@
                                                         ]
                                                     )
                                                     ?>
+
                                                 </td>
                                             </tr>
                                             <?php if($order->voucher && $order->voucher->discount_type == 3) { ?>
@@ -354,6 +373,7 @@
                                                 <tr>
                                                     <td align="start" colspan="3">Voucher Discount (<?= $order->voucher->code ?>)</td>
                                                     <td align="end">
+
                                                         <?= Yii::$app->formatter->asCurrency(
                                                             $order->delivery_fee,
                                                             $order->currency->code,
@@ -363,6 +383,7 @@
                                                             ]
                                                         )
                                                         ?>
+
                                                     </td>
                                                 </tr>
 
@@ -377,6 +398,7 @@
                                             <tr>
                                                 <td align="start" colspan="3">Tax</td>
                                                 <td align="end">
+
                                                     <?= Yii::$app->formatter->asCurrency(
                                                         $order->tax,
                                                         $order->currency->code,
@@ -386,6 +408,7 @@
                                                         ]
                                                     )
                                                     ?>
+
                                                 </td>
                                             </tr>
                                             <?php } ?>
@@ -393,6 +416,7 @@
                                             <tr style="background: #f4f4f4;">
                                                 <td align="start" colspan="3">Amount</td>
                                                 <td style="text-align: right;align-content: end;" align="end">
+
                                                     <?= Yii::$app->formatter->asCurrency(
                                                         $order->total_price,
                                                         $order->currency->code,
@@ -423,4 +447,3 @@
 
     </div>
 </div>
-

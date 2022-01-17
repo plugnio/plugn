@@ -421,6 +421,18 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                             <?php } ?>
                         </ul>
                     </li>
+
+                    <li class=" nav-item">
+
+                        <?=
+                        Html::a(
+                                Html::tag('i', '', ['class' => 'feather icon-layout']) .
+                                Html::tag('span', 'Try the new Plugn'), 'https://dash.plugn.io/?utm_source=old-dashboard&utm_medium=poweredbylink', ['class' => 'menu-title', 'target'=>'_blank']
+                        )
+                        ?>
+                    </li>
+
+
                     <li class=" nav-item">
 
                         <?=
