@@ -178,7 +178,6 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
        return $uuid;
    }
 
-
     /**
      * @inheritdoc
      */
@@ -192,7 +191,6 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
 
         return $fields;
     }
-
 
    /**
     * {@inheritdoc}
