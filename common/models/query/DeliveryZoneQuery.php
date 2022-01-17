@@ -14,7 +14,7 @@ class DeliveryZoneQuery extends \yii\db\ActiveQuery {
      */
     public function all($db = null)
     {
-        $this->andWhere(['is_deleted' => 0]);
+        $this->andWhere(['delivery_zone.is_deleted' => 0]);
 
         return parent::all($db);
     }
