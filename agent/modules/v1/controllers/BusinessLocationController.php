@@ -265,7 +265,14 @@ class BusinessLocationController extends Controller
     {
         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
-        if (($model = BusinessLocation::find ()->where (['business_location_id' => $business_location_id, 'restaurant_uuid' => $store_model->restaurant_uuid])->one ()) !== null) {
+        $model = BusinessLocation::find()
+            ->where([
+                'business_location_id' => $business_location_id,
+                'restaurant_uuid' => $store_model->restaurant_uuid
+            ])
+            ->one();
+
+        if ($model !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested record does not exist.');

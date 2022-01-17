@@ -142,7 +142,6 @@ class AuthController extends Controller {
         $store->owner_number = Yii::$app->request->getBodyParam ('owner_number');
         $store->owner_phone_country_code= Yii::$app->request->getBodyParam ('owner_phone_country_code');
 
-
         $store->name = Yii::$app->request->getBodyParam ('restaurant_name');
         $store->business_type = Yii::$app->request->getBodyParam ('account_type');
         $store->restaurant_domain = Yii::$app->request->getBodyParam ('restaurant_domain');
@@ -367,27 +366,43 @@ class AuthController extends Controller {
         return $this->_loginResponse($agent);
     }
 
-
     /**
      * Return agent data after successful login
      * @param type $agent
      * @return type
      */
-    private function _loginResponse($agent) {
-
+    private function _loginResponse($agent)
+    {
         // Return Agent access token if everything valid
 
         $accessToken = $agent->accessToken->token_value;
 
         $assignment = $agent->getAgentAssignments()->one();
 
-        if(!$assignment){
+        if(!$assignment) {
           return [
               "operation" => "error",
               'message' => Yii::t ('agent', "You're not assigned to any store")
           ];
         }
 
+        $selectedStore = $assignment->getRestaurant()
+            ->select([
+                'restaurant_uuid',
+                'name',
+                'name_ar',
+                'restaurant_domain'
+            ])
+            ->one();
+
+        $stores = $agent->getAccountsManaged()
+            ->select([
+                'restaurant_uuid',
+                'name',
+                'name_ar',
+                'restaurant_domain'
+            ])
+            ->all();
 
         return [
             "operation" => "success",
@@ -397,23 +412,9 @@ class AuthController extends Controller {
             "agent_name" => $agent->agent_name,
             "agent_email" => $agent->agent_email,
             "role" => (int) $assignment->role,
-            "selectedStore" => $assignment->getRestaurant()
-            ->select([
-              'restaurant_uuid',
-              'name',
-              'name_ar',
-              'restaurant_domain'
-            ])
-            ->one(),
-            "stores" => $agent->getAccountsManaged()
-            ->select([
-              'restaurant_uuid',
-              'name',
-              'name_ar',
-              'restaurant_domain'
-            ])
-            ->all(),
+            "selectedStore" => $selectedStore,
+            "stores" => $stores
         ];
     }
-
 }
+

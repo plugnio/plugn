@@ -98,7 +98,6 @@ class WebLinkController extends Controller
      */
     public function actionCreate()
     {
-
         $store_uuid = Yii::$app->request->getBodyParam ("store_uuid");
         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
@@ -108,7 +107,6 @@ class WebLinkController extends Controller
         $model->url = Yii::$app->request->getBodyParam ("url");
         $model->web_link_title = Yii::$app->request->getBodyParam ("web_link_title");
         $model->web_link_title_ar = Yii::$app->request->getBodyParam ("web_link_title_ar");
-
 
         if (!$model->save ()) {
             return [

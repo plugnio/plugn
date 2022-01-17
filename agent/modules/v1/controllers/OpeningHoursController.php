@@ -239,7 +239,6 @@ class OpeningHoursController extends Controller
         ];
     }
 
-
     /**
      * Finds the OpeningHour model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
@@ -251,7 +250,13 @@ class OpeningHoursController extends Controller
     {
         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
-        if (($model = OpeningHour::find ()->where (['opening_hour_id' => $opening_hour_id, 'restaurant_uuid' => $store_model->restaurant_uuid])->one ()) !== null) {
+        $model = OpeningHour::find ()
+            ->where ([
+                'opening_hour_id' => $opening_hour_id,
+                'restaurant_uuid' => $store_model->restaurant_uuid
+            ])->one ();
+
+        if ($model !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested record does not exist.');

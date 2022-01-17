@@ -103,6 +103,7 @@ class DeliveryZoneController extends Controller
         Yii::$app->accountManager->getManagedAccount();
         return true;
     }
+
     /**
      * Get all delivery zones
      * @param type $id
