@@ -6,7 +6,9 @@ namespace agent\models;
 
 class Voucher extends \common\models\Voucher
 {
-
+    /**
+     * @return array|false|int[]|string[]
+     */
     public function fields()
     {
         $field = parent::fields();
@@ -16,6 +18,7 @@ class Voucher extends \common\models\Voucher
         };
 
         $field['totalSpent'] = function($model) {
+
             $totalSpent = (float) $model->getOrders()
                 ->activeOrders()
                 ->sum('total_price');

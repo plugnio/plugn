@@ -6,61 +6,6 @@ use yii;
 
 class Restaurant extends \common\models\Restaurant {
 
-    /**
-     * @inheritdoc
-     */
-    public function fields() {
-        $fields = parent::fields();
-
-        $fields['store_email'] = function($model) {
-            return $model->restaurant_email;
-        };
-
-        $fields['order_count'] = function($model) {
-            return $model->getOrders()->count();
-        };
-
-        $fields['item_count'] = function($model) {
-            return $model->getItems()->count();
-        };
-
-        $fields['is_cash_enabled'] = function($model) {
-            return $model->getPaymentMethods()->where(['payment_method_id' => 3])->exists();
-        };
-
-        $fields['is_knet_enabled'] = function($model) {
-            return $model->getPaymentMethods()->where(['payment_method_id' => 1])->exists();
-        };
-
-        $fields['is_credit_card_enabled'] = function($model) {
-            return $model->getPaymentMethods()->where(['payment_method_id' => 2])->exists();
-        };
-
-        $fields['is_mada_enabled'] = function($model) {
-            return $model->getPaymentMethods()->where(['payment_method_id' => 4])->exists();
-        };
-
-        $fields['is_benefit_enabled'] = function($model) {
-            return $model->getPaymentMethods()->where(['payment_method_id' => 5])->exists();
-        };
-
-        $fields['is_armada_enabled'] = function($model) {
-            return $model->getBusinessLocations()
-            ->where(['not', ['armada_api_key' => null]])
-            ->andWhere(['not', ['armada_api_key' => '']])
-            ->exists();
-        };
-
-        $fields['is_mashkor_enabled'] = function($model) {
-            return $model->getBusinessLocations()
-            ->where(['not', ['mashkor_branch_id' => null]])
-            ->andWhere(['not', ['mashkor_branch_id' => '']])
-            ->exists();
-        };
-
-        return $fields;
-    }
-
     public function extraFields()
     {
         $fields = parent::extraFields ();
@@ -72,8 +17,73 @@ class Restaurant extends \common\models\Restaurant {
             'restaurantTheme',
             'restaurantTheme',
             'countryByOwnerCountryCode',
-            'countryByPhoneCountryCode'
+            'countryByPhoneCountryCode',
+            'isMashkorEnabled',
+            'isArmadaEnabled',
+            'isCashEnabled',
+            'isKnetEnabled',
+            'isCreditCardEnabled',
+            'isMedaEnabled',
+            'isBenefitEnabled',
+            'totalOrders',
+            'totalItems'
         ]);
+    }
+
+    public function getOrderCount()  {
+        return $this->getOrders()
+            ->placedOrders()
+            ->count();
+    }
+
+    public function getItemCount() {
+        return $this->getItems()->count();
+    }
+
+    public function getIsCashEnabled() {
+        return $this->getPaymentMethods()
+            ->where(['payment_method_id' => 3])
+            ->exists();
+    }
+
+    public function getIsKnetEnabled() {
+        return $this->getPaymentMethods()
+            ->where(['payment_method_id' => 1])
+            ->exists();
+    }
+
+    public function getIsCreditCardEnabled() {
+        return $this->getPaymentMethods()
+            ->where(['payment_method_id' => 2])
+            ->exists();
+    }
+
+    public function getIsMedaEnabled() {
+        return $this->getPaymentMethods()
+            ->where(['payment_method_id' => 4])
+            ->exists();
+    }
+
+    public function getIsBenefitEnabled() {
+        return $this->getPaymentMethods()
+            ->where(['payment_method_id' => 5])
+            ->exists();
+    }
+
+    public function getIsArmadaEnabled()
+    {
+        return $this->getBusinessLocations()
+            ->where(['not', ['armada_api_key' => null]])
+            ->andWhere(['not', ['armada_api_key' => '']])
+            ->exists();
+    }
+
+    public function getIsMashkorEnabled()
+    {
+        return $this->getBusinessLocations()
+            ->where(['not', ['mashkor_branch_id' => null]])
+            ->andWhere(['not', ['mashkor_branch_id' => '']])
+            ->exists();
     }
 
     /**

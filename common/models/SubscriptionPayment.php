@@ -151,7 +151,6 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         ];
     }
 
-
     /**
      * @inheritdoc
      */
@@ -163,9 +162,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         unset($fields['payout_status']);
 
         return $fields;
-
     }
-
 
     /**
      * Update Payment's Status from TAP Payments
