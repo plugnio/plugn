@@ -11,7 +11,6 @@ use agent\models\Voucher;
 
 class VoucherController extends Controller
 {
-
     public function behaviors()
     {
         $behaviors = parent::behaviors();
@@ -95,7 +94,6 @@ class VoucherController extends Controller
             'query' => $query
         ]);
     }
-
 
     /**
      * Create voucher
@@ -190,29 +188,33 @@ class VoucherController extends Controller
     public function actionUpdateVoucherStatus()
     {
         $this->authCheck();
+        
         $store_uuid = Yii::$app->request->getBodyParam('store_uuid');
         $voucher_id = Yii::$app->request->getBodyParam('voucher_id');
         $voucherStatus = (int)Yii::$app->request->getBodyParam('voucherStatus');
 
         $voucher_model = $this->findModel($voucher_id, $store_uuid);
 
-        if ($voucherStatus) {
-
-            $voucher_model->voucher_status = $voucherStatus;
-
-            if (!$voucher_model->save()) {
-                return [
-                    "operation" => "error",
-                    "message" => $voucher_model->errors
-                ];
-            }
-
+        /*if (!$voucherStatus) {
             return [
                 "operation" => "success",
-                "message" => Yii::t('agent', "Voucher Status updated successfully")
+                "message" => Yii::t('agent', "Invalid Voucher Status updated successfully")
             ];
+        }*/
 
+        $voucher_model->voucher_status = $voucherStatus;
+
+        if (!$voucher_model->save()) {
+            return [
+                "operation" => "error",
+                "message" => $voucher_model->errors
+            ];
         }
+
+        return [
+            "operation" => "success",
+            "message" => Yii::t('agent', "Voucher Status updated successfully")
+        ];
     }
 
     /**

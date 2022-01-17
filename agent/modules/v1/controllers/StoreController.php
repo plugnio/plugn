@@ -588,7 +588,11 @@ class StoreController extends Controller
         return self::message("success","Analytics integration updated successfully");
     }
 
-
+    /**
+     * @param $store_uuid
+     * @return array
+     * @throws NotFoundHttpException
+     */
     public function actionStatus($store_uuid) {
 
         $model = $this->findModel($store_uuid);
@@ -599,7 +603,6 @@ class StoreController extends Controller
             'shipping'=>count($model->businessLocations)
         ];
     }
-
 
     /**
      * @param $store_uuid

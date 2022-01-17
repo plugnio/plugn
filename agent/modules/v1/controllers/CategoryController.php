@@ -11,9 +11,11 @@ use yii\web\NotFoundHttpException;
 use agent\models\Category;
 
 
-class CategoryController extends Controller {
+class CategoryController extends Controller
+{
 
-    public function behaviors() {
+    public function behaviors()
+    {
         $behaviors = parent::behaviors();
 
         // remove authentication filter for cors to work
@@ -38,19 +40,20 @@ class CategoryController extends Controller {
         ];
 
         // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-              $behaviors['authenticator'] = [
-                  'class' => \yii\filters\auth\HttpBearerAuth::className(),
-              ];
-              // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-              $behaviors['authenticator']['except'] = ['options'];
+        $behaviors['authenticator'] = [
+            'class' => \yii\filters\auth\HttpBearerAuth::className(),
+        ];
+        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+        $behaviors['authenticator']['except'] = ['options'];
 
-              return $behaviors;
+        return $behaviors;
     }
 
     /**
      * @inheritdoc
      */
-    public function actions() {
+    public function actions()
+    {
         $actions = parent::actions();
         $actions['options'] = [
             'class' => 'yii\rest\OptionsAction',
@@ -63,59 +66,63 @@ class CategoryController extends Controller {
 
 
     /**
-    * Get all store's categories
+     * Get all store's categories
      * @param type $id
      * @param type $store_uuid
      * @return ActiveDataProvider
      */
-     public function actionList($store_uuid) {
+    public function actionList($store_uuid)
+    {
 
-         $keyword = Yii::$app->request->get('keyword');
+        $keyword = Yii::$app->request->get('keyword');
 
-         Yii::$app->accountManager->getManagedAccount($store_uuid);
+        Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-         $query =  Category::find()
-             ->andWhere(['category.restaurant_uuid' => $store_uuid]);
+        $query = Category::find()
+            ->andWhere(['category.restaurant_uuid' => $store_uuid]);
 
-         if ($keyword){
-             $query->joinWith(['items']);
-             $query->andWhere([
-                 'OR',
-                     ['like', 'title', $keyword],
-                     ['like', 'title_ar', $keyword],
-                     ['like', 'subtitle', $keyword],
-                     ['like', 'subtitle_ar', $keyword],
-                 ['like', 'item.item_name', $keyword],
-                 ['like', 'item.item_name_ar', $keyword],
-             ]);
-         }
+        if ($keyword) {
+            $query->joinWith(['items']);
+            $query->andWhere([
+                'OR',
+                ['like', 'title', $keyword],
+                ['like', 'title_ar', $keyword],
+                ['like', 'subtitle', $keyword],
+                ['like', 'subtitle_ar', $keyword],
+                ['like', 'item.item_name', $keyword],
+                ['like', 'item.item_name_ar', $keyword],
+            ]);
+        }
 
-         $query->orderBy ([new \yii\db\Expression('sort_number ASC')]);
+        $query->orderBy([new \yii\db\Expression('sort_number ASC')]);
 
-         return new ActiveDataProvider([
-           'query' => $query
-         ]);
-     }
-
-     public function actionItemList($store_uuid) {
-
-         $category_id = Yii::$app->request->get('category_id');
-         Yii::$app->accountManager->getManagedAccount($store_uuid);
-
-        $query =  CategoryItem::find();
-        $query->joinWith('item');
-        $query->andWhere(['category_id'=>$category_id]);
-        $query->orderBy ([new \yii\db\Expression('item.sort_number ASC')]);
         return new ActiveDataProvider([
             'query' => $query
         ]);
-     }
+    }
+
+    public function actionItemList($store_uuid)
+    {
+        $category_id = Yii::$app->request->get('category_id');
+
+        Yii::$app->accountManager->getManagedAccount($store_uuid);
+
+        $query = CategoryItem::find()
+            ->joinWith('item')
+            ->andWhere(['category_id' => $category_id])
+            ->orderBy([new \yii\db\Expression('item.sort_number ASC')]);
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
 
     /**
      * Create category
      * @return array
      */
-    public function actionCreate() {
+    public function actionCreate()
+    {
 
         $store_uuid = Yii::$app->request->getBodyParam("store_uuid");
 
@@ -140,7 +147,7 @@ class CategoryController extends Controller {
 
         $category_image = Yii::$app->request->getBodyParam('category_image');
 
-        if($category_image) {
+        if ($category_image) {
             $model->updateImage($category_image);
         }
 
@@ -158,60 +165,60 @@ class CategoryController extends Controller {
         ];
     }
 
-     /**
-      * Update category
-      */
-     public function actionUpdate($category_id, $store_uuid)
-     {
-         $model = $this->findModel($category_id);
+    /**
+     * Update category
+     */
+    public function actionUpdate($category_id, $store_uuid)
+    {
+        $model = $this->findModel($category_id);
 
-         $model->title = Yii::$app->request->getBodyParam("title");
-         $model->title_ar = Yii::$app->request->getBodyParam("title_ar");
-         $model->subtitle = Yii::$app->request->getBodyParam("subtitle");
-         $model->subtitle_ar = Yii::$app->request->getBodyParam("subtitle_ar");
-         $model->sort_number = Yii::$app->request->getBodyParam("sort_number");
+        $model->title = Yii::$app->request->getBodyParam("title");
+        $model->title_ar = Yii::$app->request->getBodyParam("title_ar");
+        $model->subtitle = Yii::$app->request->getBodyParam("subtitle");
+        $model->subtitle_ar = Yii::$app->request->getBodyParam("subtitle_ar");
+        $model->sort_number = Yii::$app->request->getBodyParam("sort_number");
 
-         //validate before uploading image
+        //validate before uploading image
 
-         if (!$model->validate()) {
-             return [
-                 "operation" => "error",
-                 "message" => $model->errors
-             ];
-         }
+        if (!$model->validate()) {
+            return [
+                "operation" => "error",
+                "message" => $model->errors
+            ];
+        }
 
-         $category_image = Yii::$app->request->getBodyParam('category_image');
+        $category_image = Yii::$app->request->getBodyParam('category_image');
 
-         if($model->category_image != $category_image) {
-             $model->updateImage($category_image);
-         }
+        if ($model->category_image != $category_image) {
+            $model->updateImage($category_image);
+        }
 
-         if (!$model->save())
-         {
-             if (isset($model->errors)) {
-                 return [
-                     "operation" => "error",
-                     "message" => $model->errors
-                 ];
-             } else {
-                 return [
-                     "operation" => "error",
-                     "message" => Yii::t('agent',"We've faced a problem updating the category")
-                 ];
-             }
-         }
+        if (!$model->save()) {
+            if (isset($model->errors)) {
+                return [
+                    "operation" => "error",
+                    "message" => $model->errors
+                ];
+            } else {
+                return [
+                    "operation" => "error",
+                    "message" => Yii::t('agent', "We've faced a problem updating the category")
+                ];
+            }
+        }
 
-         return [
-             "operation" => "success",
-             "message" => Yii::t('agent',"Category updated successfully"),
-             "model" => $model
-         ];
-     }
+        return [
+            "operation" => "success",
+            "message" => Yii::t('agent', "Category updated successfully"),
+            "model" => $model
+        ];
+    }
 
     /**
      * Allows agent to upload category image
      */
-    public function actionUploadCategoryImage() {
+    public function actionUploadCategoryImage()
+    {
 
         $category_image = urldecode(Yii::$app->request->getBodyParam('category_image'));
         $store_uuid = Yii::$app->request->getBodyParam('store_uuid');
@@ -222,7 +229,7 @@ class CategoryController extends Controller {
         if (!isset($model->category_id)) {
             return [
                 "operation" => "error",
-                "message" => Yii::t('agent','Invalid Category ID')
+                "message" => Yii::t('agent', 'Invalid Category ID')
             ];
         }
 
@@ -251,33 +258,32 @@ class CategoryController extends Controller {
         }
     }
 
-      /**
-       * Delete Category
-       */
-      public function actionDelete($category_id)
-      {
-          $model =  $this->findModel($category_id);
+    /**
+     * Delete Category
+     */
+    public function actionDelete($category_id)
+    {
+        $model = $this->findModel($category_id);
 
-          if (!$model->delete())
-          {
-              if (isset($model->errors)) {
-                  return [
-                      "operation" => "error",
-                      "message" => $model->errors
-                  ];
-              } else {
-                  return [
-                      "operation" => "error",
-                      "message" => Yii::t('agent',"We've faced a problem deleting the category")
-                  ];
-              }
-          }
+        if (!$model->delete()) {
+            if (isset($model->errors)) {
+                return [
+                    "operation" => "error",
+                    "message" => $model->errors
+                ];
+            } else {
+                return [
+                    "operation" => "error",
+                    "message" => Yii::t('agent', "We've faced a problem deleting the category")
+                ];
+            }
+        }
 
-          return [
-              "operation" => "success",
-              "message" => Yii::t('agent',"Category deleted successfully")
-          ];
-      }
+        return [
+            "operation" => "success",
+            "message" => Yii::t('agent', "Category deleted successfully")
+        ];
+    }
 
 
     /**
@@ -285,12 +291,14 @@ class CategoryController extends Controller {
      * @param type $itemUuid
      * @return boolean
      */
-    public function actionChangePosition(){
+    public function actionChangePosition()
+    {
 
         $items = Yii::$app->request->getBodyParam('items');
+
         foreach ($items as $key => $value) {
             $model = Category::findOne($value);
-            $model->sort_number = (int)$key+1;
+            $model->sort_number = (int)$key + 1;
             $model->save(false);
         }
 
@@ -300,38 +308,38 @@ class CategoryController extends Controller {
         ];
     }
 
-        /**
-        * Return Category detail
-         * @param type $store_uuid
-         * @param type $category_id
-         * @return type
-         */
-        public function actionDetail($store_uuid, $category_id) {
+    /**
+     * Return Category detail
+     * @param type $store_uuid
+     * @param type $category_id
+     * @return type
+     */
+    public function actionDetail($store_uuid, $category_id)
+    {
+        return $this->findModel($category_id);
+    }
 
-            return $this->findModel($category_id);
-      }
 
+    /**
+     * Finds the Category model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $category_id
+     * @return Category the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($category_id)
+    {
+        $store = Yii::$app->accountManager->getManagedAccount();
 
-      /**
-       * Finds the Category model based on its primary key value.
-       * If the model is not found, a 404 HTTP exception will be thrown.
-       * @param integer $category_id
-       * @return Category the loaded model
-       * @throws NotFoundHttpException if the model cannot be found
-       */
-      protected function findModel($category_id)
-      {
-          $store = Yii::$app->accountManager->getManagedAccount();
+        $model = Category::find()->where([
+            'category_id' => $category_id,
+            'restaurant_uuid' => $store->restaurant_uuid
+        ])->one();
 
-          $model = Category::find()->where([
-              'category_id' => $category_id,
-              'restaurant_uuid' => $store->restaurant_uuid
-          ])->one();
-
-          if ($model !== null) {
-              return $model;
-          } else {
-              throw new NotFoundHttpException('The requested record does not exist.');
-          }
-      }
+        if ($model !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested record does not exist.');
+        }
+    }
 }

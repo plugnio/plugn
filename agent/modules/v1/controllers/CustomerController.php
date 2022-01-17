@@ -100,20 +100,8 @@ class CustomerController extends Controller
      */
     public function actionDetail($store_uuid, $customer_id)
     {
-
-        if (Yii::$app->accountManager->getManagedAccount ($store_uuid)) {
-
-            $customer = Customer::find ()
-                ->andWhere ([
-                    'restaurant_uuid' => $store_uuid,
-                    'customer_id' => $customer_id
-                ])
-                ->one ();
-
-            return $customer;
-        }
+        return $this->findModel($customer_id);
     }
-
 
     /**
      * Return a List of all customers Orders
@@ -123,7 +111,6 @@ class CustomerController extends Controller
      */
     public function actionListAllCustomerOrders($store_uuid, $customer_id)
     {
-
         if (Yii::$app->accountManager->getManagedAccount ($store_uuid)) {
 
             $query = Order::find ()
@@ -133,10 +120,7 @@ class CustomerController extends Controller
             return new ActiveDataProvider([
                 'query' => $query
             ]);
-
-
         }
-
     }
 
     /**
@@ -183,6 +167,7 @@ class CustomerController extends Controller
                     'attribute' => 'Total spent',
                     "format" => "raw",
                     "value" => function ($data) {
+
                         $total_spent = $data->getOrders ()
                             ->andWhere ([
                                 'NOT IN',
