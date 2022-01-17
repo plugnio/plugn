@@ -284,7 +284,6 @@ class DeliveryZoneController extends Controller {
         }
 
 
-
         return $this->render('update-areas', [
                     'cities' => $cities,
                     'storeUuid' => $storeUuid,
