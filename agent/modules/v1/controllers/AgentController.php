@@ -102,13 +102,6 @@ class AgentController extends Controller
     {
         $model = Yii::$app->user->identity;
 
-        if (!isset($model->agent_id)) {
-            return [
-                "operation" => "error",
-                "message" => Yii::t('agent', 'Invalid Agent ID')
-            ];
-        }
-
         $agentAssignment = $model->getAgentAssignments ()->where (['restaurant_uuid' => $store_uuid])->one ();
 
         if (!isset($agentAssignment->restaurant_uuid)) {
@@ -117,7 +110,6 @@ class AgentController extends Controller
                 "message" => Yii::t('agent','You do not own this store.')
             ];
         }
-
 
         $model->agent_name = Yii::$app->request->getBodyParam ("agent_name");
         $model->agent_email = Yii::$app->request->getBodyParam ("agent_email");
