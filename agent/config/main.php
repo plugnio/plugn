@@ -46,7 +46,6 @@ return [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
-
                 [// OrderController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/order',
@@ -157,7 +156,7 @@ return [
                         'OPTIONS <agent_assignment_id>/<store_uuid>' => 'options',
                     ]
                 ],
-                [// bankController
+                [// BankController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/bank',
                     'pluralize' => false,
