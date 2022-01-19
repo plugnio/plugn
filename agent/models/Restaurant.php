@@ -502,4 +502,12 @@ class Restaurant extends \common\models\Restaurant {
     {
         return parent::getCurrency($modelClass);
     }
+
+    public function getTotalOrders() {
+        return [];
+    }
+
+    public function getTotalItems() {
+        return [];
+    }
 }
