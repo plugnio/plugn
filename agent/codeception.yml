@@ -1,4 +1,4 @@
-namespace: admin\tests
+namespace: agent\tests
 actor: Tester
 paths:
     tests: tests
@@ -12,6 +12,6 @@ settings:
 modules:
     config:
         Yii2:
-            configFile: 'config/test-local.php'
+            configFile: 'config/codeception-local.php'
 config:
     test_entry_url: index-test.php               

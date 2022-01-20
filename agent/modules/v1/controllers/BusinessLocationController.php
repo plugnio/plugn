@@ -106,12 +106,12 @@ class BusinessLocationController extends Controller
      * @param $store_uuid
      * @return ActiveDataProvider
      */
-    public function actionList($store_uuid)
+    public function actionList($store_uuid = null)
     {
 //        $this->ownerCheck();
         $keyword = Yii::$app->request->get ('keyword');
 
-        Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $query = BusinessLocation::find()->joinWith('country');
 
@@ -124,13 +124,12 @@ class BusinessLocationController extends Controller
             ]);
         }
 
-        $query->andWhere (['restaurant_uuid' => $store_uuid]);
-        $query->orderBy('business_location_id DESC');
+        $query->andWhere (['restaurant_uuid' => $store->restaurant_uuid])
+            ->orderBy('business_location_id DESC');
 
         return new ActiveDataProvider([
             'query' => $query
         ]);
-
     }
 
     /**
@@ -172,7 +171,7 @@ class BusinessLocationController extends Controller
     /**
      * Update Business Location
      */
-    public function actionUpdate($business_location_id, $store_uuid)
+    public function actionUpdate($business_location_id, $store_uuid = null)
     {
 //        $this->ownerCheck();
         $model = $this->findModel ($business_location_id, $store_uuid);
@@ -215,7 +214,7 @@ class BusinessLocationController extends Controller
      * @param type $order_uuid
      * @return type
      */
-    public function actionDetail($store_uuid, $business_location_id)
+    public function actionDetail($store_uuid = null, $business_location_id)
     {
 //        $this->ownerCheck();
         return $this->findModel ($business_location_id, $store_uuid);
@@ -224,7 +223,7 @@ class BusinessLocationController extends Controller
     /**
      * Delete Business Location
      */
-    public function actionDelete($business_location_id, $store_uuid)
+    public function actionDelete($business_location_id, $store_uuid = null)
     {
         $this->ownerCheck();
         Yii::$app->accountManager->getManagedAccount ($store_uuid);
@@ -261,7 +260,7 @@ class BusinessLocationController extends Controller
      * @return BusinessLocation the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($business_location_id, $store_uuid)
+    protected function findModel($business_location_id, $store_uuid = null)
     {
         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 

@@ -12,7 +12,7 @@ return array(
     array('currency_id'=> 9, 'code' => 'AUD', 'decimal_place' => 2,'title' => 'Australian dollar ','currency_symbol' => ' AU$','rate' => '1.424104','sort_order' => '0','datetime' => '2019-07-01 19:14:14'),
     array('currency_id'=> 10, 'code' => 'AWG', 'decimal_place' => 2,'title' => 'Aruban florin ','currency_symbol' => ' ƒ','rate' => '1.799999','sort_order' => '0','datetime' => '2019-07-01 19:14:14'),
     array('currency_id'=> 12, 'code' => 'AZN', 'decimal_place' => 2,'title' => 'Azerbaijani manat ','currency_symbol' => ' ₼','rate' => '1.705039','sort_order' => '0','datetime' => '2019-07-01 19:14:14'),
-    array('currency_id'=> 12, 'code' => 'BAM', 'decimal_place' => 2,'title' => 'Bosnia and Herzegovina convertible mark ','currency_symbol' => ' KM','rate' => '1.719803','sort_order' => '0','datetime' => '2019-07-01 19:14:14'),
+    array('currency_id'=> 169, 'code' => 'BAM', 'decimal_place' => 2,'title' => 'Bosnia and Herzegovina convertible mark ','currency_symbol' => ' KM','rate' => '1.719803','sort_order' => '0','datetime' => '2019-07-01 19:14:14'),
     array('currency_id'=> 13, 'code' => 'BBD', 'decimal_place' => 2,'title' => 'Barbadian dollar ','currency_symbol' => ' Bds$','rate' => '2.020897','sort_order' => '0','datetime' => '2019-07-01 19:14:14'),
     array('currency_id'=> 14, 'code' => 'BDT', 'decimal_place' => 2,'title' => 'Bangladeshi taka ','currency_symbol' => ' ৳','rate' => '84.57023','sort_order' => '0','datetime' => '2019-07-01 19:14:14'),
     array('currency_id'=> 15, 'code' => 'BGN', 'decimal_place' => 2,'title' => 'Bulgarian lev ','currency_symbol' => ' лв','rate' => '1.720603','sort_order' => '0','datetime' => '2019-07-01 19:14:14'),

@@ -2,6 +2,9 @@
 
 namespace agent\tests;
 
+use agent\models\Agent;
+use Codeception\Util\HttpCode;
+use common\fixtures\AgentAssignmentFixture;
 use common\fixtures\AgentFixture;
 use common\fixtures\AgentTokenFixture;
 use common\fixtures\ItemFixture;
@@ -16,6 +19,7 @@ class ItemCest
     public function _fixtures() {
         return [
             'agents' => AgentFixture::className(),
+            'agent_assignments' => AgentAssignmentFixture::className(),
             'items' => ItemFixture::className(),
             'restaurants' => RestaurantFixture::className(),
             'agentToken' => AgentTokenFixture::className()
@@ -26,7 +30,7 @@ class ItemCest
 
         $this->agent = Agent::find()->one();//['agent_email_verification'=>1]
 
-        $this->store = $this->agent->getStores()->one();
+        $this->store = $this->agent->getAccountsManaged()->one();
 
         $this->token = $this->agent->getAccessToken()->token_value;
 
@@ -110,11 +114,12 @@ class ItemCest
     }
 
     public function tryToUpdateStock(FunctionalTester $I) {
+
         $item = $this->store->getItems()->one();
 
         $I->wantTo('Validate item > update stock api');
-        $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
-        $I->sendPATCH('v1/items/update-stock', [
+        //$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
+        $I->sendPOST('v1/items/update-stock', [
             "item_uuid" => $item->item_uuid,
             "stock_qty" => 12
         ]);
@@ -122,6 +127,7 @@ class ItemCest
     }
 
     public function tryToUpdatePosition(FunctionalTester $I) {
+
         $item = $this->store->getItems()->one();
         $item2 = $this->store->getItems()->offset(1)->one();
 
@@ -139,12 +145,17 @@ class ItemCest
         $item = $this->store->getItems()->one();
 
         $I->wantTo('Validate item > update status api');
+        $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
         $I->sendPATCH('v1/items/update-status/' . $item->item_uuid
             . '/' . $this->store->restaurant_uuid, [
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
     }
 
+    /**
+     * todo: delete image test
+     * @param FunctionalTester $I
+     *
     public function tryToDeleteImage(FunctionalTester $I) {
         $item = $this->store->getItems()->one();
 
@@ -155,8 +166,9 @@ class ItemCest
             . '/' . $image->product_file_name, [
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
-    }
+    }*/
 
+    /*
     public function tryToExportToExcel(FunctionalTester $I) {
         $I->wantTo('Validate item > export to excel api');
         $I->sendGET('v1/items/export-to-excel');
@@ -167,5 +179,5 @@ class ItemCest
         $I->wantTo('Validate item > export item report api');
         $I->sendGET('v1/items/items-report');
         $I->seeResponseCodeIs(HttpCode::OK); // 200
-    }
+    }*/
 }

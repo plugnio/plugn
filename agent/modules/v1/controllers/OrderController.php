@@ -97,7 +97,6 @@ class OrderController extends Controller
             ->andWhere (['is_deleted' => 0])
             ->orderBy (['order_created_at' => SORT_DESC]);
 
-
         return new ActiveDataProvider([
             'query' => $query
         ]);
@@ -513,7 +512,7 @@ class OrderController extends Controller
     /**
      * Place an order
      */
-    public function actionPlaceAnOrder($store_uuid)
+    public function actionPlaceAnOrder($store_uuid = null)
     {
         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
@@ -705,7 +704,7 @@ class OrderController extends Controller
     /**
      * Update Order
      */
-    public function actionUpdate($order_uuid, $store_uuid)
+    public function actionUpdate($order_uuid, $store_uuid = null)
     {
         $transaction = Yii::$app->db->beginTransaction ();
 
@@ -1071,7 +1070,7 @@ class OrderController extends Controller
     /**
      * Update Order Status
      */
-    public function actionUpdateOrderStatus($order_uuid, $store_uuid)
+    public function actionUpdateOrderStatus($order_uuid, $store_uuid = null)
     {
         $model = $this->findModel ($order_uuid, $store_uuid);
 
@@ -1105,7 +1104,7 @@ class OrderController extends Controller
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionRequestDriverFromArmada($order_uuid, $store_uuid)
+    public function actionRequestDriverFromArmada($order_uuid, $store_uuid = null)
     {
         $armadaApiKey = Yii::$app->request->getBodyParam ("armada_api_key");
 
@@ -1155,7 +1154,7 @@ class OrderController extends Controller
      * @param type $order_uuid
      * @param type $store_uuid
      */
-    public function actionRequestDriverFromMashkor($order_uuid, $store_uuid)
+    public function actionRequestDriverFromMashkor($order_uuid, $store_uuid = null)
     {
         $mashkorBranchId = Yii::$app->request->getBodyParam ("mashkor_branch_id");
 
@@ -1202,7 +1201,7 @@ class OrderController extends Controller
      * @param type $order_uuid
      * @return type
      */
-    public function actionDetail($store_uuid, $order_uuid)
+    public function actionDetail($store_uuid = null, $order_uuid)
     {
         return $this->findModel ($order_uuid, $store_uuid);
     }
@@ -1210,7 +1209,7 @@ class OrderController extends Controller
     /**
      * Delete Order
      */
-    public function actionDelete($order_uuid, $store_uuid)
+    public function actionDelete($order_uuid, $store_uuid = null)
     {
         $model = $this->findModel ($order_uuid, $store_uuid);
 
@@ -1238,7 +1237,7 @@ class OrderController extends Controller
     /**
      * Delete Order
      */
-    public function actionSoftDelete($order_uuid, $store_uuid)
+    public function actionSoftDelete($order_uuid, $store_uuid = null)
     {
         $model = $this->findModel ($order_uuid, $store_uuid);
         $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
@@ -1432,7 +1431,7 @@ class OrderController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($store_uuid)
+    public function actionCreate($store_uuid = null)
     {
         $restaurant_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 

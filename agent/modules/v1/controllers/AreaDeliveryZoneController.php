@@ -259,7 +259,7 @@ class AreaDeliveryZoneController extends Controller
     /**
      * Update  AreaDelivery Zone
      */
-    public function actionUpdate($area_delivery_zone_id, $store_uuid)
+    public function actionUpdate($area_delivery_zone_id, $store_uuid = null)
     {
         $this->ownerCheck();
         $store_uuid = Yii::$app->request->getBodyParam ("store_uuid");
@@ -310,7 +310,7 @@ class AreaDeliveryZoneController extends Controller
     /**
      * Delete Delivery zone
      */
-    public function actionDelete($area_delivery_zone_id, $store_uuid)
+    public function actionDelete($area_delivery_zone_id, $store_uuid = null)
     {
         $this->ownerCheck();
 
@@ -343,13 +343,13 @@ class AreaDeliveryZoneController extends Controller
      * @return BusinessLocation the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($area_delivery_zone_id, $store_uuid)
+    protected function findModel($area_delivery_zone_id, $store_uuid = null)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $model = AreaDeliveryZone::find ()->where ([
             'area_delivery_zone' => $area_delivery_zone_id,
-            'restaurant_uuid' => $store_model->restaurant_uuid
+            'restaurant_uuid' => $store->restaurant_uuid
         ])->one ();
 
         if ($model !== null) {
