@@ -2,14 +2,18 @@
 
 namespace agent\tests;
 
+use agent\models\Agent;
+use Codeception\Util\HttpCode;
+use common\fixtures\AgentAssignmentFixture;
 use common\fixtures\AgentFixture;
 use common\fixtures\AgentTokenFixture;
 use common\fixtures\AreaDeliveryZoneFixture;
 use common\fixtures\AreaFixture;
+use common\fixtures\CityFixture;
 use common\fixtures\CountryFixture;
 use common\fixtures\DeliveryZoneFixture;
-use common\fixtures\OrderFixture;
 use common\fixtures\RestaurantFixture;
+
 
 class AreaDeliveryZoneCest
 {
@@ -21,6 +25,8 @@ class AreaDeliveryZoneCest
         return [
             'agents' => AgentFixture::className(),
             'areas' => AreaFixture::className(),
+            'cities' => CityFixture::className(),
+            'agent_assignments' => AgentAssignmentFixture::className(),
             'countries' => CountryFixture::className(),
             'areaDeliveryZone' => AreaDeliveryZoneFixture::className(),
             'deliveryZones' => DeliveryZoneFixture::className(),
@@ -33,7 +39,7 @@ class AreaDeliveryZoneCest
 
         $this->agent = Agent::find()->one();//['agent_email_verification'=>1]
 
-        $this->store = $this->agent->getStores()->one();
+        $this->store = $this->agent->getAccountsManaged()->one();
 
         $this->token = $this->agent->getAccessToken()->token_value;
 
@@ -56,7 +62,7 @@ class AreaDeliveryZoneCest
         $model = $this->store->getAreaDeliveryZones()->one();
 
         $I->wantTo('Validate area-delivery-zone > delete api');
-        $I->sendDELETE('v1/area-delivery-zone/' . $model->area_delivery_zone_id);
+        $I->sendDELETE('v1/area-delivery-zone/' . $model->area_delivery_zone);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
     }
 
@@ -66,7 +72,8 @@ class AreaDeliveryZoneCest
         $dz = $this->store->getDeliveryZones()->one();
 
         $I->wantTo('Validate area-delivery-zone > delete api');
-        $I->sendPATCH('v1/area-delivery-zone/' . $model->area_delivery_zone_id, [
+        $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
+        $I->sendPATCH('v1/area-delivery-zone/' . $model->area_delivery_zone, [
             'area_id' => 1,
             'delivery_zone_id' => $dz->delivery_zone_id
         ]);
@@ -90,10 +97,13 @@ class AreaDeliveryZoneCest
         $dz = $this->store->getDeliveryZones()->one();
 
         $I->wantTo('Validate area-delivery-zone > save api');
+        $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
         $I->sendPATCH('v1/area-delivery-zone/save', [
             'areas' => [
-                'city_id' => 1,
-                'area_id' => 1,
+                [
+                    'city_id' => 1,
+                    'area_id' => 1,
+                ]
             ],
             'delivery_zone_id' => $dz->delivery_zone_id
         ]);

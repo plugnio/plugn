@@ -65,16 +65,16 @@ class VoucherController extends Controller
      * @param $store_uuid
      * @return ActiveDataProvider
      */
-    public function actionList($store_uuid)
+    public function actionList($store_uuid = null)
     {
         $this->authCheck();
         $keyword = Yii::$app->request->get('keyword');
         $status = Yii::$app->request->get('status');
 
-        Yii::$app->accountManager->getManagedAccount($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $query = Voucher::find()
-            ->andWhere(['restaurant_uuid' => $store_uuid])
+            ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
             ->orderBy('voucher_id DESC');
 
         if ($keyword && $keyword != 'null') {
@@ -102,11 +102,13 @@ class VoucherController extends Controller
     public function actionCreate()
     {
         $this->authCheck();
+
         $store_uuid = Yii::$app->request->getBodyParam("store_uuid");
-        Yii::$app->accountManager->getManagedAccount($store_uuid);
+
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $model = new Voucher();
-        $model->restaurant_uuid = $store_uuid;
+        $model->restaurant_uuid = $store->restaurant_uuid;
         $model->code = Yii::$app->request->getBodyParam("code");
         $model->description = Yii::$app->request->getBodyParam("description");
         $model->description_ar = Yii::$app->request->getBodyParam("description_ar");
@@ -141,7 +143,7 @@ class VoucherController extends Controller
     /**
      * Update voucher
      */
-    public function actionUpdate($voucher_id, $store_uuid)
+    public function actionUpdate($voucher_id, $store_uuid = null)
     {
         $this->authCheck();
         $model = $this->findModel($voucher_id, $store_uuid);
@@ -223,7 +225,7 @@ class VoucherController extends Controller
      * @param type $order_uuid
      * @return type
      */
-    public function actionDetail($store_uuid, $voucher_id)
+    public function actionDetail($store_uuid = null, $voucher_id)
     {
         $this->authCheck();
         return $this->findModel($voucher_id, $store_uuid);
@@ -232,7 +234,7 @@ class VoucherController extends Controller
     /**
      * Delete Voucher
      */
-    public function actionRemove($voucher_id, $store_uuid)
+    public function actionRemove($voucher_id, $store_uuid = null)
     {
         $this->authCheck();
         Yii::$app->accountManager->getManagedAccount($store_uuid);
@@ -266,7 +268,7 @@ class VoucherController extends Controller
      * @return Country the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($voucher_id, $store_uuid)
+    protected function findModel($voucher_id, $store_uuid = null)
     {
         $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
 

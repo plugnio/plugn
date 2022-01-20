@@ -4,6 +4,7 @@ namespace agent\tests;
 
 use agent\models\Agent;
 use Codeception\Util\HttpCode;
+use common\fixtures\AgentAssignmentFixture;
 use common\fixtures\AgentFixture;
 use common\fixtures\AgentTokenFixture;
 use common\fixtures\AreaFixture;
@@ -16,6 +17,7 @@ class AreaCest
 
     public function _fixtures() {
         return [
+            'agent_assignments' => AgentAssignmentFixture::className(),
             'area' => AreaFixture::className(),
             'agents' => AgentFixture::className(),
             'agentToken' => AgentTokenFixture::className()
@@ -29,6 +31,11 @@ class AreaCest
         $this->token = $this->agent->getAccessToken()->token_value;
 
         $I->amBearerAuthenticated($this->token);
+
+        $this->store = $this->agent->getAccountsManaged()->one();
+
+        $I->haveHttpHeader('Store-Id', $this->store->restaurant_uuid);
+
     }
 
     public function _after(FunctionalTester $I) {

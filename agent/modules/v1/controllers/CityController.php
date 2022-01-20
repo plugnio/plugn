@@ -102,7 +102,7 @@ class CityController extends Controller {
      * @param type $city_id
      * @return type
      */
-    public function actionDetail($city_id, $store_uuid)
+    public function actionDetail($city_id)
     {
         return $this->findModel($city_id);
     }

@@ -3,6 +3,7 @@
 return [
     'customer0' => [
         'customer_id' => 1,
+        'restaurant_uuid' => 1,
         'customer_name' => 'Constance',
         'customer_phone_number' => '518-248-9534 x334',
         'customer_email' => 'schimmel.darrell@kuhlman.com',

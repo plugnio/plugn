@@ -2,10 +2,14 @@
 
 namespace agent\tests;
 
+use agent\models\Agent;
 use agent\models\Voucher;
+use Codeception\Util\HttpCode;
+use common\fixtures\AgentAssignmentFixture;
 use common\fixtures\AgentFixture;
 use common\fixtures\AgentTokenFixture;
 use common\fixtures\RestaurantFixture;
+use common\fixtures\VoucherFixture;
 use common\fixtures\WebLinkFixture;
 
 class VoucherCest
@@ -16,8 +20,9 @@ class VoucherCest
 
     public function _fixtures() {
         return [
-            'weblinks' => WebLinkFixture::className(),
+            'vouchers' => VoucherFixture::className(),
             'agents' => AgentFixture::className(),
+            'agent_assignments' => AgentAssignmentFixture::className(),
             'restaurants' => RestaurantFixture::className(),
             'agentToken' => AgentTokenFixture::className()
         ];
@@ -27,7 +32,7 @@ class VoucherCest
 
         $this->agent = Agent::find()->one();//['agent_email_verification'=>1]
 
-        $this->store = $this->agent->getStores()->one();
+        $this->store = $this->agent->getAccountsManaged()->one();
 
         $this->token = $this->agent->getAccessToken()->token_value;
 

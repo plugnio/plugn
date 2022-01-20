@@ -71,7 +71,7 @@ class CategoryController extends Controller
      * @param type $store_uuid
      * @return ActiveDataProvider
      */
-    public function actionList($store_uuid)
+    public function actionList($store_uuid = null)
     {
 
         $keyword = Yii::$app->request->get('keyword');
@@ -101,7 +101,7 @@ class CategoryController extends Controller
         ]);
     }
 
-    public function actionItemList($store_uuid)
+    public function actionItemList($store_uuid = null)
     {
         $category_id = Yii::$app->request->get('category_id');
 
@@ -168,7 +168,7 @@ class CategoryController extends Controller
     /**
      * Update category
      */
-    public function actionUpdate($category_id, $store_uuid)
+    public function actionUpdate($category_id)
     {
         $model = $this->findModel($category_id);
 
@@ -314,7 +314,7 @@ class CategoryController extends Controller
      * @param type $category_id
      * @return type
      */
-    public function actionDetail($store_uuid, $category_id)
+    public function actionDetail($category_id)
     {
         return $this->findModel($category_id);
     }

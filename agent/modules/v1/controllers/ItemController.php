@@ -399,6 +399,7 @@ class ItemController extends Controller
     public function actionDeleteImage($id, $image)
     {
         $itemImage = ItemImage::findOne(['item_uuid'=>$id, 'product_file_name'=>$image]);
+        
         if ($itemImage && !$itemImage->delete()) {
             if (isset($model->errors)) {
                 return [

@@ -98,18 +98,11 @@ class AgentController extends Controller
      * @param $store_uuid
      * @return array|string[]
      */
-    public function actionUpdateAgentProfile($store_uuid)
+    public function actionUpdateAgentProfile($store_uuid = null)
     {
         $model = Yii::$app->user->identity;
 
-        $agentAssignment = $model->getAgentAssignments ()->where (['restaurant_uuid' => $store_uuid])->one ();
-
-        if (!isset($agentAssignment->restaurant_uuid)) {
-            return [
-                "operation" => "error",
-                "message" => Yii::t('agent','You do not own this store.')
-            ];
-        }
+        $agentAssignment = Yii::$app->accountManager->getAssignment($store_uuid);
 
         $model->agent_name = Yii::$app->request->getBodyParam ("agent_name");
         $model->agent_email = Yii::$app->request->getBodyParam ("agent_email");

@@ -2,6 +2,9 @@
 
 namespace agent\tests;
 
+use agent\models\Agent;
+use Codeception\Util\HttpCode;
+use common\fixtures\AgentAssignmentFixture;
 use common\fixtures\AgentFixture;
 use common\fixtures\AgentTokenFixture;
 use common\fixtures\BusinessLocationFixture;
@@ -18,6 +21,7 @@ class CategoryCest
     public function _fixtures() {
         return [
             'agents' => AgentFixture::className(),
+            'agent_assignments' => AgentAssignmentFixture::className(),
             'categories' => CategoryFixture::className(),
             'restaurants' => RestaurantFixture::className(),
             'agentToken' => AgentTokenFixture::className()
@@ -28,7 +32,7 @@ class CategoryCest
 
         $this->agent = Agent::find()->one();//['agent_email_verification'=>1]
 
-        $this->store = $this->agent->getStores()->one();
+        $this->store = $this->agent->getAccountsManaged()->one();
 
         $this->token = $this->agent->getAccessToken()->token_value;
 
@@ -90,6 +94,7 @@ class CategoryCest
         $model = $this->store->getCategories()->one();
 
         $I->wantTo('Validate category > update api');
+        $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
         $I->sendPATCH('v1/category/'. $model->category_id, [
             'title' => 'Cat name',
             'title_ar' => 'Cat name',
@@ -128,8 +133,10 @@ class CategoryCest
     public function tryToUploadImage(FunctionalTester $I) {
 
         $model = $this->store->getCategories()->one();
+//var_dump(codecept_data_dir() . 'files/sample.jpg');
+//die();
 
-        $response = Yii::$app->temporaryBucketResourceManager->save(
+        $response = \Yii::$app->temporaryBucketResourceManager->save(
             null,
             'sample.jpg',
             [],
