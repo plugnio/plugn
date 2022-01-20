@@ -133,13 +133,14 @@ class OrderItem extends \yii\db\ActiveRecord {
         if ($this->item)
             $this->item->increaseStockQty($this->qty);
 
-        $orderItemsExtraOption = OrderItemExtraOption::find()->where(['order_item_id' => $this->order_item_id])->all();
+        $orderItemsExtraOption = OrderItemExtraOption::find()
+            ->where(['order_item_id' => $this->order_item_id])
+            ->all();
 
         if($orderItemsExtraOption) {
 
           foreach ($orderItemsExtraOption as $orderItemExtraOption)
              $orderItemExtraOption->delete();
-
         }
 
         return parent::beforeDelete();

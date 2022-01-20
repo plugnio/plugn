@@ -214,7 +214,6 @@ class Category extends \yii\db\ActiveRecord
      */
     public function moveCategoryImageFromS3toCloudinary()
     {
-
         if (!$this->category_image) {
             $this->addError ('category image', Yii::t ('app', 'Image not available to save.'));
             return false;

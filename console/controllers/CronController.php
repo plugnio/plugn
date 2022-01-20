@@ -44,7 +44,6 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-
     public function actionOrderItem(){
 
       $orders = Yii::$app->db->createCommand('select order_uuid,restaurant_uuid from `order`')->queryAll();

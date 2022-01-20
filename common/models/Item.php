@@ -219,13 +219,18 @@ class Item extends \yii\db\ActiveRecord
     {
         parent::afterSave ($insert, $changedAttributes);
 
-        if ($insert || isset($changedAttributes['item_name'])) {
+        if ($insert || isset($changedAttributes['item_name']))
+        {
+            if ($this->restaurant->sitemap_require_update == 0)
+            {
+                $this->restaurant->sitemap_require_update = 1;
 
-            $store = $this->restaurant;
-
-            if ($store->sitemap_require_update == 0) {
-                $store->sitemap_require_update = 1;
-                $store->save (false);
+                Restaurant::updateAll([
+                    'sitemap_require_update' => $this->restaurant->sitemap_require_update
+                ], [
+                    'restaurant_uuid' => $this->restaurant_uuid
+                ]);
+                //$this->restaurant->save (false);
             }
         }
 
@@ -242,7 +247,13 @@ class Item extends \yii\db\ActiveRecord
             $this->stock_qty += $qty;
 
         $this->unit_sold -= $qty;
-        $this->save (false);
+
+        self::updateAll([
+            'unit_sold' => $this->unit_sold, 
+            'stock_qty' => $this->stock_qty
+        ], [
+            'item_uuid' => $this->item_uuid
+        ]);
     }
 
     /**
@@ -255,7 +266,13 @@ class Item extends \yii\db\ActiveRecord
             $this->stock_qty -= $qty;
 
         $this->unit_sold += $qty;
-        $this->save (false);
+
+        self::updateAll([
+            'unit_sold' => $this->unit_sold, 
+            'stock_qty' => $this->stock_qty
+        ], [
+            'item_uuid' => $this->item_uuid
+        ]);
     }
 
     /**

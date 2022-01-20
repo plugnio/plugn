@@ -24,10 +24,10 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
 {
 
 
-      //Values for `queue_status`
-      const QUEUE_STATUS_PENDING = 1;
-      const QUEUE_STATUS_CREATING = 2;
-      const QUEUE_STATUS_COMPLETE = 3;
+    //Values for `queue_status`
+    const QUEUE_STATUS_PENDING = 1;
+    const QUEUE_STATUS_CREATING = 2;
+    const QUEUE_STATUS_COMPLETE = 3;
 
 
     /**
@@ -41,7 +41,8 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules() {
+    public function rules()
+    {
         return [
             [['restaurant_uuid', 'queue_status'], 'required'],
             [['queue_status'], 'integer'],
@@ -53,12 +54,12 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
     }
 
 
-
     /**
      *
      * @return type
      */
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             [
                 'class' => \yii\behaviors\TimestampBehavior::className(),
@@ -69,45 +70,55 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * @param bool $insert
+     * @param array $changedAttributes
+     * @return bool
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($this->queue_status != self::QUEUE_STATUS_CREATING) {
+            return parent::afterSave($insert, $changedAttributes);
+        }
 
+        if ($this->payment_gateway == 'tap')
+            $response = $this->restaurant->createTapAccount();
+        else if ($this->payment_gateway == 'myfatoorah') {
+            $response = $this->restaurant->createMyFatoorahAccount();
+        }
 
+        if ($response) {
 
-      public function afterSave($insert, $changedAttributes) {
+            $this->queue_status = self::QUEUE_STATUS_COMPLETE;
 
-        if ($this->queue_status == self::QUEUE_STATUS_CREATING) {
-          if ($this->payment_gateway == 'tap')
-            $response =  $this->restaurant->createTapAccount();
-          else if ($this->payment_gateway == 'myfatoorah'){
-            $response =  $this->restaurant->createMyFatoorahAccount();
-          }
+            if ($this->validate() && $this->restaurant->restaurant_email) {
 
-              if($response){
-                $this->queue_status = self::QUEUE_STATUS_COMPLETE;
-                if($this->save() && $this->restaurant->restaurant_email){
+                //save
 
-                  $paymentGateway = $this->payment_gateway == 'tap' ? 'Tap Payments' : 'MyFatoorah';
-                  $subject = 'Your '. $paymentGateway .' account has been approved';
+                self::updateAll([
+                    'queue_status' => $this->queue_status
+                ], [
+                    'payment_gateway_queue_id' => $this->payment_gateway_queue_id
+                ]);
 
-                  \Yii::$app->mailer->compose([
-                         'html' => 'payment-gateway-created',
-                             ], [
-                         'store' => $this->restaurant,
-                         'paymentGateway' => $this->payment_gateway == 'tap' ? 'Tap' : 'MyFatoorah',
-                     ])
-                     ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-                     ->setTo([$this->restaurant->restaurant_email])
-                     ->setSubject($subject)
-                     ->send();
-                }
-              }
+                $paymentGateway = $this->payment_gateway == 'tap' ? 'Tap Payments' : 'MyFatoorah';
+                $subject = 'Your ' . $paymentGateway . ' account has been approved';
 
-          }
-
-
+                \Yii::$app->mailer->compose([
+                    'html' => 'payment-gateway-created',
+                ], [
+                    'store' => $this->restaurant,
+                    'paymentGateway' => $this->payment_gateway == 'tap' ? 'Tap' : 'MyFatoorah',
+                ])
+                    ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                    ->setTo([$this->restaurant->restaurant_email])
+                    ->setSubject($subject)
+                    ->send();
+            }
+        }
 
         return parent::afterSave($insert, $changedAttributes);
-
-      }
+    }
 
     /**
      * {@inheritdoc}

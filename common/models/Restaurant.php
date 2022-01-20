@@ -873,9 +873,9 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function createMyFatoorahAccount() {
 
-
         //Create  supplier for a vendor on MyFatoorah
         Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
+
         $response = Yii::$app->myFatoorahPayment->createSupplier($this);
         $supplierApiResponse = json_decode($response->content);
 
@@ -911,21 +911,20 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function createTapAccount() {
 
-
         //Upload documents file on our server before we create an account on tap we gonaa delete them
         $this->uploadDocumentsToTap();
-
 
         //Create a business for a vendor on Tap
         $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
 
-        if ($businessApiResponse->isOk) {
-
+        if ($businessApiResponse->isOk)
+        {
             $this->business_id = $businessApiResponse->data['id'];
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
             $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
-        } else {
-
+        }
+        else
+        {
             Yii::error('Error while create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
             return false;
         }
@@ -933,15 +932,17 @@ class Restaurant extends \yii\db\ActiveRecord
         //Create a merchant on Tap
         $merchantApiResponse = Yii::$app->tapPayments->createMerchantAccount($this->company_name, $this->currency->code ,$this->business_id, $this->business_entity_id, $this->iban);
 
-
-        if ($merchantApiResponse->isOk) {
+        if ($merchantApiResponse->isOk)
+        {
             $this->merchant_id = $merchantApiResponse->data['id'];
             $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
         }
-
-        else {
+        else
+        {
              Yii::error('Error while create Merchant' . json_encode($merchantApiResponse->data));
-             if($merchantApiResponse->data['message'] == 'Profile Name already exists') {
+
+             if($merchantApiResponse->data['message'] == 'Profile Name already exists')
+             {
                $merchantApiResponse = Yii::$app->tapPayments->createMerchantAccount($this->company_name . '-' . $this->country->iso, $this->currency->code ,$this->business_id, $this->business_entity_id, $this->iban);
 
                if ($merchantApiResponse->isOk) {
@@ -949,7 +950,24 @@ class Restaurant extends \yii\db\ActiveRecord
                    $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
                } else{
                    Yii::error('Error while create Merchant [ ' . $this->name . '] #2#' . json_encode($merchantApiResponse->data));
-                   $this->save();
+
+                   self::updateAll([
+                       'business_id' => $this->business_id,
+                       'business_entity_id' => $this->business_entity_id,
+                       'developer_id' => $this->developer_id,
+                       'merchant_id' => $this->merchant_id,
+                       'wallet_id' => $this->wallet_id,
+                       'operator_id' => $this->operator_id,
+                       'test_api_key' => $this->test_api_key,
+                       'test_public_key' => $this->test_public_key,
+                       'live_api_key' => $this->live_api_key,
+                       'live_public_key' => $this->live_public_key,
+                       'is_tap_enable' => $this->is_tap_enable,
+                       'is_myfatoorah_enable' => $this->is_myfatoorah_enable
+                   ], [
+                       'order_uuid' => $this->order_uuid
+                   ]);
+
                    return false;
                }
              }
@@ -972,16 +990,52 @@ class Restaurant extends \yii\db\ActiveRecord
               $this->is_tap_enable = 1;
               $this->is_myfatoorah_enable = 0;
             }
-            else
-              $this->is_tap_enable = 0;
-
+            else {
+                $this->is_tap_enable = 0;
+            }
 
             \Yii::info($this->name . " has just created TAP account", __METHOD__);
-            $this->save();
+
+            self::updateAll([
+                'business_id' => $this->business_id,
+                'business_entity_id' => $this->business_entity_id,
+                'developer_id' => $this->developer_id,
+                'merchant_id' => $this->merchant_id,
+                'wallet_id' => $this->wallet_id,
+                'operator_id' => $this->operator_id,
+                'test_api_key' => $this->test_api_key,
+                'test_public_key' => $this->test_public_key,
+                'live_api_key' => $this->live_api_key,
+                'live_public_key' => $this->live_public_key,
+                'is_tap_enable' => $this->is_tap_enable,
+                'is_myfatoorah_enable' => $this->is_myfatoorah_enable
+            ], [
+                'order_uuid' => $this->order_uuid
+            ]);
+
             return true;
-        } else {
+        }
+        else
+        {
           Yii::error('Error while create Operator  [' . $this->name . '] ' . json_encode($operatorApiResponse->data));
-          $this->save();
+
+            self::updateAll([
+                'business_id' => $this->business_id,
+                'business_entity_id' => $this->business_entity_id,
+                'developer_id' => $this->developer_id,
+                'merchant_id' => $this->merchant_id,
+                'wallet_id' => $this->wallet_id,
+                'operator_id' => $this->operator_id,
+                'test_api_key' => $this->test_api_key,
+                'test_public_key' => $this->test_public_key,
+                'live_api_key' => $this->live_api_key,
+                'live_public_key' => $this->live_public_key,
+                'is_tap_enable' => $this->is_tap_enable,
+                'is_myfatoorah_enable' => $this->is_myfatoorah_enable
+            ], [
+                'order_uuid' => $this->order_uuid
+            ]);
+
           return false;
         }
     }
@@ -1135,18 +1189,12 @@ class Restaurant extends \yii\db\ActiveRecord
 
           if($isDomainExist)
             return  $this->addError('restaurant_domain', 'Another store is already using this domain');
-
-
         }
-
-
-
 
         if ($this->scenario == self::SCENARIO_UPLOAD_STORE_DOCUMENT) {
             //delete tmp files
             $this->deleteTempFiles();
         }
-
 
         return parent::beforeSave($insert);
     }
@@ -1186,12 +1234,12 @@ class Restaurant extends \yii\db\ActiveRecord
         if ($this->scenario == self::SCENARIO_CREATE_STORE_BY_AGENT && $insert) {
 
             //Create a new record in queue table
-            $queue_model = new Queue();
-            $queue_model->restaurant_uuid = $this->restaurant_uuid;
-            $queue_model->queue_status = Queue::QUEUE_STATUS_PENDING;
+            $queue = new Queue();
+            $queue->restaurant_uuid = $this->restaurant_uuid;
+            $queue->queue_status = Queue::QUEUE_STATUS_PENDING;
 
-            if (!$queue_model->save ())
-                Yii::error ('Queue Error:' . json_encode ($queue_model->errors));
+            if (!$queue->save ())
+                Yii::error ('Queue Error:' . json_encode ($queue->errors));
         }
 
         if ($insert) {
@@ -1536,7 +1584,6 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function beforeDelete()
     {
-
         $this->deleteRestaurantThumbnailImage ();
         $this->deleteRestaurantLogo ();
 
@@ -1548,8 +1595,9 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function markAsBusy()
     {
-        $this->restaurant_status = Restaurant::RESTAURANT_STATUS_BUSY;
-        $this->save (false);
+        self::updateAll(['restaurant_status' => self::RESTAURANT_STATUS_BUSY], [
+            'restaurant_uuid' => $this->restaurant_uuid
+        ]);
     }
 
     /**
@@ -1557,8 +1605,9 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function markAsOpen()
     {
-        $this->restaurant_status = Restaurant::RESTAURANT_STATUS_OPEN;
-        $this->save (false);
+        self::updateAll(['restaurant_status' => self::RESTAURANT_STATUS_OPEN], [
+            'restaurant_uuid' => $this->restaurant_uuid
+        ]);
     }
 
     /**

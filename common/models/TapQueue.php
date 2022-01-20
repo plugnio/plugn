@@ -21,10 +21,10 @@ use yii\behaviors\TimestampBehavior;
  */
 class TapQueue extends \yii\db\ActiveRecord
 {
-      //Values for `queue_status`
-      const QUEUE_STATUS_PENDING = 1;
-      const QUEUE_STATUS_CREATING = 2;
-      const QUEUE_STATUS_COMPLETE = 3;
+    //Values for `queue_status`
+    const QUEUE_STATUS_PENDING = 1;
+    const QUEUE_STATUS_CREATING = 2;
+    const QUEUE_STATUS_COMPLETE = 3;
 
     /**
      * {@inheritdoc}
@@ -37,7 +37,8 @@ class TapQueue extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules() {
+    public function rules()
+    {
         return [
             [['restaurant_uuid', 'queue_status'], 'required'],
             [['queue_status'], 'integer'],
@@ -51,7 +52,8 @@ class TapQueue extends \yii\db\ActiveRecord
      *
      * @return type
      */
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             [
                 'class' => \yii\behaviors\TimestampBehavior::className(),
@@ -62,31 +64,37 @@ class TapQueue extends \yii\db\ActiveRecord
         ];
     }
 
-    public function afterSave($insert, $changedAttributes) {
+    public function afterSave($insert, $changedAttributes)
+    {
 
         if ($this->queue_status == self::QUEUE_STATUS_CREATING) {
-          if($this->restaurant->createTapAccount()){
-            $this->queue_status = self::QUEUE_STATUS_COMPLETE;
-            if($this->save()){
 
-              foreach ($this->restaurant->getOwnerAgent()->all() as $agent) {
+            if ($this->restaurant->createTapAccount()) {
 
-                \Yii::$app->mailer->compose([
-                       'html' => 'tap-created',
-                           ], [
-                       'store' => $this->restaurant,
-                   ])
-                   ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-                   ->setTo([$agent->agent_email])
-                   ->setSubject('Your TAP Payments account has been approved')
-                   ->send();
+                if ($this->validate()) {
 
-              }
+                    self::updateAll(['queue_status' => self::QUEUE_STATUS_COMPLETE], [
+                        'tap_queue_id' => $this->tap_queue_id
+                    ]);
+
+                    foreach ($this->restaurant->getOwnerAgent()->all() as $agent) {
+
+                        \Yii::$app->mailer->compose([
+                            'html' => 'tap-created',
+                        ], [
+                            'store' => $this->restaurant,
+                        ])
+                            ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                            ->setTo([$agent->agent_email])
+                            ->setSubject('Your TAP Payments account has been approved')
+                            ->send();
+
+                    }
+                }
             }
-          }
         }
 
-      return parent::afterSave($insert, $changedAttributes);
+        return parent::afterSave($insert, $changedAttributes);
 
     }
 
