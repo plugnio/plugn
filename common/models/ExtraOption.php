@@ -93,7 +93,10 @@ class ExtraOption extends \yii\db\ActiveRecord {
     {
         if($this->stock_qty !== null && $this->stock_qty >= 0 ){
           $this->stock_qty += $qty;
-          $this->save(false);
+
+          self::updateAll(['stock_qty' => $this->stock_qty], [
+              'extra_option_id' => $this->extra_option_id
+          ]);
         }
     }
 
@@ -104,8 +107,11 @@ class ExtraOption extends \yii\db\ActiveRecord {
     public function decreaseStockQty($qty)
     {
         if($this->stock_qty !== null && $this->stock_qty > 0 ){
-          $this->stock_qty -= $qty;
-          $this->save(false);
+            $this->stock_qty -= $qty;
+
+            self::updateAll(['stock_qty' => $this->stock_qty], [
+                'extra_option_id' => $this->extra_option_id
+            ]);
         }
     }
 
