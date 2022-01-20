@@ -249,9 +249,13 @@ class DeliveryZoneController extends Controller
     public function actionDelete($delivery_zone_id, $store_uuid)
     {
         $this->ownerCheck();
+        $transaction = Yii::$app->db->beginTransaction();
+
+        AreaDeliveryZone::deleteAll(['delivery_zone_id'=> $delivery_zone_id, 'restaurant_uuid' => $store_uuid]);
         $model = $this->findModel($delivery_zone_id, $store_uuid);
 
         if (!$model->delete()) {
+            $transaction->rollBack();
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",
@@ -265,6 +269,7 @@ class DeliveryZoneController extends Controller
             }
         }
 
+        $transaction->commit();
         return [
             "operation" => "success",
             "message" => Yii::t('agent',"Delivery Zone deleted successfully")
