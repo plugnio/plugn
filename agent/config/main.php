@@ -65,6 +65,7 @@ return [
                         'PATCH update-order-status/<order_uuid>/<store_uuid>' => 'update-order-status',
                         'POST request-driver-from-armada/<order_uuid>/<store_uuid>' => 'request-driver-from-armada',
                         'POST request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'request-driver-from-mashkor',
+                        'POST request-payment-status-from-tap/<order_uuid>/<store_uuid>' => 'request-payment-status-from-tap',
                         'POST create/<store_uuid>' => 'create',
                         'DELETE <order_uuid>/<store_uuid>' => 'delete',
                         'DELETE soft-delete/<order_uuid>/<store_uuid>' => 'soft-delete',
@@ -86,6 +87,7 @@ return [
                         'OPTIONS live-orders' => 'options',
                         'OPTIONS create/<store_uuid>' => 'options',
                         'OPTIONS soft-delete/<order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS request-payment-status-from-tap/<order_uuid>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// OrderItemController
