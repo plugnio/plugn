@@ -3,6 +3,7 @@
 namespace agent\modules\v1\controllers;
 
 use agent\models\Currency;
+use agent\models\RestaurantTheme;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
@@ -106,7 +107,7 @@ class StoreController extends Controller
      * Return an overview of the store details
      * @param type $store_uuid
      */
-    public function actionUpdate($store_uuid)
+    public function actionUpdate($store_uuid = null)
     {
         $store = $this->findModel($store_uuid);
 
@@ -256,7 +257,7 @@ class StoreController extends Controller
         $model->commercial_license_file = Yii::$app->request->getBodyParam('commercial_license_file');
         $model->authorized_signature_file = Yii::$app->request->getBodyParam('authorized_signature_file');
 
-        if ($model->country->iso != 'KW') {
+        if ($model->country && $model->country->iso != 'KW') {
             $model->business_type = 'corp';
         }
 
@@ -507,7 +508,7 @@ class StoreController extends Controller
         $restaurantTheme = $model->restaurantTheme;
 
         if(!$restaurantTheme) {
-            $restaurantTheme = new RestaurantTheme;
+            $restaurantTheme = new RestaurantTheme();
             $restaurantTheme->restaurant_uuid = $model->restaurant_uuid;
         }
 
@@ -540,7 +541,7 @@ class StoreController extends Controller
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionUpdateDeliveryIntegration($id) {
+    public function actionUpdateDeliveryIntegration($id = null) {
 
         $model = $this->findModel($id);
 
@@ -566,7 +567,7 @@ class StoreController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdateAnalyticsIntegration($id) {
+    public function actionUpdateAnalyticsIntegration($id = null) {
 
         $model = $this->findModel($id);
 

@@ -2,6 +2,9 @@
 
 namespace agent\tests;
 
+use common\fixtures\AgentAssignmentFixture;
+use common\fixtures\CountryFixture;
+use common\fixtures\CurrencyFixture;
 use yii;
 use agent\models\Agent;
 use agent\tests\FunctionalTester;
@@ -17,7 +20,10 @@ class AuthCest {
 
     public function _fixtures() {
         return [
+            'country' => CountryFixture::className(),
+            'currencies' => CurrencyFixture::className(),
             'agents' => AgentFixture::className(),
+            'agent_assignments' => AgentAssignmentFixture::className(),
             'agentToken' => AgentTokenFixture::className()
         ];
     }
@@ -29,6 +35,11 @@ class AuthCest {
         $this->token = $this->agent->getAccessToken()->token_value;
 
         $I->amBearerAuthenticated($this->token);
+
+        $this->store = $this->agent->getAccountsManaged()->one();
+
+        $I->haveHttpHeader('Store-Id', $this->store->restaurant_uuid);
+
     }
 
     public function _after(FunctionalTester $I) {
@@ -63,6 +74,7 @@ class AuthCest {
         $agent->save(false);
 
         $I->wantTo('Validate auth > update-password api');
+        $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
         $I->sendPATCH('v1/auth/update-password', [
             'newPassword' => 'demo1admin',
             'token' => $agent->agent_password_reset_token
@@ -94,8 +106,8 @@ class AuthCest {
      */
     public function tryToRegister(FunctionalTester $I) {
         $I->wantTo('Validate auth > register api');
-        $I->sendPOST('v1/auth/register', [
-            'currency' => 'KWD',
+        $I->sendPOST('v1/auth/signup', [
+            'currency' => 1,
             'name' => 'demo com',
             'email' => 'demo@demo.com',
             'password' => 'demo1admin',
@@ -118,6 +130,8 @@ class AuthCest {
      * @param FunctionalTester $I
      */
     public function tryToResetPassword(FunctionalTester $I) {
+        Yii::$app->params['newDashboardAppUrl'] = 'localhost';
+
         $I->wantTo('Validate auth > request-reset-password api');
         $I->sendPOST('v1/auth/request-reset-password', [
             'email' => $this->agent->agent_email,

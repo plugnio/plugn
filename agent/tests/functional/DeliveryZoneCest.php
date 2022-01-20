@@ -2,9 +2,13 @@
 
 namespace agent\tests;
 
+use agent\models\Agent;
 use agent\models\DeliveryZone;
+use Codeception\Util\HttpCode;
+use common\fixtures\AgentAssignmentFixture;
 use common\fixtures\AgentFixture;
 use common\fixtures\AgentTokenFixture;
+use common\fixtures\BusinessLocationFixture;
 use common\fixtures\CurrencyFixture;
 use common\fixtures\DeliveryZoneFixture;
 use common\fixtures\RestaurantFixture;
@@ -18,7 +22,9 @@ class DeliveryZoneCest
     public function _fixtures() {
         return [
             'agents' => AgentFixture::className(),
+            'agent_assignments' => AgentAssignmentFixture::className(),
             'delivery-zone' => DeliveryZoneFixture::className(),
+            'businessLocations' => BusinessLocationFixture::className(),
             'restaurants' => RestaurantFixture::className(),
             'agentToken' => AgentTokenFixture::className()
         ];
@@ -28,7 +34,7 @@ class DeliveryZoneCest
 
         $this->agent = Agent::find()->one();//['agent_email_verification'=>1]
 
-        $this->store = $this->agent->getStores()->one();
+        $this->store = $this->agent->getAccountsManaged()->one();
 
         $this->token = $this->agent->getAccessToken()->token_value;
 
@@ -42,8 +48,13 @@ class DeliveryZoneCest
     }
 
     public function tryToList(FunctionalTester $I) {
+
+        $model = $this->store->getBusinessLocations()->one();
+
         $I->wantTo('Validate delivery-zone > list api');
-        $I->sendGET('v1/delivery-zone');
+        $I->sendGET('v1/delivery-zone', [
+            'business_location_id' => $model->business_location_id
+        ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
     }
 
@@ -61,7 +72,7 @@ class DeliveryZoneCest
 
         $model = $this->store->getBusinessLocations()->one();
 
-        $I->wantTo('Validate delivery-zone > detail api');
+        $I->wantTo('Validate delivery-zone > create api');
         $I->sendPOST('v1/delivery-zone/create', [
             'business_location_id' => $model->business_location_id,
             'country_id' => 1,
@@ -76,12 +87,14 @@ class DeliveryZoneCest
 
     public function tryToUpdate(FunctionalTester $I) {
 
-        $dz = $this->store->getBusinessLocations()->one();
+        $dz = $this->store->getDeliveryZones()->one();
 
         $model = $this->store->getBusinessLocations()->one();
 
         $I->wantTo('Validate delivery-zone > update api');
-        $I->sendPATCH('v1/delivery-zone/update/' . $dz->delivery_zone_id, [
+        $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
+        $I->sendPATCH('v1/delivery-zone/' . $dz->delivery_zone_id, [
+           // 'store_id'
             'business_location_id' => $model->business_location_id,
             'country_id' => 1,
             'delivery_time' => '10am to 11pm',
@@ -95,7 +108,7 @@ class DeliveryZoneCest
 
     public function tryToDelete(FunctionalTester $I) {
 
-        $dz = $this->store->getBusinessLocations()->one();
+        $dz = $this->store->getDeliveryZones()->one();
 
         $I->wantTo('Validate delivery-zone > delete api');
         $I->sendDELETE('v1/delivery-zone/' . $dz->delivery_zone_id);
@@ -104,7 +117,7 @@ class DeliveryZoneCest
 
     public function tryToCancelOverride(FunctionalTester $I) {
 
-        $dz = $this->store->getBusinessLocations()->one();
+        $dz = $this->store->getDeliveryZones()->one();
 
         $I->wantTo('Validate delivery-zone > cancel override api');
         $I->sendDELETE('v1/delivery-zone/cancel-override/' . $dz->delivery_zone_id);

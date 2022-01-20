@@ -68,13 +68,11 @@ class WebLinkController extends Controller
      * @param type $store_uuid
      * @return type
      */
-    public function actionList($store_uuid)
+    public function actionList($store_uuid = null)
     {
-
         $keyword = Yii::$app->request->get ('keyword');
 
-        Yii::$app->accountManager->getManagedAccount ($store_uuid);
-
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $query = WebLink::find ();
 
@@ -84,7 +82,7 @@ class WebLinkController extends Controller
             $query->orWhere (['like', 'web_link_title_ar', $keyword]);
         }
 
-        $query->andWhere (['restaurant_uuid' => $store_uuid]);
+        $query->andWhere (['restaurant_uuid' => $store->restaurant_uuid]);
 
         return new ActiveDataProvider([
             'query' => $query
@@ -99,6 +97,7 @@ class WebLinkController extends Controller
     public function actionCreate()
     {
         $store_uuid = Yii::$app->request->getBodyParam ("store_uuid");
+
         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $model = new WebLink();
@@ -125,7 +124,7 @@ class WebLinkController extends Controller
     /**
      * Update Web Link
      */
-    public function actionUpdate($web_link_id, $store_uuid)
+    public function actionUpdate($web_link_id, $store_uuid = null)
     {
         $model = $this->findModel ($web_link_id, $store_uuid);
 
@@ -162,7 +161,7 @@ class WebLinkController extends Controller
      * @param type $order_uuid
      * @return type
      */
-    public function actionDetail($store_uuid, $web_link_id)
+    public function actionDetail($store_uuid = null, $web_link_id)
     {
         return $this->findModel ($web_link_id, $store_uuid);
     }
@@ -170,10 +169,9 @@ class WebLinkController extends Controller
     /**
      * Delete Web Link
      */
-    public function actionDelete($web_link_id, $store_uuid)
+    public function actionDelete($web_link_id, $store_uuid = null)
     {
         $model = $this->findModel ($web_link_id, $store_uuid);
-
 
         if (!$model->delete ()) {
             if (isset($model->errors)) {
@@ -202,7 +200,7 @@ class WebLinkController extends Controller
      * @return Country the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($web_link_id, $store_uuid)
+    protected function findModel($web_link_id, $store_uuid = null)
     {
         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 

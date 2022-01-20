@@ -110,7 +110,8 @@ class StaffController extends Controller {
      */
     public function actionCreate() {
         $this->ownerCheck();
-        $store_uuid = Yii::$app->request->getBodyParam("store_uuid");
+
+        $store = Yii::$app->accountManager->getManagedAccount();
 
         /*if(!$this->_isOwner($store_uuid)) {
          return [
@@ -165,7 +166,7 @@ class StaffController extends Controller {
         }
 
         $model = new AgentAssignment();
-        $model->restaurant_uuid = $store_uuid;
+        $model->restaurant_uuid = $store->restaurant_uuid;
         $model->agent_id =  $agent->agent_id;
         $model->business_location_id =  Yii::$app->request->getBodyParam("business_location_id");
         $model->role = (int) Yii::$app->request->getBodyParam("role");
@@ -194,7 +195,7 @@ class StaffController extends Controller {
      /**
       * Update voucher
       */
-     public function actionUpdate($assignment_id, $store_uuid)
+     public function actionUpdate($assignment_id, $store_uuid = null)
      {
          $this->ownerCheck();
          $model = $this->findModel($assignment_id);

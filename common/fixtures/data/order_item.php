@@ -3,6 +3,7 @@
 return [
     'order_item0' => [
         'order_item_id' => 1,
+        'restaurant_uuid' => 1,
         'order_uuid' => 1,
         'item_uuid' => 1,
         'item_name' => 'placeat',

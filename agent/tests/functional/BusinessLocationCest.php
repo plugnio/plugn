@@ -2,6 +2,9 @@
 
 namespace agent\tests;
 
+use agent\models\Agent;
+use Codeception\Util\HttpCode;
+use common\fixtures\AgentAssignmentFixture;
 use common\fixtures\AgentFixture;
 use common\fixtures\AgentTokenFixture;
 use common\fixtures\BusinessLocationFixture;
@@ -17,6 +20,7 @@ class BusinessLocationCest
     public function _fixtures() {
         return [
             'agents' => AgentFixture::className(),
+            'agent_assignments' => AgentAssignmentFixture::className(),
             'countries' => CountryFixture::className(),
             'locations' => BusinessLocationFixture::className(),
             'restaurants' => RestaurantFixture::className(),
@@ -28,7 +32,7 @@ class BusinessLocationCest
 
         $this->agent = Agent::find()->one();//['agent_email_verification'=>1]
 
-        $this->store = $this->agent->getStores()->one();
+        $this->store = $this->agent->getAccountsManaged()->one();
 
         $this->token = $this->agent->getAccessToken()->token_value;
 
@@ -62,7 +66,8 @@ class BusinessLocationCest
 
         $model = $this->store->getBusinessLocations()->one();
 
-        $I->wantTo('Validate business-location > view api');
+        $I->wantTo('Validate business-location > update api');
+        $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
         $I->sendPATCH('v1/business-location/' . $model->business_location_id, [
             'country_id' => 1,
             'business_location_name' => 'Lahor',

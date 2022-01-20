@@ -2,7 +2,10 @@
 
 namespace agent\tests;
 
+use agent\models\Agent;
 use agent\models\BankDiscount;
+use Codeception\Util\HttpCode;
+use common\fixtures\AgentAssignmentFixture;
 use common\fixtures\AgentFixture;
 use common\fixtures\AgentTokenFixture;
 use common\fixtures\BankDiscountFixture;
@@ -19,6 +22,7 @@ class BankDiscountCest
     public function _fixtures() {
         return [
             'agents' => AgentFixture::className(),
+            'agent_assignments' => AgentAssignmentFixture::className(),
             'banks' => BankFixture::className(),
             'bankDiscounts' => BankDiscountFixture::className(),
             'restaurants' => RestaurantFixture::className(),
@@ -30,7 +34,7 @@ class BankDiscountCest
 
         $this->agent = Agent::find()->one();//['agent_email_verification'=>1]
 
-        $this->store = $this->agent->getStores()->one();
+        $this->store = $this->agent->getAccountsManaged()->one();
 
         $this->token = $this->agent->getAccessToken()->token_value;
 
@@ -63,6 +67,7 @@ class BankDiscountCest
         $model = BankDiscount::find()->one();
 
         $I->wantTo('Validate bank-discount > update api');
+        $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
         $I->sendPATCH('v1/bank-discount/'. $model->bank_discount_id, [
             'bank_id' => 1,
             'discount_type' => BankDiscount::DISCOUNT_TYPE_PERCENTAGE,
@@ -90,7 +95,8 @@ class BankDiscountCest
         $model = BankDiscount::find()->one();
 
         $I->wantTo('Validate bank-discount > update status api');
-        $I->sendPOST('v1/bank-discount/update-status', [
+        $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
+        $I->sendPATCH('v1/bank-discount/update-status', [
             'bank_discount_id' => $model->bank_discount_id,
             'bankDiscountStatus' => BankDiscount::BANK_DISCOUNT_STATUS_ACTIVE,
         ]);

@@ -2,6 +2,9 @@
 
 namespace agent\tests;
 
+use agent\models\Agent;
+use Codeception\Util\HttpCode;
+use common\fixtures\AgentAssignmentFixture;
 use common\fixtures\AgentFixture;
 use common\fixtures\AgentTokenFixture;
 use common\fixtures\CustomerFixture;
@@ -19,6 +22,7 @@ class StatsCest
         return [
             'agents' => AgentFixture::className(),
             'items' => ItemFixture::className(),
+            'agent_assignments' => AgentAssignmentFixture::className(),
             'orders' => OrderFixture::className(),
             'customers' => CustomerFixture::className(),
             'restaurants' => RestaurantFixture::className(),
@@ -30,7 +34,7 @@ class StatsCest
 
         $this->agent = Agent::find()->one();//['agent_email_verification'=>1]
 
-        $this->store = $this->agent->getStores()->one();
+        $this->store = $this->agent->getAccountsManaged()->one();
 
         $this->token = $this->agent->getAccessToken()->token_value;
 

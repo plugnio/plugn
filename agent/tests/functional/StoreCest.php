@@ -2,11 +2,17 @@
 
 namespace agent\tests;
 
+use Yii;
+use agent\models\Agent;
 use agent\models\PaymentMethod;
 use agent\models\Restaurant;
+use agent\models\RestaurantPaymentMethod;
+use Codeception\Util\HttpCode;
+use common\fixtures\AgentAssignmentFixture;
 use common\fixtures\AgentFixture;
 use common\fixtures\AgentTokenFixture;
 use common\fixtures\RestaurantFixture;
+
 
 class StoreCest
 {
@@ -17,6 +23,7 @@ class StoreCest
     public function _fixtures() {
         return [
             'agents' => AgentFixture::className(),
+            'agent_assignments' => AgentAssignmentFixture::className(),
             'restaurants' => RestaurantFixture::className(),
             'agentToken' => AgentTokenFixture::className()
         ];
@@ -26,7 +33,7 @@ class StoreCest
 
         $this->agent = Agent::find()->one();//['agent_email_verification'=>1]
 
-        $this->store = $this->agent->getStores()->one();
+        $this->store = $this->agent->getAccountsManaged()->one();
 
         $this->token = $this->agent->getAccessToken()->token_value;
 
@@ -57,7 +64,8 @@ class StoreCest
 
     public function tryToUpdate(FunctionalTester $I) {
         $I->wantTo('Validate store > update api');
-        $I->sendPOST('v1/store/' . $this->store->restaurant_uuid, [
+        $I->sendPOST('v1/store', [
+            'store_uuid' => $this->store->restaurant_uuid,
             'email_notification' => 1,
             'mobile_country_code' => 91,
             'phone_number' => 8758702738,
@@ -87,7 +95,7 @@ class StoreCest
         $payment_method = PaymentMethod::find()->one();
 
         $I->wantTo('Validate store > update payment method api');
-        $I->sendPOST('v1/store/disable-payment-method/'. $this->store->restaurant_uid
+        $I->sendPOST('v1/store/disable-payment-method/'. $this->store->restaurant_uuid
             . '/' . $payment_method->payment_method_id, [
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
@@ -97,7 +105,7 @@ class StoreCest
         $payment_method = PaymentMethod::find()->one();
 
         $I->wantTo('Validate store > enable payment method api');
-        $I->sendPOST('v1/store/enable-payment-method/'. $this->store->restaurant_uid
+        $I->sendPOST('v1/store/enable-payment-method/'. $this->store->restaurant_uuid
             . '/' . $payment_method->payment_method_id, [
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
@@ -114,28 +122,34 @@ class StoreCest
 
     public function tryToEnableOnlinePaymentMethod(FunctionalTester $I) {
         $I->wantTo('Validate store > enable online payment method api');
-        $I->sendPOST('v1/store/enable-online-payment/'. $this->store->restaurant_uid, [
+        $I->sendPOST('v1/store/enable-online-payment/'. $this->store->restaurant_uuid, [
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
     }
 
     public function tryToDisableOnlinePaymentMethod(FunctionalTester $I) {
         $I->wantTo('Validate store > disable online payment method api');
-        $I->sendPOST('v1/store/disable-online-payment/'. $this->store->restaurant_uid, [
+        $I->sendPOST('v1/store/disable-online-payment/'. $this->store->restaurant_uuid, [
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
     }
 
     public function tryToEnableCODPaymentMethod(FunctionalTester $I) {
         $I->wantTo('Validate store > enable cash on delivery payment method api');
-        $I->sendPOST('v1/store/enable-cod/'. $this->store->restaurant_uid, [
+        $I->sendPOST('v1/store/enable-cod/'. $this->store->restaurant_uuid, [
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
     }
 
     public function tryToDisableCODPaymentMethod(FunctionalTester $I) {
+
+        $pm = new RestaurantPaymentMethod();
+        $pm->restaurant_uuid = $this->store->restaurant_uuid;
+        $pm->payment_method_id = 3;
+        $pm->save();
+
         $I->wantTo('Validate store > disable cash on delivery payment method api');
-        $I->sendPOST('v1/store/disable-cod/'. $this->store->restaurant_uid, [
+        $I->sendPOST('v1/store/disable-cod/'. $this->store->restaurant_uuid, [
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
     }
@@ -181,7 +195,8 @@ class StoreCest
 
     public function tryToUpdateStatus(FunctionalTester $I) {
         $I->wantTo('Validate store > update store status api');
-        $I->sendPATCH('v1/store/update-status/' . $this->store->restaurant_uid
+        $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
+        $I->sendPATCH('v1/store/update-status/' . $this->store->restaurant_uuid
             . '/' . Restaurant::RESTAURANT_STATUS_BUSY, [
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
@@ -224,7 +239,8 @@ class StoreCest
         );
 
         $I->wantTo('Validate store > create tap account api');
-        $I->sendPATCH('v1/store/create-tap-account/' . $this->store->restaurant_uid, [
+        //$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
+        $I->sendPOST('v1/store/create-tap-account/' . $this->store->restaurant_uuid, [
             'owner_first_name' => 'Chhaganbhai',
             'owner_last_name' => 'Maganbhai',
             'owner_email' => 'demo@plugn.io',
@@ -239,6 +255,7 @@ class StoreCest
             'identification_file_back_side' => basename($identification_file_back_upload['ObjectURL']),
             'commercial_license_file' => basename($commercial_license_file_upload['ObjectURL']),
             'authorized_signature_file' => basename($authorized_signature_file_upload['ObjectURL']),
+            'country_id' => 1
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
         $I->seeResponseContainsJson([
