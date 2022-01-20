@@ -64,8 +64,7 @@ return [
                         'POST' => 'place-an-order',
                         'POST request-driver-from-armada/<order_uuid>/<store_uuid>' => 'request-driver-from-armada',
                         'POST request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'request-driver-from-mashkor',
-                        'POST request-driver-from-armada/<order_uuid>' => 'request-driver-from-armada',
-                        'POST request-driver-from-mashkor/<order_uuid>' => 'request-driver-from-mashkor',
+                        'POST request-payment-status-from-tap/<order_uuid>/<store_uuid>' => 'request-payment-status-from-tap',
                         'POST create/<store_uuid>' => 'create',
                         'POST create' => 'create',
                         'PATCH update-order-status/<order_uuid>/<store_uuid>' => 'update-order-status',
@@ -101,6 +100,7 @@ return [
                         'OPTIONS soft-delete/<order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS create' => 'options',
                         'OPTIONS soft-delete/<order_uuid>' => 'options',
+                        'OPTIONS request-payment-status-from-tap/<order_uuid>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// OrderItemController
@@ -124,14 +124,11 @@ return [
                         'PATCH save' => 'save-details',
                         'PATCH <area_delivery_zone_id>/<store_uuid>' => 'update',
                         'DELETE <area_delivery_zone_id>/<store_uuid>' => 'delete',
-                        'PATCH <area_delivery_zone_id>' => 'update',
-                        'DELETE <area_delivery_zone_id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS create' => 'options',
                         'OPTIONS save' => 'options',
                         'OPTIONS <area_delivery_zone_id>/<store_uuid>' => 'options',
-                        'OPTIONS <area_delivery_zone_id>' => 'options',
                     ]
                 ],
                 [// CategoryController
@@ -143,18 +140,16 @@ return [
                         'GET detail' => 'detail',
                         'GET item-list' => 'item-list',
                         'POST create' => 'create',
-                        'POST' => 'create',
                         'POST upload-image' => 'upload-category-image',
                         'POST update-position' => 'change-position',
                         'PATCH <category_id>/<store_uuid>' => 'update',
-                        'PATCH <category_id>' => 'update',
                         'DELETE <category_id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS create' => 'options',
-                        'OPTIONS <category_id>/<store_uuid>' => 'options',
                         'OPTIONS <category_id>' => 'options',
+                        'OPTIONS <category_id>/<store_uuid>' => 'options',
                         'OPTIONS update-position' => 'options',
                         'OPTIONS item-list' => 'options',
                     ]
@@ -169,14 +164,11 @@ return [
                         'POST create' => 'create',
                         'PATCH <assignment_id>/<store_uuid>' => 'update',
                         'DELETE <assignment_id>/<store_uuid>' => 'delete',
-                        'PATCH <assignment_id>' => 'update',
-                        'DELETE <assignment_id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS create' => 'options',
                         'OPTIONS <agent_assignment_id>/<store_uuid>' => 'options',
-                        'OPTIONS <agent_assignment_id>' => 'options',
                     ]
                 ],
                 [// BankController
@@ -262,17 +254,14 @@ return [
                         'GET' => 'list',
                         'GET detail' => 'detail',
                         'POST create' => 'create',
-                        'PATCH update-status' => 'update-voucher-status',
                         'PATCH <voucher_id>/<store_uuid>' => 'update',
-                        'PATCH <voucher_id>' => 'update',
+                        'PATCH update-status' => 'update-voucher-status',
                         'DELETE <voucher_id>/<store_uuid>' => 'remove',
-                        'DELETE <voucher_id>' => 'remove',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS update-status' => 'options',
                         'OPTIONS <voucher_id>/<store_uuid>' => 'options',
-                        'OPTIONS <voucher_id>' => 'options',
                         'OPTIONS create' => 'options'
                     ]
                 ],
@@ -284,18 +273,14 @@ return [
                         'GET' => 'list',
                         'GET detail' => 'detail',
                         'POST create' => 'create',
-                        'POST' => 'create',
-                        'PATCH update-status' => 'update-bank-discount-status',
                         'PATCH <bank_discount_id>/<store_uuid>' => 'update',
-                        'PATCH <bank_discount_id>' => 'update',
+                        'PATCH update-status' => 'update-bank-discount-status',
                         'DELETE <bank_discount_id>/<store_uuid>' => 'delete',
-                        'DELETE <bank_discount_id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS update-status' => 'options',
                         'OPTIONS <bank_discount_id>/<store_uuid>' => 'options',
-                        'OPTIONS <bank_discount_id>' => 'options',
                         'OPTIONS create' => 'options'
                     ]
                 ],
@@ -308,19 +293,14 @@ return [
                         'GET detail' => 'detail',
                         'POST create' => 'create',
                         'PATCH <delivery_zone_id>/<store_uuid>' => 'update',
-                        'PATCH <delivery_zone_id>' => 'update',
-                        'DELETE cancel-override/<delivery_zone_id>/<store_uuid>' => 'cancel-override',
-                        'DELETE cancel-override/<delivery_zone_id>' => 'cancel-override',
                         'DELETE <delivery_zone_id>/<store_uuid>' => 'delete',
-                        'DELETE <delivery_zone_id>' => 'delete',
+                        'DELETE cancel-override/<delivery_zone_id>/<store_uuid>' => 'cancel-override',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS create' => 'options',
                         'OPTIONS <delivery_zone_id>/<store_uuid>' => 'options',
                         'OPTIONS cancel-override/<delivery_zone_id>/<store_uuid>' => 'options',
-                        'OPTIONS <delivery_zone_id>' => 'options',
-                        'OPTIONS cancel-override/<delivery_zone_id>' => 'options',
                     ]
                 ],
                 [// OpeningHoursController
@@ -330,17 +310,13 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET <day_of_week>/<store_uuid>' => 'detail',
-                        'GET <day_of_week>' => 'detail',
                         'POST <store_uuid>' => 'create',
-                        'POST' => 'create',
                         'PATCH <day_of_week>' => 'update',
                         'DELETE <opening_hour_id>/<store_uuid>' => 'delete',
-                        'DELETE <opening_hour_id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS <day_of_week>' => 'options',
                         'OPTIONS <opening_hour_id>/<store_uuid>' => 'options',
-                        'OPTIONS <opening_hour_id>' => 'options',
                     ]
                 ],
                 [// WebLinkController
@@ -353,32 +329,28 @@ return [
                         'POST create' => 'create',
                         'PATCH <web_link_id>/<store_uuid>' => 'update',
                         'DELETE <web_link_id>/<store_uuid>' => 'delete',
-                        'PATCH <web_link_id>' => 'update',
-                        'DELETE <web_link_id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS create' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS <web_link_id>/<store_uuid>' => 'options',
-                        'OPTIONS <web_link_id>' => 'options',
                     ]
                 ],
                 [// ItemController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/item',
                     'patterns' => [
+                        'GET' => 'list',
                         'GET export-to-excel' => 'export-to-excel',
                         'GET items-report' => 'items-report',
                         'GET <id>' => 'detail',
-                        'GET' => 'list',
+                        'POST' => 'create',
                         'POST update-stock' => 'update-stock-qty',
                         'POST update-position' => 'change-position',
-                        'POST' => 'create',
-                        'PATCH update-status/<id>/<store_uuid>' => 'change-status',
-                        'PATCH update-status/<id>' => 'change-status',
                         'PATCH <id>' => 'update',
-                        'DELETE delete-image/<id>/<image>' => 'delete-image',
+                        'PATCH update-status/<id>/<store_uuid>' => 'change-status',
                         'DELETE <id>' => 'delete',
+                        'DELETE delete-image/<id>/<image>' => 'delete-image',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS export-to-excel' => 'options',
@@ -387,7 +359,6 @@ return [
                         'OPTIONS update-position' => 'options',
                         'OPTIONS update-stock' => 'options',
                         'OPTIONS update-status/<id>/<store_uuid>' => 'options',
-                        'OPTIONS update-status/<id>' => 'options',
                         'OPTIONS delete-image/<id>/<image>' => 'options',
                     ]
                 ],
@@ -416,17 +387,13 @@ return [
                         'GET' => 'list',
                         'GET detail' => 'detail',
                         'POST create' => 'create',
-                        'POST' => 'create',
                         'PATCH <business_location_id>/<store_uuid>' => 'update',
                         'DELETE <business_location_id>/<store_uuid>' => 'delete',
-                        'PATCH <business_location_id>' => 'update',
-                        'DELETE <business_location_id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS create' => 'options',
                         'OPTIONS <business_location_id>/<store_uuid>' => 'options',
-                        'OPTIONS <business_location_id>' => 'options',
                     ]
                 ],
                 [// StoreController
@@ -450,9 +417,6 @@ return [
                         'POST update-analytics-integration/<id>' => 'update-analytics-integration',
                         'POST update-delivery-integration/<id>' => 'update-delivery-integration',
                         'PATCH update-status/<id>/<status>' => 'update-store-status',
-                        'POST update-analytics-integration' => 'update-analytics-integration',
-                        'POST update-delivery-integration' => 'update-delivery-integration',
-                        'PATCH update-status/<status>' => 'update-store-status',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS connect-domain' => 'options',
@@ -468,10 +432,7 @@ return [
                         'OPTIONS disable-cod/<id>' => 'options',
                         'OPTIONS update-layout' => 'options',
                         'OPTIONS update-status/<id>/<status>' => 'options',
-                        'OPTIONS status' => 'options',
-                        'OPTIONS update-analytics-integration' => 'options',
-                        'OPTIONS update-delivery-integration' => 'options',
-                        'OPTIONS update-status/<status>' => 'options',
+                        'OPTIONS status' => 'options'
                     ]
                 ],
 

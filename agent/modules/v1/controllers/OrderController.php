@@ -7,6 +7,7 @@ use agent\models\Item;
 use agent\models\Refund;
 use agent\models\RefundedItem;
 use common\models\AreaDeliveryZone;
+use common\models\Payment;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -1563,6 +1564,28 @@ class OrderController extends Controller
             "operation" => "success",
             "message" => Yii::t ('agent', "Order created successfully")
         ];
+    }
+
+    public function actionRequestPaymentStatusFromTap($order_uuid, $store_uuid) {
+        try {
+            $payment = Payment::findOne(['order_uuid' => $order_uuid]);
+
+            if (($payment = Payment::find()->where(['payment_uuid' => $payment->payment_uuid, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($store_uuid)->restaurant_uuid ])->one()) !== null) {
+
+                if($payment->payment_gateway_name == 'tap'){
+                    $transaction_id = $payment->payment_gateway_transaction_id;
+                    Payment::updatePaymentStatusFromTap($transaction_id, true);
+                } else if ($payment->payment_gateway_name == 'myfatoorah'){
+                    $invoice_id = $payment->payment_gateway_invoice_id;
+                    Payment::updatePaymentStatusFromMyFatoorah($invoice_id, true);
+                }
+                return [
+                    "operation" => "success",
+                ];
+            }
+        } catch (\Exception $e) {
+            throw new NotFoundHttpException($e->getMessage());
+        }
     }
 
     /**
