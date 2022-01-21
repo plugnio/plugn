@@ -147,7 +147,9 @@ class Subscription extends \yii\db\ActiveRecord {
               $subscription->save(false);
             }
 
-          } else {
+          }
+          else
+          {
             if($this->payment_uuid && $this->subscriptionPayment->payment_current_status == 'CAPTURED' || $this->plan->price == 0){
               
               Subscription::updateAll(['subscription_status' => self::STATUS_INACTIVE], ['and',  ['subscription_status' => self::STATUS_ACTIVE ] , ['restaurant_uuid' => $this->restaurant_uuid  ]]);

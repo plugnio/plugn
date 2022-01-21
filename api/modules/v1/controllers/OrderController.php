@@ -83,10 +83,7 @@ class OrderController extends Controller {
             $order->customer_phone_country_code = '965';
             $order->customer_phone_number = '+' . $order->customer_phone_country_code . strval(Yii::$app->request->getBodyParam("phone_number"));
 
-
             $order->customer_phone_number = str_replace(' ','',$order->customer_phone_number);
-
-
 
             $order->customer_email = Yii::$app->request->getBodyParam("email"); //optional
             //payment method
@@ -95,19 +92,14 @@ class OrderController extends Controller {
             //save Customer address
             $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
 
-
-
             //Preorder
             // if( Yii::$app->request->getBodyParam("is_order_scheduled") !== null)
             $order->is_order_scheduled = Yii::$app->request->getBodyParam("is_order_scheduled") ? Yii::$app->request->getBodyParam("is_order_scheduled") : 0;
-
-
 
             //Apply promo code
             if (Yii::$app->request->getBodyParam("voucher_id")) {
                 $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
             }
-
 
             //if the order mode = 1 => Delivery
             if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
@@ -139,7 +131,8 @@ class OrderController extends Controller {
 
                 $restaurantBranch = RestaurantBranch::findOne($order->restaurant_branch_id);
 
-                if($restaurantBranch){
+                if($restaurantBranch)
+                {
                   $pickupLocation = BusinessLocation::find()
                     ->andWhere([
                         'business_location_name' => $restaurantBranch->branch_name_en,
@@ -150,7 +143,6 @@ class OrderController extends Controller {
                     $order->pickup_location_id = $pickupLocation->business_location_id;
 
                 }
-
             }
 
 
@@ -250,6 +242,7 @@ class OrderController extends Controller {
 
 
                 //if payment method not cash redirect customer to payment gateway
+
                 if ($response == null && $order->payment_method_id != 3) {
 
                     // Create new payment record
@@ -614,23 +607,18 @@ class OrderController extends Controller {
 
           $order_model = Order::find()->where(['mashkor_order_number' => $mashkor_order_number])->one();
 
-          if(  $order_model ) {
+          if($order_model) {
 
             $order_model->mashkor_driver_name = Yii::$app->request->getBodyParam("driver_name");
             $order_model->mashkor_driver_phone = Yii::$app->request->getBodyParam("driver_phone");
             $order_model->mashkor_tracking_link = Yii::$app->request->getBodyParam("tracking_link");
             $order_model->mashkor_order_status = Yii::$app->request->getBodyParam("order_status");
 
-
-
-
             if( $order_model->mashkor_order_status == Order::MASHKOR_ORDER_STATUS_IN_DELIVERY ) // In delivery
                 $order_model->order_status = Order::STATUS_OUT_FOR_DELIVERY;
 
             if( $order_model->mashkor_order_status == Order::MASHKOR_ORDER_STATUS_DELIVERED ) // Delivered
                 $order_model->order_status = Order::STATUS_COMPLETE;
-
-
 
             if ($order_model->save(false)) {
                 return [
@@ -659,7 +647,5 @@ class OrderController extends Controller {
               'message' => 'Failed to authorize the request.',
           ];
         }
-
     }
-
 }
