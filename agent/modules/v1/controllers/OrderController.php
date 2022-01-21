@@ -7,6 +7,7 @@ use agent\models\Item;
 use agent\models\Refund;
 use agent\models\RefundedItem;
 use common\models\AreaDeliveryZone;
+use common\models\Payment;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -97,7 +98,6 @@ class OrderController extends Controller
             ->andWhere (['is_deleted' => 0])
             ->orderBy (['order_created_at' => SORT_DESC]);
 
-
         return new ActiveDataProvider([
             'query' => $query
         ]);
@@ -126,7 +126,6 @@ class OrderController extends Controller
             )
             ->andWhere (['is_deleted' => 0])
             ->orderBy (['order_created_at' => SORT_DESC]);
-
 
         return new ActiveDataProvider([
             'query' => $query
@@ -229,6 +228,7 @@ class OrderController extends Controller
             $response['allCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
+                ->notDeleted()
                 ->andFilterWhere ([
                     'customer_id' => $customer_id
                 ])
@@ -236,6 +236,7 @@ class OrderController extends Controller
         } else {
             $response['allCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->count ();
         }
@@ -244,6 +245,7 @@ class OrderController extends Controller
             $response['draftCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
+                ->notDeleted()
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
                     'order_status' => Order::STATUS_DRAFT
@@ -252,6 +254,7 @@ class OrderController extends Controller
         } else {
             $response['draftCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere (['order_status' => Order::STATUS_DRAFT])
                 ->count ();
@@ -260,6 +263,7 @@ class OrderController extends Controller
         if ($customer_id) {
             $response['acceptedCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -269,6 +273,7 @@ class OrderController extends Controller
         } else {
             $response['acceptedCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere (['order_status' => Order::STATUS_ACCEPTED])
                 ->count ();
@@ -277,6 +282,7 @@ class OrderController extends Controller
         if ($customer_id) {
             $response['pendingCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -286,6 +292,7 @@ class OrderController extends Controller
         } else {
             $response['pendingCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere (['order_status' => Order::STATUS_PENDING])
                 ->count ();
@@ -294,6 +301,7 @@ class OrderController extends Controller
         if ($customer_id) {
             $response['preparedCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -303,6 +311,7 @@ class OrderController extends Controller
         } else {
             $response['preparedCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere (['order_status' => Order::STATUS_BEING_PREPARED])
                 ->count ();
@@ -311,6 +320,7 @@ class OrderController extends Controller
         if ($customer_id) {
             $response['outForDeliveryCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -319,6 +329,7 @@ class OrderController extends Controller
         } else {
             $response['outForDeliveryCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'order_status' => Order::STATUS_OUT_FOR_DELIVERY
@@ -329,6 +340,7 @@ class OrderController extends Controller
         if ($customer_id) {
             $response['completeCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -338,6 +350,7 @@ class OrderController extends Controller
         } else {
             $response['completeCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'order_status' => Order::STATUS_COMPLETE
@@ -348,6 +361,7 @@ class OrderController extends Controller
         if ($customer_id) {
             $response['canceledCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -357,6 +371,7 @@ class OrderController extends Controller
         } else {
             $response['canceledCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'order_status' => Order::STATUS_CANCELED
@@ -367,6 +382,7 @@ class OrderController extends Controller
         if ($customer_id) {
             $response['partialRefundedCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -376,6 +392,7 @@ class OrderController extends Controller
         } else {
             $response['partialRefundedCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'order_status' => Order::STATUS_PARTIALLY_REFUNDED
@@ -386,6 +403,7 @@ class OrderController extends Controller
         if ($customer_id) {
             $response['refundedCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -395,6 +413,7 @@ class OrderController extends Controller
         } else {
             $response['refundedCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'order_status' => Order::STATUS_REFUNDED
@@ -405,6 +424,7 @@ class OrderController extends Controller
         if ($customer_id) {
             $response['abandonedCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id,
@@ -414,6 +434,7 @@ class OrderController extends Controller
         } else {
             $response['abandonedCount'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'order_status' => Order::STATUS_ABANDONED_CHECKOUT
@@ -424,6 +445,7 @@ class OrderController extends Controller
         if ($customer_id) {
             $response['liveOrders'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id
@@ -433,6 +455,7 @@ class OrderController extends Controller
         } else {
             $response['liveOrders'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->liveOrders()
                 ->count ();
@@ -441,6 +464,7 @@ class OrderController extends Controller
         if ($customer_id) {
             $response['archiveOrders'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->andFilterWhere ([
                     'customer_id' => $customer_id
@@ -450,6 +474,7 @@ class OrderController extends Controller
         } else {
             $response['archiveOrders'] = $store->getOrders ()
                 ->filterByKeyword($keyword)
+                ->notDeleted()
                 ->filterBusinessLocationIfManager ($store->restaurant_uuid)
                 ->archiveOrders()
                 ->count ();
@@ -488,7 +513,7 @@ class OrderController extends Controller
     /**
      * Place an order
      */
-    public function actionPlaceAnOrder($store_uuid)
+    public function actionPlaceAnOrder($store_uuid = null)
     {
         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
@@ -502,6 +527,9 @@ class OrderController extends Controller
         $order->customer_phone_number = str_replace (' ', '', strval (Yii::$app->request->getBodyParam ("phone_number")));
         $order->customer_phone_country_code = Yii::$app->request->getBodyParam ("country_code") ? Yii::$app->request->getBodyParam ("country_code") : 965;
         $order->customer_email = Yii::$app->request->getBodyParam ("email"); //optional
+
+        $order->currency_code = Yii::$app->request->getBodyParam ("currency_code");
+
         //payment method => cash
         $order->payment_method_id = 3;
 
@@ -527,7 +555,6 @@ class OrderController extends Controller
                 $order->street = Yii::$app->request->getBodyParam ("street");
                 $order->avenue = Yii::$app->request->getBodyParam ("avenue"); //optional
                 $order->house_number = Yii::$app->request->getBodyParam ("house_number");
-
 
                 if (Yii::$app->request->getBodyParam ("floor") != null && ($order->unit_type == 'Apartment' || $order->unit_type == 'Office'))
                     $order->floor = Yii::$app->request->getBodyParam ("floor");
@@ -556,7 +583,6 @@ class OrderController extends Controller
             $order->pickup_location_id = Yii::$app->request->getBodyParam ("business_location_id");
         }
 
-
         $response = [];
 
         if ($order->save ()) {
@@ -578,8 +604,8 @@ class OrderController extends Controller
 
 
                     //optional field
-                    if (array_key_exists ("customer_instructions", $item) && $item["customer_instructions"] != null)
-                        $orderItem->customer_instruction = $item["customer_instructions"];
+                    if (array_key_exists ("customer_instruction", $item) && $item["customer_instruction"] != null)
+                        $orderItem->customer_instruction = $item["customer_instruction"];
 
                     if ($orderItem->save ()) {
 
@@ -647,7 +673,11 @@ class OrderController extends Controller
                 $response = [
                     'operation' => 'error',
                     'message' => Yii::t ('agent', 'Minimum order amount {amount}', [
-                        'amount' => Yii::$app->formatter->asCurrency ($order->deliveryZone->min_charge, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
+                        'amount' => Yii::$app->formatter->asCurrency (
+                            $order->deliveryZone->min_charge,
+                            $order->currency->code,
+                            [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]
+                        )
                     ])
                 ];
             }
@@ -675,7 +705,7 @@ class OrderController extends Controller
     /**
      * Update Order
      */
-    public function actionUpdate($order_uuid, $store_uuid)
+    public function actionUpdate($order_uuid, $store_uuid = null)
     {
         $transaction = Yii::$app->db->beginTransaction ();
 
@@ -737,13 +767,11 @@ class OrderController extends Controller
                 $order->postalcode = Yii::$app->request->getBodyParam ('postal_code');
                 $order->city = Yii::$app->request->getBodyParam ("city");
             }
-
-            $order->special_directions = Yii::$app->request->getBodyParam ("special_directions"); //optional
-
-
         } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
             $order->pickup_location_id = Yii::$app->request->getBodyParam ("pickup_location_id");
         }
+
+        $order->special_directions = Yii::$app->request->getBodyParam ("special_directions"); //optional
 
         if (!$order->save ()) {
 
@@ -797,8 +825,8 @@ class OrderController extends Controller
             $orderItem->qty = (int)$item["qty"];
             $orderItem->item_price = $item["item_price"];
 
-            if (isset($item["customer_instructions"]))
-                $orderItem->customer_instruction = $item["customer_instructions"];
+            if (isset($item["customer_instruction"]))
+                $orderItem->customer_instruction = $item["customer_instruction"];
 
             if (!$orderItem->save ()) {
 
@@ -810,7 +838,7 @@ class OrderController extends Controller
                 ];
             }
 
-            if (!isset($item['extraOptions']) || !is_array($item['extraOptions'])) {
+            if (!isset($item['orderItemExtraOptions']) || !is_array($item['orderItemExtraOptions'])) {
                 continue;
             }
 
@@ -873,66 +901,75 @@ class OrderController extends Controller
 
         //validate order status for refund
 
-        if (!in_array ($model->order_status, [Order::STATUS_COMPLETE, Order::STATUS_PARTIALLY_REFUNDED])) {
-            return [
-                "operation" => "error",
-                "message" => Yii::t ('agent', "Invalid order status to process refund!")
-            ];
-        }
+        // if (!in_array ($model->order_status, [Order::STATUS_COMPLETE, Order::STATUS_PARTIALLY_REFUNDED])) {
+        //     return [
+        //         "operation" => "error",
+        //         "message" => Yii::t ('agent', "Invalid order status to process refund!")
+        //     ];
+        // }
 
         //validate refund qty less than or equals to current qty
 
-        $maxRefundAmount = 0;
+        // $maxRefundAmount = 0;
+        //
+        // foreach ($itemsToRefund as $key => $qty) {
+        //
+        //     $orderItem = OrderItem::find ()
+        //         ->andWhere ([
+        //             'order_uuid' => $order_uuid,
+        //             'order_item_id' => $key
+        //         ])
+        //         ->one ();
+        //
+        //     $refundedQty = RefundedItem::find ()
+        //         ->andWhere ([
+        //             'order_uuid' => $order_uuid,
+        //             'order_item_id' => $key
+        //         ])
+        //         ->sum ('qty');
+        //
+        //     if ($orderItem->qty - $refundedQty < $qty) {
+        //         return [
+        //             "operation" => "error",
+        //             "message" => Yii::t ('agent', "Max {qty} {item} available for refund!", [
+        //                 'qty' => $orderItem->qty - $refundedQty,
+        //                 'item' => Yii::$app->language == 'ar' && $orderItem->item_name_ar ?
+        //                     $orderItem->item_name_ar : $orderItem->item_name
+        //             ])
+        //         ];
+        //     }
+        //
+        //     //calculate refund total
+        //
+        //     $unitPrice = $orderItem->item_price / $orderItem->qty;
+        //
+        //     $maxRefundAmount += $qty * $unitPrice;
+        // }
+        //
+        // //refund_amount should be less than or equal to itemsToRefund's total refund amount
+        //
+        // if ($refund_amount > $maxRefundAmount) {
+        //     return [
+        //         "operation" => "error",
+        //         "message" => Yii::t ('agent', "{amount} available for refund!", [
+        //             'amount' => \Yii::$app->formatter->asCurrency ($maxRefundAmount, $model->currency->code)
+        //         ])
+        //     ];
+        // }
 
-        foreach ($itemsToRefund as $key => $qty) {
-
-            $orderItem = OrderItem::find ()
-                ->andWhere ([
-                    'order_uuid' => $order_uuid,
-                    'order_item_id' => $key
-                ])
-                ->one ();
-
-            $refundedQty = RefundedItem::find ()
-                ->andWhere ([
-                    'order_uuid' => $order_uuid,
-                    'order_item_id' => $key
-                ])
-                ->sum ('qty');
-
-            if ($orderItem->qty - $refundedQty < $qty) {
-                return [
-                    "operation" => "error",
-                    "message" => Yii::t ('agent', "Max {qty} {item} available for refund!", [
-                        'qty' => $orderItem->qty - $refundedQty,
-                        'item' => Yii::$app->language == 'ar' && $orderItem->item_name_ar ?
-                            $orderItem->item_name_ar : $orderItem->item_name
-                    ])
-                ];
-            }
-
-            //calculate refund total
-
-            $unitPrice = $orderItem->item_price / $orderItem->qty;
-
-            $maxRefundAmount += $qty * $unitPrice;
+        if( $refund_amount > $model->total_price ){
+              return [
+                  "operation" => "error",
+                  "message" => Yii::t ('agent', "{amount} available for refund!", [
+                      'amount' => \Yii::$app->formatter->asCurrency ($model->total_price, $model->currency->code)
+                  ])
+              ];
         }
-
-        //refund_amount should be less than or equal to itemsToRefund's total refund amount
-
-        if ($refund_amount > $maxRefundAmount) {
-            return [
-                "operation" => "error",
-                "message" => Yii::t ('agent', "{amount} available for refund!", [
-                    'amount' => \Yii::$app->formatter->asCurrency ($maxRefundAmount, $model->currency->code)
-                ])
-            ];
-        }
-
         $transaction = Yii::$app->db->beginTransaction ();
 
         $refund = new Refund();
         $refund->restaurant_uuid = $model->restaurant_uuid;
+        $refund->payment_uuid = $model->payment_uuid;
         $refund->order_uuid = $order_uuid;
         $refund->refund_amount = $refund_amount;
         $refund->reason = Yii::$app->request->getBodyParam ('reason');
@@ -1034,7 +1071,7 @@ class OrderController extends Controller
     /**
      * Update Order Status
      */
-    public function actionUpdateOrderStatus($order_uuid, $store_uuid)
+    public function actionUpdateOrderStatus($order_uuid, $store_uuid = null)
     {
         $model = $this->findModel ($order_uuid, $store_uuid);
 
@@ -1068,7 +1105,7 @@ class OrderController extends Controller
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionRequestDriverFromArmada($order_uuid, $store_uuid)
+    public function actionRequestDriverFromArmada($order_uuid, $store_uuid = null)
     {
         $armadaApiKey = Yii::$app->request->getBodyParam ("armada_api_key");
 
@@ -1118,7 +1155,7 @@ class OrderController extends Controller
      * @param type $order_uuid
      * @param type $store_uuid
      */
-    public function actionRequestDriverFromMashkor($order_uuid, $store_uuid)
+    public function actionRequestDriverFromMashkor($order_uuid, $store_uuid = null)
     {
         $mashkorBranchId = Yii::$app->request->getBodyParam ("mashkor_branch_id");
 
@@ -1165,7 +1202,7 @@ class OrderController extends Controller
      * @param type $order_uuid
      * @return type
      */
-    public function actionDetail($store_uuid, $order_uuid)
+    public function actionDetail($store_uuid = null, $order_uuid)
     {
         return $this->findModel ($order_uuid, $store_uuid);
     }
@@ -1173,7 +1210,7 @@ class OrderController extends Controller
     /**
      * Delete Order
      */
-    public function actionDelete($order_uuid, $store_uuid)
+    public function actionDelete($order_uuid, $store_uuid = null)
     {
         $model = $this->findModel ($order_uuid, $store_uuid);
 
@@ -1201,9 +1238,11 @@ class OrderController extends Controller
     /**
      * Delete Order
      */
-    public function actionSoftDelete($order_uuid, $store_uuid)
+    public function actionSoftDelete($order_uuid, $store_uuid = null)
     {
         $model = $this->findModel ($order_uuid, $store_uuid);
+        $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
+
         $transaction = Yii::$app->db->beginTransaction();
         if ($model->orderItems) {
             foreach ($model->orderItems as $item) {
@@ -1393,7 +1432,7 @@ class OrderController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($store_uuid)
+    public function actionCreate($store_uuid = null)
     {
         $restaurant_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
@@ -1483,8 +1522,8 @@ class OrderController extends Controller
             $orderItem->qty = (int)$item["qty"];
             $orderItem->item_price = $item["item_price"];
 
-            if (isset($item["customer_instructions"]))
-                $orderItem->customer_instruction = $item["customer_instructions"];
+            if (isset($item["customer_instruction"]))
+                $orderItem->customer_instruction = $item["customer_instruction"];
 
             if (!$orderItem->save ()) {
 
@@ -1496,7 +1535,7 @@ class OrderController extends Controller
                 ];
             }
 
-            if (!isset($item['extraOptions']) || !is_array($item['extraOptions'])) {
+            if (!isset($item['orderItemExtraOptions']) || !is_array($item['orderItemExtraOptions'])) {
                 continue;
             }
 
@@ -1525,6 +1564,28 @@ class OrderController extends Controller
             "operation" => "success",
             "message" => Yii::t ('agent', "Order created successfully")
         ];
+    }
+
+    public function actionRequestPaymentStatusFromTap($order_uuid, $store_uuid) {
+        try {
+            $payment = Payment::findOne(['order_uuid' => $order_uuid]);
+
+            if (($payment = Payment::find()->where(['payment_uuid' => $payment->payment_uuid, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($store_uuid)->restaurant_uuid ])->one()) !== null) {
+
+                if($payment->payment_gateway_name == 'tap'){
+                    $transaction_id = $payment->payment_gateway_transaction_id;
+                    Payment::updatePaymentStatusFromTap($transaction_id, true);
+                } else if ($payment->payment_gateway_name == 'myfatoorah'){
+                    $invoice_id = $payment->payment_gateway_invoice_id;
+                    Payment::updatePaymentStatusFromMyFatoorah($invoice_id, true);
+                }
+                return [
+                    "operation" => "success",
+                ];
+            }
+        } catch (\Exception $e) {
+            throw new NotFoundHttpException($e->getMessage());
+        }
     }
 
     /**

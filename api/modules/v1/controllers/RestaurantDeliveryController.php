@@ -75,7 +75,6 @@ class RestaurantDeliveryController extends Controller {
      */
     public function actionListAllCities($restaurant_uuid) {
 
-
         $allCitiesData = City::find()
                 ->asArray()
                 ->all();

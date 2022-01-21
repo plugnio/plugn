@@ -73,7 +73,7 @@ class CountryController extends Controller {
 
         $query =  Country::find();
 
-        if ($keyword){
+        if ($keyword) {
           $query->andWhere(['like', 'country_name', $keyword]);
           $query->orWhere(['like', 'country_name_ar', $keyword]);
         }

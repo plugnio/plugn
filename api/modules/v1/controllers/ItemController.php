@@ -56,7 +56,8 @@ class ItemController extends Controller {
     /**
      * Return category's products
      */
-    public function actionCategoryProducts($category_id) {
+    public function actionCategoryProducts($category_id)
+    {
       $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
 
       if($restaurant_uuid){

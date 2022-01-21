@@ -2,6 +2,7 @@
 
 namespace console\controllers;
 
+use common\models\Currency;
 use Yii;
 use common\models\Restaurant;
 use common\models\OrderItem;
@@ -42,7 +43,6 @@ use yii\db\Expression;
  * All Cron actions related to this project
  */
 class CronController extends \yii\console\Controller {
-
 
     public function actionOrderItem(){
 
@@ -749,6 +749,17 @@ class CronController extends \yii\console\Controller {
 
         $this->stdout("Reminder email has been sent \n", Console::FG_RED, Console::BOLD);
         return self::EXIT_CODE_NORMAL;
+    }
+
+    /**
+     * Method called by cron once a day to update currency
+     */
+    public function actionDaily()
+    {
+        // GET UPDATED CURRENCY DATA FROM API
+        $response = Currency::getDataFromApi();
+
+        $this->stdout($response . " \n", Console::FG_RED, Console::BOLD);
     }
 
 }

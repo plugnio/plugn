@@ -97,13 +97,29 @@ class OrderQuery extends \yii\db\ActiveQuery
         }
 
         return $this->andWhere ([
+            'NOT IN',
+            'order_status',
+            [
+                Order::STATUS_DRAFT,
+                Order::STATUS_ABANDONED_CHECKOUT,
+                Order::STATUS_REFUNDED,
+                Order::STATUS_PARTIALLY_REFUNDED,
+                Order::STATUS_CANCELED
+            ]
+        ]);
+    }
+
+    /**
+     * @return OrderQuery
+     */
+    public function placedOrders()
+    {
+        return $this->andWhere ([
                 'NOT IN',
                 'order_status',
                 [
                     Order::STATUS_DRAFT,
                     Order::STATUS_ABANDONED_CHECKOUT,
-                    Order::STATUS_REFUNDED,
-                    Order::STATUS_PARTIALLY_REFUNDED,
                     Order::STATUS_CANCELED
                 ]
             ]);
@@ -167,6 +183,14 @@ class OrderQuery extends \yii\db\ActiveQuery
                 Order::STATUS_COMPLETE
             ]
         ]);
+    }
+
+    /**
+     * Orders successfully placed
+     */
+    public function notDeleted()
+    {
+        return $this->andWhere (['is_deleted'=>'0']);
     }
 
 }

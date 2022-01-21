@@ -102,17 +102,27 @@ class CityController extends Controller {
      * @param type $city_id
      * @return type
      */
-    public function actionDetail($city_id, $store_uuid) {
+    public function actionDetail($city_id)
+    {
+        return $this->findModel($city_id);
+    }
 
-      if (Yii::$app->accountManager->getManagedAccount($store_uuid)) {
+    /**
+     * @param $city_id
+     * @return City
+     */
+    protected function findModel($city_id)
+    {
+        //Yii::$app->accountManager->getManagedAccount();
 
-        $city =  City::find()
-                  ->andWhere(['city_id' =>  $city_id])
-                  ->one();
+        $model = City::findOne([
+            'city_id' => $city_id
+        ]);
 
-        return $city;
-
-      }
-
-  }
+        if ($model !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested record does not exist.');
+        }
+    }
 }

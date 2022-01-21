@@ -3,6 +3,7 @@
 namespace agent\modules\v1\controllers;
 
 use agent\models\Currency;
+use agent\models\RestaurantTheme;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
@@ -106,7 +107,7 @@ class StoreController extends Controller
      * Return an overview of the store details
      * @param type $store_uuid
      */
-    public function actionUpdate($store_uuid)
+    public function actionUpdate($store_uuid = null)
     {
         $store = $this->findModel($store_uuid);
 
@@ -256,7 +257,7 @@ class StoreController extends Controller
         $model->commercial_license_file = Yii::$app->request->getBodyParam('commercial_license_file');
         $model->authorized_signature_file = Yii::$app->request->getBodyParam('authorized_signature_file');
 
-        if ($model->country->iso != 'KW') {
+        if ($model->country && $model->country->iso != 'KW') {
             $model->business_type = 'corp';
         }
 
@@ -316,18 +317,18 @@ class StoreController extends Controller
 
             /*-------- uploading documents-------*/
 
-            $payment_gateway_queue_model = new PaymentGatewayQueue;
-            $payment_gateway_queue_model->queue_status = PaymentGatewayQueue::QUEUE_STATUS_PENDING;
-            $payment_gateway_queue_model->restaurant_uuid = $model->restaurant_uuid;
-            $payment_gateway_queue_model->payment_gateway =  'tap';
+            $payment_gateway_queue = new PaymentGatewayQueue;
+            $payment_gateway_queue->queue_status = PaymentGatewayQueue::QUEUE_STATUS_PENDING;
+            $payment_gateway_queue->restaurant_uuid = $model->restaurant_uuid;
+            $payment_gateway_queue->payment_gateway =  'tap';
 
 
-            if (!$payment_gateway_queue_model->save()) {
+            if (!$payment_gateway_queue->save()) {
                 $transaction->rollBack();
                 return self::message("error",$model->errors);
             }
 
-            $model->payment_gateway_queue_id = $payment_gateway_queue_model->payment_gateway_queue_id;
+            $model->payment_gateway_queue_id = $payment_gateway_queue->payment_gateway_queue_id;
             $model->save(false);
 
             $transaction->commit();
@@ -507,7 +508,7 @@ class StoreController extends Controller
         $restaurantTheme = $model->restaurantTheme;
 
         if(!$restaurantTheme) {
-            $restaurantTheme = new RestaurantTheme;
+            $restaurantTheme = new RestaurantTheme();
             $restaurantTheme->restaurant_uuid = $model->restaurant_uuid;
         }
 
@@ -540,7 +541,7 @@ class StoreController extends Controller
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionUpdateDeliveryIntegration($id) {
+    public function actionUpdateDeliveryIntegration($id = null) {
 
         $model = $this->findModel($id);
 
@@ -566,7 +567,7 @@ class StoreController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdateAnalyticsIntegration($id) {
+    public function actionUpdateAnalyticsIntegration($id = null) {
 
         $model = $this->findModel($id);
 
@@ -588,6 +589,21 @@ class StoreController extends Controller
         return self::message("success","Analytics integration updated successfully");
     }
 
+    /**
+     * @param $store_uuid
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionStatus($store_uuid) {
+
+        $model = $this->findModel($store_uuid);
+
+        return [
+            'itemQuantity'=>count($model->items),
+            'payment'=>count($model->paymentMethods),
+            'shipping'=>count($model->businessLocations)
+        ];
+    }
 
     /**
      * @param $store_uuid
@@ -638,7 +654,7 @@ class StoreController extends Controller
     public static function message($type = "success", $message) {
         return [
             "operation" => $type,
-            "message" => Yii::t('agent', $message)
+            "message" => is_string ($message)? Yii::t('agent', $message): $message
         ];
     }
 }

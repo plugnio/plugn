@@ -7,6 +7,7 @@
 return [
     'order_item_id' => $index + 1,
     'order_uuid' => $index + 1,
+    'restaurant_uuid' => $index + 1,
     'item_uuid' => $index + 1,
     'item_name' => $faker->word,
     'item_name_ar' => $faker->word,

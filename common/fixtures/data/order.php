@@ -2,6 +2,7 @@
 
 return [
     'order0' => [
+        'currency_code' => 'KWD',
         'order_uuid' => 1,
         'payment_uuid' => 1,
         'customer_id' => 1,
