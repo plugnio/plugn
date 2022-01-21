@@ -92,33 +92,29 @@ class ItemController extends Controller {
 
 
 
-    /**
-     * Return restaurant menu
-     */
-    public function actionRestaurantMenu() {
 
-        $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
-        $wihoutItems = Yii::$app->request->get("wihoutItems");
+        /**
+         * Return restaurant menu
+         */
+        public function actionRestaurantMenu() {
 
-        $restaurant = Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->one();
+            $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
+
+            $restaurant = Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->one();
 
 
 
-        if ($restaurant) {
+            if ($restaurant) {
 
-          if($restaurant->is_myfatoorah_enable)
-            unset($restaurant['live_public_key']);
+              if($restaurant->is_myfatoorah_enable)
+                unset($restaurant['live_public_key']);
 
-           $restaurantMenu = [];
-
-            if(!$wihoutItems){
-              $restaurantMenu = Category::find()
-                      ->andWhere(['restaurant_uuid' => $restaurant_uuid])
-                      ->with('items', 'items.options', 'items.options.extraOptions','items.itemImages')
-                      ->orderBy([new \yii\db\Expression('sort_number IS NULL, sort_number ASC')])
-                      ->asArray()
-                      ->all();
-
+                $restaurantMenu = Category::find()
+                        ->andWhere(['restaurant_uuid' => $restaurant_uuid])
+                        ->with('items', 'items.options', 'items.options.extraOptions','items.itemImages')
+                        ->orderBy([new \yii\db\Expression('sort_number IS NULL, sort_number ASC')])
+                        ->asArray()
+                        ->all();
 
 
                 foreach ($restaurantMenu as $category) {
@@ -132,24 +128,19 @@ class ItemController extends Controller {
                       unset($restaurantMenu[$key]['items'][$itemKey]['unit_sold']);
                     }
                 }
+
+                return [
+                    'restaurant' => $restaurant,
+                    'restaurantTheme' => $restaurant->getRestaurantTheme()->one(),
+                    'restaurantMenu' => $restaurantMenu
+                ];
+            } else {
+                return [
+                    'operation' => 'error',
+                    'message' => 'Store Uuid is invalid'
+                ];
             }
-
-
-
-            return [
-                'restaurant' => $restaurant,
-                'restaurantTheme' => $restaurant->getRestaurantTheme()->one(),
-                'restaurantMenu' => $restaurantMenu
-            ];
-        } else {
-            return [
-                'operation' => 'error',
-                'message' => 'Store Uuid is invalid'
-            ];
         }
-    }
-
-
     /**
      * Return item's data
      */
