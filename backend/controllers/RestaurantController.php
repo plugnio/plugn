@@ -13,7 +13,7 @@ use yii\filters\AccessControl;
 use yii\web\UploadedFile;
 
 /**
- * RestaurantController implements the CRUD actions for Restaurant model.
+ * RestaurantCest implements the CRUD actions for Restaurant model.
  */
 class RestaurantController extends Controller {
 

@@ -71,7 +71,6 @@ class RestaurantController extends Controller {
 
           $schedule_time = [];
 
-
             if($deliveryArea){
 
               for ($i = 0; $i <= OpeningHour::DAY_OF_WEEK_SATURDAY; $i++) {
@@ -84,9 +83,6 @@ class RestaurantController extends Controller {
                       continue;
 
                   $selectedDay = 'next '  . date('l', $deliveryDate);
-
-
-
 
                   $startTime =   date('c',strtotime( date('Y-m-d', strtotime($i == 0 ? "now" : $selectedDay)) . ' ' . $opening_hrs->open_at));
 

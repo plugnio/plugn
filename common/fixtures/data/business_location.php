@@ -7,7 +7,7 @@ return [
         'restaurant_uuid' => 1,
         'business_location_name' => 'Wilfredo Mountain',
         'business_location_name_ar' => 'Amara Mountain',
-        'support_pick_up' => 0,
+        'support_pick_up' => 1,
         'business_location_tax' => 16,
         'address' => '27007 Rhianna Summit Apt. 366
 Rosieside, OK 35010',

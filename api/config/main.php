@@ -57,11 +57,9 @@ return [
                     'patterns' => [
                         'GET detail' => 'item-data',
                         'GET' => 'restaurant-menu',
-                        'GET items' => 'items',
                         'GET <category_id>' => 'category-products',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS items' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS <category_id>' => 'options',
                     ]
@@ -114,7 +112,7 @@ return [
                         // 'OPTIONS <restaurant_uuid>' => 'options'
                     ]
                 ],
-                [// RestaurantController
+                [// RestaurantCest
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/restaurant',
                     'pluralize' => false,
