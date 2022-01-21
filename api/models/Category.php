@@ -15,18 +15,6 @@ use yii\helpers\ArrayHelper;
  */
 class Category extends \common\models\Category {
 
-  public function extraFields()
-  {
-      $fields = parent::extraFields ();
-
-      return array_merge ($fields, [
-          'items',
-          'itemImages',
-      ]);
-  }
-
-
-
   /**
    * Gets query for [[ItemUus]].
    *

@@ -206,33 +206,6 @@ class StoreController extends Controller {
         }
     }
 
-    /**
-     * Return restaurant menu
-     */
-    public function actionStoreData() {
-
-        $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
-
-        $restaurant = Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->one();
-
-
-        if ($restaurant) {
-
-          if($restaurant->is_myfatoorah_enable)
-            unset($restaurant['live_public_key']);
-
-            return [
-                'restaurant' => $restaurant,
-                'restaurantTheme' => $restaurant->getRestaurantTheme()->one()
-            ];
-        } else {
-            return [
-                'operation' => 'error',
-                'message' => 'Store Uuid is invalid'
-            ];
-        }
-    }
-
 
     /**
      * Return Restaurant's data

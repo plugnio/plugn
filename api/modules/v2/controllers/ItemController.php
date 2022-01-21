@@ -150,55 +150,6 @@ class ItemController extends Controller {
     }
 
 
-
-
-    /**
-     * Return Store's products
-     */
-    public function actionGetStoreCatalog() {
-      $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
-
-      $restaurant = Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->one();
-
-              if ($restaurant) {
-
-                  $query = Category::find()
-                          ->andWhere(['restaurant_uuid' => $restaurant_uuid])
-                          // ->with('items', 'items.options', 'items.options.extraOptions','items.itemImages')
-                          ->orderBy([new \yii\db\Expression('sort_number IS NULL, sort_number ASC')]);
-                          // ->all();
-
-
-                  // foreach ($restaurantMenu as $category) {
-                  //     unset($category['categoryItems']);
-                  // }
-                  //
-                  // foreach ($restaurantMenu as $key => $category) {
-                  //     unset($restaurantMenu[$key]['categoryItems']);
-                  //
-                  //     foreach ($category['items'] as $itemKey => $item) {
-                  //       unset($restaurantMenu[$key]['items'][$itemKey]['unit_sold']);
-                  //     }
-                  // }
-
-                  // return [
-                  //     'restaurantMenu' => $restaurantMenu
-                  // ];
-
-                  return new ActiveDataProvider([
-                      'query' => $query
-                  ]);
-
-              } else {
-                  return [
-                      'operation' => 'error',
-                      'message' => 'Store Uuid is invalid'
-                  ];
-              }
-    }
-
-
-
     /**
      * Return item's data
      */
