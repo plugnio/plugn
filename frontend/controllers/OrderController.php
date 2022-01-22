@@ -841,7 +841,33 @@ class OrderController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionDelete($id, $storeUuid) {
-        $this->findModel($id, $storeUuid)->delete();
+
+        $model = $this->findModel ($id, $storeUuid);
+        $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
+
+
+
+        $transaction = Yii::$app->db->beginTransaction();
+
+        $model->restockItems();
+
+        $model->is_deleted = 1;
+        if (!$model->save ()) {
+            $transaction->rollBack();
+            if (isset($model->errors)) {
+
+              Yii::$app->session->setFlash('errorResponse', "We've faced a problem deleting the order");
+              Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ' . json_encode($model->errors));
+
+            } else {
+
+              Yii::$app->session->setFlash('errorResponse', "We've faced a problem deleting the order");
+              Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ');
+
+            }
+        }
+        $transaction->commit();
+
 
         return $this->redirect(['index', 'storeUuid' => $storeUuid]);
     }
