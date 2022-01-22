@@ -115,13 +115,13 @@
                             </p>
                             <?php } ?>
 
-                            <?php if(strtolower($order->unit_type) == 'house') { ?>
+                            <?php if(strtolower($order->unit_type) == 'house' &&  $order->house_number ) { ?>
                             <p class="txt-house-number">
                                 House No. <?= $order->house_number ?>
                             </p>
                             <?php } ?>
 
-                            <?php if(strtolower($order->unit_type) != 'house') { ?>
+                            <?php if(strtolower($order->unit_type) != 'house'  &&  $order->house_number ) { ?>
                             <p class="txt-building">
                                 Building <?= $order->house_number ?>
                             </p>
