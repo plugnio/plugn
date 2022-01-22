@@ -1244,19 +1244,7 @@ class OrderController extends Controller
         $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
 
         $transaction = Yii::$app->db->beginTransaction();
-        if ($model->orderItems) {
-            foreach ($model->orderItems as $item) {
-                $itemsModel = Item::findOne(['item_uuid'=>$item->item_uuid]);
-                if ($itemsModel) {
-                    $itemsModel->unit_sold -= $item->qty;
-                    $itemsModel->stock_qty += $item->qty;
-                    if (!$itemsModel->save(false)) {
-                        $transaction->rollBack();
-                    }
-                }
-            }
-        }
-
+        $model->restockItems();
 
         $model->is_deleted = 1;
         if (!$model->save ()) {
