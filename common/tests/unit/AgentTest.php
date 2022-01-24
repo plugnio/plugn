@@ -44,7 +44,7 @@ class AgentTest extends \Codeception\Test\Unit
             //$agent->scenario = 'newAccount';
             expect('should not accept empty agent_name', $agent->validate(['agent_name']))->false();
             expect('should not accept empty agent_email', $agent->validate(['agent_email']))->false();
-            expect('should not accept empty agent_password_hash', $agent->validate(['agent_password_hash']))->false();
+            //expect('should not accept empty agent_password_hash', $agent->validate(['agent_password_hash']))->false();
 
             $agent->agent_email = 'randomString';
             expect('should not accept invalid email', $agent->validate(['agent_email']))->false();
