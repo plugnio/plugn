@@ -1415,11 +1415,9 @@ class SiteController extends Controller {
 
             $store_model->name_ar = $store_model->name;
 
-
-
-
-
-            if ($agent_model->validate() && $store_model->validate() && $store_model->save() && $agent_model->save()) {
+            if (
+                $agent_model->validate() && $store_model->validate() &&
+                $store_model->save() && $agent_model->save()) {
 
 
                 //Create a catrgory for a store by default named "Products". so they can get started adding products without having to add category first

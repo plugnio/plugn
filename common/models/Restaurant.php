@@ -1180,13 +1180,14 @@ class Restaurant extends \yii\db\ActiveRecord
             $store_name = strtolower(str_replace(' ', '_', $this->name));
             $store_domain = strtolower(str_replace(' ', '_', $this->restaurant_domain));
             $this->app_id = 'store.plugn.' . $store_domain;
-            $this->restaurant_domain = 'https://' . $store_domain . '.plugn.store';
             $this->store_branch_name = $store_name;
 
-          $isDomainExist = self::find()->where(['restaurant_domain' => $this->restaurant_domain])->exists();
+            $isDomainExist = self::find()->where(['restaurant_domain' => $this->restaurant_domain])->exists();
 
-          if($isDomainExist)
-            return  $this->addError('restaurant_domain', 'Another store is already using this domain');
+            if($isDomainExist)
+                return  $this->addError('restaurant_domain', 'Another store is already using this domain');
+
+            $this->restaurant_domain = 'https://' . $store_domain . '.plugn.store';
         }
 
         if ($this->scenario == self::SCENARIO_UPLOAD_STORE_DOCUMENT) {
