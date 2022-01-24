@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\RestaurantDeliveryFixture;
+use Codeception\Specify;
+use common\models\RestaurantDelivery;
 
 class RestaurantDeliveryTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

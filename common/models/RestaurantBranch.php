@@ -31,7 +31,7 @@ class RestaurantBranch extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['branch_name_en','branch_name_ar'], 'required'],
+            [['branch_name_en', 'branch_name_ar', 'restaurant_uuid'], 'required'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['prep_time'], 'integer' , 'min'=> 0],
             [['branch_name_en', 'branch_name_ar'], 'string', 'max' => 255],

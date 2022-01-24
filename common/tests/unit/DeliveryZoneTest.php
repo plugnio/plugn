@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\DeliveryZoneFixture;
+use Codeception\Specify;
+use common\models\DeliveryZone;
 
 class DeliveryZoneTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -34,7 +38,7 @@ class DeliveryZoneTest extends \Codeception\Test\Unit
         });
 
         $this->specify('DeliveryZone model fields validation', function () {
-            $model = new DeliveryZone;
+            $model = new DeliveryZone();
 
             expect('should not accept empty country_id', $model->validate(['country_id']))->false();
             expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
@@ -43,8 +47,8 @@ class DeliveryZoneTest extends \Codeception\Test\Unit
             $model->restaurant_uuid = 99999999999;
             expect('should not accept invalid restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
 
-            $model->business_location_id  = 99999999999;
-            expect('should not accept invalid business_location_id ', $model->validate(['business_location_id ']))->false();
+            $model->business_location_id  = 999999999999999;
+            expect('should not accept invalid business_location_id ', $model->validate(['business_location_id']))->false();
 
             $model->country_id = 99999999999;
             expect('should not accept invalid country_id', $model->validate(['country_id']))->false();

@@ -37,7 +37,6 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     const SCENARIO_CHANGE_PASSWORD = 'change-password';
     const SCENARIO_CREATE_NEW_AGENT = 'create';
 
-
     /**
      * Field for temporary password. If set, it will overwrite the old password on save
      * @var string
@@ -64,7 +63,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['agent_name', 'agent_email'], 'required'],
+            [['agent_name', 'agent_email', 'agent_password_hash'], 'required'],
             ['tempPassword', 'required', 'on' => [self::SCENARIO_CHANGE_PASSWORD, self::SCENARIO_CREATE_NEW_AGENT]],
             [['agent_status', 'email_notification', 'reminder_email', 'receive_weekly_stats'], 'integer'],
             [['agent_created_at', 'agent_updated_at'], 'safe'],

@@ -1,7 +1,7 @@
 <?php
 namespace common\tests;
 
-use admin\models\Admin;
+use backend\models\Admin;
 use common\fixtures\AdminFixture;
 use Codeception\Specify;
 
@@ -15,7 +15,9 @@ class AdminTest extends \Codeception\Test\Unit
     protected $tester;
 
     public function _fixtures(){
-        return ['admin' => AdminFixture::className()];
+        return [
+            'admin' => AdminFixture::className()
+        ];
     }
 
     protected function _before(){}
@@ -35,10 +37,10 @@ class AdminTest extends \Codeception\Test\Unit
 
         $this->specify('Admin model fields validation', function () {
             $admin = new Admin;
-            $admin->scenario = 'newAccount';
+            //$admin->scenario = 'newAccount';
             expect('should not accept empty admin_name', $admin->validate(['admin_name']))->false();
             expect('should not accept empty admin_email', $admin->validate(['admin_email']))->false();
-            expect('should not accept empty admin_password_hash', $admin->validate(['admin_password_hash']))->false();
+            //expect('should not accept empty admin_password_hash', $admin->validate(['admin_password_hash']))->false();
 
             $admin->admin_email = 'randomString';
             expect('should not accept invalid email', $admin->validate(['admin_email']))->false();

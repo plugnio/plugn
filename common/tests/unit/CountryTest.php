@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\CountryFixture;
+use Codeception\Specify;
+use common\models\Country;
 
 class CountryTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

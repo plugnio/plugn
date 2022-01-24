@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\RestaurantFixture;
+use Codeception\Specify;
+use common\models\Restaurant;
 
 class RestaurantTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -35,7 +39,7 @@ class RestaurantTest extends \Codeception\Test\Unit
         });
 
         $this->specify('Restaurant model fields validation', function () {
-            $model = new Restaurant;
+            $model = new Restaurant();
 
             expect('should not accept empty name', $model->validate(['name']))->false();
             expect('should not accept empty restaurant_email', $model->validate(['restaurant_email']))->false();

@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\CountryPaymentMethodFixture;
+use Codeception\Specify;
+use common\models\CountryPaymentMethod;
 
 class CountryPaymentMethodTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -19,7 +23,7 @@ class CountryPaymentMethodTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'bankDiscounts' => CountryPaymentMethodFixture::className()];
+            'cpms' => CountryPaymentMethodFixture::className()];
     }
 
     /**

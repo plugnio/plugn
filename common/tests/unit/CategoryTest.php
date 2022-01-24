@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\CategoryFixture;
+use Codeception\Specify;
+use common\models\Category;
 
 class CategoryTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -34,7 +38,7 @@ class CategoryTest extends \Codeception\Test\Unit
         });
 
         $this->specify('Category model fields validation', function () {
-            $model = new Category;
+            $model = new Category();
 
             expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
             expect('should not accept empty title', $model->validate(['title']))->false();

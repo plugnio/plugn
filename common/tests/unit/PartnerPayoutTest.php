@@ -1,7 +1,14 @@
-<?php namespace common\tests;
+<?php 
+namespace common\tests;
+
+use Codeception\Specify;
+use common\fixtures\PartnerPayoutFixture;
+use common\models\PartnerPayout;
 
 class PartnerPayoutTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

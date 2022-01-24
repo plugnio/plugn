@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\PaymentMethodFixture;
+use Codeception\Specify;
+use common\models\PaymentMethod;
 
 class PaymentMethodTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

@@ -148,7 +148,9 @@ class Order extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['customer_name', 'order_mode'], 'required'],
+            [['customer_name', 'order_mode', 'currency_code', 'store_currency_code', 'total_price', 'subtotal',
+                'order_mode', 'restaurant_branch_id', 'restaurant_uuid', 'payment_method_name', 'payment_method_id',
+                'customer_email', 'customer_phone_number', 'customer_phone_country_code', 'customer_name'], 'required'],
             [['is_order_scheduled'], 'required', 'on' => 'create'],
             [['payment_method_id'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['order_uuid'], 'string', 'max' => 40],
@@ -277,6 +279,8 @@ class Order extends \yii\db\ActiveRecord
             [['civil_id', 'section', 'class'], 'string', 'max' => 255], //Temp var
 
             [['mashkor_order_number', 'mashkor_tracking_link', 'mashkor_driver_name', 'mashkor_driver_phone'], 'string', 'max' => 255],
+            [['delivery_zone_id'], 'exist', 'skipOnError' => false, 'targetClass' => DeliveryZone::className(), 'targetAttribute' => ['delivery_zone_id' => 'delivery_zone_id']],
+            [['shipping_country_id'], 'exist', 'skipOnError' => false, 'targetClass' => Country::className(), 'targetAttribute' => ['shipping_country_id' => 'country_id']],
             [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
             [['bank_discount_id'], 'exist', 'skipOnError' => true, 'targetClass' => BankDiscount::className(), 'targetAttribute' => ['bank_discount_id' => 'bank_discount_id']],
             [['customer_id'], 'exist', 'skipOnError' => false, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],

@@ -28,18 +28,15 @@ use common\models\CustomerBankDiscount;
  */
 class BankDiscount extends \yii\db\ActiveRecord
 {
-
     public $duration;
 
     //Values for `discount_type`
     const DISCOUNT_TYPE_PERCENTAGE = 1;
     const DISCOUNT_TYPE_AMOUNT = 2;
 
-
     //Values for `bank_discount_status`
     const BANK_DISCOUNT_STATUS_ACTIVE = 1;
     const BANK_DISCOUNT_STATUS_EXPIRED = 2;
-
 
     /**
      * {@inheritdoc}
@@ -56,7 +53,7 @@ class BankDiscount extends \yii\db\ActiveRecord
     {
         return [
             [['bank_id', 'discount_type', 'discount_amount', 'bank_discount_status', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'integer'],
-            [['restaurant_uuid', 'discount_amount'], 'required'],
+            [['restaurant_uuid', 'discount_amount', 'discount_type', 'discount_amount'], 'required'],
             ['bank_discount_status', 'in', 'range' => [self::BANK_DISCOUNT_STATUS_ACTIVE, self::BANK_DISCOUNT_STATUS_EXPIRED]],
             ['discount_type', 'in', 'range' => [self::DISCOUNT_TYPE_PERCENTAGE, self::DISCOUNT_TYPE_AMOUNT]],
             [['valid_from', 'valid_until', 'bank_discount_created_at', 'bank_discount_updated_at','duration'], 'safe'],
@@ -87,7 +84,6 @@ class BankDiscount extends \yii\db\ActiveRecord
             'bank_discount_updated_at' => 'Bank Discount Updated At',
         ];
     }
-
 
     public function getBankDiscountStatus() {
         switch ($this->bank_discount_status) {

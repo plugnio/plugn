@@ -37,6 +37,7 @@ class Country extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['country_name'], 'required'],
             [['country_code'], 'integer'],
             [['country_name','country_name_ar'], 'string', 'max' => 80],
             [['iso'], 'string', 'max' => 2],

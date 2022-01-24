@@ -61,11 +61,12 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
     */
    public function rules() {
        return [
-           [[ 'username', 'partner_email','partner_iban','benef_name','bank_id','partner_phone_number'], 'required'],
+           [['username', 'partner_email','partner_iban','benef_name','bank_id','partner_phone_number', 'partner_password_hash', 'referral_code'], 'required'],
            [['partner_status'], 'integer'],
            ['partner_status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
            ['tempPassword', 'required', 'on' => [self::SCENARIO_CHANGE_PASSWORD, self::SCENARIO_CREATE_NEW_PARTNER]],
            [['commission'], 'number'],
+           [['partner_email'], 'email'],
            [['partner_uuid'], 'string', 'max' => 60],
            [['partner_iban'], 'string', 'max' => 100],
            [['username', 'partner_password_hash', 'partner_password_reset_token', 'partner_email','benef_name'], 'string', 'max' => 255],
@@ -82,7 +83,6 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
            [['partner_phone_number_country_code'], 'integer'],
            [['partner_phone_number'], 'string', 'min' => 6, 'max' => 20],
            [['partner_phone_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number'],
-
 
            [['bank_id'], 'exist', 'skipOnError' => true, 'targetClass' => Bank::className(), 'targetAttribute' => ['bank_id' => 'bank_id']],
        ];

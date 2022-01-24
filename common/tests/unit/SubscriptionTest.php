@@ -2,9 +2,12 @@
 
 use common\fixtures\SubscriptionFixture;
 use common\models\Subscription;
+use Codeception\Specify;
 
 class SubscriptionTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

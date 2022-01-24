@@ -39,7 +39,7 @@ class OrderItem extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['order_uuid', 'qty'], 'required'],
+            [['order_uuid', 'restaurant_uuid', 'item_uuid', 'item_name', 'item_price', 'qty'], 'required'],
             [['qty'], 'integer', 'min' => 0],
             [['order_uuid'], 'string', 'max' => 40],
             [['item_price'], 'number', 'min' => 0],
@@ -87,14 +87,19 @@ class OrderItem extends \yii\db\ActiveRecord {
      * Check if item belongs to restaurant
      * @param type $attribute
      */
-    public function checkIfItemBelongToRestaurant($attribute) {
-        $isItemBelongToRestaurant = Item::find()->where(['restaurant_uuid' => $this->order->restaurant_uuid, 'item_uuid' => $this->item_uuid])->one();
+    public function checkIfItemBelongToRestaurant($attribute)
+    {
+        $isItemBelongToRestaurant = $this->order? Item::find()
+            ->where([
+                'restaurant_uuid' => $this->order->restaurant_uuid,
+                'item_uuid' => $this->item_uuid
+            ])
+            ->one(): null;
 
         if (!$isItemBelongToRestaurant)
             $this->addError($attribute, 'Item Uuid is invalid');
         else if ($isItemBelongToRestaurant->item_status == Item::ITEM_STATUS_UNPUBLISH)
             $this->addError($attribute, 'Sorry, the selected item is no longer available.');
-
     }
 
     /**

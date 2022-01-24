@@ -63,7 +63,7 @@ class Payment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['customer_id', 'order_uuid', 'payment_amount_charged', 'restaurant_uuid'], 'required'],
+            [['customer_id', 'order_uuid', 'payment_amount_charged', 'restaurant_uuid', 'payment_mode'], 'required'],
             [['customer_id', 'received_callback', 'payout_status'], 'integer'],
             ['payout_status', 'in', 'range' => [self::PAYOUT_STATUS_UNPAID, self::PAYOUT_STATUS_PAID, self::PAYOUT_STATUS_PENDING]],
             [['order_uuid'], 'string', 'max' => 40],

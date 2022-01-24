@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\BankDiscountFixture;
+use Codeception\Specify;
+use common\models\BankDiscount;
 
 class BankDiscountTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -34,9 +38,9 @@ class BankDiscountTest extends \Codeception\Test\Unit
         });
 
         $this->specify('BankDiscount model fields validation', function () {
-            $model = new BankDiscount;
+            $model = new BankDiscount();
 
-            expect('should not accept empty bank_id', $model->validate(['bank_id']))->false();
+           // expect('should not accept empty bank_id', $model->validate(['bank_id']))->false();
             expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
             expect('should not accept empty discount_type', $model->validate(['discount_type']))->false();
             expect('should not accept empty discount_amount', $model->validate(['discount_amount']))->false();

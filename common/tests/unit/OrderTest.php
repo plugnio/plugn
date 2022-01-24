@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\OrderFixture;
+use Codeception\Specify;
+use common\models\Order;
 
 class OrderTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -35,7 +39,7 @@ class OrderTest extends \Codeception\Test\Unit
         });
 
         $this->specify('Order model fields validation', function () {
-            $model = new Order;
+            $model = new Order();
 
             expect('should not accept empty customer_name', $model->validate(['customer_name']))->false();
             expect('should not accept empty customer_phone_number', $model->validate(['customer_phone_number']))->false();

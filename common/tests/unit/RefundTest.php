@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\RefundFixture;
+use Codeception\Specify;
+use common\models\Refund;
 
 class RefundTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -36,7 +40,7 @@ class RefundTest extends \Codeception\Test\Unit
         });
 
         $this->specify('Refund model fields validation', function () {
-            $model = new Refund;
+            $model = new Refund();
 
             expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
             expect('should not accept empty order_uuid', $model->validate(['order_uuid']))->false();

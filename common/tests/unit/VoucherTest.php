@@ -2,9 +2,12 @@
 
 use common\fixtures\VoucherFixture;
 use common\models\Voucher;
+use Codeception\Specify;
 
 class VoucherTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\RestaurantPaymentMethodFixture;
+use Codeception\Specify;
+use common\models\RestaurantPaymentMethod;
 
 class RestaurantPaymentMethodTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

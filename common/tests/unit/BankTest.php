@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\BankFixture;
+use Codeception\Specify;
+use common\models\Bank;
 
 class BankTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

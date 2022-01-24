@@ -2,9 +2,12 @@
 
 use common\fixtures\SubscriptionPaymentFixture;
 use common\models\SubscriptionPayment;
+use Codeception\Specify;
 
 class SubscriptionPaymentTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -46,7 +49,7 @@ class SubscriptionPaymentTest extends \Codeception\Test\Unit
             $model->subscription_uuid = 12312312313;
             expect('should not accept invalid subscription_uuid', $model->validate(['subscription_uuid']))->false();
 
-            $model->city_id = 12312312313;
+            $model->restaurant_uuid = 12312312313;
             expect('should not accept invalid restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
         });
     }

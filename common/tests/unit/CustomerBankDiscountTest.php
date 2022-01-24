@@ -2,9 +2,12 @@
 
 use common\fixtures\CustomerBankDiscountFixture;
 use common\models\CustomerBankDiscount;
+use Codeception\Specify;
 
 class CustomerBankDiscountTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -35,7 +38,7 @@ class CustomerBankDiscountTest extends \Codeception\Test\Unit
         });
 
         $this->specify('CustomerBankDiscount model fields validation', function () {
-            $model = new CustomerBankDiscount;
+            $model = new CustomerBankDiscount();
 
             expect('should not accept empty customer_id', $model->validate(['customer_id']))->false();
             expect('should not accept empty bank_discount_id', $model->validate(['bank_discount_id']))->false();

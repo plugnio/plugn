@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\TapQueueFixture;
+use Codeception\Specify;
+use common\models\TapQueue;
 
 class TapQueueTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

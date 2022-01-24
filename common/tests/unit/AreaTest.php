@@ -1,10 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\AreaFixture;
-
+use Codeception\Specify;
+use common\models\Area;
 
 class AreaTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -35,7 +38,7 @@ class AreaTest extends \Codeception\Test\Unit
         });
 
         $this->specify('Area model fields validation', function () {
-            $area = new Area;
+            $area = new Area();
 
             expect('should not accept empty city_id', $area->validate(['city_id']))->false();
             expect('should not accept empty area_name', $area->validate(['area_name']))->false();

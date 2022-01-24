@@ -30,7 +30,7 @@ class StoreWebLink extends \yii\db\ActiveRecord
     {
         return [
             [['web_link_id'], 'integer'],
-            [['restaurant_uuid'], 'required'],
+            [['restaurant_uuid', 'web_link_id'], 'required'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
             [['web_link_id'], 'exist', 'skipOnError' => true, 'targetClass' => WebLink::className(), 'targetAttribute' => ['web_link_id' => 'web_link_id']],

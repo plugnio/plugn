@@ -35,7 +35,7 @@ class PartnerToken extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['token_uuid', 'partner_uuid'], 'required'],
+            [['token_uuid', 'partner_uuid', 'token_value', 'token_status'], 'required'],
             [['token_status'], 'integer'],
             [['token_last_used_datetime', 'token_expiry_datetime', 'token_created_datetime'], 'safe'],
             [['token_uuid', 'partner_uuid'], 'string', 'max' => 60],
@@ -61,6 +61,18 @@ class PartnerToken extends \yii\db\ActiveRecord
             'token_expiry_datetime' => 'Token Expiry Datetime',
             'token_created_datetime' => 'Token Created Datetime',
         ];
+    }
+
+    /**
+     * Generates unique access token to be used as value
+     * @return string
+     */
+    public static function generateUniqueTokenString(){
+        $randomString = Yii::$app->getSecurity()->generateRandomString();
+        if(!static::findOne(['token_value' => $randomString ])){
+            return $randomString;
+
+        }else return static::generateUniqueTokenString();
     }
 
     /**

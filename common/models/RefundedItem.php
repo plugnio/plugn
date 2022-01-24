@@ -40,7 +40,7 @@ class RefundedItem extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['refund_id', 'order_item_id', 'order_uuid', 'qty'], 'required'],
+            [['refund_id', 'order_item_id', 'order_uuid', 'item_uuid', 'item_name', 'item_price', 'qty'], 'required'],
             [['order_item_id', 'qty'], 'integer'],
             ['qty', 'validateQty'],
             [['item_price'], 'number'],

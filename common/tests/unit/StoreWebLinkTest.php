@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\StoreWebLinkFixture;
+use Codeception\Specify;
+use common\models\StoreWebLink;
 
 class StoreWebLinkTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\CurrencyFixture;
+use Codeception\Specify;
+use common\models\Currency;
 
 class CurrencyTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -19,7 +23,7 @@ class CurrencyTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'bankDiscounts' => CurrencyFixture::className()];
+            'currencies' => CurrencyFixture::className()];
     }
 
     /**
@@ -38,11 +42,8 @@ class CurrencyTest extends \Codeception\Test\Unit
 
             expect('should not accept empty title', $model->validate(['title']))->false();
             expect('should not accept empty code', $model->validate(['code']))->false();
-            expect('should not accept empty currency_symbol', $model->validate(['currency_symbol']))->false();
+            //expect('should not accept empty currency_symbol', $model->validate(['currency_symbol']))->false();
             expect('should not accept empty rate', $model->validate(['rate']))->false();
-
-            $model->city_id = 12312312313;
-            expect('should not accept invalid city_id', $model->validate(['city_id']))->false();
         });
     }
 }

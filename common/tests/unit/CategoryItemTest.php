@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\CategoryItemFixture;
+use Codeception\Specify;
+use common\models\CategoryItem;
 
 class CategoryItemTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

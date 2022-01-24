@@ -39,6 +39,7 @@ class AgentTokenTest extends \Codeception\Test\Unit
         $this->specify('Test Validator', function() {
             $model = new AgentToken();
             $model->validate();
+
             expect('agent_id required error',$model->errors)->hasKey('agent_id');
             expect('token_value required error',$model->errors)->hasKey('token_value');
             expect('token_status required error',$model->errors)->hasKey('token_status');

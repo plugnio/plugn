@@ -2,9 +2,12 @@
 
 use common\fixtures\WebLinkFixture;
 use common\models\WebLink;
+use Codeception\Specify;
 
 class WebLinkTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

@@ -37,7 +37,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['order_item_id', 'extra_option_id'], 'required'],
+            [['order_item_id', 'extra_option_id', 'extra_option_name', 'extra_option_price', 'qty'], 'required'],
             [['qty'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_ITEM_EXTRA_OPTION_BY_ADMIN],
             [['qty'], 'default', 'value' => 1 , 'on' =>  self::SCENARIO_CREATE_ORDER_ITEM_EXTRA_OPTION_BY_ADMIN],
             [['order_item_id', 'extra_option_id','qty'], 'integer', 'min' => 0],
