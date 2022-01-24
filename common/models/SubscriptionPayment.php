@@ -47,8 +47,6 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
     const PAYOUT_STATUS_UNPAID = 1;
     const PAYOUT_STATUS_PAID = 2;
 
-
-
     /**
      * {@inheritdoc}
      */

@@ -44,7 +44,7 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['restaurant_uuid', 'queue_status'], 'required'],
+            [['restaurant_uuid', 'payment_gateway', 'queue_status'], 'required'],
             [['queue_status'], 'integer'],
             [['queue_start_at', 'queue_end_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
