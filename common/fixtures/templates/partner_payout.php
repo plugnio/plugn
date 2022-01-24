@@ -11,7 +11,7 @@ return [
     'updated_at' => $faker->date('Y-m-d H:i:s'),
     'payout_status' => 1,
     'transfer_benef_iban' => $faker->word(),
-    'transfer_benef_name' => $faker->words(2),
+    'transfer_benef_name' => $faker->name(),
     'bank_id' => $index + 1,
     'transfer_file' => null,
 ];

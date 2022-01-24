@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\OrderItemExtraOptionFixture;
+use Codeception\Specify;
+use common\models\OrderItemExtraOption;
 
 class OrderItemExtraOptionTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -34,7 +38,7 @@ class OrderItemExtraOptionTest extends \Codeception\Test\Unit
         });
 
         $this->specify('OrderItemExtraOption model fields validation', function () {
-            $model = new OrderItemExtraOption;
+            $model = new OrderItemExtraOption();
 
             expect('should not accept empty order_item_id', $model->validate(['order_item_id']))->false();
             expect('should not accept empty extra_option_id', $model->validate(['extra_option_id']))->false();

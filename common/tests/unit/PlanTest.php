@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\PlanFixture;
+use Codeception\Specify;
+use common\models\Plan;
 
 class PlanTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

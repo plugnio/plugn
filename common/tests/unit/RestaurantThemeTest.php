@@ -2,9 +2,12 @@
 
 use common\fixtures\RestaurantThemeFixture;
 use common\models\RestaurantTheme;
+use Codeception\Specify;
 
 class RestaurantThemeTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -39,7 +42,6 @@ class RestaurantThemeTest extends \Codeception\Test\Unit
             $model = new RestaurantTheme;
 
             expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-            expect('should not accept empty area_name', $model->validate(['area_name']))->false();
 
             $model->restaurant_uuid = 12312312313;
             expect('should not accept invalid restaurant_uuid', $model->validate(['restaurant_uuid']))->false();

@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\OpeningHourFixture;
+use Codeception\Specify;
+use common\models\OpeningHour;
 
 class OpeningHourTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -34,7 +38,7 @@ class OpeningHourTest extends \Codeception\Test\Unit
         });
 
         $this->specify('OpeningHour model fields validation', function () {
-            $model = new OpeningHour;
+            $model = new OpeningHour();
 
             expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
             expect('should not accept empty day_of_week', $model->validate(['day_of_week']))->false();

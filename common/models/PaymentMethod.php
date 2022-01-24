@@ -33,6 +33,7 @@ class PaymentMethod extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['payment_method_name'], 'required'],
             [['payment_method_name' , 'payment_method_name_ar', 'source_id','payment_method_code'], 'string', 'max' => 255],
             [['vat'], 'number']
         ];

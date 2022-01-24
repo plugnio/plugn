@@ -2,9 +2,12 @@
 
 use common\fixtures\RestaurantCurrencyFixture;
 use common\models\RestaurantCurrency;
+use Codeception\Specify;
 
 class RestaurantCurrencyTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

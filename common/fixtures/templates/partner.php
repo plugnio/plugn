@@ -5,7 +5,7 @@
  */
 return [
     'partner_uuid' => $index + 1,
-    'username' => 'user_' . $index + 1,
+    'username' => 'user_' . ($index + 1),
     'partner_auth_key' => Yii::$app->getSecurity()->generateRandomString(),
     'partner_password_hash' => Yii::$app->getSecurity()->generatePasswordHash(12345),
     'partner_password_reset_token' => null,

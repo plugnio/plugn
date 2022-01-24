@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\ItemImageFixture;
+use Codeception\Specify;
+use common\models\ItemImage;
 
 class ItemImageTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -34,7 +38,7 @@ class ItemImageTest extends \Codeception\Test\Unit
         });
 
         $this->specify('ItemImage model fields validation', function () {
-            $model = new ItemImage;
+            $model = new ItemImage();
 
             expect('should not accept empty item_uuid', $model->validate(['item_uuid']))->false();
             expect('should not accept empty product_file_name', $model->validate(['product_file_name']))->false();

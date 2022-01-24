@@ -35,7 +35,7 @@ class Bank extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['bank_iban_code', 'bank_swift_code', 'bank_address', 'bank_transfer_type', 'bank_created_at', 'bank_updated_at'], 'required'],
+            [['bank_name', 'bank_iban_code', 'bank_swift_code', 'bank_address', 'bank_transfer_type', 'bank_created_at', 'bank_updated_at'], 'required'],
             [['bank_created_at', 'bank_updated_at'], 'safe'],
             [['deleted'], 'integer'],
             [['bank_name', 'bank_address', 'bank_transfer_type'], 'string', 'max' => 100],

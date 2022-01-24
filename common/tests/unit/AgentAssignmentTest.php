@@ -2,9 +2,12 @@
 
 use common\fixtures\AgentAssignmentFixture;
 use common\models\AgentAssignment;
+use Codeception\Specify;
 
 class AgentAssignmentTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

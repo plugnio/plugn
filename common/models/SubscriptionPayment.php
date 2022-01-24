@@ -59,7 +59,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['subscription_uuid', 'payment_amount_charged', 'restaurant_uuid'], 'required'],
+            [['subscription_uuid', 'payment_amount_charged', 'restaurant_uuid', 'payment_mode'], 'required'],
             [['received_callback','payout_status'], 'integer'],
             ['payout_status', 'in', 'range' => [self::PAYOUT_STATUS_UNPAID, self::PAYOUT_STATUS_PAID,self::PAYOUT_STATUS_PENDING]],
             [['payment_gateway_order_id', 'payment_current_status'], 'string'],

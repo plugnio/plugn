@@ -38,7 +38,7 @@ class Category extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'title_ar'], 'required'],
+            [['title', 'title_ar', 'restaurant_uuid'], 'required'],
             //Upload Category Image
             // ['category_image', 'file', 'extensions' => 'jpg, png, gif', 'maxSize' => 10000000,
             //     'wrongExtension' => Yii::t('app', 'Only files with these extensions are allowed for your Image: {extensions}')

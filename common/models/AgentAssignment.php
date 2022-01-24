@@ -45,7 +45,7 @@ class AgentAssignment extends \yii\db\ActiveRecord {
     public function rules() {
         return [
 //            [['assignment_agent_email'], 'required'],
-            [['role'], 'required'],
+            [['role', 'business_location_id', 'agent_id', 'restaurant_uuid'], 'required'],
             [['business_location_id'], 'required','when' => function($model) {
                     return ($model->role == self::AGENT_ROLE_BRANCH_MANAGER);
                 }

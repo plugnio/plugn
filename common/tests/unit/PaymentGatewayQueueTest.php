@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
+use common\fixtures\PaymentGatewayQueueFixture;
 use common\models\PaymentGatewayQueue;
+use Codeception\Specify;
 
 class PaymentGatewayQueueTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\CustomerFixture;
+use Codeception\Specify;
+use common\models\Customer;
 
 class CustomerTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -34,7 +38,7 @@ class CustomerTest extends \Codeception\Test\Unit
         });
 
         $this->specify('Customer model fields validation', function () {
-            $model = new Customer;
+            $model = new Customer();
 
             expect('should not accept empty customer_name', $model->validate(['customer_name']))->false();
             expect('should not accept empty customer_email', $model->validate(['customer_email']))->false();

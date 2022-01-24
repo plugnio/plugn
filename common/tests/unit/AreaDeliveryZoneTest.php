@@ -7,9 +7,12 @@ use common\fixtures\CountryFixture;
 use common\fixtures\DeliveryZoneFixture;
 use common\fixtures\RestaurantFixture;
 use common\models\AreaDeliveryZone;
+use Codeception\Specify;
 
 class AreaDeliveryZoneTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

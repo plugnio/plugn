@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\PaymentFixture;
+use Codeception\Specify;
+use common\models\Payment;
 
 class PaymentTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -35,7 +39,7 @@ class PaymentTest extends \Codeception\Test\Unit
         });
 
         $this->specify('Payment model fields validation', function () {
-            $model = new Payment;
+            $model = new Payment();
 
             expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
             expect('should not accept empty customer_id', $model->validate(['customer_id']))->false();

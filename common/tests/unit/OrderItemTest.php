@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\OrderItemFixture;
+use Codeception\Specify;
+use common\models\OrderItem;
 
 class OrderItemTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -34,7 +38,8 @@ class OrderItemTest extends \Codeception\Test\Unit
         });
 
         $this->specify('OrderItem model fields validation', function () {
-            $model = new OrderItem;
+
+            $model = new OrderItem();
 
             expect('should not accept empty order_uuid', $model->validate(['order_uuid']))->false();
             expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();

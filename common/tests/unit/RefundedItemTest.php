@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\RefundedItemFixture;
+use Codeception\Specify;
+use common\models\RefundedItem;
 
 class RefundedItemTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -35,7 +39,7 @@ class RefundedItemTest extends \Codeception\Test\Unit
         });
 
         $this->specify('RefundedItem model fields validation', function () {
-            $model = new RefundedItem;
+            $model = new RefundedItem();
 
             expect('should not accept empty refund_id', $model->validate(['refund_id']))->false();
             expect('should not accept empty order_item_id', $model->validate(['order_item_id']))->false();

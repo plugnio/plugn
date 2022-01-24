@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\QueueFixture;
+use Codeception\Specify;
+use common\models\Queue;
 
 class QueueTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -35,7 +39,7 @@ class QueueTest extends \Codeception\Test\Unit
         });
 
         $this->specify('Queue model fields validation', function () {
-            $model = new Queue;
+            $model = new Queue();
 
             expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
 

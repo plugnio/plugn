@@ -3,9 +3,12 @@ namespace common\tests;
 
 use common\fixtures\AgentFixture;
 use common\models\Agent;
+use Codeception\Specify;
 
 class AgentTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

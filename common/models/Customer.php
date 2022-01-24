@@ -38,7 +38,7 @@ class Customer extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['customer_name', 'customer_phone_number','restaurant_uuid', 'country_code'], 'required'],
+            [['customer_name', 'customer_email', 'customer_phone_number','restaurant_uuid', 'country_code'], 'required'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['customer_phone_number'], 'unique'],
             [['customer_email'], 'unique'],

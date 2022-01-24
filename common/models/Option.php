@@ -57,6 +57,7 @@ class Option extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
+            [['item_uuid', 'option_name'], 'required'],
             ['updateType', 'required', 'on' => self::SCENARIO_BATCH_UPDATE],
             ['updateType',
                 'in',

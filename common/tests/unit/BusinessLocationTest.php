@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\BusinessLocationFixture;
+use Codeception\Specify;
+use common\models\BusinessLocation;
 
 class BusinessLocationTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */

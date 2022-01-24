@@ -29,6 +29,7 @@ class ItemImage extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['item_uuid', 'product_file_name'], 'required'],
             [['item_uuid'], 'string', 'max' => 300],
             [['product_file_name'], 'unique'],
             [['product_file_name'], 'string', 'max' => 255],

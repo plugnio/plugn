@@ -1,9 +1,13 @@
 <?php namespace common\tests;
 
 use common\fixtures\CustomerVoucherFixture;
+use Codeception\Specify;
+use common\models\CustomerVoucher;
 
 class CustomerVoucherTest extends \Codeception\Test\Unit
 {
+    use Specify;
+    
     /**
      * @var \common\tests\UnitTester
      */
@@ -34,7 +38,7 @@ class CustomerVoucherTest extends \Codeception\Test\Unit
         });
 
         $this->specify('CustomerVoucher model fields validation', function () {
-            $model = new CustomerVoucher;
+            $model = new CustomerVoucher();
 
             expect('should not accept empty customer_id', $model->validate(['customer_id']))->false();
             expect('should not accept empty voucher_id', $model->validate(['voucher_id']))->false();
