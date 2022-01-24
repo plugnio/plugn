@@ -492,12 +492,14 @@ class OrderController extends Controller
         $store = Yii::$app->accountManager->getManagedAccount ();
 
         $totalPendingOrders = Order::find ()
+            ->notDeleted()
             ->filterBusinessLocationIfManager ($store->restaurant_uuid)
             ->andWhere (['order_status' => Order::STATUS_PENDING])
             ->andWhere (['restaurant_uuid' => $store->restaurant_uuid])
             ->count ();
 
         $latestOrder = Order::find ()
+            ->notDeleted()
             ->filterBusinessLocationIfManager ($store->restaurant_uuid)
             ->andWhere (['order_status' => Order::STATUS_PENDING])
             ->andWhere (['restaurant_uuid' => $store->restaurant_uuid])
