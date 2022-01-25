@@ -64,6 +64,7 @@ class OrderSearch extends Order {
 
         $query
             ->andWhere(['order.restaurant_uuid' => $storeUuid])
+            ->andWhere(['order.is_deleted' => 0])
             ->andWhere(['order_status' => Order::STATUS_ABANDONED_CHECKOUT]);
 
 
@@ -142,6 +143,7 @@ class OrderSearch extends Order {
 
         $query
             ->andWhere(['order.restaurant_uuid' => $storeUuid])
+            ->andWhere(['order.is_deleted' => 0])
             ->andWhere(['order.order_status' => Order::STATUS_DRAFT]);
 
         // add conditions that should always apply here
@@ -219,6 +221,7 @@ class OrderSearch extends Order {
 
           $query
               ->andWhere(['order.restaurant_uuid' => $storeUuid])
+              ->andWhere(['order.is_deleted' => 0])
               ->andWhere(['order.order_status' => Order::STATUS_PENDING]);
 
         // add conditions that should always apply here
@@ -294,6 +297,7 @@ class OrderSearch extends Order {
 
         $query->andWhere(['order.restaurant_uuid' => $storeUuid])
                     ->andWhere(['!=' , 'order_status' , Order::STATUS_DRAFT])
+                    ->andWhere(['order.is_deleted' => 0])
                     ->andWhere(['!=' , 'order_status' , Order::STATUS_ABANDONED_CHECKOUT]);
 
         // add conditions that should always apply here
