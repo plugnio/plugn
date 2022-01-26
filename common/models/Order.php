@@ -694,7 +694,13 @@ class Order extends \yii\db\ActiveRecord
                 'order_uuid' => $this->order_uuid
             ]);
         }
+
+
     }
+
+
+
+
 
     /**
      * Update order status to pending
@@ -1043,7 +1049,7 @@ class Order extends \yii\db\ActiveRecord
 
         if ($this->customer_phone_country_code == 965 && !$insert &&
             $this->restaurant_uuid != 'rest_7351b2ff-c73d-11ea-808a-0673128d0c9c' &&
-            $this->restaurant_uuid != 'rest_085f7a5f-19db-11eb-b97d-0673128d0c9c' && !$this->sms_sent &&
+            !$this->sms_sent &&
             isset($changedAttributes['order_status']) && $changedAttributes['order_status'] == self::STATUS_PENDING && $this->order_status == self::STATUS_ACCEPTED
         ) {
 
@@ -1280,6 +1286,8 @@ class Order extends \yii\db\ActiveRecord
 
         self::updateAll([
             'sms_sent' => $this->sms_sent,
+            'customer_phone_number' => $this->customer_phone_number,
+            'customer_id' => $this->customer_id,
             'area_name' => $this->area_name,
             'area_name_ar' => $this->area_name_ar,
             'country_name' => $this->country_name,

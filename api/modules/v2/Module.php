@@ -20,6 +20,7 @@ class Module extends \yii\base\Module
         parent::init();
 
         $lang = \Yii::$app->request->headers->get('language');
+
         $currency = \Yii::$app->request->headers->get('currency');
 
         if ($lang && $lang != \Yii::$app->language)
@@ -27,9 +28,13 @@ class Module extends \yii\base\Module
             \Yii::$app->language = $lang;
         }
 
+
+
         if ($currency && $currency != \Yii::$app->currency)
         {
             \Yii::$app->currency->setCode($currency);
         }
+
+
     }
 }

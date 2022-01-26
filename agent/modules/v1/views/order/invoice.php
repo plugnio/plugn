@@ -61,92 +61,100 @@
 
                     <?php if($order->order_mode == 1) { ?>
 
-                        <?php if($order->area_id && $order->block) { ?>
-                        <p style="font-family: Nunito;">
-                            Block <?= $order->block ?>
-                        </p>
-                        <?php } ?>
+                      <?php if(!$order->address_1 && !$order->address_2) { ?>
 
-                        <?php if($order->street) { ?>
-                        <p style="font-family: Nunito" >
-                            Street <?= $order->street ?>
-                        </p>
-                        <?php } ?>
+                          <?php if($order->area_id && $order->block) { ?>
+                          <p style="font-family: Nunito;">
+                              Block <?= $order->block ?>
+                          </p>
+                          <?php } ?>
 
-                        <?php if((strtolower($order->unit_type) == 'apartment' || strtolower($order->unit_type) == 'office')) { ?>
+                          <?php if($order->street) { ?>
+                          <p style="font-family: Nunito" >
+                              Street <?= $order->street ?>
+                          </p>
+                          <?php } ?>
 
-                            <?php if($order->avenue) { ?>
-                                <p style="font-family: Nunito"  class="txt-avenue">
-                                    Avenue <?= $order->avenue ?>
-                                </p>
-                            <?php } ?>
+                          <?php if((strtolower($order->unit_type) == 'apartment' || strtolower($order->unit_type) == 'office')) { ?>
 
-                            <?php if($order->floor) { ?>
-                                <p style="font-family: Nunito"  class="txt-building">
-                                    Floor <?= $order->floor ?>
-                                </p>
-                            <?php } ?>
+                              <?php if($order->avenue) { ?>
+                                  <p style="font-family: Nunito"  class="txt-avenue">
+                                      Avenue <?= $order->avenue ?>
+                                  </p>
+                              <?php } ?>
 
-                            <?php if(strtolower($order->unit_type) == 'apartment' && $order->apartment) { ?>
-                                <p style="font-family: Nunito"  class="txt-building">
-                                    Apartment No. <?= $order->apartment ?>
-                                </p>
-                            <?php } ?>
+                              <?php if($order->floor) { ?>
+                                  <p style="font-family: Nunito"  class="txt-building">
+                                      Floor <?= $order->floor ?>
+                                  </p>
+                              <?php } ?>
 
-                            <?php if(strtolower($order->unit_type) == 'office' && $order->office) { ?>
-                                <p style="font-family: Nunito"  class="txt-building">
-                                    Office No. <?= $order->office ?>
-                                </p>
-                            <?php } ?>
+                              <?php if(strtolower($order->unit_type) == 'apartment' && $order->apartment) { ?>
+                                  <p style="font-family: Nunito"  class="txt-building">
+                                      Apartment No. <?= $order->apartment ?>
+                                  </p>
+                              <?php } ?>
 
-                            <?php if(strtolower($order->unit_type) != 'house' && $order->house_number) { ?>
-                                <p style="font-family: Nunito"  class="txt-building">
-                                    Building <?= $order->house_number ?>
-                                </p>
-                            <?php } ?>
+                              <?php if(strtolower($order->unit_type) == 'office' && $order->office) { ?>
+                                  <p style="font-family: Nunito"  class="txt-building">
+                                      Office No. <?= $order->office ?>
+                                  </p>
+                              <?php } ?>
 
-                        <?php } ?>
+                              <?php if(strtolower($order->unit_type) != 'house' && $order->house_number) { ?>
+                                  <p style="font-family: Nunito"  class="txt-building">
+                                      Building <?= $order->house_number ?>
+                                  </p>
+                              <?php } ?>
 
-                        <?php if(strtolower($order->unit_type) != 'apartment' && strtolower($order->unit_type) != 'office') { ?>
+                          <?php } ?>
 
-                            <?php if($order->avenue) { ?>
-                            <p class="txt-avenue">
-                                Avenue <?= $order->avenue ?>
+                          <?php if(strtolower($order->unit_type) != 'apartment' && strtolower($order->unit_type) != 'office') { ?>
+
+                              <?php if($order->avenue) { ?>
+                              <p class="txt-avenue">
+                                  Avenue <?= $order->avenue ?>
+                              </p>
+                              <?php } ?>
+
+                              <?php if(strtolower($order->unit_type) == 'house' &&  $order->house_number ) { ?>
+                              <p class="txt-house-number">
+                                  House No. <?= $order->house_number ?>
+                              </p>
+                              <?php } ?>
+
+                              <?php if(strtolower($order->unit_type) != 'house'  &&  $order->house_number ) { ?>
+                              <p class="txt-building">
+                                  Building <?= $order->house_number ?>
+                              </p>
+                              <?php } ?>
+
+                          <?php } ?>
+
+                          <?php if($order->area_id) { ?>
+                              <p style="font-family: Nunito" >
+                                  <?= $order->area_name ?>
+                              </p>
+                          <?php } ?>
+
+                        <?php } else { ?>
+
+                        <?php if($order->address_1) { ?>
+                            <p class="txt-address-1">
+                                <?= $order->address_1 ?>
                             </p>
-                            <?php } ?>
+                        <?php
 
-                            <?php if(strtolower($order->unit_type) == 'house' &&  $order->house_number ) { ?>
-                            <p class="txt-house-number">
-                                House No. <?= $order->house_number ?>
-                            </p>
-                            <?php } ?>
+                          }
 
-                            <?php if(strtolower($order->unit_type) != 'house'  &&  $order->house_number ) { ?>
-                            <p class="txt-building">
-                                Building <?= $order->house_number ?>
-                            </p>
-                            <?php } ?>
-
-                            <?php if($order->address_1) { ?>
-                                <p class="txt-address-1">
-                                    <?= $order->address_1 ?>
-                                </p>
-                            <?php } ?>
-
-                            <?php if($order->address_2) { ?>
+                          if($order->address_2) { ?>
                             <p class="txt-address-2">
                                 <?= $order->address_2 ?>
                             </p>
-                            <?php } ?>
-                        <?php } ?>
+                          <?php }
+                        }
 
-                        <?php if($order->area_id) { ?>
-                            <p style="font-family: Nunito" >
-                                <?= $order->area_name ?>
-                            </p>
-                        <?php } ?>
-
-                        <?php if(($order->area && $order->area->city) || $order->city) { ?>
+                         if(($order->area && $order->area->city) || $order->city) { ?>
                         <p style="font-family: Nunito" >
                             <?= $order->area_id && $order->area->city ? $order->area->city->city_name : $order->city ?> <?= $order->postalcode ?>
                         </p>
