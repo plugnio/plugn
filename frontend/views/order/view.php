@@ -451,6 +451,11 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                 'format' => 'raw',
                 'value' => 'item.sku',
             ],
+            [
+                'label' => 'Barcode',
+                'format' => 'raw',
+                'value' => 'item.barcode',
+            ],
             // 'customer_instruction',
             [
                 'attribute' => 'customer_instruction',
