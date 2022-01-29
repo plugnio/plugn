@@ -709,24 +709,26 @@ public function restockItems()
     $orderItemExtraOptions = $this->getOrderItemExtraOptions ();
 
     if ($orderItems->count () > 0) {
-        foreach ($orderItems->all () as $orderItem)
-            if ($orderItem->item_uuid) {
+        foreach ($orderItems->all () as $orderItem){
+          if ($orderItem->item_uuid) {
 
-                $orderItemExtraOptions = $orderItem->getOrderItemExtraOptions ();
+              $orderItemExtraOptions = $orderItem->getOrderItemExtraOptions ();
 
-                if ($orderItemExtraOptions->count() > 0) {
-                    foreach ($orderItemExtraOptions->all() as $orderItemExtraOption){
-                      if ($orderItemExtraOption->order_item_extra_option_id && $orderItemExtraOption->order_item_extra_option_id && $orderItemExtraOption->extra_option_id)
-                          $orderItemExtraOption->extraOption->increaseStockQty($orderItem->qty);
-                    }
-                }
+              if ($orderItemExtraOptions->count() > 0) {
+                  foreach ($orderItemExtraOptions->all() as $orderItemExtraOption){
+                    if ($orderItemExtraOption->order_item_extra_option_id && $orderItemExtraOption->order_item_extra_option_id && $orderItemExtraOption->extra_option_id)
+                        $orderItemExtraOption->extraOption->increaseStockQty($orderItem->qty);
+                  }
+              }
 
 
-                $orderItem->item->increaseStockQty ($orderItem->qty);
-                self::updateAll(['items_has_been_restocked' => true], [
-                    'order_uuid' => $this->order_uuid
-                ]);
-            }
+              $orderItem->item->increaseStockQty ($orderItem->qty);
+              self::updateAll(['items_has_been_restocked' => true], [
+                  'order_uuid' => $this->order_uuid
+              ]);
+          }
+        }
+
     }
 
 
