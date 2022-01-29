@@ -11,12 +11,17 @@ return [
     'order_uuid' => $index + 1,
     'payment_gateway_order_id' => $index + 1,
     'payment_gateway_transaction_id' => $index + 1,
+    'payment_gateway_payment_id' => $index + 1,
+    'payment_gateway_invoice_id' => 'invoice' . ($index + 1),
     'payment_mode' => 'KNET',
     'payment_current_status' => 'captured',
     'payment_amount_charged' => $faker->numberBetween(100, 200),
-    'payment_net_amount' =>$faker->numberBetween(100, 200),
+    'payment_net_amount' => $faker->numberBetween(100, 200),
+    'payment_gateway_name' => 'KNET',
     'payment_gateway_fee' => 2,
+    'payment_vat' => $faker->numberBetween(10, 20),
     'plugn_fee' => 2,
+    'partner_fee' => $faker->numberBetween(1, 10),
     'payment_udf1' => null,
     'payment_udf2' => null,
     'payment_udf3' => null,
@@ -26,5 +31,7 @@ return [
     'payment_updated_at' => $faker->date('Y-m-d H:i:s'),
     'received_callback' => 1,
     'response_message' => $faker->sentence(),
-    'payment_token' => md5($index + 1)
+    'payment_token' => md5($index + 1),
+    'payout_status' => 1,
+    'partner_payout_uuid' => $faker->uuid()
 ];

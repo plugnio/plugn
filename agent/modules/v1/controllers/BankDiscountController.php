@@ -79,7 +79,7 @@ class BankDiscountController extends Controller {
      * @param $store_uuid
      * @return ActiveDataProvider
      */
-    public function actionList($store_uuid) {
+    public function actionList($store_uuid = null) {
 
         $this->ownerCheck();
         $keyword = Yii::$app->request->get('keyword');
@@ -157,9 +157,10 @@ class BankDiscountController extends Controller {
      * @return array|string[]
      * @throws NotFoundHttpException
      */
-     public function actionUpdate($bank_discount_id, $store_uuid)
+     public function actionUpdate($bank_discount_id, $store_uuid = null)
      {
          $this->ownerCheck();
+
          $model = $this->findModel($bank_discount_id, $store_uuid);
 
          $model->bank_id = Yii::$app->request->getBodyParam("bank_id");
@@ -202,7 +203,9 @@ class BankDiscountController extends Controller {
          $this->ownerCheck();
          $store_uuid =  Yii::$app->request->getBodyParam('store_uuid');
          $bank_discount_id =  Yii::$app->request->getBodyParam('bank_discount_id');
+         
          $bankDiscountStatus = (int) Yii::$app->request->getBodyParam('bankDiscountStatus');
+
          $bank_discount_model = $this->findModel($bank_discount_id, $store_uuid);
 
          if ($bankDiscountStatus) {
@@ -229,7 +232,7 @@ class BankDiscountController extends Controller {
      * @return BankDiscount
      * @throws NotFoundHttpException
      */
-    public function actionDetail($store_uuid, $bank_discount_id) {
+    public function actionDetail($store_uuid = null, $bank_discount_id) {
         $this->ownerCheck();
         return $this->findModel($bank_discount_id, $store_uuid);
     }
@@ -237,7 +240,7 @@ class BankDiscountController extends Controller {
      /**
       * Delete Bank Discount
       */
-     public function actionDelete($bank_discount_id, $store_uuid)
+     public function actionDelete($bank_discount_id, $store_uuid = null)
      {
          $this->ownerCheck();
          Yii::$app->accountManager->getManagedAccount($store_uuid);
@@ -271,14 +274,14 @@ class BankDiscountController extends Controller {
      * @return BankDiscount the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($bank_discount_id, $store_uuid)
+    protected function findModel($bank_discount_id, $store_uuid = null)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $model = BankDiscount::find()
             ->andWhere([
                 'bank_discount_id' => $bank_discount_id,
-                'restaurant_uuid' => $store_model->restaurant_uuid
+                'restaurant_uuid' => $store->restaurant_uuid
             ])
             ->one();
 

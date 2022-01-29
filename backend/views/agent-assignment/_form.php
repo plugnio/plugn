@@ -99,7 +99,7 @@ $this->registerJs($js);
 
     <?php
 
-      if($model->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
+      if(!$model->isNewRecord && $model->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
         echo $form->field($model, 'business_location_id')->widget(Select2::classname(), [
             'data' => $businessLocationsList,
             'options' => ['placeholder' => 'Select a branch ...'],

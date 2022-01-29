@@ -42,6 +42,9 @@ return [
                 ],
             ],
         ],
+        'currency' => [
+            'class' => 'api\components\Currency',
+        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => false,
@@ -78,10 +81,12 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET detail' => 'item-data',
+                        'GET items' => 'items',
                         'GET' => 'restaurant-menu',
                         'GET <category_id>' => 'category-products',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS items' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS <category_id>' => 'options',
                     ]
@@ -107,7 +112,7 @@ return [
                         // 'OPTIONS <restaurant_uuid>' => 'options'
                     ]
                 ],
-                [// RestaurantController
+                [// RestaurantCest
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/restaurant',
                     'pluralize' => false,

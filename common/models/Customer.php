@@ -42,6 +42,7 @@ class Customer extends \yii\db\ActiveRecord {
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['customer_phone_number'], 'unique'],
             [['customer_email'], 'unique'],
+            [['customer_email'], 'email'],
             [['country_code'], 'integer'],
             [['customer_phone_number'], 'string', 'min' => 5, 'max' => 20],
             [['customer_created_at','customer_updated_at'], 'safe'],

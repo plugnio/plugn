@@ -46,7 +46,6 @@ return [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
-
                 [// OrderController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/order',
@@ -57,18 +56,26 @@ return [
                         'GET orders-report' => 'orders-report',
                         'GET total-pending' => 'total-pending',
                         'GET download-invoice/<id>' => 'download-invoice',
-                        'GET <type>' => 'list',
                         'GET archive-orders' => 'archive-orders',
                         'GET live-orders' => 'live-orders',
+                        'GET <type>' => 'list',
+                        'GET' => 'list',
                         'POST <store_uuid>' => 'place-an-order',
-                        'PATCH refund/<order_uuid>' => 'refund',
-                        'PATCH <order_uuid>/<store_uuid>' => 'update',
-                        'PATCH update-order-status/<order_uuid>/<store_uuid>' => 'update-order-status',
+                        'POST' => 'place-an-order',
                         'POST request-driver-from-armada/<order_uuid>/<store_uuid>' => 'request-driver-from-armada',
                         'POST request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'request-driver-from-mashkor',
+                        'POST request-payment-status-from-tap/<order_uuid>/<store_uuid>' => 'request-payment-status-from-tap',
                         'POST create/<store_uuid>' => 'create',
-                        'DELETE <order_uuid>/<store_uuid>' => 'delete',
+                        'POST create' => 'create',
+                        'PATCH update-order-status/<order_uuid>/<store_uuid>' => 'update-order-status',
+                        'PATCH refund/<order_uuid>' => 'refund',
+                        'PATCH update-order-status/<order_uuid>' => 'update-order-status',
+                        'PATCH <order_uuid>/<store_uuid>' => 'update',
+                        'PATCH <order_uuid>' => 'update',
                         'DELETE soft-delete/<order_uuid>/<store_uuid>' => 'soft-delete',
+                        'DELETE soft-delete/<order_uuid>' => 'soft-delete',
+                        'DELETE <order_uuid>/<store_uuid>' => 'delete',
+                        'DELETE <order_uuid>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS stats' => 'options',
@@ -80,13 +87,20 @@ return [
                         'OPTIONS update-order-status/<order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS request-driver-from-armada/<order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS update-order-status/<order_uuid>' => 'options',
+                        'OPTIONS request-driver-from-armada/<order_uuid>' => 'options',
+                        'OPTIONS request-driver-from-mashkor/<order_uuid>' => 'options',
                         'OPTIONS <store_uuid>' => 'options',
                         'OPTIONS <order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS <order_uuid>' => 'options',
                         'OPTIONS <type>' => 'options',
                         'OPTIONS archive-orders' => 'options',
                         'OPTIONS live-orders' => 'options',
                         'OPTIONS create/<store_uuid>' => 'options',
                         'OPTIONS soft-delete/<order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS soft-delete/<order_uuid>' => 'options',
+                        'OPTIONS request-payment-status-from-tap/<order_uuid>/<store_uuid>' => 'options',
                     ]
                 ],
                 [// OrderItemController
@@ -157,7 +171,7 @@ return [
                         'OPTIONS <agent_assignment_id>/<store_uuid>' => 'options',
                     ]
                 ],
-                [// bankController
+                [// BankController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/bank',
                     'pluralize' => false,
@@ -165,6 +179,18 @@ return [
                         'GET' => 'list',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options'
+                    ]
+                ],
+                [// CurrencyController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/currency',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET store-currencies' => 'store-currencies',
+                        'POST' => 'update',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS store-currencies' => 'options'
                     ]
                 ],
                 [// CountryController
@@ -376,6 +402,7 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'detail',
+                        'GET status' => 'status',
                         'POST' => 'update',
                         'POST connect-domain' => 'connect-domain',
                         'POST disable-payment-method/<id>/<paymentMethodId>' => 'disable-payment-method',
@@ -404,7 +431,8 @@ return [
                         'OPTIONS enable-cod/<id>' => 'options',
                         'OPTIONS disable-cod/<id>' => 'options',
                         'OPTIONS update-layout' => 'options',
-                        'OPTIONS update-status/<id>/<status>' => 'options'
+                        'OPTIONS update-status/<id>/<status>' => 'options',
+                        'OPTIONS status' => 'options'
                     ]
                 ],
 

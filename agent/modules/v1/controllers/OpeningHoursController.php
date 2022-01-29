@@ -84,7 +84,7 @@ class OpeningHoursController extends Controller
      * @param type $store_uuid
      * @return type
      */
-    public function actionList($store_uuid)
+    public function actionList($store_uuid = null)
     {
          $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
@@ -102,7 +102,7 @@ class OpeningHoursController extends Controller
      * Create opening hours
      * @return array
      */
-    public function actionCreate($store_uuid)
+    public function actionCreate($store_uuid = null)
     {
 //        $this->ownerCheck();
         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
@@ -194,7 +194,7 @@ class OpeningHoursController extends Controller
      * @param type $opening_hour_id
      * @return type
      */
-    public function actionDetail($store_uuid, $day_of_week)
+    public function actionDetail($store_uuid = null, $day_of_week)
     {
 //        $this->ownerCheck();
         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
@@ -215,7 +215,7 @@ class OpeningHoursController extends Controller
     /**
      * Delete Opening hours
      */
-    public function actionDelete($opening_hour_id, $store_uuid)
+    public function actionDelete($opening_hour_id, $store_uuid = null)
     {
         $this->ownerCheck();
         $model = $this->findModel ($opening_hour_id, $store_uuid);
@@ -239,7 +239,6 @@ class OpeningHoursController extends Controller
         ];
     }
 
-
     /**
      * Finds the OpeningHour model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
@@ -247,11 +246,17 @@ class OpeningHoursController extends Controller
      * @return OpeningHour the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($opening_hour_id, $store_uuid)
+    protected function findModel($opening_hour_id, $store_uuid = null)
     {
         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
-        if (($model = OpeningHour::find ()->where (['opening_hour_id' => $opening_hour_id, 'restaurant_uuid' => $store_model->restaurant_uuid])->one ()) !== null) {
+        $model = OpeningHour::find ()
+            ->where ([
+                'opening_hour_id' => $opening_hour_id,
+                'restaurant_uuid' => $store_model->restaurant_uuid
+            ])->one ();
+
+        if ($model !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested record does not exist.');

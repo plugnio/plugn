@@ -178,7 +178,6 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
        return $uuid;
    }
 
-
     /**
      * @inheritdoc
      */
@@ -192,7 +191,6 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
 
         return $fields;
     }
-
 
    /**
     * {@inheritdoc}
@@ -220,6 +218,7 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
    public function afterSave($insert, $changedAttributes) {
 
        parent::afterSave($insert, $changedAttributes);
+
        if (
           !$insert &&
            array_key_exists('partner_iban', $changedAttributes) ||

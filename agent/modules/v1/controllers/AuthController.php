@@ -40,7 +40,9 @@ class AuthController extends Controller {
                     'X-Pagination-Current-Page',
                     'X-Pagination-Page-Count',
                     'X-Pagination-Per-Page',
-                    'X-Pagination-Total-Count'
+                    'X-Pagination-Total-Count',
+                    'X-Error-Email',
+                    'X-Error-Password'
                 ],
             ],
         ];
@@ -53,9 +55,23 @@ class AuthController extends Controller {
 
                 $agent = Agent::findByEmail($email);
 
-                if ($agent && $agent->validatePassword($password)) {
+                if(!$agent) {
+                    Yii::$app->response->headers->set (
+                        'X-Error-Email', 
+                        Yii::t('agent', 'Email not found')
+                    );
+                    
+                    return null;
+                }
+
+                if ($agent->validatePassword($password)) {
                     return $agent;
                 }
+
+                Yii::$app->response->headers->set (
+                    'X-Error-Password', 
+                    Yii::t('agent', 'Password not matching')
+                );
 
                 return null;
             }
@@ -125,7 +141,6 @@ class AuthController extends Controller {
         $store->setScenario(Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
         $store->owner_number = Yii::$app->request->getBodyParam ('owner_number');
         $store->owner_phone_country_code= Yii::$app->request->getBodyParam ('owner_phone_country_code');
-
 
         $store->name = Yii::$app->request->getBodyParam ('restaurant_name');
         $store->business_type = Yii::$app->request->getBodyParam ('account_type');
@@ -266,31 +281,25 @@ class AuthController extends Controller {
         $model = new PasswordResetRequestForm();
         $model->email = $emailInput;
 
-        $errors = false;
-
-        if ($model->validate()) {
-
-            $agent = Agent::findOne([
-               'agent_email' => $model->email,
-            ]);
-
-            if ($agent) {
-
-                if (!$model->sendEmail($agent)) {
-                    $errors = 'Sorry, we are unable to reset a password for email provided.';
-                }
-            }
-
-        } else if (isset($model->errors['agent_email'])) {
-            $errors = $model->errors['agent_email'];
-        }
-
-        // If errors exist show them
-        if ($errors) {
+        if (!$model->validate()) {
             return [
                 'operation' => 'error',
-                'message' => $errors
+                'message' => $model->getErrors()
             ];
+        }
+
+        $agent = Agent::findOne([
+           'agent_email' => $model->email,
+        ]);
+
+        if ($agent) {
+
+            if (!$model->sendEmail($agent)) {
+                return [
+                    'operation' => 'error',
+                    'message' => 'Sorry, we are unable to reset a password for email provided.'
+                ];
+            }
         }
 
         // Otherwise return success
@@ -357,27 +366,43 @@ class AuthController extends Controller {
         return $this->_loginResponse($agent);
     }
 
-
     /**
      * Return agent data after successful login
      * @param type $agent
      * @return type
      */
-    private function _loginResponse($agent) {
-
+    private function _loginResponse($agent)
+    {
         // Return Agent access token if everything valid
 
         $accessToken = $agent->accessToken->token_value;
 
         $assignment = $agent->getAgentAssignments()->one();
 
-        if(!$assignment){
+        if(!$assignment) {
           return [
               "operation" => "error",
               'message' => Yii::t ('agent', "You're not assigned to any store")
           ];
         }
 
+        $selectedStore = $assignment->getRestaurant()
+            ->select([
+                'restaurant_uuid',
+                'name',
+                'name_ar',
+                'restaurant_domain'
+            ])
+            ->one();
+
+        $stores = $agent->getAccountsManaged()
+            ->select([
+                'restaurant_uuid',
+                'name',
+                'name_ar',
+                'restaurant_domain'
+            ])
+            ->all();
 
         return [
             "operation" => "success",
@@ -387,23 +412,9 @@ class AuthController extends Controller {
             "agent_name" => $agent->agent_name,
             "agent_email" => $agent->agent_email,
             "role" => (int) $assignment->role,
-            "selectedStore" => $assignment->getRestaurant()
-            ->select([
-              'restaurant_uuid',
-              'name',
-              'name_ar',
-              'restaurant_domain'
-            ])
-            ->one(),
-            "stores" => $agent->getAccountsManaged()
-            ->select([
-              'restaurant_uuid',
-              'name',
-              'name_ar',
-              'restaurant_domain'
-            ])
-            ->all(),
+            "selectedStore" => $selectedStore,
+            "stores" => $stores
         ];
     }
-
 }
+

@@ -70,7 +70,7 @@ class Item extends \yii\db\ActiveRecord
         return [
             [['item_name', 'prep_time_unit', 'prep_time'], 'required', 'on' => 'create'],
             ['prep_time_unit', 'in', 'range' => [self::TIME_UNIT_MIN, self::TIME_UNIT_HRS, self::TIME_UNIT_DAY]],
-            [['item_name', 'item_name_ar', 'item_price','items_category'], 'required'],
+            [['item_name', 'item_name_ar', 'item_price', 'items_category'], 'required'],
             [['sort_number', 'stock_qty'], 'integer', 'min' => 0],
             [['unit_sold'], 'integer', 'min' => 0],
             [['item_price','compare_at_price'], 'number', 'min' => 0],
@@ -205,6 +205,7 @@ class Item extends \yii\db\ActiveRecord
         return array_merge ($fields, [
             'currency',
             'options',
+            'itemImages',
             'extraOptions'
         ]);
     }
@@ -218,13 +219,18 @@ class Item extends \yii\db\ActiveRecord
     {
         parent::afterSave ($insert, $changedAttributes);
 
-        if ($insert || isset($changedAttributes['item_name'])) {
+        if ($insert || isset($changedAttributes['item_name']))
+        {
+            if ($this->restaurant->sitemap_require_update == 0)
+            {
+                $this->restaurant->sitemap_require_update = 1;
 
-            $store = $this->restaurant;
-
-            if ($store->sitemap_require_update == 0) {
-                $store->sitemap_require_update = 1;
-                $store->save (false);
+                Restaurant::updateAll([
+                    'sitemap_require_update' => $this->restaurant->sitemap_require_update
+                ], [
+                    'restaurant_uuid' => $this->restaurant_uuid
+                ]);
+                //$this->restaurant->save (false);
             }
         }
 
@@ -241,7 +247,13 @@ class Item extends \yii\db\ActiveRecord
             $this->stock_qty += $qty;
 
         $this->unit_sold -= $qty;
-        $this->save (false);
+
+        self::updateAll([
+            'unit_sold' => $this->unit_sold,
+            'stock_qty' => $this->stock_qty
+        ], [
+            'item_uuid' => $this->item_uuid
+        ]);
     }
 
     /**
@@ -254,7 +266,13 @@ class Item extends \yii\db\ActiveRecord
             $this->stock_qty -= $qty;
 
         $this->unit_sold += $qty;
-        $this->save (false);
+
+        self::updateAll([
+            'unit_sold' => $this->unit_sold,
+            'stock_qty' => $this->stock_qty
+        ], [
+            'item_uuid' => $this->item_uuid
+        ]);
     }
 
     /**
@@ -358,7 +376,8 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getCategories($modelClass = "\common\models\Category")
     {
-        return $this->hasMany ($modelClass::className (), ['category_id' => 'category_id'])->viaTable ('category_item', ['item_uuid' => 'item_uuid']);
+        return $this->hasMany ($modelClass::className (), ['category_id' => 'category_id'])
+            ->viaTable ('category_item', ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -440,7 +459,6 @@ class Item extends \yii\db\ActiveRecord
 
     /**
      * Gets query for [[Options]].
-     *
      */
     public function getSoldUnitsInSpecifcDate($start_date = null, $end_date = null, $modelClass = "\common\models\OrderItem")
     {

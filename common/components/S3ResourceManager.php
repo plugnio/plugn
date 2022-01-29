@@ -93,7 +93,7 @@ class S3ResourceManager extends Component {
         if ($file) {
             $source_file = $file->tempName;
             $content_type = $file->type;
-        } else {
+        } else if (gettype($source_file) == 'string' && strpos($source_file, 'http') > -1) { //if url
             $source_file = urlencode($source_file);
         }
 

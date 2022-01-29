@@ -61,7 +61,7 @@ class BankController extends Controller {
      * @param $store_uuid
      * @return ActiveDataProvider
      */
-    public function actionList($store_uuid) {
+    public function actionList($store_uuid = null) {
 
           Yii::$app->accountManager->getManagedAccount($store_uuid);
 

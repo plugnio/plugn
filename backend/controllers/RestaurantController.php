@@ -13,7 +13,7 @@ use yii\filters\AccessControl;
 use yii\web\UploadedFile;
 
 /**
- * RestaurantController implements the CRUD actions for Restaurant model.
+ * RestaurantCest implements the CRUD actions for Restaurant model.
  */
 class RestaurantController extends Controller {
 
@@ -327,44 +327,47 @@ class RestaurantController extends Controller {
         return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
     }
 
-    // /**
-    //  * Change restaurant status to become open
-    //  * @param integer $id
-    //  * @return mixed
-    //  * @throws NotFoundHttpException if the model cannot be found
-    //  */
-    // public function actionPromoteToOpen($id) {
-    //     $model = $this->findModel($id);
-    //     $model->promoteToOpenRestaurant();
-    //
-    //     return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
-    // }
-    //
-    // /**
-    //  * Change restaurant status to become busy
-    //  * @param integer $id
-    //  * @return mixed
-    //  * @throws NotFoundHttpException if the model cannot be found
-    //  */
-    // public function actionPromoteToBusy($id) {
-    //     $model = $this->findModel($id);
-    //     $model->promoteToBusyRestaurant();
-    //
-    //     return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
-    // }
-    //
-    // /**
-    //  * Change restaurant status to become close
-    //  * @param integer $id
-    //  * @return mixed
-    //  * @throws NotFoundHttpException if the model cannot be found
-    //  */
-    // public function actionPromoteToClose($id) {
-    //     $model = $this->findModel($id);
-    //     $model->promoteToCloseRestaurant();
-    //
-    //     return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
-    // }
+    /**
+     * Change restaurant status to become open
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionPromoteToOpen($id) {
+        $model = $this->findModel($id);
+        $model->restaurant_status = Restaurant::RESTAURANT_STATUS_OPEN;
+        $model->save(false);
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
+
+    /**
+     * Change restaurant status to become busy
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionPromoteToBusy($id) {
+        $model = $this->findModel($id);
+        $model->restaurant_status = Restaurant::RESTAURANT_STATUS_BUSY;
+        $model->save(false);
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
+
+    /**
+     * Change restaurant status to become close
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionPromoteToClose($id) {
+        $model = $this->findModel($id);
+        $model->restaurant_status = Restaurant::RESTAURANT_STATUS_CLOSED;
+        $model->save(false);
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
 
     /**
      * Deletes an existing Restaurant model.

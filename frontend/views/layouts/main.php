@@ -531,7 +531,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
         $ownerPhoneNumber = $restaurant_model->owner_number;
         $agentEmail = Yii::$app->user->identity->agent_email;
 
-        $planName = $restaurant_model->plan->name;
+        $planName = $restaurant_model->plan? $restaurant_model->plan->name: 'Free plan';
 
         $tapAccountCreated = $restaurant_model->is_tap_enable ? 'yes' : 'no';
         $paymentCash = $restaurant_model->getPaymentMethods()->where(['payment_method_id' => 3])->exists() ? 'yes' : 'no';

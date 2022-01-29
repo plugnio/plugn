@@ -470,12 +470,12 @@ class StoreController extends Controller {
 
 
               // if ($paymentGateway == 'tap ? !$model->is_myfatoorah_enable : ($paymentGateway == 'my')) {
-                    $payment_gateway_queue_model = new PaymentGatewayQueue;
-                    $payment_gateway_queue_model->queue_status = PaymentGatewayQueue::QUEUE_STATUS_PENDING;
-                    $payment_gateway_queue_model->payment_gateway =  $paymentGateway;
-                    $payment_gateway_queue_model->restaurant_uuid = $model->restaurant_uuid;
-                    if ($payment_gateway_queue_model->save()) {
-                        $model->payment_gateway_queue_id = $payment_gateway_queue_model->payment_gateway_queue_id;
+                    $payment_gateway_queue = new PaymentGatewayQueue;
+                    $payment_gateway_queue->queue_status = PaymentGatewayQueue::QUEUE_STATUS_PENDING;
+                    $payment_gateway_queue->payment_gateway =  $paymentGateway;
+                    $payment_gateway_queue->restaurant_uuid = $model->restaurant_uuid;
+                    if ($payment_gateway_queue->save()) {
+                        $model->payment_gateway_queue_id = $payment_gateway_queue->payment_gateway_queue_id;
                         $model->save(false);
                     }
                 // }

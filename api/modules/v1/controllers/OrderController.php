@@ -83,10 +83,7 @@ class OrderController extends Controller {
             $order->customer_phone_country_code = '965';
             $order->customer_phone_number = '+' . $order->customer_phone_country_code . strval(Yii::$app->request->getBodyParam("phone_number"));
 
-
             $order->customer_phone_number = str_replace(' ','',$order->customer_phone_number);
-
-
 
             $order->customer_email = Yii::$app->request->getBodyParam("email"); //optional
             //payment method
@@ -95,19 +92,14 @@ class OrderController extends Controller {
             //save Customer address
             $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
 
-
-
             //Preorder
             // if( Yii::$app->request->getBodyParam("is_order_scheduled") !== null)
             $order->is_order_scheduled = Yii::$app->request->getBodyParam("is_order_scheduled") ? Yii::$app->request->getBodyParam("is_order_scheduled") : 0;
-
-
 
             //Apply promo code
             if (Yii::$app->request->getBodyParam("voucher_id")) {
                 $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
             }
-
 
             //if the order mode = 1 => Delivery
             if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
@@ -139,7 +131,8 @@ class OrderController extends Controller {
 
                 $restaurantBranch = RestaurantBranch::findOne($order->restaurant_branch_id);
 
-                if($restaurantBranch){
+                if($restaurantBranch)
+                {
                   $pickupLocation = BusinessLocation::find()
                     ->andWhere([
                         'business_location_name' => $restaurantBranch->branch_name_en,
@@ -150,7 +143,6 @@ class OrderController extends Controller {
                     $order->pickup_location_id = $pickupLocation->business_location_id;
 
                 }
-
             }
 
 
@@ -240,12 +232,17 @@ class OrderController extends Controller {
                 if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->restaurantDelivery->min_charge) {
                     $response = [
                         'operation' => 'error',
-                        'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->restaurantDelivery->min_charge,  $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
+                        'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency(
+                            $order->restaurantDelivery->min_charge,
+                            $order->currency->code, [
+                                \NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place
+                            ])
                     ];
                 }
 
 
                 //if payment method not cash redirect customer to payment gateway
+
                 if ($response == null && $order->payment_method_id != 3) {
 
                     // Create new payment record
@@ -323,7 +320,7 @@ class OrderController extends Controller {
                         $order->save(false);
                         $order->updateOrderTotalPrice();
 
-                          Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]), __METHOD__);
+                          Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]), __METHOD__);
 
 
                         // Redirect to payment gateway
@@ -429,7 +426,7 @@ class OrderController extends Controller {
                         $order->changeOrderStatusToPending();
                         $order->sendPaymentConfirmationEmail();
 
-                        Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
+                        Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
 
 
 //                            //Update product inventory
@@ -610,23 +607,18 @@ class OrderController extends Controller {
 
           $order_model = Order::find()->where(['mashkor_order_number' => $mashkor_order_number])->one();
 
-          if(  $order_model ) {
+          if($order_model) {
 
             $order_model->mashkor_driver_name = Yii::$app->request->getBodyParam("driver_name");
             $order_model->mashkor_driver_phone = Yii::$app->request->getBodyParam("driver_phone");
             $order_model->mashkor_tracking_link = Yii::$app->request->getBodyParam("tracking_link");
             $order_model->mashkor_order_status = Yii::$app->request->getBodyParam("order_status");
 
-
-
-
             if( $order_model->mashkor_order_status == Order::MASHKOR_ORDER_STATUS_IN_DELIVERY ) // In delivery
                 $order_model->order_status = Order::STATUS_OUT_FOR_DELIVERY;
 
             if( $order_model->mashkor_order_status == Order::MASHKOR_ORDER_STATUS_DELIVERED ) // Delivered
                 $order_model->order_status = Order::STATUS_COMPLETE;
-
-
 
             if ($order_model->save(false)) {
                 return [
@@ -655,7 +647,5 @@ class OrderController extends Controller {
               'message' => 'Failed to authorize the request.',
           ];
         }
-
     }
-
 }

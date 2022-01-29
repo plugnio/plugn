@@ -317,14 +317,20 @@ class ItemController extends Controller
     public function actionUpdateStockQty(){
 
         $id = Yii::$app->request->getBodyParam('item_uuid');
+
+        $stock_qty = Yii::$app->request->getBodyParam('stock_qty');
+
         $model = $this->findModel($id);
-        $model->stock_qty = (int)Yii::$app->request->getBodyParam('stock_qty');
+
+        $model->stock_qty = (int) $stock_qty;
+
         if (!$model->save(false)){
             return [
                 "operation" => "error",
                 "message" => $model->errors
             ];
         }
+
         return [
             "operation" => "success",
             "message" => Yii::t('agent', "Item quantity updated successfully")
@@ -339,6 +345,7 @@ class ItemController extends Controller
     public function actionChangePosition(){
 
         $items = Yii::$app->request->getBodyParam('items');
+
         foreach ($items as $key => $value) {
             $model = $this->findModel($value);
             $model->sort_number = (int)$key+1;
@@ -392,6 +399,7 @@ class ItemController extends Controller
     public function actionDeleteImage($id, $image)
     {
         $itemImage = ItemImage::findOne(['item_uuid'=>$id, 'product_file_name'=>$image]);
+        
         if ($itemImage && !$itemImage->delete()) {
             if (isset($model->errors)) {
                 return [
@@ -412,6 +420,9 @@ class ItemController extends Controller
         ];
     }
 
+    /**
+     * download excel of item report
+     */
     public function actionItemsReport()
     {
         $store_model = Yii::$app->accountManager->getManagedAccount();
@@ -494,7 +505,9 @@ class ItemController extends Controller
                     'attribute' => 'item_price',
                     "format" => "raw",
                     "value" => function($data) {
-                        return Yii::$app->formatter->asCurrency($data->item_price, $data->currency->code);
+                        return Yii::$app->formatter->asCurrency($data->item_price, $data->currency->code, [
+                            \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                        ]);
                     }
                 ]
             ],

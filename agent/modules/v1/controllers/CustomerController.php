@@ -71,7 +71,7 @@ class CustomerController extends Controller
      * @param type $store_uuid
      * @return type
      */
-    public function actionList($store_uuid)
+    public function actionList($store_uuid = null)
     {
         $keyword = Yii::$app->request->get ('keyword');
 
@@ -94,26 +94,13 @@ class CustomerController extends Controller
 
     /**
      * Return customer detail
-     * @param type $store_uuid
      * @param type $order_uuid
      * @return type
      */
-    public function actionDetail($store_uuid, $customer_id)
+    public function actionDetail($customer_id)
     {
-
-        if (Yii::$app->accountManager->getManagedAccount ($store_uuid)) {
-
-            $customer = Customer::find ()
-                ->andWhere ([
-                    'restaurant_uuid' => $store_uuid,
-                    'customer_id' => $customer_id
-                ])
-                ->one ();
-
-            return $customer;
-        }
+        return $this->findModel($customer_id);
     }
-
 
     /**
      * Return a List of all customers Orders
@@ -121,22 +108,17 @@ class CustomerController extends Controller
      * @param type $customer_id
      * @return type
      */
-    public function actionListAllCustomerOrders($store_uuid, $customer_id)
+    public function actionListAllCustomerOrders($store_uuid = null, $customer_id)
     {
-
-        if (Yii::$app->accountManager->getManagedAccount ($store_uuid)) {
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
             $query = Order::find ()
-                ->andWhere (['restaurant_uuid' => $store_uuid, 'customer_id' => $customer_id])
+                ->andWhere (['restaurant_uuid' => $store->restaurant_uuid, 'customer_id' => $customer_id])
                 ->orderBy (['order_created_at' => SORT_DESC]);
 
             return new ActiveDataProvider([
                 'query' => $query
             ]);
-
-
-        }
-
     }
 
     /**
@@ -183,6 +165,7 @@ class CustomerController extends Controller
                     'attribute' => 'Total spent',
                     "format" => "raw",
                     "value" => function ($data) {
+
                         $total_spent = $data->getOrders ()
                             ->andWhere ([
                                 'NOT IN',
@@ -198,7 +181,10 @@ class CustomerController extends Controller
 
                         $total_spent = \Yii::$app->formatter->asDecimal ($total_spent ? $total_spent : 0, 3);
 
-                        return Yii::$app->formatter->asCurrency ($total_spent ? $total_spent : 0, $data->currency->code);
+                        if($data->currency)
+                            return Yii::$app->formatter->asCurrency ($total_spent ? $total_spent : 0, $data->currency->code);
+
+                        return $total_spent ? $total_spent : 0;
                     }
                 ],
                 [

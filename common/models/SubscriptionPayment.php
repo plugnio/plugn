@@ -151,7 +151,6 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         ];
     }
 
-
     /**
      * @inheritdoc
      */
@@ -163,9 +162,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         unset($fields['payout_status']);
 
         return $fields;
-
     }
-
 
     /**
      * Update Payment's Status from TAP Payments
@@ -254,7 +251,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         } else {
             Yii::info('[TAP Payment Issue > ' . $paymentRecord->restaurant->name . ']'
                     . $paymentRecord->restaurant->name .
-                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) .
+                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]) .
                     ' and has failed at gateway. Maybe card issue.', __METHOD__);
 
             Yii::info('[Response from TAP for Failed Payment] ' .
