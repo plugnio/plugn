@@ -220,8 +220,18 @@ class CategoryController extends Controller {
      * @return Category the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $storeUuid) {
-        if (($model = Category::find()->where(['category_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
+    protected function findModel($id, $storeUuid)
+    {
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $model = Category::find()
+            ->where([
+                'category_id' => $id,
+                'restaurant_uuid' => $store->restaurant_uuid
+            ])
+            ->one();
+
+        if ($model !== null) {
             return $model;
         }
 

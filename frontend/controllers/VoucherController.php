@@ -15,9 +15,7 @@ use Segment;
  */
 class VoucherController extends Controller
 {
-
    public $enableCsrfValidation = false;
-
 
    /**
      * {@inheritdoc}
@@ -70,10 +68,10 @@ class VoucherController extends Controller
     {
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        if($restaurant_model){
+        if($restaurant_model) {
+
           $model = new Voucher();
           $model->restaurant_uuid = $storeUuid;
-
 
           if ($model->load(Yii::$app->request->post())) {
 
@@ -193,7 +191,16 @@ class VoucherController extends Controller
      */
     protected function findModel($id, $storeUuid)
     {
-        if (($model = Voucher::find()->where(['voucher_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $model = Voucher::find()
+            ->where([
+                'voucher_id' => $id,
+                'restaurant_uuid' => $store->restaurant_uuid
+            ])
+            ->one();
+
+        if ($model !== null) {
             return $model;
         }
 

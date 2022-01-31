@@ -13,14 +13,15 @@ use yii\base\Model;
 /**
  * AgentController implements the CRUD actions for Agent model.
  */
-class AgentController extends Controller {
-
+class AgentController extends Controller
+{
     public $enableCsrfValidation = false;
 
     /**
      * {@inheritdoc}
      */
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -58,23 +59,24 @@ class AgentController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($storeUuid) {
+    public function actionUpdate($storeUuid)
+    {
         $model = $this->findModel($storeUuid);
 
         $agentAssignment = $model->getAgentAssignments()
-                            ->andWhere(['restaurant_uuid' => $storeUuid, 'agent_id' =>Yii::$app->user->identity->agent_id])
-                            ->one();
+            ->andWhere(['restaurant_uuid' => $storeUuid, 'agent_id' => Yii::$app->user->identity->agent_id])
+            ->one();
 
-        if(  $agentAssignment->load(Yii::$app->request->post()) && $model->load(Yii::$app->request->post()) ){
+        if ($agentAssignment->load(Yii::$app->request->post()) && $model->load(Yii::$app->request->post())) {
 
-          if($agentAssignment->save() && $model->save())
-            return $this->redirect(['update', 'storeUuid' => $storeUuid]);
+            if ($agentAssignment->save() && $model->save())
+                return $this->redirect(['update', 'storeUuid' => $storeUuid]);
         }
 
         return $this->render('update', [
-                    'model' => $model,
-                    'agentAssignment' => $agentAssignment,
-                    'storeUuid' => $storeUuid
+            'model' => $model,
+            'agentAssignment' => $agentAssignment,
+            'storeUuid' => $storeUuid
         ]);
     }
 
@@ -84,8 +86,10 @@ class AgentController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionChangePassword($storeUuid) {
+    public function actionChangePassword($storeUuid)
+    {
         $model = $this->findModel($storeUuid);
+
         $model->setScenario(Agent::SCENARIO_CHANGE_PASSWORD);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -93,8 +97,8 @@ class AgentController extends Controller {
         }
 
         return $this->render('change-password', [
-                    'model' => $model,
-                    'storeUuid' => $storeUuid
+            'model' => $model,
+            'storeUuid' => $storeUuid
         ]);
     }
 
@@ -104,8 +108,11 @@ class AgentController extends Controller {
      * @return Agent the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($storeUuid) {
-        if (($model = Agent::findOne(Yii::$app->user->identity->agent_id)) !== null && Yii::$app->accountManager->getManagedAccount($storeUuid)) {
+    protected function findModel($storeUuid)
+    {
+        $model = Agent::findOne(Yii::$app->user->identity->agent_id);
+
+        if ($model !== null && Yii::$app->accountManager->getManagedAccount($storeUuid)) {
             return $model;
         }
 

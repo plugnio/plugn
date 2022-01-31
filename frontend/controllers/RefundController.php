@@ -150,8 +150,13 @@ class RefundController extends Controller {
      * @return Refund the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $storeUuid) {
-        if (($model = Refund::find()->where(['refund_id' => $id, 'restaurant_uuid' => $storeUuid])->one()) !== null) {
+    protected function findModel($id, $storeUuid)
+    {
+        $model = Refund::find()
+            ->where(['refund_id' => $id, 'restaurant_uuid' => $storeUuid])
+            ->one();
+
+        if ($model !== null) {
             return $model;
         }
 

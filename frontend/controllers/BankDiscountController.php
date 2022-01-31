@@ -50,7 +50,11 @@ class BankDiscountController extends Controller
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new BankDiscountSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
+
+        $dataProvider = $searchModel->search(
+            Yii::$app->request->queryParams,
+            $restaurant_model->restaurant_uuid
+        );
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -70,15 +74,14 @@ class BankDiscountController extends Controller
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         if($restaurant_model){
+
           $model = new BankDiscount();
           $model->restaurant_uuid = $storeUuid;
-
 
           if ($model->load(Yii::$app->request->post())) {
 
             if( $model->duration && $model->duration != null )
               list($model->valid_from, $model->valid_until) = explode(' - ', $model->duration);
-
 
               if($model->save())
                 return $this->redirect(['index',  'storeUuid' => $storeUuid]);
@@ -89,7 +92,6 @@ class BankDiscountController extends Controller
               'storeUuid' => $storeUuid
           ]);
         }
-
     }
 
     /**
@@ -133,7 +135,9 @@ class BankDiscountController extends Controller
       {
           $model = $this->findModel($id, $storeUuid);
 
-          $model->bank_discount_status = $model->bank_discount_status == BankDiscount::BANK_DISCOUNT_STATUS_ACTIVE ? BankDiscount::BANK_DISCOUNT_STATUS_EXPIRED  : BankDiscount::BANK_DISCOUNT_STATUS_ACTIVE;
+          $model->bank_discount_status = $model->bank_discount_status == BankDiscount::BANK_DISCOUNT_STATUS_ACTIVE ?
+              BankDiscount::BANK_DISCOUNT_STATUS_EXPIRED  : BankDiscount::BANK_DISCOUNT_STATUS_ACTIVE;
+
           $model->save();
 
           return $this->redirect(['index', 'storeUuid' => $storeUuid]);
@@ -153,7 +157,6 @@ class BankDiscountController extends Controller
          $this->findModel($id, $storeUuid)->delete();
 
          return $this->redirect(['index', 'storeUuid' => $storeUuid]);
-
      }
 
     /**
@@ -168,6 +171,7 @@ class BankDiscountController extends Controller
         if (($model = BankDiscount::find()->where(['bank_discount_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
             return $model;
         }
+
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 }

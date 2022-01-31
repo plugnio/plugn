@@ -23,14 +23,16 @@ use yii\base\Model;
 /**
  * OrderController implements the CRUD actions for Order model.
  */
-class OrderController extends Controller {
+class OrderController extends Controller
+{
 
     public $enableCsrfValidation = false;
 
     /**
      * {@inheritdoc}
      */
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -54,182 +56,187 @@ class OrderController extends Controller {
      * Lists all Order models.
      * @return mixed
      */
-    public function actionIndex($storeUuid) {
+    public function actionIndex($storeUuid)
+    {
 
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
-        $agentAssignment = $restaurant_model->getAgentAssignments()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid, 'agent_id' => Yii::$app->user->identity->agent_id])->one();
+
+        $agentAssignment = $restaurant_model->getAgentAssignments()
+            ->where([
+                'restaurant_uuid' => $restaurant_model->restaurant_uuid,
+                'agent_id' => Yii::$app->user->identity->agent_id
+            ])->one();
 
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid, $agentAssignment );
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid, $agentAssignment);
 
         return $this->render('index', [
-                    'searchModel' => $searchModel,
-                    'dataProvider' => $dataProvider,
-                    'restaurant_model' => $restaurant_model
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'restaurant_model' => $restaurant_model
         ]);
     }
 
-
-  public function actionDownloadPendingOrdersForMashkor($storeUuid) {
+    public function actionDownloadPendingOrdersForMashkor($storeUuid)
+    {
         $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-            $orders = Order::find()
-                    ->where(['order_status' => Order::STATUS_PENDING])
-                    ->andWhere(['<>', 'payment_method_id', 3 ])
-                    ->andWhere([ 'restaurant_uuid' =>  $store_model->restaurant_uuid ])
-                    ->andWhere([ 'country_name' => 'Kuwait' ])
-                    ->orderBy(['order_created_at' => SORT_ASC])
-                    ->all();
+        $orders = Order::find()
+            ->where(['order_status' => Order::STATUS_PENDING])
+            ->andWhere(['<>', 'payment_method_id', 3])
+            ->andWhere(['restaurant_uuid' => $store_model->restaurant_uuid])
+            ->andWhere(['country_name' => 'Kuwait'])
+            ->orderBy(['order_created_at' => SORT_ASC])
+            ->all();
 
-            header('Access-Control-Allow-Origin: *');
-            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            header("Content-Disposition: attachment;filename=\"orders.xlsx\"");
-            header("Cache-Control: max-age=0");
+        header('Access-Control-Allow-Origin: *');
+        header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        header("Content-Disposition: attachment;filename=\"orders.xlsx\"");
+        header("Cache-Control: max-age=0");
 
-            \moonland\phpexcel\Excel::export([
-                'isMultipleSheet' => false,
-                'models' => $orders,
-                'columns' => [
+        \moonland\phpexcel\Excel::export([
+            'isMultipleSheet' => false,
+            'models' => $orders,
+            'columns' => [
 
-                    [
-                        'attribute' => 'customer_name',
-                        'format' => 'raw',
-                        'value' => function ($data) {
-                            return $data->customer_name;
-                        },
-                    ],
+                [
+                    'attribute' => 'customer_name',
+                    'format' => 'raw',
+                    'value' => function ($data) {
+                        return $data->customer_name;
+                    },
+                ],
 
-                    [
-                        'header' => 'Customer Phone number',
-                        'attribute' => 'customer_phone_number',
-                        "format" => "raw",
-                        "value" => function($model) {
-                            return $model->customer_phone_number;
-                        }
-                    ],
-                    [
-                        'header' => 'Vendor Order ID',
-                        'attribute' => 'order_uuid',
-                        "format" => "raw",
-                        "value" => function($model) {
-                            return '#' . $model->order_uuid;
-                        }
-                    ],
-                    [
-                        'header' => 'COD',
-                        'attribute' => 'order_uuid',
-                        "format" => "raw",
-                        "value" => function($model) {
-                            return 'No';
-                        }
-                    ],
+                [
+                    'header' => 'Customer Phone number',
+                    'attribute' => 'customer_phone_number',
+                    "format" => "raw",
+                    "value" => function ($model) {
+                        return $model->customer_phone_number;
+                    }
+                ],
+                [
+                    'header' => 'Vendor Order ID',
+                    'attribute' => 'order_uuid',
+                    "format" => "raw",
+                    "value" => function ($model) {
+                        return '#' . $model->order_uuid;
+                    }
+                ],
+                [
+                    'header' => 'COD',
+                    'attribute' => 'order_uuid',
+                    "format" => "raw",
+                    "value" => function ($model) {
+                        return 'No';
+                    }
+                ],
 
-                    [
-                        'header' => 'Area',
-                        // 'format' => 'html',
-                        'value' => function ($data) {
-                            if($data->area_id)
-                              return $data->area_name;
-                        }
-                    ],
-                    [
-                        'header' => 'Block',
-                        // 'format' => 'html',
-                        'value' => function ($data) {
-                            if($data->block)
-                              return $data->block;
-                        }
-                    ],
-                    [
-                        'header' => 'Street',
-                        // 'format' => 'html',
-                        'value' => function ($data) {
-                            if($data->street)
-                              return $data->street;
-                        }
-                    ],
-                    [
-                        'header' => 'Avenue',
-                        // 'format' => 'html',
-                        'value' => function ($data) {
-                              return $data->avenue ? $data->avenue  : '-----';
-                        }
-                    ],
-                    [
-                        'header' => 'Unit Type',
-                        // 'format' => 'html',
-                        'value' => function ($data) {
-                            if($data->unit_type)
-                              return $data->unit_type;
-                        }
-                    ],
-                    [
-                        'header' => 'Floor',
-                        // 'format' => 'html',
-                        'value' => function ($data) {
-                              return $data->floor ? $data->floor  : '-----';
-                        }
-                    ],
-                    [
-                        'header' => 'Apartment',
-                        // 'format' => 'html',
-                        'value' => function ($data) {
-                              return $data->apartment ? $data->apartment  : '-----';
-                        }
-                    ],
-                    [
-                        'header' => 'Office',
-                        // 'format' => 'html',
-                        'value' => function ($data) {
-                              return $data->office ? $data->office  : '-----';
-                        }
-                    ],
-                    [
-                        'header' => 'House number/Building',
-                        // 'format' => 'html',
-                        'value' => function ($data) {
-                            if($data->house_number)
-                              return $data->house_number;
-                        }
-                    ],
-                    [
-                        'header' => 'Extra Instruction',
-                        // 'format' => 'html',
-                        'value' => function ($data) {
-                            if($data->house_number)
-                              return $data->special_directions;
-                        }
-                    ],
+                [
+                    'header' => 'Area',
+                    // 'format' => 'html',
+                    'value' => function ($data) {
+                        if ($data->area_id)
+                            return $data->area_name;
+                    }
+                ],
+                [
+                    'header' => 'Block',
+                    // 'format' => 'html',
+                    'value' => function ($data) {
+                        if ($data->block)
+                            return $data->block;
+                    }
+                ],
+                [
+                    'header' => 'Street',
+                    // 'format' => 'html',
+                    'value' => function ($data) {
+                        if ($data->street)
+                            return $data->street;
+                    }
+                ],
+                [
+                    'header' => 'Avenue',
+                    // 'format' => 'html',
+                    'value' => function ($data) {
+                        return $data->avenue ? $data->avenue : '-----';
+                    }
+                ],
+                [
+                    'header' => 'Unit Type',
+                    // 'format' => 'html',
+                    'value' => function ($data) {
+                        if ($data->unit_type)
+                            return $data->unit_type;
+                    }
+                ],
+                [
+                    'header' => 'Floor',
+                    // 'format' => 'html',
+                    'value' => function ($data) {
+                        return $data->floor ? $data->floor : '-----';
+                    }
+                ],
+                [
+                    'header' => 'Apartment',
+                    // 'format' => 'html',
+                    'value' => function ($data) {
+                        return $data->apartment ? $data->apartment : '-----';
+                    }
+                ],
+                [
+                    'header' => 'Office',
+                    // 'format' => 'html',
+                    'value' => function ($data) {
+                        return $data->office ? $data->office : '-----';
+                    }
+                ],
+                [
+                    'header' => 'House number/Building',
+                    // 'format' => 'html',
+                    'value' => function ($data) {
+                        if ($data->house_number)
+                            return $data->house_number;
+                    }
+                ],
+                [
+                    'header' => 'Extra Instruction',
+                    // 'format' => 'html',
+                    'value' => function ($data) {
+                        if ($data->house_number)
+                            return $data->special_directions;
+                    }
+                ],
 
-                ]
-            ]);
+            ]
+        ]);
 
-        return $this->redirect(['index', 'storeUuid' =>  $store_model->restaurant_uuid]);
+        return $this->redirect(['index', 'storeUuid' => $store_model->restaurant_uuid]);
 
-      }
+    }
 
 
     /**
      * Lists all Order models.
      * @return mixed
      */
-    public function actionOrdersReport($storeUuid) {
-
+    public function actionOrdersReport($storeUuid)
+    {
         $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new OrderSearch();
-
 
         if ($store_model->load(Yii::$app->request->post())) {
 
             list($start_date, $end_date) = explode(' - ', $store_model->export_orders_data_in_specific_date_range);
 
             $searchResult = Order::find()
-                    ->activeOrders($storeUuid)
-                    ->with('voucher')
-                    ->andWhere(['between', 'order_created_at', $start_date, $end_date])
-                    ->orderBy(['order_created_at' => SORT_ASC])
-                    ->all();
+                ->activeOrders($storeUuid)
+                ->with('voucher')
+                ->andWhere(['between', 'order_created_at', $start_date, $end_date])
+                ->orderBy(['order_created_at' => SORT_ASC])
+                ->all();
 
             header('Access-Control-Allow-Origin: *');
             header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -243,7 +250,7 @@ class OrderController extends Controller {
                     [
                         'attribute' => 'order_uuid',
                         "format" => "raw",
-                        "value" => function($model) {
+                        "value" => function ($model) {
                             return '#' . $model->order_uuid;
                         }
                     ],
@@ -258,28 +265,28 @@ class OrderController extends Controller {
                     [
                         'header' => 'Order Mode',
                         'value' => function ($data) {
-                              return $data->order_mode == Order::ORDER_MODE_DELIVERY ? 'Delivery' : 'Pickup';
+                            return $data->order_mode == Order::ORDER_MODE_DELIVERY ? 'Delivery' : 'Pickup';
                         }
                     ],
                     [
                         'header' => 'Area',
                         // 'format' => 'html',
                         'value' => function ($data) {
-                            if($data->area_id)
-                              return $data->area_name;
+                            if ($data->area_id)
+                                return $data->area_name;
                         }
                     ],
                     [
                         'attribute' => 'order_status',
                         "format" => "raw",
-                        "value" => function($model) {
-                           return $model->orderStatusInEnglish;
+                        "value" => function ($model) {
+                            return $model->orderStatusInEnglish;
                         }
                     ],
                     [
                         'attribute' => 'Payment method',
                         "format" => "raw",
-                        "value" => function($data) {
+                        "value" => function ($data) {
                             if ($data->payment_uuid)
                                 return $data->payment->payment_current_status;
                             else
@@ -289,7 +296,7 @@ class OrderController extends Controller {
                     [
                         'attribute' => 'Voucher Code',
                         "format" => "raw",
-                        "value" => function($data) {
+                        "value" => function ($data) {
                             if ($data->voucher_id)
                                 return $data->voucher->code;
                             else
@@ -299,18 +306,18 @@ class OrderController extends Controller {
 
                     [
                         'attribute' => 'delivery_fee',
-                        "value" => function($data) {
-                          return \Yii::$app->formatter->asCurrency($data->delivery_fee, $data->currency->code, [
-                              \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
-                          ]);
+                        "value" => function ($data) {
+                            return \Yii::$app->formatter->asCurrency($data->delivery_fee, $data->currency->code, [
+                                \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                            ]);
                         },
                     ],
 
                     [
                         'header' => 'Amount Charged',
                         'attribute' => 'total_price',
-                        "value" => function($data) {
-                            return \Yii::$app->formatter->asCurrency($data->payment_uuid ? $data->payment->payment_amount_charged : $data->total_price, $data->currency->code,[
+                        "value" => function ($data) {
+                            return \Yii::$app->formatter->asCurrency($data->payment_uuid ? $data->payment->payment_amount_charged : $data->total_price, $data->currency->code, [
                                 \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                             ]);
                         }
@@ -318,41 +325,40 @@ class OrderController extends Controller {
 
                     [
                         'header' => 'Net Amount',
-                        "value" => function($data) {
-                          if($data->payment_uuid )
-                            return \Yii::$app->formatter->asCurrency($data->payment->payment_net_amount, $data->currency->code, [
-                                \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
-                            ]);
-                          else
-                            return \Yii::$app->formatter->asCurrency( $data->total_price, $data->currency->code, [
-                                \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
-                            ]);
+                        "value" => function ($data) {
+                            if ($data->payment_uuid)
+                                return \Yii::$app->formatter->asCurrency($data->payment->payment_net_amount, $data->currency->code, [
+                                    \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                ]);
+                            else
+                                return \Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code, [
+                                    \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                ]);
                         }
                     ],
                     [
                         'header' => 'Plugn fee',
-                        "value" => function($data) {
-                              if($data->payment_uuid && $data->payment->plugn_fee){
-                                  $plugnFee = $data->payment->plugn_fee + $data->payment->partner_fee;
-                                  return \Yii::$app->formatter->asCurrency($plugnFee, $data->currency->code, [
-                                      \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
-                                  ]);
-                              }
-                              else
-                                  return \Yii::$app->formatter->asCurrency(0 , $data->currency->code, [
-                                      \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
-                                  ]);
+                        "value" => function ($data) {
+                            if ($data->payment_uuid && $data->payment->plugn_fee) {
+                                $plugnFee = $data->payment->plugn_fee + $data->payment->partner_fee;
+                                return \Yii::$app->formatter->asCurrency($plugnFee, $data->currency->code, [
+                                    \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                ]);
+                            } else
+                                return \Yii::$app->formatter->asCurrency(0, $data->currency->code, [
+                                    \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                ]);
                         }
                     ],
                     [
                         'header' => 'Payment Gateway fee',
-                        "value" => function($data) {
-                            if($data->payment_uuid)
-                              return \Yii::$app->formatter->asCurrency($data->payment->payment_gateway_fee, $data->currency->code);
+                        "value" => function ($data) {
+                            if ($data->payment_uuid)
+                                return \Yii::$app->formatter->asCurrency($data->payment->payment_gateway_fee, $data->currency->code);
                             else
-                              return \Yii::$app->formatter->asCurrency(0 , $data->currency->code, [
-                                  \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
-                              ]);
+                                return \Yii::$app->formatter->asCurrency(0, $data->currency->code, [
+                                    \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                ]);
 
                         }
                     ],
@@ -363,26 +369,31 @@ class OrderController extends Controller {
         }
 
         return $this->render('orders-report', [
-                    'model' => $store_model
+            'model' => $store_model
         ]);
-      }
+    }
 
-      /**
+    /**
      * Lists all draft Orders.
      * @return mixed
      */
-    public function actionDraft($storeUuid) {
-
+    public function actionDraft($storeUuid)
+    {
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
-        $agentAssignment = $restaurant_model->getAgentAssignments()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid, 'agent_id' => Yii::$app->user->identity->agent_id])->one();
+
+        $agentAssignment = $restaurant_model->getAgentAssignments()
+            ->where([
+                'restaurant_uuid' => $restaurant_model->restaurant_uuid,
+                'agent_id' => Yii::$app->user->identity->agent_id
+            ])->one();
 
         $searchModel = new OrderSearch();
         $dataProvider = $searchModel->searchDraftOrders(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid, $agentAssignment);
 
         return $this->render('draft', [
-                    'searchModel' => $searchModel,
-                    'dataProvider' => $dataProvider,
-                    'restaurant_model' => $restaurant_model
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'restaurant_model' => $restaurant_model
         ]);
     }
 
@@ -390,62 +401,63 @@ class OrderController extends Controller {
      * Lists all Order models.
      * @return mixed
      */
-    public function actionAbandonedCheckout($storeUuid) {
-
+    public function actionAbandonedCheckout($storeUuid)
+    {
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
-        $agentAssignment = $restaurant_model->getAgentAssignments()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid, 'agent_id' => Yii::$app->user->identity->agent_id])->one();
+
+        $agentAssignment = $restaurant_model->getAgentAssignments()
+            ->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid, 'agent_id' => Yii::$app->user->identity->agent_id])->one();
 
         $searchModel = new OrderSearch();
         $dataProvider = $searchModel->searchAbandonedCheckoutOrders(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid, $agentAssignment);
 
-
-
         return $this->render('abandoned-checkout', [
-                    'searchModel' => $searchModel,
-                    'dataProvider' => $dataProvider,
-                    'restaurant_model' => $restaurant_model
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'restaurant_model' => $restaurant_model
         ]);
     }
 
 
     /**
-    * Request fulfillment
-    * @param type $order_uuid
-    * @param type $storeUuid
-    * @param type $customerId
-    */
-   public function actionRequestFulfillment($order_uuid, $storeUuid) {
+     * Request fulfillment
+     * @param type $order_uuid
+     * @param type $storeUuid
+     * @param type $customerId
+     */
+    public function actionRequestFulfillment($order_uuid, $storeUuid)
+    {
 
-       $order_model = $this->findModel($order_uuid, $storeUuid);
+        $order_model = $this->findModel($order_uuid, $storeUuid);
 
-       $requestFulfillmentApiResponse = Yii::$app->diggipacksWarehouseComponent->createOrder($order_model, $order_model->orderItems);
+        $requestFulfillmentApiResponse = Yii::$app->diggipacksWarehouseComponent->createOrder($order_model, $order_model->orderItems);
 
 
-       if ($requestFulfillmentApiResponse->isOk) {
+        if ($requestFulfillmentApiResponse->isOk) {
 
-           $order_model->diggipack_awb_no = $requestFulfillmentApiResponse->data['awb_no'];
+            $order_model->diggipack_awb_no = $requestFulfillmentApiResponse->data['awb_no'];
 
-           $order_model->save(false);
-           Yii::$app->session->setFlash('successResponse', "Fulfillment requested");
+            $order_model->save(false);
+            Yii::$app->session->setFlash('successResponse', "Fulfillment requested");
 
-       } else {
+        } else {
 
-           if ($requestFulfillmentApiResponse->content){
-             Yii::$app->session->setFlash('errorResponse', json_encode($requestFulfillmentApiResponse->content));
-             Yii::error('Error while requesting fulfillment  [' . $order_model->restaurant->name . '] ' . json_encode($requestFulfillmentApiResponse->content));
+            if ($requestFulfillmentApiResponse->content) {
+                Yii::$app->session->setFlash('errorResponse', json_encode($requestFulfillmentApiResponse->content));
+                Yii::error('Error while requesting fulfillment  [' . $order_model->restaurant->name . '] ' . json_encode($requestFulfillmentApiResponse->content));
 
-           } else {
+            } else {
 
-             Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
-             Yii::error('Error while requesting fulfillment  [' . $order_model->restaurant->name . '] ' . json_encode($requestFulfillmentApiResponse));
+                Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
+                Yii::error('Error while requesting fulfillment  [' . $order_model->restaurant->name . '] ' . json_encode($requestFulfillmentApiResponse));
 
-           }
+            }
 
-           return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
-       }
+            return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
+        }
 
-       return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
-   }
+        return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
+    }
 
 
     /**
@@ -453,11 +465,12 @@ class OrderController extends Controller {
      * @param type $order_uuid
      * @param type $storeUuid
      */
-    public function actionRequestDriverFromMashkor($order_uuid, $storeUuid, $mashkorBranchId) {
+    public function actionRequestDriverFromMashkor($order_uuid, $storeUuid, $mashkorBranchId)
+    {
 
         $order_model = $this->findModel($order_uuid, $storeUuid);
 
-        $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($order_model,$mashkorBranchId);
+        $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($order_model, $mashkorBranchId);
 
 
         if ($createDeliveryApiResponse->isOk) {
@@ -470,21 +483,19 @@ class OrderController extends Controller {
 
         } else {
 
-           if ($response = $createDeliveryApiResponse->data){
+            if ($response = $createDeliveryApiResponse->data) {
 
-              if(array_key_exists('message',$response )){
-                $errorMessage =
-                str_replace( array( '\'', '"', ',' , ';', '<', '>' ), ' ', $response['message']);
+                if (array_key_exists('message', $response)) {
+                    $errorMessage =
+                        str_replace(array('\'', '"', ',', ';', '<', '>'), ' ', $response['message']);
 
-                Yii::$app->session->setFlash('errorResponse', json_encode($errorMessage));
+                    Yii::$app->session->setFlash('errorResponse', json_encode($errorMessage));
 
-              }
-              else
-                Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->data));
+                } else
+                    Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->data));
 
-            }
-            else
-               Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
+            } else
+                Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
 
 
             Yii::error('Error while requesting driver from Mashkor  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->data));
@@ -496,13 +507,13 @@ class OrderController extends Controller {
     }
 
 
-
-     /**
+    /**
      * Request a driver from Armada
      * @param type $order_uuid
      * @param type $storeUuid
      */
-    public function actionRequestDriverFromArmada($order_uuid, $storeUuid, $armadaApiKey) {
+    public function actionRequestDriverFromArmada($order_uuid, $storeUuid, $armadaApiKey)
+    {
 
         $order_model = $this->findModel($order_uuid, $storeUuid);
 
@@ -521,16 +532,16 @@ class OrderController extends Controller {
 
         } else {
 
-            if ($createDeliveryApiResponse->content){
+            if ($createDeliveryApiResponse->content) {
 
 
-              Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->content));
-              Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->content));
+                Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->content));
+                Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->content));
 
             } else {
 
-              Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
-              Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
+                Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
+                Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
 
             }
 
@@ -539,7 +550,6 @@ class OrderController extends Controller {
 
         return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
     }
-
 
 
     /**
@@ -552,17 +562,17 @@ class OrderController extends Controller {
         try {
             $payment = Payment::findOne($id);
 
-            if (($payment = Payment::find()->where(['payment_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->one()) !== null) {
+            if (($payment = Payment::find()->where(['payment_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
 
-              if($payment->payment_gateway_name == 'tap'){
-                $transaction_id = $payment->payment_gateway_transaction_id;
-                Payment::updatePaymentStatusFromTap($transaction_id, true);
-              } else if ($payment->payment_gateway_name == 'myfatoorah'){
-                $invoice_id = $payment->payment_gateway_invoice_id;
-                Payment::updatePaymentStatusFromMyFatoorah($invoice_id, true);
-              }
+                if ($payment->payment_gateway_name == 'tap') {
+                    $transaction_id = $payment->payment_gateway_transaction_id;
+                    Payment::updatePaymentStatusFromTap($transaction_id, true);
+                } else if ($payment->payment_gateway_name == 'myfatoorah') {
+                    $invoice_id = $payment->payment_gateway_invoice_id;
+                    Payment::updatePaymentStatusFromMyFatoorah($invoice_id, true);
+                }
 
-              return $this->redirect(['view', 'id' => $payment->order_uuid, 'storeUuid' => $storeUuid]);
+                return $this->redirect(['view', 'id' => $payment->order_uuid, 'storeUuid' => $storeUuid]);
             }
 
         } catch (\Exception $e) {
@@ -578,26 +588,27 @@ class OrderController extends Controller {
      * @param type $status
      * @return type
      */
-     public function actionChangeOrderStatus($order_uuid, $storeUuid, $status, $redirect = null) {
-         $order_model = $this->findModel($order_uuid, $storeUuid);
+    public function actionChangeOrderStatus($order_uuid, $storeUuid, $status, $redirect = null)
+    {
+        $order_model = $this->findModel($order_uuid, $storeUuid);
 
-         $previousOrderStatus =  $order_model->order_status;
+        $previousOrderStatus = $order_model->order_status;
 
-         $order_model->order_status = $status;
+        $order_model->order_status = $status;
 
-         if($order_model->save(false)){
+        if ($order_model->save(false)) {
 
-           if($previousOrderStatus == Order::STATUS_DRAFT && $order_model->order_status == Order::STATUS_PENDING){
-             $order_model->sendPaymentConfirmationEmail();
-           }
-         }
+            if ($previousOrderStatus == Order::STATUS_DRAFT && $order_model->order_status == Order::STATUS_PENDING) {
+                $order_model->sendPaymentConfirmationEmail();
+            }
+        }
 
-         if($redirect)
-          return $this->redirect(['index', 'storeUuid' => $storeUuid]);
+        if ($redirect)
+            return $this->redirect(['index', 'storeUuid' => $storeUuid]);
 
-         else
+        else
             return $this->redirect(['view', 'id' => $order_model->order_uuid, 'storeUuid' => $storeUuid]);
-     }
+    }
 
     /**
      * Change order status
@@ -607,7 +618,8 @@ class OrderController extends Controller {
      * @param type $status
      * @return type
      */
-    public function actionViewInvoice($order_uuid, $storeUuid) {
+    public function actionViewInvoice($order_uuid, $storeUuid)
+    {
         $order_model = $this->findModel($order_uuid, $storeUuid);
 
         // Item
@@ -623,8 +635,8 @@ class OrderController extends Controller {
 
 
         return $this->render('invoice', [
-                    'model' => $order_model,
-                    'orderItems' => $orderItems
+            'model' => $order_model,
+            'orderItems' => $orderItems
         ]);
     }
 
@@ -634,61 +646,62 @@ class OrderController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-     public function actionView($id, $storeUuid) {
+    public function actionView($id, $storeUuid)
+    {
 
-         $order_model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->with(['currency','country','deliveryZone.country','pickupLocation','deliveryZone.businessLocation'])->one();
-
-
-         if($order_model){
-
-           // Item
-           $orderItems = new \yii\data\ActiveDataProvider([
-               'query' => $order_model->getOrderItems()->with(['orderItemExtraOptions','item','currency']),
-               'sort' => false,
-               'pagination' => false
-           ]);
-
-           // Item extra optn
-           // $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
-           //     'query' => $order_model->getOrderItemExtraOptions(),
-           //     'pagination' => false
-           // ]);
-
-           // order's Item
-           $refundDataProvider = new \yii\data\ActiveDataProvider([
-               'query' => $order_model->getRefunds(),
-               'sort' =>false
-          ]);
-
-           // order's Item
-           $refundItemsDataProvider = new \yii\data\ActiveDataProvider([
-               'query' => $order_model->getRefundedItems()->with('item'),
-               'sort' =>false
-          ]);
+        $order_model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->with(['currency', 'country', 'deliveryZone.country', 'pickupLocation', 'deliveryZone.businessLocation'])->one();
 
 
+        if ($order_model) {
 
-           return $this->render('view', [
-                       'model' => $order_model,
-                       'refundDataProvider' => $refundDataProvider,
-                       'storeUuid' => $storeUuid,
-                       'refundItemsDataProvider' => $refundItemsDataProvider,
-                       'orderItems' => $orderItems
-           ]);
+            // Item
+            $orderItems = new \yii\data\ActiveDataProvider([
+                'query' => $order_model->getOrderItems()->with(['orderItemExtraOptions', 'item', 'currency']),
+                'sort' => false,
+                'pagination' => false
+            ]);
+
+            // Item extra optn
+            // $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
+            //     'query' => $order_model->getOrderItemExtraOptions(),
+            //     'pagination' => false
+            // ]);
+
+            // order's Item
+            $refundDataProvider = new \yii\data\ActiveDataProvider([
+                'query' => $order_model->getRefunds(),
+                'sort' => false
+            ]);
+
+            // order's Item
+            $refundItemsDataProvider = new \yii\data\ActiveDataProvider([
+                'query' => $order_model->getRefundedItems()->with('item'),
+                'sort' => false
+            ]);
 
 
-         } else {
-           throw new NotFoundHttpException('The requested page does not exist.');
-         }
+            return $this->render('view', [
+                'model' => $order_model,
+                'refundDataProvider' => $refundDataProvider,
+                'storeUuid' => $storeUuid,
+                'refundItemsDataProvider' => $refundItemsDataProvider,
+                'orderItems' => $orderItems
+            ]);
 
-     }
+
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+    }
 
     /**
      * Creates a new Order model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($storeUuid) {
+    public function actionCreate($storeUuid)
+    {
 
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
@@ -701,25 +714,24 @@ class OrderController extends Controller {
         if ($model->load(Yii::$app->request->post())) {
             // $model->payment_method_id = 3;
 
-        if($model->order_mode == Order::ORDER_MODE_DELIVERY){
+            if ($model->order_mode == Order::ORDER_MODE_DELIVERY) {
 
-            $areaDeliveryZone = AreaDeliveryZone::find() ->andWhere([ 'restaurant_uuid' => $restaurant_model->restaurant_uuid, 'area_id' => $model->area_id ])->one();
+                $areaDeliveryZone = AreaDeliveryZone::find()->andWhere(['restaurant_uuid' => $restaurant_model->restaurant_uuid, 'area_id' => $model->area_id])->one();
 
-          if($areaDeliveryZone)
-             $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
+                if ($areaDeliveryZone)
+                    $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
 
-        }
+            }
 
 
-
-        if ($model->validate() && $model->save())
-            return $this->redirect(['update', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid]);
+            if ($model->validate() && $model->save())
+                return $this->redirect(['update', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid]);
 
         }
 
         return $this->render('create', [
-                    'model' => $model,
-                    'restaurant_model' => $restaurant_model
+            'model' => $model,
+            'restaurant_model' => $restaurant_model
         ]);
     }
 
@@ -731,7 +743,8 @@ class OrderController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id, $storeUuid) {
+    public function actionUpdate($id, $storeUuid)
+    {
 
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
@@ -749,28 +762,27 @@ class OrderController extends Controller {
 
         if ($model->load(Yii::$app->request->post())) {
 
-          if($model->order_mode == Order::ORDER_MODE_DELIVERY){
-            $model->pickup_location_id = null;
-            if($areaDeliveryZone = AreaDeliveryZone::find() ->where([ 'restaurant_uuid' => $restaurant_model->restaurant_uuid, 'area_id' => $model->area_id ])->one())
-               $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
+            if ($model->order_mode == Order::ORDER_MODE_DELIVERY) {
+                $model->pickup_location_id = null;
+                if ($areaDeliveryZone = AreaDeliveryZone::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid, 'area_id' => $model->area_id])->one())
+                    $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
 
-          } else {
-            $model->delivery_zone_id = null;
-            $model->area_id = null;
-          }
+            } else {
+                $model->delivery_zone_id = null;
+                $model->area_id = null;
+            }
 
 
-
-          if ($model->validate() && $model->save())
-              return $this->redirect(['update', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid]);
+            if ($model->validate() && $model->save())
+                return $this->redirect(['update', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid]);
 
         }
 
 
         return $this->render('update', [
-                    'model' => $model,
-                    'ordersItemDataProvider' => $ordersItemDataProvider,
-                    'restaurant_model' => $restaurant_model
+            'model' => $model,
+            'ordersItemDataProvider' => $ordersItemDataProvider,
+            'restaurant_model' => $restaurant_model
         ]);
     }
 
@@ -782,55 +794,56 @@ class OrderController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionRefundOrder($order_uuid, $storeUuid) {
+    public function actionRefundOrder($order_uuid, $storeUuid)
+    {
 
-      $order_model = $this->findModel($order_uuid, $storeUuid);
+        $order_model = $this->findModel($order_uuid, $storeUuid);
 
-      if(($order_model->payment_uuid && !$order_model->payment->payment_gateway_invoice_id && !$order_model->payment->payment_gateway_transaction_id) || !$order_model->payment_uuid ){
-        return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
-      }
+        if (($order_model->payment_uuid && !$order_model->payment->payment_gateway_invoice_id && !$order_model->payment->payment_gateway_transaction_id) || !$order_model->payment_uuid) {
+            return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
+        }
 
-      $refunded_items_model = [new RefundedItem()];
+        $refunded_items_model = [new RefundedItem()];
 
-      foreach ($order_model->getOrderItems()->all() as $key => $orderItem) {
-        $refunded_items_model[$key] = new RefundedItem();
-        $refunded_items_model[$key]->order_item_id = $orderItem->order_item_id;
-        $refunded_items_model[$key]->order_uuid = $orderItem->order_uuid;
-        $refunded_items_model[$key]->item_uuid = $orderItem->item_uuid;
-        $refunded_items_model[$key]->item_name = $orderItem->item_name;
-        $refunded_items_model[$key]->item_name_ar = $orderItem->item_name_ar;
-        $refunded_items_model[$key]->item_price = $orderItem->item_price;
-       }
-
-
-      $model = new Refund();
-      $model->setScenario('create');
-      $model->restaurant_uuid = $order_model->restaurant_uuid;
-      $model->payment_uuid = $order_model->payment_uuid;
-      $model->order_uuid = $order_model->order_uuid;
-
-      if(Model::loadMultiple($refunded_items_model, Yii::$app->request->post())  && $model->load(Yii::$app->request->post()) && $model->save()){
+        foreach ($order_model->getOrderItems()->all() as $key => $orderItem) {
+            $refunded_items_model[$key] = new RefundedItem();
+            $refunded_items_model[$key]->order_item_id = $orderItem->order_item_id;
+            $refunded_items_model[$key]->order_uuid = $orderItem->order_uuid;
+            $refunded_items_model[$key]->item_uuid = $orderItem->item_uuid;
+            $refunded_items_model[$key]->item_name = $orderItem->item_name;
+            $refunded_items_model[$key]->item_name_ar = $orderItem->item_name_ar;
+            $refunded_items_model[$key]->item_price = $orderItem->item_price;
+        }
 
 
-          foreach ($refunded_items_model as  $key => $refunded_item_model) {
-            if($refunded_item_model->qty > 0){
-              $refunded_item_model->refund_id = $model->refund_id;
-              $refunded_item_model->save();
+        $model = new Refund();
+        $model->setScenario('create');
+        $model->restaurant_uuid = $order_model->restaurant_uuid;
+        $model->payment_uuid = $order_model->payment_uuid;
+        $model->order_uuid = $order_model->order_uuid;
+
+        if (Model::loadMultiple($refunded_items_model, Yii::$app->request->post()) && $model->load(Yii::$app->request->post()) && $model->save()) {
+
+
+            foreach ($refunded_items_model as $key => $refunded_item_model) {
+                if ($refunded_item_model->qty > 0) {
+                    $refunded_item_model->refund_id = $model->refund_id;
+                    $refunded_item_model->save();
+
+                }
 
             }
 
+            return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
+
         }
 
-        return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
 
-     }
-
-
-      return $this->render('refund-order', [
-                  'model' => $model,
-                  'order_model' => $order_model,
-                  'refunded_items_model' => $refunded_items_model
-      ]);
+        return $this->render('refund-order', [
+            'model' => $model,
+            'order_model' => $order_model,
+            'refunded_items_model' => $refunded_items_model
+        ]);
     }
 
     /**
@@ -840,34 +853,34 @@ class OrderController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id, $storeUuid) {
+    public function actionDelete($id, $storeUuid)
+    {
+        $model = $this->findModel($id, $storeUuid);
 
-        $model = $this->findModel ($id, $storeUuid);
         $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
-
-
 
         $transaction = Yii::$app->db->beginTransaction();
 
         $model->restockItems();
 
         $model->is_deleted = 1;
-        if (!$model->save ()) {
+
+        if (!$model->save()) {
             $transaction->rollBack();
             if (isset($model->errors)) {
 
-              Yii::$app->session->setFlash('errorResponse', "We've faced a problem deleting the order");
-              Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ' . json_encode($model->errors));
+                Yii::$app->session->setFlash('errorResponse', "We've faced a problem deleting the order");
+                Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ' . json_encode($model->errors));
 
             } else {
 
-              Yii::$app->session->setFlash('errorResponse', "We've faced a problem deleting the order");
-              Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ');
+                Yii::$app->session->setFlash('errorResponse', "We've faced a problem deleting the order");
+                Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ');
 
             }
         }
-        $transaction->commit();
 
+        $transaction->commit();
 
         return $this->redirect(['index', 'storeUuid' => $storeUuid]);
     }
@@ -879,12 +892,12 @@ class OrderController extends Controller {
      * @return Order the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $storeUuid) {
-        if (($model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->with(['restaurant','currency','country','deliveryZone.country'])->one()) !== null) {
+    protected function findModel($id, $storeUuid)
+    {
+        if (($model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->with(['restaurant', 'currency', 'country', 'deliveryZone.country'])->one()) !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
-
 }
