@@ -449,16 +449,19 @@ return [
                         'POST signup' => 'signup',
                         'PATCH update-password' => 'update-password',
                         'POST request-reset-password' => 'request-reset-password',
+                        'POST is-email-verified' => 'is-email-verified',
+                        'POST update-email' => 'update-email',
+                        'POST resend-verification-email' => 'resend-verification-email',
+                        'POST verify-email' => 'verify-email',
                         // OPTIONS VERBS
                         'OPTIONS login' => 'options',
                         'OPTIONS update-password' => 'options',
                         'OPTIONS request-reset-password' => 'options',
-                        'OPTIONS signup' => 'signup'
-/*todo: implement for email verification
-  public _urlresendVerificationEmail = '/auth/resend-verification-email';
-  public _urlUpdateEmail = '/auth/update-email';
-  public _urlIsEmailVerified = '/auth/is-email-verified';
-  public _urlVerifyEmail = '/auth/verify-email';*/
+                        'OPTIONS signup' => 'options',
+                        'OPTIONS is-email-verified' => 'options',
+                        'OPTIONS update-email' => 'options',
+                        'OPTIONS resend-verification-email' => 'options',
+                        'OPTIONS verify-email' => 'options'
                     ]
                 ],
                 [ // StatsController

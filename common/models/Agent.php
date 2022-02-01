@@ -35,6 +35,9 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
 
+    const EMAIL_VERIFIED = 1;
+    const EMAIL_NOT_VERIFIED = 0;
+
     const SCENARIO_CHANGE_PASSWORD = 'change-password';
     const SCENARIO_CREATE_NEW_AGENT = 'create';
 
@@ -84,7 +87,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function scenarios()
     {
-        $scenarios = parent::scenarios();
+        $scenarios = parent::scenarios ();
 
         $scenarios['updateLanguagePref'] = ['agent_language_pref'];
 
@@ -143,6 +146,115 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
 
             return true;
         }
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave ($insert, $changedAttributes);
+
+        if (isset($changedAttributes['agent_password_hash'])) {
+            $this->sendPasswordUpdatedEmail ();
+        }
+    }
+
+    /**
+     * Whenever a user changes his password using any method (password reset email / profile page),
+     * we need to send out the following email to confirm that his password was set
+     */
+    public function sendPasswordUpdatedEmail()
+    {
+        \Yii::$app->mailer->htmlLayout = "layouts/text";
+
+        \Yii::$app->mailer->compose ([
+                'html' => 'agent/password-updated-html',
+                'text' => 'agent/password-updated-text',
+            ], [
+                'agent' => $this
+            ])
+            ->setFrom ([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
+            ->setTo ($this->agent_email)
+            ->setSubject (Yii::t ('agent', 'Your password reset was a success'))
+            ->send ();
+    }
+
+    /**
+     * Verifies the agent email
+     */
+    public static function verifyEmail($email, $code) {
+
+        $model = self::find()
+            ->andWhere([
+                'OR',
+                ['agent_new_email' => $email],
+                ['agent_email' => $email]
+            ])
+            ->one();
+
+        if(!$model) {
+            return [
+                'success' => false,
+                'message' =>Yii::t('agent','This email verification link is no longer valid, please login to send a new one')
+            ];
+        }
+
+        if ($model->agent_auth_key && $code && $model->agent_auth_key == $code) { //to cope with sql case insensitivity
+            //If not verified
+            if ($model->agent_email_verification == Agent::EMAIL_NOT_VERIFIED) {
+                //Verify this candidates email
+                $model->agent_email_verification = Agent::EMAIL_VERIFIED;
+            }
+
+            // new email address
+
+            if (!empty($model->agent_new_email)) {
+                $model->agent_email = $model->agent_new_email;
+                $model->agent_new_email = null;
+            }
+
+            $model->agent_auth_key = ''; //remove auth key
+            $model->save(false);
+
+            return [
+                'success' => true,
+                'data' => $model
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' =>Yii::t('agent','This email verification link is no longer valid, please login to send a new one')
+            ];
+        }
+    }
+
+    /**
+     * Sends an email requesting a user to verify his email address
+     * @return boolean whether the email was sent
+     */
+    public function sendVerificationEmail() {
+
+        $this->generateAuthKey();
+
+        //Update agent's last email limit timestamp
+        $this->agent_limit_email = new Expression('NOW()');
+        $this->save(false);
+
+        if ($this->agent_new_email) {
+            $email = $this->agent_new_email;
+        } else {
+            $email = $this->agent_email;
+        }
+
+        return Yii::$app->mailer->compose([
+            'html' => 'agent/verify-email-html',
+            'text' => 'agent/verify-email-text',
+        ], [
+            'agent' => $this,
+            'email' => $email
+        ])
+            ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
+            ->setTo($email)
+            ->setSubject('Please confirm your email address')
+            ->send();
     }
 
     /**
@@ -437,22 +549,22 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             ];
         }
 
-        \Yii::info("[New Store Signup] " . $store->name . " has just joined Plugn", __METHOD__);
+        \Yii::info ("[New Store Signup] " . $store->name . " has just joined Plugn", __METHOD__);
 
-        if(YII_ENV == 'prod') {
+        if (YII_ENV == 'prod') {
 
-            $full_name = explode(' ', $this->agent_name);
+            $full_name = explode (' ', $this->agent_name);
             $firstname = $full_name[0];
-            $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
+            $lastname = array_key_exists (1, $full_name) ? $full_name[1] : null;
 
-            \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-            \Segment::track([
+            \Segment::init ('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+            \Segment::track ([
                 'userId' => $store->restaurant_uuid,
                 'event' => 'Store Created',
                 'type' => 'track',
                 'properties' => [
-                    'first_name' => trim($firstname),
-                    'last_name' => trim($lastname),
+                    'first_name' => trim ($firstname),
+                    'last_name' => trim ($lastname),
                     'store_name' => $store->name,
                     'phone_number' => $store->owner_number,
                     'email' => $this->agent_email,
@@ -461,7 +573,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             ]);
         }
 
-        return  [
+        return [
             'operation' => 'success',
         ];
     }
