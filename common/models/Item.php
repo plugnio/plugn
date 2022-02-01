@@ -249,7 +249,7 @@ class Item extends \yii\db\ActiveRecord
         $this->unit_sold -= $qty;
 
         self::updateAll([
-            'unit_sold' => $this->unit_sold, 
+            'unit_sold' => $this->unit_sold,
             'stock_qty' => $this->stock_qty
         ], [
             'item_uuid' => $this->item_uuid
@@ -268,7 +268,7 @@ class Item extends \yii\db\ActiveRecord
         $this->unit_sold += $qty;
 
         self::updateAll([
-            'unit_sold' => $this->unit_sold, 
+            'unit_sold' => $this->unit_sold,
             'stock_qty' => $this->stock_qty
         ], [
             'item_uuid' => $this->item_uuid

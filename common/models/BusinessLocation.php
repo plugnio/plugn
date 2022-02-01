@@ -73,9 +73,9 @@ class BusinessLocation extends \yii\db\ActiveRecord
 
     public function scenarios() {
         $scenarios = parent::scenarios();
-    
+
         $scenarios['delete'] = ['is_deleted'];
-    
+
         return $scenarios;
     }
 
@@ -91,6 +91,45 @@ class BusinessLocation extends \yii\db\ActiveRecord
             'totalDeliveryZoneCountry'
         ];
     }
+
+
+    /**
+     *
+     * @param type $insert
+     * @param type $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave ($insert, $changedAttributes);
+
+        if ($this->scenario == self::SCENARIO_DELETE ) {
+
+
+            $businessLocationDeliverZones = $this->getDeliveryZones()->all();
+
+
+            foreach ($businessLocationDeliverZones as $key => $deliveryZone) {
+              \common\models\AreaDeliveryZone::updateAll([
+                  'is_deleted' => 1
+              ], [
+                  'delivery_zone_id' => $deliveryZone->delivery_zone_id,
+                  'restaurant_uuid' => $deliveryZone->restaurant_uuid,
+              ]);
+            }
+
+            \common\models\DeliveryZone::updateAll([
+                'is_deleted' => 1
+            ], [
+                'business_location_id' => $this->business_location_id,
+                'restaurant_uuid' => $this->restaurant_uuid,
+            ]);
+
+
+
+        }
+
+    }
+
 
 
     /**
@@ -131,7 +170,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
      */
     public function getDeliveryZones($modelClass = "\common\models\DeliveryZone")
     {
-        return $this->hasMany($modelClass::className(), ['business_location_id' => 'business_location_id']);
+        return $this->hasMany($modelClass::className(), ['business_location_id' => 'business_location_id'])->where(['is_deleted' => 0]);
     }
 
     /**

@@ -4,9 +4,9 @@ namespace common\models\query;
 
 
 /**
- * BusinessLocationQuery extends ActiveQuery, allowing easier filtering of BusinessLocation
+ * DeliveryZoneQuery extends ActiveQuery, allowing easier filtering of DeliveryZone
  */
-class BusinessLocationQuery extends \yii\db\ActiveQuery {
+class DeliveryZoneQuery extends \yii\db\ActiveQuery {
 
     /**
      * @inheritdoc
@@ -14,7 +14,7 @@ class BusinessLocationQuery extends \yii\db\ActiveQuery {
      */
     public function all($db = null)
     {
-        $this->andWhere(['business_location.is_deleted' => 0]);
+        $this->andWhere(['delivery_zone.is_deleted' => 0]);
 
         return parent::all($db);
     }

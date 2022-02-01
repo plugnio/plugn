@@ -78,7 +78,7 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
 
         <?=
           Html::a('Delete',
-          ['delete', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
+          ['delete', 'delivery_zone_id' => $deliveryZone->delivery_zone_id, 'store_uuid' => $store_model->restaurant_uuid],
           [
             'style' => ' position: absolute; top: 10px; right: 10px; color:#EA5455',
             'data' => [

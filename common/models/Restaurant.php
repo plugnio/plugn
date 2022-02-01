@@ -963,7 +963,7 @@ class Restaurant extends \yii\db\ActiveRecord
                        'is_tap_enable' => $this->is_tap_enable,
                        'is_myfatoorah_enable' => $this->is_myfatoorah_enable
                    ], [
-                       'order_uuid' => $this->order_uuid
+                     'restaurant_uuid' => $this->restaurant_uuid
                    ]);
 
                    return false;
@@ -1008,7 +1008,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 'is_tap_enable' => $this->is_tap_enable,
                 'is_myfatoorah_enable' => $this->is_myfatoorah_enable
             ], [
-                'order_uuid' => $this->order_uuid
+              'restaurant_uuid' => $this->restaurant_uuid
             ]);
 
             return true;
@@ -1031,7 +1031,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 'is_tap_enable' => $this->is_tap_enable,
                 'is_myfatoorah_enable' => $this->is_myfatoorah_enable
             ], [
-                'order_uuid' => $this->order_uuid
+              'restaurant_uuid' => $this->restaurant_uuid
             ]);
 
           return false;

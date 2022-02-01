@@ -284,7 +284,6 @@ class DeliveryZoneController extends Controller {
         }
 
 
-
         return $this->render('update-areas', [
                     'cities' => $cities,
                     'storeUuid' => $storeUuid,
@@ -300,14 +299,34 @@ class DeliveryZoneController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id, $storeUuid) {
+    public function actionDelete($delivery_zone_id, $store_uuid = null) {
 
-        $model = $this->findModel($id, $storeUuid);
+
+        $transaction = Yii::$app->db->beginTransaction();
+        $model = $this->findModel($delivery_zone_id, $store_uuid);
         $businessLocationId = $model->business_location_id;
-        $model->delete();
 
-        $this->redirect(['index', 'storeUuid' => $storeUuid, 'businessLocationId' => $businessLocationId]);
+        if(!$model)
+          throw new NotFoundHttpException('The requested record does not exist.');
+
+        AreaDeliveryZone::deleteAll(['delivery_zone_id'=> $delivery_zone_id, 'restaurant_uuid' => $store_uuid]);
+
+        if (!$model->delete()) {
+            $transaction->rollBack();
+            if (isset($model->errors)) {
+
+                Yii::$app->session->setFlash('errorResponse', print_r("We've faced a problem deleting the delivery zone", true));
+                Yii::error ('[Error while deleting delivery zone ]' . json_encode ($model->getErrors ()), __METHOD__);
+
+            } else {
+                Yii::$app->session->setFlash('errorResponse', print_r("We've faced a problem deleting the delivery zone", true));
+            }
+        }
+
+        $transaction->commit();
+        $this->redirect(['index', 'storeUuid' => $store_uuid, 'businessLocationId' => $businessLocationId]);
     }
+
 
     /**
      * Finds the DeliveryZone model based on its primary key value.

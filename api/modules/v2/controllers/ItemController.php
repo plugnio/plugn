@@ -109,9 +109,9 @@ class ItemController extends Controller {
             ->with('options', 'options.extraOptions', 'itemImages')
             ->andWhere (['item_status' => Item::ITEM_STATUS_PUBLISH])
             ->orderBy ([new \yii\db\Expression('
-                item.sort_number IS NULL, 
-                item.sort_number ASC, 
-                item.sku IS NULL, 
+                item.sort_number IS NULL,
+                item.sort_number ASC,
+                item.sku IS NULL,
                 item.sku ASC')]);
 
         if($category_id) {

@@ -94,6 +94,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
         }
     }
 
+
     /**
      * @inheritdoc
      */
@@ -179,4 +180,9 @@ class DeliveryZone extends \yii\db\ActiveRecord
     {
         return $this->hasOne($modelClass::className(), ['country_id' => 'country_id']);
     }
+
+    public static function find() {
+        return new query\DeliveryZoneQuery(get_called_class());
+    }
+
 }

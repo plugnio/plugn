@@ -676,6 +676,7 @@ class CronController extends \yii\console\Controller {
                 ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')])
                 ->all();
 
+
         if ($payments) {
             foreach ($payments as $payment) {
                 try {

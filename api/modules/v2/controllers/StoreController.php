@@ -208,6 +208,7 @@ class StoreController extends Controller
         }
     }
 
+
     /**
      * Return Restaurant's data
      */

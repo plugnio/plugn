@@ -414,7 +414,8 @@ class OrderController extends Controller {
                           ];
                       }
 
-                    } else if ($restaurant_model->is_myfatoorah_enable){
+                    }
+                    else if ($restaurant_model->is_myfatoorah_enable){
 
                         $payment->payment_gateway_name = 'myfatoorah';
                         $payment->payment_mode = $order->paymentMethod->payment_method_name;
@@ -869,7 +870,7 @@ class OrderController extends Controller {
 
           Yii::error('[Mashkor (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
 
-          
+
           return [
               'operation' => 'error',
               'message' => 'Failed to authorize the request.',

@@ -138,7 +138,6 @@ class Voucher extends \yii\db\ActiveRecord {
         return "Couldnt find discount type";
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -150,6 +149,20 @@ class Voucher extends \yii\db\ActiveRecord {
 
             return true;
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function beforeDelete()
+    {
+        if(!parent::beforeDelete ()) {
+            return false;
+        }
+
+        CustomerVoucher::deleteAll (['voucher_id' => $this->voucher_id]);
+
+        return true;
     }
 
     public function isValid($phone_number) {
