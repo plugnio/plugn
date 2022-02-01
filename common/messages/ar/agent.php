@@ -1,5 +1,6 @@
 <?php
 return [
+    "Language Preferency Updated Successfully" => "تم تحديث تفضيل اللغة بنجاح",
     "Email not found" => "البريد الإلكتروني غير موجود",
     "Password not matching" => "كلمة المرور غير متطابقة",
     "Currencies updated successfully" => "تم تحديث العملات بنجاح",
@@ -21,7 +22,6 @@ return [
     "Old Password field required" => "مطلوب حقل كلمة المرور القديمة",
     "Confirm Password field required" => "مطلوب حقل تأكيد كلمة المرور",
     "Password field required" => "حقل كلمة المرور مطلوب",
-    "Password not matching" => "كلمة المرور غير متطابقة",
     "You're not assigned to any store" => "لم يتم تعيينك إلى أي متجر",
     "Old Password not valid" => "كلمة المرور القديمة غير صالحة",
     "Account Password Updated Successfully" => "تم تحديث كلمة مرور الحساب بنجاح",

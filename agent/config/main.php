@@ -234,8 +234,11 @@ return [
                     'patterns' => [
                         'GET' => 'detail',
                         //todo: update-email
+
                         'GET store-profile' => 'store-profile',
                         'GET stores' => 'stores',
+                        'GET language-pref' => 'language-pref',
+                        'PATCH language-pref' => 'language-pref',
                         'PUT update' => 'update-agent-profile',
                         'POST change-password' => 'change-password',
                         // OPTIONS VERBS
@@ -244,6 +247,7 @@ return [
                         'OPTIONS stores' => 'options',
                         'OPTIONS update' => 'options',
                         'OPTIONS change-password' => 'options',
+                        'OPTIONS language-pref' => 'options'
                     ]
                 ],
                 [// VoucherController

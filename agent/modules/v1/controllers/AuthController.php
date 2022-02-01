@@ -411,6 +411,7 @@ class AuthController extends Controller {
             "username" => $agent->agent_id,
             "agent_name" => $agent->agent_name,
             "agent_email" => $agent->agent_email,
+            "language_pref" => $agent->agent_language_pref,
             "role" => (int) $assignment->role,
             "selectedStore" => $selectedStore,
             "stores" => $stores
