@@ -62,6 +62,16 @@ class AgentCest
         $I->seeResponseCodeIs(HttpCode::OK); // 200
     }
 
+    public function tryToUpdateLanguagePref(FunctionalTester $I) {
+        $I->wantTo('Validate agent > update language preference api');
+        $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
+        $I->sendPATCH('v1/agent/language-pref', [
+            'language_pref' => 'en'
+        ]);
+        $I->seeResponseCodeIs(HttpCode::OK); // 200
+    }
+
+
     public function tryToUpdate(FunctionalTester $I) {
         $I->wantTo('Validate agent > update api');
         $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');

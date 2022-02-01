@@ -22,6 +22,7 @@ use common\models\AgentToken;
  * @property int $email_notification
  * @property int $receive_weekly_stats
  * @property int $reminder_email
+ * @property string $agent_language_pref
  * @property string $agent_created_at
  * @property string $agent_updated_at
  *
@@ -68,6 +69,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             [['agent_status', 'email_notification', 'reminder_email', 'receive_weekly_stats'], 'integer'],
             [['agent_created_at', 'agent_updated_at'], 'safe'],
             [['agent_name', 'agent_email', 'agent_password_hash', 'agent_password_reset_token'], 'string', 'max' => 255],
+            ['agent_language_pref', 'string', 'max' => 2],
             [['agent_auth_key'], 'string', 'max' => 32],
             [['agent_email'], 'unique'],
             [['agent_email'], 'email'],
@@ -75,6 +77,18 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             [['tempPassword'], 'safe'],
             [['agent_password_reset_token'], 'unique'],
         ];
+    }
+
+    /**
+     * @return array|array[]
+     */
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+
+        $scenarios['updateLanguagePref'] = ['agent_language_pref'];
+
+        return $scenarios;
     }
 
     /**
@@ -90,6 +104,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             'agent_auth_key' => 'Agent Auth Key',
             'agent_password_hash' => 'Agent Password Hash',
             'agent_password_reset_token' => 'Agent Password Reset Token',
+            'agent_language_pref' => 'Agent Language Preference',
             'agent_status' => 'Agent Status',
             'email_notification' => 'Email Notification',
             'agent_created_at' => 'Agent Created At',

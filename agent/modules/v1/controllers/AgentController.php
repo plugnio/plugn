@@ -129,6 +129,31 @@ class AgentController extends Controller
     }
 
     /**
+     * update language preferency
+     * @return array
+     */
+    public function actionLanguagePref()
+    {
+        $agent = Yii::$app->user->identity;
+        $agent->agent_language_pref = Yii::$app->request->getBodyParam ('language_pref');
+
+        $agent->scenario = 'updateLanguagePref';
+
+        if(!$agent->save())
+        {
+            return [
+                "operation" => "error",
+                "message" => $agent->errors
+            ];
+        }
+
+        return [
+            "operation" => "success",
+            "message" => Yii::t('agent', "Language Preferency Updated Successfully")
+        ];
+    }
+
+    /**
      * change password
      */
     public function actionChangePassword()
