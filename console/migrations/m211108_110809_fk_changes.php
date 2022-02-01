@@ -15,8 +15,11 @@ class m211108_110809_fk_changes extends Migration
         Yii::$app->db->createCommand('SET foreign_key_checks = 0')->execute();
 
         $action = 'NO ACTION';
+
         // add foreign key for table `restaurant`
+
         $this->dropForeignKey('fk-agent_assignment-restaurant_uuid', 'agent_assignment');
+
         $this->addForeignKey(
             'fk-agent_assignment-restaurant_uuid',
             'agent_assignment',
@@ -27,6 +30,7 @@ class m211108_110809_fk_changes extends Migration
         );
 
         $this->dropForeignKey('fk-agent_assignment-business_location_id', 'agent_assignment');
+
         $this->addForeignKey(
             'fk-agent_assignment-business_location_id',
             'agent_assignment',
@@ -46,7 +50,6 @@ class m211108_110809_fk_changes extends Migration
             'business_location_id',
             $action
         );
-
 
         // add foreign key for table `city`
         $this->dropForeignKey('fk-area-city_id', 'area');
@@ -58,6 +61,7 @@ class m211108_110809_fk_changes extends Migration
         /*==================delivery_zone==========*/
 
         $this->dropForeignKey('fk-delivery_zone-restaurant_uuid', 'delivery_zone');
+
         $this->addForeignKey(
             'fk-delivery_zone-restaurant_uuid',
             'delivery_zone',
@@ -81,6 +85,7 @@ class m211108_110809_fk_changes extends Migration
 
 
         $this->dropForeignKey('fk-delivery_zone-business_location_id', 'delivery_zone');
+
         // add foreign key for table `delivery_zone`
         $this->addForeignKey(
             'fk-delivery_zone-business_location_id',
@@ -104,6 +109,7 @@ class m211108_110809_fk_changes extends Migration
         );
 
         $this->dropForeignKey('fk-area_delivery_zone-city_id', 'area_delivery_zone');
+
         // add foreign key for table `area_delivery_zone`
         $this->addForeignKey(
             'fk-area_delivery_zone-city_id',
@@ -257,6 +263,7 @@ class m211108_110809_fk_changes extends Migration
         );
 
         $this->dropForeignKey('fk-restaurant_currency-currency_id', 'restaurant_currency');
+
         $this->addForeignKey(
             'fk-restaurant_currency-currency_id',
             'restaurant_currency',
@@ -267,6 +274,7 @@ class m211108_110809_fk_changes extends Migration
         );
 
         $this->dropForeignKey('fk-restaurant_currency-restaurant_uuid', 'restaurant_currency');
+
         $this->addForeignKey(
             'fk-restaurant_currency-restaurant_uuid',
             'restaurant_currency',
@@ -278,6 +286,7 @@ class m211108_110809_fk_changes extends Migration
 
 
         $this->dropForeignKey('fk-subscription-payment_method_id', 'subscription');
+
         $this->addForeignKey(
             'fk-subscription-payment_method_id',
             'subscription',
@@ -289,6 +298,7 @@ class m211108_110809_fk_changes extends Migration
 
 
         $this->dropForeignKey('fk-subscription-payment_uuid', 'subscription');
+
         $this->addForeignKey(
             'fk-subscription-payment_uuid',
             'subscription',
