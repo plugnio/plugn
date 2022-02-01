@@ -5,6 +5,7 @@ namespace agent\modules\v1\controllers;
 use agent\models\Currency;
 use agent\models\Restaurant;
 use common\models\AgentAssignment;
+use common\models\AgentEmailVerifyAttempt;
 use common\models\BusinessLocation;
 use common\models\Category;
 use common\models\RestaurantPaymentMethod;
@@ -13,6 +14,7 @@ use yii\rest\Controller;
 use yii\filters\auth\HttpBasicAuth;
 use agent\models\Agent;
 use agent\models\PasswordResetRequestForm;
+
 
 /**
  * Auth controller provides the initial access token that is required for further requests
@@ -83,7 +85,11 @@ class AuthController extends Controller {
             'options',
             'request-reset-password',
             'update-password',
-            'signup'
+            'signup',
+            'update-email',
+            'resend-verification-email',
+            'verify-email',
+            'is-email-verified',
         ];
 
         return $behaviors;
@@ -173,30 +179,34 @@ class AuthController extends Controller {
             }
 
             //Create a catrgory for a store by default named "Products". so they can get started adding products without having to add category first
-            $category_model = new Category();
-            $category_model->restaurant_uuid = $store->restaurant_uuid;
-            $category_model->title = 'Products';
-            $category_model->title_ar = 'منتجات';
-            if (!$category_model->save()) {
+
+            $category = new Category();
+            $category->restaurant_uuid = $store->restaurant_uuid;
+            $category->title = 'Products';
+            $category->title_ar = 'منتجات';
+
+            if (!$category->save()) {
                 $transaction->rollBack();
                 return [
                     "operation" => "error",
-                    "message" => $category_model->errors
+                    "message" => $category->errors
                 ];
             }
 
             //Create a business Location for a store by default named "Main Branch".
-            $business_location_model = new BusinessLocation();
-            $business_location_model->restaurant_uuid = $store->restaurant_uuid;
-            $business_location_model->country_id = $store->country_id;
-            $business_location_model->support_pick_up = 1;
-            $business_location_model->business_location_name = 'Main Branch';
-            $business_location_model->business_location_name_ar = 'الفرع الرئيسي';
-            if (!$business_location_model->save()) {
+            $business_location = new BusinessLocation();
+            $business_location->restaurant_uuid = $store->restaurant_uuid;
+            $business_location->country_id = $store->country_id;
+            $business_location->support_pick_up = 1;
+            $business_location->business_location_name = 'Main Branch';
+            $business_location->business_location_name_ar = 'الفرع الرئيسي';
+
+            if (!$business_location->save()) {
                 $transaction->rollBack();
+
                 return [
                     "operation" => "error",
-                    "message" => $business_location_model->errors
+                    "message" => $business_location->errors
                 ];
             }
 
@@ -204,6 +214,7 @@ class AuthController extends Controller {
             $payments_method = new RestaurantPaymentMethod();
             $payments_method->payment_method_id = 3; //Cash
             $payments_method->restaurant_uuid = $store->restaurant_uuid;
+            
             if (!$payments_method->save()) {
                 $transaction->rollBack();
                 return [
@@ -212,16 +223,18 @@ class AuthController extends Controller {
                 ];
             }
 
-            $assignment_agent_model = new AgentAssignment();
-            $assignment_agent_model->agent_id = $agent->agent_id;
-            $assignment_agent_model->assignment_agent_email = $agent->agent_email;
-            $assignment_agent_model->role = AgentAssignment::AGENT_ROLE_OWNER;
-            $assignment_agent_model->restaurant_uuid = $store->restaurant_uuid;
-            if (!$assignment_agent_model->save()) {
+            $assignment_agent = new AgentAssignment();
+            $assignment_agent->agent_id = $agent->agent_id;
+            $assignment_agent->assignment_agent_email = $agent->agent_email;
+            $assignment_agent->role = AgentAssignment::AGENT_ROLE_OWNER;
+            $assignment_agent->restaurant_uuid = $store->restaurant_uuid;
+            $assignment_agent->business_location_id = $business_location->business_location_id;
+            
+            if (!$assignment_agent->save()) {
                 $transaction->rollBack();
                 return [
                     "operation" => "error",
-                    "message" => $assignment_agent_model->errors
+                    "message" => $assignment_agent->errors
                 ];
             }
 
@@ -247,9 +260,8 @@ class AuthController extends Controller {
                         'store_url' => $store->restaurant_domain
                     ]
                 ]);
-
-
             }
+
             $transaction->commit();
 
             /*return [
@@ -257,7 +269,14 @@ class AuthController extends Controller {
                 'message' => Yii::t ('agent', 'Registration completed successfully')
             ];*/
 
-            return $this->_loginResponse($agent);
+            return [
+                "operation" => "success",
+                "agent_id" => $agent->agent_id,
+                "message" => Yii::t('agent', "Please click on the link sent to you by email to verify your account"),
+                "unVerifiedToken" => $this->_loginResponse($agent)
+            ];
+
+            //return $this->_loginResponse($agent);
 
         } catch (\Exception $e) {
             $transaction->rollBack();
@@ -272,10 +291,143 @@ class AuthController extends Controller {
     }
 
     /**
+     * Re-send manual verification email to candidate
+     * @return array
+     */
+    public function actionResendVerificationEmail()
+    {
+        $emailInput = Yii::$app->request->getBodyParam("email");
+
+        $agent = Agent::findOne([
+            'agent_email' => $emailInput,
+        ]);
+
+        $errors = false;
+        $errorCode = null; //error code
+
+        if ($agent) {
+
+            if ($agent->agent_email_verification == Agent::EMAIL_VERIFIED) {
+                return [
+                    'operation' => 'error',
+                    'errorCode' => 1,
+                    'message' => Yii::t('agent', 'You have verified your email')
+                ];
+            }
+
+            //Check if this user sent an email in past few minutes (to limit email spam)
+            $emailLimitDatetime = new \DateTime($candidate->candidate_limit_email);
+            date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));
+            $currentDatetime = new \DateTime();
+
+            if ($agent->agent_limit_email && $currentDatetime < $emailLimitDatetime) {
+                $difference = $currentDatetime->diff($emailLimitDatetime);
+                $minuteDifference = (int) $difference->i;
+                $secondDifference = (int) $difference->s;
+
+                $errorCode = 2;
+
+                $errors = Yii::t('candidate', "Email was sent previously, you may request another one in {numMinutes, number} minutes and {numSeconds, number} seconds", [
+                    'numMinutes' => $minuteDifference,
+                    'numSeconds' => $secondDifference,
+                ]);
+            } else if ($agent->agent_email_verification == Agent::EMAIL_NOT_VERIFIED) {
+                $agent->sendVerificationEmail();
+            }
+        } else {
+            $errorCode = 3;
+            $errors['email'] = [Yii::t('agent', 'Account not found')];
+        }
+
+        // If errors exist show them
+
+        if ($errors) {
+            return [
+                'errorCode' => $errorCode,
+                'operation' => 'error',
+                'message' => $errors
+            ];
+        }
+
+        // Otherwise return success
+        return [
+            'operation' => 'success',
+            'message' => Yii::t('agent', 'Please click on the link sent to you by email to verify your account'),
+        ];
+    }
+
+    /**
+     * Process email verification
+     * @return array
+     */
+    public function actionVerifyEmail() {
+
+        $code = Yii::$app->request->getBodyParam("code");
+        $email = Yii::$app->request->getBodyParam("email");
+
+        //check limit reached
+
+        $totalInvalidAttempts = AgentEmailVerifyAttempt::find()
+            ->andWhere([
+                'agent_email' => $email,
+                'ip_address' => Yii::$app->getRequest()->getUserIP()
+            ])
+            ->andWhere(new \yii\db\Expression("created_at >= DATE_SUB(NOW(),INTERVAL 1 HOUR)"))//last 1 hour
+            ->count();
+
+        if ($totalInvalidAttempts > 4) {
+            return [
+                'operation' => 'error',
+                'message' => Yii::t('agent', 'You reached your limit to verify email. Please try again after an hour.')
+            ];
+        }
+
+        $response = Agent::verifyEmail($email, $code);
+
+        if ($response['success'] == false) {
+            return [
+                'operation' => 'error',
+                'message' => $response['message']
+            ];
+        }
+
+        if ($response['success'] == true) {
+            //remove old email verification attempts
+
+            AgentEmailVerifyAttempt::deleteAll([
+                'agent_email' => $email,
+                'ip_address' => Yii::$app->getRequest()->getUserIP()
+            ]);
+
+            //remove otp
+
+            //$agent->otp = null;
+            //$agent->save(false);
+
+            return $this->_loginResponse($response['data']);
+            
+        } else {
+            //add entry for invalid attempt
+
+            $model = new AgentEmailVerifyAttempt;
+            $model->code = $code;
+            $model->agent_email = $email;
+            $model->ip_address = Yii::$app->getRequest()->getUserIP();
+            $model->save();
+
+            return [
+                'operation' => 'error',
+                'message' => Yii::t('agent', 'Invalid email verification code.')
+            ];
+        }
+    }
+
+    /**
      * Sends password reset email to user
      * @return array
      */
     public function actionRequestResetPassword() {
+
         $emailInput = Yii::$app->request->getBodyParam("email");
 
         $model = new PasswordResetRequestForm();
@@ -292,14 +444,29 @@ class AuthController extends Controller {
            'agent_email' => $model->email,
         ]);
 
-        if ($agent) {
+        //Check if this user sent an email in past few minutes (to limit email spam)
+        $emailLimitDatetime = new \DateTime($candidate->candidate_limit_email);
+        date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));
+        $currentDatetime = new \DateTime('now');
 
-            if (!$model->sendEmail($agent)) {
-                return [
-                    'operation' => 'error',
-                    'message' => 'Sorry, we are unable to reset a password for email provided.'
-                ];
-            }
+        if ($agent->agent_limit_email && $currentDatetime < $emailLimitDatetime) {
+            $difference = $currentDatetime->diff($emailLimitDatetime);
+            $minuteDifference = (int) $difference->i;
+            $secondDifference = (int) $difference->s;
+
+            $errors = Yii::t('agent', "Email was sent previously, you may request another one in {numMinutes, number} minutes and {numSeconds, number} seconds", [
+                'numMinutes' => $minuteDifference,
+                'numSeconds' => $secondDifference,
+            ]);
+        } else if (!$model->sendEmail()) {
+            $errors = Yii::t('agent', 'Sorry, we are unable to reset a password for email provided.');
+        }
+
+        if($errors) {
+            return [
+                'operation' => 'error',
+                'message' => $errors
+            ];
         }
 
         // Otherwise return success
@@ -350,18 +517,15 @@ class AuthController extends Controller {
 
         $agent->setPassword($newPassword);
         $agent->removePasswordResetToken();
-        $agent->save(false);
 
-        //Whenever a user changes his password using any method (password reset email / profile page), we need to send out the following email to confirm that his password was set
-        // \Yii::$app->mailer->htmlLayout = "layouts/text";
-        //
-        // \Yii::$app->mailer->compose([
-        //                     'html' => 'employer/password-reset-confirmed'
-        //                         ])
-        //                 ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
-        //                 ->setTo($agent->email)
-        //                 ->setSubject(Yii::t('employer', 'Your password reset was a success'))
-        //                 ->send();
+        /**
+         * as password reset token will be sent to email and user will update password
+         * from that link so if user have token he have valid email
+         */
+
+        $agent->agent_email_verification = Agent::EMAIL_VERIFIED;
+
+        $agent->save(false);
 
         return $this->_loginResponse($agent);
     }
