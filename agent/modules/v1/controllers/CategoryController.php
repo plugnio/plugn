@@ -293,11 +293,10 @@ class CategoryController extends Controller
      */
     public function actionChangePosition()
     {
-
         $items = Yii::$app->request->getBodyParam('items');
 
         foreach ($items as $key => $value) {
-            $model = Category::findOne($value);
+            $model = $this->findModel ($value);
             $model->sort_number = (int)$key + 1;
             $model->save(false);
         }
