@@ -69,38 +69,65 @@ class StoreController extends Controller
      */
     public function actionStatistics($storeUuid)
     {
-
         $model = $this->findModel ($storeUuid);
 
         $revenue_generated_chart_data = [];
         $months = [];
+        
+        $cacheDependency = Yii::createObject ([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT ' . date ('Y-m-d') . ', COUNT(*) FROM `order` WHERE restaurant_uuid="' . $storeUuid . '"',
 
-        $revenue_generated_last_five_months_month = Order::find ()
+            // we SELECT agent_id as well to make sure every cached sql statement is unique to this agent
+            // don't want agents viewing the cached content of another agent
+            // SUM of agent_status is to bust the cache when status changes
+        ]);
+
+        $customerCacheDependency = Yii::createObject ([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT ' . date ('Y-m-d') . ', COUNT(*) FROM customer WHERE restaurant_uuid="' . $model->restaurant_uuid . '"',
+
+            // we SELECT agent_id as well to make sure every cached sql statement is unique to this agent
+            // don't want agents viewing the cached content of another agent
+            // SUM of agent_status is to bust the cache when status changes
+        ]);
+
+        $cacheDuration = 60 * 60 * 24; //24 hour then delete from cache
+        
+        $revenue_generated_last_five_months_month = Order::getDb ()->cache (function ($db) use ($model) {
+            return Order::find ()
             ->revenueGenerated (
                 $model->restaurant_uuid,
                 date ("Y-m-d H:i:s", mktime (0, 0, 0, date ("m") - 5, 1)),
                 date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 4, 0))
             );
-
+        }, $cacheDuration, $cacheDependency);
+        
         $lastFiveMonths = date ('M', strtotime ('-5 months'));
 
         array_push ($revenue_generated_chart_data, $revenue_generated_last_five_months_month ? (double)$revenue_generated_last_five_months_month : 0);
 
         // array_push($months, $lastFiveMonths);
 
-        $revenue_generated_last_four_months_month = Order::find ()
+        $revenue_generated_last_four_months_month = Order::getDb ()->cache (function ($db) use ($model) {
+            return Order::find ()
             ->revenueGenerated (
                 $model->restaurant_uuid, date ("Y-m-d H:i:s", mktime (0, 0, 0, date ("m") - 4, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 3, 0)));
-
+        }, $cacheDuration, $cacheDependency);
+        
         $lastFoureMonths = date ('M', strtotime ('-4 months'));
 
         array_push ($revenue_generated_chart_data, $revenue_generated_last_four_months_month ? (double)$revenue_generated_last_four_months_month : 0);
 
         // array_push($months, $lastFoureMonths);
 
-        $revenue_generated_last_three_months_month = Order::find ()
+        $revenue_generated_last_three_months_month = Order::getDb ()->cache (function ($db) use ($model) {
+            return Order::find ()
             ->revenueGenerated (
                 $model->restaurant_uuid, date ("Y-m-d H:i:s", mktime (0, 0, 0, date ("m") - 3, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 2, 0)));
+        }, $cacheDuration, $cacheDependency);
 
         $lastThreeMonths = date ('M', strtotime ('-3 months'));
 
@@ -108,9 +135,11 @@ class StoreController extends Controller
 
         // array_push($months, $lastThreeMonths);
 
-        $revenue_generated_last_two_months_month = Order::find ()
+        $revenue_generated_last_two_months_month = Order::getDb ()->cache (function ($db) use ($model) {
+            return Order::find ()
             ->revenueGenerated (
                 $model->restaurant_uuid, date ("Y-m-d H:i:s", mktime (0, 0, 0, date ("m") - 2, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 1, 0)));
+        }, $cacheDuration, $cacheDependency);
 
         $lastTwoMonths = date ('M', strtotime ('-2 months'));
 
@@ -118,19 +147,21 @@ class StoreController extends Controller
 
         // array_push($months, $lastTwoMonths);
 
-
-        $revenue_generated_last_month = Order::find ()
+        $revenue_generated_last_month = Order::getDb ()->cache (function ($db) use ($model) {
+            return Order::find ()
             ->revenueGenerated ($model->restaurant_uuid, date ("Y-m-d H:i:s", mktime (0, 0, 0, date ("m") - 1, 1)),
                 date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), 0)));
-
+        }, $cacheDuration, $cacheDependency);
 
         $lastMonth = date ('M', strtotime ('-1 months'));
         array_push ($revenue_generated_chart_data, $revenue_generated_last_month ? (double)$revenue_generated_last_month : 0);
         // array_push($months, $lastMonth);
 
 
-        $revenue_generated_current_month = Order::find ()
+        $revenue_generated_current_month = Order::getDb ()->cache (function ($db) use ($model) {
+            return Order::find ()
             ->revenueGenerated ($model->restaurant_uuid, date ("Y-m-d H:i:s", mktime (0, 0, 0, date ("m"), 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") + 1, 0)));
+        }, $cacheDuration, $cacheDependency);
 
         $currentMonth = date ('M');
 
@@ -138,96 +169,113 @@ class StoreController extends Controller
 
         // array_push($months, $currentMonth);
 
-
         $order_recevied_chart_data = [];
 
-
-        $order_recevied_last_five_months_month = Order::find ()
+        $order_recevied_last_five_months_month = Order::getDb ()->cache (function ($db) use ($model) {
+            return Order::find ()
             ->ordersReceived (
                 $model->restaurant_uuid, date ("Y-m-d H:i:s", mktime (0, 0, 0, date ("m") - 5, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 4, 0)));
-
+        }, $cacheDuration, $cacheDependency);
 
         array_push ($order_recevied_chart_data, $order_recevied_last_five_months_month ? $order_recevied_last_five_months_month : 0);
 
-
-        $order_recevied_last_four_months_month = Order::find ()
+        $order_recevied_last_four_months_month = Order::getDb ()->cache (function ($db) use ($model) {
+            return Order::find ()
             ->ordersReceived (
                 $model->restaurant_uuid, date ("Y-m-d H:i:s", mktime (0, 0, 0, date ("m") - 4, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 3, 0)));
-
+        }, $cacheDuration, $cacheDependency);
 
         array_push ($order_recevied_chart_data, $order_recevied_last_four_months_month ? $order_recevied_last_four_months_month : 0);
 
 
-        $order_recevied_last_three_months_month = Order::find ()
+        $order_recevied_last_three_months_month = Order::getDb ()->cache (function ($db) use ($model) {
+            return Order::find ()
             ->ordersReceived (
                 $model->restaurant_uuid, date ("Y-m-d H:i:s", mktime (0, 0, 0, date ("m") - 3, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 2, 0)));
+        }, $cacheDuration, $cacheDependency);
 
         array_push ($order_recevied_chart_data, $order_recevied_last_three_months_month ? $order_recevied_last_three_months_month : 0);
 
 
-        $order_recevied_last_two_months_month = Order::find ()
+        $order_recevied_last_two_months_month = Order::getDb ()->cache (function ($db) use ($model) {
+            return Order::find ()
             ->ordersReceived (
                 $model->restaurant_uuid, date ("Y-m-d H:i:s", mktime (0, 0, 0, date ("m") - 2, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 1, 0)));
+        }, $cacheDuration, $cacheDependency);
 
         array_push ($order_recevied_chart_data, $order_recevied_last_two_months_month ? $order_recevied_last_two_months_month : 0);
 
-        $order_recevied_last_month = Order::find ()
+        $order_recevied_last_month = Order::getDb ()->cache (function ($db) use ($model) {
+            return Order::find ()
             ->ordersReceived (
                 $model->restaurant_uuid, date ("Y-m-d H:i:s", mktime (0, 0, 0, date ("m") - 1, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), 0)));
-
+        }, $cacheDuration, $cacheDependency);
 
         array_push ($order_recevied_chart_data, $order_recevied_last_month ? $order_recevied_last_month : 0);
 
 
-        $order_recevied_current_month = Order::find ()
+        $order_recevied_current_month = Order::getDb ()->cache (function ($db) use ($model) {
+            return Order::find ()
             ->ordersReceived (
                 $model->restaurant_uuid, date ("Y-m-d H:i:s", mktime (0, 0, 0, date ("m"), 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") + 1, 0)));
-
+        }, $cacheDuration, $cacheDependency);
 
         array_push ($order_recevied_chart_data, $order_recevied_current_month ? $order_recevied_current_month : 0);
 
 
         $customer_gained_chart_data = [];
 
-
-        $customer_gained_last_five_months_month = Customer::find ()
+        $customer_gained_last_five_months_month = Customer::getDb ()->cache (function ($db) use ($model) {
+            return Customer::find ()
             ->customerGained (
                 $model->restaurant_uuid, date ("Y-m-d H:i:s", mktime (0, 0, 0, date ("m") - 5, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 4, 0)));
+        }, $cacheDuration, $customerCacheDependency);
 
         array_push ($customer_gained_chart_data, $customer_gained_last_five_months_month ? $customer_gained_last_five_months_month : 0);
 
 
-        $customer_gained_last_four_months_month = Customer::find ()
+        $customer_gained_last_four_months_month = Customer::getDb ()->cache (function ($db) use ($model) {
+            return Customer::find ()
             ->customerGained (
                 $model->restaurant_uuid, date ("Y-m-d H:i:s", mktime (0, 0, 0, date ("m") - 4, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 3, 0)));
+        }, $cacheDuration, $customerCacheDependency);
 
         array_push ($customer_gained_chart_data, $customer_gained_last_four_months_month ? $customer_gained_last_four_months_month : 0);
 
 
-        $customer_gained_last_three_months_month = Customer::find ()
+        $customer_gained_last_three_months_month = Customer::getDb ()->cache (function ($db) use ($model) {
+            return Customer::find ()
             ->customerGained (
                 $model->restaurant_uuid, date ("Y-m-d H:i:s", mktime (0, 0, 0, date ("m") - 3, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 2, 0)));
+        }, $cacheDuration, $customerCacheDependency);
 
         array_push ($customer_gained_chart_data, $customer_gained_last_three_months_month ? $customer_gained_last_three_months_month : 0);
 
 
-        $customer_gained_last_two_months_month = Customer::find ()
+        $customer_gained_last_two_months_month = Customer::getDb ()->cache (function ($db) use ($model) {
+            return Customer::find ()
             ->customerGained (
                 $model->restaurant_uuid, date ("Y-m-d H:i:s", mktime (0, 0, 0, date ("m") - 2, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 1, 0)));
+        }, $cacheDuration, $customerCacheDependency);
 
         array_push ($customer_gained_chart_data, $customer_gained_last_two_months_month ? $customer_gained_last_two_months_month : 0);
 
 
-        $customer_gained_last_month = Customer::find ()
+        $customer_gained_last_month = Customer::getDb ()->cache (function ($db) use ($model) {
+            return Customer::find ()
             ->customerGained (
                 $model->restaurant_uuid, date ("Y-m-d H:i:s", mktime (0, 0, 0, date ("m") - 1, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), 0)));
+        }, $cacheDuration, $customerCacheDependency);
 
         array_push ($customer_gained_chart_data, $customer_gained_last_month ? $customer_gained_last_month : 0);
 
 
-        $customer_gained_current_month = Customer::find ()
+        $customer_gained_current_month = Customer::getDb ()->cache (function ($db) use ($model) {
+            return Customer::find ()
             ->customerGained (
                 $model->restaurant_uuid, date ("Y-m-d H:i:s", mktime (0, 0, 0, date ("m"), 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") + 1, 0)));
+        }, $cacheDuration, $customerCacheDependency);
+        
         array_push ($customer_gained_chart_data, $customer_gained_current_month ? $customer_gained_current_month : 0);
 
 
