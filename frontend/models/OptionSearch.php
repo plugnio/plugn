@@ -45,8 +45,7 @@ class OptionSearch extends Option
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'pagination' => false
+            'query' => $query
         ]);
 
         $this->load($params);

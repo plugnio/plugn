@@ -73,7 +73,7 @@ class OrderSearch extends Order {
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 50,
+                'pageSize' => 20,
              ],
         ]);
 
@@ -150,7 +150,7 @@ class OrderSearch extends Order {
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 50,
+                'pageSize' => 20,
              ],
         ]);
 
@@ -200,24 +200,27 @@ class OrderSearch extends Order {
     public function searchPendingOrders($params, $storeUuid, $agentAssignment) {
 
         $query = Order::find()
-            ->with(['country', 'pickupLocation', 'payment','paymentMethod','currency','deliveryZone','deliveryZone.businessLocation','customer'])
+            ->with([
+                'country',
+                'pickupLocation',
+                'payment',
+                'paymentMethod',
+                'currency',
+                'deliveryZone',
+                'deliveryZone.businessLocation',
+                'customer'])
             ->joinWith('deliveryZone', true)
             ->joinWith('pickupLocation', true)
             ->orderBy(['order_created_at' => SORT_DESC]);
-
-
-
 
           if($agentAssignment && $agentAssignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
               $query
                   ->andWhere([
                       'OR',
                       ['delivery_zone.business_location_id' => $agentAssignment->business_location_id],
-                      [ 'pickup_location_id' => $agentAssignment->business_location_id]
+                      ['pickup_location_id' => $agentAssignment->business_location_id]
                   ]);
           }
-
-
 
           $query
               ->andWhere(['order.restaurant_uuid' => $storeUuid])
@@ -226,10 +229,8 @@ class OrderSearch extends Order {
 
         // add conditions that should always apply here
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'pagination' => false
+            'query' => $query
         ]);
-
 
         $this->load($params);
 
@@ -262,12 +263,8 @@ class OrderSearch extends Order {
                 ->andFilterWhere(['like', 'payment_method_name', $this->payment_method_name])
                 ->andFilterWhere(['like', 'payment_method_name_ar', $this->payment_method_name_ar]);
 
-
-
         return $dataProvider;
     }
-
-
 
     /**
      * Creates data provider instance with search query applied
@@ -279,7 +276,7 @@ class OrderSearch extends Order {
     public function search($params, $storeUuid, $agentAssignment = null) {
 
         $query = Order::find()
-            ->with(['paymentMethod','currency','deliveryZone.businessLocation', 'selectedItems'])
+            ->with(['paymentMethod', 'currency','deliveryZone.businessLocation', 'selectedItems'])
             ->joinWith('deliveryZone', true)
             ->joinWith('pickupLocation', true)
             ->joinWith('customer', true)
@@ -304,7 +301,7 @@ class OrderSearch extends Order {
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 50,
+                'pageSize' => 20,
              ],
         ]);
 
@@ -321,15 +318,12 @@ class OrderSearch extends Order {
             return $dataProvider;
         }
 
-
         // do we have values? if so, add a filter to our query
         if (!empty($this->date_range) && strpos($this->date_range, '-') !== false) {
 
             list($start_date, $end_date) = explode(' - ', $this->date_range);
             $query->andFilterWhere(['between', 'order_created_at', $start_date, $end_date]);
         }
-
-
 
         // grid filtering conditions
         $query->andFilterWhere([
@@ -354,7 +348,7 @@ class OrderSearch extends Order {
                 ->andFilterWhere(['like', 'customer_email', $this->customer_email])
                 ->andFilterWhere(['like', 'payment_method_name', $this->payment_method_name])
                 ->andFilterWhere(['like', 'payment_method_name_ar', $this->payment_method_name_ar]);
+
         return $dataProvider;
     }
-
 }
