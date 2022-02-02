@@ -104,8 +104,13 @@ class AgentController extends Controller
 
         $agentAssignment = Yii::$app->accountManager->getAssignment($store_uuid);
 
+        $email = Yii::$app->request->getBodyParam ("agent_email");
+
+        if($email != $model->agent_email) {
+            $model->agent_new_email = $email;
+        }
+
         $model->agent_name = Yii::$app->request->getBodyParam ("agent_name");
-        $model->agent_email = Yii::$app->request->getBodyParam ("agent_email");
 
         if (!$model->save ()) {
             return [
@@ -113,6 +118,8 @@ class AgentController extends Controller
                 "message" => $model->errors
             ];
         }
+
+        $model->sendVerificationEmail();
 
         $agentAssignment->assignment_agent_email = Yii::$app->request->getBodyParam ("agent_email");
         $agentAssignment->email_notification = (int) Yii::$app->request->getBodyParam ("email_notification");

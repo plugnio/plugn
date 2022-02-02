@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'appName' => 'Plugn',
     'adminEmail' => 'saoud@plugn.io',
     'supportEmail' => 'contact@plugn.io',
     // 'senderEmail' => 'noreply@example.com',
