@@ -45,8 +45,7 @@ class BankDiscountSearch extends BankDiscount
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'pagination' => false
+            'query' => $query
         ]);
 
         

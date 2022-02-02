@@ -644,7 +644,6 @@ class Order extends \yii\db\ActiveRecord
 
         foreach ($this->restaurant->getAgentAssignments()->all() as $agentAssignment) {
 
-
             if ($agentAssignment->email_notification) {
 
                 \Yii::$app->mailer->compose([

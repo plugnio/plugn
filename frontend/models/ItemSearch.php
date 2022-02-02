@@ -53,8 +53,7 @@ class ItemSearch extends Item
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'pagination' => false
+            'query' => $query
         ]);
 
 
@@ -115,10 +114,8 @@ class ItemSearch extends Item
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'pagination' => false
+            'query' => $query
         ]);
-
 
         $dataProvider->sort->attributes['category_id'] = [
             'asc' => ['category.title' => SORT_ASC],

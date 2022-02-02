@@ -18,9 +18,6 @@ $(function () {
   $('.summary').insertAfter('.top');
 });
 
-
-
-
 ";
 $this->registerJs($js);
 ?>

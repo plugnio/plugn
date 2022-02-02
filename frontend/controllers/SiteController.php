@@ -2,7 +2,6 @@
 
 namespace frontend\controllers;
 
-use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
 use yii\base\InvalidArgumentException;
@@ -163,9 +162,6 @@ class SiteController extends Controller {
 
             if ($managedRestaurant->load(Yii::$app->request->post())) {
 
-
-
-
                 if ($old_domain != $managedRestaurant->restaurant_domain) {
 
                    $managedRestaurant->restaurant_domain = rtrim($managedRestaurant->restaurant_domain, '/');
@@ -195,7 +191,13 @@ class SiteController extends Controller {
         }
     }
 
-
+    /**
+     * confirm plan
+     * @param $id
+     * @param $selectedPlanId
+     * @return array|string|string[]|\yii\web\Response
+     * @throws NotFoundHttpException
+     */
     public function actionConfirmPlan($id, $selectedPlanId) {
 
       if ($managedRestaurant = $this->findModel($id)) {
@@ -210,7 +212,7 @@ class SiteController extends Controller {
 
         if ($subscription_model->load(Yii::$app->request->post()) && $subscription_model->save()) {
 
-        if($selectedPlan->price > 0){
+        if($selectedPlan->price > 0) {
 
           $payment = new SubscriptionPayment;
           $payment->restaurant_uuid = $managedRestaurant->restaurant_uuid;
@@ -219,13 +221,11 @@ class SiteController extends Controller {
           $payment->payment_amount_charged = $subscription_model->plan->price;
           $payment->payment_current_status = "Redirected to payment gateway";
 
-          if($managedRestaurant->referral_code){
+          if($managedRestaurant->referral_code) {
             $payment->partner_fee = $payment->payment_amount_charged * $managedRestaurant->partner->commission;
           }
 
-
           if ($payment->save()) {
-
 
               //Update payment_uuid in order
               $subscription_model->payment_uuid = $payment->payment_uuid;
@@ -354,7 +354,6 @@ class SiteController extends Controller {
 
         $managedRestaurant = $this->findModel($storeUuid);
         $agentAssignment = $managedRestaurant->getAgentAssignments()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])->one();
-
 
         $searchModel = new OrderSearch();
         $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid, $agentAssignment);
@@ -1448,7 +1447,6 @@ class SiteController extends Controller {
                 $payments_method->payment_method_id = 3; //Cash
                 $payments_method->restaurant_uuid = $store_model->restaurant_uuid;
                 $payments_method->save();
-
 
                 $assignment_agent_model = new AgentAssignment();
                 $assignment_agent_model->agent_id = $agent_model->agent_id;
