@@ -58,6 +58,7 @@ class AgentController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($storeUuid) {
+
         $model = $this->findModel($storeUuid);
 
         $agentAssignment = $model->getAgentAssignments()
