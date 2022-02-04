@@ -738,6 +738,21 @@ class OrderController extends Controller
         $order->avenue = Yii::$app->request->getBodyParam ("avenue"); //optional
         $order->house_number = Yii::$app->request->getBodyParam ("building");
 
+        $order->payment_method_id = Yii::$app->request->getBodyParam ('payment_method_id');
+        if ($order->paymentMethod && $order->paymentMethod->payment_method_name) {
+            $order->payment_method_name = $order->paymentMethod->payment_method_name;
+            $order->payment_method_name_ar = $order->paymentMethod->payment_method_name_ar;
+        }
+
+        $order->total_price = Yii::$app->request->getBodyParam ('total_price');
+        $order->subtotal = Yii::$app->request->getBodyParam ('subtotal');
+
+        $order->currency_code = Yii::$app->request->getBodyParam ('currency_code');
+        $order->store_currency_code = Yii::$app->request->getBodyParam ('currency_code');
+        if ($order->restaurant && $order->restaurant->currency && $order->restaurant->currency->code) {
+            $order->store_currency_code = $order->restaurant->currency->code;
+        }
+
         //Apply promo code
         if (Yii::$app->request->getBodyParam ("voucher_id")) {
             $order->voucher_id = Yii::$app->request->getBodyParam ("voucher_id");
@@ -1447,8 +1462,21 @@ class OrderController extends Controller
         $pickup_location_id = Yii::$app->request->getBodyParam ('pickup_location_id');
         $estimated_time_of_arrival = Yii::$app->request->getBodyParam ('estimated_time_of_arrival');
         $special_directions = Yii::$app->request->getBodyParam ('special_directions');
+        $model->payment_method_id = Yii::$app->request->getBodyParam ('payment_method_id');
+        if ($model->paymentMethod && $model->paymentMethod->payment_method_name) {
+            $model->payment_method_name = $model->paymentMethod->payment_method_name;
+            $model->payment_method_name_ar = $model->paymentMethod->payment_method_name_ar;
+        }
+
+        $model->total_price = Yii::$app->request->getBodyParam ('total_price');
+        $model->subtotal = Yii::$app->request->getBodyParam ('subtotal');
 
         $model->currency_code = Yii::$app->request->getBodyParam ('currency_code');
+        $model->store_currency_code = Yii::$app->request->getBodyParam ('currency_code');
+        if ($model->restaurant && $model->restaurant->currency && $model->restaurant->currency->code) {
+            $model->store_currency_code = $model->restaurant->currency->code;
+        }
+
         $model->order_mode = $order_mode;
         $model->customer_name = $customer_name;
         $model->area_name = $area_name;
@@ -1479,7 +1507,6 @@ class OrderController extends Controller
         }
 
         $transaction = Yii::$app->db->beginTransaction ();
-
         if (!$model->save ()) {
 
             $transaction->rollBack ();
@@ -1511,6 +1538,7 @@ class OrderController extends Controller
             $orderItem->item_name_ar = $item["item_name_ar"];
             $orderItem->qty = (int)$item["qty"];
             $orderItem->item_price = $item["item_price"];
+            $orderItem->restaurant_uuid = $restaurant_model->restaurant_uuid;
 
             if (isset($item["customer_instruction"]))
                 $orderItem->customer_instruction = $item["customer_instruction"];

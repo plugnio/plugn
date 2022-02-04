@@ -12,6 +12,7 @@ use yii\db\Expression;
  *
  * @property int $order_item_id
  * @property int $order_uuid
+ * @property string $restaurant_uuid
  * @property string $item_uuid
  * @property string $item_name
  * @property string $item_name_ar

@@ -485,6 +485,15 @@ return [
                        'OPTIONS <id>' => 'options'
                    ]
                ],
+                [ // RestaurantPaymentMethod
+                   'class' => 'yii\rest\UrlRule',
+                   'controller' => 'v1/restaurant-payment-method',
+                   'patterns' => [
+                       'GET' => 'index',
+                       // OPTIONS VERBS
+                       'OPTIONS' => 'options'
+                   ]
+               ],
             ],
         ],
     ],

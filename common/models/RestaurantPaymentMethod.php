@@ -36,6 +36,13 @@ class RestaurantPaymentMethod extends \yii\db\ActiveRecord {
         ];
     }
 
+    public function extraFields()
+    {
+        return [
+            'paymentMethod'
+        ];
+    }
+
     /**
      * {@inheritdoc}
      */
