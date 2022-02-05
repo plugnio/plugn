@@ -41,7 +41,7 @@ class LoginForm extends Model {
      * @param array $params the additional name-value pairs given in the rule
      */
     public function validatePassword($attribute, $params) {
-       
+
         if (!$this->hasErrors()) {
             $agent = $this->getAgent();
             if (!$agent || !$agent->validatePassword($this->password)) {
