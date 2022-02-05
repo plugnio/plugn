@@ -297,6 +297,7 @@ class CategoryController extends Controller
 
         foreach ($items as $key => $value) {
             $model = $this->findModel ($value);
+
             $model->sort_number = (int)$key + 1;
             $model->save(false);
         }

@@ -20,7 +20,6 @@ $js = "
 $(function () {
   $('.summary').insertAfter('.top');
 
-
   $('table.data-list-view.dataTable tbody td').css('padding', '10px');
 
   $('#restaurant-export_sold_items_data_in_specific_date_range').attr('autocomplete','off');

@@ -79,7 +79,7 @@ class DashboardAsset extends AssetBundle {
         'app-assets/vendors/js/extensions/shepherd.min.js',
         'app-assets/js/scripts/pages/dashboard-analytics.js',
         'app-assets/js/scripts/pages/dashboard-ecommerce.js',
-        'app-assets/js/scripts/ui/data-list-view.js',
+        //'app-assets/js/scripts/ui/data-list-view.js',
         'app-assets/vendors/js/tables/datatable/datatables.min.js',
         'app-assets/vendors/js/tables/datatable/datatables.buttons.min.js',
         'app-assets/vendors/js/tables/datatable/datatables.bootstrap4.min.js',
