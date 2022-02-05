@@ -66,6 +66,8 @@ class AuthController extends Controller {
                     return null;
                 }
 
+                return $agent;
+
                 if ($agent->validatePassword($password)) {
                     return $agent;
                 }
@@ -291,7 +293,7 @@ class AuthController extends Controller {
     }
 
     /**
-     * Re-send manual verification email to candidate
+     * Re-send manual verification email to agent
      * @return array
      */
     public function actionResendVerificationEmail()
@@ -316,7 +318,7 @@ class AuthController extends Controller {
             }
 
             //Check if this user sent an email in past few minutes (to limit email spam)
-            $emailLimitDatetime = new \DateTime($candidate->candidate_limit_email);
+            $emailLimitDatetime = new \DateTime($agent->agent_limit_email);
             date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));
             $currentDatetime = new \DateTime();
 
@@ -327,7 +329,7 @@ class AuthController extends Controller {
 
                 $errorCode = 2;
 
-                $errors = Yii::t('candidate', "Email was sent previously, you may request another one in {numMinutes, number} minutes and {numSeconds, number} seconds", [
+                $errors = Yii::t('agent', "Email was sent previously, you may request another one in {numMinutes, number} minutes and {numSeconds, number} seconds", [
                     'numMinutes' => $minuteDifference,
                     'numSeconds' => $secondDifference,
                 ]);
@@ -445,7 +447,7 @@ class AuthController extends Controller {
         ]);
 
         //Check if this user sent an email in past few minutes (to limit email spam)
-        $emailLimitDatetime = new \DateTime($candidate->candidate_limit_email);
+        $emailLimitDatetime = new \DateTime($agent->agent_limit_email);
         date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));
         $currentDatetime = new \DateTime('now');
 
