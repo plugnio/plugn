@@ -248,6 +248,89 @@ class Payment extends \yii\db\ActiveRecord
     }
 
     /**
+     * Update Payment's Status from TAP Payments
+     * @param  [type]  $id                           [description]
+     * @param boolean $showUpdatedFlashNotification [description]
+     * @return self                                [description]
+     */
+    public static function updatePaymentStatus($id, $status, $destinations = null , $source = null, $reference, $response_message = null )
+    {
+        // Look for payment with same Payment Gateway Transaction ID
+        $paymentRecord = \common\models\Payment::findOne(['payment_gateway_transaction_id' => $id]);
+        if (!$paymentRecord) {
+            throw new NotFoundHttpException('The requested payment does not exist in our database.');
+        }
+
+
+        $paymentRecord->payment_current_status = $status; // 'CAPTURED' ?
+        $paymentRecord->response_message = $response_message;
+
+
+        // On Successful Payments
+        if ($status == 'CAPTURED') {
+
+
+            // KNET Gateway Fee Calculation
+            if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
+
+                if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->knetGatewayFee) > Yii::$app->tapPayments->minKnetGatewayFee)
+                    $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->knetGatewayFee;
+                else
+                    $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minKnetGatewayFee;
+            } // Creditcard Gateway Fee Calculation
+            else if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_VISA_MASTERCARD) {
+
+                if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage) > Yii::$app->tapPayments->minCreditcardGatewayFee)
+                    $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage;
+                else
+                    $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minCreditcardGatewayFee;
+            } // Mada Gateway Fee Calculation
+            else if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_MADA) {
+
+                if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->madaGatewayFee) > Yii::$app->tapPayments->minMadaGatewayFee)
+                    $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->madaGatewayFee;
+                else
+                    $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->madaGatewayFee;
+            } // BENEFIT Gateway Fee Calculation
+            else if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_BENEFIT) {
+
+                if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->benefitGatewayFee) > Yii::$app->tapPayments->minBenefitGatewayFee)
+                    $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->benefitGatewayFee;
+                else
+                    $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->benefitGatewayFee;
+            }
+
+
+            if (isset($destinations))
+                $paymentRecord->plugn_fee = $destinations['amount'];
+            else
+                $paymentRecord->plugn_fee = 0;
+
+
+            // Update payment method used and the order id assigned to it
+            if (isset($source->payment_method) && $source->payment_method)
+                $paymentRecord->payment_mode = $source->payment_method;
+            if (isset($reference->payment) && $reference->payment)
+                $paymentRecord->payment_gateway_order_id = $reference->payment;
+
+            // Net amount after deducting gateway fee
+            $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee;
+
+        } else {
+            Yii::info('[TAP Payment Issue: ' . $paymentRecord->customer->customer_name . ' - #' . $paymentRecord->order_uuid . ']'
+                . $paymentRecord->restaurant->name . ': ' .$paymentRecord->customer->customer_name .
+                ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]) .
+                ' and has failed at gateway. '. $response_message . ' or maybe card issue.', __METHOD__);
+
+        }
+
+        $paymentRecord->received_callback = true;
+        $paymentRecord->save();
+
+        return $paymentRecord;
+    }
+
+    /**
      * Update Payment's Status from Myfatoorah Payments
      * @param  [type]  $id                           [description]
      * @param boolean $showUpdatedFlashNotification [description]
