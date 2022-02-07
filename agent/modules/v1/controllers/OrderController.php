@@ -1264,7 +1264,7 @@ class OrderController extends Controller
         $model->restockItems();
 
         $model->is_deleted = 1;
-        if (!$model->save ()) {
+        if (!$model->save (false)) {
             $transaction->rollBack();
             if (isset($model->errors)) {
                 return [
