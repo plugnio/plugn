@@ -178,11 +178,16 @@ class CustomerController extends Controller
                                 ]
                             ])
                             ->sum ('total_price');
-                        
-                        if($data->currency)
-                            return Yii::$app->formatter->asCurrency ($total_spent ? $total_spent : 0, $data->currency->code);
 
-                        return \Yii::$app->formatter->asDecimal ($total_spent ? $total_spent : 0, 3);
+                        if (is_numeric($total_spent)) {
+                            if ($data->currency) {
+                                return Yii::$app->formatter->asCurrency($total_spent ? $total_spent : 0, $data->currency->code);
+                            }
+
+                            return \Yii::$app->formatter->asDecimal($total_spent ? $total_spent : 0, 3);
+                        } else {
+                            return \Yii::$app->formatter->asDecimal(0, 3);
+                        }
                     }
                 ],
                 [
