@@ -2,6 +2,8 @@
 
 namespace agent\modules\v1\controllers;
 
+use agent\models\Payment;
+use agent\models\PaymentMethod;
 use agent\models\RestaurantPaymentMethod;
 use Yii;
 use common\components\TapPayments;
@@ -100,6 +102,17 @@ class RestaurantPaymentMethodController extends Controller
     {
         $store_uuid = Yii::$app->request->get('store_uuid');
         return RestaurantPaymentMethod::findAll(['restaurant_uuid'=>$store_uuid]);
+    }
+
+    /**
+     * return all payment method
+     * @param $id
+     * @return Plan|null
+     * @throws NotFoundHttpException
+     */
+    public function actionListAll()
+    {
+        return PaymentMethod::find()->all();
     }
     /**
      * Finds the Plan model based on its primary key value.

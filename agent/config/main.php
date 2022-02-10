@@ -490,8 +490,10 @@ return [
                    'controller' => 'v1/restaurant-payment-method',
                    'patterns' => [
                        'GET' => 'index',
+                       'GET all' => 'list-all',
                        // OPTIONS VERBS
-                       'OPTIONS' => 'options'
+                       'OPTIONS' => 'options',
+                       'OPTIONS all' => 'options'
                    ]
                ],
             ],
