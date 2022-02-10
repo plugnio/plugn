@@ -143,6 +143,7 @@ class OrderItemController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id, $storeUuid) {
+
         if (($model = OrderItem::findOne($id)) !== null) {
             if ($model->restaurant->restaurant_uuid == Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid)
                 return $model;

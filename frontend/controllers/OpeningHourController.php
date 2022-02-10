@@ -15,31 +15,31 @@ use yii\base\Model;
  */
 class OpeningHourController extends Controller
 {
+    public $enableCsrfValidation = false;
 
-                public $enableCsrfValidation = false;
-
-                /**
-                 * {@inheritdoc}
-                 */
-                public function behaviors() {
-                    return [
-                        'verbs' => [
-                            'class' => VerbFilter::className(),
-                            'actions' => [
-                                'delete' => ['POST'],
-                            ],
-                        ],
-                        'access' => [
-                            'class' => \yii\filters\AccessControl::className(),
-                            'rules' => [
-                                [//allow authenticated users only
-                                    'allow' => true,
-                                    'roles' => ['@'],
-                                ],
-                            ],
-                        ],
-                    ];
-                }
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
+            ],
+            'access' => [
+                'class' => \yii\filters\AccessControl::className(),
+                'rules' => [
+                    [//allow authenticated users only
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+        ];
+    }
 
     /**
      * Lists all OpeningHour models.
@@ -47,13 +47,12 @@ class OpeningHourController extends Controller
      */
     public function actionIndex($storeUuid)
     {
-
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $models = OpeningHour::find()
-                      ->andWhere(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
-                      ->orderBy(['day_of_week' => SORT_ASC, 'open_at' => SORT_ASC])
-                      ->all();
+            ->andWhere(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
+            ->orderBy(['day_of_week' => SORT_ASC, 'open_at' => SORT_ASC])
+            ->all();
 
         return $this->render('index', [
             'models' => $models,
@@ -99,7 +98,8 @@ class OpeningHourController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($storeUuid, $dayOfWeek) {
+    public function actionUpdate($storeUuid, $dayOfWeek)
+    {
 
         // $models = $this->findModel($storeUuid, $dayOfWeek);
         //
@@ -126,16 +126,12 @@ class OpeningHourController extends Controller
         //
 
 
-
-
-
-
         $openingHours = $this->findModel($storeUuid, $dayOfWeek);
 
 
         switch ($dayOfWeek) {
             case OpeningHour::DAY_OF_WEEK_SATURDAY:
-                 $day = 'Saturday';
+                $day = 'Saturday';
                 break;
             case OpeningHour::DAY_OF_WEEK_SUNDAY:
                 $day = 'Sunday';
@@ -165,31 +161,29 @@ class OpeningHourController extends Controller
         // }
 
 
+        $formDetails = Yii::$app->request->post('OpeningHour', []);
+        foreach ($formDetails as $i => $formDetail) {
 
+            //loading the models if they are not new
+            if (isset($formDetail['opening_hour_id']) && isset($formDetail['updateType']) && $formDetail['updateType'] != OpeningHour::UPDATE_TYPE_CREATE) {
 
-            $formDetails = Yii::$app->request->post('OpeningHour', []);
-            foreach ($formDetails as $i => $formDetail) {
+                //making sure that it is actually a child of the main model
+                $modelDetail = OpeningHour::findOne(['opening_hour_id' => $formDetail['opening_hour_id'], 'restaurant_uuid' => $storeUuid, 'day_of_week' => $dayOfWeek]);
 
-                //loading the models if they are not new
-                if (isset($formDetail['opening_hour_id']) && isset($formDetail['updateType']) && $formDetail['updateType'] != OpeningHour::UPDATE_TYPE_CREATE) {
-
-                    //making sure that it is actually a child of the main model
-                    $modelDetail = OpeningHour::findOne(['opening_hour_id' => $formDetail['opening_hour_id'] ,'restaurant_uuid' => $storeUuid ,'day_of_week' => $dayOfWeek]);
-
-                    $modelDetail->day_of_week = $dayOfWeek;
-                    $modelDetail->restaurant_uuid = $storeUuid;
-                    $modelDetail->setScenario(OpeningHour::SCENARIO_BATCH_UPDATE);
-                    $modelDetail->setAttributes($formDetail);
-                    $openingHours[$i] = $modelDetail;
-                    //validate here if the modelDetail loaded is valid, and if it can be updated or deleted
-                } else {
-                    $modelDetail = new OpeningHour(['scenario' => OpeningHour::SCENARIO_BATCH_UPDATE]);
-                    // $modelDetail->restaurant_uuid = $storeUuid;
-                    $modelDetail->setAttributes($formDetail);
-                    $openingHours[] = $modelDetail;
-                }
-
+                $modelDetail->day_of_week = $dayOfWeek;
+                $modelDetail->restaurant_uuid = $storeUuid;
+                $modelDetail->setScenario(OpeningHour::SCENARIO_BATCH_UPDATE);
+                $modelDetail->setAttributes($formDetail);
+                $openingHours[$i] = $modelDetail;
+                //validate here if the modelDetail loaded is valid, and if it can be updated or deleted
+            } else {
+                $modelDetail = new OpeningHour(['scenario' => OpeningHour::SCENARIO_BATCH_UPDATE]);
+                // $modelDetail->restaurant_uuid = $storeUuid;
+                $modelDetail->setAttributes($formDetail);
+                $openingHours[] = $modelDetail;
             }
+
+        }
 
 
         //handling if the addRow button has been pressed
@@ -202,31 +196,31 @@ class OpeningHourController extends Controller
             ]);
         }
 
-        if (Model::loadMultiple($openingHours, Yii::$app->request->post()) ) {
+        if (Model::loadMultiple($openingHours, Yii::$app->request->post())) {
 
             // if (Model::validateMultiple($openingHours)) {
-                foreach($openingHours as $modelDetail) {
-                    //details that has been flagged for deletion will be deleted
-                    if ($modelDetail->updateType == OpeningHour::UPDATE_TYPE_DELETE) {
-                        $modelDetail->delete();
-                    } else {
-                        //new or updated records go here
-                        $modelDetail->day_of_week = $dayOfWeek;
-                        $modelDetail->restaurant_uuid = $storeUuid;
+            foreach ($openingHours as $modelDetail) {
+                //details that has been flagged for deletion will be deleted
+                if ($modelDetail->updateType == OpeningHour::UPDATE_TYPE_DELETE) {
+                    $modelDetail->delete();
+                } else {
+                    //new or updated records go here
+                    $modelDetail->day_of_week = $dayOfWeek;
+                    $modelDetail->restaurant_uuid = $storeUuid;
 
-                        $modelDetail->save();
+                    $modelDetail->save();
 
 
-                    }
                 }
-                return $this->redirect(['index', 'storeUuid' => $storeUuid]);
+            }
+            return $this->redirect(['index', 'storeUuid' => $storeUuid]);
             // }
         }
 
         return $this->render('update', [
-          'openingHours' => $openingHours,
-          'day' => $day,
-          'storeUuid' => $storeUuid
+            'openingHours' => $openingHours,
+            'day' => $day,
+            'storeUuid' => $storeUuid
         ]);
 
     }
@@ -254,7 +248,7 @@ class OpeningHourController extends Controller
      */
     protected function findModel($storeUuid, $dayOfWeek)
     {
-        if (($model = OpeningHour::find()->where(['day_of_week'=>$dayOfWeek, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->all()) !== null) {
+        if (($model = OpeningHour::find()->where(['day_of_week' => $dayOfWeek, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->all()) !== null) {
             return $model;
         }
 

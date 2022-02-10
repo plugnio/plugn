@@ -122,7 +122,14 @@ class WebLinkController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id, $storeUuid) {
-        if (($model = WebLink::find()->where(['web_link_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
+
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $model = WebLink::find()
+            ->where(['web_link_id' => $id, 'restaurant_uuid' => $store->restaurant_uuid])
+            ->one();
+
+        if ($model !== null) {
             return $model;
         }
 

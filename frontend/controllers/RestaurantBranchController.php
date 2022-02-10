@@ -133,7 +133,15 @@ class RestaurantBranchController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id, $storeUuid) {
-        if (($model = RestaurantBranch::findOne(['restaurant_branch_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])) !== null) {
+
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $model = RestaurantBranch::findOne([
+            'restaurant_branch_id' => $id,
+            'restaurant_uuid' => $store->restaurant_uuid
+        ]);
+
+        if ($model !== null) {
             return $model;
         }
 

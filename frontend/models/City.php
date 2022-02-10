@@ -24,7 +24,8 @@ class City extends \common\models\City
      */
     public function getRestaurantDeliveryAreas()
     {
-        return $this->hasMany(RestaurantDelivery::className(), ['area_id' => 'area_id'])->via('areas');
+        return $this->hasMany(RestaurantDelivery::className(), ['area_id' => 'area_id'])
+            ->via('areas');
     }
 
 }

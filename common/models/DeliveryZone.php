@@ -67,6 +67,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
     {
         return [
             'delivery_zone_id' => 'Delivery Zone ID',
+            'city_id' => 'City ID',
             'country_id' => 'Country ID',
             'business_location_id' => 'Business Location',
             'delivery_time' => 'Delivery Time',

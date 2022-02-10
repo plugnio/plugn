@@ -45,7 +45,6 @@ class PaymentController extends Controller
      */
     public function actionIndex($storeUuid)
     {
-        
         $restaurant_model = Yii::$app->getManagedAccount->getManagedAccount($storeUuid);
 
         $searchModel = new PaymentSearch();
@@ -72,7 +71,6 @@ class PaymentController extends Controller
         ]);
     }
 
- 
     /**
      * Deletes an existing Payment model.
      * If deletion is successful, the browser will be redirected to the 'index' page.

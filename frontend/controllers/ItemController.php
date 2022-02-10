@@ -61,7 +61,6 @@ class ItemController extends Controller
         header("Content-Disposition: attachment;filename=\"item-report.xlsx\"");
         header("Cache-Control: max-age=0");
 
-
         \moonland\phpexcel\Excel::export([
             'isMultipleSheet' => false,
             'models' => $model,
@@ -119,7 +118,6 @@ class ItemController extends Controller
         if ($store_model->load(Yii::$app->request->post())) {
 
           list($start_date, $end_date) = explode(' - ', $store_model->export_sold_items_data_in_specific_date_range);
-
 
             $searchResult = Item::find()
                     ->joinWith(['orderItems', 'orderItems.order'])

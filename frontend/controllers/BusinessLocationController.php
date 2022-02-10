@@ -48,16 +48,15 @@ class BusinessLocationController extends Controller
     {
         $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        $businessLocations = BusinessLocation::find()->where(['restaurant_uuid' => $store_model->restaurant_uuid])->all();
-
+        $businessLocations = BusinessLocation::find()
+            ->where(['restaurant_uuid' => $store_model->restaurant_uuid])
+            ->all();
 
         return $this->render('index', [
             'businessLocations' => $businessLocations,
             'store' => $store_model
         ]);
     }
-
-
 
     /**
      * Creates a new BusinessLocation model.
@@ -67,6 +66,7 @@ class BusinessLocationController extends Controller
     public function actionCreate($storeUuid)
     {
         $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
         $model = new BusinessLocation();
         $model->restaurant_uuid = $store_model->restaurant_uuid;
 

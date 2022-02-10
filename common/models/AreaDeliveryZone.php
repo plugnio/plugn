@@ -68,8 +68,8 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
 
         if ($insert) {
 
-          if( $this->area_id){
-            $this->country_id = $this->area->country->country_id;
+          if($this->area_id) {
+            $this->country_id = $this->area->country_id;
             $this->city_id = $this->area->city_id;
           } else {
             $this->country_id = $this->deliveryZone->country_id;

@@ -135,13 +135,14 @@ class CustomerController extends Controller {
     * Export customers data to excel
     * @return mixed
     */
-    public function actionExportToExcel($storeUuid){
+    public function actionExportToExcel($storeUuid)
+    {
            $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
            $model = Customer::find()
-           ->andWhere(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
-           ->orderBy(['customer_created_at' => SORT_DESC])
-           ->all();
+            ->andWhere(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
+            ->orderBy(['customer_created_at' => SORT_DESC])
+            ->all();
 
            header('Access-Control-Allow-Origin: *');
            header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

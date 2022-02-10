@@ -153,11 +153,11 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
                 <div class="col-12" style=" margin-bottom:12px; border-width: 0.5px; border-style: solid; border-color: #e2e8f0; padding: 10px; border-radius: 7px;     position: relative;">
 
                   <?php
-                    if($deliveryZone->country->areas){
+                    //if($deliveryZone->country->areas) {
                         echo  Html::a('Edit <i class="feather icon-edit"></i>',
-                                      ['update-areas', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
+                                      ['cities', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
                                       [ 'style' => ' position: absolute; top: 10px; right: 10px;']);
-                    }
+                   // }
                   ?>
 
 
