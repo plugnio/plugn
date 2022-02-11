@@ -154,6 +154,15 @@ class Payment extends \yii\db\ActiveRecord
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
+        if($paymentRecord->received_callback){
+          \Yii::info("updatePaymentStatusFromTap: received_callback", __METHOD__);
+
+          return $paymentRecord;
+        } else {
+          \Yii::info("updatePaymentStatusFromTap: !received_callback", __METHOD__);
+
+        }
+
 
         // Request response about it from TAP
         Yii::$app->tapPayments->setApiKeys($paymentRecord->restaurant->live_api_key, $paymentRecord->restaurant->test_api_key);
@@ -259,6 +268,15 @@ class Payment extends \yii\db\ActiveRecord
         $paymentRecord = \common\models\Payment::findOne(['payment_gateway_transaction_id' => $id]);
         if (!$paymentRecord) {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
+        }
+
+        if($paymentRecord->received_callback){
+          \Yii::info("updatePaymentStatus:  received_callback", __METHOD__);
+
+          return $paymentRecord;
+        } else {
+
+          \Yii::info("updatePaymentStatus:  !received_callback", __METHOD__);
         }
 
 
