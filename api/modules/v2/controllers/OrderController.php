@@ -687,6 +687,8 @@ class OrderController extends Controller {
 
 
       $paymentRecord = Payment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
+      $paymentRecord->received_callback = true;
+      $paymentRecord->save(false);
 
       if($paymentRecord){
         return [

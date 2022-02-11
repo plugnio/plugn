@@ -342,8 +342,6 @@ class Payment extends \yii\db\ActiveRecord
 
         }
 
-        $paymentRecord->received_callback = true;
-        $paymentRecord->save();
 
         return $paymentRecord;
     }
