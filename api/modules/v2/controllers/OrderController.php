@@ -643,6 +643,8 @@ class OrderController extends Controller {
      */
     public function actionCallback($tap_id) {
 
+      \Yii::info(" enter actionCallback", __METHOD__);
+
         try {
             $paymentRecord = Payment::updatePaymentStatusFromTap($tap_id);
             $paymentRecord->received_callback = true;
@@ -668,6 +670,8 @@ class OrderController extends Controller {
      */
     public function actionPaymentWebhook() {
 
+      \Yii::info(" enter actionPaymentWebhook", __METHOD__);
+
       $charge_id = Yii::$app->request->getBodyParam("id");
       $status = Yii::$app->request->getBodyParam("status");
       $destinations = Yii::$app->request->getBodyParam("destinations");
@@ -690,7 +694,7 @@ class OrderController extends Controller {
             'message' => 'Payment status has been updated successfully'
         ];
       }
-      
+
     }
 
     /**
