@@ -154,14 +154,8 @@ class Payment extends \yii\db\ActiveRecord
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
-        if($paymentRecord->received_callback){
-          \Yii::info("updatePaymentStatusFromTap: received_callback", __METHOD__);
-
+        if($paymentRecord->received_callback)
           return $paymentRecord;
-        } else {
-          \Yii::info("updatePaymentStatusFromTap: !received_callback", __METHOD__);
-
-        }
 
 
         // Request response about it from TAP
@@ -270,14 +264,9 @@ class Payment extends \yii\db\ActiveRecord
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
-        if($paymentRecord->received_callback){
-          \Yii::info("updatePaymentStatus:  received_callback", __METHOD__);
-
+        if($paymentRecord->received_callback)
           return $paymentRecord;
-        } else {
 
-          \Yii::info("updatePaymentStatus:  !received_callback", __METHOD__);
-        }
 
 
         $paymentRecord->payment_current_status = $status; // 'CAPTURED' ?
