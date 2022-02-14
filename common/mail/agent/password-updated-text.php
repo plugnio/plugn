@@ -2,8 +2,8 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $user common\models\User */
+/* @var $agent common\models\Agent */
 
 ?>
 
-Hello <?= Html::encode($user->username) ?>, Your password has been updated successfully.
+Hello <?= Html::encode($agent->agent_name) ?>, Your password has been updated successfully.

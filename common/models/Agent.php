@@ -152,7 +152,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     {
         parent::afterSave ($insert, $changedAttributes);
 
-        if (isset($changedAttributes['agent_password_hash'])) {
+        if (!$insert && $this->agent_password_hash && isset($changedAttributes['agent_password_hash'])) {
             $this->sendPasswordUpdatedEmail ();
         }
     }

@@ -8,7 +8,7 @@ use yii\helpers\Url;
 /* @var $searchModel frontend\models\CategorySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 
 $this->title = 'Manage Categories';
 $this->params['breadcrumbs'][] = $this->title;
@@ -31,7 +31,7 @@ $this->registerJs($js);
 <div class="action-btns d-none">
     <div class="btn-dropdown mr-1 mb-1">
         <div class="btn-group dropdown actions-dropodown">
-          <?= Html::a('Create category', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+          <?= Html::a('Create category', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
         </div>
     </div>
 </div>
@@ -40,7 +40,7 @@ $this->registerJs($js);
 
    <?php if($dataProvider->getCount() == 0 ){  ?>
      <div style="padding-left:14px">
-     <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'    padding: 0.85rem 1.7rem;']) ?>
+     <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'    padding: 0.85rem 1.7rem;']) ?>
    </div>
    <?php } ?>
 
@@ -95,7 +95,7 @@ $this->registerJs($js);
         <p>
           Use categories to organize your products for your online store.
         </p>
-        <?= Html::a('Create category', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Create category', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
       </div>
     </div>
 

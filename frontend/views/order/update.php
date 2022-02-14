@@ -27,7 +27,7 @@ $this->registerJs($js);
     <?=
     $this->render('_form', [
         'model' => $model,
-        'restaurant_model' => $restaurant_model,
+        'restaurant' => $restaurant,
     ])
     ?>
 

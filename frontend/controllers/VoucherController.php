@@ -47,15 +47,15 @@ class VoucherController extends Controller
      */
     public function actionIndex($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new VoucherSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant->restaurant_uuid);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'restaurant_model' => $restaurant_model
+            'restaurant' => $restaurant
         ]);
     }
 
@@ -66,9 +66,9 @@ class VoucherController extends Controller
      */
     public function actionCreate($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        if($restaurant_model) {
+        if($restaurant) {
 
           $model = new Voucher();
           $model->restaurant_uuid = $storeUuid;

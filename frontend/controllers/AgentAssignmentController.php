@@ -49,18 +49,18 @@ class AgentAssignmentController extends Controller
      */
     public function actionIndex($storeUuid)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        if (Yii::$app->user->identity->isOwner($store_model->restaurant_uuid))
+        if (Yii::$app->user->identity->isOwner($store->restaurant_uuid))
         {
             $dataProvider = new ActiveDataProvider([
                 'query' => AgentAssignment::find()
-                    ->where(['restaurant_uuid' => $store_model->restaurant_uuid]),
+                    ->where(['restaurant_uuid' => $store->restaurant_uuid]),
             ]);
 
             return $this->render('index', [
                 'dataProvider' => $dataProvider,
-                'restaurant_uuid' => $store_model->restaurant_uuid
+                'restaurant_uuid' => $store->restaurant_uuid
             ]);
         } else {
             throw new \yii\web\BadRequestHttpException('Sorry, you are not allowed to access this page.');

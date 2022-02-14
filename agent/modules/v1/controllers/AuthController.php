@@ -162,7 +162,6 @@ class AuthController extends Controller {
 
         $transaction = Yii::$app->db->beginTransaction();
 
-        try {
             if (!$agent->save()) {
                 $transaction->rollBack();
                 return [
@@ -262,6 +261,8 @@ class AuthController extends Controller {
                 ]);
             }
 
+            $agent->sendVerificationEmail();
+
             $transaction->commit();
 
             /*return [
@@ -278,13 +279,13 @@ class AuthController extends Controller {
 
             //return $this->_loginResponse($agent);
 
-        } catch (\Exception $e) {
+        /*} catch (\Exception $e) {
             $transaction->rollBack();
             return [
                 "operation" => 'error',
                 "message" => $e->getMessage()
             ];
-        }
+        }*/
 
 //        return $this->_loginResponse ($agent);
 

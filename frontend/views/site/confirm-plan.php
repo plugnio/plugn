@@ -11,7 +11,7 @@ use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 $this->title = "Confirm " . $selectedPlan->name;
 
 ?>
@@ -39,7 +39,7 @@ $this->title = "Confirm " . $selectedPlan->name;
         ?>
 
         <?=
-        $form->field($subscription_model, 'payment_method_id')->radioList($paymentMethodArray, [
+        $form->field($subscription, 'payment_method_id')->radioList($paymentMethodArray, [
             'style' => 'display:grid',
             'item' => function($index, $label, $name, $checked, $value) {
 

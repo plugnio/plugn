@@ -50,7 +50,7 @@ class SiteController extends Controller
                 'class' => AccessControl::className (),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error', 'index', 'signup', 'thank-you', 'request-password-reset', 'reset-password'],
+                        'actions' => ['login', 'error', 'index', 'signup', 'verify-email', 'thank-you', 'request-password-reset', 'reset-password'],
                         'allow' => true,
                     ],
                     [
@@ -147,7 +147,7 @@ class SiteController extends Controller
             $this->layout = 'login';
 
             return $this->render ('coming-soon', [
-                'restaurant_model' => $managedRestaurant
+                'restaurant' => $managedRestaurant
             ]);
         }
     }
@@ -191,7 +191,7 @@ class SiteController extends Controller
         }
 
         return $this->render ('connect-domain', [
-            'restaurant_model' => $managedRestaurant
+            'restaurant' => $managedRestaurant
         ]);
     }
 
@@ -208,21 +208,21 @@ class SiteController extends Controller
 
         $selectedPlan = Plan::findOne ($selectedPlanId);
 
-        $subscription_model = new Subscription();
-        $subscription_model->restaurant_uuid = $managedRestaurant->restaurant_uuid;
-        $subscription_model->plan_id = $selectedPlan->plan_id;
+        $subscription = new Subscription();
+        $subscription->restaurant_uuid = $managedRestaurant->restaurant_uuid;
+        $subscription->plan_id = $selectedPlan->plan_id;
 
         $payment_methods = PaymentMethod::find ()->all ();
 
-        if ($subscription_model->load (Yii::$app->request->post ()) && $subscription_model->save ()) {
+        if ($subscription->load (Yii::$app->request->post ()) && $subscription->save ()) {
 
             if ($selectedPlan->price > 0) {
 
                 $payment = new SubscriptionPayment;
                 $payment->restaurant_uuid = $managedRestaurant->restaurant_uuid;
-                $payment->payment_mode = $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
-                $payment->subscription_uuid = $subscription_model->subscription_uuid; //subscription_uuid
-                $payment->payment_amount_charged = $subscription_model->plan->price;
+                $payment->payment_mode = $subscription->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
+                $payment->subscription_uuid = $subscription->subscription_uuid; //subscription_uuid
+                $payment->payment_amount_charged = $subscription->plan->price;
                 $payment->payment_current_status = "Redirected to payment gateway";
 
                 if ($managedRestaurant->referral_code) {
@@ -232,8 +232,8 @@ class SiteController extends Controller
                 if ($payment->save ()) {
 
                     //Update payment_uuid in order
-                    $subscription_model->payment_uuid = $payment->payment_uuid;
-                    $subscription_model->save (false);
+                    $subscription->payment_uuid = $payment->payment_uuid;
+                    $subscription->save (false);
 
 
                     // Redirect to payment gateway
@@ -241,17 +241,17 @@ class SiteController extends Controller
 
                     $response = Yii::$app->tapPayments->createCharge (
                         "KWD",
-                        "Upgrade $managedRestaurant->name's plan to " . $subscription_model->plan->name, // Description
+                        "Upgrade $managedRestaurant->name's plan to " . $subscription->plan->name, // Description
                         'Plugn', //Statement Desc.
                         $payment->payment_uuid, // Reference
-                        $subscription_model->plan->price,
+                        $subscription->plan->price,
                         $managedRestaurant->name,
                         $managedRestaurant->getAgents ()->one ()->agent_email,
                         $managedRestaurant->country->country_code,
                         $managedRestaurant->owner_number ? $managedRestaurant->owner_number : null,
                         0, //Comission
                         Url::to (['site/callback'], true),
-                        $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD,
+                        $subscription->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD,
                         0
                     );
 
@@ -308,9 +308,9 @@ class SiteController extends Controller
         }
 
         return $this->render ('confirm-plan', [
-            'restaurant_model' => $managedRestaurant,
+            'restaurant' => $managedRestaurant,
             'selectedPlan' => Plan::findOne ($selectedPlanId),
-            'subscription_model' => $subscription_model,
+            'subscription' => $subscription,
             'paymentMethods' => $payment_methods
         ]);
     }
@@ -1364,7 +1364,7 @@ class SiteController extends Controller
             }
 
             return $this->render ('index', [
-                'restaurant_model' => $managedRestaurant,
+                'restaurant' => $managedRestaurant,
                 'numberOfOrders' => $numberOfOrders,
                 //customer gained
                 'today_customer_gained' => $today_customer_gained ? $today_customer_gained : 0,
@@ -1502,113 +1502,116 @@ class SiteController extends Controller
      */
     public function actionSignup()
     {
-
         $this->layout = 'login';
 
-        $store_model = new Restaurant();
-        $store_model->version = 3;
-        $store_model->setScenario (Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
+        $store = new Restaurant();
+        $store->version = 3;
+        $store->setScenario (Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
 
-        $agent_model = new Agent();
-        $agent_model->setScenario (Agent::SCENARIO_CREATE_NEW_AGENT);
+        $agent = new Agent();
+        $agent->setScenario (Agent::SCENARIO_CREATE_NEW_AGENT);
 
-        if ($agent_model->load (Yii::$app->request->post ()) && $store_model->load (Yii::$app->request->post ())) {
+        if ($agent->load (Yii::$app->request->post ()) && $store->load (Yii::$app->request->post ())) {
 
-            $store_model->restaurant_email = $agent_model->agent_email;
-            $store_model->owner_first_name = $agent_model->agent_name;
+            $store->restaurant_email = $agent->agent_email;
+            $store->owner_first_name = $agent->agent_name;
 
-            $store_model->name_ar = $store_model->name;
+            $store->name_ar = $store->name;
 
             if (
-                $agent_model->validate () && $store_model->validate () &&
-                $store_model->save () && $agent_model->save ()) {
-
+                $agent->validate () && $store->validate () &&
+                $store->save () && $agent->save ()) {
 
                 //Create a catrgory for a store by default named "Products". so they can get started adding products without having to add category first
-                $category_model = new Category();
-                $category_model->restaurant_uuid = $store_model->restaurant_uuid;
-                $category_model->title = 'Products';
-                $category_model->title_ar = 'منتجات';
-                $category_model->save ();
+                $category = new Category();
+                $category->restaurant_uuid = $store->restaurant_uuid;
+                $category->title = 'Products';
+                $category->title_ar = 'منتجات';
+                $category->save ();
 
                 //Create a business Location for a store by default named "Main Branch".
-                $business_location_model = new BusinessLocation();
-                $business_location_model->restaurant_uuid = $store_model->restaurant_uuid;
-                $business_location_model->country_id = $store_model->country_id;
-                $business_location_model->support_pick_up = 1;
-                $business_location_model->business_location_name = 'Main Branch';
-                $business_location_model->business_location_name_ar = 'الفرع الرئيسي';
-                $business_location_model->save ();
+                $business_location = new BusinessLocation();
+                $business_location->restaurant_uuid = $store->restaurant_uuid;
+                $business_location->country_id = $store->country_id;
+                $business_location->support_pick_up = 1;
+                $business_location->business_location_name = 'Main Branch';
+                $business_location->business_location_name_ar = 'الفرع الرئيسي';
+                $business_location->save ();
 
                 //Enable cash by default
                 $payments_method = new RestaurantPaymentMethod();
                 $payments_method->payment_method_id = 3; //Cash
-                $payments_method->restaurant_uuid = $store_model->restaurant_uuid;
+                $payments_method->restaurant_uuid = $store->restaurant_uuid;
                 $payments_method->save ();
-
-
+                
                 //Enable cash by default
                 $payments_method = new RestaurantPaymentMethod();
                 $payments_method->payment_method_id = 3; //Cash
-                $payments_method->restaurant_uuid = $store_model->restaurant_uuid;
+                $payments_method->restaurant_uuid = $store->restaurant_uuid;
                 $payments_method->save ();
 
-                $assignment_agent_model = new AgentAssignment();
-                $assignment_agent_model->agent_id = $agent_model->agent_id;
-                $assignment_agent_model->assignment_agent_email = $agent_model->agent_email;
-                $assignment_agent_model->role = AgentAssignment::AGENT_ROLE_OWNER;
-                $assignment_agent_model->restaurant_uuid = $store_model->restaurant_uuid;
-                $assignment_agent_model->email_notification = 1;
+                $assignment_agent = new AgentAssignment();
+                $assignment_agent->agent_id = $agent->agent_id;
+                $assignment_agent->assignment_agent_email = $agent->agent_email;
+                $assignment_agent->role = AgentAssignment::AGENT_ROLE_OWNER;
+                $assignment_agent->restaurant_uuid = $store->restaurant_uuid;
+                $assignment_agent->email_notification = 1;
 
-                if ($assignment_agent_model->save ()) {
-                    $model = new LoginForm();
-                    $model->email = $agent_model->agent_email;
-                    $model->password = $agent_model->tempPassword;
+                if ($assignment_agent->save ()) {
 
-                    if ($managedRestaurant = $model->login ()) {
-                        \Yii::info ("[New Store Signup] " . $store_model->name . " has just joined Plugn", __METHOD__);
+                    $agent->sendVerificationEmail();
 
-                        if (YII_ENV == 'prod') {
-                            $full_name = explode (' ', $agent_model->agent_name);
-                            $firstname = $full_name[0];
-                            $lastname = array_key_exists (1, $full_name) ? $full_name[1] : null;
+                    \Yii::info ("[New Store Signup] " . $store->name . " has just joined Plugn", __METHOD__);
 
-                            \Segment::init ('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-                            \Segment::track ([
-                                'userId' => $store_model->restaurant_uuid,
-                                'event' => 'Store Created',
-                                'type' => 'track',
-                                'properties' => [
-                                    'first_name' => trim ($firstname),
-                                    'last_name' => trim ($lastname),
-                                    'store_name' => $store_model->name,
-                                    'country' => $store_model->country_id ? $store_model->country->country_name : '',
-                                    'currency' => $store_model->currency_id ? $store_model->currency->title : '',
-                                    'phone_number' => $store_model->owner_number,
-                                    'email' => $agent_model->agent_email,
-                                    'store_url' => $store_model->restaurant_domain
-                                ]
-                            ]);
+                    if (YII_ENV == 'prod') {
+                        $full_name = explode (' ', $agent->agent_name);
+                        $firstname = $full_name[0];
+                        $lastname = array_key_exists (1, $full_name) ? $full_name[1] : null;
 
-                            Yii::$app->session->setFlash ('storeCreated');
-
-                        }
-
-                        return $this->redirect (['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
-                    } else {
-                        $model->password = '';
-
-                        return $this->render ('login', [
-                            'model' => $model,
+                        \Segment::init ('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+                        \Segment::track ([
+                            'userId' => $store->restaurant_uuid,
+                            'event' => 'Store Created',
+                            'type' => 'track',
+                            'properties' => [
+                                'first_name' => trim ($firstname),
+                                'last_name' => trim ($lastname),
+                                'store_name' => $store->name,
+                                'country' => $store->country_id ? $store->country->country_name : '',
+                                'currency' => $store->currency_id ? $store->currency->title : '',
+                                'phone_number' => $store->owner_number,
+                                'email' => $agent->agent_email,
+                                'store_url' => $store->restaurant_domain
+                            ]
                         ]);
+
+                        Yii::$app->session->setFlash ('storeCreated');
+
                     }
+
+                    return $this->redirect (['site/verify-email', 'email' => $agent->agent_email]);
                 }
             }
         }
 
         return $this->render ('signup', [
-            'agent_model' => $agent_model,
-            'store_model' => $store_model
+            'agent' => $agent,
+            'store' => $store
+        ]);
+    }
+
+    /**
+     * page to ask user to check email for email verification
+     * @return string
+     */
+    public function actionVerifyEmail()
+    {
+        $email = Yii::$app->request->get('email');
+
+        $this->layout = 'landing';
+
+        return $this->render ('verify-email', [
+            'email' => $email
         ]);
     }
 
@@ -1625,13 +1628,11 @@ class SiteController extends Controller
      */
     public function actionRequestPasswordReset()
     {
-
         $this->layout = 'login';
 
-
         $model = new PasswordResetRequestForm();
-        if ($model->load (Yii::$app->request->post ())) {
 
+        if ($model->load (Yii::$app->request->post ())) {
 
             if ($model->sendEmail ()) {
                 Yii::$app->session->setFlash ('success', 'Check your email for further instructions.');

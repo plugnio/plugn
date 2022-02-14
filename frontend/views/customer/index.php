@@ -47,7 +47,7 @@ white-space: nowrap !important;
 
 <section id="data-list-view" class="data-list-view-header">
 
-  <?php  echo $this->render('_search', ['model' => $searchModel,'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
+  <?php  echo $this->render('_search', ['model' => $searchModel,'restaurant_uuid' => $restaurant->restaurant_uuid]); ?>
 
   <?php if ($dataProvider->getCount() > 0) { ?>
 

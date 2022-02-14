@@ -108,7 +108,7 @@ class OrderItemController extends Controller {
     public function actionUpdate($id, $storeUuid) {
         $model = $this->findModel($id, $storeUuid);
 
-        $order_model = Order::findOne($model->order_uuid);
+        $order = Order::findOne($model->order_uuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->order_item_id, 'storeUuid' => $storeUuid]);
@@ -127,10 +127,10 @@ class OrderItemController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionDelete($id, $storeUuid) {
-        $order_item_model = $this->findModel($id, $storeUuid);
-        $order_uuid = $order_item_model->order_uuid;
+        $order_item = $this->findModel($id, $storeUuid);
+        $order_uuid = $order_item->order_uuid;
 
-        $order_item_model->delete();
+        $order_item->delete();
 
         return $this->redirect(['order/update', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
     }

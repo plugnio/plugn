@@ -15,7 +15,7 @@ use yii\helpers\Url;
 
 DashboardAsset::register($this);
 
-$restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->params['restaurant_uuid']])->one();
+$restaurant = Restaurant::find()->where(['restaurant_uuid' => $this->params['restaurant_uuid']])->one();
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -117,9 +117,9 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                 <ul class="nav navbar-nav flex-row">
                     <li class="nav-item mr-auto">
                         <?=
-                           Html::a('<img src="' . $restaurant_model->getRestaurantLogoUrl() . '" class="round"  height="40" width="40" ">'
-                                    . '<h2 class="brand-text mb-0"  style="font-size: 20px; width: 190px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">' . $restaurant_model->name . '</h2>'
-                                    , ['site/index', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'navbar-brand']);
+                           Html::a('<img src="' . $restaurant->getRestaurantLogoUrl() . '" class="round"  height="40" width="40" ">'
+                                    . '<h2 class="brand-text mb-0"  style="font-size: 20px; width: 190px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">' . $restaurant->name . '</h2>'
+                                    , ['site/index', 'id' => $restaurant->restaurant_uuid], ['class' => 'navbar-brand']);
                         ?>
                     </li>
                     </a>
@@ -134,14 +134,14 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                 <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
 
 
-                    <?php if (Yii::$app->user->identity->isOwner($restaurant_model->restaurant_uuid)) { ?>
+                    <?php if (Yii::$app->user->identity->isOwner($restaurant->restaurant_uuid)) { ?>
 
                         <li class=" nav-item <?= $this->context->route == 'site/vendor-dashboard' ? 'active' : '' ?> ">
 
                             <?=
                             Html::a(
                                     Html::tag('i', '', ['class' => ' feather icon-home']) .
-                                    Html::tag('span', 'Dashboard'), ['site/vendor-dashboard', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                    Html::tag('span', 'Dashboard'), ['site/vendor-dashboard', 'id' => $restaurant->restaurant_uuid], ['class' => 'menu-title']
                             )
                             ?>
                         </li>
@@ -152,7 +152,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                         <?=
                         Html::a(
                                 Html::tag('i', '', ['class' => 'feather icon-server']) .
-                                Html::tag('span', 'Real Time Orders'), ['site/real-time-orders', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                Html::tag('span', 'Real Time Orders'), ['site/real-time-orders', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-item']
                         )
                         ?>
                     </li>
@@ -169,7 +169,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'All Orders'), ['order/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                        Html::tag('span', 'All Orders'), ['order/index', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-item']
                                 )
                                 ?>
                             </li>
@@ -177,7 +177,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'Drafts'), ['order/draft', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                        Html::tag('span', 'Drafts'), ['order/draft', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-item']
                                 )
                                 ?>
                             </li>
@@ -185,7 +185,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'Abandoned checkouts'), ['order/abandoned-checkout', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                        Html::tag('span', 'Abandoned checkouts'), ['order/abandoned-checkout', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-item']
                                 )
                                 ?>
                             </li>
@@ -197,7 +197,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                         <?=
                         Html::a(
                                 Html::tag('i', '', ['class' => 'feather icon-grid']) .
-                                Html::tag('span', 'Categories'), ['category/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                Html::tag('span', 'Categories'), ['category/index', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-title']
                         )
                         ?>
                     </li>
@@ -212,7 +212,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'All Items'), ['item/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                        Html::tag('span', 'All Items'), ['item/index', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-title']
                                 )
                                 ?>
                             </li>
@@ -222,7 +222,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'Inventory'), ['item/inventory', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                        Html::tag('span', 'Inventory'), ['item/inventory', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-title']
                                 )
                                 ?>
                             </li>
@@ -231,7 +231,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                     </li>
 
 
-                    <?php if($restaurant_model->country_id = 84 && $restaurant_model->is_tap_enable) { ?>
+                    <?php if($restaurant->country_id = 84 && $restaurant->is_tap_enable) { ?>
 
                     <li class=" nav-item">
                         <a>
@@ -243,7 +243,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'Voucher'), ['voucher/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                        Html::tag('span', 'Voucher'), ['voucher/index', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-item']
                                 )
                                 ?>
                             </li>
@@ -252,7 +252,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'Bank Discount'), ['bank-discount/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                        Html::tag('span', 'Bank Discount'), ['bank-discount/index', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-item']
                                 )
                                 ?>
                             </li>
@@ -264,7 +264,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                         <?=
                         Html::a(
                                 Html::tag('i', '', ['class' =>  'fa  fa-tags']) .
-                                Html::tag('span', 'Voucher'), ['voucher/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                Html::tag('span', 'Voucher'), ['voucher/index', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-item']
                         )
                         ?>
                     </li>
@@ -276,11 +276,11 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                         <?=
                         Html::a(
                                 Html::tag('i', '', ['class' => 'feather icon-user']) .
-                                Html::tag('span', 'Customers'), ['customer/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                Html::tag('span', 'Customers'), ['customer/index', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-title']
                         )
                         ?>
                     </li>
-                    <?php if (Yii::$app->user->identity->isOwner($restaurant_model->restaurant_uuid)) { ?>
+                    <?php if (Yii::$app->user->identity->isOwner($restaurant->restaurant_uuid)) { ?>
 
                         <li class=" nav-item">
                             <a>
@@ -293,7 +293,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                   <?=
                                   Html::a(
                                     Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                          Html::tag('span', 'Statistics'), ['store/statistics', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                          Html::tag('span', 'Statistics'), ['store/statistics', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-title']
                                   )
                                   ?>
                               </li>
@@ -302,7 +302,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                   <?=
                                   Html::a(
                                     Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                          Html::tag('span', 'Reports'), ['store/reports', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                          Html::tag('span', 'Reports'), ['store/reports', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-title']
                                   )
                                   ?>
                               </li>
@@ -321,13 +321,13 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                             <span class="menu-title">Settings</span>
                         </a>
                         <ul class="menu-content" style="padding-left: 17px;">
-                            <?php if (Yii::$app->user->identity->isOwner($restaurant_model->restaurant_uuid)) { ?>
+                            <?php if (Yii::$app->user->identity->isOwner($restaurant->restaurant_uuid)) { ?>
 
                                 <li class=" nav-item <?= $this->context->route == 'store/update' || $this->context->route == 'store/update' ? 'active' : '' ?> ">
                                     <?=
                                     Html::a(
                                             Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                            Html::tag('span', 'Store Info'), ['store/update', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                            Html::tag('span', 'Store Info'), ['store/update', 'id' => $restaurant->restaurant_uuid], ['class' => 'menu-title']
                                     )
                                     ?>
                                 </li>
@@ -336,29 +336,29 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                     <?=
                                     Html::a(
                                             Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                            Html::tag('span', 'Payment Methods'), ['store/view-payment-methods', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                            Html::tag('span', 'Payment Methods'), ['store/view-payment-methods', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-title']
                                     )
                                     ?>
                                 </li>
 
-                              <?php if ($restaurant_model->version == 2 || $restaurant_model->version == 3 || $restaurant_model->version == 4) { ?>
+                              <?php if ($restaurant->version == 2 || $restaurant->version == 3 || $restaurant->version == 4) { ?>
 
                                 <li class=" nav-item <?= $this->context->route == 'business-location/index'  ? 'active' : '' ?> ">
                                     <?=
                                     Html::a(
                                             Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                            Html::tag('span', 'Business Locations'), ['business-location/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                            Html::tag('span', 'Business Locations'), ['business-location/index', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-title']
                                     )
                                     ?>
                                 </li>
                               <?php }  ?>
 
-                              <?php if ($restaurant_model->has_deployed) { ?>
+                              <?php if ($restaurant->has_deployed) { ?>
                                 <li class=" nav-item <?= $this->context->route == 'site/domains'  ? 'active' : '' ?> ">
                                     <?=
                                     Html::a(
                                             Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                            Html::tag('span', 'Domains'), ['site/connect-domain', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                            Html::tag('span', 'Domains'), ['site/connect-domain', 'id' => $restaurant->restaurant_uuid], ['class' => 'menu-title']
                                     )
                                     ?>
                                 </li>
@@ -368,7 +368,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                     <?=
                                     Html::a(
                                             Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                            Html::tag('span', 'Design & layout'), ['store/update-design-layout', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                            Html::tag('span', 'Design & layout'), ['store/update-design-layout', 'id' => $restaurant->restaurant_uuid], ['class' => 'menu-title']
                                     )
                                     ?>
                                 </li>
@@ -376,7 +376,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                     <?=
                                     Html::a(
                                             Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                            Html::tag('span', 'Web Links'), ['web-link/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                            Html::tag('span', 'Web Links'), ['web-link/index', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-title']
                                     )
                                     ?>
                                 </li>
@@ -391,7 +391,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                             <?=
                                             Html::a(
                                                     Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                                    Html::tag('span', 'Analytics'), ['store/update-analytics-integration', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'menu-item']
+                                                    Html::tag('span', 'Analytics'), ['store/update-analytics-integration', 'id' => $restaurant->restaurant_uuid], ['class' => 'menu-item']
                                             )
                                             ?>
                                         </li>
@@ -404,17 +404,17 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                                 <?=
                                 Html::a(
                                         Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                        Html::tag('span', 'Opening Hours'), ['opening-hour/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                        Html::tag('span', 'Opening Hours'), ['opening-hour/index', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-title']
                                 )
                                 ?>
                             </li>
-                            <?php if (Yii::$app->user->identity->isOwner($restaurant_model->restaurant_uuid)) { ?>
+                            <?php if (Yii::$app->user->identity->isOwner($restaurant->restaurant_uuid)) { ?>
                                 <li class=" nav-item <?= $this->context->route == 'agent-assignment/index' ? 'active' : '' ?> ">
 
                                     <?=
                                     Html::a(
                                             Html::tag('i', '', ['class' => 'feather icon-circle']) .
-                                            Html::tag('span', 'Staff Management'), ['agent-assignment/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title']
+                                            Html::tag('span', 'Staff Management'), ['agent-assignment/index', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-title']
                                     )
                                     ?>
                                 </li>
@@ -438,7 +438,7 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
                         <?=
                         Html::a(
                                 Html::tag('i', '', ['class' => 'feather icon-eye']) .
-                                Html::tag('span', 'Visit Store'), ['site/redirect-to-store-domain', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'menu-title', 'style' => 'border: 2px solid #28c76f; border-radius: 5px;']
+                                Html::tag('span', 'Visit Store'), ['site/redirect-to-store-domain', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'menu-title', 'style' => 'border: 2px solid #28c76f; border-radius: 5px;']
                         )
                         ?>
                     </li>
@@ -527,30 +527,30 @@ $restaurant_model = Restaurant::find()->where(['restaurant_uuid' => $this->param
 
         $full_name = explode(' ', Yii::$app->user->identity->agent_name);
 
-        $storeName = $restaurant_model->name;
-        $ownerPhoneNumber = $restaurant_model->owner_number;
+        $storeName = $restaurant->name;
+        $ownerPhoneNumber = $restaurant->owner_number;
         $agentEmail = Yii::$app->user->identity->agent_email;
 
-        $planName = $restaurant_model->plan? $restaurant_model->plan->name: 'Free plan';
+        $planName = $restaurant->plan? $restaurant->plan->name: 'Free plan';
 
-        $tapAccountCreated = $restaurant_model->is_tap_enable ? 'yes' : 'no';
-        $paymentCash = $restaurant_model->getPaymentMethods()->where(['payment_method_id' => 3])->exists() ? 'yes' : 'no';
-        $paymentKNET = $restaurant_model->getPaymentMethods()->where(['payment_method_id' => 1])->exists() ? 'yes' : 'no';
-        $paymentCreditcard = $restaurant_model->getPaymentMethods()->where(['payment_method_id' => 2])->exists() ? 'yes' : 'no';
-        $deliveryMashkor = $restaurant_model->mashkor_branch_id ? 'yes' : 'no' ;
-        $deliveryArmada = $restaurant_model->armada_api_key ? 'yes' : 'no' ;
-        $storeLogo = $restaurant_model->logo ? $restaurant_model->getRestaurantLogoUrl() : 'false';
+        $tapAccountCreated = $restaurant->is_tap_enable ? 'yes' : 'no';
+        $paymentCash = $restaurant->getPaymentMethods()->where(['payment_method_id' => 3])->exists() ? 'yes' : 'no';
+        $paymentKNET = $restaurant->getPaymentMethods()->where(['payment_method_id' => 1])->exists() ? 'yes' : 'no';
+        $paymentCreditcard = $restaurant->getPaymentMethods()->where(['payment_method_id' => 2])->exists() ? 'yes' : 'no';
+        $deliveryMashkor = $restaurant->mashkor_branch_id ? 'yes' : 'no' ;
+        $deliveryArmada = $restaurant->armada_api_key ? 'yes' : 'no' ;
+        $storeLogo = $restaurant->logo ? $restaurant->getRestaurantLogoUrl() : 'false';
 
-        $segmentScript = "analytics.identify('". $restaurant_model->restaurant_uuid."', {
+        $segmentScript = "analytics.identify('". $restaurant->restaurant_uuid."', {
             newDashboard: false,
             name: '". $storeName ."',
-            domain:'". $restaurant_model->restaurant_domain  ."',
+            domain:'". $restaurant->restaurant_domain  ."',
             phone:'". $ownerPhoneNumber  ."',
             email: '".$agentEmail  ."',
             plan: '". $planName ."',
             logo: '". $storeLogo ."',
-            totalProducts: '". $restaurant_model->getItems()->count() ."',
-            totalOrders: '". $restaurant_model->getOrders()->count() ."',
+            totalProducts: '". $restaurant->getItems()->count() ."',
+            totalOrders: '". $restaurant->getOrders()->count() ."',
             tapAccountCreated: '". $tapAccountCreated ."',
             paymentCash: '". $paymentCash ."',
             paymentKNET: '". $paymentKNET ."',

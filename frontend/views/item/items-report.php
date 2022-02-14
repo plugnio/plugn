@@ -11,7 +11,7 @@ use kartik\daterange\DateRangePicker;
 /* @var $searchModel backend\models\ItemSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $store->restaurant_uuid;
 
 $this->title = 'Items';
 $this->params['breadcrumbs'][] = $this->title;
@@ -58,7 +58,7 @@ $this->registerJs($js);
 
 
           <?=
-          $form->field($store_model, 'export_sold_items_data_in_specific_date_range', [
+          $form->field($store, 'export_sold_items_data_in_specific_date_range', [
               'labelOptions' => ['style' => ' margin-bottom: 10px;   font-size: 1.32rem;'],
               'template' => '
             {label}
