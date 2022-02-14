@@ -346,10 +346,10 @@ class StoreController extends Controller
 
         $model = $this->findModel ($storeUuid);
 
-        $restaurant_payment_method_model = new RestaurantPaymentMethod();
-        $restaurant_payment_method_model->payment_method_id = $paymentMethodId;
-        $restaurant_payment_method_model->restaurant_uuid = $model->restaurant_uuid;
-        $restaurant_payment_method_model->save (false);
+        $restaurant_payment_method = new RestaurantPaymentMethod();
+        $restaurant_payment_method->payment_method_id = $paymentMethodId;
+        $restaurant_payment_method->restaurant_uuid = $model->restaurant_uuid;
+        $restaurant_payment_method->save (false);
 
         return $this->redirect (['view-payment-methods', 'storeUuid' => $model->restaurant_uuid]);
     }
@@ -625,11 +625,11 @@ class StoreController extends Controller
 
         $model = $this->findModel ($storeUuid);
 
-        $store_theme_model = RestaurantTheme::findOne ($model->restaurant_uuid);
+        $store_theme = RestaurantTheme::findOne ($model->restaurant_uuid);
 
         return $this->render ('design-layout/view-design-layout', [
             'model' => $model,
-            'store_theme_model' => $store_theme_model
+            'store_theme' => $store_theme
         ]);
     }
 
@@ -810,9 +810,9 @@ class StoreController extends Controller
 
         $model = $this->findModel ($id);
 
-        $store_theme_model = RestaurantTheme::findOne ($model->restaurant_uuid);
+        $store_theme = RestaurantTheme::findOne ($model->restaurant_uuid);
 
-        if (Yii::$app->request->isPost && $model->load (Yii::$app->request->post ()) && $store_theme_model->load (Yii::$app->request->post ())) {
+        if (Yii::$app->request->isPost && $model->load (Yii::$app->request->post ()) && $store_theme->load (Yii::$app->request->post ())) {
 
             if (!$model->phone_number)
                 $model->phone_number_display = Restaurant::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER;
@@ -866,7 +866,7 @@ class StoreController extends Controller
 
             $model->sitemap_require_update = 1;
 
-            if ($model->save () && $store_theme_model->save ()) {
+            if ($model->save () && $store_theme->save ()) {
 
 
                 if ($thumbnail_image)
@@ -879,7 +879,7 @@ class StoreController extends Controller
 
         return $this->render ('design-layout/update-design-layout', [
             'model' => $model,
-            'store_theme_model' => $store_theme_model
+            'store_theme' => $store_theme
         ]);
     }
 
@@ -943,11 +943,11 @@ class StoreController extends Controller
     protected function findModel($id)
     {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount ($id);
+        $restaurant = Yii::$app->accountManager->getManagedAccount ($id);
 
-        if ($restaurant_model !== null) {
+        if ($restaurant !== null) {
             if (Yii::$app->user->identity->isOwner ($id))
-                return $restaurant_model;
+                return $restaurant;
             else
                 throw new \yii\web\BadRequestHttpException('Sorry, you are not allowed to access this page.');
         }

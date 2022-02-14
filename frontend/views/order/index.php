@@ -10,7 +10,7 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\OrderSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 
 $this->title = 'Orders';
 $this->params['breadcrumbs'][] = $this->title;
@@ -61,7 +61,7 @@ white-space: nowrap !important;
 <section id="data-list-view" class="data-list-view-header">
 
 
-      <?php  echo $this->render('_search', ['model' => $searchModel,'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
+      <?php  echo $this->render('_search', ['model' => $searchModel,'restaurant_uuid' => $restaurant->restaurant_uuid]); ?>
 
     <?php if ($dataProvider->getCount() > 0) { ?>
 
@@ -70,11 +70,11 @@ white-space: nowrap !important;
         <div class="action-btns ">
             <div class="btn-dropdown mr-1 mb-1">
                 <div class="btn-group dropdown actions-dropodown">
-                    <?= Html::a('Create order ', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                    <?= Html::a('Create order ', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
                 </div>
                 <?php if(\Yii::$app->user->identity->agent_id == 404 || \Yii::$app->user->identity->agent_id == 1){  ?>
                 <div class="btn-group dropdown actions-dropodown">
-                    <?= Html::a('Print Pending Orders For Mashkor', ['download-pending-orders-for-mashkor', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+                    <?= Html::a('Print Pending Orders For Mashkor', ['download-pending-orders-for-mashkor', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-success']) ?>
                 </div>
               <?php } ?>
             </div>
@@ -276,7 +276,7 @@ white-space: nowrap !important;
                 <p>
                     This is where you’ll fulfill orders, collect payments, and track order progress.
                 </p>
-    <?= Html::a('Create order', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+    <?= Html::a('Create order', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
             </div>
         </div>
 

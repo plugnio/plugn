@@ -52,9 +52,9 @@ class ItemController extends Controller
 
     public function actionExportToExcel($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        $model = Item::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->all();
+        $model = Item::find()->where(['restaurant_uuid' => $restaurant->restaurant_uuid])->all();
 
         header('Access-Control-Allow-Origin: *');
         header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -95,15 +95,15 @@ class ItemController extends Controller
      */
     public function actionIndex($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new ItemSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant->restaurant_uuid);
 
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
-                    'restaurant_model' => $restaurant_model
+                    'restaurant' => $restaurant
         ]);
     }
 
@@ -113,11 +113,11 @@ class ItemController extends Controller
      */
     public function actionItemsReport($storeUuid)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        if ($store_model->load(Yii::$app->request->post())) {
+        if ($store->load(Yii::$app->request->post())) {
 
-          list($start_date, $end_date) = explode(' - ', $store_model->export_sold_items_data_in_specific_date_range);
+          list($start_date, $end_date) = explode(' - ', $store->export_sold_items_data_in_specific_date_range);
 
             $searchResult = Item::find()
                     ->joinWith(['orderItems', 'orderItems.order'])
@@ -131,7 +131,7 @@ class ItemController extends Controller
                             Order::STATUS_COMPLETE
                         ]
                     ])
-                    ->andWhere(['order.restaurant_uuid' => $store_model->restaurant_uuid])
+                    ->andWhere(['order.restaurant_uuid' => $store->restaurant_uuid])
                     ->andWhere(['between', 'order.order_created_at', $start_date, $end_date])
                     ->all();
 
@@ -163,7 +163,7 @@ class ItemController extends Controller
         }
 
         return $this->render('items-report', [
-                    'store_model' => $store_model
+                    'store' => $store
         ]);
     }
 
@@ -173,10 +173,10 @@ class ItemController extends Controller
      */
     public function actionInventory($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new ItemSearch();
-        $dataProvider = $searchModel->searchTrackQuantity(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
+        $dataProvider = $searchModel->searchTrackQuantity(Yii::$app->request->queryParams, $restaurant->restaurant_uuid);
 
         // foreach ($dataProvider->query->all() as $key => $item) {
         //     if (isset($_POST[$item->item_uuid])) {
@@ -188,7 +188,7 @@ class ItemController extends Controller
         return $this->render('inventory', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
-                    'restaurant_model' => $restaurant_model
+                    'restaurant' => $restaurant
         ]);
     }
 
@@ -242,10 +242,10 @@ class ItemController extends Controller
      */
     public function actionCreate($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $modelItem = new Item;
-        $modelItem->restaurant_uuid = $restaurant_model->restaurant_uuid;
+        $modelItem->restaurant_uuid = $restaurant->restaurant_uuid;
         $categoryQuery = Category::find()->where(['restaurant_uuid' => $modelItem->restaurant_uuid])->asArray()->all();
 
 
@@ -359,7 +359,7 @@ class ItemController extends Controller
                     'categoryQuery' => $categoryQuery,
                     'modelsOption' => (empty($modelsOption)) ? [new Option] : $modelsOption,
                     'modelsExtraOption' => (empty($modelsExtraOption)) ? [[new ExtraOption]] : $modelsExtraOption,
-                    'storeUuid' => $restaurant_model->restaurant_uuid
+                    'storeUuid' => $restaurant->restaurant_uuid
         ]);
     }
 

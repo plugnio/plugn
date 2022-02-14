@@ -9,7 +9,7 @@ use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 $this->title = 'Connect existing domain';
 ?>
 
@@ -37,7 +37,7 @@ $this->title = 'Connect existing domain';
                 <?php $form = ActiveForm::begin(); ?>
 
                 <?=
-                $form->field($restaurant_model, 'restaurant_domain', [
+                $form->field($restaurant, 'restaurant_domain', [
                     'template' => "{label}"
                     . "
                    {input}

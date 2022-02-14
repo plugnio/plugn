@@ -9,7 +9,7 @@ use yii\helpers\Url;
 /* @var $searchModel frontend\models\BankDiscountSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 
 
 $this->title = 'Bank Discounts';
@@ -28,7 +28,7 @@ $this->registerJs($js);
     <div class="action-btns d-none">
         <div class="btn-dropdown mr-1 mb-1">
             <div class="btn-group dropdown actions-dropodown">
-                <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary']) ?>
+                <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-outline-primary']) ?>
             </div>
         </div>
     </div>
@@ -37,7 +37,7 @@ $this->registerJs($js);
 
     <?php if ($dataProvider->getCount() == 0) { ?>
         <div style="padding-left:14px">
-            <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary', 'style' => '    padding: 0.85rem 1.7rem;']) ?>
+            <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-outline-primary', 'style' => '    padding: 0.85rem 1.7rem;']) ?>
         </div>
     <?php } ?>
 

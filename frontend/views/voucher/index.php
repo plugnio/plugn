@@ -8,7 +8,7 @@ use common\models\Voucher;
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\VoucherSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 
 $this->title = 'Vouchers';
 $this->params['breadcrumbs'][] = $this->title;
@@ -28,7 +28,7 @@ $this->registerJs($js);
     <div class="action-btns d-none">
         <div class="btn-dropdown mr-1 mb-1">
             <div class="btn-group dropdown actions-dropodown">
-                <?= Html::a('Create voucher code', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                <?= Html::a('Create voucher code', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
             </div>
         </div>
     </div>
@@ -151,7 +151,7 @@ $this->registerJs($js);
           <p>
             Create voucher codes that apply at checkout.
           </p>
-          <?= Html::a('Create voucher code', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+          <?= Html::a('Create voucher code', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
         </div>
       </div>
 

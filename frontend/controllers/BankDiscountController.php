@@ -47,19 +47,19 @@ class BankDiscountController extends Controller
      */
     public function actionIndex($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new BankDiscountSearch();
 
         $dataProvider = $searchModel->search(
             Yii::$app->request->queryParams,
-            $restaurant_model->restaurant_uuid
+            $restaurant->restaurant_uuid
         );
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'restaurant_model' => $restaurant_model
+            'restaurant' => $restaurant
         ]);
     }
 
@@ -71,9 +71,9 @@ class BankDiscountController extends Controller
      */
     public function actionCreate($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        if($restaurant_model){
+        if($restaurant){
 
           $model = new BankDiscount();
           $model->restaurant_uuid = $storeUuid;

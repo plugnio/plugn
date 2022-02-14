@@ -8,10 +8,10 @@ use yii\grid\GridView;
 /* @var $searchModel frontend\models\DeliveryZoneSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Delivery Zones for ' . $business_location_model->business_location_name . ' | ' . $business_location_model->country->country_name;
-$this->params['breadcrumbs'][] = ['label' => 'Business Locations', 'url' => ['business-location/index', 'storeUuid' => $business_location_model->restaurant_uuid]];
+$this->title = 'Delivery Zones for ' . $business_location->business_location_name . ' | ' . $business_location->country->country_name;
+$this->params['breadcrumbs'][] = ['label' => 'Business Locations', 'url' => ['business-location/index', 'storeUuid' => $business_location->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
-$this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $store->restaurant_uuid;
 
 ?>
 
@@ -40,17 +40,17 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
 
       <?php
 
-      if(!$business_location_model->getDeliveryZones()->where(['country_id' => $business_location_model->country_id])->exists()){
-          echo  Html::a('Add delivery zone to ' . $business_location_model->country->country_name ,
-                  ['create', 'storeUuid' => $store_model->restaurant_uuid, 'businessLocationId' => $business_location_model->business_location_id, 'countryId' => $business_location_model->country_id],
+      if(!$business_location->getDeliveryZones()->where(['country_id' => $business_location->country_id])->exists()){
+          echo  Html::a('Add delivery zone to ' . $business_location->country->country_name ,
+                  ['create', 'storeUuid' => $store->restaurant_uuid, 'businessLocationId' => $business_location->business_location_id, 'countryId' => $business_location->country_id],
                   ['class' => 'btn btn-outline-primary', 'style' => 'margin-bottom : 15px']);
 
           echo  Html::a('Add delivery zone other country',
-                   ['create', 'storeUuid' => $store_model->restaurant_uuid, 'businessLocationId' => $business_location_model->business_location_id],
+                   ['create', 'storeUuid' => $store->restaurant_uuid, 'businessLocationId' => $business_location->business_location_id],
                    ['class' => 'btn btn-outline-primary', 'style' => 'margin-bottom : 15px; margin-left:10px']);
       } else {
         echo Html::a('Add delivery zone',
-          ['create', 'storeUuid' => $store_model->restaurant_uuid, 'businessLocationId' => $business_location_model->business_location_id],
+          ['create', 'storeUuid' => $store->restaurant_uuid, 'businessLocationId' => $business_location->business_location_id],
           ['class' => 'btn btn-outline-primary', 'style' => 'margin-bottom : 15px']);
       }
 
@@ -78,7 +78,7 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
 
         <?=
           Html::a('Delete',
-          ['delete', 'delivery_zone_id' => $deliveryZone->delivery_zone_id, 'store_uuid' => $store_model->restaurant_uuid],
+          ['delete', 'delivery_zone_id' => $deliveryZone->delivery_zone_id, 'store_uuid' => $store->restaurant_uuid],
           [
             'style' => ' position: absolute; top: 10px; right: 10px; color:#EA5455',
             'data' => [
@@ -112,7 +112,7 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
 
                 <?=
                   Html::a('Edit <i class="feather icon-edit"></i>',
-                  ['update', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
+                  ['update', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store->restaurant_uuid],
                   [ 'style' => ' position: absolute; top: 10px; right: 10px;'])
                 ?>
 
@@ -155,7 +155,7 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
                   <?php
                     //if($deliveryZone->country->areas) {
                         echo  Html::a('Edit <i class="feather icon-edit"></i>',
-                                      ['cities', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
+                                      ['cities', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store->restaurant_uuid],
                                       [ 'style' => ' position: absolute; top: 10px; right: 10px;']);
                    // }
                   ?>
@@ -180,11 +180,11 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
                   <?php
                     if(!$deliveryZone->delivery_zone_tax){
                         echo  Html::a('Override <i class="feather icon-edit"></i>',
-                                       ['update-delivery-zone-vat', 'deliveryZoneId' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
+                                       ['update-delivery-zone-vat', 'deliveryZoneId' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store->restaurant_uuid],
                                       [ 'style' => ' position: absolute; top: 10px; right: 10px;']);
                     } else {
                       echo  Html::a('Cancel override',
-                          ['remove-tax-override', 'deliveryZoneId' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
+                          ['remove-tax-override', 'deliveryZoneId' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store->restaurant_uuid],
                                     [ 'style' => ' position: absolute; top: 10px; right: 10px; color: #EA5455']);
                     }
                   ?>

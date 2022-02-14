@@ -9,7 +9,7 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\OrderSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 
 $this->title = 'Abandoned checkouts';
 $this->params['breadcrumbs'][] = $this->title;

@@ -52,7 +52,7 @@ $this->registerJs($js);
 
     <div class="card-body">
         <?php
-        $areaQuery = $restaurant_model->getAreas()->asArray()->all();
+        $areaQuery = $restaurant->getAreas()->asArray()->all();
         $areaList = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
 
 

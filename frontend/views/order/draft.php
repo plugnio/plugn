@@ -9,7 +9,7 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\OrderSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 
 $this->title = 'Drafts';
 $this->params['breadcrumbs'][] = $this->title;
@@ -29,7 +29,7 @@ $this->registerJs($js);
     <div class="action-btns d-none">
         <div class="btn-dropdown mr-1 mb-1">
             <div class="btn-group dropdown actions-dropodown">
-              <?= Html::a('Create draft order ', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+              <?= Html::a('Create draft order ', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
             </div>
         </div>
     </div>
@@ -114,7 +114,7 @@ $this->registerJs($js);
         <p>
           Use draft orders to take orders over the phone, email invoices to customers, and collect payments.
         </p>
-        <?= Html::a('Create draft order', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Create draft order', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
       </div>
     </div>
 

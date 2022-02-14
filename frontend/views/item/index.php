@@ -11,7 +11,7 @@ use kartik\daterange\DateRangePicker;
 /* @var $searchModel backend\models\ItemSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 
 $this->title = 'Items';
 $this->params['breadcrumbs'][] = $this->title;
@@ -52,7 +52,7 @@ $this->registerJs($js);
     <div class="action-btns d-none">
         <div class="btn-dropdown mr-1 mb-1">
             <div class="btn-group dropdown actions-dropodown">
-                <?= Html::a('Add item', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                <?= Html::a('Add item', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
             </div>
         </div>
     </div>
@@ -60,7 +60,7 @@ $this->registerJs($js);
 
     <?php if ($dataProvider->getCount() == 0) { ?>
         <div style="padding-left:14px">
-            <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary', 'style' => '    padding: 0.85rem 1.7rem;']) ?>
+            <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-outline-primary', 'style' => '    padding: 0.85rem 1.7rem;']) ?>
         </div>
     <?php } ?>
 
@@ -207,7 +207,7 @@ $this->registerJs($js);
         <p>
           This is where you’ll add products and manage your pricing. You can also import and export your product inventory.
         </p>
-        <?= Html::a('Add item', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Add item', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
       </div>
     </div>
 

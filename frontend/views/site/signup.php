@@ -1,7 +1,7 @@
 <?php
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
-/* @var $agent_model \frontend\models\ContactForm */
+/* @var $agent \frontend\models\ContactForm */
 
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
@@ -59,23 +59,23 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ?>
 
 
-                                <?= $form->field($agent_model, 'agent_name')->textInput(['maxlength' => true])->label('Your name *') ?>
+                                <?= $form->field($agent, 'agent_name')->textInput(['maxlength' => true])->label('Your name *') ?>
 
-                                <?= $form->field($agent_model, 'agent_email')->textInput(['maxlength' => true,'type' => 'email'])->label('Your email *') ?>
+                                <?= $form->field($agent, 'agent_email')->textInput(['maxlength' => true,'type' => 'email'])->label('Your email *') ?>
 
                                 <?=
-                                    $form->field($store_model, 'owner_number')->widget(PhoneInput::className(), [
+                                    $form->field($store, 'owner_number')->widget(PhoneInput::className(), [
                                          'jsOptions' => [
                                              'preferredCountries' => ['kw', 'sa', 'aed','qa','bh','om'],
                                          ]
                                      ])->label('Phone Number *');
                                ?>
 
-                               <?= $form->field($store_model, 'name')->textInput(['maxlength' => true])->label('Your store name *') ?>
+                               <?= $form->field($store, 'name')->textInput(['maxlength' => true])->label('Your store name *') ?>
 
 
                                 <?=
-                                $form->field($store_model, 'restaurant_domain', [
+                                $form->field($store, 'restaurant_domain', [
                                     'template' => "{label}"
                                     . "<div class='input-group'>
                                            {input}
@@ -93,12 +93,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ])->label('Store URL *')
                                 ?>
 
-                                <?= $form->field($store_model, 'country_id')->dropDownList($countryArray,['value'=>'84'])->label('Business location *'); ?>
+                                <?= $form->field($store, 'country_id')->dropDownList($countryArray,['value'=>'84'])->label('Business location *'); ?>
 
 
-                                <?= $form->field($store_model, 'currency_id')->dropDownList($currencyArray,['value'=>'2'])->label('Store Currency *'); ?>
+                                <?= $form->field($store, 'currency_id')->dropDownList($currencyArray,['value'=>'2'])->label('Store Currency *'); ?>
 
-                                <?= $form->field($agent_model, 'tempPassword')->passwordInput(['maxlength' => true])->label('Password *') ?>
+                                <?= $form->field($agent, 'tempPassword')->passwordInput(['maxlength' => true])->label('Password *') ?>
 
                                 <div class="form-group">
                                     <?= Html::submitButton('Create', ['class' => 'btn btn-primary  btn-inline', 'style' => 'width: 100%;',  'name' => 'register-button']) ?>

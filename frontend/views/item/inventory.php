@@ -10,7 +10,7 @@ use kartik\touchspin\TouchSpin;
 /* @var $searchModel backend\models\ItemSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 
 $this->title = 'Inventory';
 $this->params['breadcrumbs'][] = $this->title;
@@ -118,7 +118,7 @@ $this->registerJs($js);
         <p>
           When you enable inventory tracking on your products, you can view and adjust their inventory counts here.
         </p>
-        <?= Html::a('Go to items', ['item/index', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Go to items', ['item/index', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
       </div>
     </div>
 

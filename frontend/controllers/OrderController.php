@@ -59,32 +59,32 @@ class OrderController extends Controller
     public function actionIndex($storeUuid)
     {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        $agentAssignment = $restaurant_model->getAgentAssignments()
+        $agentAssignment = $restaurant->getAgentAssignments()
             ->where([
-                'restaurant_uuid' => $restaurant_model->restaurant_uuid,
+                'restaurant_uuid' => $restaurant->restaurant_uuid,
                 'agent_id' => Yii::$app->user->identity->agent_id
             ])->one();
 
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid, $agentAssignment);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant->restaurant_uuid, $agentAssignment);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'restaurant_model' => $restaurant_model
+            'restaurant' => $restaurant
         ]);
     }
 
     public function actionDownloadPendingOrdersForMashkor($storeUuid)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $orders = Order::find()
             ->where(['order_status' => Order::STATUS_PENDING])
             ->andWhere(['<>', 'payment_method_id', 3])
-            ->andWhere(['restaurant_uuid' => $store_model->restaurant_uuid])
+            ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
             ->andWhere(['country_name' => 'Kuwait'])
             ->orderBy(['order_created_at' => SORT_ASC])
             ->all();
@@ -212,7 +212,7 @@ class OrderController extends Controller
             ]
         ]);
 
-        return $this->redirect(['index', 'storeUuid' => $store_model->restaurant_uuid]);
+        return $this->redirect(['index', 'storeUuid' => $store->restaurant_uuid]);
 
     }
 
@@ -223,13 +223,13 @@ class OrderController extends Controller
      */
     public function actionOrdersReport($storeUuid)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new OrderSearch();
 
-        if ($store_model->load(Yii::$app->request->post())) {
+        if ($store->load(Yii::$app->request->post())) {
 
-            list($start_date, $end_date) = explode(' - ', $store_model->export_orders_data_in_specific_date_range);
+            list($start_date, $end_date) = explode(' - ', $store->export_orders_data_in_specific_date_range);
 
             $searchResult = Order::find()
                 ->activeOrders($storeUuid)
@@ -369,7 +369,7 @@ class OrderController extends Controller
         }
 
         return $this->render('orders-report', [
-            'model' => $store_model
+            'model' => $store
         ]);
     }
 
@@ -379,21 +379,21 @@ class OrderController extends Controller
      */
     public function actionDraft($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        $agentAssignment = $restaurant_model->getAgentAssignments()
+        $agentAssignment = $restaurant->getAgentAssignments()
             ->where([
-                'restaurant_uuid' => $restaurant_model->restaurant_uuid,
+                'restaurant_uuid' => $restaurant->restaurant_uuid,
                 'agent_id' => Yii::$app->user->identity->agent_id
             ])->one();
 
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->searchDraftOrders(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid, $agentAssignment);
+        $dataProvider = $searchModel->searchDraftOrders(Yii::$app->request->queryParams, $restaurant->restaurant_uuid, $agentAssignment);
 
         return $this->render('draft', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'restaurant_model' => $restaurant_model
+            'restaurant' => $restaurant
         ]);
     }
 
@@ -403,18 +403,18 @@ class OrderController extends Controller
      */
     public function actionAbandonedCheckout($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        $agentAssignment = $restaurant_model->getAgentAssignments()
-            ->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid, 'agent_id' => Yii::$app->user->identity->agent_id])->one();
+        $agentAssignment = $restaurant->getAgentAssignments()
+            ->where(['restaurant_uuid' => $restaurant->restaurant_uuid, 'agent_id' => Yii::$app->user->identity->agent_id])->one();
 
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->searchAbandonedCheckoutOrders(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid, $agentAssignment);
+        $dataProvider = $searchModel->searchAbandonedCheckoutOrders(Yii::$app->request->queryParams, $restaurant->restaurant_uuid, $agentAssignment);
 
         return $this->render('abandoned-checkout', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'restaurant_model' => $restaurant_model
+            'restaurant' => $restaurant
         ]);
     }
 
@@ -428,28 +428,28 @@ class OrderController extends Controller
     public function actionRequestFulfillment($order_uuid, $storeUuid)
     {
 
-        $order_model = $this->findModel($order_uuid, $storeUuid);
+        $order = $this->findModel($order_uuid, $storeUuid);
 
-        $requestFulfillmentApiResponse = Yii::$app->diggipacksWarehouseComponent->createOrder($order_model, $order_model->orderItems);
+        $requestFulfillmentApiResponse = Yii::$app->diggipacksWarehouseComponent->createOrder($order, $order->orderItems);
 
 
         if ($requestFulfillmentApiResponse->isOk) {
 
-            $order_model->diggipack_awb_no = $requestFulfillmentApiResponse->data['awb_no'];
+            $order->diggipack_awb_no = $requestFulfillmentApiResponse->data['awb_no'];
 
-            $order_model->save(false);
+            $order->save(false);
             Yii::$app->session->setFlash('successResponse', "Fulfillment requested");
 
         } else {
 
             if ($requestFulfillmentApiResponse->content) {
                 Yii::$app->session->setFlash('errorResponse', json_encode($requestFulfillmentApiResponse->content));
-                Yii::error('Error while requesting fulfillment  [' . $order_model->restaurant->name . '] ' . json_encode($requestFulfillmentApiResponse->content));
+                Yii::error('Error while requesting fulfillment  [' . $order->restaurant->name . '] ' . json_encode($requestFulfillmentApiResponse->content));
 
             } else {
 
                 Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
-                Yii::error('Error while requesting fulfillment  [' . $order_model->restaurant->name . '] ' . json_encode($requestFulfillmentApiResponse));
+                Yii::error('Error while requesting fulfillment  [' . $order->restaurant->name . '] ' . json_encode($requestFulfillmentApiResponse));
 
             }
 
@@ -468,16 +468,16 @@ class OrderController extends Controller
     public function actionRequestDriverFromMashkor($order_uuid, $storeUuid, $mashkorBranchId)
     {
 
-        $order_model = $this->findModel($order_uuid, $storeUuid);
+        $order = $this->findModel($order_uuid, $storeUuid);
 
-        $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($order_model, $mashkorBranchId);
+        $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($order, $mashkorBranchId);
 
 
         if ($createDeliveryApiResponse->isOk) {
 
-            $order_model->mashkor_order_number = $createDeliveryApiResponse->data['data']['order_number'];
-            $order_model->mashkor_order_status = Order::MASHKOR_ORDER_STATUS_CONFIRMED;
-            $order_model->save(false);
+            $order->mashkor_order_number = $createDeliveryApiResponse->data['data']['order_number'];
+            $order->mashkor_order_status = Order::MASHKOR_ORDER_STATUS_CONFIRMED;
+            $order->save(false);
 
             Yii::$app->session->setFlash('successResponse', "Your request has been successfully submitted");
 
@@ -498,7 +498,7 @@ class OrderController extends Controller
                 Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
 
 
-            Yii::error('Error while requesting driver from Mashkor  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->data));
+            Yii::error('Error while requesting driver from Mashkor  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->data));
 
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
         }
@@ -515,19 +515,19 @@ class OrderController extends Controller
     public function actionRequestDriverFromArmada($order_uuid, $storeUuid, $armadaApiKey)
     {
 
-        $order_model = $this->findModel($order_uuid, $storeUuid);
+        $order = $this->findModel($order_uuid, $storeUuid);
 
-        $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($order_model, $armadaApiKey);
+        $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($order, $armadaApiKey);
 
 
         if ($createDeliveryApiResponse->isOk) {
 
-            $order_model->armada_tracking_link = $createDeliveryApiResponse->data['trackingLink'];
-            $order_model->armada_qr_code_link = $createDeliveryApiResponse->data['qrCodeLink'];
-            $order_model->armada_delivery_code = $createDeliveryApiResponse->data['code'];
-            $order_model->armada_order_status = $createDeliveryApiResponse->data['orderStatus'];
+            $order->armada_tracking_link = $createDeliveryApiResponse->data['trackingLink'];
+            $order->armada_qr_code_link = $createDeliveryApiResponse->data['qrCodeLink'];
+            $order->armada_delivery_code = $createDeliveryApiResponse->data['code'];
+            $order->armada_order_status = $createDeliveryApiResponse->data['orderStatus'];
 
-            $order_model->save(false);
+            $order->save(false);
             Yii::$app->session->setFlash('successResponse', "Your request has been successfully submitted");
 
         } else {
@@ -536,12 +536,12 @@ class OrderController extends Controller
 
 
                 Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->content));
-                Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->content));
+                Yii::error('Error while requesting driver from Armada  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->content));
 
             } else {
 
                 Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
-                Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
+                Yii::error('Error while requesting driver from Armada  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
 
             }
 
@@ -590,16 +590,16 @@ class OrderController extends Controller
      */
     public function actionChangeOrderStatus($order_uuid, $storeUuid, $status, $redirect = null)
     {
-        $order_model = $this->findModel($order_uuid, $storeUuid);
+        $order = $this->findModel($order_uuid, $storeUuid);
 
-        $previousOrderStatus = $order_model->order_status;
+        $previousOrderStatus = $order->order_status;
 
-        $order_model->order_status = $status;
+        $order->order_status = $status;
 
-        if ($order_model->save(false)) {
+        if ($order->save(false)) {
 
-            if ($previousOrderStatus == Order::STATUS_DRAFT && $order_model->order_status == Order::STATUS_PENDING) {
-                $order_model->sendPaymentConfirmationEmail();
+            if ($previousOrderStatus == Order::STATUS_DRAFT && $order->order_status == Order::STATUS_PENDING) {
+                $order->sendPaymentConfirmationEmail();
             }
         }
 
@@ -607,7 +607,7 @@ class OrderController extends Controller
             return $this->redirect(['index', 'storeUuid' => $storeUuid]);
 
         else
-            return $this->redirect(['view', 'id' => $order_model->order_uuid, 'storeUuid' => $storeUuid]);
+            return $this->redirect(['view', 'id' => $order->order_uuid, 'storeUuid' => $storeUuid]);
     }
 
     /**
@@ -620,22 +620,22 @@ class OrderController extends Controller
      */
     public function actionViewInvoice($order_uuid, $storeUuid)
     {
-        $order_model = $this->findModel($order_uuid, $storeUuid);
+        $order = $this->findModel($order_uuid, $storeUuid);
 
         // Item
         $orderItems = new \yii\data\ActiveDataProvider([
-            'query' => $order_model->getOrderItems()->with(['currency']),
+            'query' => $order->getOrderItems()->with(['currency']),
             'sort' => false,
         ]);
 
         // Item extra optn
         // $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
-        //     'query' => $order_model->getOrderItemExtraOptions()
+        //     'query' => $order->getOrderItemExtraOptions()
         // ]);
 
 
         return $this->render('invoice', [
-            'model' => $order_model,
+            'model' => $order,
             'orderItems' => $orderItems
         ]);
     }
@@ -649,39 +649,39 @@ class OrderController extends Controller
     public function actionView($id, $storeUuid)
     {
 
-        $order_model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->with(['currency', 'country', 'deliveryZone.country', 'pickupLocation', 'deliveryZone.businessLocation'])->one();
+        $order = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->with(['currency', 'country', 'deliveryZone.country', 'pickupLocation', 'deliveryZone.businessLocation'])->one();
 
 
-        if ($order_model) {
+        if ($order) {
 
             // Item
             $orderItems = new \yii\data\ActiveDataProvider([
-                'query' => $order_model->getOrderItems()->with(['orderItemExtraOptions', 'item', 'currency']),
+                'query' => $order->getOrderItems()->with(['orderItemExtraOptions', 'item', 'currency']),
                 'sort' => false,
                 'pagination' => false
             ]);
 
             // Item extra optn
             // $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
-            //     'query' => $order_model->getOrderItemExtraOptions(),
+            //     'query' => $order->getOrderItemExtraOptions(),
             //     'pagination' => false
             // ]);
 
             // order's Item
             $refundDataProvider = new \yii\data\ActiveDataProvider([
-                'query' => $order_model->getRefunds(),
+                'query' => $order->getRefunds(),
                 'sort' => false
             ]);
 
             // order's Item
             $refundItemsDataProvider = new \yii\data\ActiveDataProvider([
-                'query' => $order_model->getRefundedItems()->with('item'),
+                'query' => $order->getRefundedItems()->with('item'),
                 'sort' => false
             ]);
 
 
             return $this->render('view', [
-                'model' => $order_model,
+                'model' => $order,
                 'refundDataProvider' => $refundDataProvider,
                 'storeUuid' => $storeUuid,
                 'refundItemsDataProvider' => $refundItemsDataProvider,
@@ -703,12 +703,12 @@ class OrderController extends Controller
     public function actionCreate($storeUuid)
     {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $model = new Order();
         $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
 
-        $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
+        $model->restaurant_uuid = $restaurant->restaurant_uuid;
         $model->is_order_scheduled = 0;
 
         if ($model->load(Yii::$app->request->post())) {
@@ -716,7 +716,7 @@ class OrderController extends Controller
 
             if ($model->order_mode == Order::ORDER_MODE_DELIVERY) {
 
-                $areaDeliveryZone = AreaDeliveryZone::find()->andWhere(['restaurant_uuid' => $restaurant_model->restaurant_uuid, 'area_id' => $model->area_id])->one();
+                $areaDeliveryZone = AreaDeliveryZone::find()->andWhere(['restaurant_uuid' => $restaurant->restaurant_uuid, 'area_id' => $model->area_id])->one();
 
                 if ($areaDeliveryZone)
                     $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
@@ -731,7 +731,7 @@ class OrderController extends Controller
 
         return $this->render('create', [
             'model' => $model,
-            'restaurant_model' => $restaurant_model
+            'restaurant' => $restaurant
         ]);
     }
 
@@ -746,7 +746,7 @@ class OrderController extends Controller
     public function actionUpdate($id, $storeUuid)
     {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $model = $this->findModel($id, $storeUuid);
         $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
@@ -764,7 +764,7 @@ class OrderController extends Controller
 
             if ($model->order_mode == Order::ORDER_MODE_DELIVERY) {
                 $model->pickup_location_id = null;
-                if ($areaDeliveryZone = AreaDeliveryZone::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid, 'area_id' => $model->area_id])->one())
+                if ($areaDeliveryZone = AreaDeliveryZone::find()->where(['restaurant_uuid' => $restaurant->restaurant_uuid, 'area_id' => $model->area_id])->one())
                     $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
 
             } else {
@@ -782,7 +782,7 @@ class OrderController extends Controller
         return $this->render('update', [
             'model' => $model,
             'ordersItemDataProvider' => $ordersItemDataProvider,
-            'restaurant_model' => $restaurant_model
+            'restaurant' => $restaurant
         ]);
     }
 
@@ -797,38 +797,38 @@ class OrderController extends Controller
     public function actionRefundOrder($order_uuid, $storeUuid)
     {
 
-        $order_model = $this->findModel($order_uuid, $storeUuid);
+        $order = $this->findModel($order_uuid, $storeUuid);
 
-        if (($order_model->payment_uuid && !$order_model->payment->payment_gateway_invoice_id && !$order_model->payment->payment_gateway_transaction_id) || !$order_model->payment_uuid) {
+        if (($order->payment_uuid && !$order->payment->payment_gateway_invoice_id && !$order->payment->payment_gateway_transaction_id) || !$order->payment_uuid) {
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
         }
 
-        $refunded_items_model = [new RefundedItem()];
+        $refunded_items = [new RefundedItem()];
 
-        foreach ($order_model->getOrderItems()->all() as $key => $orderItem) {
-            $refunded_items_model[$key] = new RefundedItem();
-            $refunded_items_model[$key]->order_item_id = $orderItem->order_item_id;
-            $refunded_items_model[$key]->order_uuid = $orderItem->order_uuid;
-            $refunded_items_model[$key]->item_uuid = $orderItem->item_uuid;
-            $refunded_items_model[$key]->item_name = $orderItem->item_name;
-            $refunded_items_model[$key]->item_name_ar = $orderItem->item_name_ar;
-            $refunded_items_model[$key]->item_price = $orderItem->item_price;
+        foreach ($order->getOrderItems()->all() as $key => $orderItem) {
+            $refunded_items[$key] = new RefundedItem();
+            $refunded_items[$key]->order_item_id = $orderItem->order_item_id;
+            $refunded_items[$key]->order_uuid = $orderItem->order_uuid;
+            $refunded_items[$key]->item_uuid = $orderItem->item_uuid;
+            $refunded_items[$key]->item_name = $orderItem->item_name;
+            $refunded_items[$key]->item_name_ar = $orderItem->item_name_ar;
+            $refunded_items[$key]->item_price = $orderItem->item_price;
         }
 
 
         $model = new Refund();
         $model->setScenario('create');
-        $model->restaurant_uuid = $order_model->restaurant_uuid;
-        $model->payment_uuid = $order_model->payment_uuid;
-        $model->order_uuid = $order_model->order_uuid;
+        $model->restaurant_uuid = $order->restaurant_uuid;
+        $model->payment_uuid = $order->payment_uuid;
+        $model->order_uuid = $order->order_uuid;
 
-        if (Model::loadMultiple($refunded_items_model, Yii::$app->request->post()) && $model->load(Yii::$app->request->post()) && $model->save()) {
+        if (Model::loadMultiple($refunded_items, Yii::$app->request->post()) && $model->load(Yii::$app->request->post()) && $model->save()) {
 
 
-            foreach ($refunded_items_model as $key => $refunded_item_model) {
-                if ($refunded_item_model->qty > 0) {
-                    $refunded_item_model->refund_id = $model->refund_id;
-                    $refunded_item_model->save();
+            foreach ($refunded_items as $key => $refunded_item) {
+                if ($refunded_item->qty > 0) {
+                    $refunded_item->refund_id = $model->refund_id;
+                    $refunded_item->save();
 
                 }
 
@@ -841,8 +841,8 @@ class OrderController extends Controller
 
         return $this->render('refund-order', [
             'model' => $model,
-            'order_model' => $order_model,
-            'refunded_items_model' => $refunded_items_model
+            'order' => $order,
+            'refunded_items' => $refunded_items
         ]);
     }
 

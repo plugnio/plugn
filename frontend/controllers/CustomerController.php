@@ -48,7 +48,7 @@ class CustomerController extends Controller {
 
       // add conditions that should always apply here
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new CustomerSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $storeUuid);
@@ -56,7 +56,7 @@ class CustomerController extends Controller {
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
-                    'restaurant_model' => $restaurant_model,
+                    'restaurant' => $restaurant,
                     'storeUuid' => $storeUuid
         ]);
     }
@@ -69,7 +69,7 @@ class CustomerController extends Controller {
        */
       // public function actionCreate($storeUuid)
       // {
-          // $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+          // $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
           //
           // $model = new Customer();
           // $model->setScenario(Customer::SCENARIO_CREATE_ORDER_BY_AGENT);
@@ -94,7 +94,7 @@ class CustomerController extends Controller {
        */
       public function actionUpdate($id, $storeUuid)
       {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $model = $this->findModel($id, $storeUuid);
 
@@ -114,7 +114,7 @@ class CustomerController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($id, $storeUuid) {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $model = $this->findModel($id, $storeUuid);
 
@@ -137,10 +137,10 @@ class CustomerController extends Controller {
     */
     public function actionExportToExcel($storeUuid)
     {
-           $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+           $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
            $model = Customer::find()
-            ->andWhere(['restaurant_uuid' => $restaurant_model->restaurant_uuid])
+            ->andWhere(['restaurant_uuid' => $restaurant->restaurant_uuid])
             ->orderBy(['customer_created_at' => SORT_DESC])
             ->all();
 
@@ -149,7 +149,7 @@ class CustomerController extends Controller {
            header("Content-Disposition: attachment;filename=\"customers.xlsx\"");
            header("Cache-Control: max-age=0");
 
-           if($restaurant_model->restaurant_uuid == 'rest_fe5b6a72-18a7-11ec-973b-069e9504599a'){
+           if($restaurant->restaurant_uuid == 'rest_fe5b6a72-18a7-11ec-973b-069e9504599a'){
              \moonland\phpexcel\Excel::export([
                  'isMultipleSheet' => false,
                  'models' => $model,

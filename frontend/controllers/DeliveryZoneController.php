@@ -77,24 +77,24 @@ class DeliveryZoneController extends Controller
     public function actionIndex($storeUuid, $businessLocationId)
     {
 
-        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        $business_location_model = BusinessLocation::find()
-            ->andWhere(['restaurant_uuid' => $store_model->restaurant_uuid, 'business_location_id' => $businessLocationId])
+        $business_location = BusinessLocation::find()
+            ->andWhere(['restaurant_uuid' => $store->restaurant_uuid, 'business_location_id' => $businessLocationId])
             ->with(['country'])
             ->one();
 
-        if ($business_location_model) {
+        if ($business_location) {
 
             $searchModel = new DeliveryZoneSearch();
-            $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $store_model->restaurant_uuid, $businessLocationId);
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $store->restaurant_uuid, $businessLocationId);
 
 
             return $this->render('index', [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
-                'business_location_model' => $business_location_model,
-                'store_model' => $store_model
+                'business_location' => $business_location,
+                'store' => $store
             ]);
 
         }
@@ -103,7 +103,7 @@ class DeliveryZoneController extends Controller
 
     public function actionDeliverAllAreas($storeUuid, $deliveryZoneId)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
         $model = $this->findModel($deliveryZoneId, $storeUuid);
 
         if ($model) {
@@ -129,7 +129,7 @@ class DeliveryZoneController extends Controller
 
     public function actionRemoveTaxOverride($storeUuid, $deliveryZoneId)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
         $model = $this->findModel($deliveryZoneId, $storeUuid);
 
         $model->delivery_zone_tax = null;
@@ -148,40 +148,40 @@ class DeliveryZoneController extends Controller
     public function actionCreate($storeUuid, $businessLocationId, $countryId = null)
     {
 
-        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
-        $business_location_model = BusinessLocation::find()->where(['restaurant_uuid' => $store_model->restaurant_uuid, 'business_location_id' => $businessLocationId])->one();
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $business_location = BusinessLocation::find()->where(['restaurant_uuid' => $store->restaurant_uuid, 'business_location_id' => $businessLocationId])->one();
 
-        if ($business_location_model) {
+        if ($business_location) {
 
 
-            $delivery_zone_model = new DeliveryZone();
-            $delivery_zone_model->business_location_id = $business_location_model->business_location_id;
-            $delivery_zone_model->restaurant_uuid = $storeUuid;
+            $delivery_zone = new DeliveryZone();
+            $delivery_zone->business_location_id = $business_location->business_location_id;
+            $delivery_zone->restaurant_uuid = $storeUuid;
 
 
             if ($countryId)
-                $delivery_zone_model->country_id = $countryId;
+                $delivery_zone->country_id = $countryId;
 
 
-            if ($delivery_zone_model->load(Yii::$app->request->post()) && $delivery_zone_model->save()) {
+            if ($delivery_zone->load(Yii::$app->request->post()) && $delivery_zone->save()) {
 
 
-                if ($delivery_zone_model->country->getAreas()->count() > 0) {
+                if ($delivery_zone->country->getAreas()->count() > 0) {
 
                     return $this->render('select-area', [
-                        'deliveryZoneId' => $delivery_zone_model->delivery_zone_id,
-                        'selectedCountry' => $delivery_zone_model->country->country_name,
+                        'deliveryZoneId' => $delivery_zone->delivery_zone_id,
+                        'selectedCountry' => $delivery_zone->country->country_name,
                         'storeUuid' => $storeUuid
                     ]);
 
 
                 } else {
 
-                    $area_delivery_zone_model = new AreaDeliveryZone();
-                    $area_delivery_zone_model->delivery_zone_id = $delivery_zone_model->delivery_zone_id;
-                    $area_delivery_zone_model->country_id = $delivery_zone_model->country_id;
-                    $area_delivery_zone_model->restaurant_uuid = $storeUuid;
-                    $area_delivery_zone_model->save(false);
+                    $area_delivery_zone = new AreaDeliveryZone();
+                    $area_delivery_zone->delivery_zone_id = $delivery_zone->delivery_zone_id;
+                    $area_delivery_zone->country_id = $delivery_zone->country_id;
+                    $area_delivery_zone->restaurant_uuid = $storeUuid;
+                    $area_delivery_zone->save(false);
 
 
                     $this->redirect(['index', 'storeUuid' => $storeUuid, 'businessLocationId' => $businessLocationId]);
@@ -190,7 +190,7 @@ class DeliveryZoneController extends Controller
             }
 
             return $this->render('create', [
-                'model' => $delivery_zone_model,
+                'model' => $delivery_zone,
                 'storeUuid' => $storeUuid
             ]);
 
@@ -208,7 +208,7 @@ class DeliveryZoneController extends Controller
     public function actionUpdate($id, $storeUuid)
     {
 
-        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $model = $this->findModel($id, $storeUuid);
 

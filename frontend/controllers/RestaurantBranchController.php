@@ -45,15 +45,15 @@ class RestaurantBranchController extends Controller {
      */
     public function actionIndex($storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $dataProvider = new ActiveDataProvider([
-            'query' => RestaurantBranch::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid]),
+            'query' => RestaurantBranch::find()->where(['restaurant_uuid' => $restaurant->restaurant_uuid]),
         ]);
 
         return $this->render('index', [
                     'dataProvider' => $dataProvider,
-                    'storeUuid' => $restaurant_model->restaurant_uuid
+                    'storeUuid' => $restaurant->restaurant_uuid
         ]);
     }
 
