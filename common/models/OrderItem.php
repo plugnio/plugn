@@ -40,7 +40,7 @@ class OrderItem extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['order_uuid', 'restaurant_uuid', 'item_uuid', 'item_name', 'item_price', 'qty'], 'required'],
+            [['order_uuid', 'restaurant_uuid', 'item_name', 'item_price', 'qty'], 'required'],
             [['qty'], 'integer', 'min' => 0],
             [['order_uuid'], 'string', 'max' => 40],
             [['item_price'], 'number', 'min' => 0],
