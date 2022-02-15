@@ -209,6 +209,7 @@ return [
                     'controller' => 'v2/order',
                     'pluralize' => false,
                     'patterns' => [
+                        'POST payment-webhook' => 'payment-webhook',
                         'POST status-update-webhook' => 'update-mashkor-order-status',
                         'POST update-armada-order-status' => 'update-armada-order-status',
                         'POST <id>' => 'place-an-order',
@@ -220,6 +221,7 @@ return [
                         'GET order-details/<id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS payment-webhook' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
                         'OPTIONS update-armada-order-status' => 'options',
                         'OPTIONS <id>' => 'options',
