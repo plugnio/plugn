@@ -34,7 +34,19 @@ $this->params['breadcrumbs'][] = $this->title;
                         <p class="px-2">Fill the below form to create an online store.</p>
                         <div class="card-content">
                             <div class="card-body pt-0">
-                                <?php
+
+                                <?php if (Yii::$app->session->hasFlash('error')) { ?>
+                                    <div class="alert alert-danger alert-dismissable">
+                                        <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+                                        <?php
+                                        foreach(Yii::$app->session->getFlash('error') as $errors) {
+                                            foreach($errors as $error) { ?>
+                                                <p><?= $error ?></p>
+                                            <?php
+                                            }
+                                        } ?>
+                                    </div>
+                                <?php }
 
                                       $form = ActiveForm::begin(['id' => 'store-form', 'enableClientScript' => false]);
 

@@ -47,7 +47,7 @@ class SiteController extends Controller
     {
         return [
             'access' => [
-                'class' => AccessControl::className (),
+                'class' => AccessControl::className(),
                 'rules' => [
                     [
                         'actions' => ['login', 'error', 'index', 'signup', 'verify-email', 'thank-you', 'request-password-reset', 'reset-password'],
@@ -61,7 +61,7 @@ class SiteController extends Controller
                 ],
             ],
             'verbs' => [
-                'class' => VerbFilter::className (),
+                'class' => VerbFilter::className(),
                 'actions' => [
                     'logout' => ['post'],
                 ],
@@ -95,16 +95,16 @@ class SiteController extends Controller
     {
 
         if (Yii::$app->user->isGuest)
-            return $this->redirect (['login']);
+            return $this->redirect(['login']);
         else {
-            foreach (Yii::$app->accountManager->getManagedAccounts () as $managedRestaurant) {
+            foreach (Yii::$app->accountManager->getManagedAccounts() as $managedRestaurant) {
 
-                if (Yii::$app->user->identity->isOwner ($managedRestaurant->restaurant_uuid)) {
-                    return $this->redirect (['vendor-dashboard',
+                if (Yii::$app->user->identity->isOwner($managedRestaurant->restaurant_uuid)) {
+                    return $this->redirect(['vendor-dashboard',
                         'id' => $managedRestaurant->restaurant_uuid
                     ]);
                 } else {
-                    return $this->redirect (['real-time-orders',
+                    return $this->redirect(['real-time-orders',
                         'storeUuid' => $managedRestaurant->restaurant_uuid
                     ]);
                 }
@@ -119,13 +119,13 @@ class SiteController extends Controller
     {
 
         $this->layout = false;
-        $managedRestaurant = $this->findModel ($storeUuid);
-        $agentAssignment = $managedRestaurant->getAgentAssignments ()->where (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])->one ();
+        $managedRestaurant = $this->findModel($storeUuid);
+        $agentAssignment = $managedRestaurant->getAgentAssignments()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])->one();
 
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->searchPendingOrders (Yii::$app->request->queryParams, $storeUuid, $agentAssignment);
+        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid, $agentAssignment);
 
-        return $this->render ('incoming-orders-table', [
+        return $this->render('incoming-orders-table', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider
         ]);
@@ -139,14 +139,14 @@ class SiteController extends Controller
      */
     public function actionRedirectToStoreDomain($storeUuid)
     {
-        $managedRestaurant = $this->findModel ($storeUuid);
+        $managedRestaurant = $this->findModel($storeUuid);
 
         if ($managedRestaurant->has_deployed) {
-            return $this->redirect ($managedRestaurant->restaurant_domain);
+            return $this->redirect($managedRestaurant->restaurant_domain);
         } else {
             $this->layout = 'login';
 
-            return $this->render ('coming-soon', [
+            return $this->render('coming-soon', [
                 'restaurant' => $managedRestaurant
             ]);
         }
@@ -160,37 +160,37 @@ class SiteController extends Controller
      */
     public function actionConnectDomain($id)
     {
-        $managedRestaurant = $this->findModel ($id);
+        $managedRestaurant = $this->findModel($id);
 
         $old_domain = $managedRestaurant->restaurant_domain;
 
-        if ($managedRestaurant->load (Yii::$app->request->post ())) {
+        if ($managedRestaurant->load(Yii::$app->request->post())) {
 
             if ($old_domain != $managedRestaurant->restaurant_domain) {
 
-                $managedRestaurant->restaurant_domain = rtrim ($managedRestaurant->restaurant_domain, '/');
+                $managedRestaurant->restaurant_domain = rtrim($managedRestaurant->restaurant_domain, '/');
 
-                if ($managedRestaurant->save ()) {
-                    Yii::$app->session->setFlash ('successResponse', "Congratulations you have successfully changed your domain name");
+                if ($managedRestaurant->save()) {
+                    Yii::$app->session->setFlash('successResponse', "Congratulations you have successfully changed your domain name");
 
-                    \Yii::$app->mailer->compose ([
+                    \Yii::$app->mailer->compose([
                         'html' => 'domain-update-request',
                     ], [
                         'store_name' => $managedRestaurant->name,
                         'new_domain' => $managedRestaurant->restaurant_domain,
                         'old_domain' => $old_domain
                     ])
-                        ->setFrom ([Yii::$app->params['supportEmail'] => Yii::$app->name])
-                        ->setTo (Yii::$app->params['adminEmail'])
-                        ->setSubject ('[Plugn] Agent updated DN')
-                        ->send ();
+                        ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                        ->setTo(Yii::$app->params['adminEmail'])
+                        ->setSubject('[Plugn] Agent updated DN')
+                        ->send();
 
                 }
 
             }
         }
 
-        return $this->render ('connect-domain', [
+        return $this->render('connect-domain', [
             'restaurant' => $managedRestaurant
         ]);
     }
@@ -204,17 +204,17 @@ class SiteController extends Controller
      */
     public function actionConfirmPlan($id, $selectedPlanId)
     {
-        $managedRestaurant = $this->findModel ($id);
+        $managedRestaurant = $this->findModel($id);
 
-        $selectedPlan = Plan::findOne ($selectedPlanId);
+        $selectedPlan = Plan::findOne($selectedPlanId);
 
         $subscription = new Subscription();
         $subscription->restaurant_uuid = $managedRestaurant->restaurant_uuid;
         $subscription->plan_id = $selectedPlan->plan_id;
 
-        $payment_methods = PaymentMethod::find ()->all ();
+        $payment_methods = PaymentMethod::find()->all();
 
-        if ($subscription->load (Yii::$app->request->post ()) && $subscription->save ()) {
+        if ($subscription->load(Yii::$app->request->post()) && $subscription->save()) {
 
             if ($selectedPlan->price > 0) {
 
@@ -229,40 +229,40 @@ class SiteController extends Controller
                     $payment->partner_fee = $payment->payment_amount_charged * $managedRestaurant->partner->commission;
                 }
 
-                if ($payment->save ()) {
+                if ($payment->save()) {
 
                     //Update payment_uuid in order
                     $subscription->payment_uuid = $payment->payment_uuid;
-                    $subscription->save (false);
+                    $subscription->save(false);
 
 
                     // Redirect to payment gateway
-                    Yii::$app->tapPayments->setApiKeys (\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
+                    Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
 
-                    $response = Yii::$app->tapPayments->createCharge (
+                    $response = Yii::$app->tapPayments->createCharge(
                         "KWD",
                         "Upgrade $managedRestaurant->name's plan to " . $subscription->plan->name, // Description
                         'Plugn', //Statement Desc.
                         $payment->payment_uuid, // Reference
                         $subscription->plan->price,
                         $managedRestaurant->name,
-                        $managedRestaurant->getAgents ()->one ()->agent_email,
+                        $managedRestaurant->getAgents()->one()->agent_email,
                         $managedRestaurant->country->country_code,
                         $managedRestaurant->owner_number ? $managedRestaurant->owner_number : null,
                         0, //Comission
-                        Url::to (['site/callback'], true),
+                        Url::to(['site/callback'], true),
                         $subscription->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD,
                         0
                     );
 
-                    $responseContent = json_decode ($response->content);
+                    $responseContent = json_decode($response->content);
 
                     try {
 
                         // Validate that theres no error from TAP gateway
                         if (isset($responseContent->errors)) {
                             $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
-                            \Yii::error ($errorMessage, __METHOD__); // Log error faced by user
+                            \Yii::error($errorMessage, __METHOD__); // Log error faced by user
 
                             return [
                                 'operation' => 'error',
@@ -277,39 +277,39 @@ class SiteController extends Controller
 
                             $payment->payment_gateway_transaction_id = $chargeId;
 
-                            if (!$payment->save (false)) {
+                            if (!$payment->save(false)) {
 
-                                \Yii::error ($payment->errors, __METHOD__); // Log error faced by user
+                                \Yii::error($payment->errors, __METHOD__); // Log error faced by user
 
                                 return [
                                     'operation' => 'error',
-                                    'message' => $payment->getErrors ()
+                                    'message' => $payment->getErrors()
                                 ];
                             }
                         } else {
-                            \Yii::error ('[Payment Issue > Charge id is missing ]' . json_encode ($responseContent), __METHOD__); // Log error faced by user
+                            \Yii::error('[Payment Issue > Charge id is missing ]' . json_encode($responseContent), __METHOD__); // Log error faced by user
                         }
 
-                        return $this->redirect ($redirectUrl);
+                        return $this->redirect($redirectUrl);
                     } catch (\Exception $e) {
 
                         if ($payment)
-                            Yii::error ('[TAP Payment Issue > ]' . json_encode ($payment->getErrors ()), __METHOD__);
+                            Yii::error('[TAP Payment Issue > ]' . json_encode($payment->getErrors()), __METHOD__);
 
-                        Yii::error ('[TAP Payment Issue > Charge id is missing]' . json_encode ($responseContent), __METHOD__);
+                        Yii::error('[TAP Payment Issue > Charge id is missing]' . json_encode($responseContent), __METHOD__);
 
                         $response = [
                             'operation' => 'error',
-                            'message' => json_encode ($responseContent)
+                            'message' => json_encode($responseContent)
                         ];
                     }
                 }
             }
         }
 
-        return $this->render ('confirm-plan', [
+        return $this->render('confirm-plan', [
             'restaurant' => $managedRestaurant,
-            'selectedPlan' => Plan::findOne ($selectedPlanId),
+            'selectedPlan' => Plan::findOne($selectedPlanId),
             'subscription' => $subscription,
             'paymentMethods' => $payment_methods
         ]);
@@ -324,23 +324,23 @@ class SiteController extends Controller
     {
         try {
 
-            $paymentRecord = SubscriptionPayment::updatePaymentStatusFromTap ($tap_id);
+            $paymentRecord = SubscriptionPayment::updatePaymentStatusFromTap($tap_id);
             $paymentRecord->received_callback = true;
-            $paymentRecord->save (false);
+            $paymentRecord->save(false);
 
             // Redirect back to app
             if ($paymentRecord->payment_current_status == 'CAPTURED')
-                Yii::$app->session->setFlash ('success', $paymentRecord->plan->name . print_r (' has been activated', true));
+                Yii::$app->session->setFlash('success', $paymentRecord->plan->name . print_r(' has been activated', true));
             else if ($paymentRecord->payment_current_status != 'CAPTURED')  //Failed Payment
-                Yii::$app->session->setFlash ('error', print_r ('There seems to be an issue with your payment, please try again.', true));
+                Yii::$app->session->setFlash('error', print_r('There seems to be an issue with your payment, please try again.', true));
 
             // Redirect back to current plan page
-            return $this->redirect (['store/view-payment-methods',
+            return $this->redirect(['store/view-payment-methods',
                 'storeUuid' => $paymentRecord->restaurant_uuid
             ]);
 
         } catch (\Exception $e) {
-            throw new NotFoundHttpException($e->getMessage ());
+            throw new NotFoundHttpException($e->getMessage());
         }
     }
 
@@ -352,14 +352,14 @@ class SiteController extends Controller
      */
     public function actionRealTimeOrders($storeUuid)
     {
-        $managedRestaurant = $this->findModel ($storeUuid);
+        $managedRestaurant = $this->findModel($storeUuid);
 
-        $agentAssignment = $managedRestaurant->getAgentAssignments ()->where (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])->one ();
+        $agentAssignment = $managedRestaurant->getAgentAssignments()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])->one();
 
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->searchPendingOrders (Yii::$app->request->queryParams, $storeUuid, $agentAssignment);
+        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid, $agentAssignment);
 
-        return $this->render ('real-time-orders', [
+        return $this->render('real-time-orders', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'storeUuid' => $storeUuid
@@ -372,28 +372,28 @@ class SiteController extends Controller
      */
     public function actionVendorDashboard($id)
     {
-        $managedRestaurant = $this->findModel ($id);
+        $managedRestaurant = $this->findModel($id);
 
-        if (Yii::$app->user->identity->isOwner ($managedRestaurant->restaurant_uuid)) {
+        if (Yii::$app->user->identity->isOwner($managedRestaurant->restaurant_uuid)) {
 
-            $numberOfOrders = Order::find ()
-                ->where (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                ->count ();
+            $numberOfOrders = Order::find()
+                ->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                ->count();
 
-            $cacheDependency = Yii::createObject ([
+            $cacheDependency = Yii::createObject([
                 'class' => 'yii\caching\DbDependency',
                 'reusable' => true,
-                'sql' => 'SELECT ' . date ('Y-m-d') . ', COUNT(*) FROM `order` WHERE restaurant_uuid="' . $managedRestaurant->restaurant_uuid . '"',
+                'sql' => 'SELECT ' . date('Y-m-d') . ', COUNT(*) FROM `order` WHERE restaurant_uuid="' . $managedRestaurant->restaurant_uuid . '"',
 
                 // we SELECT agent_id as well to make sure every cached sql statement is unique to this agent
                 // don't want agents viewing the cached content of another agent
                 // SUM of agent_status is to bust the cache when status changes
             ]);
 
-            $customerCacheDependency = Yii::createObject ([
+            $customerCacheDependency = Yii::createObject([
                 'class' => 'yii\caching\DbDependency',
                 'reusable' => true,
-                'sql' => 'SELECT ' . date ('Y-m-d') . ', COUNT(*) FROM customer WHERE restaurant_uuid="' . $managedRestaurant->restaurant_uuid . '"',
+                'sql' => 'SELECT ' . date('Y-m-d') . ', COUNT(*) FROM customer WHERE restaurant_uuid="' . $managedRestaurant->restaurant_uuid . '"',
 
                 // we SELECT agent_id as well to make sure every cached sql statement is unique to this agent
                 // don't want agents viewing the cached content of another agent
@@ -410,9 +410,9 @@ class SiteController extends Controller
 
             // orders recevied
 
-            $today_orders_received = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere ([
+            $today_orders_received = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -422,15 +422,15 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
                     // ->andWhere(['DATE(order_created_at)' => new Expression('CURDATE()')])
-                    ->andWhere (new Expression("date(order_created_at) = date(NOW())"))
-                    ->count ();
+                    ->andWhere(new Expression("date(order_created_at) = date(NOW())"))
+                    ->count();
             }, $cacheDuration, $cacheDependency);
 
-            $number_of_all_orders_received_last_month = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere ([
+            $number_of_all_orders_received_last_month = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -440,17 +440,17 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->count ();
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->count();
             }, $cacheDuration, $cacheDependency);
 
             //order recevied chart
 
-            $number_of_all_orders_received_last_7_days_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere ([
+            $number_of_all_orders_received_last_7_days_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -460,16 +460,16 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 6 DAY) ')
-                    ->count ();
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 6 DAY) ')
+                    ->count();
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($orders_received_chart_data_this_week, $number_of_all_orders_received_last_7_days_only ? (int)($number_of_all_orders_received_last_7_days_only) : 0);
+            array_push($orders_received_chart_data_this_week, $number_of_all_orders_received_last_7_days_only ? (int)($number_of_all_orders_received_last_7_days_only) : 0);
 
-            $number_of_all_orders_received_last_6_days_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere ([
+            $number_of_all_orders_received_last_6_days_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -479,16 +479,16 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')
-                    ->count ();
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')
+                    ->count();
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($orders_received_chart_data_this_week, $number_of_all_orders_received_last_6_days_only ? (int)($number_of_all_orders_received_last_6_days_only) : 0);
+            array_push($orders_received_chart_data_this_week, $number_of_all_orders_received_last_6_days_only ? (int)($number_of_all_orders_received_last_6_days_only) : 0);
 
-            $number_of_all_orders_received_last_5_days_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere ([
+            $number_of_all_orders_received_last_5_days_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -498,16 +498,16 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 4 DAY) ')
-                    ->count ();
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 4 DAY) ')
+                    ->count();
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($orders_received_chart_data_this_week, $number_of_all_orders_received_last_5_days_only ? (int)($number_of_all_orders_received_last_5_days_only) : 0);
+            array_push($orders_received_chart_data_this_week, $number_of_all_orders_received_last_5_days_only ? (int)($number_of_all_orders_received_last_5_days_only) : 0);
 
-            $number_of_all_orders_received_last_4_days_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere ([
+            $number_of_all_orders_received_last_4_days_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -517,16 +517,16 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 3 DAY) ')
-                    ->count ();
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 3 DAY) ')
+                    ->count();
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($orders_received_chart_data_this_week, $number_of_all_orders_received_last_4_days_only ? (int)($number_of_all_orders_received_last_4_days_only) : 0);
+            array_push($orders_received_chart_data_this_week, $number_of_all_orders_received_last_4_days_only ? (int)($number_of_all_orders_received_last_4_days_only) : 0);
 
-            $number_of_all_orders_received_last_3_days_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere ([
+            $number_of_all_orders_received_last_3_days_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -537,16 +537,16 @@ class SiteController extends Controller
                             Order::STATUS_CANCELED
                         ]
                     ])
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')
-                    ->count ();
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')
+                    ->count();
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($orders_received_chart_data_this_week, $number_of_all_orders_received_last_3_days_only ? (int)($number_of_all_orders_received_last_3_days_only) : 0);
+            array_push($orders_received_chart_data_this_week, $number_of_all_orders_received_last_3_days_only ? (int)($number_of_all_orders_received_last_3_days_only) : 0);
 
-            $number_of_all_orders_received_last_2_days_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere ([
+            $number_of_all_orders_received_last_2_days_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -556,16 +556,16 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 1 DAY) ')
-                    ->count ();
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 1 DAY) ')
+                    ->count();
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($orders_received_chart_data_this_week, $number_of_all_orders_received_last_2_days_only ? (int)($number_of_all_orders_received_last_2_days_only) : 0);
+            array_push($orders_received_chart_data_this_week, $number_of_all_orders_received_last_2_days_only ? (int)($number_of_all_orders_received_last_2_days_only) : 0);
 
-            $number_of_all_orders_received_today_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere ([
+            $number_of_all_orders_received_today_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -575,12 +575,12 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (['DATE(order.order_created_at)' => new Expression('CURDATE()')])
-                    ->count ();
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['DATE(order.order_created_at)' => new Expression('CURDATE()')])
+                    ->count();
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($orders_received_chart_data_this_week, $number_of_all_orders_received_today_only ? (int)($number_of_all_orders_received_today_only) : 0);
+            array_push($orders_received_chart_data_this_week, $number_of_all_orders_received_today_only ? (int)($number_of_all_orders_received_today_only) : 0);
 
             $number_of_all_orders_received_this_week = 0;
 
@@ -590,9 +590,9 @@ class SiteController extends Controller
 
             //last month
 
-            $number_of_all_orders_received_last_three_months_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere ([
+            $number_of_all_orders_received_last_three_months_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -602,15 +602,15 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
-                    ->count ();
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
+                    ->count();
             }, $cacheDuration, $cacheDependency);
 
-            $number_of_all_orders_received_last_two_months_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere ([
+            $number_of_all_orders_received_last_two_months_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -620,17 +620,17 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
-                    ->count ();
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
+                    ->count();
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($orders_received_chart_data_last_month, $number_of_all_orders_received_last_two_months_only ? (int)($number_of_all_orders_received_last_two_months_only) : 0);
+            array_push($orders_received_chart_data_last_month, $number_of_all_orders_received_last_two_months_only ? (int)($number_of_all_orders_received_last_two_months_only) : 0);
 
-            $number_of_all_orders_received_last_month_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere ([
+            $number_of_all_orders_received_last_month_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -640,21 +640,21 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->count ();
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->count();
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($orders_received_chart_data_last_month, $number_of_all_orders_received_last_month_only ? (int)($number_of_all_orders_received_last_month_only) : 0);
+            array_push($orders_received_chart_data_last_month, $number_of_all_orders_received_last_month_only ? (int)($number_of_all_orders_received_last_month_only) : 0);
 
-            array_push ($orders_received_chart_data_last_three_months, $number_of_all_orders_received_last_three_months_only ? (int)($number_of_all_orders_received_last_three_months_only) : 0);
+            array_push($orders_received_chart_data_last_three_months, $number_of_all_orders_received_last_three_months_only ? (int)($number_of_all_orders_received_last_three_months_only) : 0);
 
-            array_push ($orders_received_chart_data_last_three_months, $number_of_all_orders_received_last_month_only ? (int)($number_of_all_orders_received_last_month_only) : 0);
+            array_push($orders_received_chart_data_last_three_months, $number_of_all_orders_received_last_month_only ? (int)($number_of_all_orders_received_last_month_only) : 0);
 
-            $number_of_all_orders_received_current_month_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere ([
+            $number_of_all_orders_received_current_month_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -664,19 +664,19 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ('YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
-                    ->count ();
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere('YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
+                    ->count();
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($orders_received_chart_data_last_three_months, $number_of_all_orders_received_current_month_only ? (int)($number_of_all_orders_received_current_month_only) : 0);
+            array_push($orders_received_chart_data_last_three_months, $number_of_all_orders_received_current_month_only ? (int)($number_of_all_orders_received_current_month_only) : 0);
 
 
             $number_of_all_orders_received_last_three_months = 0;
 
             foreach ($orders_received_chart_data_last_three_months as $orderReceived) {
-                $number_of_all_orders_received_last_three_months += $orderReceived ? intval ($orderReceived) : 0;
+                $number_of_all_orders_received_last_three_months += $orderReceived ? intval($orderReceived) : 0;
             }
 
 
@@ -686,10 +686,10 @@ class SiteController extends Controller
             $sold_item_chart_data_last_three_months = [];
 
 
-            $today_sold_items = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return OrderItem::find ()
-                    ->joinWith ('order')
-                    ->andWhere ([
+            $today_sold_items = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return OrderItem::find()
+                    ->joinWith('order')
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -699,15 +699,15 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (['DATE(order_created_at)' => new Expression('CURDATE()')])
-                    ->sum ('order_item.qty');
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['DATE(order_created_at)' => new Expression('CURDATE()')])
+                    ->sum('order_item.qty');
             }, $cacheDuration, $cacheDependency);
 
-            $number_of_all_sold_item_last_month = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return OrderItem::find ()
-                    ->joinWith ('order')
-                    ->andWhere ([
+            $number_of_all_sold_item_last_month = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return OrderItem::find()
+                    ->joinWith('order')
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -717,17 +717,17 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->sum ('order_item.qty');
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->sum('order_item.qty');
             }, $cacheDuration, $cacheDependency);
 
             //Sold items chart
-            $number_of_all_sold_item_last_7_days_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return OrderItem::find ()
-                    ->joinWith ('order')
-                    ->andWhere ([
+            $number_of_all_sold_item_last_7_days_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return OrderItem::find()
+                    ->joinWith('order')
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -737,17 +737,17 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 6 DAY) ')
-                    ->sum ('order_item.qty');
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 6 DAY) ')
+                    ->sum('order_item.qty');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($sold_item_chart_data_this_week, $number_of_all_sold_item_last_7_days_only ? (int)($number_of_all_sold_item_last_7_days_only) : 0);
+            array_push($sold_item_chart_data_this_week, $number_of_all_sold_item_last_7_days_only ? (int)($number_of_all_sold_item_last_7_days_only) : 0);
 
-            $number_of_all_sold_item_last_6_days_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return OrderItem::find ()
-                    ->joinWith ('order')
-                    ->andWhere ([
+            $number_of_all_sold_item_last_6_days_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return OrderItem::find()
+                    ->joinWith('order')
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -757,17 +757,17 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')
-                    ->sum ('order_item.qty');
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')
+                    ->sum('order_item.qty');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($sold_item_chart_data_this_week, $number_of_all_sold_item_last_6_days_only ? (int)($number_of_all_sold_item_last_6_days_only) : 0);
+            array_push($sold_item_chart_data_this_week, $number_of_all_sold_item_last_6_days_only ? (int)($number_of_all_sold_item_last_6_days_only) : 0);
 
-            $number_of_all_sold_item_last_5_days_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return OrderItem::find ()
-                    ->joinWith ('order')
-                    ->andWhere ([
+            $number_of_all_sold_item_last_5_days_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return OrderItem::find()
+                    ->joinWith('order')
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -777,17 +777,17 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 4 DAY) ')
-                    ->sum ('order_item.qty');
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 4 DAY) ')
+                    ->sum('order_item.qty');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($sold_item_chart_data_this_week, $number_of_all_sold_item_last_5_days_only ? (int)($number_of_all_sold_item_last_5_days_only) : 0);
+            array_push($sold_item_chart_data_this_week, $number_of_all_sold_item_last_5_days_only ? (int)($number_of_all_sold_item_last_5_days_only) : 0);
 
-            $number_of_all_sold_item_last_4_days_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return OrderItem::find ()
-                    ->joinWith ('order')
-                    ->andWhere ([
+            $number_of_all_sold_item_last_4_days_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return OrderItem::find()
+                    ->joinWith('order')
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -797,17 +797,17 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 3 DAY) ')
-                    ->sum ('order_item.qty');
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 3 DAY) ')
+                    ->sum('order_item.qty');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($sold_item_chart_data_this_week, $number_of_all_sold_item_last_4_days_only ? (int)($number_of_all_sold_item_last_4_days_only) : 0);
+            array_push($sold_item_chart_data_this_week, $number_of_all_sold_item_last_4_days_only ? (int)($number_of_all_sold_item_last_4_days_only) : 0);
 
-            $number_of_all_sold_item_last_3_days_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return OrderItem::find ()
-                    ->joinWith ('order')
-                    ->andWhere ([
+            $number_of_all_sold_item_last_3_days_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return OrderItem::find()
+                    ->joinWith('order')
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -817,17 +817,17 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')
-                    ->sum ('order_item.qty');
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')
+                    ->sum('order_item.qty');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($sold_item_chart_data_this_week, $number_of_all_sold_item_last_3_days_only ? (int)($number_of_all_sold_item_last_3_days_only) : 0);
+            array_push($sold_item_chart_data_this_week, $number_of_all_sold_item_last_3_days_only ? (int)($number_of_all_sold_item_last_3_days_only) : 0);
 
-            $number_of_all_sold_item_last_2_days_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return OrderItem::find ()
-                    ->joinWith ('order')
-                    ->andWhere ([
+            $number_of_all_sold_item_last_2_days_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return OrderItem::find()
+                    ->joinWith('order')
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -837,17 +837,17 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 1 DAY) ')
-                    ->sum ('order_item.qty');
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 1 DAY) ')
+                    ->sum('order_item.qty');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($sold_item_chart_data_this_week, $number_of_all_sold_item_last_2_days_only ? (int)($number_of_all_sold_item_last_2_days_only) : 0);
+            array_push($sold_item_chart_data_this_week, $number_of_all_sold_item_last_2_days_only ? (int)($number_of_all_sold_item_last_2_days_only) : 0);
 
-            $number_of_all_sold_item_today_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return OrderItem::find ()
-                    ->joinWith ('order')
-                    ->andWhere ([
+            $number_of_all_sold_item_today_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return OrderItem::find()
+                    ->joinWith('order')
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -857,12 +857,12 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (['DATE(order.order_created_at)' => new Expression('CURDATE()')])
-                    ->sum ('order_item.qty');
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['DATE(order.order_created_at)' => new Expression('CURDATE()')])
+                    ->sum('order_item.qty');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($sold_item_chart_data_this_week, $number_of_all_sold_item_today_only ? (int)($number_of_all_sold_item_today_only) : 0);
+            array_push($sold_item_chart_data_this_week, $number_of_all_sold_item_today_only ? (int)($number_of_all_sold_item_today_only) : 0);
 
             $number_of_all_sold_item_this_week = 0;
 
@@ -871,10 +871,10 @@ class SiteController extends Controller
             }
 
             //last month
-            $number_of_all_sold_item_last_three_months_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return OrderItem::find ()
-                    ->joinWith ('order')
-                    ->andWhere ([
+            $number_of_all_sold_item_last_three_months_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return OrderItem::find()
+                    ->joinWith('order')
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -884,16 +884,16 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
-                    ->sum ('order_item.qty');
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
+                    ->sum('order_item.qty');
             }, $cacheDuration, $cacheDependency);
 
-            $number_of_all_sold_item_last_two_months_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return OrderItem::find ()
-                    ->joinWith ('order')
-                    ->andWhere ([
+            $number_of_all_sold_item_last_two_months_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return OrderItem::find()
+                    ->joinWith('order')
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -903,18 +903,18 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
-                    ->sum ('order_item.qty');
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
+                    ->sum('order_item.qty');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($sold_item_chart_data_last_month, $number_of_all_sold_item_last_two_months_only ? (int)($number_of_all_sold_item_last_two_months_only) : 0);
+            array_push($sold_item_chart_data_last_month, $number_of_all_sold_item_last_two_months_only ? (int)($number_of_all_sold_item_last_two_months_only) : 0);
 
-            $number_of_all_sold_item_last_month_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return OrderItem::find ()
-                    ->joinWith ('order')
-                    ->andWhere ([
+            $number_of_all_sold_item_last_month_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return OrderItem::find()
+                    ->joinWith('order')
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -924,22 +924,22 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->sum ('order_item.qty');
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->sum('order_item.qty');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($sold_item_chart_data_last_month, $number_of_all_sold_item_last_month_only ? (int)($number_of_all_sold_item_last_month_only) : 0);
+            array_push($sold_item_chart_data_last_month, $number_of_all_sold_item_last_month_only ? (int)($number_of_all_sold_item_last_month_only) : 0);
 
-            array_push ($sold_item_chart_data_last_three_months, $number_of_all_sold_item_last_three_months_only ? (int)($number_of_all_sold_item_last_three_months_only) : 0);
+            array_push($sold_item_chart_data_last_three_months, $number_of_all_sold_item_last_three_months_only ? (int)($number_of_all_sold_item_last_three_months_only) : 0);
 
-            array_push ($sold_item_chart_data_last_three_months, $number_of_all_sold_item_last_month_only ? (int)($number_of_all_sold_item_last_month_only) : 0);
+            array_push($sold_item_chart_data_last_three_months, $number_of_all_sold_item_last_month_only ? (int)($number_of_all_sold_item_last_month_only) : 0);
 
-            $number_of_all_sold_item_current_month_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return OrderItem::find ()
-                    ->joinWith ('order')
-                    ->andWhere ([
+            $number_of_all_sold_item_current_month_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return OrderItem::find()
+                    ->joinWith('order')
+                    ->andWhere([
                         'IN',
                         'order_status', [
                             Order::STATUS_PENDING,
@@ -949,18 +949,18 @@ class SiteController extends Controller
                             Order::STATUS_ACCEPTED
                         ]
                     ])
-                    ->andWhere (['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ('YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
-                    ->sum ('order_item.qty');
+                    ->andWhere(['order.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere('YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
+                    ->sum('order_item.qty');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($sold_item_chart_data_last_three_months, $number_of_all_sold_item_current_month_only ? (int)($number_of_all_sold_item_current_month_only) : 0);
+            array_push($sold_item_chart_data_last_three_months, $number_of_all_sold_item_current_month_only ? (int)($number_of_all_sold_item_current_month_only) : 0);
 
             $number_of_all_sold_item_last_three_months = 0;
 
             foreach ($sold_item_chart_data_last_three_months as $soldItem) {
-                $number_of_all_sold_item_last_three_months += $soldItem ? intval ($soldItem) : 0;
+                $number_of_all_sold_item_last_three_months += $soldItem ? intval($soldItem) : 0;
             }
 
             //Customers
@@ -969,84 +969,84 @@ class SiteController extends Controller
             $customer_chart_data_last_month = [];
             $customer_chart_data_last_three_months = [];
 
-            $today_customer_gained = Customer::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Customer::find ()
-                    ->andWhere (['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (['DATE(customer_created_at)' => new Expression('CURDATE()')])
-                    ->count ();
+            $today_customer_gained = Customer::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Customer::find()
+                    ->andWhere(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['DATE(customer_created_at)' => new Expression('CURDATE()')])
+                    ->count();
             }, $cacheDuration, $customerCacheDependency);
 
-            $number_of_all_customer_gained_last_month = Customer::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Customer::find ()
-                    ->andWhere (['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->count (); //6
+            $number_of_all_customer_gained_last_month = Customer::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Customer::find()
+                    ->andWhere(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->count(); //6
             }, $cacheDuration, $customerCacheDependency);
 
-            $number_of_all_customers_gained_last_7_days_only = Customer::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Customer::find ()
-                    ->andWhere (['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (' DATE(`customer_created_at`) = DATE(NOW() - INTERVAL 6 DAY) ')
-                    ->count (); //
+            $number_of_all_customers_gained_last_7_days_only = Customer::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Customer::find()
+                    ->andWhere(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(`customer_created_at`) = DATE(NOW() - INTERVAL 6 DAY) ')
+                    ->count(); //
             }, $cacheDuration, $customerCacheDependency);
 
-            array_push ($customer_chart_data_this_week, $number_of_all_customers_gained_last_7_days_only ? (int)($number_of_all_customers_gained_last_7_days_only) : 0);
+            array_push($customer_chart_data_this_week, $number_of_all_customers_gained_last_7_days_only ? (int)($number_of_all_customers_gained_last_7_days_only) : 0);
 
-            $number_of_all_customers_gained_last_6_days_only = Customer::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Customer::find ()
-                    ->andWhere (['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (' DATE(`customer_created_at`) = DATE(NOW() - INTERVAL 5 DAY) ')
-                    ->count (); //
+            $number_of_all_customers_gained_last_6_days_only = Customer::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Customer::find()
+                    ->andWhere(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(`customer_created_at`) = DATE(NOW() - INTERVAL 5 DAY) ')
+                    ->count(); //
             }, $cacheDuration, $customerCacheDependency);
 
-            array_push ($customer_chart_data_this_week, $number_of_all_customers_gained_last_6_days_only ? (int)($number_of_all_customers_gained_last_6_days_only) : 0);
+            array_push($customer_chart_data_this_week, $number_of_all_customers_gained_last_6_days_only ? (int)($number_of_all_customers_gained_last_6_days_only) : 0);
 
-            $number_of_all_customers_gained_last_5_days_only = Customer::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Customer::find ()
-                    ->andWhere (['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (' DATE(`customer_created_at`) = DATE(NOW() - INTERVAL 4 DAY) ')
-                    ->count (); //
+            $number_of_all_customers_gained_last_5_days_only = Customer::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Customer::find()
+                    ->andWhere(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(`customer_created_at`) = DATE(NOW() - INTERVAL 4 DAY) ')
+                    ->count(); //
             }, $cacheDuration, $customerCacheDependency);
 
-            array_push ($customer_chart_data_this_week, $number_of_all_customers_gained_last_5_days_only ? (int)($number_of_all_customers_gained_last_5_days_only) : 0);
+            array_push($customer_chart_data_this_week, $number_of_all_customers_gained_last_5_days_only ? (int)($number_of_all_customers_gained_last_5_days_only) : 0);
 
-            $number_of_all_customers_gained_last_4_days_only = Customer::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Customer::find ()
-                    ->andWhere (['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (' DATE(`customer_created_at`) = DATE(NOW() - INTERVAL 3 DAY) ')
-                    ->count (); //
+            $number_of_all_customers_gained_last_4_days_only = Customer::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Customer::find()
+                    ->andWhere(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(`customer_created_at`) = DATE(NOW() - INTERVAL 3 DAY) ')
+                    ->count(); //
             }, $cacheDuration, $customerCacheDependency);
 
-            array_push ($customer_chart_data_this_week, $number_of_all_customers_gained_last_4_days_only ? (int)($number_of_all_customers_gained_last_4_days_only) : 0);
+            array_push($customer_chart_data_this_week, $number_of_all_customers_gained_last_4_days_only ? (int)($number_of_all_customers_gained_last_4_days_only) : 0);
 
-            $number_of_all_customers_gained_last_3_days_only = Customer::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Customer::find ()
-                    ->andWhere (['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (' DATE(`customer_created_at`) = DATE(NOW() - INTERVAL 2 DAY) ')
-                    ->count (); //
+            $number_of_all_customers_gained_last_3_days_only = Customer::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Customer::find()
+                    ->andWhere(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(`customer_created_at`) = DATE(NOW() - INTERVAL 2 DAY) ')
+                    ->count(); //
             }, $cacheDuration, $customerCacheDependency);
 
-            array_push ($customer_chart_data_this_week, $number_of_all_customers_gained_last_3_days_only ? (int)($number_of_all_customers_gained_last_3_days_only) : 0);
+            array_push($customer_chart_data_this_week, $number_of_all_customers_gained_last_3_days_only ? (int)($number_of_all_customers_gained_last_3_days_only) : 0);
 
-            $number_of_all_customers_gained_last_2_days_only = Customer::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Customer::find ()
-                    ->andWhere (['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (' DATE(`customer_created_at`) = DATE(NOW() - INTERVAL 1 DAY) ')
-                    ->count (); //
+            $number_of_all_customers_gained_last_2_days_only = Customer::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Customer::find()
+                    ->andWhere(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(' DATE(`customer_created_at`) = DATE(NOW() - INTERVAL 1 DAY) ')
+                    ->count(); //
             }, $cacheDuration, $customerCacheDependency);
 
-            array_push ($customer_chart_data_this_week, $number_of_all_customers_gained_last_2_days_only ? (int)($number_of_all_customers_gained_last_2_days_only) : 0);
+            array_push($customer_chart_data_this_week, $number_of_all_customers_gained_last_2_days_only ? (int)($number_of_all_customers_gained_last_2_days_only) : 0);
 
 
-            $number_of_all_customers_gained_today_only = Customer::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Customer::find ()
-                    ->andWhere (['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere (['DATE(customer_created_at)' => new Expression('CURDATE()')])
-                    ->count (); //
+            $number_of_all_customers_gained_today_only = Customer::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Customer::find()
+                    ->andWhere(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere(['DATE(customer_created_at)' => new Expression('CURDATE()')])
+                    ->count(); //
             }, $cacheDuration, $customerCacheDependency);
 
-            array_push ($customer_chart_data_this_week, $number_of_all_customers_gained_today_only ? (int)($number_of_all_customers_gained_today_only) : 0);
+            array_push($customer_chart_data_this_week, $number_of_all_customers_gained_today_only ? (int)($number_of_all_customers_gained_today_only) : 0);
 
             $number_of_all_customer_gained_this_week = 0;
 
@@ -1055,53 +1055,53 @@ class SiteController extends Controller
             }
 
             //last month
-            $number_of_all_customers_gained_last_three_months_only = Customer::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Customer::find ()
-                    ->andWhere (['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
-                    ->count ();
+            $number_of_all_customers_gained_last_three_months_only = Customer::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Customer::find()
+                    ->andWhere(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
+                    ->count();
             }, $cacheDuration, $customerCacheDependency);
 
-            $number_of_all_customers_gained_last_two_months_only = Customer::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Customer::find ()
-                    ->andWhere (['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
-                    ->count ();
+            $number_of_all_customers_gained_last_two_months_only = Customer::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Customer::find()
+                    ->andWhere(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
+                    ->count();
             }, $cacheDuration, $customerCacheDependency);
 
-            array_push ($customer_chart_data_last_month, $number_of_all_customers_gained_last_two_months_only ? (int)($number_of_all_customers_gained_last_two_months_only) : 0);
+            array_push($customer_chart_data_last_month, $number_of_all_customers_gained_last_two_months_only ? (int)($number_of_all_customers_gained_last_two_months_only) : 0);
 
-            $number_of_all_customers_gained_last_month_only = Customer::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Customer::find ()
-                    ->andWhere (['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->count ();
+            $number_of_all_customers_gained_last_month_only = Customer::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Customer::find()
+                    ->andWhere(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->count();
             }, $cacheDuration, $customerCacheDependency);
 
-            array_push ($customer_chart_data_last_month, $number_of_all_customers_gained_last_month_only ? (int)($number_of_all_customers_gained_last_month_only) : 0);
+            array_push($customer_chart_data_last_month, $number_of_all_customers_gained_last_month_only ? (int)($number_of_all_customers_gained_last_month_only) : 0);
 
             //last three month
-            array_push ($customer_chart_data_last_three_months, $number_of_all_customers_gained_last_three_months_only ? (int)($number_of_all_customers_gained_last_three_months_only) : 0);
+            array_push($customer_chart_data_last_three_months, $number_of_all_customers_gained_last_three_months_only ? (int)($number_of_all_customers_gained_last_three_months_only) : 0);
 
-            array_push ($customer_chart_data_last_three_months, $number_of_all_customers_gained_last_month_only ? (int)($number_of_all_customers_gained_last_month_only) : 0);
+            array_push($customer_chart_data_last_three_months, $number_of_all_customers_gained_last_month_only ? (int)($number_of_all_customers_gained_last_month_only) : 0);
 
-            $number_of_all_customers_gained_current_month_only = Customer::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Customer::find ()
-                    ->andWhere (['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
-                    ->count ();
+            $number_of_all_customers_gained_current_month_only = Customer::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Customer::find()
+                    ->andWhere(['customer.restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere('YEAR(`customer`.`customer_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`customer`.`customer_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
+                    ->count();
             }, $cacheDuration, $customerCacheDependency);
 
-            array_push ($customer_chart_data_last_three_months, $number_of_all_customers_gained_current_month_only ? (int)($number_of_all_customers_gained_current_month_only) : 0);
+            array_push($customer_chart_data_last_three_months, $number_of_all_customers_gained_current_month_only ? (int)($number_of_all_customers_gained_current_month_only) : 0);
 
             $number_of_all_customer_gained_last_three_months = 0;
 
             foreach ($customer_chart_data_last_three_months as $customerGained) {
-                $number_of_all_customer_gained_last_three_months += $customerGained ? intval ($customerGained) : 0;
+                $number_of_all_customer_gained_last_three_months += $customerGained ? intval($customerGained) : 0;
             }
 
             //Revenue
@@ -1111,10 +1111,10 @@ class SiteController extends Controller
             $revenue_generated_chart_data_last_three_months = [];
             $revenue_generated_chart_data = [];
 
-            $today_revenue_generated = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ([
+            $today_revenue_generated = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere([
                         'NOT IN',
                         'order_status', [
                             Order::STATUS_ABANDONED_CHECKOUT,
@@ -1123,14 +1123,14 @@ class SiteController extends Controller
                             Order::STATUS_CANCELED
                         ]
                     ])
-                    ->andWhere (['DATE(order_created_at)' => new Expression('CURDATE()')])
-                    ->sum ('total_price');
+                    ->andWhere(['DATE(order_created_at)' => new Expression('CURDATE()')])
+                    ->sum('total_price');
             }, $cacheDuration, $cacheDependency);
 
-            $number_of_all_revenue_generated_last_month = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ([
+            $number_of_all_revenue_generated_last_month = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere([
                         'NOT IN',
                         'order_status', [
                             Order::STATUS_ABANDONED_CHECKOUT,
@@ -1139,16 +1139,16 @@ class SiteController extends Controller
                             Order::STATUS_CANCELED
                         ]
                     ])
-                    ->andWhere ('YEAR(`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->sum ('total_price'); //434.5
+                    ->andWhere('YEAR(`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->sum('total_price'); //434.5
             }, $cacheDuration, $cacheDependency);
 
             //Chart
-            $number_of_all_revenue_generated_last_7_days_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ([
+            $number_of_all_revenue_generated_last_7_days_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere([
                         'NOT IN',
                         'order_status', [
                             Order::STATUS_ABANDONED_CHECKOUT,
@@ -1157,16 +1157,16 @@ class SiteController extends Controller
                             Order::STATUS_CANCELED
                         ]
                     ])
-                    ->andWhere (' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 6 DAY) ')
-                    ->sum ('total_price');
+                    ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 6 DAY) ')
+                    ->sum('total_price');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($revenue_generated_chart_data_this_week, number_format ((float)$number_of_all_revenue_generated_last_7_days_only, 2, '.', ''));
+            array_push($revenue_generated_chart_data_this_week, number_format((float)$number_of_all_revenue_generated_last_7_days_only, 2, '.', ''));
 
-            $number_of_all_revenue_generated_last_6_days_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ([
+            $number_of_all_revenue_generated_last_6_days_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere([
                         'NOT IN',
                         'order_status', [
                             Order::STATUS_ABANDONED_CHECKOUT,
@@ -1175,16 +1175,16 @@ class SiteController extends Controller
                             Order::STATUS_CANCELED
                         ]
                     ])
-                    ->andWhere (' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 5 DAY) ')
-                    ->sum ('total_price');
+                    ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 5 DAY) ')
+                    ->sum('total_price');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($revenue_generated_chart_data_this_week, number_format ((float)$number_of_all_revenue_generated_last_6_days_only, 2, '.', ''));
+            array_push($revenue_generated_chart_data_this_week, number_format((float)$number_of_all_revenue_generated_last_6_days_only, 2, '.', ''));
 
-            $number_of_all_revenue_generated_last_5_days_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ([
+            $number_of_all_revenue_generated_last_5_days_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere([
                         'NOT IN',
                         'order_status', [
                             Order::STATUS_ABANDONED_CHECKOUT,
@@ -1193,16 +1193,16 @@ class SiteController extends Controller
                             Order::STATUS_CANCELED
                         ]
                     ])
-                    ->andWhere (' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 4 DAY) ')
-                    ->sum ('total_price');
+                    ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 4 DAY) ')
+                    ->sum('total_price');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($revenue_generated_chart_data_this_week, number_format ((float)$number_of_all_revenue_generated_last_5_days_only, 2, '.', ''));
+            array_push($revenue_generated_chart_data_this_week, number_format((float)$number_of_all_revenue_generated_last_5_days_only, 2, '.', ''));
 
-            $number_of_all_revenue_generated_last_4_days_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ([
+            $number_of_all_revenue_generated_last_4_days_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere([
                         'NOT IN',
                         'order_status', [
                             Order::STATUS_ABANDONED_CHECKOUT,
@@ -1211,16 +1211,16 @@ class SiteController extends Controller
                             Order::STATUS_CANCELED
                         ]
                     ])
-                    ->andWhere (' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 3 DAY) ')
-                    ->sum ('total_price');
+                    ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 3 DAY) ')
+                    ->sum('total_price');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($revenue_generated_chart_data_this_week, number_format ((float)$number_of_all_revenue_generated_last_4_days_only, 2, '.', ''));
+            array_push($revenue_generated_chart_data_this_week, number_format((float)$number_of_all_revenue_generated_last_4_days_only, 2, '.', ''));
 
-            $number_of_all_revenue_generated_last_3_days_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ([
+            $number_of_all_revenue_generated_last_3_days_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere([
                         'NOT IN',
                         'order_status', [
                             Order::STATUS_ABANDONED_CHECKOUT,
@@ -1229,16 +1229,16 @@ class SiteController extends Controller
                             Order::STATUS_CANCELED
                         ]
                     ])
-                    ->andWhere (' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 2 DAY) ')
-                    ->sum ('total_price');
+                    ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 2 DAY) ')
+                    ->sum('total_price');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($revenue_generated_chart_data_this_week, number_format ((float)$number_of_all_revenue_generated_last_3_days_only, 2, '.', ''));
+            array_push($revenue_generated_chart_data_this_week, number_format((float)$number_of_all_revenue_generated_last_3_days_only, 2, '.', ''));
 
-            $number_of_all_revenue_generated_last_2_days_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ([
+            $number_of_all_revenue_generated_last_2_days_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere([
                         'NOT IN',
                         'order_status', [
                             Order::STATUS_ABANDONED_CHECKOUT,
@@ -1247,16 +1247,16 @@ class SiteController extends Controller
                             Order::STATUS_CANCELED
                         ]
                     ])
-                    ->andWhere (' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 1 DAY) ')
-                    ->sum ('total_price');
+                    ->andWhere(' DATE(`order_created_at`) = DATE(NOW() - INTERVAL 1 DAY) ')
+                    ->sum('total_price');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($revenue_generated_chart_data_this_week, number_format ((float)$number_of_all_revenue_generated_last_2_days_only, 2, '.', ''));
+            array_push($revenue_generated_chart_data_this_week, number_format((float)$number_of_all_revenue_generated_last_2_days_only, 2, '.', ''));
 
-            $number_of_all_revenue_generated_today_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ([
+            $number_of_all_revenue_generated_today_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere([
                         'NOT IN',
                         'order_status', [
                             Order::STATUS_ABANDONED_CHECKOUT,
@@ -1265,24 +1265,24 @@ class SiteController extends Controller
                             Order::STATUS_CANCELED
                         ]
                     ])
-                    ->andWhere (['DATE(order_created_at)' => new Expression('CURDATE()')])
-                    ->sum ('total_price');
+                    ->andWhere(['DATE(order_created_at)' => new Expression('CURDATE()')])
+                    ->sum('total_price');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($revenue_generated_chart_data_this_week, number_format ((float)$number_of_all_revenue_generated_today_only, 2, '.', ''));
+            array_push($revenue_generated_chart_data_this_week, number_format((float)$number_of_all_revenue_generated_today_only, 2, '.', ''));
 
             $number_of_all_revenue_generated_this_week = 0;
 
             foreach ($revenue_generated_chart_data_this_week as $revenueGenerated) {
-                $number_of_all_revenue_generated_this_week += $revenueGenerated ? floatval ($revenueGenerated) : 0;
+                $number_of_all_revenue_generated_this_week += $revenueGenerated ? floatval($revenueGenerated) : 0;
             }
 
 
             //last month
-            $number_of_all_revenue_generated_last_three_months_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ([
+            $number_of_all_revenue_generated_last_three_months_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere([
                         'NOT IN',
                         'order_status', [
                             Order::STATUS_ABANDONED_CHECKOUT,
@@ -1291,15 +1291,15 @@ class SiteController extends Controller
                             Order::STATUS_CANCELED
                         ]
                     ])
-                    ->andWhere ('YEAR(`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
-                    ->sum ('total_price');
+                    ->andWhere('YEAR(`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
+                    ->sum('total_price');
             }, $cacheDuration, $cacheDependency);
 
-            $number_of_all_revenue_generated_last_two_months_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ([
+            $number_of_all_revenue_generated_last_two_months_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere([
                         'NOT IN',
                         'order_status', [
                             Order::STATUS_ABANDONED_CHECKOUT,
@@ -1308,17 +1308,17 @@ class SiteController extends Controller
                             Order::STATUS_CANCELED
                         ]
                     ])
-                    ->andWhere ('YEAR(`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
-                    ->sum ('total_price');
+                    ->andWhere('YEAR(`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 2 MONTH)')
+                    ->sum('total_price');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($revenue_generated_chart_data_last_month, $number_of_all_revenue_generated_last_two_months_only ? number_format ((float)$number_of_all_revenue_generated_last_two_months_only, 2, '.', '') : 0);
+            array_push($revenue_generated_chart_data_last_month, $number_of_all_revenue_generated_last_two_months_only ? number_format((float)$number_of_all_revenue_generated_last_two_months_only, 2, '.', '') : 0);
 
-            $number_of_all_revenue_generated_last_month_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ([
+            $number_of_all_revenue_generated_last_month_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere([
                         'NOT IN',
                         'order_status', [
                             Order::STATUS_ABANDONED_CHECKOUT,
@@ -1327,21 +1327,21 @@ class SiteController extends Controller
                             Order::STATUS_CANCELED
                         ]
                     ])
-                    ->andWhere ('YEAR(`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->sum ('total_price');
+                    ->andWhere('YEAR(`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->sum('total_price');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($revenue_generated_chart_data_last_month, $number_of_all_revenue_generated_last_month_only ? number_format ((float)$number_of_all_revenue_generated_last_month_only, 2, '.', '') : 0);
+            array_push($revenue_generated_chart_data_last_month, $number_of_all_revenue_generated_last_month_only ? number_format((float)$number_of_all_revenue_generated_last_month_only, 2, '.', '') : 0);
 
             //last 3 months
-            array_push ($revenue_generated_chart_data_last_three_months, $number_of_all_revenue_generated_last_three_months_only ? number_format ((float)$number_of_all_revenue_generated_last_three_months_only, 2, '.', '') : 0);
-            array_push ($revenue_generated_chart_data_last_three_months, $number_of_all_revenue_generated_last_month_only ? number_format ((float)$number_of_all_revenue_generated_last_month_only, 2, '.', '') : 0);
+            array_push($revenue_generated_chart_data_last_three_months, $number_of_all_revenue_generated_last_three_months_only ? number_format((float)$number_of_all_revenue_generated_last_three_months_only, 2, '.', '') : 0);
+            array_push($revenue_generated_chart_data_last_three_months, $number_of_all_revenue_generated_last_month_only ? number_format((float)$number_of_all_revenue_generated_last_month_only, 2, '.', '') : 0);
 
-            $number_of_all_revenue_generated_current_month_only = Order::getDb ()->cache (function ($db) use ($managedRestaurant) {
-                return Order::find ()
-                    ->andWhere (['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
-                    ->andWhere ([
+            $number_of_all_revenue_generated_current_month_only = Order::getDb()->cache(function ($db) use ($managedRestaurant) {
+                return Order::find()
+                    ->andWhere(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])
+                    ->andWhere([
                         'NOT IN',
                         'order_status', [
                             Order::STATUS_ABANDONED_CHECKOUT,
@@ -1350,20 +1350,20 @@ class SiteController extends Controller
                             Order::STATUS_CANCELED
                         ]
                     ])
-                    ->andWhere ('YEAR(`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-                    ->andWhere ('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
-                    ->sum ('total_price');
+                    ->andWhere('YEAR(`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+                    ->andWhere('MONTH(`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
+                    ->sum('total_price');
             }, $cacheDuration, $cacheDependency);
 
-            array_push ($revenue_generated_chart_data_last_three_months, $number_of_all_revenue_generated_current_month_only ? number_format ((float)$number_of_all_revenue_generated_current_month_only, 2, '.', '') : 0);
+            array_push($revenue_generated_chart_data_last_three_months, $number_of_all_revenue_generated_current_month_only ? number_format((float)$number_of_all_revenue_generated_current_month_only, 2, '.', '') : 0);
 
             $number_of_all_revenue_generated_last_three_months = 0;
 
             foreach ($revenue_generated_chart_data_last_three_months as $revenueGenerated) {
-                $number_of_all_revenue_generated_last_three_months += $revenueGenerated ? floatval ($revenueGenerated) : 0;
+                $number_of_all_revenue_generated_last_three_months += $revenueGenerated ? floatval($revenueGenerated) : 0;
             }
 
-            return $this->render ('index', [
+            return $this->render('index', [
                 'restaurant' => $managedRestaurant,
                 'numberOfOrders' => $numberOfOrders,
                 //customer gained
@@ -1405,7 +1405,7 @@ class SiteController extends Controller
             ]);
         } else {
 
-            return $this->redirect (['real-time-orders',
+            return $this->redirect(['real-time-orders',
                 'storeUuid' => $managedRestaurant->restaurant_uuid
             ]);
         }
@@ -1420,10 +1420,10 @@ class SiteController extends Controller
     public function actionPromoteToOpen($id)
     {
 
-        $model = $this->findModel ($id);
-        $model->promoteToOpenRestaurant ();
+        $model = $this->findModel($id);
+        $model->promoteToOpenRestaurant();
 
-        return $this->redirect (['index', 'id' => $id]);
+        return $this->redirect(['index', 'id' => $id]);
     }
 
     /**
@@ -1434,10 +1434,10 @@ class SiteController extends Controller
      */
     public function actionPromoteToBusy($id)
     {
-        $model = $this->findModel ($id);
-        $model->promoteToBusyRestaurant ();
+        $model = $this->findModel($id);
+        $model->promoteToBusyRestaurant();
 
-        return $this->redirect (['index', 'id' => $id]);
+        return $this->redirect(['index', 'id' => $id]);
     }
 
     /**
@@ -1448,10 +1448,10 @@ class SiteController extends Controller
      */
     public function actionPromoteToClose($id)
     {
-        $model = $this->findModel ($id);
-        $model->promoteToCloseRestaurant ();
+        $model = $this->findModel($id);
+        $model->promoteToCloseRestaurant();
 
-        return $this->redirect (['index', 'id' => $id]);
+        return $this->redirect(['index', 'id' => $id]);
     }
 
     /**
@@ -1467,17 +1467,17 @@ class SiteController extends Controller
         $this->layout = 'login';
 
         if (!Yii::$app->user->isGuest) {
-            return $this->goHome ();
+            return $this->goHome();
         }
 
         $model = new LoginForm();
 
-        if ($model->load (Yii::$app->request->post ()) && $managedRestaurant = $model->login ()) {
-            return $this->redirect (['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
+        if ($model->load(Yii::$app->request->post()) && $managedRestaurant = $model->login()) {
+            return $this->redirect(['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
         } else {
             $model->password = '';
 
-            return $this->render ('login', [
+            return $this->render('login', [
                 'model' => $model,
             ]);
         }
@@ -1490,9 +1490,9 @@ class SiteController extends Controller
      */
     public function actionLogout()
     {
-        Yii::$app->user->logout ();
+        Yii::$app->user->logout();
 
-        return $this->redirect ('https://plugn.io/');
+        return $this->redirect('https://plugn.io/');
     }
 
     /**
@@ -1506,98 +1506,152 @@ class SiteController extends Controller
 
         $store = new Restaurant();
         $store->version = 3;
-        $store->setScenario (Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
+        $store->setScenario(Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
 
         $agent = new Agent();
-        $agent->setScenario (Agent::SCENARIO_CREATE_NEW_AGENT);
+        $agent->setScenario(Agent::SCENARIO_CREATE_NEW_AGENT);
 
-        if ($agent->load (Yii::$app->request->post ()) && $store->load (Yii::$app->request->post ())) {
+        $transaction = Yii::$app->db->beginTransaction();
 
+        if ($agent->load(Yii::$app->request->post()) && !$agent->save()) {
+            $transaction->rollBack();
+
+            Yii::$app->session->setFlash('error', $agent->errors);
+
+            return $this->render('signup', [
+                'agent' => $agent,
+                'store' => $store
+            ]);
+        }
+
+        if ($store->load(Yii::$app->request->post()))
+        {
             $store->restaurant_email = $agent->agent_email;
             $store->owner_first_name = $agent->agent_name;
 
             $store->name_ar = $store->name;
 
-            if (
-                $agent->validate () && $store->validate () &&
-                $store->save () && $agent->save ()) {
+            if (!$store->save()) {
+                $transaction->rollBack();
 
-                //Create a catrgory for a store by default named "Products". so they can get started adding products without having to add category first
-                $category = new Category();
-                $category->restaurant_uuid = $store->restaurant_uuid;
-                $category->title = 'Products';
-                $category->title_ar = 'منتجات';
-                $category->save ();
+                Yii::$app->session->setFlash('error', $store->errors);
 
-                //Create a business Location for a store by default named "Main Branch".
-                $business_location = new BusinessLocation();
-                $business_location->restaurant_uuid = $store->restaurant_uuid;
-                $business_location->country_id = $store->country_id;
-                $business_location->support_pick_up = 1;
-                $business_location->business_location_name = 'Main Branch';
-                $business_location->business_location_name_ar = 'الفرع الرئيسي';
-                $business_location->save ();
-
-                //Enable cash by default
-                $payments_method = new RestaurantPaymentMethod();
-                $payments_method->payment_method_id = 3; //Cash
-                $payments_method->restaurant_uuid = $store->restaurant_uuid;
-                $payments_method->save ();
-                
-                //Enable cash by default
-                $payments_method = new RestaurantPaymentMethod();
-                $payments_method->payment_method_id = 3; //Cash
-                $payments_method->restaurant_uuid = $store->restaurant_uuid;
-                $payments_method->save ();
-
-                $assignment_agent = new AgentAssignment();
-                $assignment_agent->agent_id = $agent->agent_id;
-                $assignment_agent->assignment_agent_email = $agent->agent_email;
-                $assignment_agent->role = AgentAssignment::AGENT_ROLE_OWNER;
-                $assignment_agent->restaurant_uuid = $store->restaurant_uuid;
-                $assignment_agent->email_notification = 1;
-
-                if ($assignment_agent->save ()) {
-
-                    $agent->sendVerificationEmail();
-
-                    \Yii::info ("[New Store Signup] " . $store->name . " has just joined Plugn", __METHOD__);
-
-                    if (YII_ENV == 'prod') {
-                        $full_name = explode (' ', $agent->agent_name);
-                        $firstname = $full_name[0];
-                        $lastname = array_key_exists (1, $full_name) ? $full_name[1] : null;
-
-                        \Segment::init ('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-                        \Segment::track ([
-                            'userId' => $store->restaurant_uuid,
-                            'event' => 'Store Created',
-                            'type' => 'track',
-                            'properties' => [
-                                'first_name' => trim ($firstname),
-                                'last_name' => trim ($lastname),
-                                'store_name' => $store->name,
-                                'country' => $store->country_id ? $store->country->country_name : '',
-                                'currency' => $store->currency_id ? $store->currency->title : '',
-                                'phone_number' => $store->owner_number,
-                                'email' => $agent->agent_email,
-                                'store_url' => $store->restaurant_domain
-                            ]
-                        ]);
-
-                        Yii::$app->session->setFlash ('storeCreated');
-
-                    }
-
-                    return $this->redirect (['site/verify-email', 'email' => $agent->agent_email]);
-                }
+                return $this->render('signup', [
+                    'agent' => $agent,
+                    'store' => $store
+                ]);
             }
+
+            //Create a catrgory for a store by default named "Products". so they can get started adding products without having to add category first
+
+            $category = new Category();
+            $category->restaurant_uuid = $store->restaurant_uuid;
+            $category->title = 'Products';
+            $category->title_ar = 'منتجات';
+
+            if (!$category->save()) {
+                $transaction->rollBack();
+
+                Yii::$app->session->setFlash('error', $category->errors);
+
+                return $this->render('signup', [
+                    'agent' => $agent,
+                    'store' => $store
+                ]);
+            }
+
+            //Create a business Location for a store by default named "Main Branch".
+
+            $business_location = new BusinessLocation();
+            $business_location->restaurant_uuid = $store->restaurant_uuid;
+            $business_location->country_id = $store->country_id;
+            $business_location->support_pick_up = 1;
+            $business_location->business_location_name = 'Main Branch';
+            $business_location->business_location_name_ar = 'الفرع الرئيسي';
+
+            if (!$business_location->save()) {
+                $transaction->rollBack();
+
+                Yii::$app->session->setFlash('error', $business_location->errors);
+
+                return $this->render('signup', [
+                    'agent' => $agent,
+                    'store' => $store
+                ]);
+            }
+
+            //Enable cash by default
+
+            $payments_method = new RestaurantPaymentMethod();
+            $payments_method->payment_method_id = 3; //Cash
+            $payments_method->restaurant_uuid = $store->restaurant_uuid;
+
+            if (!$payments_method->save()) {
+                $transaction->rollBack();
+
+                Yii::$app->session->setFlash('error', $payments_method->errors);
+
+                return $this->render('signup', [
+                    'agent' => $agent,
+                    'store' => $store
+                ]);
+            }
+
+            $assignment_agent = new AgentAssignment();
+            $assignment_agent->agent_id = $agent->agent_id;
+            $assignment_agent->assignment_agent_email = $agent->agent_email;
+            $assignment_agent->role = AgentAssignment::AGENT_ROLE_OWNER;
+            $assignment_agent->restaurant_uuid = $store->restaurant_uuid;
+            $assignment_agent->email_notification = 1;
+            $assignment_agent->business_location_id = $business_location->business_location_id;
+
+            if (!$assignment_agent->save()) {
+                $transaction->rollBack();
+
+                Yii::$app->session->setFlash('error', $assignment_agent->errors);
+
+                return $this->render('signup', [
+                    'agent' => $agent,
+                    'store' => $store
+                ]);
+            }
+
+            $agent->sendVerificationEmail();
+
+            $transaction->commit();
+
+            \Yii::info("[New Store Signup] " . $store->name . " has just joined Plugn", __METHOD__);
+
+            if (YII_ENV == 'prod') {
+                $full_name = explode(' ', $agent->agent_name);
+                $firstname = $full_name[0];
+                $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
+
+                \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+                \Segment::track([
+                    'userId' => $store->restaurant_uuid,
+                    'event' => 'Store Created',
+                    'type' => 'track',
+                    'properties' => [
+                        'first_name' => trim($firstname),
+                        'last_name' => trim($lastname),
+                        'store_name' => $store->name,
+                        'country' => $store->country_id ? $store->country->country_name : '',
+                        'currency' => $store->currency_id ? $store->currency->title : '',
+                        'phone_number' => $store->owner_number,
+                        'email' => $agent->agent_email,
+                        'store_url' => $store->restaurant_domain
+                    ]
+                ]);
+
+                Yii::$app->session->setFlash('storeCreated');
+            }
+
+            return $this->redirect(['site/verify-email', 'email' => $agent->agent_email]);
         }
 
-        return $this->render ('signup', [
-            'agent' => $agent,
-            'store' => $store
-        ]);
+        return $this->render('signup', ['agent' => $agent,
+            'store' => $store]);
     }
 
     /**
@@ -1608,9 +1662,9 @@ class SiteController extends Controller
     {
         $email = Yii::$app->request->get('email');
 
-        $this->layout = 'landing';
+        $this->layout = 'login';
 
-        return $this->render ('verify-email', [
+        return $this->render('verify-email', [
             'email' => $email
         ]);
     }
@@ -1618,7 +1672,7 @@ class SiteController extends Controller
     public function actionThankYou()
     {
         $this->layout = 'landing';
-        return $this->render ('thankYou');
+        return $this->render('thankYou');
     }
 
     /**
@@ -1632,18 +1686,18 @@ class SiteController extends Controller
 
         $model = new PasswordResetRequestForm();
 
-        if ($model->load (Yii::$app->request->post ())) {
+        if ($model->load(Yii::$app->request->post())) {
 
-            if ($model->sendEmail ()) {
-                Yii::$app->session->setFlash ('success', 'Check your email for further instructions.');
+            if ($model->sendEmail()) {
+                Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
 
-                return $this->goHome ();
+                return $this->goHome();
             } else {
-                Yii::$app->session->setFlash ('error', 'Sorry, we are unable to reset password for the provided email address.');
+                Yii::$app->session->setFlash('error', 'Sorry, we are unable to reset password for the provided email address.');
             }
         }
 
-        return $this->render ('requestPasswordResetToken', [
+        return $this->render('requestPasswordResetToken', [
             'model' => $model,
         ]);
     }
@@ -1655,7 +1709,8 @@ class SiteController extends Controller
      * @return mixed
      * @throws BadRequestHttpException
      */
-    public function actionResetPassword($token)
+    public
+    function actionResetPassword($token)
     {
         $this->layout = 'login';
 
@@ -1663,16 +1718,16 @@ class SiteController extends Controller
         try {
             $model = new ResetPasswordForm($token);
         } catch (InvalidArgumentException $e) {
-            throw new BadRequestHttpException($e->getMessage ());
+            throw new BadRequestHttpException($e->getMessage());
         }
 
-        if ($model->load (Yii::$app->request->post ()) && $model->validate () && $model->resetPassword ()) {
-            Yii::$app->session->setFlash ('success', 'New password saved.');
+        if ($model->load(Yii::$app->request->post()) && $model->validate() && $model->resetPassword()) {
+            Yii::$app->session->setFlash('success', 'New password saved.');
 
-            return $this->goHome ();
+            return $this->goHome();
         }
 
-        return $this->render ('resetPassword', [
+        return $this->render('resetPassword', [
             'model' => $model,
         ]);
     }
@@ -1684,9 +1739,10 @@ class SiteController extends Controller
      * @return Restaurant the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected
+    function findModel($id)
     {
-        if (($model = Yii::$app->accountManager->getManagedAccount ($id))) {
+        if (($model = Yii::$app->accountManager->getManagedAccount($id))) {
             return $model;
         }
 
