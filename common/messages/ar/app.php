@@ -17,6 +17,7 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    "Store does not deliver to this delivery zone." => "",
     'Delivery Zone' => 'منطقة التسليم',
     'Amount Charged' => "المبلغ المشحون",
     'Created at' => "تم الإنشاء في",

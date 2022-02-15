@@ -68,6 +68,7 @@ class Order extends \common\models\Order
             'refunds',
             'area',
             'currency',
+            'customer',
             'itemImage'//first image in first order item 
         ];
     }
