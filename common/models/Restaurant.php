@@ -939,7 +939,7 @@ class Restaurant extends \yii\db\ActiveRecord
         {
              Yii::error('Error while create Merchant' . json_encode($merchantApiResponse->data));
 
-             if($merchantApiResponse->data['message'] == 'Profile Name already exists')
+             if($merchantApiResponse->data && isset($merchantApiResponse->data['message']) && $merchantApiResponse->data['message'] == 'Profile Name already exists')
              {
                $merchantApiResponse = Yii::$app->tapPayments->createMerchantAccount($this->company_name . '-' . $this->country->iso, $this->currency->code ,$this->business_id, $this->business_entity_id, $this->iban);
 

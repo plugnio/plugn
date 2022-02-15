@@ -346,6 +346,7 @@ class OrderController extends Controller {
                                    $order->customer_phone_number,
                                    $order->restaurant->platform_fee,
                                    Url::to(['order/callback'], true),
+                                   Url::to(['order/payment-webhook'], true),
                                   $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id,
                                   $order->restaurant->warehouse_fee,
                                   $order->restaurant->warehouse_delivery_charges,
@@ -642,6 +643,7 @@ class OrderController extends Controller {
      */
     public function actionCallback($tap_id) {
 
+
         try {
             $paymentRecord = Payment::updatePaymentStatusFromTap($tap_id);
             $paymentRecord->received_callback = true;
@@ -658,6 +660,41 @@ class OrderController extends Controller {
         } catch (\Exception $e) {
             throw new NotFoundHttpException($e->getMessage());
         }
+    }
+
+    /**
+     * Process callback from TAP payment gateway
+     * @param string $tap_id
+     * @return mixed
+     */
+    public function actionPaymentWebhook() {
+
+
+      $charge_id = Yii::$app->request->getBodyParam("id");
+      $status = Yii::$app->request->getBodyParam("status");
+      $destinations = Yii::$app->request->getBodyParam("destinations");
+      $response = Yii::$app->request->getBodyParam("response");
+      $source = Yii::$app->request->getBodyParam("source");
+      $reference = Yii::$app->request->getBodyParam("reference");
+
+
+      $response_message  = null;
+
+      if(isset($response))
+        $response_message = $response['message'];
+
+
+      $paymentRecord = Payment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
+      $paymentRecord->received_callback = true;
+      $paymentRecord->save(false);
+
+      if($paymentRecord){
+        return [
+            'operation' => 'success',
+            'message' => 'Payment status has been updated successfully'
+        ];
+      }
+
     }
 
     /**
