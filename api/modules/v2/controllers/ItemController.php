@@ -99,6 +99,7 @@ class ItemController extends Controller {
     {
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
         $category_id = Yii::$app->request->get("category_id");
+        $keyword = Yii::$app->request->get("keyword");
 
         $restaurant = Restaurant::find()
             ->where(['restaurant_uuid' => $restaurant_uuid])
@@ -113,6 +114,10 @@ class ItemController extends Controller {
                 item.sort_number ASC,
                 item.sku IS NULL,
                 item.sku ASC')]);
+
+        if($keyword) {
+            $query->filterKeyword($keyword);
+        }
 
         if($category_id) {
             $query->joinWith('categoryItems')

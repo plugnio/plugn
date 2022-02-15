@@ -113,6 +113,7 @@ class ItemController extends Controller {
         $restaurant = Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->one();
 
         if ($restaurant) {
+
             $restaurantMenu = Category::find()
                     ->andWhere(['restaurant_uuid' => $restaurant_uuid])
                     ->with('items', 'items.options', 'items.options.extraOptions','items.itemImages')
