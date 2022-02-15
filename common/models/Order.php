@@ -8,6 +8,7 @@ use yii\db\Expression;
 use yii\behaviors\AttributeBehavior;
 use borales\extensions\phoneInput\PhoneInputValidator;
 use yii\helpers\ArrayHelper;
+use yii\web\BadRequestHttpException;
 
 /**
  * This is the model class for table "order".
@@ -148,9 +149,10 @@ class Order extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['customer_name', 'order_mode', 'currency_code', 'store_currency_code', 'total_price', 'subtotal',
-                'order_mode', 'restaurant_uuid', 'payment_method_name', 'payment_method_id',
-                'customer_email', 'customer_phone_number', 'customer_phone_country_code', 'customer_name'], 'required'],
+            // 'currency_code', 'store_currency_code', 'payment_method_name'
+            [['customer_name', 'order_mode', 'total_price', 'subtotal',
+                'order_mode', 'restaurant_uuid', 'payment_method_id',
+                'customer_phone_number', 'customer_phone_country_code', 'customer_name'], 'required'],
             [['is_order_scheduled'], 'required', 'on' => 'create'],
             [['payment_method_id'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['order_uuid'], 'string', 'max' => 40],
@@ -485,7 +487,6 @@ class Order extends \yii\db\ActiveRecord
      */
     public function validateVoucherId($attribute)
     {
-
         $voucher = Voucher::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'voucher_id' => $this->voucher_id, 'voucher_status' => Voucher::VOUCHER_STATUS_ACTIVE])->exists();
 
         if (!$voucher || !$this->voucher->isValid($this->customer_phone_number))
@@ -941,6 +942,10 @@ public function restockItems()
         return parent::beforeDelete();
     }
 
+    /**
+     * @param bool $insert
+     * @return bool|void
+     */
     public function beforeSave($insert)
     {
         if (!parent::beforeSave($insert)) {
@@ -1018,7 +1023,6 @@ public function restockItems()
             //   }
             // }
 
-
             if ($this->restaurant->version == 4) {
                 if (!$this->is_order_scheduled && $this->orderItems) {
 
@@ -1042,7 +1046,7 @@ public function restockItems()
                     }
 
 
-                    $this->estimated_time_of_arrival = date("c", strtotime('+' . $maxPrepTime . ' min', Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $maxPrepTime . ' min', Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
 
                 }
             } else {
@@ -1068,7 +1072,7 @@ public function restockItems()
                     }
 
 
-                    $this->estimated_time_of_arrival = date("c", strtotime('+' . $maxPrepTime . ' min', Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $maxPrepTime . ' min', Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
 
                 }
             }
@@ -1076,13 +1080,102 @@ public function restockItems()
 
         }
 
-
         return true;
     }
 
+    /**
+     * @param bool $insert
+     * @param array $changedAttributes
+     */
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
+
+        if ($insert) {
+
+            if(is_null ($this->items_has_been_restocked)) {
+                $this->items_has_been_restocked = false;
+            }
+
+            if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
+                $this->delivery_time = $this->deliveryZone->delivery_time;
+                //$this->save(false);
+            }
+
+            $this->customer_phone_number = str_replace(' ', '', $this->customer_phone_number);
+
+            //Save Customer data
+            $customer = Customer::find()->where(['customer_phone_number' => $this->customer_phone_number, 'restaurant_uuid' => $this->restaurant_uuid])->one();
+
+            if (!$customer) {//new customer
+                $customer = new Customer();
+                $customer->restaurant_uuid = $this->restaurant_uuid;
+                $customer->customer_name = $this->customer_name;
+                $customer->country_code = $this->customer_phone_country_code;
+                $customer->customer_phone_number = $this->customer_phone_number;
+
+                if ($this->restaurant_uuid == 'rest_fe5b6a72-18a7-11ec-973b-069e9504599a' && $this->civil_id && $this->section && $this->class) {
+                    $customer->civil_id = $this->civil_id;
+                    $customer->section = $this->section;
+                    $customer->class = $this->class;
+                }
+            } else {
+                $customer->customer_name = $this->customer_name;
+
+                if ($this->restaurant_uuid == 'rest_fe5b6a72-18a7-11ec-973b-069e9504599a' && $this->civil_id && $this->section && $this->class) {
+                    $customer->civil_id = $this->civil_id;
+                    $customer->section = $this->section;
+                    $customer->class = $this->class;
+                }
+            }
+
+            if ($this->customer_email != null)
+                $customer->customer_email = $this->customer_email;
+
+            $customer->save(false);
+
+            $this->customer_id = $customer->customer_id;
+
+            if ($this->voucher_id) {
+
+                $voucher_model = Voucher::findOne($this->voucher_id);
+
+                if ($voucher_model->isValid($this->customer_phone_number)) {
+                    $customerVoucher = new CustomerVoucher();
+                    $customerVoucher->customer_id = $this->customer_id;
+                    $customerVoucher->voucher_id = $this->voucher_id;
+                    $customerVoucher->save();
+                }
+            }
+
+            if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
+
+                if ($this->area_id) {
+                    $area_model = Area::findOne($this->area_id);
+                    $this->area_name = $area_model->area_name;
+                    $this->area_name_ar = $area_model->area_name_ar;
+                }
+            }
+
+            $payment_method_model = PaymentMethod::findOne($this->payment_method_id);
+
+            if(!$payment_method_model) {
+                throw new BadRequestHttpException('payment gateway not found');
+            }
+
+            if ($payment_method_model) {
+                $this->payment_method_name = $payment_method_model->payment_method_name;
+                $this->payment_method_name_ar = $payment_method_model->payment_method_name_ar;
+            }
+
+            if (!$this->currency_code && $this->restaurant && $this->restaurant->currency) {
+                $this->currency_code = $this->restaurant->currency->code;
+            }
+
+            $this->store_currency_code = $this->restaurant->currency->code;
+
+            //$this->save(false);
+        }
 
         //Send SMS To customer
 
@@ -1227,82 +1320,6 @@ public function restockItems()
             }
 
             $this->items_has_been_restocked = false;
-            //$this->save(false);
-        }
-
-        if ($insert) {
-
-            if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
-                $this->delivery_time = $this->deliveryZone->delivery_time;
-                //$this->save(false);
-            }
-
-            $this->customer_phone_number = str_replace(' ', '', $this->customer_phone_number);
-
-            //Save Customer data
-            $customer = Customer::find()->where(['customer_phone_number' => $this->customer_phone_number, 'restaurant_uuid' => $this->restaurant_uuid])->one();
-
-            if (!$customer) {//new customer
-                $customer = new Customer();
-                $customer->restaurant_uuid = $this->restaurant_uuid;
-                $customer->customer_name = $this->customer_name;
-                $customer->country_code = $this->customer_phone_country_code;
-                $customer->customer_phone_number = $this->customer_phone_number;
-
-                if ($this->restaurant_uuid == 'rest_fe5b6a72-18a7-11ec-973b-069e9504599a' && $this->civil_id && $this->section && $this->class) {
-                    $customer->civil_id = $this->civil_id;
-                    $customer->section = $this->section;
-                    $customer->class = $this->class;
-                }
-            } else {
-                $customer->customer_name = $this->customer_name;
-
-                if ($this->restaurant_uuid == 'rest_fe5b6a72-18a7-11ec-973b-069e9504599a' && $this->civil_id && $this->section && $this->class) {
-                    $customer->civil_id = $this->civil_id;
-                    $customer->section = $this->section;
-                    $customer->class = $this->class;
-                }
-            }
-
-            if ($this->customer_email != null)
-                $customer->customer_email = $this->customer_email;
-
-            $customer->save(false);
-
-            $this->customer_id = $customer->customer_id;
-
-            if ($this->voucher_id) {
-
-                $voucher_model = Voucher::findOne($this->voucher_id);
-
-                if ($voucher_model->isValid($this->customer_phone_number)) {
-                    $customerVoucher = new CustomerVoucher();
-                    $customerVoucher->customer_id = $this->customer_id;
-                    $customerVoucher->voucher_id = $this->voucher_id;
-                    $customerVoucher->save();
-                }
-            }
-
-            if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
-
-                if ($this->area_id) {
-                    $area_model = Area::findOne($this->area_id);
-                    $this->area_name = $area_model->area_name;
-                    $this->area_name_ar = $area_model->area_name_ar;
-                }
-            }
-
-            $payment_method_model = PaymentMethod::findOne($this->payment_method_id);
-
-            if ($payment_method_model) {
-                $this->payment_method_name = $payment_method_model->payment_method_name;
-                $this->payment_method_name_ar = $payment_method_model->payment_method_name_ar;
-            }
-
-            if (!$this->currency_code && $this->restaurant && $this->restaurant->currency) {
-                $this->currency_code = $this->restaurant->currency->code;
-            }
-
             //$this->save(false);
         }
 

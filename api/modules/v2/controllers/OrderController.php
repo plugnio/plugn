@@ -2,6 +2,7 @@
 
 namespace api\modules\v2\controllers;
 
+use agent\models\PaymentMethod;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
@@ -72,6 +73,10 @@ class OrderController extends Controller {
 
             $order = new Order();
 
+            //as we will calculate after items get saved
+            $order->total_price = 0;
+            $order->subtotal = 0;
+
             $order->restaurant_uuid = $restaurant_model->restaurant_uuid;
 
             //Save Customer Info
@@ -92,6 +97,16 @@ class OrderController extends Controller {
             //payment method
             $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
 
+            /**
+             *
+            $paymentMethod = PaymentMethod::find()
+            ->andWhere (['payment_method_id' => $order->payment_method_id])
+            ->one();
+
+            $order->payment_method_name = $paymentMethod->payment_method_name;
+            $order->payment_method_name_ar = $paymentMethod->payment_method_name_ar;
+
+             */
             //save Customer address
             $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
 
@@ -159,7 +174,7 @@ class OrderController extends Controller {
 
             if ($order->save()) {
 
-                if($order->restaurant->enable_gift_message){
+                if($order->restaurant->enable_gift_message) {
 
                   //save gift message
                   $order->sender_name = Yii::$app->request->getBodyParam("sender_name");
@@ -179,6 +194,7 @@ class OrderController extends Controller {
                         $orderItem = new OrderItem;
 
                         $orderItem->order_uuid = $order->order_uuid;
+                        $orderItem->restaurant_uuid = $order->restaurant_uuid;
                         $orderItem->item_uuid = $item["item_uuid"];
                         $orderItem->qty = (int) $item["qty"];
 
@@ -327,6 +343,7 @@ class OrderController extends Controller {
                           //Update payment_uuid in order
                           $order->payment_uuid = $payment->payment_uuid;
                           $order->save(false);
+
                           $order->updateOrderTotalPrice();
 
                           Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]), __METHOD__);
@@ -570,7 +587,6 @@ class OrderController extends Controller {
                     }
                 }
             }
-
 
             if (array_key_exists('operation', $response) && $response['operation'] == 'error') {
 
