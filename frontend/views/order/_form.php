@@ -65,6 +65,17 @@ $this->registerJs($js);
 
         <?php
 
+        $paymentMethods = $restaurant->getRestaurantPaymentMethods()
+          ->with('paymentMethod')
+          ->asArray()
+          ->all();
+
+        $paymentMethodsArray = ArrayHelper::map($paymentMethods, 'payment_method_id', 'paymentMethod.payment_method_name');
+
+        echo $form->field($model, 'payment_method_id')->dropDownList($paymentMethodsArray, [
+          'prompt' => 'Choose...', 'class' => 'form-control select2',
+        ]);
+
         echo $form->field($model, 'order_mode')->dropDownList([
           Order::ORDER_MODE_DELIVERY => 'Delivery',
           Order::ORDER_MODE_PICK_UP => 'Pick up'
