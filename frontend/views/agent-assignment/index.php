@@ -43,6 +43,7 @@ $this->registerJs($js);
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
             'rowOptions' => function($model) {
                   if ($model->agent_id != Yii::$app->user->identity->agent_id) {
                 $url = Url::to(['view', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'storeUuid' => $model->restaurant_uuid]);
@@ -54,11 +55,19 @@ $this->registerJs($js);
             },
             'columns' => [
               ['class' => 'yii\grid\SerialColumn'],
-              'agent.agent_name',
+              [
+                'attribute' => 'agent_name',
+                'value' => 'agent.agent_name'
+              ],
               'assignment_agent_email:email',
               [
                   'attribute' => 'role',
                   'format' => 'html',
+                  'filter'=> [
+                        AgentAssignment::AGENT_ROLE_OWNER => "Owner",
+                        AgentAssignment::AGENT_ROLE_BRANCH_MANAGER => "Branch Manager",
+                        AgentAssignment::AGENT_ROLE_STAFF => "Staff"
+                  ],
                   'value' => function ($data) {
                       if($data->role == AgentAssignment::AGENT_ROLE_OWNER)
                         $role = 'Owner';

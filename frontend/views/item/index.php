@@ -71,6 +71,7 @@ $this->registerJs($js);
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
             'rowOptions' => function($model) {
                 $url = Url::to(['item/update', 'id' => $model->item_uuid, 'storeUuid' => $model->restaurant_uuid]);
 
@@ -95,18 +96,14 @@ $this->registerJs($js);
                     },
                 ],
                 [
+                        'attribute' => 'item_name',
                            'label' => 'Item name',
-                           'format' => 'html',
-                           'value' => function ($data) {
-                               return $data->item_name;
-                           },
+                           'format' => 'html'
                 ],
                 [
+                    'attribute' => 'sku',
                     'label' => 'SKU',
-                    'format' => 'raw',
-                    'value' => function ($data) {
-                        return $data->sku;
-                    },
+                    'format' => 'raw'
                 ],
                 [
                     'label' => 'Category name',
@@ -147,6 +144,10 @@ $this->registerJs($js);
                 [
                     'attribute' => 'item_status',
                     "format" => "raw",
+                    "filter" => [
+                        Item::ITEM_STATUS_UNPUBLISH => 'Unpublished',
+                        Item::ITEM_STATUS_PUBLISH => 'Published'
+                    ],
                     "value" => function($model) {
                         if ($model->item_status == Item::ITEM_STATUS_PUBLISH) {
                             return '

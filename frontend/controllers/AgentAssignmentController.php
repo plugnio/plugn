@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use frontend\models\AgentAssignmentSearch;
 use Yii;
 use common\models\AgentAssignment;
 use yii\data\ActiveDataProvider;
@@ -53,13 +54,13 @@ class AgentAssignmentController extends Controller
 
         if (Yii::$app->user->identity->isOwner($store->restaurant_uuid))
         {
-            $dataProvider = new ActiveDataProvider([
-                'query' => AgentAssignment::find()
-                    ->where(['restaurant_uuid' => $store->restaurant_uuid]),
-            ]);
+            $searchModel = new AgentAssignmentSearch();
+
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $store->restaurant_uuid);
 
             return $this->render('index', [
                 'dataProvider' => $dataProvider,
+                'searchModel' => $searchModel,
                 'restaurant_uuid' => $store->restaurant_uuid
             ]);
         } else {

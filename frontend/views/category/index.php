@@ -50,6 +50,7 @@ $this->registerJs($js);
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
             'rowOptions' => function($model) {
                 $url = Url::to(['category/update', 'id' => $model->category_id, 'storeUuid' => $model->restaurant_uuid]);
 

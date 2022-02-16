@@ -63,7 +63,6 @@ class BankDiscountController extends Controller
         ]);
     }
 
-
     /**
      * Creates a new BankDiscount model.
      * If creation is successful, the browser will be redirected to the 'view' page.

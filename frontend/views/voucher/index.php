@@ -39,6 +39,7 @@ $this->registerJs($js);
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
             'rowOptions' => function($model) {
                 $url = Url::to(['voucher/update', 'id' => $model->voucher_id, 'storeUuid' => $model->restaurant_uuid]);
 
@@ -69,6 +70,7 @@ $this->registerJs($js);
                     }
                 ],
                 [
+                   // 'attribute' => 'discount_amount',
                     'label' => 'Amount',
                     "format" => "raw",
                     "value" => function($model) {
@@ -79,6 +81,10 @@ $this->registerJs($js);
                 [
                     'attribute' => 'voucher_status',
                     "format" => "raw",
+                    "filter" => [
+                        Voucher::VOUCHER_STATUS_ACTIVE => "Active",
+                        Voucher::VOUCHER_STATUS_EXPIRED => 'Expired'
+                    ],
                     "value" => function($model) {
                         if ($model->voucher_status == Voucher::VOUCHER_STATUS_ACTIVE) {
                             return '<div class="chip chip-success mr-1">

@@ -51,6 +51,7 @@
 })(window.jQuery);
 
 (function ($) {
+
     var pluginName = 'yiiDynamicForm';
 
     var regexID = /^(.+?)([-\d-]{1,})(.+)$/i;

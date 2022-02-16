@@ -11,7 +11,6 @@ use common\models\Item;
  */
 class ItemSearch extends Item
 {
-
     // public category_id;
     public $category_id;
 
@@ -21,7 +20,7 @@ class ItemSearch extends Item
     public function rules()
     {
         return [
-            [['item_uuid', 'restaurant_uuid', 'item_name', 'item_name_ar', 'item_description', 'item_description_ar', 'item_image', 'item_created_at', 'item_updated_at','category_id','barcode','sku'], 'safe'],
+            [['item_uuid', 'item_status', 'restaurant_uuid', 'item_name', 'item_name_ar', 'item_description', 'item_description_ar', 'item_image', 'item_created_at', 'item_updated_at','category_id','barcode','sku'], 'safe'],
             [['sort_number', 'stock_qty', 'unit_sold'], 'integer'],
             [['item_price'], 'number'],
         ];
@@ -47,8 +46,8 @@ class ItemSearch extends Item
     public function search($params, $storeUuid)
     {
         $query = Item::find()->where(['item.restaurant_uuid' => $storeUuid])
-        ->with(['currency','extraOptions','itemImage'])
-        ->joinWith('category', true);
+            ->with(['currency','extraOptions','itemImage'])
+            ->joinWith('category', true);
 
         // add conditions that should always apply here
 
@@ -56,12 +55,10 @@ class ItemSearch extends Item
             'query' => $query
         ]);
 
-
         $dataProvider->sort->attributes['category_id'] = [
             'asc' => ['category.title' => SORT_ASC],
             'desc' => ['category.title' => SORT_DESC],
         ];
-
 
         $this->load($params);
 
@@ -71,9 +68,9 @@ class ItemSearch extends Item
             return $dataProvider;
         }
 
-
         // grid filtering conditions
         $query->andFilterWhere([
+            'item_status' => $this->item_status,
             'sort_number' => $this->sort_number,
             'stock_qty' => $this->stock_qty,
             'unit_sold' => $this->unit_sold,
@@ -106,10 +103,9 @@ class ItemSearch extends Item
      */
     public function searchTrackQuantity($params, $storeUuid)
     {
-
         $query = Item::find()->where(['item.restaurant_uuid' => $storeUuid , 'track_quantity' => 1])
-        ->with(['restaurant','itemImage'])
-        ->joinWith('category', true);
+            ->with(['restaurant', 'itemImage'])
+            ->joinWith('category', true);
 
         // add conditions that should always apply here
 
@@ -122,7 +118,6 @@ class ItemSearch extends Item
             'desc' => ['category.title' => SORT_DESC],
         ];
 
-
         $this->load($params);
 
         if (!$this->validate()) {
@@ -131,9 +126,9 @@ class ItemSearch extends Item
             return $dataProvider;
         }
 
-
         // grid filtering conditions
         $query->andFilterWhere([
+            'item_status' => $this->item_status,
             'sort_number' => $this->sort_number,
             'stock_qty' => $this->stock_qty,
             'unit_sold' => $this->unit_sold,

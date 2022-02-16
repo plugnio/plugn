@@ -33,18 +33,14 @@ $this->registerJs($js);
 
 <section id="data-list-view" class="data-list-view-header">
 
-
-
-
-
   <?php if ($dataProvider->getCount() > 0) { ?>
-
 
     <div class="table-responsive">
 
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
             'columns' => [
                 [
                     'label' => 'Image',
@@ -57,30 +53,21 @@ $this->registerJs($js);
                               return  Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_60,w_60/restaurants/" . $item->restaurant->restaurant_uuid . "/items/" . $itemItmage->product_file_name, ['style' => 'border-radius: 3px;margin-right: 20px;']);
                             else
                                 return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_60,w_60/no-image.jpg", ['style' => 'border-radius: 3px;margin-right: 20px;']);
-
-
                     },
                 ],
                 [
                     'label' => 'Item name',
                     'format' => 'raw',
-                    'value' => function ($item) {
-                        return $item->item_name ;
-                    },
+                    'attribute' => 'item_name',
                 ],
                 [
-                    'attribute' => 'sku',
                     'format' => 'raw',
-                    'value' => function ($item) {
-                        return $item->sku ? $item->sku : '(not set)';
-                    },
+                    'attribute' => 'sku'
                 ],
                 [
-                    'label' => '	Available',
+                    'label' => 'Available',
                     'format' => 'raw',
-                    'value' => function ($item) {
-                        return $item->stock_qty;
-                    },
+                    'attribute' => 'stock_qty'
                 ],
                 [
                     'header' => 'Edit quantity available',
@@ -93,7 +80,7 @@ $this->registerJs($js);
                     ],
                 ],
             ],
-            'layout' => '{summary}{items}{pager}',
+            //'layout' => '{summary}{items}{pager}',
             'tableOptions' => ['class' => 'table data-list-view'],
         ]);
         ?>
