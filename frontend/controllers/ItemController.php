@@ -50,6 +50,9 @@ class ItemController extends Controller
         ];
     }
 
+    /**
+     * @param $storeUuid
+     */
     public function actionExportToExcel($storeUuid)
     {
         $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
@@ -176,6 +179,7 @@ class ItemController extends Controller
         $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new ItemSearch();
+
         $dataProvider = $searchModel->searchTrackQuantity(Yii::$app->request->queryParams, $restaurant->restaurant_uuid);
 
         // foreach ($dataProvider->query->all() as $key => $item) {

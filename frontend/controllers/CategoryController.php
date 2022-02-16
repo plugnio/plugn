@@ -50,6 +50,7 @@ class CategoryController extends Controller {
         $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new CategorySearch();
+
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant->restaurant_uuid);
 
         return $this->render('index', [

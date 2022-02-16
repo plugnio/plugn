@@ -47,6 +47,7 @@ $this->registerJs($js);
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
             'rowOptions' => function($model) {
                 $url = Url::to(['bank-discount/update', 'id' => $model->bank_discount_id, 'storeUuid' => $model->restaurant_uuid]);
 
@@ -56,7 +57,14 @@ $this->registerJs($js);
             },
             'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
-                'bank.bank_name',
+                //'bank.bank_name',
+                [
+                    "format" => "raw",
+                    "attribute" => "bank_name",
+                    "value" => function($model) {
+                        return $model->bank->bank_name;
+                    }
+                ],
                 [
                     'label' => 'Redeemed',
                     "format" => "raw",
@@ -67,14 +75,19 @@ $this->registerJs($js);
                 [
                     'label' => 'Amount',
                     "format" => "raw",
+                    "attribute" => "discount_amount",
                     "value" => function($model) {
                         return $model->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ? $model->discount_amount . '%' : $model->discount_amount;
                     }
                 ],
                 'minimum_order_amount',
                 [
-                    'attribute' => 'bank_dscount_status',
+                    'attribute' => 'bank_discount_status',
                     "format" => "raw",
+                    'filter'=> [
+                        BankDiscount::BANK_DISCOUNT_STATUS_ACTIVE => "Active",
+                        BankDiscount::BANK_DISCOUNT_STATUS_EXPIRED => "Expired"
+                    ],
                     "value" => function($model) {
                         if ($model->bank_discount_status == BankDiscount::BANK_DISCOUNT_STATUS_ACTIVE) {
                             return '<div class="chip chip-success mr-1">

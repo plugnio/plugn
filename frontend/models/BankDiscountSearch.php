@@ -11,14 +11,16 @@ use common\models\BankDiscount;
  */
 class BankDiscountSearch extends BankDiscount
 {
+    public $bank_name;
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['bank_discount_id', 'bank_id', 'discount_type', 'discount_amount', 'bank_discount_status', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'integer'],
-            [['restaurant_uuid', 'valid_from', 'valid_until', 'bank_discount_created_at', 'bank_discount_updated_at'], 'safe'],
+            [['bank_discount_id', 'bank_id', 'discount_type', 'discount_amount', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'integer'],
+            [['bank_discount_status', 'restaurant_uuid', 'valid_from', 'valid_until', 'bank_discount_created_at', 'bank_discount_updated_at', 'bank_name'], 'safe'],
         ];
     }
 
@@ -40,7 +42,9 @@ class BankDiscountSearch extends BankDiscount
      */
     public function search($params, $storeUuid)
     {
-        $query = BankDiscount::find()->where(['restaurant_uuid' => $storeUuid]);;
+        $query = BankDiscount::find()
+            ->joinWith('bank')
+            ->where(['restaurant_uuid' => $storeUuid]);;
 
         // add conditions that should always apply here
 
@@ -68,12 +72,14 @@ class BankDiscountSearch extends BankDiscount
             'valid_until' => $this->valid_until,
             'max_redemption' => $this->max_redemption,
             'limit_per_customer' => $this->limit_per_customer,
-            'minimum_order_amount' => $this->minimum_order_amount,
+             'minimum_order_amount' => $this->minimum_order_amount,
             'bank_discount_created_at' => $this->bank_discount_created_at,
             'bank_discount_updated_at' => $this->bank_discount_updated_at,
         ]);
 
-        $query->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid]);
+        //$query->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid]);
+
+        $query->andFilterWhere(['like', 'bank_name', $this->bank_name]);
 
         return $dataProvider;
     }

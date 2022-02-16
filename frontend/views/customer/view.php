@@ -61,6 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?=
                 GridView::widget([
                     'dataProvider' => $customersOrdersData,
+                    'filterModel' => $searchModel,
                     'rowOptions' => function($model) {
                         $url = Url::to(['order/view', 'id' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid]);
 
