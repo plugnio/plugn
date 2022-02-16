@@ -708,6 +708,10 @@ class OrderController extends Controller
         $model = new Order();
         $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
 
+        //as we will calculate after items get saved
+        $model->total_price = 0;
+        $model->subtotal = 0;
+
         $model->restaurant_uuid = $restaurant->restaurant_uuid;
         $model->is_order_scheduled = 0;
 
@@ -745,7 +749,6 @@ class OrderController extends Controller
      */
     public function actionUpdate($id, $storeUuid)
     {
-
         $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $model = $this->findModel($id, $storeUuid);
