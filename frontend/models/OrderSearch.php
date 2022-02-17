@@ -14,6 +14,7 @@ class OrderSearch extends Order {
 
     public $date_range;
     public $business_location_id;
+    //public $payment_method_name;
 
     /**
      * {@inheritdoc}
@@ -23,7 +24,7 @@ class OrderSearch extends Order {
             [['area_id', 'payment_method_id', 'order_status'], 'integer'],
             [['total_price_before_refund'], 'number'],
             [['date_range','business_location_id'], 'safe'],
-            [['order_uuid', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name', 'payment_method_name_ar'], 'safe'],
+            [['delivery_fee', 'order_mode', 'total_price', 'is_order_scheduled', 'order_uuid', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name', 'payment_method_name_ar', 'business_location_name', 'order_created_at'], 'safe'],
         ];
     }
 
@@ -44,13 +45,11 @@ class OrderSearch extends Order {
      */
     public function searchAbandonedCheckoutOrders($params, $storeUuid, $agentAssignment) {
 
-
         $query = Order::find()
             ->with(['restaurant','country', 'pickupLocation', 'payment','paymentMethod','currency','deliveryZone','deliveryZone.businessLocation','customer'])
             ->joinWith('deliveryZone', true)
             ->joinWith('pickupLocation', true)
             ->orderBy(['order_created_at' => SORT_DESC]);
-
 
 
         if($agentAssignment && $agentAssignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
@@ -66,7 +65,6 @@ class OrderSearch extends Order {
             ->andWhere(['order.restaurant_uuid' => $storeUuid])
             ->andWhere(['order.is_deleted' => 0])
             ->andWhere(['order_status' => Order::STATUS_ABANDONED_CHECKOUT]);
-
 
 
         // add conditions that should always apply here
@@ -91,8 +89,14 @@ class OrderSearch extends Order {
             'area_id' => $this->area_id,
             'payment_method_id' => $this->payment_method_id,
             'order_status' => $this->order_status,
+            'total_price' => str_replace([$this->currency_code, ','], ['', ''], $this->total_price),
+            'is_order_scheduled' => $this->is_order_scheduled,
         ]);
-
+        
+        if($this->order_created_at) {
+            $query->andWhere(new \yii\db\Expression("DATE(order_created_at) = '".date('Y-m-d', strtotime($this->order_created_at))."'"));
+        }
+        
         $query->andFilterWhere(['like', 'area_name', $this->area_name])
                 ->andFilterWhere(['like', 'area_name_ar', $this->area_name_ar])
                 ->andFilterWhere(['like', 'unit_type', $this->unit_type])
@@ -106,9 +110,8 @@ class OrderSearch extends Order {
                 ->andFilterWhere(['like', 'customer_phone_number', $this->customer_phone_number])
                 ->andFilterWhere(['like', 'customer_email', $this->customer_email])
                 ->andFilterWhere(['like', 'payment_method_name', $this->payment_method_name])
-                ->andFilterWhere(['like', 'payment_method_name_ar', $this->payment_method_name_ar]);
-
-
+                ->andFilterWhere(['like', 'payment_method_name_ar', $this->payment_method_name_ar])
+                ->andFilterWhere(['like', 'business_location_name', $this->business_location_name]);
 
         return $dataProvider;
     }
@@ -168,8 +171,16 @@ class OrderSearch extends Order {
             'area_id' => $this->area_id,
             'payment_method_id' => $this->payment_method_id,
             'order_status' => $this->order_status,
+            'total_price' => str_replace([$this->currency_code, ','], ['', ''], $this->total_price),
+            'is_order_scheduled' => $this->is_order_scheduled,
+        //    'order_created_at' => $this->order_created_at?date('Y-m-d h:m', strtotime($this->order_created_at)) : null
         ]);
 
+
+        if($this->order_created_at) {
+            $query->andWhere(new \yii\db\Expression("DATE(order_created_at) = '".date('Y-m-d', strtotime($this->order_created_at))."'"));
+        }
+        
         $query->andFilterWhere(['like', 'area_name', $this->area_name])
                 ->andFilterWhere(['like', 'area_name_ar', $this->area_name_ar])
                 ->andFilterWhere(['like', 'unit_type', $this->unit_type])
@@ -183,8 +194,8 @@ class OrderSearch extends Order {
                 ->andFilterWhere(['like', 'customer_phone_number', $this->customer_phone_number])
                 ->andFilterWhere(['like', 'customer_email', $this->customer_email])
                 ->andFilterWhere(['like', 'payment_method_name', $this->payment_method_name])
-                ->andFilterWhere(['like', 'payment_method_name_ar', $this->payment_method_name_ar]);
-
+                ->andFilterWhere(['like', 'payment_method_name_ar', $this->payment_method_name_ar])
+                ->andFilterWhere(['like', 'business_location_name', $this->business_location_name]);
 
 
         return $dataProvider;
@@ -246,8 +257,16 @@ class OrderSearch extends Order {
             'area_id' => $this->area_id,
             'payment_method_id' => $this->payment_method_id,
             'order_status' => $this->order_status,
+            'total_price' => str_replace([$this->currency_code, ','], ['', ''], $this->total_price),
+            'is_order_scheduled' => $this->is_order_scheduled,
+        //    'order_created_at' => $this->order_created_at?date('Y-m-d h:m', strtotime($this->order_created_at)) : null
         ]);
 
+
+        if($this->order_created_at) {
+            $query->andWhere(new \yii\db\Expression("DATE(order_created_at) = '".date('Y-m-d', strtotime($this->order_created_at))."'"));
+        }
+        
         $query->andFilterWhere(['like', 'area_name', $this->area_name])
                 ->andFilterWhere(['like', 'area_name_ar', $this->area_name_ar])
                 ->andFilterWhere(['like', 'unit_type', $this->unit_type])
@@ -261,7 +280,8 @@ class OrderSearch extends Order {
                 ->andFilterWhere(['like', 'customer_phone_number', $this->customer_phone_number])
                 ->andFilterWhere(['like', 'customer_email', $this->customer_email])
                 ->andFilterWhere(['like', 'payment_method_name', $this->payment_method_name])
-                ->andFilterWhere(['like', 'payment_method_name_ar', $this->payment_method_name_ar]);
+                ->andFilterWhere(['like', 'payment_method_name_ar', $this->payment_method_name_ar])
+                ->andFilterWhere(['like', 'business_location_name', $this->business_location_name]);
 
         return $dataProvider;
     }
@@ -331,8 +351,16 @@ class OrderSearch extends Order {
             'area_id' => $this->area_id,
             'payment_method_id' => $this->payment_method_id,
             'order_status' => $this->order_status,
+            'total_price' => str_replace([$this->currency_code, ','], ['', ''], $this->total_price),
+            'is_order_scheduled' => $this->is_order_scheduled,
+        //    'order_created_at' => $this->order_created_at?date('Y-m-d h:m', strtotime($this->order_created_at)) : null
         ]);
 
+
+        if($this->order_created_at) {
+            $query->andWhere(new \yii\db\Expression("DATE(order_created_at) = '".date('Y-m-d', strtotime($this->order_created_at))."'"));
+        }
+        
         $query->andFilterWhere(['like', 'area_name', $this->area_name])
                 ->andFilterWhere(['like', 'area_name_ar', $this->area_name_ar])
                 ->andFilterWhere(['like', 'unit_type', $this->unit_type])
@@ -347,7 +375,8 @@ class OrderSearch extends Order {
                 ->andFilterWhere(['like', 'customer.customer_phone_number', $this->customer_phone_number])
                 ->andFilterWhere(['like', 'customer_email', $this->customer_email])
                 ->andFilterWhere(['like', 'payment_method_name', $this->payment_method_name])
-                ->andFilterWhere(['like', 'payment_method_name_ar', $this->payment_method_name_ar]);
+                ->andFilterWhere(['like', 'payment_method_name_ar', $this->payment_method_name_ar])
+                ->andFilterWhere(['like', 'business_location_name', $this->business_location_name]);
 
         return $dataProvider;
     }

@@ -16,6 +16,11 @@ $this->params['breadcrumbs'][] = $this->title;
 $js = "
 $(function () {
   $('.summary').insertAfter('.top');
+
+  $('input[name=\"OrderSearch[order_created_at]\"]').pickadate({
+    format: 'd mmmm yyyy',
+  });
+
 });
 ";
 $this->registerJs($js);
@@ -41,6 +46,7 @@ $this->registerJs($js);
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
             'rowOptions' => function($model) {
                 $url = Url::to(['order/view', 'id' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid]);
 
@@ -49,8 +55,9 @@ $this->registerJs($js);
                 ];
             },
             'columns' => [
-                ['class' => 'yii\grid\SerialColumn'],
+                //['class' => 'yii\grid\SerialColumn'],
                 [
+                    'attribute' => 'order_uuid',
                     'label' => 'Order ID',
                     "format" => "raw",
                     "value" => function($model) {
@@ -86,6 +93,13 @@ $this->registerJs($js);
                             ]);
                     },
                 ],
+                /*[
+                    'attribute' => 'order_created_at',
+                    "format" => "raw",
+                    "value" => function($model) {
+                        return date('d M - h:i A', strtotime($model->order_created_at));
+                    }
+                ],*/
                 'order_created_at:datetime',
             ],
             'layout' => '{summary}{items}{pager}',

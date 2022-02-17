@@ -54,6 +54,7 @@ $selectedAreas = \yii\helpers\ArrayHelper::map($selectedAreas, 'area_id', 'area_
 
 <?= \yii\grid\GridView::widget([
     'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
     'columns' => [
         'area_name',
         'area_name_ar',
