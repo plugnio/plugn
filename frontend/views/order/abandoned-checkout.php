@@ -13,16 +13,20 @@ $this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 
 $this->title = 'Abandoned checkouts';
 $this->params['breadcrumbs'][] = $this->title;
+
 $js = "
 $(function () {
   $('.summary').insertAfter('.top');
+  
+  $('input[name=\"OrderSearch[order_created_at]\"]').pickadate({
+    format: 'd mmmm yyyy',
+  });
+
 });
-
-
-
 
 ";
 $this->registerJs($js);
+
 ?>
 
 
@@ -37,6 +41,7 @@ $this->registerJs($js);
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
             'rowOptions' => function($model) {
                 $url = Url::to(['order/view', 'id' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid]);
 
@@ -45,10 +50,11 @@ $this->registerJs($js);
                 ];
             },
             'columns' => [
-                ['class' => 'yii\grid\SerialColumn'],
+                //['class' => 'yii\grid\SerialColumn'],
                 [
                     'label' => 'Order ID',
                     "format" => "raw",
+                    "attribute" => 'order_uuid',
                     "value" => function($model) {
                         return '#' . $model->order_uuid;
                     }
@@ -57,7 +63,7 @@ $this->registerJs($js);
                     'attribute' => 'order_created_at',
                     "format" => "raw",
                     "value" => function($model) {
-                        return date('d M - h:i A', strtotime($model->order_created_at));
+                        return date('d M Y - h:i A', strtotime($model->order_created_at));
                     }
                 ],
                 [
@@ -78,13 +84,13 @@ $this->registerJs($js);
                       return '<a href="tel:'. $model->customer_phone_number .'"> '. str_replace(' ', '', $model->customer_phone_number) .' </a>';
                     }
                 ],
-                [
+                /*[
                     'label' => 'When',
                     'format' => 'raw',
                     'value' => function ($data) {
                         return $data->is_order_scheduled ? 'Scheduled' : 'As soon as possible';
                     },
-                ],
+                ],*/
                 [
                     'label' => 'Payment',
                     "format" => "raw",

@@ -11,6 +11,8 @@ use common\models\Area;
 use common\models\City;
 use common\models\AreaDeliveryZone;
 use frontend\models\DeliveryZoneSearch;
+use frontend\models\AreaSearch;
+use frontend\models\CitySearch;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
 use yii\web\Controller;
@@ -253,19 +255,15 @@ class DeliveryZoneController extends Controller
     {
         $model = $this->findModel($id, $storeUuid);
 
-        $query = City::find()
-            ->where(['country_id' => $model->country_id]);
+        $searchModel = new CitySearch;
+        $searchModel->country_id = $model->country_id;
 
-        $provider = new ActiveDataProvider([
-            'query' => $query,
-            'pagination' => [
-                'pageSize' => 20,
-            ],
-        ]);
+        $provider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('cities', [
             //'delivery_zone_id' => $id,
             'cityProvider' => $provider,
+            'searchModel' => $searchModel,
             'cities' => [],//$cities,
             'model' => $model,
         ]);
@@ -479,17 +477,17 @@ class DeliveryZoneController extends Controller
             return $this->redirect(['index', 'storeUuid' => $storeUuid, 'businessLocationId' => $model->business_location_id]);
         }
 
-        $provider = new ActiveDataProvider([
-            'query' => $city->getAreas(),
-            'pagination' => [
-                'pageSize' => 20,
-            ],
-        ]);
+        $searchModel = new AreaSearch;
+        //$searchModel->country_id = $model->country_id;
+        $searchModel->city_id = $city_id;
+
+        $provider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('update-areas', [
             'city' => $city,
             'model' => $model,
             'dataProvider' => $provider,
+            'searchModel' => $searchModel
         ]);
     }
 

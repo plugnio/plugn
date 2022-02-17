@@ -20,8 +20,7 @@ $js = "
 
     $('#order-estimated_time_of_arrival').attr('autocomplete','off');
     $('#order-estimated_time_of_arrival').attr('style', '  padding-right: 2rem !important; padding-left: 3rem !important; ');
-
-
+    
 
     let orderModeInput = $('#orderModeInput');
     // On Change of project type input

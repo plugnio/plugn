@@ -19,6 +19,10 @@ $js = "
 $(function () {
   $('.summary').insertAfter('.top');
 
+  $('input[name=\"OrderSearch[order_created_at]\"]').pickadate({
+    format: 'd mmmm yyyy',
+  });
+
   $('table.data-list-view.dataTable tbody td').css('padding', '10px');
 
   $('#restaurant-export_orders_data_in_specific_date_range').attr('autocomplete','off');

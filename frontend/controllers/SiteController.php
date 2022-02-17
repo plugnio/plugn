@@ -64,6 +64,7 @@ class SiteController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'logout' => ['post'],
+                    'check-for-new-orders' => ['post'],
                 ],
             ],
         ];
@@ -117,13 +118,21 @@ class SiteController extends Controller
      */
     public function actionCheckForNewOrders($storeUuid)
     {
-
         $this->layout = false;
         $managedRestaurant = $this->findModel($storeUuid);
         $agentAssignment = $managedRestaurant->getAgentAssignments()->where(['restaurant_uuid' => $managedRestaurant->restaurant_uuid])->one();
 
+
+        if(Yii::$app->request->isPost) {
+            $params = Yii::$app->request->post();
+        }
+        else 
+        {
+            $params = Yii::$app->request->queryParams;
+        }
+
         $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->searchPendingOrders(Yii::$app->request->queryParams, $storeUuid, $agentAssignment);
+        $dataProvider = $searchModel->searchPendingOrders($params, $storeUuid, $agentAssignment);
 
         return $this->render('incoming-orders-table', [
             'searchModel' => $searchModel,
@@ -362,7 +371,8 @@ class SiteController extends Controller
         return $this->render('real-time-orders', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'storeUuid' => $storeUuid
+            'storeUuid' => $storeUuid,
+            'page' => Yii::$app->request->get('page')? Yii::$app->request->get('page'): 1
         ]);
     }
 

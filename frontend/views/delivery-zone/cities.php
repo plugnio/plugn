@@ -18,6 +18,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 echo \yii\grid\GridView::widget([
     'dataProvider' => $cityProvider,
+    'filterModel' => $searchModel,
     'columns' => [
         //'city_id',
         'city_name',
