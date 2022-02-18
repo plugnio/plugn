@@ -50,13 +50,16 @@ class DashboardAsset extends AssetBundle {
         'app-assets/vendors/css/editors/quill/quill.snow.css',
         'app-assets/vendors/css/charts/apexcharts.css',
 
-        'app-assets/vendors/css/pickers/pickadate/pickadate.css',
+        //'app-assets/vendors/css/pickers/pickadate/pickadate.css',
+        //'app-assets/vendors/css/pickers/pickadate/pickadate.css',
+        //'app-assets/vendors/css/pickers/pickadate/pickadate.css',
+
         'app-assets/css/pages/invoice.css',
-        'app-assets/vendors/css/pickers/pickadate/pickadate.css',
-        'app-assets/vendors/css/pickers/pickadate/pickadate.css',
         'css/bootstrap-duallistbox.css',
-        'app-assets/css/pages/coming-soon.css',
+        //'app-assets/css/pages/coming-soon.css',
         'css/intlTelInput.css',
+
+        'js/bootstrap-datepicker/css/bootstrap-datepicker.min.css',
 
         'https://fonts.googleapis.com/css?family=Roboto:400,700',
         'fileuploader/dist/font/font-fileuploader.css',
@@ -102,11 +105,15 @@ class DashboardAsset extends AssetBundle {
         'app-assets/vendors/js/extensions/jquery.steps.min.js',
         'app-assets/vendors/js/forms/validation/jquery.validate.min.js',
         'app-assets/js/scripts/pages/invoice.js',
-        'app-assets/vendors/js/pickers/pickadate/picker.js',
+        
+        'js/bootstrap-datepicker/js/bootstrap-datepicker.min.js',
+
+        /*'app-assets/vendors/js/pickers/pickadate/picker.js',
         'app-assets/vendors/js/pickers/pickadate/picker.date.js',
         'app-assets/vendors/js/pickers/pickadate/picker.time.js',
         'app-assets/vendors/js/pickers/pickadate/legacy.js',
-        'app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js',
+        'app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js',*/
+
         'js/intlTelInput-jquery.js',
         // 'https://code.jquery.com/jquery-3.2.1.slim.min.js',
         'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js',

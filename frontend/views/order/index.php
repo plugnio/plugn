@@ -19,8 +19,8 @@ $js = "
 $(function () {
   $('.summary').insertAfter('.top');
 
-  $('input[name=\"OrderSearch[order_created_at]\"]').pickadate({
-    format: 'd mmmm yyyy',
+  $('input[name=\"OrderSearch[order_created_at]\"]').datepicker({
+    format: 'd M yyyy',
   });
 
   $('table.data-list-view.dataTable tbody td').css('padding', '10px');

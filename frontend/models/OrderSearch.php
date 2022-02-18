@@ -235,8 +235,8 @@ class OrderSearch extends Order {
 
           $query
               ->andWhere(['order.restaurant_uuid' => $storeUuid])
-              ->andWhere(['order.is_deleted' => 0]);
-              //->andWhere(['order.order_status' => Order::STATUS_PENDING]);
+              ->andWhere(['order.is_deleted' => 0])
+              ->andWhere(['order.order_status' => Order::STATUS_PENDING]);
 
         // add conditions that should always apply here
         $dataProvider = new ActiveDataProvider([
