@@ -51,12 +51,16 @@ class CustomerController extends Controller {
         $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new CustomerSearch();
+        
+        $count = $searchModel->search([], $restaurant->restaurant_uuid)->getCount();
+
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $storeUuid);
 
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
                     'restaurant' => $restaurant,
+                    'count' => $count,
                     'storeUuid' => $storeUuid
         ]);
     }

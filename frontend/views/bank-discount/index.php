@@ -35,7 +35,7 @@ $this->registerJs($js);
 
 
 
-    <?php if ($dataProvider->getCount() == 0) { ?>
+    <?php if ($count == 0) { ?>
         <div style="padding-left:14px">
             <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-outline-primary', 'style' => '    padding: 0.85rem 1.7rem;']) ?>
         </div>

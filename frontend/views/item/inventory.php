@@ -33,7 +33,7 @@ $this->registerJs($js);
 
 <section id="data-list-view" class="data-list-view-header">
 
-  <?php if ($dataProvider->getCount() > 0) { ?>
+  <?php if ($count > 0) { ?>
 
     <div class="table-responsive">
 
