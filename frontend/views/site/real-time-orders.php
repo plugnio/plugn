@@ -18,12 +18,8 @@ $(function () {
   $('.summary').insertAfter('.top');
   
   $('input[name=\"OrderSearch[order_created_at]\"]').datepicker({
-    format: 'd mmmm yyyy',
+    format: 'd M yyyy',
   });
-
-  /*$('input[name=\"OrderSearch[order_created_at]\"]').pickadate({
-    format: 'd mmmm yyyy',
-  });*/
 
 });
 
