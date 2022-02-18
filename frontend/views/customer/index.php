@@ -49,7 +49,7 @@ white-space: nowrap !important;
 
   <?php  echo $this->render('_search', ['model' => $searchModel,'restaurant_uuid' => $restaurant->restaurant_uuid]); ?>
 
-  <?php if ($dataProvider->getCount() > 0) { ?>
+  <?php if ($count > 0) { ?>
 
   <!-- Data list view starts -->
   <!-- <div class="action-btns d-none">

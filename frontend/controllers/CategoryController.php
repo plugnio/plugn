@@ -51,11 +51,14 @@ class CategoryController extends Controller {
 
         $searchModel = new CategorySearch();
 
+        $count = $searchModel->search([], $restaurant->restaurant_uuid)->getCount();
+
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant->restaurant_uuid);
 
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
+                    'count' => $count,
                     'restaurant' => $restaurant
         ]);
     }

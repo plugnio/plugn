@@ -36,7 +36,6 @@ $this->registerJs($js);
 </div>
 
 
-
     <!-- DataTable starts -->
     <div class="table-responsive">
 

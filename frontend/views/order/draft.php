@@ -28,7 +28,7 @@ $this->registerJs($js);
 
 <section id="data-list-view" class="data-list-view-header">
 
-  <?php if ($dataProvider->getCount() > 0) { ?>
+  <?php if ($count > 0) { ?>
 
     <!-- Data list view starts -->
     <div class="action-btns d-none">
@@ -103,7 +103,7 @@ $this->registerJs($js);
                 'order_created_at:datetime',
             ],
             'layout' => '{summary}{items}{pager}',
-            'tableOptions' => ['class' => 'table data-list-view'],
+            'tableOptions' => ['class' => 'table dataTable data-list-view'],
         ]);
         ?>
 

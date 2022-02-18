@@ -25,7 +25,7 @@ $this->registerJs($js);
 
 <section id="data-list-view" class="data-list-view-header">
 
-  <?php if ($dataProvider->getCount() > 0) { ?>
+  <?php if ($count > 0) { ?>
 
 <!-- Data list view starts -->
 <div class="action-btns d-none">
@@ -37,8 +37,7 @@ $this->registerJs($js);
 </div>
 
 
-
-   <?php if($dataProvider->getCount() == 0 ){  ?>
+   <?php if($count == 0 ) {  ?>
      <div style="padding-left:14px">
      <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'    padding: 0.85rem 1.7rem;']) ?>
    </div>

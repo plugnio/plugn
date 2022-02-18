@@ -51,6 +51,8 @@ class BankDiscountController extends Controller
 
         $searchModel = new BankDiscountSearch();
 
+        $count = $searchModel->search([], $restaurant->restaurant_uuid)->getCount();
+
         $dataProvider = $searchModel->search(
             Yii::$app->request->queryParams,
             $restaurant->restaurant_uuid
@@ -59,6 +61,7 @@ class BankDiscountController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'count' => $count,
             'restaurant' => $restaurant
         ]);
     }

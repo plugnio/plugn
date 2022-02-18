@@ -101,10 +101,14 @@ class ItemController extends Controller
         $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new ItemSearch();
+
+        $count = $searchModel->search([], $restaurant->restaurant_uuid)->getCount();
+
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant->restaurant_uuid);
 
         return $this->render('index', [
                     'searchModel' => $searchModel,
+                    'count' => $count,
                     'dataProvider' => $dataProvider,
                     'restaurant' => $restaurant
         ]);
@@ -180,6 +184,8 @@ class ItemController extends Controller
 
         $searchModel = new ItemSearch();
 
+        $count = $searchModel->searchTrackQuantity([], $restaurant->restaurant_uuid)->getCount();
+
         $dataProvider = $searchModel->searchTrackQuantity(Yii::$app->request->queryParams, $restaurant->restaurant_uuid);
 
         // foreach ($dataProvider->query->all() as $key => $item) {
@@ -191,6 +197,7 @@ class ItemController extends Controller
 
         return $this->render('inventory', [
                     'searchModel' => $searchModel,
+                    'count' => $count,
                     'dataProvider' => $dataProvider,
                     'restaurant' => $restaurant
         ]);

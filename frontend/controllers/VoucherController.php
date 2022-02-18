@@ -50,10 +50,14 @@ class VoucherController extends Controller
         $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new VoucherSearch();
+
+        $count = $searchModel->search([], $restaurant->restaurant_uuid)->getCount();
+
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant->restaurant_uuid);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
+            'count' => $count,
             'dataProvider' => $dataProvider,
             'restaurant' => $restaurant
         ]);

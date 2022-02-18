@@ -68,10 +68,14 @@ class OrderController extends Controller
             ])->one();
 
         $searchModel = new OrderSearch();
+        
+        $count = $searchModel->search([], $restaurant->restaurant_uuid, $agentAssignment)->getCount();
+
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant->restaurant_uuid, $agentAssignment);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
+            'count' => $count,
             'dataProvider' => $dataProvider,
             'restaurant' => $restaurant
         ]);
@@ -388,11 +392,15 @@ class OrderController extends Controller
             ])->one();
 
         $searchModel = new OrderSearch();
+        
+        $count = $searchModel->searchDraftOrders([], $restaurant->restaurant_uuid, $agentAssignment)->getCount();
+
         $dataProvider = $searchModel->searchDraftOrders(Yii::$app->request->queryParams, $restaurant->restaurant_uuid, $agentAssignment);
 
         return $this->render('draft', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'count' => $count,
             'restaurant' => $restaurant
         ]);
     }
@@ -409,10 +417,14 @@ class OrderController extends Controller
             ->where(['restaurant_uuid' => $restaurant->restaurant_uuid, 'agent_id' => Yii::$app->user->identity->agent_id])->one();
 
         $searchModel = new OrderSearch();
+        
+        $count = $searchModel->searchAbandonedCheckoutOrders([], $restaurant->restaurant_uuid, $agentAssignment)->getCount();
+
         $dataProvider = $searchModel->searchAbandonedCheckoutOrders(Yii::$app->request->queryParams, $restaurant->restaurant_uuid, $agentAssignment);
 
         return $this->render('abandoned-checkout', [
             'searchModel' => $searchModel,
+            'count' => $count,
             'dataProvider' => $dataProvider,
             'restaurant' => $restaurant
         ]);
