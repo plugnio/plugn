@@ -53,8 +53,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <section id="data-list-view" class="data-list-view-header">
           <h2>Order history</h2>
 
-
-
             <!-- DataTable starts -->
             <div class="table-responsive">
 
@@ -157,7 +155,7 @@ $this->params['breadcrumbs'][] = $this->title;
                       ],
                     ],
                     'layout' => '{summary}{items}{pager}',
-                    'tableOptions' => ['class' => 'table data-list-view'],
+                    'tableOptions' => ['class' => 'table dataTable data-list-view'],
                 ]);
                 ?>
 

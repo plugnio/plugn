@@ -200,7 +200,7 @@ var soundForNewOrders = new Audio("data:audio/wav;base64,//uQRAAAAWMSLwUIYAAsYkX
                 ],
             ],
             'layout' => '{items}{pager}',
-            'tableOptions' => ['class' => 'table data-list-view', 'id' => 'new-order-table'],
+            'tableOptions' => ['class' => 'table dataTable data-list-view', 'id' => 'new-order-table'],
         ]);
         ?>
 

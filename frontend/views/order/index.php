@@ -258,7 +258,7 @@ white-space: nowrap !important;
                   'prevPageCssClass' => 'paginate_button page-item previous',
                   'nextPageCssClass' => 'paginate_button page-item next',
               ],
-                'tableOptions' => ['class' => 'table data-list-view'],
+                'tableOptions' => ['class' => 'table dataTable data-list-view'],
 
         ]);
         ?>

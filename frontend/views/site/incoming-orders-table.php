@@ -90,6 +90,6 @@ echo GridView::widget([
         ],
     ],
     'layout' => '{summary}{items}{pager}',
-    'tableOptions' => ['class' => 'table data-list-view', 'id' => 'new-order-table'],
+    'tableOptions' => ['class' => 'table dataTable data-list-view', 'id' => 'new-order-table'],
 ]);
 ?>

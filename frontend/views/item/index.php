@@ -66,7 +66,7 @@ $this->registerJs($js);
 
 
     <!-- DataTable starts -->
-    <div class="table-responsive">
+    <div class="table-responsive dataTables_wrapper">
 
         <?=
         GridView::widget([
@@ -184,7 +184,7 @@ $this->registerJs($js);
                 ],
             ],
             'layout' => '{summary}{items}{pager}',
-            'tableOptions' => ['class' => 'table data-list-view'],
+            'tableOptions' => ['class' => 'table data-list-view dataTable'],
         ]);
         ?>
 
