@@ -348,6 +348,11 @@ class ItemController extends Controller
 
         foreach ($items as $key => $value) {
             $model = $this->findModel($value);
+
+            if(!$model) {
+                continue;
+            }
+            
             $model->sort_number = (int)$key+1;
             $model->save(false);
         }
