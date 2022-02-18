@@ -45,13 +45,14 @@ $this->registerJs($js);
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
             'rowOptions' => function($model) {
-                  if ($model->agent_id != Yii::$app->user->identity->agent_id) {
+              //if ($model->agent_id != Yii::$app->user->identity->agent_id) {
                 $url = Url::to(['view', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'storeUuid' => $model->restaurant_uuid]);
 
                 return [
+                  'class' => 'clickable',
                     'onclick' => "window.location.href='{$url}'"
                 ];
-              }
+            //  }
             },
             'columns' => [
               ['class' => 'yii\grid\SerialColumn'],
@@ -82,7 +83,7 @@ $this->registerJs($js);
               'assignment_created_at',
             ],
             'layout' => '{summary}{items}{pager}',
-            'tableOptions' => ['class' => 'table data-list-view'],
+            'tableOptions' => ['class' => 'table data-list-view dataTable'],
         ]);
         ?>
 

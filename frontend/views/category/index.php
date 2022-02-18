@@ -61,10 +61,7 @@ $this->registerJs($js);
             'columns' => [
               [
                   'label' => 'Sort #',
-                  'format' => 'html',
-                  'value' => function ($data) {
-                      return $data->sort_number;
-                  },
+                  'attribute' => 'sort_number'
               ],
                 'title',
                 'title_ar',
@@ -72,7 +69,7 @@ $this->registerJs($js);
                 'subtitle_ar',
             ],
             'layout' => '{summary}{items}{pager}',
-            'tableOptions' => ['class' => 'table data-list-view'],
+            'tableOptions' => ['class' => 'table  dataTable data-list-view'],
         ]);
         ?>
 

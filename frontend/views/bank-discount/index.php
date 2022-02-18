@@ -52,6 +52,7 @@ $this->registerJs($js);
                 $url = Url::to(['bank-discount/update', 'id' => $model->bank_discount_id, 'storeUuid' => $model->restaurant_uuid]);
 
                 return [
+                    'class' => 'clickable',
                     'onclick' => "window.location.href='{$url}'"
                 ];
             },
@@ -135,7 +136,7 @@ $this->registerJs($js);
                 ],
             ],
             'layout' => '{summary}{items}{pager}',
-            'tableOptions' => ['class' => 'table data-list-view']
+            'tableOptions' => ['class' => 'table data-list-view dataTable']
         ]);
         ?>
 

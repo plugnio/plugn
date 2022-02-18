@@ -81,7 +81,14 @@
    box-shadow: inset 0 0 0 1px rgba(33,43,54,.1);
 }
 
-
 .refund-summary{
   padding: 20px;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+[onclick] {
+ cursor: pointer; 
 }
