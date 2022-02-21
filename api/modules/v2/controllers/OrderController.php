@@ -595,7 +595,7 @@ class OrderController extends Controller {
               if(!is_array($response['message']) || !isset($response['message']['qty']))
                  \Yii::error(json_encode($response['message']), __METHOD__); // Log error faced by user
 
-                $order->delete();
+              //$order->delete();
             }
 
         } else {
@@ -957,21 +957,21 @@ class OrderController extends Controller {
 
             $order_model->armada_order_status = Yii::$app->request->getBodyParam("orderStatus");
 
-
             if( $order_model->armada_order_status == 'en_route' ) // In delivery
                 $order_model->order_status = Order::STATUS_OUT_FOR_DELIVERY;
 
             else if( $order_model->armada_order_status == 'completed' ) // Delivered
                 $order_model->order_status = Order::STATUS_COMPLETE;
 
-
-            if ($order_model->save()) {
+            if ($order_model->save())
+            {
                 return [
                     'operation' => 'success'
                 ];
-            } else {
+            }
+            else
+            {
               Yii::error('[Armada (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
-
 
               return [
                   'operation' => 'error',
@@ -981,8 +981,7 @@ class OrderController extends Controller {
 
           } else {
 
-            Yii::error('[Armada (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
-
+            Yii::error('[Armada (Webhook): Error while changing order status ]', __METHOD__);
 
             return [
                 'operation' => 'error',

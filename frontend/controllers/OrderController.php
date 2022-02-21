@@ -872,7 +872,7 @@ class OrderController extends Controller
     {
         $model = $this->findModel($id, $storeUuid);
 
-        $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
+        $model->setScenario(Order::SCENARIO_DELETE);
 
         $transaction = Yii::$app->db->beginTransaction();
 
@@ -881,7 +881,9 @@ class OrderController extends Controller
         $model->is_deleted = 1;
 
         if (!$model->save()) {
+
             $transaction->rollBack();
+
             if (isset($model->errors)) {
 
                 Yii::$app->session->setFlash('errorResponse', "We've faced a problem deleting the order");
@@ -893,9 +895,9 @@ class OrderController extends Controller
                 Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ');
 
             }
+        } else {
+            $transaction->commit();
         }
-
-        $transaction->commit();
 
         return $this->redirect(['index', 'storeUuid' => $storeUuid]);
     }

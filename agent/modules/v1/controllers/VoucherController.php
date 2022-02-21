@@ -237,10 +237,14 @@ class VoucherController extends Controller
     public function actionRemove($voucher_id, $store_uuid = null)
     {
         $this->authCheck();
+
         Yii::$app->accountManager->getManagedAccount($store_uuid);
+
         $model = $this->findModel($voucher_id, $store_uuid);
 
-        if (!$model->delete()) {
+        $model->is_deleted = 1;
+
+        if (!$model->save()) {
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",
@@ -259,7 +263,6 @@ class VoucherController extends Controller
             "message" => Yii::t('agent', "Voucher deleted successfully")
         ];
     }
-
 
     /**
      * Finds the Voucher model based on its primary key value.

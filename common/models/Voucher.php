@@ -22,6 +22,7 @@ use yii\db\Expression;
  * @property int|null $max_redemption
  * @property int|null $limit_per_customer
  * @property int|null $minimum_order_amount
+ * @property int is_deleted
  * @property string|null $voucher_created_at
  * @property string|null $voucher_updated_at
  *
@@ -66,6 +67,7 @@ class Voucher extends \yii\db\ActiveRecord {
             /*['discount_amount', 'compare', 'compareValue' => 0, 'operator' => '>', 'when' => function($model) {
                 return $model->discount_type != self::DISCOUNT_TYPE_FREE_DELIVERY;
             }],*/
+            ['is_deleted', 'integer'],
             [['discount_amount'], 'integer', 'min' => 1, 'when' => function($model) {
                 return $model->discount_type != self::DISCOUNT_TYPE_FREE_DELIVERY;
             }],
@@ -333,5 +335,10 @@ class Voucher extends \yii\db\ActiveRecord {
     public function getCurrency($modelClass = "\common\models\Currency")
     {
         return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+    }
+
+    public static function find()
+    {
+        return new query\VoucherQuery(get_called_class());
     }
 }

@@ -19,7 +19,6 @@ use Yii;
  */
 class WebLink extends \yii\db\ActiveRecord
 {
-
       //Values for `web_link_type`
       const WEB_LINK_TYPE_WEBSITE_URL = 1;
       const WEB_LINK_TYPE_FACEBOOK = 2;
@@ -48,7 +47,9 @@ class WebLink extends \yii\db\ActiveRecord
             [['restaurant_uuid'], 'string', 'max' => 60],
             ['url', 'url', 'when' => function($model) {
                 return $model->web_link_type == self::WEB_LINK_TYPE_WEBSITE_URL;
-            }],
+            }, 'whenClient' => "function (attribute, value) {
+                return $('#webLinkTypeInput').val() == 1;
+            }"],
             [['url', 'web_link_title','web_link_title_ar'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];

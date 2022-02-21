@@ -180,10 +180,16 @@ class VoucherController extends Controller
      */
     public function actionDelete($id, $storeUuid)
     {
-        $this->findModel($id, $storeUuid)->delete();
+        $model = $this->findModel($id, $storeUuid);
+
+        $model->is_deleted = 1;
+
+        if(!$model->save())
+        {
+            Yii::$app->session->setFlash('error', $model->errors);
+        }
 
         return $this->redirect(['index', 'storeUuid' => $storeUuid]);
-
     }
 
     /**

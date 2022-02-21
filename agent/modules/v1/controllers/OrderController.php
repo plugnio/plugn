@@ -1254,9 +1254,20 @@ class OrderController extends Controller
      */
     public function actionDelete($order_uuid, $store_uuid = null)
     {
+        $transaction = Yii::$app->db->beginTransaction();
+
         $model = $this->findModel($order_uuid, $store_uuid);
 
-        if (!$model->delete()) {
+        $model->setScenario(\common\models\Order::SCENARIO_DELETE);
+
+        $model->is_deleted = 1;
+
+        $model->restockItems();
+
+        if (!$model->save()) {
+
+            $transaction->rollBack();
+
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",
@@ -1269,6 +1280,8 @@ class OrderController extends Controller
                 ];
             }
         }
+
+        $transaction->commit();
 
         return [
             "operation" => "success",
@@ -1283,12 +1296,15 @@ class OrderController extends Controller
     public function actionSoftDelete($order_uuid, $store_uuid = null)
     {
         $model = $this->findModel($order_uuid, $store_uuid);
+
         $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
 
         $transaction = Yii::$app->db->beginTransaction();
+
         $model->restockItems();
 
         $model->is_deleted = 1;
+
         if (!$model->save(false)) {
             $transaction->rollBack();
             if (isset($model->errors)) {
@@ -1303,7 +1319,9 @@ class OrderController extends Controller
                 ];
             }
         }
+
         $transaction->commit();
+
         return [
             "operation" => "success",
             "message" => Yii::t('agent', "Order deleted successfully")
