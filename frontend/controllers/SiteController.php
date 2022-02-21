@@ -269,12 +269,17 @@ class SiteController extends Controller
                         // Validate that theres no error from TAP gateway
                         if (isset($responseContent->errors)) {
                             $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
+
                             \Yii::error($errorMessage, __METHOD__); // Log error faced by user
 
-                            return [
-                                'operation' => 'error',
-                                'message' => $errorMessage
-                            ];
+                            Yii::$app->session->setFlash('errorResponse', $errorMessage);
+
+                            return $this->render('confirm-plan', [
+                                'restaurant' => $managedRestaurant,
+                                'selectedPlan' => Plan::findOne($selectedPlanId),
+                                'subscription' => $subscription,
+                                'paymentMethods' => $payment_methods
+                            ]);
                         }
 
                         if ($responseContent->id) {
@@ -288,16 +293,27 @@ class SiteController extends Controller
 
                                 \Yii::error($payment->errors, __METHOD__); // Log error faced by user
 
-                                return [
-                                    'operation' => 'error',
-                                    'message' => $payment->getErrors()
-                                ];
+                                Yii::$app->session->setFlash('errorResponse', json_encode($responseContent));
+
+                                if($payment->getErrors())
+                                    Yii::$app->session->setFlash('error', $payment->getErrors());
+
                             }
                         } else {
                             \Yii::error('[Payment Issue > Charge id is missing ]' . json_encode($responseContent), __METHOD__); // Log error faced by user
+
+                            Yii::$app->session->setFlash('errorResponse', json_encode($responseContent));
+
+                            return $this->render('confirm-plan', [
+                                'restaurant' => $managedRestaurant,
+                                'selectedPlan' => Plan::findOne($selectedPlanId),
+                                'subscription' => $subscription,
+                                'paymentMethods' => $payment_methods
+                            ]);
                         }
 
                         return $this->redirect($redirectUrl);
+
                     } catch (\Exception $e) {
 
                         if ($payment)
@@ -305,10 +321,10 @@ class SiteController extends Controller
 
                         Yii::error('[TAP Payment Issue > Charge id is missing]' . json_encode($responseContent), __METHOD__);
 
-                        $response = [
-                            'operation' => 'error',
-                            'message' => json_encode($responseContent)
-                        ];
+                        Yii::$app->session->setFlash('errorResponse', json_encode($responseContent));
+
+                        if($payment->getErrors())
+                            Yii::$app->session->setFlash('error', $payment->getErrors());
                     }
                 }
             }
