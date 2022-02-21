@@ -130,6 +130,7 @@ class Order extends \yii\db\ActiveRecord
     const SCENARIO_CREATE_ORDER_BY_ADMIN = 'manual';
     const SCENARIO_OLD_VERSION = 'old_version';
     const SCENARIO_UPDATE_STATUS = 'updateStatus';
+    const SCENARIO_DELETE = 'delete';
 
     public $civil_id = null;
     public $section = null;
@@ -258,7 +259,7 @@ class Order extends \yii\db\ActiveRecord
             [['payment_method_id'], 'default', 'value' => 3, 'on' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['voucher_id'], 'validateVoucherId', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['payment_uuid'], 'string', 'max' => 36],
-            [['estimated_time_of_arrival', 'scheduled_time_start_from', 'scheduled_time_to', 'latitude', 'longitude','restaurant_branch_id'], 'safe'],
+            [['estimated_time_of_arrival', 'scheduled_time_start_from', 'scheduled_time_to', 'latitude', 'longitude', 'restaurant_branch_id'], 'safe'],
             [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
 
             [
@@ -682,6 +683,10 @@ class Order extends \yii\db\ActiveRecord
     // public function restockItems()
     // {
     //     foreach ($this->getOrderItems()->all() as $orderItem) {
+    //
+    //           if($orderItem->item)
+    //               continue;
+    //
     //         $orderItemExtraOptions = $orderItem->getOrderItemExtraOptions();
     //
     //         if ($orderItemExtraOptions->count() > 0) {
@@ -690,7 +695,6 @@ class Order extends \yii\db\ActiveRecord
     //                     $orderItemExtraOption->extraOption->increaseStockQty($orderItem->qty);
     //             }
     //         }
-    //
     //
     //         $orderItem->item->increaseStockQty($orderItem->qty);
     //
@@ -704,42 +708,36 @@ class Order extends \yii\db\ActiveRecord
 
 
     /**
- * Update order status to pending
- */
-public function restockItems()
-{
+     * Update order status to pending
+     */
+    public function restockItems()
+    {
+        $orderItems = $this->getOrderItems();
+        //$orderItemExtraOptions = $this->getOrderItemExtraOptions();
 
-    $orderItems = $this->getOrderItems ();
-    $orderItemExtraOptions = $this->getOrderItemExtraOptions ();
+        foreach ($orderItems->all() as $orderItem) {
+            if (!$orderItem->item_uuid) {
+                continue;
+            }
 
-    if ($orderItems->count () > 0) {
-        foreach ($orderItems->all () as $orderItem){
-          if ($orderItem->item_uuid) {
+                $orderItemExtraOptions = $orderItem->getOrderItemExtraOptions();
 
-              $orderItemExtraOptions = $orderItem->getOrderItemExtraOptions ();
+                    foreach ($orderItemExtraOptions->all() as $orderItemExtraOption) {
+                        if (
+                            $orderItemExtraOption->order_item_extra_option_id &&
+                            $orderItemExtraOption->order_item_extra_option_id &&
+                            $orderItemExtraOption->extra_option_id
+                        )
+                            $orderItemExtraOption->extraOption->increaseStockQty($orderItem->qty);
+                    }
 
-              if ($orderItemExtraOptions->count() > 0) {
-                  foreach ($orderItemExtraOptions->all() as $orderItemExtraOption){
-                    if ($orderItemExtraOption->order_item_extra_option_id && $orderItemExtraOption->order_item_extra_option_id && $orderItemExtraOption->extra_option_id)
-                        $orderItemExtraOption->extraOption->increaseStockQty($orderItem->qty);
-                  }
-              }
+                $orderItem->item->increaseStockQty($orderItem->qty);
 
-
-              $orderItem->item->increaseStockQty ($orderItem->qty);
-              self::updateAll(['items_has_been_restocked' => true], [
-                  'order_uuid' => $this->order_uuid
-              ]);
-          }
+                self::updateAll(['items_has_been_restocked' => true], [
+                    'order_uuid' => $this->order_uuid
+                ]);
         }
-
     }
-
-
-}
-
-
-
 
 
     /**
@@ -1093,7 +1091,7 @@ public function restockItems()
 
         if ($insert) {
 
-            if(is_null ($this->items_has_been_restocked)) {
+            if (is_null($this->items_has_been_restocked)) {
                 $this->items_has_been_restocked = false;
             }
 
@@ -1159,7 +1157,7 @@ public function restockItems()
 
             $payment_method_model = PaymentMethod::findOne($this->payment_method_id);
 
-            if(!$payment_method_model) {
+            if (!$payment_method_model) {
                 throw new BadRequestHttpException('payment gateway not found');
             }
 
@@ -1367,6 +1365,8 @@ public function restockItems()
         $scenarios = parent::scenarios();
 
         $scenarios['updateStatus'] = ['order_status'];
+
+        $scenarios[self::SCENARIO_DELETE] = ['is_deleted'];
 
         $scenarios[self::SCENARIO_UPDATE_TOTAL] = [
             'delivery_fee',

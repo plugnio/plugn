@@ -220,7 +220,7 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         $item_model = Item::findOne($this->item_uuid);
 
-        if (!$insert && isset($changedAttributes['qty'])) {
+        if (!$insert && isset($changedAttributes['qty']) && $item_model) {
             $item_model->increaseStockQty($changedAttributes['qty']);
             $item_model->decreaseStockQty($this->qty);
         }
@@ -232,7 +232,6 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         return parent::afterSave($insert, $changedAttributes);
     }
-
 
     public function extraFields() {
         return [

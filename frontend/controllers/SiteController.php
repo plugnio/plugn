@@ -94,10 +94,9 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-
         if (Yii::$app->user->isGuest)
             return $this->redirect(['login']);
-        else {
+
             foreach (Yii::$app->accountManager->getManagedAccounts() as $managedRestaurant) {
 
                 if (Yii::$app->user->identity->isOwner($managedRestaurant->restaurant_uuid)) {
@@ -110,7 +109,6 @@ class SiteController extends Controller
                     ]);
                 }
             }
-        }
     }
 
     /**
