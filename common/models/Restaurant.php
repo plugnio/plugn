@@ -242,9 +242,11 @@ class Restaurant extends \yii\db\ActiveRecord
             [['name', 'name_ar', 'restaurant_email'], 'required', 'on' => 'default'],
             [['name', 'owner_number', 'restaurant_domain', 'currency_id', 'country_id'], 'required', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             ['name', 'match', 'pattern' => '/^[a-zA-Z0-9-\s]+$/', 'message' => 'Your store name can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
+
             ['restaurant_domain', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/', 'message' => 'Your store url can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             [['restaurant_domain'], 'url', 'except' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             [['restaurant_domain'], 'string', 'min' => 3, 'max' => 20, 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
+            [['name', 'name_ar'], 'string', 'min' => 3],
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png, pdf', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['restaurant_status', 'support_delivery', 'support_pick_up', 'hide_request_driver_button', 'sitemap_require_update', 'version'], 'integer', 'min' => 0],
@@ -618,11 +620,15 @@ class Restaurant extends \yii\db\ActiveRecord
             @unlink ($tmpFile);
 
 
-            if ($response->isOk)
+            if ($response->isOk) {
                 $this->authorized_signature_file_id = $response->data['id'];
-
+            }
             else
-                return Yii::error ('Error when uploading authorized signature document: ' . json_encode ($response->data));
+            {
+                $error = is_object($response->data) || is_array($response->data) ? json_encode ($response->data) :$response->data;
+
+                return Yii::error ('Error when uploading authorized signature document: ' . $error);
+            }
         }
 
         //Upload commercial_license file

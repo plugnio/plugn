@@ -1,5 +1,6 @@
 <?php
 
+use Yii;
 use common\models\Restaurant;
 use yii\helpers\Html;
 use common\models\Order;
@@ -18,6 +19,26 @@ $this->title = "Confirm " . $selectedPlan->name;
 
 
 <section>
+
+  <?php if (Yii::$app->session->getFlash('errorResponse') != null) { ?>
+
+    <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h5><i class="icon fa fa-ban"></i> Error!</h5>
+        <?= (Yii::$app->session->getFlash('errorResponse')) ?>
+    </div>
+  <?php } if (Yii::$app->session->hasFlash('error')) { ?>
+      <div class="alert alert-danger alert-dismissable">
+          <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+          <?php
+          foreach(Yii::$app->session->getFlash('error') as $errors) {
+              foreach($errors as $error) { ?>
+                  <p><?= $error ?></p>
+              <?php
+              }
+          } ?>
+      </div>
+  <?php }
 
   <div class="card" style=" padding-bottom:2.1rem;">
     <div class="card-header">
