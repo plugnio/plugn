@@ -228,9 +228,11 @@ class Order extends \yii\db\ActiveRecord
             [['customer_phone_number'], 'string', 'min' => 6, 'max' => 20],
             [['customer_phone_number'], 'number'],
             [['total_price', 'total_price_before_refund', 'delivery_fee', 'subtotal', 'subtotal_before_refund', 'tax'], 'number', 'min' => 0],
-            ['subtotal', 'validateMinCharge', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN, 'when' => function ($model) {
-                return $model->order_mode == static::ORDER_MODE_DELIVERY;
-            }
+            ['subtotal', 'validateMinCharge', 
+                'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN, 
+                'when' => function ($model) {
+                    return $model->order_mode == static::ORDER_MODE_DELIVERY && $model->subtotal > 0;
+                }
             ],
             [['floor'], 'required', 'when' => function ($model) {
                 return ($model->unit_type == 'Office' || $model->unit_type == 'Apartment') && ($model->restaurant->version == 2 || $model->restaurant->version == 3 || $model->restaurant->version == 4);
@@ -547,7 +549,13 @@ class Order extends \yii\db\ActiveRecord
         }
 
         if ($this->deliveryZone->min_charge > $this->$attribute) {
-            $this->addError($attribute, "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency($this->deliveryZone->min_charge, $this->currency->code, [\NumberFormatter::MAX_FRACTION_DIGITS => $this->currency->decimal_place]));
+
+            if($this->currency && $this->currency->code) 
+                $this->addError($attribute, "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency($this->deliveryZone->min_charge, $this->currency->code, [\NumberFormatter::MAX_FRACTION_DIGITS => $this->currency->decimal_place]));
+            else if($this->currency_code) 
+                $this->addError($attribute, "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency($this->deliveryZone->min_charge, $this->currency_code));
+            else 
+                $this->addError($attribute, "Minimum Order Amount: " . $this->deliveryZone->min_charge);
         }
     }
 
