@@ -17,6 +17,12 @@ class m200119_140111_create_area_table extends Migration {
             $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
         }
 
+        $tableSchema = Yii::$app->db->schema->getTableSchema('area');
+
+        if ($tableSchema !== null) {
+            return true;
+        }
+
         $this->createTable('{{%area}}', [
             'area_id' => $this->primaryKey(),
             'city_id' => $this->integer()->notNull(),

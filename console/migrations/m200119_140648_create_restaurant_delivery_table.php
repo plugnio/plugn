@@ -18,7 +18,6 @@ class m200119_140648_create_restaurant_delivery_table extends Migration
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
         }
 
-        
         $this->createTable('{{%restaurant_delivery}}', [
             'restaurant_uuid' => $this->char(60)->notNull(),
             'area_id' => $this->integer()->notNull(),
@@ -45,8 +44,7 @@ class m200119_140648_create_restaurant_delivery_table extends Migration
             'restaurant_uuid',
             'CASCADE'
         );
-        
-        
+
         // creates index for column `area_id`
         $this->createIndex(
             'idx-restaurant_delivery-area_id',
@@ -63,9 +61,6 @@ class m200119_140648_create_restaurant_delivery_table extends Migration
             'area_id',
             'CASCADE'
         );
-        
-        
-        
     }
 
     /**
