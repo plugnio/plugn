@@ -28,13 +28,9 @@ class Module extends \yii\base\Module
             \Yii::$app->language = $lang;
         }
 
-
-
-        if ($currency && $currency != \Yii::$app->currency)
+        if ($currency)//&& $currency != \Yii::$app->currency->getCode()
         {
             \Yii::$app->currency->setCode($currency);
         }
-
-
     }
 }
