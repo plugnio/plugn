@@ -601,7 +601,7 @@ class StoreController extends Controller
         return [
             'itemQuantity'=>count($model->items),
             'payment'=>count($model->paymentMethods),
-            'shipping'=>count($model->businessLocations)
+            'shipping'=>count($model->areaDeliveryZones)
         ];
     }
 
