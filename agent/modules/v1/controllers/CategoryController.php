@@ -295,8 +295,14 @@ class CategoryController extends Controller
     {
         $items = Yii::$app->request->getBodyParam('items');
 
-        foreach ($items as $key => $value) {
-            $model = $this->findModel ($value);
+        $store = Yii::$app->accountManager->getManagedAccount();
+
+        foreach ($items as $key => $category_id) {
+
+            $model = Category::find()->where([
+                'category_id' => $category_id,
+                'restaurant_uuid' => $store->restaurant_uuid
+            ])->one();
 
             if(!$model) {
                 continue;
@@ -322,7 +328,6 @@ class CategoryController extends Controller
     {
         return $this->findModel($category_id);
     }
-
 
     /**
      * Finds the Category model based on its primary key value.

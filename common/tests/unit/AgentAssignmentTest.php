@@ -39,7 +39,7 @@ class AgentAssignmentTest extends \Codeception\Test\Unit
         $this->specify('AgentAssignment model fields validation', function () {
             $agent = new AgentAssignment;
 
-            expect('should not accept empty business_location_id', $agent->validate(['business_location_id']))->false();
+            //expect('should not accept empty business_location_id', $agent->validate(['business_location_id']))->false();
             expect('should not accept empty role', $agent->validate(['role']))->false();
             expect('should not accept empty agent_id', $agent->validate(['agent_id']))->false();
             expect('should not accept empty restaurant_uuid', $agent->validate(['restaurant_uuid']))->false();
