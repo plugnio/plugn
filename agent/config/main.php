@@ -417,6 +417,8 @@ return [
                         'POST disable-online-payment/<id>' => 'disable-online-payment',
                         'POST enable-cod/<id>' => 'enable-cod',
                         'POST disable-cod/<id>' => 'disable-cod',
+                        'POST enable-free-checkout/<id>' => 'enable-free-checkout',
+                        'POST disable-free-checkout/<id>' => 'disable-free-checkout',
                         'POST update-layout' => 'update-layout',
                         'POST update-analytics-integration/<id>' => 'update-analytics-integration',
                         'POST update-delivery-integration/<id>' => 'update-delivery-integration',
@@ -434,6 +436,8 @@ return [
                         'OPTIONS disable-online-payment/<id>' => 'options',
                         'OPTIONS enable-cod/<id>' => 'options',
                         'OPTIONS disable-cod/<id>' => 'options',
+                        'OPTIONS enable-free-checkout/<id>' => 'options',
+                        'OPTIONS disable-free-checkout/<id>' => 'options',
                         'OPTIONS update-layout' => 'options',
                         'OPTIONS update-status/<id>/<status>' => 'options',
                         'OPTIONS status' => 'options'

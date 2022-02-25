@@ -260,6 +260,31 @@ class OrderController extends Controller {
 
                 $order->updateOrderTotalPrice();
 
+                /**
+                 * payment method should be free checkout if total is zero
+                 */
+                if($order->total_price == 0) {
+
+                    $freeCheckout = $order->restaurant->getPaymentMethods()
+                        //->joinWith('payment')
+                        ->andWhere (['payment_method_code' => PaymentMethod::CODE_FREE_CHECKOUT])
+                        ->one();
+
+                    if(!$freeCheckout) {
+                        $response = [
+                            'operation' => 'error',
+                            'message' => "Free checkout not enabled on this store!"
+                        ];
+                    }
+                    else if($order->payment_method_id != $freeCheckout->payment_method_id)
+                    {
+                        $response = [
+                            'operation' => 'error',
+                            'message' => "Invalid payment method for free order!"
+                        ];
+                    }
+                }
+
                 if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
                     $response = [
                         'operation' => 'error',
@@ -267,9 +292,8 @@ class OrderController extends Controller {
                     ];
                 }
 
-
                 //if payment method not cash redirect customer to payment gateway
-                if ($response == null && $order->payment_method_id != 3) {
+                if ($response == null &&  !in_array ($order->payment_method_id, [3, 7])) {
 
                     // Create new payment record
                     $payment = new Payment;
@@ -369,7 +393,6 @@ class OrderController extends Controller {
                                   $order->restaurant->warehouse_delivery_charges,
                                   $order->area_id ? $order->area->country->country_name : ''
                           );
-
 
                           $responseContent = json_decode($response->content);
 
@@ -567,8 +590,7 @@ class OrderController extends Controller {
 
                 } else {
 
-
-                    //pay by Cash
+                    //pay by Cash or Free checkout
                     if ($response == null) {
 
                         //Change order status to pending
@@ -576,7 +598,6 @@ class OrderController extends Controller {
                         $order->sendPaymentConfirmationEmail();
 
                         Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
-
 
                         $response = [
                             'operation' => 'success',
