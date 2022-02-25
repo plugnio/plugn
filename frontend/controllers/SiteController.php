@@ -1630,6 +1630,7 @@ class SiteController extends Controller
             $assignment_agent->business_location_id = $business_location->business_location_id;
 
             if (!$assignment_agent->save()) {
+
                 $transaction->rollBack();
 
                 Yii::$app->session->setFlash('error', $assignment_agent->errors);
@@ -1671,7 +1672,20 @@ class SiteController extends Controller
                 Yii::$app->session->setFlash('storeCreated');
             }
 
-            return $this->redirect(['site/verify-email', 'email' => $agent->agent_email]);
+            $model = new LoginForm();
+            $model->email = $agent->agent_email;
+            $model->password = $agent->tempPassword;
+
+            if (!$model->login ()) {
+                $model->password = '';
+
+                return $this->render ('login', [
+                    'model' => $model,
+                ]);
+            }
+
+            return $this->redirect (['site/vendor-dashboard', 'id' => $store->restaurant_uuid]);
+            //return $this->redirect(['site/verify-email', 'email' => $agent->agent_email]);
         }
 
         return $this->render('signup', ['agent' => $agent,
