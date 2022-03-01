@@ -125,6 +125,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
 
 
                 //Update stock qty
+
                 $extra_option_model->decreaseStockQty($this->qty);
 
                 $this->extra_option_name = $extra_option_model->extra_option_name;
