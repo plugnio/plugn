@@ -264,7 +264,7 @@ class Payment extends \yii\db\ActiveRecord
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
-        if($paymentRecord->received_callback)
+        if($paymentRecord->received_callback && $paymentRecord->payment_current_status == $status )
           return $paymentRecord;
 
 
