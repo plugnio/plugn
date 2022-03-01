@@ -265,17 +265,13 @@ class AuthController extends Controller {
 
             $transaction->commit();
 
-            /*return [
-                'operation' => 'success',
-                'message' => Yii::t ('agent', 'Registration completed successfully')
-            ];*/
-
+            /*
             return [
                 "operation" => "success",
                 "agent_id" => $agent->agent_id,
                 "message" => Yii::t('agent', "Please click on the link sent to you by email to verify your account"),
                 "unVerifiedToken" => $this->_loginResponse($agent)
-            ];
+            ];*/
 
             //return $this->_loginResponse($agent);
 
@@ -287,7 +283,7 @@ class AuthController extends Controller {
             ];
         }*/
 
-//        return $this->_loginResponse ($agent);
+        return $this->_loginResponse ($agent);
 
     }
 
@@ -430,7 +426,7 @@ class AuthController extends Controller {
     public function actionRequestResetPassword() {
 
         $emailInput = Yii::$app->request->getBodyParam("email");
-
+        $errors = false;
         $model = new PasswordResetRequestForm();
         $model->email = $emailInput;
 

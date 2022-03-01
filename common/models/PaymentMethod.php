@@ -19,6 +19,13 @@ use Yii;
  */
 class PaymentMethod extends \yii\db\ActiveRecord
 {
+    const CODE_FREE_CHECKOUT = 'free-checkout';
+    const CODE_BENEFIT = 'benefit';
+    const CODE_MADA = 'mada';
+    const CODE_CASH = 'cash';
+    const CODE_CREDIT_CARD = 'credit-card';
+    const CODE_KNET = 'kn';
+
     /**
      * {@inheritdoc}
      */

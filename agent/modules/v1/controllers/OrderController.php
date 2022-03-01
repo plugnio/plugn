@@ -94,7 +94,7 @@ class OrderController extends Controller
                     ]
                 ]
             )
-            ->andWhere(['is_deleted' => 0])
+            ->andWhere(['order.is_deleted' => 0])
             ->orderBy(['order_created_at' => SORT_DESC]);
 
         return new ActiveDataProvider([
@@ -123,7 +123,7 @@ class OrderController extends Controller
                     ]
                 ]
             )
-            ->andWhere(['is_deleted' => 0])
+            ->andWhere(['order.is_deleted' => 0])
             ->orderBy(['order_created_at' => SORT_DESC]);
 
         return new ActiveDataProvider([
@@ -204,7 +204,7 @@ class OrderController extends Controller
         } else if ($type == 'draft') {
             $query->andWhere(['order_status' => Order::STATUS_DRAFT]);
         }
-        $query->andWhere(['is_deleted' => 0]);
+        $query->andWhere(['order.is_deleted' => 0]);
         return new ActiveDataProvider([
             'query' => $query
         ]);
