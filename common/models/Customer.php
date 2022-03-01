@@ -26,6 +26,10 @@ use yii\db\Expression;
  */
 class Customer extends \yii\db\ActiveRecord {
 
+    //for report
+    public $totalSpent;
+    public $totalOrder;
+
     /**
      * {@inheritdoc}
      */
