@@ -710,6 +710,19 @@ class OrderController extends Controller {
       //Check If Enabled Secret Key and If The header has request
        if ($headerSignature != null)  {
 
+
+
+         $response_message  = null;
+
+         if(isset($acquirer)){
+           if(isset($acquirer['response']))
+             $response_message = $acquirer['response']['message'];
+         } else {
+           if(isset($response))
+             $response_message = $response['message'];
+         }
+
+
          $paymentRecord = Payment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
 
          $isValidSignature = false;
@@ -726,12 +739,6 @@ class OrderController extends Controller {
            }
 
 
-        $response_message  = null;
-
-        if(isset($acquirer)){
-          if(isset($acquirer['response']))
-            $response_message = $acquirer['response']['message'];
-        }
 
 
         $paymentRecord->received_callback = true;
