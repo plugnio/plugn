@@ -674,7 +674,6 @@ class OrderController extends Controller {
 
       $headers = Yii::$app->request->headers;
       $headerSignature = $headers->get('hashstring');
-      \Yii::error ( $headers->get('hashstring'), __METHOD__); // Log error faced by user
 
       $charge_id = Yii::$app->request->getBodyParam("id");
       $status = Yii::$app->request->getBodyParam("status");
@@ -706,8 +705,6 @@ class OrderController extends Controller {
 
       $toBeHashedString = 'x_id'.$charge_id.'x_amount'.$amountCharged.'x_currency'.$currency.'x_gateway_reference'.$gateway_reference.'x_payment_reference'.$payment_reference.'x_status'.$status.'x_created'.$created.'';
 
-      \Yii::error ( 'toBeHashedString => ' . $toBeHashedString , __METHOD__); // Log error faced by user
-
       $isValidSignature = true;
 
 
@@ -718,7 +715,13 @@ class OrderController extends Controller {
 
            if (!$isValidSignature) {
                   $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString , $headerSignature);
-                  if (!$isValidSignature) throw new ForbiddenHttpException('Invalid Signature');
+                  if (!$isValidSignature){
+                    \Yii::error ( 'toBeHashedString => ' . $toBeHashedString , __METHOD__); // Log error faced by user
+                    \Yii::error ( 'headerSignature => ' . $headerSignature , __METHOD__); // Log error faced by user
+                    throw new ForbiddenHttpException('Invalid Signature');
+                  } else {
+                    \Yii::error ( 'Secure Post' );
+                  }
            }
 
 
