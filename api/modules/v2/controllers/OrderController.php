@@ -675,7 +675,7 @@ class OrderController extends Controller {
       \Yii::error ( $headers->get('hashstring'), __METHOD__); // Log error faced by user
 
       $charge_id = Yii::$app->request->getBodyParam("id");
-      $status = Yii::$app->request->getBodyParam("status")
+      $status = Yii::$app->request->getBodyParam("status");
       $amount = Yii::$app->request->getBodyParam("amount");
       $currency = Yii::$app->request->getBodyParam("currency");
       $reference = Yii::$app->request->getBodyParam("reference");
