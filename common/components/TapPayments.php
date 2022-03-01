@@ -647,4 +647,20 @@ class TapPayments extends Component
 
         return $response;
     }
+
+
+    /**
+     * checkTapSignature
+     * @param  [type]  $id                           [description]
+     * @param  boolean $showUpdatedFlashNotification [description]
+     * @return self                                [description]
+     */
+     public function checkTapSignature($toBeHashedString, $headerSignature ) {
+         //***Generate The Signature*** :
+
+         $signature = hash_hmac('sha256', $toBeHashedString, $this->vendorSecretApiKey);
+
+         return $signature == $headerSignature;
+     }
+
 }

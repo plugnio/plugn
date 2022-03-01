@@ -7,6 +7,7 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use common\models\Voucher;
 use common\models\Bank;
+use common\models\Currency;
 use api\models\Order;
 use common\models\OrderItem;
 use common\models\CustomerBankDiscount;
@@ -17,6 +18,7 @@ use api\models\Payment;
 use common\components\TapPayments;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
+use yii\web\ForbiddenHttpException;
 
 class OrderController extends Controller {
 
@@ -669,33 +671,89 @@ class OrderController extends Controller {
      */
     public function actionPaymentWebhook() {
 
+      $headers = Yii::$app->request->headers;
+      $headerSignature = $headers->get('hashstring');
 
       $charge_id = Yii::$app->request->getBodyParam("id");
       $status = Yii::$app->request->getBodyParam("status");
+      $amount = Yii::$app->request->getBodyParam("amount");
+      $currency = Yii::$app->request->getBodyParam("currency");
+      $reference = Yii::$app->request->getBodyParam("reference");
       $destinations = Yii::$app->request->getBodyParam("destinations");
       $response = Yii::$app->request->getBodyParam("response");
       $source = Yii::$app->request->getBodyParam("source");
-      $reference = Yii::$app->request->getBodyParam("reference");
+      $transaction = Yii::$app->request->getBodyParam("transaction");
+      $acquirer = Yii::$app->request->getBodyParam("acquirer");
 
 
-      $response_message  = null;
+      if($currency_mode = Currency::find()->where(['code' => $currency])->one())
+        $decimal_place = $currency_mode->decimal_place;
+      else
+        throw new ForbiddenHttpException('Invalid Currency code');
 
-      if(isset($response))
-        $response_message = $response['message'];
+      if(isset($reference)){
+        $gateway_reference = $reference['gateway'];
+        $payment_reference = $reference['payment'];
+      }
+
+      if(isset($transaction)){
+        $created = $transaction['created'];
+      }
+
+      $amountCharged = \Yii::$app->formatter->asDecimal($amount, $decimal_place);
+
+      $toBeHashedString = 'x_id'.$charge_id.'x_amount'.$amountCharged.'x_currency'.$currency.'x_gateway_reference'.$gateway_reference.'x_payment_reference'.$payment_reference.'x_status'.$status.'x_created'.$created.'';
+
+      $isValidSignature = true;
 
 
-      $paymentRecord = Payment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
-      $paymentRecord->received_callback = true;
-      $paymentRecord->save(false);
+      //Check If Enabled Secret Key and If The header has request
+       if ($headerSignature != null)  {
 
-      if($paymentRecord){
-        return [
-            'operation' => 'success',
-            'message' => 'Payment status has been updated successfully'
-        ];
+
+
+         $response_message  = null;
+
+         if(isset($acquirer)){
+           if(isset($acquirer['response']))
+             $response_message = $acquirer['response']['message'];
+         } else {
+           if(isset($response))
+             $response_message = $response['message'];
+         }
+
+
+         $paymentRecord = Payment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
+
+         $isValidSignature = false;
+
+
+           if (!$isValidSignature) {
+                  Yii::$app->tapPayments->setApiKeys($paymentRecord->restaurant->live_api_key, $paymentRecord->restaurant->test_api_key);
+
+                  $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString , $headerSignature);
+                  if (!$isValidSignature){
+                    Yii::error('Invalid Signature', __METHOD__);
+                    throw new ForbiddenHttpException('Invalid Signature');
+                  }
+           }
+
+
+
+
+        $paymentRecord->received_callback = true;
+        $paymentRecord->save(false);
+
+        if($paymentRecord){
+          return [
+              'operation' => 'success',
+              'message' => 'Payment status has been updated successfully'
+          ];
+        }
       }
 
     }
+
 
     /**
      * Get Order detail
