@@ -78,6 +78,7 @@ class Restaurant extends \common\models\Restaurant {
       unset($fields['restaurant_created_at']);
       unset($fields['restaurant_updated_at']);
       unset($fields['referral_code']);
+      unset($fields['live_public_key']);
 
       return $fields;
   }
