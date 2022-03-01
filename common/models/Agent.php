@@ -173,7 +173,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             ])
             ->setFrom ([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
             ->setTo ($this->agent_email)
-            ->setSubject (Yii::t ('agent', 'Your password reset was a success'))
+            ->setSubject (Yii::t ('agent', 'Your '. \Yii::$app->params['appName'] .' password has been changed'))
             ->send ();
     }
 
