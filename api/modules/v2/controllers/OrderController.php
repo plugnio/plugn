@@ -17,6 +17,7 @@ use api\models\Payment;
 use common\components\TapPayments;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
+use yii\web\ForbiddenHttpException;
 
 class OrderController extends Controller {
 
@@ -685,8 +686,6 @@ class OrderController extends Controller {
       $transaction = Yii::$app->request->getBodyParam("transaction");
 
 
-      \Yii::error (var_dump($headerSignature . '=>' . $charge_id), __METHOD__); // Log error faced by user
-
       if(isset($reference)){
         $gateway_reference = $reference['gateway'];
         $payment_reference = $reference['payment'];
@@ -699,6 +698,7 @@ class OrderController extends Controller {
 
       $toBeHashedString = 'x_id'.$charge_id.'x_amount'.$amount.'x_currency'.$currency.'x_gateway_reference'.$gateway_reference.'x_payment_reference'.$payment_reference.'x_status'.$status.'x_created'.$created.'';
 
+      \Yii::error ( 'toBeHashedString => ' . $toBeHashedString , __METHOD__); // Log error faced by user
 
       $isValidSignature = true;
 
@@ -710,7 +710,7 @@ class OrderController extends Controller {
 
            if (!$isValidSignature) {
                   $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString , $headerSignature);
-                  if (!$isValidSignature) throw new yii\web\ForbiddenHttpException('Invalid Signature');
+                  if (!$isValidSignature) throw new ForbiddenHttpException('Invalid Signature');
            }
 
 
