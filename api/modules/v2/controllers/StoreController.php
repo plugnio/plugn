@@ -14,6 +14,7 @@ use common\models\RestaurantDelivery;
 use api\models\BusinessLocation;
 use common\models\DeliveryZone;
 
+
 class StoreController extends Controller
 {
 
@@ -60,6 +61,15 @@ class StoreController extends Controller
         return $actions;
     }
 
+    /**
+     * return store detail by id
+     * @param $id
+     * @return Category
+     */
+    public function actionView($id)
+    {
+        return $this->findModel($id);
+    }
 
     /**
      * Return Restaurant's branches
@@ -208,13 +218,11 @@ class StoreController extends Controller
         }
     }
 
-
     /**
      * Return Restaurant's data
      */
     public function actionGetRestaurantData($branch_name)
     {
-
         $store = Restaurant::find()
             ->andWhere(['store_branch_name' => $branch_name]);
 
@@ -223,7 +231,6 @@ class StoreController extends Controller
             $restaurant = $store
                 ->select(['restaurant_uuid', 'name', 'logo', 'tagline', 'restaurant_domain', 'app_id', 'google_analytics_id', 'facebook_pixil_id', 'snapchat_pixil_id', 'custom_css'])
                 ->one();
-
 
             $themeColor = RestaurantTheme::find()
                 ->select(['primary'])
@@ -260,4 +267,23 @@ class StoreController extends Controller
         }
     }
 
+    /**
+     * Finds the Restaurant model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $id
+     * @return Category the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        $model = Restaurant::find()
+            ->where(['restaurant_uuid' => $id])
+            ->one();
+
+        if ($model !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested record does not exist.');
+        }
+    }
 }
