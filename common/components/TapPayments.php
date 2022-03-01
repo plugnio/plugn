@@ -663,7 +663,7 @@ class TapPayments extends Component
              $secretAPIKey = $this->plugnTestApiKey;
          }
 
-         $signature = base64_encode(hash_hmac('sha256', $toBeHashedString, $secretAPIKey, true));
+         $signature = hash_hmac('sha256','x_idchg_TS021320221907Zl0j0103224x_amount1x_currencyKWDx_gateway_reference202206080109619x_payment_reference1401221907030043008x_statusFAILEDx_created1646161633239', 'sk_test_dlz7OCgUBEJcMIpyejZXbWVT');
          return $signature == $headerSignature;
      }
 

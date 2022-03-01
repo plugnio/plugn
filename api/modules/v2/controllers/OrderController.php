@@ -686,6 +686,11 @@ class OrderController extends Controller {
       $transaction = Yii::$app->request->getBodyParam("transaction");
 
 
+      if($currency_mode = Currency::find()->where(['code' => $currency])->one())
+        $decimal_place = $currency_mode->decimal_place;
+      else
+        throw new ForbiddenHttpException('Invalid Currency code')
+
       if(isset($reference)){
         $gateway_reference = $reference['gateway'];
         $payment_reference = $reference['payment'];
@@ -695,8 +700,9 @@ class OrderController extends Controller {
         $created = $transaction['created'];
       }
 
+      $amountCharged = \Yii::$app->formatter->asDecimal($amount, $decimal_place);
 
-      $toBeHashedString = 'x_id'.$charge_id.'x_amount'.$amount.'x_currency'.$currency.'x_gateway_reference'.$gateway_reference.'x_payment_reference'.$payment_reference.'x_status'.$status.'x_created'.$created.'';
+      $toBeHashedString = 'x_id'.$charge_id.'x_amount'.$amountCharged.'x_currency'.$currency.'x_gateway_reference'.$gateway_reference.'x_payment_reference'.$payment_reference.'x_status'.$status.'x_created'.$created.'';
 
       \Yii::error ( 'toBeHashedString => ' . $toBeHashedString , __METHOD__); // Log error faced by user
 
