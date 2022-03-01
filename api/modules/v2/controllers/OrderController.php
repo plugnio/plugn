@@ -670,7 +670,6 @@ class OrderController extends Controller {
      * @return mixed
      */
     public function actionPaymentWebhook() {
-      \Yii::error ('enter actionPaymentWebhook', __METHOD__); // Log error faced by user
 
       $headers = Yii::$app->request->headers;
       $headerSignature = $headers->get('hashstring');
@@ -710,16 +709,19 @@ class OrderController extends Controller {
 
       //Check If Enabled Secret Key and If The header has request
        if ($headerSignature != null)  {
+
+         $paymentRecord = Payment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
+
          $isValidSignature = false;
 
 
            if (!$isValidSignature) {
+                  Yii::$app->tapPayments->setApiKeys($paymentRecord->restaurant->live_api_key, $paymentRecord->restaurant->test_api_key);
+
                   $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString , $headerSignature);
                   if (!$isValidSignature){
-                    \Yii::error ( 'Invalid Signature' , __METHOD__ );
+                    Yii::error('Invalid Signature', __METHOD__);
                     throw new ForbiddenHttpException('Invalid Signature');
-                  } else {
-                    \Yii::error ( 'Secure Post' , __METHOD__ );
                   }
            }
 
@@ -732,7 +734,6 @@ class OrderController extends Controller {
         }
 
 
-        $paymentRecord = Payment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
         $paymentRecord->received_callback = true;
         $paymentRecord->save(false);
 

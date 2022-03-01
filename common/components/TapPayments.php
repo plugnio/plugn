@@ -657,18 +657,8 @@ class TapPayments extends Component
      */
      public function checkTapSignature($toBeHashedString, $headerSignature ) {
          //***Generate The Signature*** :
-         if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
-             $secretAPIKey = $this->plugnLiveApiKey;
-         } else {
-             $secretAPIKey = $this->plugnTestApiKey;
-         }
-         \Yii::error ( 'toBeHashedString => ' . $toBeHashedString , __METHOD__); // Log error faced by user
-         \Yii::error ( 'headerSignature => ' . $headerSignature , __METHOD__); // Log error faced by user
-         \Yii::error ( 'secretAPIKey => ' . $secretAPIKey , __METHOD__); // Log error faced by user
 
-         $signature = hash_hmac('sha256', $toBeHashedString, $secretAPIKey);
-
-         \Yii::error ( 'signature => ' . $signature , __METHOD__); // Log error faced by user
+         $signature = hash_hmac('sha256', $toBeHashedString, $this->vendorSecretApiKey);
 
          return $signature == $headerSignature;
      }
