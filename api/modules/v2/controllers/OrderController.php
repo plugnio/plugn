@@ -668,34 +668,72 @@ class OrderController extends Controller {
      * @return mixed
      */
     public function actionPaymentWebhook() {
+      \Yii::error ('enter actionPaymentWebhook', __METHOD__); // Log error faced by user
 
+      $headers = Yii::$app->request->headers;
+      $headerSignature = $headers->get('hashstring');
+      \Yii::error ( $headers->get('hashstring'), __METHOD__); // Log error faced by user
 
       $charge_id = Yii::$app->request->getBodyParam("id");
-      $status = Yii::$app->request->getBodyParam("status");
+      $status = Yii::$app->request->getBodyParam("status")
+      $amount = Yii::$app->request->getBodyParam("amount");
+      $currency = Yii::$app->request->getBodyParam("currency");
+      $reference = Yii::$app->request->getBodyParam("reference");
       $destinations = Yii::$app->request->getBodyParam("destinations");
       $response = Yii::$app->request->getBodyParam("response");
       $source = Yii::$app->request->getBodyParam("source");
-      $reference = Yii::$app->request->getBodyParam("reference");
+      $transaction = Yii::$app->request->getBodyParam("transaction");
 
 
-      $response_message  = null;
+      \Yii::error (var_dump($headerSignature . '=>' . $charge_id), __METHOD__); // Log error faced by user
 
-      if(isset($response))
-        $response_message = $response['message'];
+      if(isset($reference)){
+        $gateway_reference = $reference['gateway'];
+        $payment_reference = $reference['payment'];
+      }
+
+      if(isset($transaction)){
+        $created = $transaction['created'];
+      }
 
 
-      $paymentRecord = Payment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
-      $paymentRecord->received_callback = true;
-      $paymentRecord->save(false);
+      $toBeHashedString = 'x_id'.$charge_id.'x_amount'.$amount.'x_currency'.$currency.'x_gateway_reference'.$gateway_reference.'x_payment_reference'.$payment_reference.'x_status'.$status.'x_created'.$created.'';
 
-      if($paymentRecord){
-        return [
-            'operation' => 'success',
-            'message' => 'Payment status has been updated successfully'
-        ];
+
+      $isValidSignature = true;
+
+
+      //Check If Enabled Secret Key and If The header has request
+       if ($headerSignature != null)  {
+         $isValidSignature = false;
+
+
+           if (!$isValidSignature) {
+                  $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString , $headerSignature);
+                  if (!$isValidSignature) throw new ForbiddenHttpException('Invalid Signature');
+           }
+
+
+        $response_message  = null;
+
+        if(isset($response))
+          $response_message = $response['message'];
+
+
+        $paymentRecord = Payment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
+        $paymentRecord->received_callback = true;
+        $paymentRecord->save(false);
+
+        if($paymentRecord){
+          return [
+              'operation' => 'success',
+              'message' => 'Payment status has been updated successfully'
+          ];
+        }
       }
 
     }
+
 
     /**
      * Get Order detail
