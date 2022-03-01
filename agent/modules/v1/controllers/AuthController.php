@@ -261,7 +261,7 @@ class AuthController extends Controller {
                 ]);
             }
 
-            $agent->sendVerificationEmail();
+            //$agent->sendVerificationEmail();
 
             $transaction->commit();
 
