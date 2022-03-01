@@ -7,6 +7,7 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use common\models\Voucher;
 use common\models\Bank;
+use common\models\Currency;
 use api\models\Order;
 use common\models\OrderItem;
 use common\models\CustomerBankDiscount;
@@ -684,6 +685,7 @@ class OrderController extends Controller {
       $response = Yii::$app->request->getBodyParam("response");
       $source = Yii::$app->request->getBodyParam("source");
       $transaction = Yii::$app->request->getBodyParam("transaction");
+      $acquirer = Yii::$app->request->getBodyParam("acquirer");
 
 
       if($currency_mode = Currency::find()->where(['code' => $currency])->one())
@@ -722,8 +724,10 @@ class OrderController extends Controller {
 
         $response_message  = null;
 
-        if(isset($response))
-          $response_message = $response['message'];
+        if(isset($acquirer)){
+          if(isset($acquirer['response']))
+            $response_message = $acquirer['response']['message'];
+        }
 
 
         $paymentRecord = Payment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
