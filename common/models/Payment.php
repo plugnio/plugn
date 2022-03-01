@@ -154,9 +154,6 @@ class Payment extends \yii\db\ActiveRecord
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
-        if($paymentRecord->received_callback)
-          return $paymentRecord;
-
 
         // Request response about it from TAP
         Yii::$app->tapPayments->setApiKeys($paymentRecord->restaurant->live_api_key, $paymentRecord->restaurant->test_api_key);
@@ -266,7 +263,6 @@ class Payment extends \yii\db\ActiveRecord
 
         if($paymentRecord->received_callback && $paymentRecord->payment_current_status == $status )
           return $paymentRecord;
-
 
 
         $paymentRecord->payment_current_status = $status; // 'CAPTURED' ?
