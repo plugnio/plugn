@@ -689,7 +689,7 @@ class OrderController extends Controller {
       if($currency_mode = Currency::find()->where(['code' => $currency])->one())
         $decimal_place = $currency_mode->decimal_place;
       else
-        throw new ForbiddenHttpException('Invalid Currency code')
+        throw new ForbiddenHttpException('Invalid Currency code');
 
       if(isset($reference)){
         $gateway_reference = $reference['gateway'];
