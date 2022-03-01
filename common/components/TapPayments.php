@@ -662,8 +662,14 @@ class TapPayments extends Component
          } else {
              $secretAPIKey = $this->plugnTestApiKey;
          }
+         \Yii::error ( 'toBeHashedString => ' . $toBeHashedString , __METHOD__); // Log error faced by user
+         \Yii::error ( 'headerSignature => ' . $headerSignature , __METHOD__); // Log error faced by user
+         \Yii::error ( 'secretAPIKey => ' . $secretAPIKey , __METHOD__); // Log error faced by user
 
          $signature = hash_hmac('sha256', $toBeHashedString, $secretAPIKey);
+
+         \Yii::error ( 'signature => ' . $signature , __METHOD__); // Log error faced by user
+
          return $signature == $headerSignature;
      }
 

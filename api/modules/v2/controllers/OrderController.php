@@ -716,11 +716,10 @@ class OrderController extends Controller {
            if (!$isValidSignature) {
                   $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString , $headerSignature);
                   if (!$isValidSignature){
-                    \Yii::error ( 'toBeHashedString => ' . $toBeHashedString , __METHOD__); // Log error faced by user
-                    \Yii::error ( 'headerSignature => ' . $headerSignature , __METHOD__); // Log error faced by user
+                    \Yii::error ( 'Invalid Signature' , __METHOD__ );
                     throw new ForbiddenHttpException('Invalid Signature');
                   } else {
-                    \Yii::error ( 'Secure Post' );
+                    \Yii::error ( 'Secure Post' , __METHOD__ );
                   }
            }
 
