@@ -737,11 +737,7 @@ class OrderController extends Controller
         $order->customer_phone_country_code = Yii::$app->request->getBodyParam("country_code") ? Yii::$app->request->getBodyParam("customer_phone_country_code") : 965;
         $order->customer_email = Yii::$app->request->getBodyParam("customer_email"); //optional
 
-        $order->estimated_time_of_arrival =
-            date(
-                "Y-m-d H:i:s",
-                strtotime(Yii::$app->request->getBodyParam('estimated_time_of_arrival'))
-            );
+
 
         $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
         $order->area_id = Yii::$app->request->getBodyParam("area_id");
@@ -824,16 +820,6 @@ class OrderController extends Controller
             ];
         }
 
-        $order->updateOrderTotalPrice();
-
-        if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
-            return [
-                'operation' => 'error',
-                'message' => Yii::t('agent', 'Minimum order amount {amount}', [
-                    'amount' => Yii::$app->formatter->asCurrency($order->deliveryZone->min_charge, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
-                ])
-            ];
-        }
 
         $orderItems = Yii::$app->request->getBodyParam('orderItems');
 
@@ -907,6 +893,39 @@ class OrderController extends Controller
                 }
             }
         }
+
+
+        $order->updateOrderTotalPrice();
+
+        if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
+            return [
+                'operation' => 'error',
+                'message' => Yii::t('agent', 'Minimum order amount {amount}', [
+                    'amount' => Yii::$app->formatter->asCurrency($order->deliveryZone->min_charge, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
+                ])
+            ];
+        }
+
+
+        if(Yii::$app->request->getBodyParam('estimated_time_of_arrival')){
+
+          $order->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
+
+          $order->estimated_time_of_arrival =
+              date(
+                  "Y-m-d H:i:s",
+                  strtotime(Yii::$app->request->getBodyParam('estimated_time_of_arrival'))
+              );
+
+              if (!$order->save()) {
+                  return [
+                      'operation' => 'error',
+                      'message' => $order->errors,
+                  ];
+              }
+        }
+
+
 
         $transaction->commit();
 
