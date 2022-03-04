@@ -4,15 +4,12 @@ namespace api\modules\v2\controllers;
 
 use Yii;
 use yii\rest\Controller;
-use yii\data\ActiveDataProvider;
-use common\models\City;
-use common\models\RestaurantBranch;
 use api\models\Restaurant;
 use common\models\RestaurantTheme;
 use common\models\OpeningHour;
-use common\models\RestaurantDelivery;
 use api\models\BusinessLocation;
 use common\models\DeliveryZone;
+use yii\web\NotFoundHttpException;
 
 
 class StoreController extends Controller

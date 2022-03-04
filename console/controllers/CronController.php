@@ -188,7 +188,7 @@ class CronController extends \yii\console\Controller {
 
             foreach ($restaurants as $restaurant) {
 
-              if($restaurant->site_id){
+              if($restaurant->site_id && $restaurant->restaurant_email) {
 
                 $getSiteResponse = Yii::$app->netlifyComponent->getSiteData($restaurant->site_id);
 
@@ -660,6 +660,7 @@ class CronController extends \yii\console\Controller {
     public function actionUpdateTransactions() {
 
         $now = new DateTime('now');
+
         $payments = Payment::find()
                 ->where("received_callback = 0")
                 ->andWhere(['payment_gateway_name' => 'tap'])

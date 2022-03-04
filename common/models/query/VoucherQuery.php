@@ -10,7 +10,7 @@ class VoucherQuery extends \yii\db\ActiveQuery
      */
     public function all($db = null)
     {
-        $this->andWhere(['!=', 'is_deleted', 1]);
+        $this->andWhere(['!=', 'voucher.is_deleted', 1]);
         return parent::all ($db);
     }
 
@@ -20,7 +20,7 @@ class VoucherQuery extends \yii\db\ActiveQuery
      */
     public function one($db = null)
     {
-        $this->andWhere(['!=', 'is_deleted', 1]);
+        $this->andWhere(['!=', 'voucher.is_deleted', 1]);
         return parent::one ($db);
     }
 }
