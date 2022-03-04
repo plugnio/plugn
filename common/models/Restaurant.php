@@ -934,7 +934,10 @@ class Restaurant extends \yii\db\ActiveRecord
         }
 
         //Create a merchant on Tap
-        $merchantApiResponse = Yii::$app->tapPayments->createMerchantAccount($this->company_name, $this->currency->code ,$this->business_id, $this->business_entity_id, $this->iban);
+        $merchantApiResponse = Yii::$app->tapPayments->createMerchantAccount(
+            $this->company_name, $this->currency->code,
+            $this->business_id, $this->business_entity_id,
+            $this->iban);
 
         if ($merchantApiResponse->isOk)
         {
@@ -953,6 +956,7 @@ class Restaurant extends \yii\db\ActiveRecord
                    $this->merchant_id = $merchantApiResponse->data['id'];
                    $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
                } else{
+
                    Yii::error('Error while create Merchant [ ' . $this->name . '] #2#' . json_encode($merchantApiResponse->data));
 
                    self::updateAll([

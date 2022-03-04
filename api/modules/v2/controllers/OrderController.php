@@ -19,6 +19,7 @@ use common\components\TapPayments;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 
+
 class OrderController extends Controller {
 
     public function behaviors() {
@@ -435,7 +436,6 @@ class OrderController extends Controller {
                                   'redirectUrl' => $redirectUrl,
                               ];
                           } catch (\Exception $e) {
-                            Yii::error('[Error when converting to BHD Currency]222' , __METHOD__);
 
                               if ($payment)
                                   Yii::error('[TAP Payment Issue > ]' . json_encode($payment->getErrors()), __METHOD__);
@@ -705,7 +705,6 @@ class OrderController extends Controller {
      * @return mixed
      */
     public function actionPaymentWebhook() {
-
 
       $charge_id = Yii::$app->request->getBodyParam("id");
       $status = Yii::$app->request->getBodyParam("status");

@@ -8,6 +8,7 @@ use api\models\Item;
 class SitemapController extends Controller
 {
     public function actionIndex($storeUuid) {
+
         $products = Item::find()
             ->andWhere(['restaurant_uuid' => $storeUuid])
             ->orderBy('item_created_at DESC')
@@ -15,6 +16,7 @@ class SitemapController extends Controller
             ->all();
 
       header("Content-type: text/xml");
+
       \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
 
     	return $this->renderPartial('index', [
