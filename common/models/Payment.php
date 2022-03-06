@@ -49,6 +49,10 @@ class Payment extends \yii\db\ActiveRecord
     const PAYOUT_STATUS_UNPAID = 1;
     const PAYOUT_STATUS_PAID = 2;
 
+
+    const SCENARIO_UPDATE_STATUS_WEBHOOK = 'webhook';
+
+
     /**
      * {@inheritdoc}
      */
@@ -264,6 +268,9 @@ class Payment extends \yii\db\ActiveRecord
         if($paymentRecord->received_callback && $paymentRecord->payment_current_status == $status )
           return $paymentRecord;
 
+        $paymentRecord->setScenario(self::SCENARIO_UPDATE_STATUS_WEBHOOK);
+
+
 
         $paymentRecord->payment_current_status = $status; // 'CAPTURED' ?
         $paymentRecord->response_message = $response_message;
@@ -464,7 +471,6 @@ class Payment extends \yii\db\ActiveRecord
         return true;
     }
 
-
     /**
      * @inheritdoc
      */
@@ -490,6 +496,16 @@ class Payment extends \yii\db\ActiveRecord
             $this->order->sendPaymentConfirmationEmail();
 
             Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $this->currency->decimal_place]) . '] ' . 'Paid with ' . $this->order->payment_method_name, __METHOD__);
+
+        }
+
+        if(!$insert && $this->scenario == self::SCENARIO_UPDATE_STATUS_WEBHOOK && isset($changedAttributes['payment_current_status']) && $changedAttributes['payment_current_status'] != 'CAPTURED' && $this->payment_current_status == 'CAPTURED'){
+
+          $this->order->changeOrderStatusToPending();
+          $this->order->sendPaymentConfirmationEmail();
+
+          Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $this->currency->decimal_place]) . '] ' . 'Paid with ' . $this->order->payment_method_name, __METHOD__);
+
         }
 
         if ($this->plugn_fee > 0 && $this->partner_fee == 0 && $this->restaurant->referral_code) {
