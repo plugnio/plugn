@@ -2,6 +2,7 @@
 
 namespace agent\modules\v1\controllers;
 
+use common\models\ItemVariant;
 use Yii;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
@@ -200,14 +201,48 @@ class ItemController extends Controller
             $arrCategoryIds = ArrayHelper::getColumn ($itemCategories, 'category_id');
             $model->saveItemsCategory($arrCategoryIds);
 
+            //add variants
+
+            $variants = Yii::$app->request->getBodyParam ("itemVariants");
+
+            if(!$variants)
+                $variants = [];
+
+            foreach($variants as $variant)
+            {
+                $itemVariant = new ItemVariant();
+                $itemVariant->item_uuid = $model->item_uuid;
+
+                $itemVariant->stock_qty = $variant['stock_qty'];
+                $itemVariant->track_quantity = $variant['track_quantity'];
+                $itemVariant->sku = $variant['sku'];
+                $itemVariant->barcode = $variant['barcode'];
+                $itemVariant->price = $variant['price'];
+                $itemVariant->compare_at_price = $variant['compare_at_price'];
+                $itemVariant->weight = $variant['weight'];
+
+                if(!$itemVariant->save())
+                {
+                    $transaction->rollBack();
+
+                    return [
+                        "operation" => "error",
+                        "message" => $itemVariant->errors
+                    ];
+                }
+            }
+
             $transaction->commit();
 
             return [
                 "operation" => "success",
                 "message" => Yii::t('agent', "Item created successfully"),
             ];
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e)
+        {
             $transaction->rollBack();
+
             return [
                 "operation" => "error",
                 "message" => $e->getMessage()
@@ -297,6 +332,49 @@ class ItemController extends Controller
             $arrCategoryIds = ArrayHelper::getColumn ($itemCategories, 'category_id');
             $model->saveItemsCategory($arrCategoryIds);
 
+            //add variants
+
+            $variants = Yii::$app->request->getBodyParam ("itemVariants");
+
+            if(!$variants)
+                $variants = [];
+
+            $arrItemVariantIds = [];
+
+            foreach($variants as $variant)
+            {
+                $itemVariant = new ItemVariant();
+                $itemVariant->item_uuid = $model->item_uuid;
+
+                $itemVariant->stock_qty = $variant['stock_qty'];
+                $itemVariant->track_quantity = $variant['track_quantity'];
+                $itemVariant->sku = $variant['sku'];
+                $itemVariant->barcode = $variant['barcode'];
+                $itemVariant->price = $variant['price'];
+                $itemVariant->compare_at_price = $variant['compare_at_price'];
+                $itemVariant->weight = $variant['weight'];
+
+                if(!$itemVariant->save())
+                {
+                    $transaction->rollBack();
+
+                    return [
+                        "operation" => "error",
+                        "message" => $itemVariant->errors
+                    ];
+                }
+
+                $arrItemVariantIds[] = $itemVariant->item_variant_uuid;
+            }
+
+            //remove other variants
+
+            ItemVariant::deleteAll([
+                'AND',
+                ['NOT IN', 'item_variant_uuid', $arrItemVariantIds],
+                ['item_uuid' => $id]
+            ]);
+
             $transaction->commit();
 
             return [
@@ -317,8 +395,8 @@ class ItemController extends Controller
      * @param type $itemUuid
      * @return boolean
      */
-    public function actionUpdateStockQty(){
-
+    public function actionUpdateStockQty()
+    {
         $id = Yii::$app->request->getBodyParam('item_uuid');
 
         $stock_qty = Yii::$app->request->getBodyParam('stock_qty');
@@ -327,7 +405,8 @@ class ItemController extends Controller
 
         $model->stock_qty = (int) $stock_qty;
 
-        if (!$model->save(false)){
+        if (!$model->save(false))
+        {
             return [
                 "operation" => "error",
                 "message" => $model->errors
