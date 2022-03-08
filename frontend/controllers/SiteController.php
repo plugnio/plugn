@@ -1695,7 +1695,7 @@ class SiteController extends Controller
     /**
      * page to ask user to check email for email verification
      * @return string
-     */
+     *
     public function actionVerifyEmail()
     {
         $email = Yii::$app->request->get('email');
@@ -1705,7 +1705,7 @@ class SiteController extends Controller
         return $this->render('verify-email', [
             'email' => $email
         ]);
-    }
+    }*/
 
     public function actionThankYou()
     {
