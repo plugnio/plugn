@@ -17,6 +17,7 @@ use yii\behaviors\TimestampBehavior;
  * @property string|null $item_description
  * @property string|null $item_description_ar
  * @property int|null $sort_number
+ * @property int|null $item_type
  * @property int|null $track_quantity
  * @property string $barcode
  * @property string $sku
@@ -52,6 +53,9 @@ class Item extends \yii\db\ActiveRecord
     const ITEM_STATUS_PUBLISH = 1;
     const ITEM_STATUS_UNPUBLISH = 2;
 
+    const TYPE_SIMPLE = 1;
+    const TYPE_SIMPLE = 2;
+
     const SCENARIO_UPDATE_STATUS = 'update-status';
 
     /**
@@ -67,17 +71,19 @@ class Item extends \yii\db\ActiveRecord
      */
     public function rules()
     {
+        //sku barcode track_quantity stock_qty
+
         return [
             [['item_name', 'prep_time_unit', 'prep_time'], 'required', 'on' => 'create'],
             ['prep_time_unit', 'in', 'range' => [self::TIME_UNIT_MIN, self::TIME_UNIT_HRS, self::TIME_UNIT_DAY]],
             [['item_name', 'item_name_ar', 'item_price', 'items_category', 'restaurant_uuid'], 'required'],
-            [['sort_number', 'stock_qty'], 'integer', 'min' => 0],
+            [['sort_number', 'stock_qty', 'item_type'], 'integer', 'min' => 0],
             [['unit_sold'], 'integer', 'min' => 0],
             [['item_price','compare_at_price'], 'number', 'min' => 0],
             [['track_quantity', 'prep_time'], 'integer'],
             ['item_status', 'in', 'range' => [self::ITEM_STATUS_PUBLISH, self::ITEM_STATUS_UNPUBLISH]],
             ['stock_qty', 'required', 'when' => function ($model) {
-                return $model->track_quantity;
+                return $model->track_quantity && $model->item_type == self::TYPE_SIMPLE;
             }],
             [['item_images'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 10],
             [['item_created_at', 'item_updated_at', 'items_category'], 'safe'],
