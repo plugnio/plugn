@@ -78,6 +78,19 @@ class ItemVariantOption extends \yii\db\ActiveRecord
     }
 
     /**
+     * @inheritdoc
+     */
+    public function extraFields()
+    {
+        $fields = parent::fields();
+
+        return array_merge ($fields, [
+            'option',
+            'extraOption'
+        ]);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function attributeLabels()
@@ -94,13 +107,33 @@ class ItemVariantOption extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[Option]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOption($model = 'common\models\Option')
+    {
+        return $this->hasOne($model::className(), ['option_id' => 'option_id']);
+    }
+
+    /**
+     * Gets query for [[ExtraOption]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getExtraOption($model = 'common\models\ExtraOption')
+    {
+        return $this->hasOne($model::className(), ['extra_option_id' => 'extra_option_id']);
+    }
+
+    /**
      * Gets query for [[ItemUu]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItemUu()
+    public function getItem($model = 'common\models\Item')
     {
-        return $this->hasOne(Item::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasOne($model::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -108,8 +141,8 @@ class ItemVariantOption extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItemVariantUu()
+    public function getItemVariant($model = 'common\models\ItemVariant')
     {
-        return $this->hasOne(ItemVariant::className(), ['item_variant_uuid' => 'item_variant_uuid']);
+        return $this->hasOne($model::className(), ['item_variant_uuid' => 'item_variant_uuid']);
     }
 }
