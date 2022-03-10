@@ -41,7 +41,8 @@ class ItemVariant extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['stock_qty', 'track_quantity', 'weight'], 'integer'],
+            [['stock_qty', 'weight'], 'integer'],
+            ['track_quantity', 'boolean'],
             [['price', 'compare_at_price'], 'number'],
             [['created_at', 'updated_at'], 'safe'],
             [['item_variant_uuid'], 'string', 'max' => 60],
@@ -82,6 +83,18 @@ class ItemVariant extends \yii\db\ActiveRecord
     }
 
     /**
+     * @inheritdoc
+     */
+    public function extraFields()
+    {
+        $fields = parent::fields();
+
+        return array_merge ($fields, [
+            'itemVariantOptions'
+        ]);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function attributeLabels()
@@ -106,7 +119,7 @@ class ItemVariant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItemUu()
+    public function getItem()
     {
         return $this->hasOne(Item::className(), ['item_uuid' => 'item_uuid']);
     }

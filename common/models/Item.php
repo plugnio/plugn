@@ -206,7 +206,8 @@ class Item extends \yii\db\ActiveRecord
             'currency',
             'options',
             'itemImages',
-            'extraOptions'
+            'extraOptions',
+            'itemVariants'
         ]);
     }
 
@@ -347,6 +348,16 @@ class Item extends \yii\db\ActiveRecord
         return ItemImage::find ()
             ->andWhere (['item_uuid' => $this->item_uuid, 'product_file_name' => $file_name])
             ->one ();
+    }
+
+    /**
+     * Gets query for [[ItemVariant]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItemVariants($model = 'common\models\ItemVariant')
+    {
+        return $this->hasMany ($model::className (), ['item_uuid' => 'item_uuid']);
     }
 
     /**
