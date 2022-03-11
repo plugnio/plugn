@@ -2373,8 +2373,7 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getVouchers($modelClass = "\common\models\Voucher")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->with ('bank');
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
