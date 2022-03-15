@@ -217,7 +217,7 @@ class ItemController extends Controller
                 $itemVariant->item_uuid = $model->item_uuid;
 
                 $itemVariant->stock_qty = $variant['stock_qty'];
-                $itemVariant->track_quantity = $variant['track_quantity'];
+                //$itemVariant->track_quantity = $variant['track_quantity'];
                 $itemVariant->sku = $variant['sku'];
                 $itemVariant->barcode = $variant['barcode'];
                 $itemVariant->price = $variant['price'];
@@ -403,7 +403,7 @@ class ItemController extends Controller
                 $itemVariant->item_uuid = $model->item_uuid;
 
                 $itemVariant->stock_qty = $variant['stock_qty'];
-                $itemVariant->track_quantity = $variant['track_quantity'];
+                //$itemVariant->track_quantity = $variant['track_quantity'];
                 $itemVariant->sku = $variant['sku'];
                 $itemVariant->barcode = $variant['barcode'];
                 $itemVariant->price = $variant['price'];

@@ -13,7 +13,6 @@ use yii\db\Expression;
  * @property string $item_variant_uuid
  * @property string|null $item_uuid
  * @property int|null $stock_qty
- * @property int|null $track_quantity
  * @property string|null $sku
  * @property string|null $barcode
  * @property float|null $price
@@ -42,7 +41,6 @@ class ItemVariant extends \yii\db\ActiveRecord
     {
         return [
             [['stock_qty', 'weight'], 'integer'],
-            ['track_quantity', 'boolean'],
             [['price', 'compare_at_price'], 'number'],
             [['created_at', 'updated_at'], 'safe'],
             [['item_variant_uuid'], 'string', 'max' => 60],
@@ -103,7 +101,6 @@ class ItemVariant extends \yii\db\ActiveRecord
             'item_variant_uuid' => Yii::t('app', 'Item Variant Uuid'),
             'item_uuid' => Yii::t('app', 'Item Uuid'),
             'stock_qty' => Yii::t('app', 'Stock Qty'),
-            'track_quantity' => Yii::t('app', 'Track Quantity'),
             'sku' => Yii::t('app', 'Sku'),
             'barcode' => Yii::t('app', 'Barcode'),
             'price' => Yii::t('app', 'Price'),

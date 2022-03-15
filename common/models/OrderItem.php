@@ -14,6 +14,7 @@ use yii\db\Expression;
  * @property int $order_uuid
  * @property string $restaurant_uuid
  * @property string $item_uuid
+ * @property string $item_variant_uuid
  * @property string $item_name
  * @property string $item_name_ar
  * @property float $item_price
@@ -43,12 +44,15 @@ class OrderItem extends \yii\db\ActiveRecord {
             //'item_name', 'item_price',
             [['order_uuid', 'restaurant_uuid', 'qty'], 'required'],
             [['qty'], 'integer', 'min' => 0],
+            ['qty', 'validateQty'],
             [['order_uuid'], 'string', 'max' => 40],
             [['item_price'], 'number', 'min' => 0],
             [['item_uuid'], 'checkIfItemBelongToRestaurant'],
+            [['item_variant_uuid'], 'checkIfVariantBelongToRestaurant'],
             [['item_uuid'], 'string', 'max' => 300],
             [['item_name', 'item_name_ar', 'customer_instruction'], 'string', 'max' => 255],
             [['item_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_uuid' => 'item_uuid']],
+            [['item_variant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => ItemVariant::className(), 'targetAttribute' => ['item_variant_uuid' => 'item_variant_uuid']],
             [['order_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_uuid' => 'order_uuid']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
@@ -77,6 +81,7 @@ class OrderItem extends \yii\db\ActiveRecord {
             'order_uuid' => 'Order ID',
             'restaurant_uuid' => 'Store ID',
             'item_uuid' => 'Item Uuid',
+            'item_variant_uuid' => 'Item Variant Uuid',
             'item_name' => 'Item Name',
             'item_name_ar' => 'Item Name in Arabic',
             'item_price' => 'Item Price',
@@ -85,13 +90,30 @@ class OrderItem extends \yii\db\ActiveRecord {
         ];
     }
 
+    public function validateQty($attribute)
+    {
+        if(!$this->item || !$this->item->track_quantity) {
+            return true;
+        }
+
+            if($this->item == Item::TYPE_SIMPLE) {
+                if($this->qty < $this->item->stock_qty)
+                    $this->addError($attribute, 'Out of stock');
+            } else {
+                if(!$this->variant)
+                    $this->addError($attribute, 'Variant detail missing');
+                else if($this->qty < $this->variant->stock_qty)
+                    $this->addError($attribute, 'Out of stock');
+            }
+    }
+
     /**
      * Check if item belongs to restaurant
      * @param type $attribute
      */
     public function checkIfItemBelongToRestaurant($attribute)
     {
-        $isItemBelongToRestaurant = $this->order? Item::find()
+        $isItemBelongToRestaurant = $this->order ? Item::find()
             ->where([
                 'restaurant_uuid' => $this->order->restaurant_uuid,
                 'item_uuid' => $this->item_uuid
@@ -105,14 +127,34 @@ class OrderItem extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Check if variant belongs to restaurant
+     * @param type $attribute
+     */
+    public function checkIfVariantBelongToRestaurant($attribute)
+    {
+        $isItemBelongToRestaurant = $this->order? ItemVariant::find()
+            ->where([
+                'item_uuid' => $this->item_uuid,
+                'item_variant_uuid' => $this->item_variant_uuid
+            ])
+            ->one(): null;
+
+        if (!$isItemBelongToRestaurant)
+            $this->addError($attribute, 'Item Variant Uuid is invalid');
+    }
+
+    /**
      * Calculate order item total price => (item price + extra optns price)
      */
     public function calculateOrderItemPrice() {
 
-        if($this->item)
-          $totalPrice = $this->item->item_price; //5
-        else
-          $totalPrice = $this->item_price; //5
+        $totalPrice = $this->item_price;  //default
+
+        if($this->variant) {
+            $totalPrice = $this->variant->price;
+        } else if($this->item) {
+            $totalPrice = $this->item->item_price;
+        }
 
         foreach ($this->getOrderItemExtraOptions()->asArray()->all() as $extraOption)
             $totalPrice += $extraOption['extra_option_price']; //1
@@ -121,8 +163,7 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         //convert from store currency to order currency if not same
 
-        if($this->order->currency && $this->restaurant->currency->code != $this->order->currency_code)
-        {
+        if ($this->order->currency && $this->restaurant->currency->code != $this->order->currency_code) {
             return ($totalPrice / $this->restaurant->currency->rate) * $this->order->currency->rate;
         }
 
@@ -239,6 +280,7 @@ class OrderItem extends \yii\db\ActiveRecord {
             'orderItemExtraOptions',
             'itemImage',
             'item',
+            'variant',
             'refundedQty'
         ];
     }
@@ -269,6 +311,15 @@ class OrderItem extends \yii\db\ActiveRecord {
      */
     public function getItem($modelClass = "\common\models\Item") {
         return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid']);
+    }
+
+    /**
+     * Gets query for [[Variant]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getVariant($modelClass = "\common\models\ItemVariant") {
+        return $this->hasOne($modelClass::className(), ['item_variant_uuid' => 'item_variant_uuid']);
     }
 
     /**
