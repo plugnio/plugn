@@ -25,6 +25,7 @@ class Option extends \yii\db\ActiveRecord {
     const UPDATE_TYPE_CREATE = 'create';
     const UPDATE_TYPE_UPDATE = 'update';
     const UPDATE_TYPE_DELETE = 'delete';
+
     const SCENARIO_BATCH_UPDATE = 'batchUpdate';
 
     private $_updateType;

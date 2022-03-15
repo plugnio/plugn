@@ -20,7 +20,7 @@ use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 
 
-class OrderController extends Controller {
+class   OrderController extends Controller {
 
     public function behaviors() {
         $behaviors = parent::behaviors();
@@ -197,6 +197,7 @@ class OrderController extends Controller {
                         $orderItem->order_uuid = $order->order_uuid;
                         $orderItem->restaurant_uuid = $order->restaurant_uuid;
                         $orderItem->item_uuid = $item["item_uuid"];
+                        $orderItem->item_variant_uuid = isset($item["item_variant_uuid"])? $item["item_variant_uuid"]: null;
                         $orderItem->qty = (int) $item["qty"];
 
                         //optional field

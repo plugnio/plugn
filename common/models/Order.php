@@ -353,7 +353,6 @@ class Order extends \yii\db\ActiveRecord
         return $uuid;
     }
 
-
     /**
      * @inheritdoc
      */
@@ -512,6 +511,7 @@ class Order extends \yii\db\ActiveRecord
      */
     public function validateCountry($attribute)
     {
+        return true;
         $areaDeliveryZone = AreaDeliveryZone::find()->where(['country_id' => $this->shipping_country_id, 'delivery_zone_id' => $this->delivery_zone_id])->one();
 
         if (!$areaDeliveryZone || $areaDeliveryZone->area_id != null || ($areaDeliveryZone && $areaDeliveryZone->businessLocation->restaurant_uuid != $this->restaurant_uuid))
