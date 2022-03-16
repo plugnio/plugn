@@ -640,6 +640,7 @@ class OrderController extends Controller
 
             $orderItem->order_uuid = $order->order_uuid;
             $orderItem->item_uuid = $item["item_uuid"];
+            $orderItem->item_variant_uuid = isset($item["item_variant_uuid"])? $item["item_variant_uuid"]: null;
             $orderItem->qty = (int)$item["qty"];
 
             //optional field
@@ -737,8 +738,6 @@ class OrderController extends Controller
         $order->customer_phone_country_code = Yii::$app->request->getBodyParam("country_code") ? Yii::$app->request->getBodyParam("customer_phone_country_code") : 965;
         $order->customer_email = Yii::$app->request->getBodyParam("customer_email"); //optional
 
-
-
         $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
         $order->area_id = Yii::$app->request->getBodyParam("area_id");
         $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
@@ -816,10 +815,10 @@ class OrderController extends Controller
 
             return [
                 'operation' => 'error',
+                'code' => 1,
                 'message' => $order->getErrors(),
             ];
         }
-
 
         $orderItems = Yii::$app->request->getBodyParam('orderItems');
 
@@ -845,8 +844,10 @@ class OrderController extends Controller
                 $orderItem = new \common\models\OrderItem;
             }
 
+            $orderItem->restaurant_uuid = $order->restaurant_uuid;//for newly added item
             $orderItem->order_uuid = $order->order_uuid;
             $orderItem->item_uuid = isset($item["item_uuid"]) ? $item["item_uuid"] : null;
+            $orderItem->item_variant_uuid = isset($item["item_variant_uuid"])? $item["item_variant_uuid"]: null;
             $orderItem->item_name = $item["item_name"];
             $orderItem->item_name_ar = $item["item_name_ar"];
             $orderItem->qty = (int)$item["qty"];
@@ -861,6 +862,7 @@ class OrderController extends Controller
 
                 return [
                     'operation' => 'error',
+                    'code' => 2,
                     'message' => $orderItem->getErrors()
                 ];
             }
@@ -894,18 +896,17 @@ class OrderController extends Controller
             }
         }
 
-
         $order->updateOrderTotalPrice();
 
         if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
             return [
                 'operation' => 'error',
+                'code' => 3,
                 'message' => Yii::t('agent', 'Minimum order amount {amount}', [
                     'amount' => Yii::$app->formatter->asCurrency($order->deliveryZone->min_charge, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
                 ])
             ];
         }
-
 
         if(Yii::$app->request->getBodyParam('estimated_time_of_arrival')){
 
@@ -920,12 +921,11 @@ class OrderController extends Controller
               if (!$order->save()) {
                   return [
                       'operation' => 'error',
+                      'code' => 4,
                       'message' => $order->errors,
                   ];
               }
         }
-
-
 
         $transaction->commit();
 
@@ -1568,6 +1568,7 @@ class OrderController extends Controller
         }
 
         $transaction = Yii::$app->db->beginTransaction();
+
         if (!$model->save()) {
 
             $transaction->rollBack();
@@ -1595,6 +1596,7 @@ class OrderController extends Controller
 
             $orderItem->order_uuid = $model->order_uuid;
             $orderItem->item_uuid = isset($item["item_uuid"]) ? $item["item_uuid"] : null;
+            $orderItem->item_variant_uuid = isset($item["item_variant_uuid"]) ? $item["item_variant_uuid"] : null;
             $orderItem->item_name = $item["item_name"];
             $orderItem->item_name_ar = $item["item_name_ar"];
             $orderItem->qty = (int)$item["qty"];
