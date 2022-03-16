@@ -163,7 +163,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
 
         $extra_option_model = ExtraOption::findOne($this->extra_option_id);
 
-        if ($extra_option_model)
+        if ($extra_option_model && $this->option->item->item_type != Item::TYPE_CONFIGURABLE)
             $extra_option_model->increaseStockQty($this->qty); //Update stock qty
 
         return parent::beforeDelete();
