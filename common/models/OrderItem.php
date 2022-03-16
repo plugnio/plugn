@@ -178,8 +178,13 @@ class OrderItem extends \yii\db\ActiveRecord {
      */
     public function beforeDelete() {
 
-        if ($this->item)
+        if ($this->item) {
             $this->item->increaseStockQty($this->qty);
+        }
+
+        if ($this->variant) {
+            $this->variant->increaseStockQty($this->qty);
+        }
 
         $orderItemsExtraOption = OrderItemExtraOption::find()
             ->where(['order_item_id' => $this->order_item_id])
@@ -248,6 +253,9 @@ class OrderItem extends \yii\db\ActiveRecord {
               return false;
 
           $this->item->decreaseStockQty($this->qty);
+
+          if($this->variant)
+            $this->variant->decreaseStockQty($this->qty);
         }
 
         $this->item_price = $this->calculateOrderItemPrice();
@@ -264,6 +272,11 @@ class OrderItem extends \yii\db\ActiveRecord {
         if (!$insert && isset($changedAttributes['qty']) && $item_model) {
             $item_model->increaseStockQty($changedAttributes['qty']);
             $item_model->decreaseStockQty($this->qty);
+
+            if ($this->variant) {
+                $this->variant->increaseStockQty($changedAttributes['qty']);
+                $this->variant->decreaseStockQty($this->qty);
+            }
         }
 
         $order_model = Order::findOne($this->order_uuid);

@@ -728,22 +728,29 @@ class Order extends \yii\db\ActiveRecord
                 continue;
             }
 
+            if(!$orderItem->variant) {
+
                 $orderItemExtraOptions = $orderItem->getOrderItemExtraOptions();
 
-                    foreach ($orderItemExtraOptions->all() as $orderItemExtraOption) {
-                        if (
-                            $orderItemExtraOption->order_item_extra_option_id &&
-                            $orderItemExtraOption->order_item_extra_option_id &&
-                            $orderItemExtraOption->extra_option_id
-                        )
-                            $orderItemExtraOption->extraOption->increaseStockQty($orderItem->qty);
-                    }
+                foreach ($orderItemExtraOptions->all() as $orderItemExtraOption) {
+                    if (
+                        $orderItemExtraOption->order_item_extra_option_id &&
+                        $orderItemExtraOption->order_item_extra_option_id &&
+                        $orderItemExtraOption->extra_option_id
+                    )
+                        $orderItemExtraOption->extraOption->increaseStockQty($orderItem->qty);
+                }
+            }
 
-                $orderItem->item->increaseStockQty($orderItem->qty);
+            $orderItem->item->increaseStockQty($orderItem->qty);
 
-                self::updateAll(['items_has_been_restocked' => true], [
-                    'order_uuid' => $this->order_uuid
-                ]);
+            if ($orderItem->variant) {
+                $orderItem->variant->increaseStockQty($orderItem->qty);
+            }
+
+            self::updateAll(['items_has_been_restocked' => true], [
+                'order_uuid' => $this->order_uuid
+            ]);
         }
     }
 
@@ -1310,6 +1317,9 @@ class Order extends \yii\db\ActiveRecord
                         }
 
                         $orderItem->item->decreaseStockQty($orderItem->qty);
+
+                        if($orderItem->variant)
+                            $orderItem->variant->decreaseStockQty($orderItem->qty);
 
                     } else {
                         \Yii::$app->mailer->compose([

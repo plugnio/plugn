@@ -112,6 +112,48 @@ class ItemVariant extends \yii\db\ActiveRecord
     }
 
     /**
+     * increase stock_qty
+     * @param type $qty
+     */
+    public function increaseStockQty($qty)
+    {
+        if (!$this->item->track_quantity)
+            return true;
+
+        $this->stock_qty += $qty;
+
+        //$this->unit_sold -= $qty;
+
+        self::updateAll([
+            //'unit_sold' => $this->unit_sold,
+            'stock_qty' => $this->stock_qty
+        ], [
+            'item_variant_uuid' => $this->item_variant_uuid
+        ]);
+    }
+
+    /**
+     * decrease stock_qty
+     * @param type $qty
+     */
+    public function decreaseStockQty($qty)
+    {
+        if (!$this->item->track_quantity)
+            return true;
+
+        $this->stock_qty -= $qty;
+
+        //$this->unit_sold += $qty;
+
+        self::updateAll([
+            //'unit_sold' => $this->unit_sold,
+            'stock_qty' => $this->stock_qty
+        ], [
+            'item_variant_uuid' => $this->item_variant_uuid
+        ]);
+    }
+
+    /**
      * Gets query for [[ItemUu]].
      *
      * @return \yii\db\ActiveQuery
