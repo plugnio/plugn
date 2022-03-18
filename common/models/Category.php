@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\SluggableBehavior;
 
 /**
  * This is the model class for table "category".
@@ -46,6 +47,7 @@ class Category extends \yii\db\ActiveRecord
             [['image'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['sort_number'], 'integer', 'min' => 0],
             [['restaurant_uuid'], 'string', 'max' => 60],
+            ['slug', 'safe'],
             [['title', 'title_ar', 'subtitle', 'subtitle_ar'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className (), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
@@ -64,11 +66,22 @@ class Category extends \yii\db\ActiveRecord
             'image' => 'Category Image',
             'subtitle_ar' => 'Subtitle in Arabic',
             'sort_number' => 'Sort Number',
+            'slug' => 'Slug',
             'restaurant_uuid' => 'Restaurant UUID',
         ];
     }
 
-
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => SluggableBehavior::class,
+                'attribute' => 'title',
+                'ensureUnique' => true,
+                'uniqueValidator' => ['targetAttribute' => ['restaurant_uuid', 'slug']]
+            ],
+        ];
+    }
 
     /**
      * Scenarios for validation and massive assignment

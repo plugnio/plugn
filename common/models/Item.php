@@ -4,6 +4,7 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\AttributeBehavior;
+use yii\behaviors\SluggableBehavior;
 use yii\db\Expression;
 use yii\behaviors\TimestampBehavior;
 
@@ -96,6 +97,7 @@ class Item extends \yii\db\ActiveRecord
             [['item_name', 'item_name_ar', 'item_image', 'barcode', 'sku'], 'string', 'max' => 255],
             [['item_description', 'item_description_ar'], 'string', 'max' => 2500],
             [['item_uuid'], 'unique'],
+            ['slug', 'safe'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className (), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
@@ -183,6 +185,12 @@ class Item extends \yii\db\ActiveRecord
                 'createdAtAttribute' => 'item_created_at',
                 'updatedAtAttribute' => 'item_updated_at',
                 'value' => new Expression('NOW()'),
+            ],
+            [
+                'class' => SluggableBehavior::class,
+                'attribute' => 'item_name',
+                'ensureUnique' => true,
+                'uniqueValidator' => ['targetAttribute' => ['restaurant_uuid', 'slug']]
             ],
         ];
     }
