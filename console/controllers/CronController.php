@@ -753,5 +753,4 @@ class CronController extends \yii\console\Controller {
 
         $this->stdout($response . " \n", Console::FG_RED, Console::BOLD);
     }
-
 }
