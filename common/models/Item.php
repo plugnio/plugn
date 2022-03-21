@@ -80,7 +80,7 @@ class Item extends \yii\db\ActiveRecord
             [['item_name', 'item_name_ar', 'items_category', 'restaurant_uuid'], 'required'],
             [['sort_number', 'stock_qty', 'item_type'], 'integer', 'min' => 0],
             [['unit_sold'], 'integer', 'min' => 0],
-            [['item_price','compare_at_price'], 'number', 'min' => 0],
+            [['item_price', 'compare_at_price'], 'number', 'min' => 0],
             [['track_quantity', 'prep_time'], 'integer'],
             ['item_status', 'in', 'range' => [self::ITEM_STATUS_PUBLISH, self::ITEM_STATUS_UNPUBLISH]],
             [['stock_qty'], 'required', 'when' => function ($model) {
@@ -98,7 +98,7 @@ class Item extends \yii\db\ActiveRecord
             [['item_description', 'item_description_ar'], 'string', 'max' => 2500],
             [['item_uuid'], 'unique'],
             ['slug', 'safe'],
-            [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className (), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
+            [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
 
@@ -168,20 +168,20 @@ class Item extends \yii\db\ActiveRecord
     {
         return [
             [
-                'class' => AttributeBehavior::className (),
+                'class' => AttributeBehavior::className(),
                 'attributes' => [
                     \yii\db\ActiveRecord::EVENT_BEFORE_INSERT => 'item_uuid',
                 ],
                 'value' => function () {
                     if (!$this->item_uuid) {
-                        $this->item_uuid = 'item_' . Yii::$app->db->createCommand ('SELECT uuid()')->queryScalar ();
+                        $this->item_uuid = 'item_' . Yii::$app->db->createCommand('SELECT uuid()')->queryScalar();
                     }
 
                     return $this->item_uuid;
                 }
             ],
             [
-                'class' => TimestampBehavior::className (),
+                'class' => TimestampBehavior::className(),
                 'createdAtAttribute' => 'item_created_at',
                 'updatedAtAttribute' => 'item_updated_at',
                 'value' => new Expression('NOW()'),
@@ -220,13 +220,67 @@ class Item extends \yii\db\ActiveRecord
     {
         $fields = parent::fields();
 
-        return array_merge ($fields, [
+        return array_merge($fields, [
             'currency',
             'options',
             'itemImages',
             'extraOptions',
-            'itemVariants'
+            'itemVariants',
+            'itemSchema'
         ]);
+    }
+
+    public function getItemSchema()
+    {
+        $images = [];
+
+        foreach ($this->itemImages as $key => $itemImage) {
+            $images[] = "https://res.cloudinary.com/plugn/image/upload/q_auto:eco,w_1000/restaurants/" . $this->restaurant_uuid
+                . "/items/" . $itemImage->product_file_name;
+        }
+
+        $url = $this->restaurant->restaurant_domain. '/' . $this->slug;
+
+        $data = [
+            "@context" => "https://schema.org/",
+            "@type" => "Product",
+            "name" => $this->item_name,
+            "image" => $images,
+            "description" => "Sleeker than ACME's Classic Anvil, the Executive Anvil is perfect for the business traveler looking for something to drop from a height.",
+            "sku" => $this->sku,
+            /*"mpn" => "925872",
+            "brand": {
+                      "@type": "Brand",
+              "name": "ACME"
+            },
+            "review": {
+                      "@type": "Review",
+              "reviewRating": {
+                          "@type": "Rating",
+                "ratingValue": "4",
+                "bestRating": "5"
+              },
+              "author": {
+                          "@type": "Person",
+                "name": "Fred Benson"
+              }
+            },
+            "aggregateRating": {
+                      "@type": "AggregateRating",
+              "ratingValue": "4.4",
+              "reviewCount": "89"
+            },*/
+            "offers" => [
+                "@type" => "Offer",
+                "url" => $url,
+                "priceCurrency" => $this->restaurant->currency->code,
+                "price" => $this->item_price,
+                "itemCondition" => "https://schema.org/NewCondition",
+                "availability" => "https://schema.org/InStock"
+            ]
+        ];
+
+        return $data;
     }
 
     /**
@@ -236,12 +290,10 @@ class Item extends \yii\db\ActiveRecord
      */
     public function afterSave($insert, $changedAttributes)
     {
-        parent::afterSave ($insert, $changedAttributes);
+        parent::afterSave($insert, $changedAttributes);
 
-        if ($insert || isset($changedAttributes['item_name']))
-        {
-            if ($this->restaurant->sitemap_require_update == 0)
-            {
+        if ($insert || isset($changedAttributes['item_name'])) {
+            if ($this->restaurant->sitemap_require_update == 0) {
                 $this->restaurant->sitemap_require_update = 1;
 
                 Restaurant::updateAll([
@@ -299,13 +351,13 @@ class Item extends \yii\db\ActiveRecord
      */
     public function saveItemsCategory($items_categories)
     {
-        CategoryItem::deleteAll (['item_uuid' => $this->item_uuid]);
+        CategoryItem::deleteAll(['item_uuid' => $this->item_uuid]);
 
         foreach ($items_categories as $category_id) {
             $item_category = new CategoryItem();
             $item_category->category_id = $category_id;
             $item_category->item_uuid = $this->item_uuid;
-            $item_category->save ();
+            $item_category->save();
         }
     }
 
@@ -323,30 +375,30 @@ class Item extends \yii\db\ActiveRecord
         foreach ($imagesPath as $key => $path) {
 
 
-            $filename = Yii::$app->security->generateRandomString ();
+            $filename = Yii::$app->security->generateRandomString();
 
-            $itemName = str_replace (' ', '', $this->item_name);
+            $itemName = str_replace(' ', '', $this->item_name);
 
             try {
-                $result = Yii::$app->cloudinaryManager->upload (
+                $result = Yii::$app->cloudinaryManager->upload(
                     $path['file'],
                     [
                         'public_id' => "restaurants/" . $this->restaurant_uuid . "/items/" . $filename
                     ]
                 );
 
-                if ($result || count ($result) > 0) {
+                if ($result || count($result) > 0) {
                     $item_image_model = new ItemImage();
                     $item_image_model->item_uuid = $this->item_uuid;
-                    $item_image_model->product_file_name = basename ($result['url']);
-                    $item_image_model->save (false);
+                    $item_image_model->product_file_name = basename($result['url']);
+                    $item_image_model->save(false);
                 }
 
-                unlink ($path['file']);
+                unlink($path['file']);
 
             } catch (\Cloudinary\Error $err) {
-                Yii::error ("Error when uploading item's image to Cloudinry: " . json_encode ($err));
-                Yii::error ("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode ($imagesPath));
+                Yii::error("Error when uploading item's image to Cloudinry: " . json_encode($err));
+                Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($imagesPath));
 
             }
         }
@@ -354,18 +406,18 @@ class Item extends \yii\db\ActiveRecord
 
     public function beforeDelete()
     {
-        foreach ($this->getItemImages ()->all () as $itemImage) {
-            $itemImage->delete ();
+        foreach ($this->getItemImages()->all() as $itemImage) {
+            $itemImage->delete();
         }
 
-        return parent::beforeDelete ();
+        return parent::beforeDelete();
     }
 
     public function findItemImageByFileName($file_name)
     {
-        return ItemImage::find ()
-            ->andWhere (['item_uuid' => $this->item_uuid, 'product_file_name' => $file_name])
-            ->one ();
+        return ItemImage::find()
+            ->andWhere(['item_uuid' => $this->item_uuid, 'product_file_name' => $file_name])
+            ->one();
     }
 
     /**
@@ -375,7 +427,7 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getItemVariants($model = 'common\models\ItemVariant')
     {
-        return $this->hasMany ($model::className (), ['item_uuid' => 'item_uuid']);
+        return $this->hasMany($model::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -385,7 +437,7 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getCategoryItems($model = 'common\models\CategoryItem')
     {
-        return $this->hasMany ($model::className (), ['item_uuid' => 'item_uuid']);
+        return $this->hasMany($model::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -395,7 +447,7 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getCategory($modelClass = "\common\models\Category")
     {
-        return $this->hasMany ($modelClass::className (), ['category_id' => 'category_id'])->via ('categoryItems');
+        return $this->hasMany($modelClass::className(), ['category_id' => 'category_id'])->via('categoryItems');
     }
 
     /**
@@ -405,8 +457,8 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getCategories($modelClass = "\common\models\Category")
     {
-        return $this->hasMany ($modelClass::className (), ['category_id' => 'category_id'])
-            ->viaTable ('category_item', ['item_uuid' => 'item_uuid']);
+        return $this->hasMany($modelClass::className(), ['category_id' => 'category_id'])
+            ->viaTable('category_item', ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -416,7 +468,7 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getRestaurant($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasOne ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -426,7 +478,7 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne ($modelClass::className (), ['currency_id' => 'currency_id'])->via ('restaurant');
+        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])->via('restaurant');
     }
 
     /**
@@ -436,7 +488,7 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getOptions($modelClass = "\common\models\Option")
     {
-        return $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid']);
+        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -446,13 +498,13 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getItemImages($model = 'common\models\ItemImage')
     {
-        return $this->hasMany ($model::className (), ['item_uuid' => 'item_uuid']);
+        return $this->hasMany($model::className(), ['item_uuid' => 'item_uuid']);
     }
 
 
     public function getItemImage($model = 'common\models\ItemImage')
     {
-        return $this->hasOne ($model::className (), ['item_uuid' => 'item_uuid']);
+        return $this->hasOne($model::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -462,7 +514,7 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getExtraOptions($modelClass = "\common\models\ExtraOption")
     {
-        return $this->hasMany ($modelClass::className (), ['option_id' => 'option_id'])->via ('options');
+        return $this->hasMany($modelClass::className(), ['option_id' => 'option_id'])->via('options');
     }
 
     /**
@@ -471,9 +523,9 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getSoldUnits($modelClass = "\common\models\OrderItem")
     {
-        return $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
-            ->joinWith ('order')
-            ->andWhere ([
+        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid'])
+            ->joinWith('order')
+            ->andWhere([
                 'IN',
                 'order.order_status', [
                     Order::STATUS_ACCEPTED,
@@ -483,7 +535,7 @@ class Item extends \yii\db\ActiveRecord
                     Order::STATUS_COMPLETE
                 ]
             ])
-            ->sum ('qty');
+            ->sum('qty');
     }
 
     /**
@@ -491,9 +543,9 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getSoldUnitsInSpecifcDate($start_date = null, $end_date = null, $modelClass = "\common\models\OrderItem")
     {
-        $query = $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
-            ->joinWith ('order')
-            ->andWhere ([
+        $query = $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid'])
+            ->joinWith('order')
+            ->andWhere([
                 'IN',
                 'order.order_status',
                 [
@@ -505,11 +557,11 @@ class Item extends \yii\db\ActiveRecord
                 ]
             ]);
 
-        if($start_date && $end_date) {
-            $query->andWhere (['between', 'order.order_created_at', $start_date, $end_date]);
+        if ($start_date && $end_date) {
+            $query->andWhere(['between', 'order.order_created_at', $start_date, $end_date]);
         }
 
-        return $query->sum ('qty');
+        return $query->sum('qty');
     }
 
     /**
@@ -518,9 +570,9 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getTodaySoldUnits($modelClass = "\common\models\OrderItem")
     {
-        return $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
-            ->joinWith ('order')
-            ->andWhere ([
+        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid'])
+            ->joinWith('order')
+            ->andWhere([
                 'IN',
                 'order.order_status',
                 [
@@ -531,8 +583,8 @@ class Item extends \yii\db\ActiveRecord
                     Order::STATUS_COMPLETE
                 ]
             ])
-            ->andWhere (['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
-            ->sum ('qty');
+            ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
+            ->sum('qty');
     }
 
     /**
@@ -541,9 +593,9 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getThisWeekSoldUnits($modelClass = "\common\models\OrderItem")
     {
-        return $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
-            ->joinWith ('order')
-            ->andWhere ([
+        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid'])
+            ->joinWith('order')
+            ->andWhere([
                 'IN',
                 'order.order_status',
                 [
@@ -554,8 +606,8 @@ class Item extends \yii\db\ActiveRecord
                     Order::STATUS_COMPLETE
                 ]
             ])
-            ->andWhere (['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
-            ->sum ('qty');
+            ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
+            ->sum('qty');
     }
 
     /**
@@ -564,9 +616,9 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getCurrentMonthSoldUnits($modelClass = "\common\models\OrderItem")
     {
-        return $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
-            ->joinWith ('order')
-            ->andWhere ([
+        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid'])
+            ->joinWith('order')
+            ->andWhere([
                 'IN',
                 'order.order_status',
                 [
@@ -577,9 +629,9 @@ class Item extends \yii\db\ActiveRecord
                     Order::STATUS_COMPLETE
                 ]
             ])
-            ->andWhere ('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-            ->andWhere ('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
-            ->sum ('qty');
+            ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
+            ->sum('qty');
     }
 
     /**
@@ -588,9 +640,9 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getLastMonthSoldUnits($modelClass = "\common\models\OrderItem")
     {
-        return $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
-            ->joinWith ('order')
-            ->andWhere ([
+        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid'])
+            ->joinWith('order')
+            ->andWhere([
                 'IN',
                 'order.order_status',
                 [
@@ -601,9 +653,9 @@ class Item extends \yii\db\ActiveRecord
                     Order::STATUS_COMPLETE
                 ]
             ])
-            ->andWhere ('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-            ->andWhere ('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
-            ->sum ('qty');
+            ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->sum('qty');
     }
 
     /**
@@ -612,9 +664,9 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getLastThreeMonthSoldUnits($modelClass = "\common\models\OrderItem")
     {
-        return $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
-            ->joinWith ('order')
-            ->andWhere ([
+        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid'])
+            ->joinWith('order')
+            ->andWhere([
                 'IN',
                 'order.order_status',
                 [
@@ -625,9 +677,9 @@ class Item extends \yii\db\ActiveRecord
                     Order::STATUS_COMPLETE
                 ]
             ])
-            ->andWhere ('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
-            ->andWhere ('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
-            ->sum ('qty');
+            ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
+            ->sum('qty');
     }
 
     /**
@@ -637,7 +689,7 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getOrderItems($modelClass = "\common\models\OrderItem")
     {
-        return $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid']);
+        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -647,10 +699,11 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getOrder($modelClass = "\common\models\Order")
     {
-        return $this->hasMany ($modelClass::className (), ['order_uuid' => 'order_uuid'])->via ('orderItems');
+        return $this->hasMany($modelClass::className(), ['order_uuid' => 'order_uuid'])->via('orderItems');
     }
 
-    public static function find() {
+    public static function find()
+    {
         return new query\ItemQuery(get_called_class());
     }
 }
