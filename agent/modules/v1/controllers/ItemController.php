@@ -134,6 +134,8 @@ class ItemController extends Controller
         $model->item_name_ar = Yii::$app->request->getBodyParam ("item_name_ar");
         $model->item_description = Yii::$app->request->getBodyParam ("item_description");
         $model->item_description_ar = Yii::$app->request->getBodyParam ("item_description_ar");
+        $model->item_meta_description = Yii::$app->request->getBodyParam("item_meta_description");
+        $model->item_meta_description_ar = Yii::$app->request->getBodyParam("item_meta_description_ar");
         $model->sort_number = Yii::$app->request->getBodyParam ("sort_number");
         $model->item_type = Yii::$app->request->getBodyParam ("item_type"); 
         $model->prep_time = Yii::$app->request->getBodyParam ("prep_time");
@@ -264,6 +266,8 @@ class ItemController extends Controller
         $model->item_name_ar = Yii::$app->request->getBodyParam ("item_name_ar");
         $model->item_description = Yii::$app->request->getBodyParam ("item_description");
         $model->item_description_ar = Yii::$app->request->getBodyParam ("item_description_ar");
+        $model->item_meta_description = Yii::$app->request->getBodyParam("item_meta_description");
+        $model->item_meta_description_ar = Yii::$app->request->getBodyParam("item_meta_description_ar");
         $model->sort_number = Yii::$app->request->getBodyParam ("sort_number");
         $model->item_type = Yii::$app->request->getBodyParam ("item_type"); 
         $model->prep_time = Yii::$app->request->getBodyParam ("prep_time");
