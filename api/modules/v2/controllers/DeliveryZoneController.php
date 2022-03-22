@@ -104,7 +104,7 @@ class DeliveryZoneController extends Controller {
 
 
 
-            return $shipping_countries;
+            return array_values($shipping_countries);
 
 
         } else {
@@ -125,7 +125,7 @@ class DeliveryZoneController extends Controller {
             $pickupLocations = $store_model->getPickupBusinessLocations()->asArray()->all();
 
             foreach ($pickupLocations as $key => $pickupLocation) {
-              
+
               unset($pickupLocations[$key]['mashkor_branch_id']);
               unset($pickupLocations[$key]['armada_api_key']);
             }
