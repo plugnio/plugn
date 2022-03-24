@@ -13,7 +13,7 @@ class m220311_103631_voucher extends Migration
      */
     public function safeUp()
     {
-        //$this->addColumn('order', 'voucher_code', $this->string(100)->after('voucher_id')->null());
+        $this->addColumn('order', 'voucher_code', $this->string(100)->after('voucher_id')->null());
 
         $query = Order::find()
             ->joinWith('voucher');
