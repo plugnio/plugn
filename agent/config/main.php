@@ -154,6 +154,16 @@ return [
                         'OPTIONS item-list' => 'options',
                     ]
                 ],
+                [ // SitemapController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/sitemap',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'index',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
+                    ]
+                ],
                 [// StaffController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/staff',
