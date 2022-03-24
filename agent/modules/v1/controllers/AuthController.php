@@ -147,6 +147,8 @@ class AuthController extends Controller {
         $store->setScenario(Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
         $store->owner_number = Yii::$app->request->getBodyParam ('owner_number');
         $store->owner_phone_country_code= Yii::$app->request->getBodyParam ('owner_phone_country_code');
+        $store->meta_description = Yii::$app->request->getBodyParam("meta_description");
+        $store->meta_description_ar = Yii::$app->request->getBodyParam("meta_description_ar");
 
         $store->name = Yii::$app->request->getBodyParam ('restaurant_name');
         $store->business_type = Yii::$app->request->getBodyParam ('account_type');

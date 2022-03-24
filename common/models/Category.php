@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\SluggableBehavior;
 
 /**
  * This is the model class for table "category".
@@ -13,6 +14,8 @@ use Yii;
  * @property string|null $title_ar
  * @property string|null $subtitle
  * @property string|null $subtitle_ar
+ * @property string|null $category_meta_description
+ * @property string|null $category_meta_description_ar
  * @property string $category_image
  * @property int|null $sort_number
  *
@@ -46,7 +49,9 @@ class Category extends \yii\db\ActiveRecord
             [['image'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['sort_number'], 'integer', 'min' => 0],
             [['restaurant_uuid'], 'string', 'max' => 60],
+            ['slug', 'safe'],
             [['title', 'title_ar', 'subtitle', 'subtitle_ar'], 'string', 'max' => 255],
+            [['category_meta_description', 'category_meta_description_ar'], 'string'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className (), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
@@ -63,12 +68,25 @@ class Category extends \yii\db\ActiveRecord
             'subtitle' => 'Subtitle',
             'image' => 'Category Image',
             'subtitle_ar' => 'Subtitle in Arabic',
+            'category_meta_description' => 'Meta tag description',
+            'category_meta_description_ar' => 'Meta tag description in Arabic',
             'sort_number' => 'Sort Number',
+            'slug' => 'Slug',
             'restaurant_uuid' => 'Restaurant UUID',
         ];
     }
 
-
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => SluggableBehavior::class,
+                'attribute' => 'title',
+                'ensureUnique' => true,
+                'uniqueValidator' => ['targetAttribute' => ['restaurant_uuid', 'slug']]
+            ],
+        ];
+    }
 
     /**
      * Scenarios for validation and massive assignment

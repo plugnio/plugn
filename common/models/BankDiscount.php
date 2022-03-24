@@ -4,6 +4,7 @@ namespace common\models;
 
 use Yii;
 use common\models\CustomerBankDiscount;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "bank_discount".
@@ -98,15 +99,23 @@ class BankDiscount extends \yii\db\ActiveRecord
         return "Couldnt find a status";
     }
 
-
+    /**
+     * @return array|false|int[]|string[]
+     */
     public function extraFields()
     {
-        return [
+        $fields = parent::fields();
+
+        $fields['voucherChartData'] = function() {
+            return $this->voucherChartData();
+        };
+
+        return array_merge($fields, [
           'restaurant',
           'currency',
           'bank',
           'customerBankDiscounts'
-        ];
+        ]);
     }
 
     public function isValid($phone_number) {
@@ -148,6 +157,53 @@ class BankDiscount extends \yii\db\ActiveRecord
         }
 
         return $isValid ? $this : false;
+    }
+
+    /**
+     * return voucher usage by months
+     * @return array
+     */
+    public function voucherChartData() {
+
+        $voucher_chart_data = [];
+
+        /*$date_start = $this->valid_from;
+
+        if(strtotime($this->valid_until) < time()) {
+            $date_end = $this->valid_until;
+        } else {
+            $date_end = date('Y') . '-' . date('m') . '-1';
+        }
+
+        $months = $this->getMonthsBetween($date_start, $date_end);
+
+        for ($i = 0; $i < $months; $i++) {
+
+            $month = date('m', strtotime('-'.($months - $i).' month'));
+
+            $voucher_chart_data[$month] = array(
+                'month'   => date('F', strtotime('-'.($months - $i).' month')),
+                'total' => 0
+            );
+        }*/
+
+        $rows = $this->getOrders()
+            ->activeOrders()
+            ->select ('order_created_at, COUNT(*) as total')
+            //->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) < DATE("'.$date_end.'")')
+            ->groupBy (new Expression('MONTH(order_created_at), YEAR(order_created_at)'))
+            ->orderBy('order_created_at')
+            ->asArray()
+            ->all();
+
+        foreach ($rows as $result) {
+            $voucher_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
+                'month' => Yii::t('app', date ('M', strtotime ($result['order_created_at']))),
+                'total' => (int) $result['total']
+            );
+        }
+
+        return array_values($voucher_chart_data);
     }
 
     /**

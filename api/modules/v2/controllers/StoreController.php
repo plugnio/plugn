@@ -73,9 +73,8 @@ class StoreController extends Controller
      */
     public function actionGetOpeningHours()
     {
-
-
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
+
         $delivery_zone_id = Yii::$app->request->get("delivery_zone_id");
 
         if ($store_model = Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->one()) {
@@ -145,12 +144,10 @@ class StoreController extends Controller
 
             $schedule_time = [];
 
-
             if ($deliveryZone) {
 
                 $timeUnit = $deliveryZone->time_unit == 'hrs' ? 'hour' : $deliveryZone->time_unit;
                 $startDate = strtotime('+ ' . $deliveryZone->delivery_time . ' ' . $timeUnit);
-
 
                 if ($deliveryZone->time_unit == DeliveryZone::TIME_UNIT_MIN)
                     $deliveryTime = intval($deliveryZone->delivery_time);

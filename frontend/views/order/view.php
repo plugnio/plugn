@@ -449,12 +449,27 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
             [
                 'label' => 'SKU',
                 'format' => 'raw',
-                'value' => 'item.sku',
+                'value' => function ($data) {
+
+                    if($data->variant) {
+                       return $data->variant->sku;
+                    }else if($data->item) {
+                        return $data->item->sku;
+                    }
+                },
             ],
             [
                 'label' => 'Barcode',
                 'format' => 'raw',
-                'value' => 'item.barcode',
+                //'value' => 'item.barcode',
+                'value' => function ($data) {
+
+                    if($data->variant) {
+                        return $data->variant->barcode;
+                    }else if($data->item) {
+                        return $data->item->barcode;
+                    }
+                },
             ],
             // 'customer_instruction',
             [

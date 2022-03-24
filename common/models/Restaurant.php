@@ -18,6 +18,8 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property int $currency_id
  * @property string $name
  * @property string|null $name_ar
+ * @property string|null $meta_description
+ * @property string|null $meta_description_ar
  * @property string|null $tagline
  * @property string|null $tagline_ar
  * @property string|null $restaurant_domain
@@ -206,6 +208,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT
             ],
 
+            [['meta_description', 'meta_description_ar'], 'string'],
 
             [['commercial_license_file', 'authorized_signature_file'], 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function($model) {
                 return $model->business_type == 'corp';
@@ -407,6 +410,8 @@ class Restaurant extends \yii\db\ActiveRecord
             'name_ar' => 'Store name / Business name in Arabic',
             'tagline' => 'Tagline in English',
             'tagline_ar' => 'Tagline in Arabic',
+            'meta_description' => 'Meta Tag Description',
+            'meta_description_ar' => 'Meta Tag Description in Arabic',
             'restaurant_domain' => 'Store Url',
             'app_id' => 'App id',
             'restaurant_payments_method' => 'Payment method',
@@ -1975,7 +1980,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         foreach ($rows as $result) {
             $customer_data[date ('m', strtotime ($result['customer_created_at']))] = array(
-                'month' => date ('F', strtotime ($result['customer_created_at'])),
+                'month' => Yii::t('app', date ('F', strtotime ($result['customer_created_at']))),
                 'total' => (int) $result['total']
             );
         }
@@ -2019,7 +2024,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         foreach ($rows as $result) {
             $revenue_generated_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
-                'month' => date ('F', strtotime ($result['order_created_at'])),
+                'month' => Yii::t('app', date ('F', strtotime ($result['order_created_at']))),
                 'total' => (float) $result['total']
             );
         }
@@ -2063,7 +2068,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         foreach ($rows as $result) {
             $orders_received_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
-                'month' => date ('F', strtotime ($result['order_created_at'])),
+                'month' => Yii::t('app', date ('F', strtotime ($result['order_created_at']))),
                 'total' => (int) $result['total']
             );
         }
@@ -2106,7 +2111,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         foreach ($rows as $result) {
             $sold_item_chart_data[date ('m', strtotime ($result['order_item_created_at']))] = array(
-                'month' => date ('F', strtotime ($result['order_item_created_at'])),
+                'month' => Yii::t('app', date ('F', strtotime ($result['order_item_created_at']))),
                 'total' => (int) $result['total']
             );
         }

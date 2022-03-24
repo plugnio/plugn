@@ -2,6 +2,8 @@
 
 namespace agent\modules\v1\controllers;
 
+use common\models\ItemVariant;
+use common\models\ItemVariantOption;
 use Yii;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
@@ -132,7 +134,10 @@ class ItemController extends Controller
         $model->item_name_ar = Yii::$app->request->getBodyParam ("item_name_ar");
         $model->item_description = Yii::$app->request->getBodyParam ("item_description");
         $model->item_description_ar = Yii::$app->request->getBodyParam ("item_description_ar");
+        $model->item_meta_description = Yii::$app->request->getBodyParam("item_meta_description");
+        $model->item_meta_description_ar = Yii::$app->request->getBodyParam("item_meta_description_ar");
         $model->sort_number = Yii::$app->request->getBodyParam ("sort_number");
+        $model->item_type = Yii::$app->request->getBodyParam ("item_type"); 
         $model->prep_time = Yii::$app->request->getBodyParam ("prep_time");
         $model->prep_time_unit = Yii::$app->request->getBodyParam ("prep_time_unit");
         $model->item_price = Yii::$app->request->getBodyParam ("item_price");
@@ -143,6 +148,7 @@ class ItemController extends Controller
         $model->stock_qty = Yii::$app->request->getBodyParam ("stock_qty");
         $model->items_category = Yii::$app->request->getBodyParam ("itemCategories");
         $model->item_images = Yii::$app->request->getBodyParam ("itemImages");
+
         $itemOptions = Yii::$app->request->getBodyParam('options');
         $transaction = Yii::$app->db->beginTransaction();
 
@@ -200,14 +206,48 @@ class ItemController extends Controller
             $arrCategoryIds = ArrayHelper::getColumn ($itemCategories, 'category_id');
             $model->saveItemsCategory($arrCategoryIds);
 
+            //add variants
+
+            $variants = Yii::$app->request->getBodyParam ("itemVariants");
+
+            if(!$variants)
+                $variants = [];
+
+            foreach($variants as $variant)
+            {
+                $itemVariant = new ItemVariant();
+                $itemVariant->item_uuid = $model->item_uuid;
+
+                $itemVariant->stock_qty = $variant['stock_qty'];
+                //$itemVariant->track_quantity = $variant['track_quantity'];
+                $itemVariant->sku = $variant['sku'];
+                $itemVariant->barcode = $variant['barcode'];
+                $itemVariant->price = $variant['price'];
+                $itemVariant->compare_at_price = $variant['compare_at_price'];
+                $itemVariant->weight = $variant['weight'];
+
+                if(!$itemVariant->save())
+                {
+                    $transaction->rollBack();
+
+                    return [
+                        "operation" => "error",
+                        "message" => $itemVariant->errors
+                    ];
+                }
+            }
+
             $transaction->commit();
 
             return [
                 "operation" => "success",
                 "message" => Yii::t('agent', "Item created successfully"),
             ];
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e)
+        {
             $transaction->rollBack();
+
             return [
                 "operation" => "error",
                 "message" => $e->getMessage()
@@ -226,7 +266,10 @@ class ItemController extends Controller
         $model->item_name_ar = Yii::$app->request->getBodyParam ("item_name_ar");
         $model->item_description = Yii::$app->request->getBodyParam ("item_description");
         $model->item_description_ar = Yii::$app->request->getBodyParam ("item_description_ar");
+        $model->item_meta_description = Yii::$app->request->getBodyParam("item_meta_description");
+        $model->item_meta_description_ar = Yii::$app->request->getBodyParam("item_meta_description_ar");
         $model->sort_number = Yii::$app->request->getBodyParam ("sort_number");
+        $model->item_type = Yii::$app->request->getBodyParam ("item_type"); 
         $model->prep_time = Yii::$app->request->getBodyParam ("prep_time");
         $model->prep_time_unit = Yii::$app->request->getBodyParam ("prep_time_unit");
         $model->item_price = Yii::$app->request->getBodyParam ("item_price");
@@ -249,17 +292,28 @@ class ItemController extends Controller
                     "message" => $model->errors
                 ];
             }
-            Yii::$app->db->createCommand("delete from `option` where item_uuid = '$id'")->execute();
-            Yii::$app->db->createCommand("delete from `extra_option` where option_id in (SELECT option_id FROM `option` where item_uuid = '$id')")->execute();
+
+            $arrOptionIds = [];
 
             if ($itemOptions && count($itemOptions) > 0) {
+
                 foreach ($itemOptions as $option) {
-                    $optionModel = new Option();
+
+                    if(empty($option['option_id'])) {
+                        $optionModel = new Option();
+                    } else {
+                        $optionModel = Option::findOne([
+                            'option_id' => $option['option_id'],
+                            'item_uuid' => $id
+                        ]);
+                    }
+
                     $optionModel->item_uuid = $model->item_uuid;
                     $optionModel->option_name = $option['option_name'];
                     $optionModel->option_name_ar = $option['option_name_ar'];
                     $optionModel->max_qty = $option['max_qty'];
                     $optionModel->min_qty = $option['min_qty'];
+
                     if (!$optionModel->save()) {
                         $transaction->rollBack();
                         return [
@@ -268,14 +322,29 @@ class ItemController extends Controller
                         ];
                     }
 
+                    $arrOptionIds[] =  $optionModel->option_id;
+
+                    $arrExtraOptionIds = [];
+
                     if ($option['extraOptions'] && count($option['extraOptions']) > 0) {
+
                         foreach ($option['extraOptions'] as $extraOption) {
-                            $extraOptionModel = new ExtraOption();
+
+                            if(empty($extraOption['extra_option_id'])) {
+                                $extraOptionModel = new ExtraOption();
+                            } else {
+                                $extraOptionModel = ExtraOption::findOne([
+                                    'option_id' => $optionModel->option_id,
+                                    'extra_option_id' => $extraOption['extra_option_id']
+                                ]);
+                            }
+
                             $extraOptionModel->option_id = $optionModel->option_id;
                             $extraOptionModel->extra_option_name = $extraOption['extra_option_name'];
                             $extraOptionModel->extra_option_name_ar = $extraOption['extra_option_name_ar'];
                             $extraOptionModel->extra_option_price = $extraOption['extra_option_price'];
                             $extraOptionModel->stock_qty = (isset($extraOption['stock_qty']))?$extraOption['stock_qty'] : null;
+
                             if (!$extraOptionModel->save()) {
                                 $transaction->rollBack();
                                 return [
@@ -283,10 +352,26 @@ class ItemController extends Controller
                                     "message" => $extraOptionModel->errors
                                 ];
                             }
+
+                            $arrExtraOptionIds[] = $extraOptionModel->extra_option_id;
                         }
                     }
+
+                    ExtraOption::deleteAll([
+                        'AND',
+                        ['NOT IN', 'extra_option_id', $arrExtraOptionIds],
+                        ['option_id' => $optionModel->option_id]
+                    ]);
                 }
             }
+
+            //remove other option
+
+            Option::deleteAll([
+                'AND',
+                ['NOT IN', 'option_id', $arrOptionIds],
+                ['item_uuid' => $model->item_uuid]
+            ]);
 
             // save images
             $itemImages = Yii::$app->request->getBodyParam ("itemImages");
@@ -296,6 +381,117 @@ class ItemController extends Controller
             $itemCategories = Yii::$app->request->getBodyParam ("itemCategories");
             $arrCategoryIds = ArrayHelper::getColumn ($itemCategories, 'category_id');
             $model->saveItemsCategory($arrCategoryIds);
+
+            //add variants
+
+            $variants = Yii::$app->request->getBodyParam ("itemVariants");
+
+            if(!$variants)
+                $variants = [];
+
+            $arrItemVariantIds = [];
+            $arrItemVariantOptionIds = [];
+
+            foreach($variants as $variant)
+            {
+                if(empty($variant['item_variant_uuid'])) {
+                    $itemVariant = new ItemVariant();
+                }
+                else
+                {
+                    $itemVariant = $model->getItemVariants()
+                        ->andWhere(['item_variant_uuid' => $variant['item_variant_uuid']])
+                        ->one();
+                }
+
+                $itemVariant->item_uuid = $model->item_uuid;
+
+                $itemVariant->stock_qty = $variant['stock_qty'];
+                //$itemVariant->track_quantity = $variant['track_quantity'];
+                $itemVariant->sku = $variant['sku'];
+                $itemVariant->barcode = $variant['barcode'];
+                $itemVariant->price = $variant['price'];
+                $itemVariant->compare_at_price = $variant['compare_at_price'];
+                $itemVariant->weight = $variant['weight'];
+
+                if(!$itemVariant->save())
+                {
+                    $transaction->rollBack();
+
+                    return [
+                        "operation" => "error",
+                        "message" => $itemVariant->errors
+                    ];
+                }
+
+                //add variant options
+
+                foreach($variant['itemVariantOptions'] as $value) {
+
+                    if(empty($value['option_id'])) {
+                        $option_id = Option::findOne([
+                            'item_uuid' => $itemVariant->item_uuid,
+                            'option_name' => $value['option']['option_name']
+                        ])->option_id;
+                    }
+                    else
+                    {
+                        $option_id = $value['option_id'];
+                    }
+
+                    if(empty($value['extra_option_id'])) {
+                        $extra_option_id = ExtraOption::findOne([
+                            'option_id' => $option_id,
+                            'extra_option_name' => $value['extraOption']['extra_option_name']
+                        ])->extra_option_id;
+                    }
+                    else
+                    {
+                        $extra_option_id = $value['extra_option_id'];
+                    }
+
+                    if(empty($value['item_variant_option_uuid'])) {
+                        $itemVariantOption = new ItemVariantOption();
+                    } else {
+                        $itemVariantOption = ItemVariantOption::findOne($value['item_variant_option_uuid']);
+                    }
+
+                    $itemVariantOption->item_variant_uuid  = $itemVariant->item_variant_uuid;
+                    $itemVariantOption->item_uuid = $itemVariant->item_uuid;
+                    $itemVariantOption->option_id = $option_id;
+                    $itemVariantOption->extra_option_id = $extra_option_id;
+
+                    if(!$itemVariantOption->save())
+                    {
+                        $transaction->rollBack();
+
+                        return [
+                            "operation" => "error",
+                            "message" => $itemVariantOption->errors
+                        ];
+                    }
+
+                    $arrItemVariantOptionIds[] = $itemVariantOption->item_variant_option_uuid;
+                }
+
+                $arrItemVariantIds[] = $itemVariant->item_variant_uuid;
+            }
+
+            //remove other variants
+
+            ItemVariant::deleteAll([
+                'AND',
+                ['NOT IN', 'item_variant_uuid', $arrItemVariantIds],
+                ['item_uuid' => $id]
+            ]);
+
+            //remove other variantOptions
+
+            ItemVariantOption::deleteAll([
+                'AND',
+                ['NOT IN', 'item_variant_option_uuid', $arrItemVariantOptionIds],
+                ['item_uuid' => $id]
+            ]);
 
             $transaction->commit();
 
@@ -317,8 +513,8 @@ class ItemController extends Controller
      * @param type $itemUuid
      * @return boolean
      */
-    public function actionUpdateStockQty(){
-
+    public function actionUpdateStockQty()
+    {
         $id = Yii::$app->request->getBodyParam('item_uuid');
 
         $stock_qty = Yii::$app->request->getBodyParam('stock_qty');
@@ -327,7 +523,8 @@ class ItemController extends Controller
 
         $model->stock_qty = (int) $stock_qty;
 
-        if (!$model->save(false)){
+        if (!$model->save(false))
+        {
             return [
                 "operation" => "error",
                 "message" => $model->errors

@@ -56,17 +56,22 @@ class ItemController extends Controller {
     /**
      * Return category's products
      */
-    public function actionCategoryProducts($category_id) {
+    public function actionCategoryProducts($category_id = null, $slug = null) {
 
       $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
 
       if($restaurant_uuid){
 
+          $filter = $category_id? [
+              'category.restaurant_uuid' => $restaurant_uuid,
+              'category.category_id' => $category_id
+          ]: [
+              'category.restaurant_uuid' => $restaurant_uuid,
+              'category.slug' => $slug
+          ];
+
         $category = Category::find()
-                    ->andWhere([
-                        'category.restaurant_uuid' => $restaurant_uuid,
-                        'category.category_id' => $category_id
-                    ])
+                    ->andWhere($filter)
                     ->joinWith(['items', 'items.options', 'items.options.extraOptions','items.itemImages'])
                     ->asArray()
                     ->one();
@@ -186,34 +191,43 @@ class ItemController extends Controller {
     /**
      * Return item's data
      */
-    public function actionItemData() {
+    public function actionItemData()
+    {
         $item_uuid = Yii::$app->request->get("item_uuid");
-        $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
 
-        $item_model = Item::find()
-                ->andWhere([
-                    'item_uuid' => $item_uuid,
-                    'restaurant_uuid' => $restaurant_uuid
-                ])
-                ->with('options', 'options.extraOptions','itemImages')
-                ->asArray()
-                ->one();
-
-
-        if ($item_model) {
-
-          unset($item_model['unit_sold']);
-
-            return [
-                'operation' => 'success',
-                'itemData' => $item_model
-            ];
-        } else {
-            return [
-                'operation' => 'error',
-                'message' => 'Item Uuid is invalid'
-            ];
-        }
+        return $this->findModel($item_uuid);
     }
 
+    /**
+     * Return item's data
+     */
+    public function actionView($slug)
+    {
+        return $this->findBySlug($slug);
+    }
+
+    /**
+     * Finds the Item model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Item the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = Item::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    protected function findBySlug($slug)
+    {
+        if (($model = Item::findOne(['slug' => $slug])) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
 }

@@ -91,6 +91,14 @@ class ExtraOption extends \yii\db\ActiveRecord {
      */
     public function increaseStockQty($qty)
     {
+        if($this->option && $this->option->item && (
+                !$this->option->item->track_quantity ||
+                $this->option->item->item_type == Item::TYPE_CONFIGURABLE
+            )
+        ) {
+            return true;
+        }
+
         if($this->stock_qty !== null && $this->stock_qty >= 0 ){
           $this->stock_qty += $qty;
 
@@ -106,6 +114,14 @@ class ExtraOption extends \yii\db\ActiveRecord {
      */
     public function decreaseStockQty($qty)
     {
+        if($this->option && $this->option->item && (
+            !$this->option->item->track_quantity ||
+            $this->option->item->item_type == Item::TYPE_CONFIGURABLE
+            )
+        ) {
+            return true;
+        }
+
         if($this->stock_qty !== null && $this->stock_qty > 0 ){
             $this->stock_qty -= $qty;
 

@@ -41,6 +41,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
             [['order_item_id', 'extra_option_id', 'qty'], 'required'],
             [['qty'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_ITEM_EXTRA_OPTION_BY_ADMIN],
             [['qty'], 'default', 'value' => 1 , 'on' =>  self::SCENARIO_CREATE_ORDER_ITEM_EXTRA_OPTION_BY_ADMIN],
+            ['qty', 'validateQty'],
             [['order_item_id', 'extra_option_id','qty'], 'integer', 'min' => 0],
             [['extra_option_id'], 'checkIfExtraOptionBelongToItem'],
             [['extra_option_price'], 'number', 'min' => 0],
@@ -48,6 +49,20 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
             [['extra_option_id'], 'exist', 'skipOnError' => false, 'targetClass' => ExtraOption::className(), 'targetAttribute' => ['extra_option_id' => 'extra_option_id']],
             [['order_item_id'], 'exist', 'skipOnError' => true, 'targetClass' => OrderItem::className(), 'targetAttribute' => ['order_item_id' => 'order_item_id']],
         ];
+    }
+
+    public function validateQty($attribute)
+    {
+        if(
+            !$this->orderItem->item || //if custom items or deleted (have nothing to compare to)
+            !$this->orderItem->item->track_quantity || //if tracking disabled
+            $this->orderItem->item->item_type == Item::TYPE_CONFIGURABLE //not tracking option stock for configurable items
+        ) {
+            return true;
+        }
+
+        if($this->qty < $this->extraOption->stock_qty)
+            $this->addError($attribute, 'Out of stock');
     }
 
     /**
@@ -148,7 +163,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
 
         $extra_option_model = ExtraOption::findOne($this->extra_option_id);
 
-        if ($extra_option_model)
+        if ($extra_option_model && $this->option->item->item_type != Item::TYPE_CONFIGURABLE)
             $extra_option_model->increaseStockQty($this->qty); //Update stock qty
 
         return parent::beforeDelete();

@@ -80,14 +80,18 @@ return [
                     'controller' => 'v2/item',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET view/<slug>' => 'view',
                         'GET detail' => 'item-data',
                         'GET items' => 'items',
                         'GET' => 'restaurant-menu',
+                        'GET category/<slug>' => 'category-products',
                         'GET <category_id>' => 'category-products',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS items' => 'options',
                         'OPTIONS detail' => 'options',
+                        'OPTIONS view/<slug>' => 'options',
+                        'OPTIONS category/<slug>' => 'options',
                         'OPTIONS <category_id>' => 'options',
                     ]
                 ],
