@@ -101,11 +101,15 @@ class CurrencyController extends Controller {
         $keyword = Yii::$app->request->get('keyword');
         $page = Yii::$app->request->get('page');
 
-        $query =  Currency::find();
+        $query =  Currency::find()
+            ->andWhere(['status' => Currency::STATUS_ACTIVE]);
 
         if ($keyword) {
-            $query->andWhere(['like', 'title', $keyword]);
-            $query->orWhere(['like', 'code', $keyword]);
+            $query->andWhere([
+                'OR',
+                ['like', 'title', $keyword],
+                ['like', 'code', $keyword]
+            ]);
         }
 
         if($page == -1) {

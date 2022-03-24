@@ -17,7 +17,7 @@ class CurrencySearch extends Currency
     public function rules()
     {
         return [
-            [['currency_id'], 'integer'],
+            [['currency_id', 'status'], 'integer'],
             [['title', 'code'], 'safe'],
         ];
     }
@@ -59,6 +59,10 @@ class CurrencySearch extends Currency
         // grid filtering conditions
         $query->andFilterWhere([
             'currency_id' => $this->currency_id,
+        ]);
+
+        $query->andFilterWhere([
+            'status' => $this->status,
         ]);
 
         $query->andFilterWhere(['like', 'title', $this->title])

@@ -68,7 +68,7 @@ class OrderController extends Controller
             ])->one();
 
         $searchModel = new OrderSearch();
-        
+
         $count = $searchModel->search([], $restaurant->restaurant_uuid, $agentAssignment)->getCount();
 
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant->restaurant_uuid, $agentAssignment);
@@ -392,7 +392,7 @@ class OrderController extends Controller
             ])->one();
 
         $searchModel = new OrderSearch();
-        
+
         $count = $searchModel->searchDraftOrders([], $restaurant->restaurant_uuid, $agentAssignment)->getCount();
 
         $dataProvider = $searchModel->searchDraftOrders(Yii::$app->request->queryParams, $restaurant->restaurant_uuid, $agentAssignment);
@@ -417,7 +417,7 @@ class OrderController extends Controller
             ->where(['restaurant_uuid' => $restaurant->restaurant_uuid, 'agent_id' => Yii::$app->user->identity->agent_id])->one();
 
         $searchModel = new OrderSearch();
-        
+
         $count = $searchModel->searchAbandonedCheckoutOrders([], $restaurant->restaurant_uuid, $agentAssignment)->getCount();
 
         $dataProvider = $searchModel->searchAbandonedCheckoutOrders(Yii::$app->request->queryParams, $restaurant->restaurant_uuid, $agentAssignment);
@@ -429,48 +429,6 @@ class OrderController extends Controller
             'restaurant' => $restaurant
         ]);
     }
-
-
-    /**
-     * Request fulfillment
-     * @param type $order_uuid
-     * @param type $storeUuid
-     * @param type $customerId
-     */
-    public function actionRequestFulfillment($order_uuid, $storeUuid)
-    {
-
-        $order = $this->findModel($order_uuid, $storeUuid);
-
-        $requestFulfillmentApiResponse = Yii::$app->diggipacksWarehouseComponent->createOrder($order, $order->orderItems);
-
-
-        if ($requestFulfillmentApiResponse->isOk) {
-
-            $order->diggipack_awb_no = $requestFulfillmentApiResponse->data['awb_no'];
-
-            $order->save(false);
-            Yii::$app->session->setFlash('successResponse', "Fulfillment requested");
-
-        } else {
-
-            if ($requestFulfillmentApiResponse->content) {
-                Yii::$app->session->setFlash('errorResponse', json_encode($requestFulfillmentApiResponse->content));
-                Yii::error('Error while requesting fulfillment  [' . $order->restaurant->name . '] ' . json_encode($requestFulfillmentApiResponse->content));
-
-            } else {
-
-                Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
-                Yii::error('Error while requesting fulfillment  [' . $order->restaurant->name . '] ' . json_encode($requestFulfillmentApiResponse));
-
-            }
-
-            return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
-        }
-
-        return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
-    }
-
 
     /**
      * Request a driver from Mashkor

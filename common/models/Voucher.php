@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 
@@ -265,7 +266,7 @@ class Voucher extends \yii\db\ActiveRecord {
 
         foreach ($rows as $result) {
             $voucher_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
-                'month' => date ('M', strtotime ($result['order_created_at'])),
+                'month' => Yii::t('app', date ('M', strtotime ($result['order_created_at']))),
                 'total' => (int) $result['total']
             );
         }

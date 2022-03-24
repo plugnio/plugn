@@ -1980,7 +1980,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         foreach ($rows as $result) {
             $customer_data[date ('m', strtotime ($result['customer_created_at']))] = array(
-                'month' => date ('F', strtotime ($result['customer_created_at'])),
+                'month' => Yii::t('app', date ('F', strtotime ($result['customer_created_at']))),
                 'total' => (int) $result['total']
             );
         }
@@ -2024,7 +2024,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         foreach ($rows as $result) {
             $revenue_generated_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
-                'month' => date ('F', strtotime ($result['order_created_at'])),
+                'month' => Yii::t('app', date ('F', strtotime ($result['order_created_at']))),
                 'total' => (float) $result['total']
             );
         }
@@ -2068,7 +2068,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         foreach ($rows as $result) {
             $orders_received_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
-                'month' => date ('F', strtotime ($result['order_created_at'])),
+                'month' => Yii::t('app', date ('F', strtotime ($result['order_created_at']))),
                 'total' => (int) $result['total']
             );
         }
@@ -2111,7 +2111,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         foreach ($rows as $result) {
             $sold_item_chart_data[date ('m', strtotime ($result['order_item_created_at']))] = array(
-                'month' => date ('F', strtotime ($result['order_item_created_at'])),
+                'month' => Yii::t('app', date ('F', strtotime ($result['order_item_created_at']))),
                 'total' => (int) $result['total']
             );
         }
@@ -2378,8 +2378,7 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getVouchers($modelClass = "\common\models\Voucher")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->with ('bank');
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**

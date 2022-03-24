@@ -17,6 +17,7 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    "Invalid voucher code." => "",
     "Store does not deliver to this delivery zone." => "",
     'Delivery Zone' => 'منطقة التسليم',
     'Amount Charged' => "المبلغ المشحون",
@@ -37,4 +38,28 @@ return [
     'Udf3' => 'Udf3',
     'Udf4' => 'Udf4',
     'Udf5' => 'Udf5',
+    'JAN' => 'كانون الثاني',
+    'FEB' => 'شهر فبراير',
+    'MAR' => 'مارس',
+    'APR' => "أبريل",
+    'MAY' => "يمكن",
+    'JUN' => "يونيه",
+    'JUL' => 'يوليو',
+    'AUG' => 'أغسطس',
+    'SEP' => 'سبتمبر',
+    'OCT' => 'اكتوبر',
+    'NOV' => 'شهر نوفمبر',
+    'DEC' => 'ديسمبر',
+    'Jan' => 'كانون الثاني',
+    'Feb' => 'شهر فبراير',
+    'Mar' => 'مارس',
+    'Apr' => "أبريل",
+    'May' => "يمكن",
+    'Jun' => "يونيه",
+    'Jul' => 'يوليو',
+    'Aug' => 'أغسطس',
+    'Sep' => 'سبتمبر',
+    'Oct' => 'اكتوبر',
+    'Nov' => 'شهر نوفمبر',
+    'Dec' => 'ديسمبر'
 ];

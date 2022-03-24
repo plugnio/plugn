@@ -547,6 +547,21 @@ class OrderController extends Controller
         //Apply promo code
         if (Yii::$app->request->getBodyParam("voucher_id")) {
             $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
+        } else if (Yii::$app->request->getBodyParam("voucher_code")) {
+
+            $voucherModel = $order->restaurant->getVouchers()
+                ->andWhere(['code' => Yii::$app->request->getBodyParam("voucher_code")])
+                ->one();
+
+            if(!$voucherModel) {
+
+                return [
+                    'operation' => 'error',
+                    'message' => Yii::t('app', "Invalid voucher code.")
+                ];
+            }
+
+            $order->voucher_id = $voucherModel->voucher_id;
         }
 
         //if the order mode = 1 => Delivery
@@ -732,7 +747,7 @@ class OrderController extends Controller
 
         $order->currency_code = Yii::$app->request->getBodyParam('currency_code');
 
-        //todo: what if change customer
+        //todo: what if change, customer
         $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
         $order->customer_phone_number = str_replace(' ', '', strval(Yii::$app->request->getBodyParam("customer_phone_number")));
         $order->customer_phone_country_code = Yii::$app->request->getBodyParam("country_code") ? Yii::$app->request->getBodyParam("customer_phone_country_code") : 965;
@@ -762,9 +777,27 @@ class OrderController extends Controller
         }
 
         //Apply promo code
+
         if (Yii::$app->request->getBodyParam("voucher_id")) {
             $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
         }
+        /*else if (($voucher = Yii::$app->request->getBodyParam("voucher")) !== null) {
+
+            $voucherModel = $order->restaurant->getVouchers()
+                ->andWhere(['code' => $voucher['code']])
+                ->one();
+
+            if(!$voucherModel) {
+                    $transaction->rollBack();
+
+                    return [
+                        'operation' => 'error',
+                        'message' => Yii::t('app', "Invalid voucher code.")
+                    ];
+            }
+
+            $order->voucher_id = $voucherModel->voucher_id;
+        }*/
 
         //if the order mode = 1 => Delivery
         #todo below code need to remove if not in use
@@ -1523,7 +1556,28 @@ class OrderController extends Controller
         $pickup_location_id = Yii::$app->request->getBodyParam('pickup_location_id');
         $estimated_time_of_arrival = Yii::$app->request->getBodyParam('estimated_time_of_arrival');
         $special_directions = Yii::$app->request->getBodyParam('special_directions');
+        $voucher_code = Yii::$app->request->getBodyParam("voucher_code");
+
+        $voucher = $restaurant->getVouchers()
+            ->andWhere(['code' => $voucher_code])
+            ->one();
+
+        if($voucher_code) {
+            if(!$voucher) {
+                return [
+                    'operation' => 'error',
+                    'message' => Yii::t('app', "Invalid voucher code.")
+                ];
+            }
+            else
+            {
+                $model->voucher_id = $voucher->voucher_id;
+                $model->voucher_code = $voucher->code;
+            }
+        }
+
         $model->payment_method_id = Yii::$app->request->getBodyParam('payment_method_id');
+
         if ($model->paymentMethod && $model->paymentMethod->payment_method_name) {
             $model->payment_method_name = $model->paymentMethod->payment_method_name;
             $model->payment_method_name_ar = $model->paymentMethod->payment_method_name_ar;
