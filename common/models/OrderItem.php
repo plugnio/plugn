@@ -96,15 +96,15 @@ class OrderItem extends \yii\db\ActiveRecord {
             return true;
         }
 
-            if($this->item == Item::TYPE_SIMPLE) {
-                if($this->qty < $this->item->stock_qty)
-                    $this->addError($attribute, 'Out of stock');
-            } else {
-                if(!$this->variant)
-                    $this->addError($attribute, 'Variant detail missing');
-                else if($this->qty < $this->variant->stock_qty)
-                    $this->addError($attribute, 'Out of stock');
-            }
+        if($this->item->item_type == Item::TYPE_SIMPLE) {
+            if($this->qty < $this->item->stock_qty)
+                $this->addError($attribute, 'Out of stock');
+        } else {
+            if(!$this->variant)
+                $this->addError($attribute, 'Variant detail missing');
+            else if($this->qty < $this->variant->stock_qty)
+                $this->addError($attribute, 'Out of stock');
+        }
     }
 
     /**
