@@ -133,7 +133,7 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
              $armadaApiKey != null && $model->armada_tracking_link == null
            ) {
 
-                if ( $difference <= 1  && $model->restaurant->hide_request_driver_button ){
+                if ( $difference <= 1  && $model->restaurant->hide_request_driver_button && $model->area_id != 4007 ){
                           echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid, 'armadaApiKey' => $armadaApiKey], [
                               'class' => 'btn btn-dark mr-1 mb-1',
                               'style' => 'margin-right: 7px;',
@@ -144,7 +144,7 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
                           ]);
                 }
 
-                if ( !$model->restaurant->hide_request_driver_button  )  {
+                if ( !$model->restaurant->hide_request_driver_button && $model->area_id != 4007 )  {
                       echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid , 'armadaApiKey' => $armadaApiKey], [
                           'class' => 'btn btn-dark mr-1 mb-1',
                           'style' => 'margin-right: 7px;',
