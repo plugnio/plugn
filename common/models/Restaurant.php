@@ -1390,6 +1390,9 @@ class Restaurant extends \yii\db\ActiveRecord
             'country' => function ($restaurant) {
                 return $restaurant->getCountry ()->one ();
             },
+            'storeTheme' => function ($restaurant) {
+                return $restaurant->getRestaurantTheme ()->one ();
+            },
             'currencies',
             'currency' => function ($restaurant) {
                 return $restaurant->getCurrency ()->one ();
