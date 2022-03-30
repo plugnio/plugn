@@ -247,11 +247,16 @@ class SiteController extends Controller {
                        $managedRestaurant->owner_number ? $managedRestaurant->owner_number : null,
                        0, //Comission
                       Url::to(['site/callback'], true),
+                      Url::to(['site/payment-webhook'], true),
                       $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET :  TapPayments::GATEWAY_VISA_MASTERCARD,
-                      0
+                      0,
+                      0,
+                      ''
               );
 
+
               $responseContent = json_decode($response->content);
+
 
               try {
 
@@ -342,6 +347,142 @@ class SiteController extends Controller {
         } catch (\Exception $e) {
             throw new NotFoundHttpException($e->getMessage());
         }
+    }
+
+
+
+    /**
+     * Process callback from TAP payment gateway
+     * @param string $tap_id
+     * @return mixed
+     */
+    public function actionPaymentWebhook() {
+
+      $headers = Yii::$app->request->headers;
+      $headerSignature = $headers->get('hashstring');
+
+      $charge_id = Yii::$app->request->getBodyParam("id");
+      $status = Yii::$app->request->getBodyParam("status");
+      $amount = Yii::$app->request->getBodyParam("amount");
+      $currency = Yii::$app->request->getBodyParam("currency");
+      $reference = Yii::$app->request->getBodyParam("reference");
+      $destinations = Yii::$app->request->getBodyParam("destinations");
+      $response = Yii::$app->request->getBodyParam("response");
+      $source = Yii::$app->request->getBodyParam("source");
+      $transaction = Yii::$app->request->getBodyParam("transaction");
+      $acquirer = Yii::$app->request->getBodyParam("acquirer");
+
+
+      if($currency_mode = Currency::find()->where(['code' => $currency])->one())
+        $decimal_place = $currency_mode->decimal_place;
+      else
+        throw new ForbiddenHttpException('Invalid Currency code');
+
+      if(isset($reference)){
+        $gateway_reference = $reference['gateway'];
+        $payment_reference = $reference['payment'];
+      }
+
+      if(isset($transaction)){
+        $created = $transaction['created'];
+      }
+
+      $amountCharged = \Yii::$app->formatter->asDecimal($amount, $decimal_place);
+
+      $toBeHashedString = 'x_id'.$charge_id.'x_amount'.$amountCharged.'x_currency'.$currency.'x_gateway_reference'.$gateway_reference.'x_payment_reference'.$payment_reference.'x_status'.$status.'x_created'.$created.'';
+
+      $isValidSignature = true;
+
+
+      //Check If Enabled Secret Key and If The header has request
+       if ($headerSignature != null)  {
+
+
+
+         $response_message  = null;
+
+         if(isset($acquirer)){
+           if(isset($acquirer['response']))
+             $response_message = $acquirer['response']['message'];
+         } else {
+           if(isset($response))
+             $response_message = $response['message'];
+         }
+
+
+         $paymentRecord = SubscriptionPayment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
+
+         $isValidSignature = false;
+
+
+           if (!$isValidSignature) {
+                  Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
+
+                  $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString , $headerSignature);
+                  if (!$isValidSignature){
+                    Yii::error('Invalid Signature', __METHOD__);
+                    throw new ForbiddenHttpException('Invalid Signature');
+                  }
+           }
+
+        $paymentRecord->received_callback = true;
+
+        if($paymentRecord->save(false) && $paymentRecord->payment_current_status == 'CAPTURED' ) {
+
+              Subscription::updateAll(['subscription_status' => Subscription::STATUS_INACTIVE], ['and', ['subscription_status' => Subscription::STATUS_ACTIVE], ['restaurant_uuid' => $paymentRecord->restaurant_uuid]]);
+              $subscription_model = $paymentRecord->subscription;
+              $subscription_model->subscription_status = Subscription::STATUS_ACTIVE;
+
+              $valid_for =  $subscription_model->plan->valid_for;
+
+              $subscription_model->subscription_end_at = date('Y-m-d', strtotime(date('Y-m-d H:i:s',  strtotime($subscription_model->subscription_start_at)) . " + $valid_for MONTHS"));
+
+              $subscription_model->save(false);
+
+              foreach ($subscription_model->restaurant->getOwnerAgent()->all() as $agent ) {
+
+                \Yii::$app->mailer->compose([
+                       'html' => 'premium-upgrade',
+                           ], [
+                       'subscription' => $subscription_model,
+                       'store' => $paymentRecord->restaurant,
+                   ])
+                   ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                   ->setTo([$agent->agent_email])
+                   ->setBcc(\Yii::$app->params['supportEmail'])
+                   ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription_model->plan->name)
+                   ->send();
+              }
+
+          if ($isError) {
+              throw new \Exception($errorMessage);
+          }
+
+
+          if(YII_ENV == 'prod') {
+              //Send event to Segment
+              \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+              \Segment::track([
+                    'userId' => $paymentRecord->restaurant_uuid,
+                    'event' => 'Premium Plan Purchase',
+                    'properties' => [
+                        'order_id' => $paymentRecord->payment_uuid,
+                        'value' => ( $paymentRecord->payment_amount_charged * 3.28 ),
+                        'paymentMethod' => $paymentRecord->payment_mode,
+                        'currency' => 'USD'
+                    ]
+                ]);
+            }
+        }
+
+        if($paymentRecord){
+          return [
+              'operation' => 'success',
+              'message' => 'Payment status has been updated successfully'
+          ];
+        }
+      }
+
     }
 
 
