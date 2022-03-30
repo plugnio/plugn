@@ -26,6 +26,10 @@ class Option extends \yii\db\ActiveRecord {
     const UPDATE_TYPE_UPDATE = 'update';
     const UPDATE_TYPE_DELETE = 'delete';
 
+    const TYPE_CHECKBOX = 1;
+    const TYPE_RADIO = 2;
+    const TYPE_TEXT = 3;
+
     const SCENARIO_BATCH_UPDATE = 'batchUpdate';
 
     private $_updateType;
@@ -58,7 +62,8 @@ class Option extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['item_uuid', 'option_name'], 'required'],
+            [['item_uuid', 'option_name', 'option_type'], 'required'],
+            ['is_required', 'boolean'],
             ['updateType', 'required', 'on' => self::SCENARIO_BATCH_UPDATE],
             ['updateType',
                 'in',
@@ -93,8 +98,10 @@ class Option extends \yii\db\ActiveRecord {
             'item_uuid' => 'Item Uuid',
             'min_qty' => 'Min Selections',
             'max_qty' => 'Max Selections',
+            'is_required' => 'Is Required?',
             'option_name' => 'Option Name',
             'option_name_ar' => 'Option Name in Arabic',
+            'option_type' => 'Option Type'
         ];
     }
 
