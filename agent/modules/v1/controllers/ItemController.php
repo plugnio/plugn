@@ -167,6 +167,9 @@ class ItemController extends Controller
                     $optionModel->option_name_ar = $option['option_name_ar'];
                     $optionModel->max_qty = (isset($option['max_qty'])) ? $option['max_qty'] : 0;
                     $optionModel->min_qty = (isset($option['min_qty'])) ? $option['min_qty'] : 0;
+                    $optionModel->is_required = $option['is_required'];
+                    $optionModel->option_type = $option['option_type'];
+
                     if (!$optionModel->save()) {
                         $transaction->rollBack();
                         return [
@@ -307,8 +310,10 @@ class ItemController extends Controller
                     $optionModel->item_uuid = $model->item_uuid;
                     $optionModel->option_name = $option['option_name'];
                     $optionModel->option_name_ar = $option['option_name_ar'];
-                    $optionModel->max_qty = $option['max_qty'];
-                    $optionModel->min_qty = $option['min_qty'];
+                    $optionModel->is_required = $option['is_required'];
+                    $optionModel->option_type = $option['option_type'];
+                    $optionModel->max_qty = (isset($option['max_qty'])) ? $option['max_qty'] : 0;
+                    $optionModel->min_qty = (isset($option['min_qty'])) ? $option['min_qty'] : 0;
 
                     if (!$optionModel->save()) {
                         $transaction->rollBack();
