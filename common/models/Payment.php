@@ -253,9 +253,11 @@ class Payment extends \yii\db\ActiveRecord
 
     /**
      * Update Payment's Status from TAP Payments
-     * @param  [type]  $id                           [description]
-     * @param boolean $showUpdatedFlashNotification [description]
-     * @return self                                [description]
+     * @param  string  $id                         Charge id
+     * @param string $status                       transaction status
+     * @param string $destinations                 transaction's destination
+     * @param string $source                        transaction's source
+     * @param string $response_message
      */
     public static function updatePaymentStatus($id, $status, $destinations = null , $source = null, $reference, $response_message = null )
     {
