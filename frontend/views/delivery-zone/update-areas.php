@@ -90,7 +90,7 @@ foreach ($cities as $cityIndex => $city) {
     SELECT DISTINCT area_id, area_name FROM area
       WHERE NOT EXISTS (
                     SELECT * FROM area_delivery_zone
-                    WHERE area_delivery_zone.area_id = area.area_id AND  area_delivery_zone.restaurant_uuid = '" . $storeUuid ."' AND delivery_zone_id != ". $model->delivery_zone_id ."
+                    WHERE area_delivery_zone.is_deleted = 0  AND area_delivery_zone.area_id = area.area_id AND  area_delivery_zone.restaurant_uuid = '" . $storeUuid ."' AND delivery_zone_id != ". $model->delivery_zone_id ."
                    )
        AND city_id = " . $city->city_id ."
         ";

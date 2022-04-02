@@ -141,4 +141,8 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
     {
         return $this->hasOne($modelClass::className(), ['business_location_id' => 'business_location_id'])->via('deliveryZone');
     }
+
+    public static function find() {
+        return new query\AreaDeliveryZoneQuery(get_called_class());
+    }
 }

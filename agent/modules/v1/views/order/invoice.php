@@ -232,6 +232,7 @@
                                 <tr>
                                     <th align="start" style="background:#000;color: #fff;">Item name</th>
                                     <th align="center" style="background:#000;color: #fff;">SKU</th>
+                                    <th align="center" style="background:#000;color: #fff;">Barcode</th>
                                     <th align="center" style="background:#000;color: #fff;">Instruction</th>
                                     <th align="center" style="background:#000;color: #fff;">QTY</th>
                                     <th align="end" style="background:#000;color: #fff;">Extra Options</th>
@@ -248,6 +249,7 @@
                                         </b>
                                     </td>
                                     <td align="center"><?= $orderItem->item? $orderItem->item->sku: '' ?></td>
+                                    <td align="center"><?= $orderItem->item? $orderItem->item->barcode: '' ?></td>
                                     <td align="center"><?= $orderItem->customer_instruction ?></td>
                                     <td align="center"><?= $orderItem->qty ?></td>
                                     <td align="start"><?= $orderItem->getOrderExtraOptionsText() ?></td>

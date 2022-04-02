@@ -359,6 +359,11 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                                 'format' => 'raw',
                                 'value' => 'item.sku',
                             ],
+                            [
+                                'label' => 'Barcode',
+                                'format' => 'raw',
+                                'value' => 'item.barcode',
+                            ],
                             'customer_instruction',
                             'qty',
                             [

@@ -83,7 +83,7 @@ class ItemController extends Controller
         $query = Item::find()
             ->andWhere(['restaurant_uuid'=> $store->restaurant_uuid])
             ->orderBy ([new \yii\db\Expression('item.sort_number ASC')]);
-        
+
         if ($type != 'all') {
             $query->andWhere(['track_quantity'=> 1]);
         }
@@ -319,10 +319,12 @@ class ItemController extends Controller
         $id = Yii::$app->request->getBodyParam('item_uuid');
 
         $stock_qty = Yii::$app->request->getBodyParam('stock_qty');
+        $track_quantity = Yii::$app->request->getBodyParam('track_quantity');
 
         $model = $this->findModel($id);
 
         $model->stock_qty = (int) $stock_qty;
+        $model->track_quantity = (int) $track_quantity;
 
         if (!$model->save(false)){
             return [
@@ -399,7 +401,7 @@ class ItemController extends Controller
     public function actionDeleteImage($id, $image)
     {
         $itemImage = ItemImage::findOne(['item_uuid'=>$id, 'product_file_name'=>$image]);
-        
+
         if ($itemImage && !$itemImage->delete()) {
             if (isset($model->errors)) {
                 return [

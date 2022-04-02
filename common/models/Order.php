@@ -8,7 +8,6 @@ use yii\db\Expression;
 use yii\behaviors\AttributeBehavior;
 use borales\extensions\phoneInput\PhoneInputValidator;
 use yii\helpers\ArrayHelper;
-
 /**
  * This is the model class for table "order".
  *
@@ -202,6 +201,7 @@ class Order extends \yii\db\ActiveRecord
             }
             ],
             [['area_id'], 'validateArea'],
+            [['pickup_location_id'], 'validatePickupLocation'],
             ['unit_type', function ($attribute, $params, $validator) {
                 if ($this->area_id && !$this->unit_type && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                     $this->addError($attribute, 'Unit type cannot be blank.');
@@ -499,6 +499,16 @@ class Order extends \yii\db\ActiveRecord
     }
 
     /**
+     * Check if the pickup location is exist
+     * @param type $attribute
+     */
+    public function validatePickupLocation($attribute)
+    {
+        if (!BusinessLocation::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'business_location_id' => $this->pickup_location_id])->one())
+            $this->addError($attribute, "Pickup location doesn't exist");
+    }
+
+    /**
      * Check if  store deliver to the selected country
      * @param type $attribute
      */
@@ -672,31 +682,67 @@ class Order extends \yii\db\ActiveRecord
 
     }
 
-    /**
-     * Update order status to pending
-     */
-    public function restockItems()
-    {
-        foreach ($this->getOrderItems()->all() as $orderItem) {
-            $orderItemExtraOptions = $orderItem->getOrderItemExtraOptions();
+    // /**
+    //  * Update order status to pending
+    //  */
+    // public function restockItems()
+    // {
+    //     foreach ($this->getOrderItems()->all() as $orderItem) {
+    //         $orderItemExtraOptions = $orderItem->getOrderItemExtraOptions();
+    //
+    //         if ($orderItemExtraOptions->count() > 0) {
+    //             foreach ($orderItemExtraOptions->all() as $orderItemExtraOption) {
+    //                 if ($orderItemExtraOption->order_item_extra_option_id && $orderItemExtraOption->order_item_extra_option_id && $orderItemExtraOption->extra_option_id)
+    //                     $orderItemExtraOption->extraOption->increaseStockQty($orderItem->qty);
+    //             }
+    //         }
+    //
+    //
+    //         $orderItem->item->increaseStockQty($orderItem->qty);
+    //
+    //         self::updateAll(['items_has_been_restocked' => true], [
+    //             'order_uuid' => $this->order_uuid
+    //         ]);
+    //     }
+    //
+    //
+    // }
 
-            if ($orderItemExtraOptions->count() > 0) {
-                foreach ($orderItemExtraOptions->all() as $orderItemExtraOption) {
+
+    /**
+ * Update order status to pending
+ */
+public function restockItems()
+{
+
+    $orderItems = $this->getOrderItems ();
+    $orderItemExtraOptions = $this->getOrderItemExtraOptions ();
+
+    if ($orderItems->count () > 0) {
+        foreach ($orderItems->all () as $orderItem){
+          if ($orderItem->item_uuid) {
+
+              $orderItemExtraOptions = $orderItem->getOrderItemExtraOptions ();
+
+              if ($orderItemExtraOptions->count() > 0) {
+                  foreach ($orderItemExtraOptions->all() as $orderItemExtraOption){
                     if ($orderItemExtraOption->order_item_extra_option_id && $orderItemExtraOption->order_item_extra_option_id && $orderItemExtraOption->extra_option_id)
                         $orderItemExtraOption->extraOption->increaseStockQty($orderItem->qty);
-                }
-            }
+                  }
+              }
 
 
-            $orderItem->item->increaseStockQty($orderItem->qty);
-
-            self::updateAll(['items_has_been_restocked' => true], [
-                'order_uuid' => $this->order_uuid
-            ]);
+              $orderItem->item->increaseStockQty ($orderItem->qty);
+              self::updateAll(['items_has_been_restocked' => true], [
+                  'order_uuid' => $this->order_uuid
+              ]);
+          }
         }
 
-
     }
+
+
+}
 
 
 
@@ -823,7 +869,7 @@ class Order extends \yii\db\ActiveRecord
 
         $this->setScenario(self::SCENARIO_UPDATE_TOTAL);
 
-        $this->save();
+        return $this->save();
     }
 
     /**
@@ -908,6 +954,8 @@ class Order extends \yii\db\ActiveRecord
             return false;
         }
 
+
+
         if (!$this->currency_code) {
 
             if (!$this->restaurant || !$this->restaurant->currency) {
@@ -933,14 +981,7 @@ class Order extends \yii\db\ActiveRecord
             $this->order_status = self::STATUS_DRAFT;
         }
 
-        // if (
-        //     !in_array(
-        //         $this->scenario, [
-        //             self::SCENARIO_UPDATE_TOTAL,
-        //             self::SCENARIO_CREATE_ORDER_BY_ADMIN
-        //         ]
-        //     )
-        // ) {
+
         if ($this->scenario == self::SCENARIO_UPDATE_TOTAL) {
 
             if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
@@ -1035,7 +1076,49 @@ class Order extends \yii\db\ActiveRecord
             }
 
 
-        }
+
+                      if($this->restaurant->version == 4){
+
+                          $start_date = date("Y-m-d H:i:s", mktime(00, 00, 0, date("m",strtotime($this->estimated_time_of_arrival)),  date("d",strtotime($this->estimated_time_of_arrival))  ));
+                          $end_date =  date("Y-m-d H:i:s", mktime(23, 59, 59, date("m",strtotime($this->estimated_time_of_arrival)),  date("d",strtotime($this->estimated_time_of_arrival)) ));
+
+
+                          $numOfOrders = $this->restaurant->getOrders()->activeOrders()
+                                  ->andWhere(['between', 'estimated_time_of_arrival', $start_date, $end_date])
+                                  ->count();
+                        
+
+                          if($this->order_mode  == static::ORDER_MODE_DELIVERY && $this->businessLocation->max_num_orders !== null){
+
+                            if($numOfOrders >= $this->businessLocation->max_num_orders){
+                              return $this->addError(
+                                  'max_order_limit',
+                                  Yii::t('yii', "{attribute} is invalid.", [
+                                    'attribute' => Yii::t('app', 'Sorry, order limit has been exceeded.')
+                                  ])
+                              );
+                            }
+
+                          } else if($this->order_mode  == static::ORDER_MODE_PICK_UP && $this->pickupLocation->max_num_orders != null){
+
+                            if($numOfOrders >= $this->pickupLocation->max_num_orders){
+
+                              return $this->addError(
+                                'max_order_limit',
+                                  Yii::t('yii', "{attribute} is invalid.", [
+                                    'attribute' => Yii::t('app', 'Sorry, order limit has been exceeded.')
+                                  ])
+                              );
+                            }
+                          }
+
+                        }
+
+          }
+
+
+
+
 
 
         return true;
@@ -1096,7 +1179,10 @@ class Order extends \yii\db\ActiveRecord
 
                 if ($this->delivery_zone_id) {
 
-                    $deliveryZone = DeliveryZone::findOne($this->delivery_zone_id);
+                    $deliveryZone = DeliveryZone::find()->where([
+                      'delivery_zone_id' =>$this->delivery_zone_id,
+                      'restaurant_uuid' =>$this->restaurant_uuid,
+                    ])->one();
 
                     if ($deliveryZone) {
 
@@ -1107,13 +1193,24 @@ class Order extends \yii\db\ActiveRecord
                             $this->business_location_name = $deliveryZone->businessLocation->business_location_name;
 
                         //$this->save(false);
+                    }else {
+                      return $this->addError(
+                          'delivery_zone_id',
+                          Yii::t('yii', "{attribute} is invalid.", [
+                            'attribute' => Yii::t('app', "Store does not deliver to this delivery zone.")
+                          ])
+                      );
                     }
                 }
 
             } else if ($this->order_mode == Order::ORDER_MODE_PICK_UP) {
 
                 if ($this->pickup_location_id) {
-                    $pickupLocation = BusinessLocation::findOne($this->pickup_location_id);
+
+                    $pickupLocation = BusinessLocation::find()->where([
+                      'business_location_id' =>$this->pickup_location_id,
+                      'restaurant_uuid' =>$this->restaurant_uuid,
+                    ])->one();
 
                     if ($pickupLocation) {
 
@@ -1122,6 +1219,14 @@ class Order extends \yii\db\ActiveRecord
                         $this->business_location_name = $pickupLocation->business_location_name;
 
                         //$this->save(false);
+                    } else {
+
+                      return $this->addError(
+                          'pickup_location_id',
+                          Yii::t('yii', "{attribute} is invalid.", [
+                            'attribute' => Yii::t('app', "Pickup location doesn't exist")
+                          ])
+                      );
                     }
                 }
             }

@@ -96,10 +96,13 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
         $extra_option_model = ExtraOption::findOne($this->extra_option_id);
 
         if ($extra_option_model) {
-            if ($this->orderItem->item_uuid != $extra_option_model->option->item_uuid)
-                $this->addError($attribute, 'Extra Option Uuid is invalid');
+            if ($this->orderItem->item_uuid != $extra_option_model->option->item_uuid){
+              $this->addError($attribute, 'Extra Option Uuid is invalid');
+              Yii::error('[1Extra Option Uuid is invalid]', __METHOD__);
+            }
         }else {
             $this->addError($attribute, 'Extra Option Uuid is invalid');
+            Yii::error('[2Extra Option Uuid is invalid]', __METHOD__);
         }
     }
 
@@ -179,7 +182,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
     {
         return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])->via('restaurant');
     }
-    
+
     /**
      * Gets query for [[ExtraOption]].
      *

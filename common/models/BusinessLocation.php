@@ -20,6 +20,7 @@ use Yii;
  * @property float|null $latitude
  * @property float|null $longitude
  * @property boolean $is_deleted
+ * @property int|null $max_num_orders
  * @property Restaurant $restaurant
  * @property Country $country
  * @property DeliveryZone[] $deliveryZones
@@ -43,7 +44,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
     {
         return [
             [['restaurant_uuid', 'country_id', 'business_location_name', 'business_location_name_ar'], 'required'],
-            [['country_id' , 'support_pick_up', 'is_deleted'], 'integer'],
+            [['country_id' , 'support_pick_up', 'is_deleted','max_num_orders'], 'integer'],
             [['support_pick_up'], 'default', 'value' => 0],
             [['latitude', 'longitude'], 'number'],
             [['business_location_tax'], 'default', 'value' => 0],
@@ -68,14 +69,15 @@ class BusinessLocation extends \yii\db\ActiveRecord
             'business_location_name_ar' => 'Location Name in Arabic',
             'support_pick_up' => 'Support Pick Up',
             'business_location_tax' => 'Tax / VAT',
+            'max_num_orders' => 'Maximum number of orders'
         ];
     }
 
     public function scenarios() {
         $scenarios = parent::scenarios();
-    
+
         $scenarios['delete'] = ['is_deleted'];
-    
+
         return $scenarios;
     }
 
@@ -91,6 +93,45 @@ class BusinessLocation extends \yii\db\ActiveRecord
             'totalDeliveryZoneCountry'
         ];
     }
+
+
+    /**
+     *
+     * @param type $insert
+     * @param type $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave ($insert, $changedAttributes);
+
+        if ($this->scenario == self::SCENARIO_DELETE ) {
+
+
+            $businessLocationDeliverZones = $this->getDeliveryZones()->all();
+
+
+            foreach ($businessLocationDeliverZones as $key => $deliveryZone) {
+              \common\models\AreaDeliveryZone::updateAll([
+                  'is_deleted' => 1
+              ], [
+                  'delivery_zone_id' => $deliveryZone->delivery_zone_id,
+                  'restaurant_uuid' => $deliveryZone->restaurant_uuid,
+              ]);
+            }
+
+            \common\models\DeliveryZone::updateAll([
+                'is_deleted' => 1
+            ], [
+                'business_location_id' => $this->business_location_id,
+                'restaurant_uuid' => $this->restaurant_uuid,
+            ]);
+
+
+
+        }
+
+    }
+
 
 
     /**
@@ -131,7 +172,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
      */
     public function getDeliveryZones($modelClass = "\common\models\DeliveryZone")
     {
-        return $this->hasMany($modelClass::className(), ['business_location_id' => 'business_location_id']);
+        return $this->hasMany($modelClass::className(), ['business_location_id' => 'business_location_id'])->where(['is_deleted' => 0]);
     }
 
     /**

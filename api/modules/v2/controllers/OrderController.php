@@ -244,7 +244,15 @@ class OrderController extends Controller {
 
             if ($response == null) {
 
-                $order->updateOrderTotalPrice();
+
+                if (!$order->updateOrderTotalPrice()) {
+                    $response = [
+                        'operation' => 'error',
+                        'message' => $order->getErrors()
+                    ];
+                }
+
+
 
                 if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
                     $response = [
@@ -329,7 +337,13 @@ class OrderController extends Controller {
                           //Update payment_uuid in order
                           $order->payment_uuid = $payment->payment_uuid;
                           $order->save(false);
-                          $order->updateOrderTotalPrice();
+                          if (!$order->updateOrderTotalPrice()) {
+                              $response = [
+                                  'operation' => 'error',
+                                  'message' => $order->getErrors()
+                              ];
+                          }
+
 
                           Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]), __METHOD__);
 
@@ -429,7 +443,12 @@ class OrderController extends Controller {
                             //Update payment_uuid in order
                             $order->payment_uuid = $payment->payment_uuid;
                             $order->save(false);
-                            $order->updateOrderTotalPrice();
+                            if (!$order->updateOrderTotalPrice()) {
+                                $response = [
+                                    'operation' => 'error',
+                                    'message' => $order->getErrors()
+                                ];
+                            }
 
                             Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]), __METHOD__);
 
@@ -566,8 +585,7 @@ class OrderController extends Controller {
                         $response = [
                             'operation' => 'success',
                             'order_uuid' => $order->order_uuid,
-                            // 'estimated_time_of_arrival' => $order->estimated_time_of_arrival,
-                            'message' => 'Order created successfully',
+                            'message' => 'Order created successfully'
                         ];
                     }
                 }
@@ -578,8 +596,10 @@ class OrderController extends Controller {
 
                 //either object of payment result or not stock validation error
 
-              if(!is_array($response['message']) || !isset($response['message']['qty']))
-                 \Yii::error(json_encode($response['message']), __METHOD__); // Log error faced by user
+              // if(!is_array($response['message']) || !isset($response['message']['qty']))
+              //    \Yii::error(json_encode($response['message']), __METHOD__); // Log error faced by user
+
+               \Yii::error(json_encode($response), __METHOD__); // Log error faced by user
 
                 $order->delete();
             }
@@ -765,7 +785,7 @@ class OrderController extends Controller {
     public function actionOrderDetails($id, $restaurant_uuid) {
 
         $model = Order::find()
-            ->andWhere(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid])
+            ->andWhere(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid, 'is_deleted' => 0])
             ->one();
 
         if (!$model) {
