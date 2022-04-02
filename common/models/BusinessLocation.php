@@ -132,7 +132,25 @@ class BusinessLocation extends \yii\db\ActiveRecord
 
     }
 
+    /**
+     * Gets query for [[Orders]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeliveryOrders()
+    {
+        return $this->hasMany(Order::className(), ['delivery_zone_id' => 'delivery_zone_id'])->via('deliveryZones');
+    }
 
+    /**
+     * Gets query for [[Orders]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPickupOrders()
+    {
+        return $this->hasMany(Order::className(), ['pickup_location_id' => 'business_location_id']);
+    }
 
     /**
      * Gets query for [[Country]].

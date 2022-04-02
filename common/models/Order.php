@@ -1082,13 +1082,21 @@ public function restockItems()
                           $start_date = date("Y-m-d H:i:s", mktime(00, 00, 0, date("m",strtotime($this->estimated_time_of_arrival)),  date("d",strtotime($this->estimated_time_of_arrival))  ));
                           $end_date =  date("Y-m-d H:i:s", mktime(23, 59, 59, date("m",strtotime($this->estimated_time_of_arrival)),  date("d",strtotime($this->estimated_time_of_arrival)) ));
 
+                          $numOfPickupOrders = 0;
+                          $numOfDeliveryOrders =  0;
+                          $numOfOrders =  0;
 
-                          $numOfOrders = $this->restaurant->getOrders()->activeOrders()
-                                  ->andWhere(['between', 'estimated_time_of_arrival', $start_date, $end_date])
-                                  ->count();
-                        
 
                           if($this->order_mode  == static::ORDER_MODE_DELIVERY && $this->businessLocation->max_num_orders !== null){
+                            $numOfPickupOrders = $this->businessLocation->getPickupOrders()->activeOrders()
+                                    ->andWhere(['between', 'estimated_time_of_arrival', $start_date, $end_date])
+                                    ->count();
+
+                            $numOfDeliveryOrders = $this->businessLocation->getDeliveryOrders()->activeOrders()
+                                    ->andWhere(['between', 'estimated_time_of_arrival', $start_date, $end_date])
+                                    ->count();
+
+                            $numOfOrders = $numOfPickupOrders + $numOfDeliveryOrders;
 
                             if($numOfOrders >= $this->businessLocation->max_num_orders){
                               return $this->addError(
@@ -1099,7 +1107,19 @@ public function restockItems()
                               );
                             }
 
-                          } else if($this->order_mode  == static::ORDER_MODE_PICK_UP && $this->pickupLocation->max_num_orders != null){
+                          } else if($this->order_mode  == static::ORDER_MODE_PICK_UP && $this->pickupLocation->max_num_orders !== null){
+
+
+                            $numOfPickupOrders = $this->pickupLocation->getPickupOrders()->activeOrders()
+                                    ->andWhere(['between', 'estimated_time_of_arrival', $start_date, $end_date])
+                                    ->count();
+
+                            $numOfDeliveryOrders = $this->pickupLocation->getDeliveryOrders()->activeOrders()
+                                    ->andWhere(['between', 'estimated_time_of_arrival', $start_date, $end_date])
+                                    ->count();
+
+
+                            $numOfOrders = $numOfPickupOrders + $numOfDeliveryOrders;
 
                             if($numOfOrders >= $this->pickupLocation->max_num_orders){
 
