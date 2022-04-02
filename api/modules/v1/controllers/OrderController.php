@@ -228,7 +228,13 @@ class OrderController extends Controller {
 
             if ($response == null) {
 
-                $order->updateOrderTotalPrice();
+              if (!$order->updateOrderTotalPrice()) {
+                  return [
+                      'operation' => 'error',
+                      'message' => $order->getErrors()
+                  ];
+              }
+
                 if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->restaurantDelivery->min_charge) {
                     $response = [
                         'operation' => 'error',
@@ -318,7 +324,13 @@ class OrderController extends Controller {
                         //Update payment_uuid in order
                         $order->payment_uuid = $payment->payment_uuid;
                         $order->save(false);
-                        $order->updateOrderTotalPrice();
+                        if (!$order->updateOrderTotalPrice()) {
+                            return [
+                                'operation' => 'error',
+                                'message' => $order->getErrors()
+                            ];
+                        }
+
 
                           Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]), __METHOD__);
 

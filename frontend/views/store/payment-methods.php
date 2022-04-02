@@ -177,12 +177,19 @@ $this->params['breadcrumbs'][] = $this->title;
                       Want better rates?<br/>
                       <?php
                       echo Html::a('Upgrade to our premium plan', ['site/confirm-plan', 'id' => $model->restaurant_uuid, 'selectedPlanId' => 2 ], ['style' => 'color: #4CAF50;']);
-                    } else {?>
+                    } else {
+
+                      ?>
 
                       <span>
                         You are on the premium plan, <?=  $interval->days ?> days left on it
-                      </span>
-                    <?php } ?>
+                      </span><br>
+
+                    <?php
+
+                    echo Html::a('Renew your premium plan', ['site/confirm-plan', 'id' => $model->restaurant_uuid, 'selectedPlanId' => 2 ], ['style' => 'color: #4CAF50;']);
+
+                   } ?>
 
 
                       <!-- Credit Card -->

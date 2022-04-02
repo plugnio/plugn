@@ -77,7 +77,7 @@ $this->registerJs($js);
 
 
     <div class="card-header">
-      <h3>Basic Info </h3>
+        <h3>Basic Info </h3>
     </div>
     <div class="card-body">
 
@@ -193,8 +193,9 @@ $this->registerJs($js);
 
         </div>
 
-        <?=
-        $form->field($model, 'schedule_interval')->textInput(['maxlength' => true, 'type' => 'number'])->label('Schedule Interval <span style="color: rgba(0,0,0,.45);">(Period in minutes)</span>') ?>
+
+            <?=
+            $form->field($model, 'schedule_interval')->textInput(['maxlength' => true, 'type' => 'number'])->label('Schedule Interval <span style="color: rgba(0,0,0,.45);">(Period in minutes)</span>') ?>
 
 
 
