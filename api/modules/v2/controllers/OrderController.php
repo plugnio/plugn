@@ -596,10 +596,10 @@ class OrderController extends Controller {
 
                 //either object of payment result or not stock validation error
 
-              // if(!is_array($response['message']) || !isset($response['message']['qty']))
-              //    \Yii::error(json_encode($response['message']), __METHOD__); // Log error faced by user
+              if(!is_array($response['message']) || !isset($response['message']['qty']))
+                 \Yii::error(json_encode($response['message']), __METHOD__); // Log error faced by user
 
-               \Yii::error(json_encode($response), __METHOD__); // Log error faced by user
+               // \Yii::error(json_encode($response), __METHOD__); // Log error faced by user
 
                 $order->delete();
             }
