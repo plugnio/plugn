@@ -70,7 +70,7 @@ class Option extends \yii\db\ActiveRecord {
                 'range' => [self::UPDATE_TYPE_CREATE, self::UPDATE_TYPE_UPDATE, self::UPDATE_TYPE_DELETE],
                 'on' => self::SCENARIO_BATCH_UPDATE
             ],
-            [[ 'min_qty', 'option_name', 'option_name_ar'], 'required'],
+            [['option_name', 'option_name_ar'], 'required'],
 //            ['max_qty', 'required', 'when' => function($model) {
 //                    return $model->min_qty != null;
 //                }
