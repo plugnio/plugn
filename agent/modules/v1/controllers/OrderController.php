@@ -669,7 +669,8 @@ class OrderController extends Controller
 
                         $orderItemExtraOption = new OrderItemExtraOption;
                         $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
-                        $orderItemExtraOption->extra_option_id = $extraOption['extra_option_id'];
+                        $orderItemExtraOption->option_id = isset($extraOption['option_id'])?$extraOption['option_id']: null;
+                        $orderItemExtraOption->extra_option_id = isset($extraOption['extra_option_id'])? $extraOption['extra_option_id']: null;
                         $orderItemExtraOption->qty = (int)$item["qty"];
 
                         if (!$orderItemExtraOption->save()) {
@@ -881,7 +882,8 @@ class OrderController extends Controller
 
                 $orderItemExtraOption = new \common\models\OrderItemExtraOption;
                 $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
-                $orderItemExtraOption->extra_option_id = $extraOption['extra_option_id'];
+                $orderItemExtraOption->extra_option_id = isset($extraOption['extra_option_id'])? $extraOption['extra_option_id']: null;
+                $orderItemExtraOption->option_id = isset($extraOption['option_id'])?$extraOption['option_id']: null;
                 $orderItemExtraOption->qty = (int)$item["qty"];
 
                 if (!$orderItemExtraOption->save()) {
@@ -1624,7 +1626,8 @@ class OrderController extends Controller
 
                 $orderItemExtraOption = new \common\models\OrderItemExtraOption;
                 $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
-                $orderItemExtraOption->extra_option_id = $extraOption['extra_option_id'];
+                $orderItemExtraOption->extra_option_id = isset($extraOption['extra_option_id'])? $extraOption['extra_option_id']: null;
+                $orderItemExtraOption->option_id = isset($extraOption['option_id'])?$extraOption['option_id']: null;
                 $orderItemExtraOption->qty = (int)$item["qty"];
 
                 if (!$orderItemExtraOption->save()) {
