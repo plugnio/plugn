@@ -236,6 +236,55 @@ class ItemController extends Controller
                         "message" => $itemVariant->errors
                     ];
                 }
+
+
+                //add variant options
+
+                foreach($variant['itemVariantOptions'] as $value) {
+
+                    if(empty($value['option_id'])) {
+                        $option_id = Option::findOne([
+                            'item_uuid' => $itemVariant->item_uuid,
+                            'option_name' => $value['option']['option_name']
+                        ])->option_id;
+                    }
+                    else
+                    {
+                        $option_id = $value['option_id'];
+                    }
+
+                    if(empty($value['extra_option_id'])) {
+                        $extra_option_id = ExtraOption::findOne([
+                            'option_id' => $option_id,
+                            'extra_option_name' => $value['extraOption']['extra_option_name']
+                        ])->extra_option_id;
+                    }
+                    else
+                    {
+                        $extra_option_id = $value['extra_option_id'];
+                    }
+
+                    if(empty($value['item_variant_option_uuid'])) {
+                        $itemVariantOption = new ItemVariantOption();
+                    } else {
+                        $itemVariantOption = ItemVariantOption::findOne($value['item_variant_option_uuid']);
+                    }
+
+                    $itemVariantOption->item_variant_uuid  = $itemVariant->item_variant_uuid;
+                    $itemVariantOption->item_uuid = $itemVariant->item_uuid;
+                    $itemVariantOption->option_id = $option_id;
+                    $itemVariantOption->extra_option_id = $extra_option_id;
+
+                    if(!$itemVariantOption->save())
+                    {
+                        $transaction->rollBack();
+
+                        return [
+                            "operation" => "error",
+                            "message" => $itemVariantOption->errors
+                        ];
+                    }
+                }
             }
 
             $transaction->commit();
