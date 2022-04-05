@@ -251,7 +251,7 @@ class Item extends \yii\db\ActiveRecord
             "@type" => "Product",
             "name" => $this->item_name,
             "image" => $images,
-            "description" => "Sleeker than ACME's Classic Anvil, the Executive Anvil is perfect for the business traveler looking for something to drop from a height.",
+            "description" => $this->item_description,
             "sku" => $this->sku,
             /*"mpn" => "925872",
             "brand": {
