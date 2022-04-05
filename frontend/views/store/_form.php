@@ -153,7 +153,20 @@ $this->registerJs($js);
         </div>
 
         <div class="row">
-          <div class="col-12 col-sm-4 col-lg-4">
+          <div class="col-12 col-sm-3 col-lg-3">
+
+              <?=
+              $form->field($model, 'demand_delivery', [
+                  'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Enable on demand delivery</span>{input}<label class='custom-control-label' for='customSwitch2'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
+              ])->checkbox([
+                  'checked' => $model->demand_delivery == 0 ? false : true,
+                  'id' => 'customSwitch2',
+                  'class' => 'custom-control-input'
+                      ], false)->label(false)
+              ?>
+
+          </div>
+          <div class="col-12 col-sm-3 col-lg-3">
 
               <?=
               $form->field($model, 'enable_gift_message', [
@@ -166,7 +179,7 @@ $this->registerJs($js);
               ?>
 
             </div>
-            <div class="col-12 col-sm-4 col-lg-4">
+            <div class="col-12 col-sm-3 col-lg-3">
               <?= $form->field($model, 'schedule_order', [
                   'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Schedule Order</span>{input}<label class='custom-control-label' for='scheduleOrder'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
               ])->checkbox([
@@ -177,7 +190,7 @@ $this->registerJs($js);
               ?>
             </div>
 
-            <div class="col-12 col-sm-4 col-lg-4">
+            <div class="col-12 col-sm-3 col-lg-3">
 
                   <?=
                   $form->field($model, 'restaurant_email_notification', [
