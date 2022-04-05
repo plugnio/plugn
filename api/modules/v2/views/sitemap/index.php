@@ -13,7 +13,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
       <?php foreach($categories as $category) { ?>
           <url>
               <loc><![CDATA[<?php if($category->slug) {
-                      echo $restaurant->restaurant_domain . '/list/' . $category->slug;
+                      echo $restaurant->restaurant_domain . '/category/' . $category->slug;
                   } else {
                       echo $restaurant->restaurant_domain . '/product-list/' . $category->item_uuid;
                   } ?>]]></loc>
