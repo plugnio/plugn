@@ -76,7 +76,7 @@ class Option extends \yii\db\ActiveRecord {
 //                }
 //            ],
             [['min_qty'], 'integer', 'min' => 0],
-            [['max_qty'], 'integer', 'min' => 1],
+            [['max_qty'], 'integer', 'min' => 0],
             // an inline validator defined as an anonymous function
             ['min_qty', function ($attribute, $params, $validator) {
                     if ($this->max_qty != null && $this->min_qty > $this->max_qty) {
