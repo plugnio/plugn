@@ -43,8 +43,8 @@ class StoreWebLink extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'web_link_id' => 'Web Link ID',
-            'restaurant_uuid' => 'Restaurant Uuid',
+            'web_link_id' => Yii::t('app','Web Link ID'),
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
         ];
     }
 

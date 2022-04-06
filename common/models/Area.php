@@ -50,12 +50,12 @@ class Area extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'area_id' => 'Area ID',
-            'city_id' => 'City ID',
-            'area_name' => 'Area Name',
-            'area_name_ar' => 'Area Name in Arabic',
-            'latitude' => 'Latitude',
-            'longitude' => 'Longitude',
+            'area_id' => Yii::t('app', 'Area ID'),
+            'city_id' => Yii::t('app', 'City ID'),
+            'area_name' => Yii::t('app', 'Area Name'),
+            'area_name_ar' => Yii::t('app', 'Area Name in Arabic'),
+            'latitude' => Yii::t('app', 'Latitude'),
+            'longitude' => Yii::t('app', 'Longitude'),
         ];
     }
 

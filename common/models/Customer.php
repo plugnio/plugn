@@ -74,14 +74,14 @@ class Customer extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'customer_id' => 'Customer ID',
-            'restaurant_uuid' => 'Restaurant UUID',
-            'customer_name' => 'Customer Name',
-            'customer_phone_number' => 'Phone Number',
-            'country_code' => 'Country Code',
-            'customer_email' => 'Customer Email',
-            'customer_created_at' => 'Customer Created At',
-            'customer_updated_at' => 'Customer Updated At',
+            'customer_id' => Yii::t('app','Customer ID'),
+            'restaurant_uuid' => Yii::t('app','Restaurant UUID'),
+            'customer_name' => Yii::t('app','Customer Name'),
+            'customer_phone_number' => Yii::t('app','Phone Number'),
+            'country_code' => Yii::t('app','Country Code'),
+            'customer_email' => Yii::t('app','Customer Email'),
+            'customer_created_at' => Yii::t('app','Customer Created At'),
+            'customer_updated_at' => Yii::t('app','Customer Updated At'),
         ];
     }
 

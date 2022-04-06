@@ -97,18 +97,21 @@ class AgentAssignment extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'assignment_id' => 'Assignment ID',
-            'restaurant_uuid' => 'Restaurant UUID',
-            'agent_id' => 'Agent ID',
-            'business_location_id' => 'Business Location',
-            'role' => "Role",
-            'email_notification' => 'Email Notification',
-            'assignment_agent_email' => 'Email',
-            'assignment_created_at' => 'Date Assigned',
-            'assignment_updated_at' => 'Assignment Updated At',
+            'assignment_id' => Yii::t('app','Assignment ID'),
+            'restaurant_uuid' =>Yii::t('app', 'Restaurant UUID'),
+            'agent_id' => Yii::t('app','Agent ID'),
+            'business_location_id' => Yii::t('app','Business Location'),
+            'role' => Yii::t('app',"Role"),
+            'email_notification' =>Yii::t('app', 'Email Notification'),
+            'assignment_agent_email' => Yii::t('app', 'Email'),
+            'assignment_created_at' => Yii::t('app','Date Assigned'),
+            'assignment_updated_at' => Yii::t('app','Assignment Updated At'),
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public function extraFields()
     {
         return [

@@ -43,9 +43,9 @@ class ItemImage extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'item_image_id' => 'Item Image ID',
-            'item_uuid' => 'Item Uuid',
-            'product_file_name' => 'Product File Name',
+            'item_image_id' => Yii::t('app','Item Image ID'),
+            'item_uuid' => Yii::t('app','Item Uuid'),
+            'product_file_name' => Yii::t('app','Product File Name')
         ];
     }
 

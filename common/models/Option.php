@@ -71,7 +71,7 @@ class Option extends \yii\db\ActiveRecord {
 //                }
 //            ],
             [['min_qty'], 'integer', 'min' => 0],
-            [['max_qty'], 'integer', 'min' => 1],
+            //[['max_qty'], 'integer', 'min' => 1],
             // an inline validator defined as an anonymous function
             ['min_qty', function ($attribute, $params, $validator) {
                     if ($this->max_qty != null && $this->min_qty > $this->max_qty) {
@@ -89,15 +89,18 @@ class Option extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'option_id' => 'Option ID',
-            'item_uuid' => 'Item Uuid',
-            'min_qty' => 'Min Selections',
-            'max_qty' => 'Max Selections',
-            'option_name' => 'Option Name',
-            'option_name_ar' => 'Option Name in Arabic',
+            'option_id' => Yii::t('app','Option ID'),
+            'item_uuid' => Yii::t('app','Item Uuid'),
+            'min_qty' => Yii::t('app','Min Selections'),
+            'max_qty' => Yii::t('app','Max Selections'),
+            'option_name' => Yii::t('app','Option Name'),
+            'option_name_ar' => Yii::t('app','Option Name in Arabic')
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public function extraFields()
     {
         return [

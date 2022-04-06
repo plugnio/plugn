@@ -61,13 +61,13 @@ class BusinessLocation extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'business_location_id' => 'Business Location ID',
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'country_id' => 'Located in',
-            'business_location_name' => 'Location Name',
-            'business_location_name_ar' => 'Location Name in Arabic',
-            'support_pick_up' => 'Support Pick Up',
-            'business_location_tax' => 'Tax / VAT',
+            'business_location_id' => Yii::t('app','Business Location ID'),
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'country_id' => Yii::t('app','Located in'),
+            'business_location_name' => Yii::t('app','Location Name'),
+            'business_location_name_ar' => Yii::t('app','Location Name in Arabic'),
+            'support_pick_up' => Yii::t('app','Support Pick Up'),
+            'business_location_tax' => Yii::t('app','Tax / VAT')
         ];
     }
 

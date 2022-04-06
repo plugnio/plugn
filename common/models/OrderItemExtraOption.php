@@ -70,16 +70,21 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'order_item_extra_option_id' => 'Order Item Extra Option ID',
-            'order_item_id' => 'Order Item ID',
-            'extra_option_id' => 'Extra Option ID',
-            'extra_option_name' => 'Extra Option Name',
-            'qty' => 'Quantity',
-            'extra_option_name_ar' => 'Extra Option Name Ar',
-            'extra_option_price' => 'Extra Option Price',
+            'order_item_extra_option_id' => Yii::t('app','Order Item Extra Option ID'),
+            'order_item_id' => Yii::t('app','Order Item ID'),
+            'extra_option_id' => Yii::t('app','Extra Option ID'),
+            'extra_option_name' => Yii::t('app','Extra Option Name'),
+            'qty' => Yii::t('app','Quantity'),
+            'extra_option_name_ar' => Yii::t('app','Extra Option Name Ar'),
+            'extra_option_price' => Yii::t('app','Extra Option Price')
         ];
     }
 
+    /**
+     * @param $insert
+     * @param $changedAttributes
+     * @return void
+     */
     public function afterSave($insert, $changedAttributes) {
 
         $order_model = Order::findOne($this->orderItem->order_uuid);
@@ -119,6 +124,10 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
         }
     }
 
+    /**
+     * @param $insert
+     * @return bool|void
+     */
     public function beforeSave($insert) {
 
         $extra_option_model = ExtraOption::findOne($this->extra_option_id);
@@ -159,6 +168,9 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
         return parent::beforeSave($insert);
     }
 
+    /**
+     * @return bool
+     */
     public function beforeDelete() {
 
         $extra_option_model = ExtraOption::findOne($this->extra_option_id);

@@ -49,13 +49,13 @@ class RestaurantDelivery extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'area_id' => 'Area ID',
-            'delivery_time' => 'Delivery time',
-            'delivery_time_ar' => 'Delivery time Ar',
-            'delivery_fee' => 'Delivery fee',
-            'restaurant_delivery_area_array' => 'Delivery Areas',
-            'min_charge' => 'Min Charge',
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'area_id' => Yii::t('app','Area ID'),
+            'delivery_time' => Yii::t('app','Delivery time'),
+            'delivery_time_ar' => Yii::t('app','Delivery time Ar'),
+            'delivery_fee' => Yii::t('app','Delivery fee'),
+            'restaurant_delivery_area_array' => Yii::t('app','Delivery Areas'),
+            'min_charge' => Yii::t('app','Min Charge')
         ];
     }
 

@@ -70,19 +70,19 @@ class BankDiscount extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'bank_discount_id' => 'Bank Discount ID',
-            'bank_id' => 'Bank ID',
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'discount_type' => 'Discount Type',
-            'discount_amount' => 'Discount Amount',
-            'bank_discount_status' => 'Bank Discount Status',
-            'valid_from' => 'Valid From',
-            'valid_until' => 'Valid Until',
-            'max_redemption' => 'Max Redemption',
-            'limit_per_customer' => 'Limit Per Customer',
-            'minimum_order_amount' => 'Minimum Order Amount',
-            'bank_discount_created_at' => 'Bank Discount Created At',
-            'bank_discount_updated_at' => 'Bank Discount Updated At',
+            'bank_discount_id' => Yii::t('app','Bank Discount ID'),
+            'bank_id' => Yii::t('app','Bank ID'),
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'discount_type' => Yii::t('app','Discount Type'),
+            'discount_amount' => Yii::t('app','Discount Amount'),
+            'bank_discount_status' => Yii::t('app','Bank Discount Status'),
+            'valid_from' => Yii::t('app','Valid From'),
+            'valid_until' => Yii::t('app','Valid Until'),
+            'max_redemption' => Yii::t('app','Max Redemption'),
+            'limit_per_customer' => Yii::t('app','Limit Per Customer'),
+            'minimum_order_amount' => Yii::t('app','Minimum Order Amount'),
+            'bank_discount_created_at' => Yii::t('app','Bank Discount Created At'),
+            'bank_discount_updated_at' => Yii::t('app','Bank Discount Updated At'),
         ];
     }
 

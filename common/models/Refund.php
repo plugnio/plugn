@@ -121,15 +121,14 @@ class Refund extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'refund_id' => 'Refund ID',
-            'payment_uuid' => 'Payment UUID',
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'order_uuid' => 'Order Uuid',
-            'refund_reference' => 'Refund Reference',
-            'refund_amount' => 'Refund amount',
-            'refund_status' => 'Refund Status',
-            'reason' => 'Reason for refund',
-
+            'refund_id' => Yii::t('app','Refund ID'),
+            'payment_uuid' => Yii::t('app','Payment UUID'),
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'order_uuid' => Yii::t('app','Order Uuid'),
+            'refund_reference' =>Yii::t('app', 'Refund Reference'),
+            'refund_amount' => Yii::t('app','Refund amount'),
+            'refund_status' => Yii::t('app','Refund Status'),
+            'reason' => Yii::t('app','Reason for refund')
         ];
     }
 

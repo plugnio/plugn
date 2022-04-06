@@ -565,72 +565,74 @@ class Order extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'order_uuid' => 'Order UUID',
-            'payment_uuid' => 'Payment Uuid',
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'area_id' => 'Area ID',
-            'shipping_country_id' => 'Country ID',
-            'delivery_zone_id' => 'Delivery Zone ID',
-            'country_name' => 'Country Name',
-            'country_name_ar' => 'Country Name Ar',
-            'business_location_name' => 'Branch',
-            'floor' => 'Floor',
-            'apartment' => 'Apartment',
-            'office' => 'Office',
-            'building' => 'Building',
-            'postalcode' => 'Postal code',
-            'address_1' => 'Address line 1',
-            'address_2' => 'Address line 2',
-            'area_name' => 'Area name',
-            'area_name_ar' => 'Area name in Arabic',
-            'unit_type' => 'Unit type',
-            'block' => 'Block',
-            'street' => 'Street',
-            'customer_id' => 'Customer ID',
-            'avenue' => 'Avenue',
-            'house_number' => 'House number',
-            'special_directions' => 'Special directions',
-            'customer_name' => 'Customer name',
-            'customer_phone_country_code' => 'Country Code',
-            'customer_phone_number' => 'Phone number',
-            'customer_email' => 'Customer email',
-            'payment_method_id' => 'Payment method ID',
-            'payment_method_name' => 'Payment method name',
-            'payment_method_name_ar' => 'Payment method name [Arabic]',
-            'currency_code' => 'Currency Code',
-            'store_currency_code' => 'Store Currency Code',
-            'currency_rate' => 'Currency Rate',
-            'order_status' => 'Status',
-            'total_price' => 'Price',
-            'total_price_before_refund' => 'Total price before refund',
-            'subtotal' => 'Subtotal',
-            'order_created_at' => 'Created at',
-            'order_updated_at' => 'Updated at',
-            'armada_tracking_link' => 'Tracking link',
-            'armada_delivery_code' => 'Armada delivery code',
-            'armada_qr_code_link' => 'QR code link',
-            'latitude' => 'Latitude',
-            'longitude' => 'Longitude',
-            'estimated_time_of_arrival' => 'Expected at',
-            'is_order_scheduled' => 'Is order scheduled',
-            'voucher_id' => 'Voucher ID',
-            'tax' => 'Tax',
-            'recipient_name' => 'Recipient name',
-            'sender_name' => 'Sender name',
-            'recipient_phone_number' => 'Recipient phone number',
-            'gift_message' => 'Gift Message',
-            'bank_discount_id' => 'Bank discount ID',
-            'mashkor_order_number' => 'Mashkor order number',
-            'mashkor_tracking_link' => 'Mashkor order tracking link',
-            'mashkor_driver_name' => 'Name of the driver',
-            'mashkor_driver_phone' => 'Driver phone number',
-            'mashkor_order_status' => 'Mashkor order status'
+            'order_uuid' => Yii::t('app','Order UUID'),
+            'payment_uuid' => Yii::t('app','Payment Uuid'),
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'area_id' => Yii::t('app','Area ID'),
+            'shipping_country_id' => Yii::t('app','Country ID'),
+            'delivery_zone_id' => Yii::t('app','Delivery Zone ID'),
+            'country_name' => Yii::t('app','Country Name'),
+            'country_name_ar' => Yii::t('app','Country Name Ar'),
+            'business_location_name' => Yii::t('app','Branch'),
+            'floor' =>Yii::t('app', 'Floor'),
+            'apartment' => Yii::t('app','Apartment'),
+            'office' => Yii::t('app','Office'),
+            'building' => Yii::t('app','Building'),
+            'postalcode' => Yii::t('app','Postal code'),
+            'address_1' => Yii::t('app','Address line 1'),
+            'address_2' => Yii::t('app','Address line 2'),
+            'area_name' => Yii::t('app','Area name'),
+            'area_name_ar' => Yii::t('app','Area name in Arabic'),
+            'unit_type' => Yii::t('app','Unit type'),
+            'block' => Yii::t('app','Block'),
+            'street' => Yii::t('app','Street'),
+            'customer_id' => Yii::t('app','Customer ID'),
+            'avenue' => Yii::t('app','Avenue'),
+            'house_number' => Yii::t('app','House number'),
+            'special_directions' => Yii::t('app','Special directions'),
+            'customer_name' => Yii::t('app','Customer name'),
+            'customer_phone_country_code' => Yii::t('app','Country Code'),
+            'customer_phone_number' => Yii::t('app','Phone number'),
+            'customer_email' => Yii::t('app','Customer email'),
+            'payment_method_id' =>Yii::t('app', 'Payment method ID'),
+            'payment_method_name' =>Yii::t('app', 'Payment method name'),
+            'payment_method_name_ar' => Yii::t('app','Payment method name [Arabic]'),
+            'currency_code' => Yii::t('app','Currency Code'),
+            'store_currency_code' => Yii::t('app','Store Currency Code'),
+            'currency_rate' => Yii::t('app','Currency Rate'),
+            'order_status' => Yii::t('app','Status'),
+            'total_price' => Yii::t('app','Price'),
+            'total_price_before_refund' => Yii::t('app','Total price before refund'),
+            'subtotal' => Yii::t('app','Subtotal'),
+            'order_created_at' => Yii::t('app','Created at'),
+            'order_updated_at' => Yii::t('app','Updated at'),
+            'armada_tracking_link' => Yii::t('app','Tracking link'),
+            'armada_delivery_code' => Yii::t('app','Armada delivery code'),
+            'armada_qr_code_link' => Yii::t('app','QR code link'),
+            'latitude' => Yii::t('app','Latitude'),
+            'longitude' => Yii::t('app','Longitude'),
+            'estimated_time_of_arrival' => Yii::t('app','Expected at'),
+            'is_order_scheduled' => Yii::t('app','Is order scheduled'),
+            'voucher_id' => Yii::t('app','Voucher ID'),
+            'tax' => Yii::t('app','Tax'),
+            'recipient_name' => Yii::t('app','Recipient name'),
+            'sender_name' => Yii::t('app','Sender name'),
+            'recipient_phone_number' => Yii::t('app','Recipient phone number'),
+            'gift_message' => Yii::t('app','Gift Message'),
+            'bank_discount_id' => Yii::t('app','Bank discount ID'),
+            'mashkor_order_number' => Yii::t('app','Mashkor order number'),
+            'mashkor_tracking_link' => Yii::t('app','Mashkor order tracking link'),
+            'mashkor_driver_name' => Yii::t('app','Name of the driver'),
+            'mashkor_driver_phone' => Yii::t('app','Driver phone number'),
+            'mashkor_order_status' => Yii::t('app','Mashkor order status')
         ];
     }
 
+    /**
+     * @return void
+     */
     public function sendPaymentConfirmationEmail()
     {
-
         $replyTo = [];
         if ($this->restaurant->restaurant_email) {
             $replyTo = [
@@ -672,10 +674,10 @@ class Order extends \yii\db\ActiveRecord
         if ($this->restaurant->restaurant_email_notification && $this->restaurant->restaurant_email) {
 
             \Yii::$app->mailer->compose([
-                'html' => 'payment-confirm-html',
-            ], [
-                'order' => $this
-            ])
+                    'html' => 'payment-confirm-html',
+                ], [
+                    'order' => $this
+                ])
                 ->setFrom([\Yii::$app->params['supportEmail'] => $this->restaurant->name])
                 ->setTo($this->restaurant->restaurant_email)
                 ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)

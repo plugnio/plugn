@@ -49,15 +49,15 @@ class Bank extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'bank_id' => 'Bank ID',
-            'bank_name' => 'Bank Name',
-            'bank_iban_code' => 'Bank Iban Code',
-            'bank_swift_code' => 'Bank Swift Code',
-            'bank_address' => 'Bank Address',
-            'bank_transfer_type' => 'Bank Transfer Type',
-            'bank_created_at' => 'Bank Created At',
-            'bank_updated_at' => 'Bank Updated At',
-            'deleted' => 'Deleted',
+            'bank_id' => Yii::t('app', 'Bank ID'),
+            'bank_name' => Yii::t('app', 'Bank Name'),
+            'bank_iban_code' => Yii::t('app', 'Bank Iban Code'),
+            'bank_swift_code' => Yii::t('app', 'Bank Swift Code'),
+            'bank_address' => Yii::t('app', 'Bank Address'),
+            'bank_transfer_type' => Yii::t('app', 'Bank Transfer Type'),
+            'bank_created_at' => Yii::t('app', 'Bank Created At'),
+            'bank_updated_at' => Yii::t('app', 'Bank Updated At'),
+            'deleted' => Yii::t('app', 'Deleted'),
         ];
     }
 

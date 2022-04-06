@@ -52,9 +52,9 @@ class PaymentMethod extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'payment_method_id' => 'Payment Method ID',
-            'payment_method_name' => 'Payment Method Name',
-            'payment_method_name_ar' => 'Payment Method Name [Arabic]',
+            'payment_method_id' => Yii::t('app','Payment Method ID'),
+            'payment_method_name' => Yii::t('app','Payment Method Name'),
+            'payment_method_name_ar' => Yii::t('app','Payment Method Name [Arabic]'),
         ];
     }
 

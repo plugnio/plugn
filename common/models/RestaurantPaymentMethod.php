@@ -48,8 +48,8 @@ class RestaurantPaymentMethod extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'payment_method_id' => 'Payment Method ID',
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'payment_method_id' => Yii::t('app','Payment Method ID'),
         ];
     }
 

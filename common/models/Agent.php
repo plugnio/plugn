@@ -100,21 +100,24 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     public function attributeLabels()
     {
         return [
-            'agent_id' => 'Agent ID',
-            'agent_name' => 'Agent Name',
-            'tempPassword' => 'Password',
-            'agent_email' => 'Agent Email',
-            'agent_auth_key' => 'Agent Auth Key',
-            'agent_password_hash' => 'Agent Password Hash',
-            'agent_password_reset_token' => 'Agent Password Reset Token',
-            'agent_language_pref' => 'Agent Language Preference',
-            'agent_status' => 'Agent Status',
-            'email_notification' => 'Email Notification',
-            'agent_created_at' => 'Agent Created At',
-            'agent_updated_at' => 'Agent Updated At',
+            'agent_id' => Yii::t('app','Agent ID'),
+            'agent_name' => Yii::t('app','Agent Name'),
+            'tempPassword' => Yii::t('app','Password'),
+            'agent_email' => Yii::t('app','Agent Email'),
+            'agent_auth_key' => Yii::t('app','Agent Auth Key'),
+            'agent_password_hash' => Yii::t('app','Agent Password Hash'),
+            'agent_password_reset_token' => Yii::t('app','Agent Password Reset Token'),
+            'agent_language_pref' => Yii::t('app','Agent Language Preference'),
+            'agent_status' => Yii::t('app','Agent Status'),
+            'email_notification' => Yii::t('app','Email Notification'),
+            'agent_created_at' => Yii::t('app','Agent Created At'),
+            'agent_updated_at' => Yii::t('app','Agent Updated At')
         ];
     }
 
+    /**
+     * @return array[]
+     */
     public function behaviors()
     {
         return [
