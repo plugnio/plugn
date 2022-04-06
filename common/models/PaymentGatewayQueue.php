@@ -126,13 +126,13 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'payment_gateway_queue_id' => 'Queue ID',
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'queue_status' => 'Queue Status',
-            'queue_created_at' => 'Queue Created At',
-            'queue_updated_at' => 'Queue Updated At',
-            'queue_start_at' => 'Queue Start At',
-            'queue_end_at' => 'Queue End At',
+            'payment_gateway_queue_id' => Yii::t('app','Queue ID'),
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'queue_status' => Yii::t('app','Queue Status'),
+            'queue_created_at' => Yii::t('app','Queue Created At'),
+            'queue_updated_at' => Yii::t('app','Queue Updated At'),
+            'queue_start_at' => Yii::t('app','Queue Start At'),
+            'queue_end_at' => Yii::t('app','Queue End At')
         ];
     }
 

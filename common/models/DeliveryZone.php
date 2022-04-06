@@ -66,14 +66,14 @@ class DeliveryZone extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'delivery_zone_id' => 'Delivery Zone ID',
-            'city_id' => 'City ID',
-            'country_id' => 'Country ID',
-            'business_location_id' => 'Business Location',
-            'delivery_time' => 'Delivery Time',
-            'delivery_fee' => 'Delivery Fee',
-            'min_charge' => 'Min Charge',
-            'delivery_zone_tax' => 'Tax Override',
+            'delivery_zone_id' => Yii::t('app', 'Delivery Zone ID'),
+            'city_id' => Yii::t('app', 'City ID'),
+            'country_id' => Yii::t('app', 'Country ID'),
+            'business_location_id' => Yii::t('app', 'Business Location'),
+            'delivery_time' => Yii::t('app', 'Delivery Time'),
+            'delivery_fee' => Yii::t('app', 'Delivery Fee'),
+            'min_charge' => Yii::t('app', 'Min Charge'),
+            'delivery_zone_tax' => Yii::t('app', 'Tax Override')
         ];
     }
 

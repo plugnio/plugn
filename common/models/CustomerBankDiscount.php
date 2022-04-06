@@ -43,9 +43,9 @@ class CustomerBankDiscount extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'customer_bank_discount_id' => 'Customer Bank Discount ID',
-            'customer_id' => 'Customer ID',
-            'bank_discount_id' => 'Bank Discount ID',
+            'customer_bank_discount_id' => Yii::t('app','Customer Bank Discount ID'),
+            'customer_id' => Yii::t('app','Customer ID'),
+            'bank_discount_id' => Yii::t('app','Bank Discount ID'),
         ];
     }
 

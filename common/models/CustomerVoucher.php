@@ -43,9 +43,9 @@ class CustomerVoucher extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'customer_voucher_id' => 'Customer Voucher ID',
-            'customer_id' => 'Customer ID',
-            'voucher_id' => 'Voucher ID',
+            'customer_voucher_id' => Yii::t('app', 'Customer Voucher ID'),
+            'customer_id' => Yii::t('app', 'Customer ID'),
+            'voucher_id' => Yii::t('app', 'Voucher ID'),
         ];
     }
 

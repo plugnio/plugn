@@ -98,21 +98,21 @@ class Voucher extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'voucher_id' => 'Voucher ID',
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'description' => 'Description',
-            'description_ar' => 'Description in Arabic',
-            'code' => 'Code',
-            'discount_type' => 'Discount Type',
-            'discount_amount' => 'Discount Amount',
-            'voucher_status' => 'Voucher Status',
-            'valid_from' => 'Valid From',
-            'valid_until' => 'Valid Until',
-            'voucher_created_at' => 'Created At',
-            'voucher_updated_at' => 'Updated At',
-            'max_redemption' => 'Max Redemption',
-            'limit_per_customer' => 'Limit Per Customer',
-            'minimum_order_amount' => 'Minimum Order Amount',
+            'voucher_id' => Yii::t('app','Voucher ID'),
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'description' => Yii::t('app','Description'),
+            'description_ar' => Yii::t('app','Description in Arabic'),
+            'code' => Yii::t('app','Code'),
+            'discount_type' => Yii::t('app','Discount Type'),
+            'discount_amount' => Yii::t('app','Discount Amount'),
+            'voucher_status' => Yii::t('app','Voucher Status'),
+            'valid_from' => Yii::t('app','Valid From'),
+            'valid_until' => Yii::t('app','Valid Until'),
+            'voucher_created_at' => Yii::t('app','Created At'),
+            'voucher_updated_at' => Yii::t('app','Updated At'),
+            'max_redemption' => Yii::t('app','Max Redemption'),
+            'limit_per_customer' => Yii::t('app','Limit Per Customer'),
+            'minimum_order_amount' => Yii::t('app','Minimum Order Amount')
         ];
     }
 

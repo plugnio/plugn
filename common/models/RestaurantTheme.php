@@ -51,13 +51,13 @@ class RestaurantTheme extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'primary' => 'Primary',
-            'secondary' => 'Secondary',
-            'tertiary' => 'Tertiary',
-            'light' => 'Light',
-            'medium' => 'Medium',
-            'dark' => 'Dark',
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'primary' => Yii::t('app','Primary'),
+            'secondary' => Yii::t('app','Secondary'),
+            'tertiary' => Yii::t('app','Tertiary'),
+            'light' => Yii::t('app','Light'),
+            'medium' => Yii::t('app','Medium'),
+            'dark' => Yii::t('app','Dark')
         ];
     }
 

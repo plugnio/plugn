@@ -76,12 +76,12 @@ class ExtraOption extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'extra_option_id' => 'Extra Option ID',
-            'option_id' => 'Option ID',
-            'extra_option_name' => 'Extra Option Name',
-            'extra_option_name_ar' => 'Extra Option Name in Arabic',
-            'extra_option_price' => 'Extra Option Price',
-            'stock_qty' => 'Stock Quantity',
+            'extra_option_id' => Yii::t('app', 'Extra Option ID'),
+            'option_id' => Yii::t('app', 'Option ID'),
+            'extra_option_name' => Yii::t('app', 'Extra Option Name'),
+            'extra_option_name_ar' => Yii::t('app', 'Extra Option Name in Arabic'),
+            'extra_option_price' => Yii::t('app', 'Extra Option Price'),
+            'stock_qty' => Yii::t('app', 'Stock Quantity')
         ];
     }
 

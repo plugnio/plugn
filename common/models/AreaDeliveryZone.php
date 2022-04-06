@@ -50,10 +50,10 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'area_delivery_zone_id' => 'Area Delivery Zone ID',
-            'delivery_zone_id' => 'Delivery Zone ID',
-            'area_id' => 'Area ID',
-            'restaurant_uuid' => 'Restaurant Uuid',
+            'area_delivery_zone_id' => Yii::t('app', 'Area Delivery Zone ID'),
+            'delivery_zone_id' => Yii::t('app', 'Delivery Zone ID'),
+            'area_id' => Yii::t('app', 'Area ID'),
+            'restaurant_uuid' => Yii::t('app', 'Restaurant Uuid'),
         ];
     }
 

@@ -62,20 +62,23 @@ class Category extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'category_id' => 'Category ID',
-            'title' => 'Title',
-            'title_ar' => 'Title in Arabic',
-            'subtitle' => 'Subtitle',
-            'image' => 'Category Image',
-            'subtitle_ar' => 'Subtitle in Arabic',
-            'category_meta_description' => 'Meta tag description',
-            'category_meta_description_ar' => 'Meta tag description in Arabic',
-            'sort_number' => 'Sort Number',
-            'slug' => 'Slug',
-            'restaurant_uuid' => 'Restaurant UUID',
+            'category_id' => Yii::t('app', 'Category ID'),
+            'title' => Yii::t('app', 'Title'),
+            'title_ar' => Yii::t('app', 'Title in Arabic'),
+            'subtitle' => Yii::t('app', 'Subtitle'),
+            'image' => Yii::t('app', 'Category Image'),
+            'subtitle_ar' => Yii::t('app', 'Subtitle in Arabic'),
+            'category_meta_description' => Yii::t('app', 'Meta tag description'),
+            'category_meta_description_ar' => Yii::t('app', 'Meta tag description in Arabic'),
+            'sort_number' => Yii::t('app', 'Sort Number'),
+            'slug' => Yii::t('app', 'Slug'),
+            'restaurant_uuid' => Yii::t('app', 'Restaurant UUID')
         ];
     }
 
+    /**
+     * @return array[]
+     */
     public function behaviors()
     {
         return [

@@ -45,8 +45,8 @@ class CategoryItem extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'category_id' => 'Category ID',
-            'item_uuid' => 'Item Uuid',
+            'category_id' => Yii::t('app', 'Category ID'),
+            'item_uuid' => Yii::t('app', 'Item Uuid'),
         ];
     }
 

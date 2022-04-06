@@ -77,19 +77,23 @@ class OrderItem extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'order_item_id' => 'Order Item ID',
-            'order_uuid' => 'Order ID',
-            'restaurant_uuid' => 'Store ID',
-            'item_uuid' => 'Item Uuid',
-            'item_variant_uuid' => 'Item Variant Uuid',
-            'item_name' => 'Item Name',
-            'item_name_ar' => 'Item Name in Arabic',
-            'item_price' => 'Item Price',
-            'qty' => 'Quantity',
-            'customer_instruction' => 'Instructions',
+            'order_item_id' => Yii::t('app','Order Item ID'),
+            'order_uuid' => Yii::t('app','Order ID'),
+            'restaurant_uuid' => Yii::t('app','Store ID'),
+            'item_uuid' => Yii::t('app','Item Uuid'),
+            'item_variant_uuid' => Yii::t('app','Item Variant Uuid'),
+            'item_name' => Yii::t('app','Item Name'),
+            'item_name_ar' => Yii::t('app','Item Name in Arabic'),
+            'item_price' => Yii::t('app','Item Price'),
+            'qty' => Yii::t('app','Quantity'),
+            'customer_instruction' => Yii::t('app','Instructions'),
         ];
     }
 
+    /**
+     * @param $attribute
+     * @return bool|void
+     */
     public function validateQty($attribute)
     {
         if(!$this->item || !$this->item->track_quantity) {
@@ -199,6 +203,9 @@ class OrderItem extends \yii\db\ActiveRecord {
         return parent::beforeDelete();
     }
 
+    /**
+     * @return false|void
+     */
     public function afterDelete() {
         $order_model = Order::findOne($this->order_uuid);
 
@@ -209,6 +216,10 @@ class OrderItem extends \yii\db\ActiveRecord {
         return false;
     }
 
+    /**
+     * @param $insert
+     * @return bool|void
+     */
     public function beforeSave($insert) {
 
         parent::beforeSave($insert);
@@ -265,6 +276,11 @@ class OrderItem extends \yii\db\ActiveRecord {
         return true;
     }
 
+    /**
+     * @param $insert
+     * @param $changedAttributes
+     * @return void
+     */
     public function afterSave($insert, $changedAttributes) {
 
         $item_model = Item::findOne($this->item_uuid);
@@ -287,6 +303,9 @@ class OrderItem extends \yii\db\ActiveRecord {
         return parent::afterSave($insert, $changedAttributes);
     }
 
+    /**
+     * @return string[]
+     */
     public function extraFields() {
         return [
             'currency',
@@ -383,6 +402,9 @@ class OrderItem extends \yii\db\ActiveRecord {
         return $this->hasMany($modelClass::className(), ['order_item_id' => 'order_item_id']);
     }
 
+    /**
+     * @return query\OrderItemQuery
+     */
     public static function find()
     {
         return new query\OrderItemQuery(get_called_class ());
