@@ -17,6 +17,8 @@ use yii\behaviors\TimestampBehavior;
  * @property string|null $item_name_ar
  * @property string|null $item_description
  * @property string|null $item_description_ar
+ * @property string|null $item_meta_title
+ * @property string|null $item_meta_title_ar
  * @property string|null $item_meta_description
  * @property string|null $item_meta_description_ar
  * @property int|null $sort_number
@@ -98,7 +100,7 @@ class Item extends \yii\db\ActiveRecord
             [['item_uuid'], 'string', 'max' => 300],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['item_name', 'item_name_ar', 'item_image', 'barcode', 'sku'], 'string', 'max' => 255],
-            [['item_description', 'item_description_ar', 'item_meta_description', 'item_meta_description_ar'], 'string', 'max' => 2500],
+            [['item_description', 'item_description_ar', 'item_meta_title', 'item_meta_title_ar', 'item_meta_description', 'item_meta_description_ar'], 'string', 'max' => 2500],
             [['item_uuid'], 'unique'],
             ['slug', 'safe'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
@@ -125,6 +127,8 @@ class Item extends \yii\db\ActiveRecord
             'item_name' => 'Title in English',
             'item_name_ar' => 'Title in Arabic',
             'item_description' => 'Item description in English',
+            'item_meta_title' => 'Page Title',
+            'item_meta_title_ar' => 'Page Title in Arabic',
             'item_description_ar' => 'Item description in Arabic',
             'item_meta_description' => 'Meta tag description',
             'item_meta_description_ar' => 'Meta tag description in Arabic',

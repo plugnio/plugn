@@ -88,7 +88,8 @@ class ItemVariant extends \yii\db\ActiveRecord
         $fields = parent::fields();
 
         return array_merge ($fields, [
-            'itemVariantOptions'
+            'itemVariantOptions',
+            'itemVariantImages'
         ]);
     }
 
@@ -171,5 +172,15 @@ class ItemVariant extends \yii\db\ActiveRecord
     public function getItemVariantOptions()
     {
         return $this->hasMany(ItemVariantOption::className(), ['item_variant_uuid' => 'item_variant_uuid']);
+    }
+
+    /**
+     * Gets query for [[ItemVariantOptions]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItemVariantImages()
+    {
+        return $this->hasMany(ItemVariantImages::className(), ['item_variant_uuid' => 'item_variant_uuid']);
     }
 }
