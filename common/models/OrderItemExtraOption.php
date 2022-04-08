@@ -61,8 +61,12 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
             return true;
         }
 
-        if($this->qty < $this->extraOption->stock_qty)
-            $this->addError($attribute, Yii::t('app','Out of stock'));
+        if($this->qty > $this->extraOption->stock_qty)
+        {
+            $this->addError($attribute, Yii::t('app', "{name} is currently out of stock and unavailable.", [
+                'name' => Yii::$app->language != 'ar'? $this->extraOption->extra_option_name: $this->extraOption->extra_option_name_ar
+            ]));
+        }
     }
 
     /**
@@ -179,7 +183,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
 
         } else {
 
-            if ($extra_option_model && $extra_option_model->stock_qty !== null && $extra_option_model->stock_qty >= $this->qty)
+            if ($extra_option_model && $extra_option_model->stock_qty !== null && $extra_option_model->stock_qty < $this->qty)
             {
                 return $this->addError('qty', Yii::t('app', "{name} is currently out of stock and unavailable.", [
                     'name' => $extra_option_model->extra_option_name
