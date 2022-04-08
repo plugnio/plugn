@@ -182,15 +182,19 @@ class Order extends \yii\db\ActiveRecord
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
             ['pickup_location_id', function ($attribute, $params, $validator) {
                 if (!$this->pickup_location_id && $this->order_mode == Order::ORDER_MODE_PICK_UP)
-                    $this->addError($attribute, 'Branch name cannot be blank.');
+                    $this->addError($attribute, Yii::t('app', 'Branch name cannot be blank.'));
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
+
             ['delivery_zone_id', function ($attribute, $params, $validator) {
                 if (!$this->delivery_zone_id && $this->order_mode == Order::ORDER_MODE_DELIVERY)
-                    $this->addError($attribute, 'Delivery zone cannot be blank.');
+                    $this->addError($attribute, Yii::t('app', 'Delivery zone cannot be blank.'));
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
+
             [['scheduled_time_start_from', 'scheduled_time_to'], function ($attribute, $params, $validator) {
                 if ($this->is_order_scheduled && (!$this->scheduled_time_start_from || !$this->scheduled_time_to))
-                    $this->addError($attribute, $attribute . ' cannot be blank.');
+                    $this->addError($attribute, Yii::t('app', '{attribute} cannot be blank.',[
+                        'attribute' => $attribute
+                    ]));
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
 
             //TODO
@@ -208,20 +212,27 @@ class Order extends \yii\db\ActiveRecord
             ],
             [['area_id'], 'validateArea'],
             ['unit_type', function ($attribute, $params, $validator) {
-                if ($this->area_id && !$this->unit_type && $this->order_mode == Order::ORDER_MODE_DELIVERY)
-                    $this->addError($attribute, 'Unit type cannot be blank.');
+                if ($this->area_id && !$this->unit_type && $this->order_mode == Order::ORDER_MODE_DELIVERY) {
+                    $this->addError($attribute, Yii::t('app','Unit type cannot be blank.'));
+                }
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['block', function ($attribute, $params, $validator) {
                 if ($this->area_id && $this->block == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
-                    $this->addError($attribute, 'Block cannot be blank.');
+                {
+                    $this->addError($attribute, Yii::t('app','Block cannot be blank.'));
+                }
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['street', function ($attribute, $params, $validator) {
                 if ($this->area_id && $this->street == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
-                    $this->addError($attribute, 'Street cannot be blank.');
+                {
+                    $this->addError($attribute, Yii::t('app','Street cannot be blank.'));
+                }
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['house_number', function ($attribute, $params, $validator) {
                 if ($this->area_id && $this->house_number == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
-                    $this->addError($attribute, 'House number cannot be blank.');
+                {
+                    $this->addError($attribute, Yii::t('app','House number cannot be blank.'));
+                }
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
             ['order_mode', 'validateOrderMode', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['restaurant_uuid'], 'string', 'max' => 60],
@@ -253,7 +264,7 @@ class Order extends \yii\db\ActiveRecord
             [
                 'subtotal', function ($attribute, $params, $validator) {
                 if ($this->voucher && $this->voucher->minimum_order_amount !== 0 && $this->calculateOrderItemsTotalPrice() >= $this->voucher->minimum_order_amount)
-                    $this->addError('voucher_id', "We can't apply this code until you reach the minimum order amount");
+                    $this->addError('voucher_id', Yii::t('app', "We can't apply this code until you reach the minimum order amount"));
             }, 'skipOnError' => false, 'skipOnEmpty' => false
             ],
             [['customer_email'], 'email'],
@@ -480,7 +491,7 @@ class Order extends \yii\db\ActiveRecord
     public function validatePaymentMethodId($attribute)
     {
         if (!RestaurantPaymentMethod::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'payment_method_id' => $this->payment_method_id])->one())
-            $this->addError($attribute, "Payment method id invalid.");
+            $this->addError($attribute, Yii::t('app',"Payment method id invalid."));
     }
 
     /**
@@ -492,7 +503,7 @@ class Order extends \yii\db\ActiveRecord
         $voucher = Voucher::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'voucher_id' => $this->voucher_id, 'voucher_status' => Voucher::VOUCHER_STATUS_ACTIVE])->exists();
 
         if (!$voucher || !$this->voucher->isValid($this->customer_phone_number))
-            $this->addError($attribute, "Voucher code is invalid or expired");
+            $this->addError($attribute, Yii::t('app',"Voucher code is invalid or expired"));
     }
 
     /**
@@ -502,7 +513,7 @@ class Order extends \yii\db\ActiveRecord
     public function validateArea($attribute)
     {
         if (!AreaDeliveryZone::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'area_id' => $this->area_id, 'delivery_zone_id' => $this->delivery_zone_id])->one())
-            $this->addError($attribute, "Store does not deliver to this delivery zone.");
+            $this->addError($attribute, Yii::t('app',"Store does not deliver to this delivery zone."));
     }
 
     /**
@@ -515,7 +526,7 @@ class Order extends \yii\db\ActiveRecord
         $areaDeliveryZone = AreaDeliveryZone::find()->where(['country_id' => $this->shipping_country_id, 'delivery_zone_id' => $this->delivery_zone_id])->one();
 
         if (!$areaDeliveryZone || $areaDeliveryZone->area_id != null || ($areaDeliveryZone && $areaDeliveryZone->businessLocation->restaurant_uuid != $this->restaurant_uuid))
-            $this->addError($attribute, "Store does not deliver to this area. ");
+            $this->addError($attribute, Yii::t('app',"Store does not deliver to this area."));
     }
 
     /**
@@ -524,11 +535,13 @@ class Order extends \yii\db\ActiveRecord
      */
     public function validateOrderMode($attribute)
     {
-        if ($this->$attribute == static::ORDER_MODE_DELIVERY && !$this->delivery_zone_id)
-            $this->addError($attribute, "Store doesn't accept delviery");
+        if ($this->$attribute == static::ORDER_MODE_DELIVERY && !$this->delivery_zone_id) {
+            $this->addError($attribute, Yii::t('app', "Store doesn't accept delivery"));
+        }
 
-        else if ($this->$attribute == static::ORDER_MODE_PICK_UP && $this->pickup_location_id && !$this->pickupLocation->support_pick_up)
-            $this->addError($attribute, "Store doesn't accept pick up");
+        else if ($this->$attribute == static::ORDER_MODE_PICK_UP && $this->pickup_location_id && !$this->pickupLocation->support_pick_up) {
+            $this->addError($attribute, Yii::t('app', "Store doesn't accept pick up"));
+        }
     }
 
     /**
@@ -550,12 +563,26 @@ class Order extends \yii\db\ActiveRecord
 
         if ($this->deliveryZone->min_charge > $this->$attribute) {
 
-            if($this->currency && $this->currency->code) 
-                $this->addError($attribute, "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency($this->deliveryZone->min_charge, $this->currency->code, [\NumberFormatter::MAX_FRACTION_DIGITS => $this->currency->decimal_place]));
-            else if($this->currency_code) 
-                $this->addError($attribute, "Minimum Order Amount: " . \Yii::$app->formatter->asCurrency($this->deliveryZone->min_charge, $this->currency_code));
-            else 
-                $this->addError($attribute, "Minimum Order Amount: " . $this->deliveryZone->min_charge);
+            if($this->currency && $this->currency->code) {
+                $this->addError($attribute, Yii::t('app', "Minimum Order Amount: {amount}", [
+                    'amount' => \Yii::$app->formatter->asCurrency(
+                        $this->deliveryZone->min_charge,
+                        $this->currency->code,
+                        [\NumberFormatter::MAX_FRACTION_DIGITS => $this->currency->decimal_place]
+                    )
+                ]));
+
+            } else if($this->currency_code) {
+                $this->addError($attribute, Yii::t('app', "Minimum Order Amount: {amount}", [
+                    'amount' => \Yii::$app->formatter->asCurrency($this->deliveryZone->min_charge, $this->currency_code)
+                ]));
+            }
+            else
+            {
+                $this->addError($attribute, Yii::t('app', "Minimum Order Amount: {amount}", [
+                    'amount' => $this->deliveryZone->min_charge
+                ]));
+            }
         }
     }
 

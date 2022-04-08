@@ -109,7 +109,9 @@ class RefundController extends Controller {
                                 return $this->redirect(['view', 'id' => $model->refund_id, 'storeUuid' => $model->restaurant_uuid]);
                         }
                     }else {
-                        $model->addError('order_uuid', 'Invalid Order Uuid');
+                        $model->addError('order_uuid', Yii::t('yii', '{attribute} is invalid.', [
+                           'attribute' => 'order_uuid'
+                        ]));
 
                         return $this->render('create', [
                                     'model' => $model,

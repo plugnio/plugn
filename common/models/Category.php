@@ -259,6 +259,7 @@ class Category extends \yii\db\ActiveRecord
         } catch (\Cloudinary\Error  $err) {
 
             $this->addError ('category_image', Yii::t ('app', 'Please try again.'));
+
             Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
 
             return false;

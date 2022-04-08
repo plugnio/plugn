@@ -101,13 +101,17 @@ class OrderItem extends \yii\db\ActiveRecord {
         }
 
         if($this->item->item_type == Item::TYPE_SIMPLE) {
-            if($this->qty < $this->item->stock_qty)
-                $this->addError($attribute, 'Out of stock');
+            if($this->qty < $this->item->stock_qty) {
+                $this->addError($attribute, Yii::t('app', 'Out of stock'));
+            }
         } else {
-            if(!$this->variant)
-                $this->addError($attribute, 'Variant detail missing');
+            if(!$this->variant) {
+                $this->addError($attribute, Yii::t('app', 'Variant detail missing'));
+            }
             else if($this->qty < $this->variant->stock_qty)
-                $this->addError($attribute, 'Out of stock');
+            {
+                $this->addError($attribute, Yii::t('app', 'Out of stock'));
+            }
         }
     }
 
@@ -124,10 +128,15 @@ class OrderItem extends \yii\db\ActiveRecord {
             ])
             ->one(): null;
 
-        if (!$isItemBelongToRestaurant)
-            $this->addError($attribute, 'Item Uuid is invalid');
+        if (!$isItemBelongToRestaurant) {
+            $this->addError($attribute, Yii::t('yii', '{attribute} is invalid', [
+                'attribute' => $attribute
+            ]));
+        }
         else if ($isItemBelongToRestaurant->item_status == Item::ITEM_STATUS_UNPUBLISH)
-            $this->addError($attribute, 'Sorry, the selected item is no longer available.');
+        {
+            $this->addError($attribute, Yii::t('app', 'Sorry, the selected item is no longer available.'));
+        }
     }
 
     /**
@@ -144,7 +153,9 @@ class OrderItem extends \yii\db\ActiveRecord {
             ->one(): null;
 
         if (!$isItemBelongToRestaurant)
-            $this->addError($attribute, 'Item Variant Uuid is invalid');
+            $this->addError($attribute, Yii::t('yii', '{attribute} is invalid', [
+                'attribute' => $attribute
+            ]));
     }
 
     /**
@@ -234,8 +245,11 @@ class OrderItem extends \yii\db\ActiveRecord {
             $this->restaurant_uuid = $this->order->restaurant_uuid;
         }
 
-        if ($this->qty == 0)
-            return $this->addError('qty', "Invalid input");
+        if ($this->qty == 0) {
+            return $this->addError('qty', Yii::t('yii', '{attribute} is invalid', [
+                'attribute' => Yii::t('app', 'Quantity')
+            ]));
+        }
 
         //if custom item
 
@@ -245,14 +259,20 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         if ($insert) {
 
-            if ($this->item_uuid && $this->item->track_quantity && $this->qty  > $this->item->stock_qty)
-                return $this->addError('qty', $this->item->item_name . " is currently out of stock and unavailable.");
+            if ($this->item_uuid && $this->item->track_quantity && $this->qty  > $this->item->stock_qty) {
+                return $this->addError('qty',  Yii::t('app', "{name} is currently out of stock and unavailable.", [
+                    'name' => $this->item->item_name
+                ]));
+            }
         }
-        else {
-
+        else
+        {
             if ($this->item_uuid && $this->item->track_quantity && $this->qty > ( $this->item->stock_qty + $this->getOldAttribute('qty')))
-                return $this->addError('qty', $this->item->item_name . " is currently out of stock and unavailable.");
-
+            {
+                return $this->addError('qty', Yii::t('app', "{name} is currently out of stock and unavailable.", [
+                    'name' => $this->item->item_name
+                ]));
+            }
         }
 
         //Update product inventory

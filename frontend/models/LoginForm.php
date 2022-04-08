@@ -45,7 +45,7 @@ class LoginForm extends Model {
         if (!$this->hasErrors()) {
             $agent = $this->getAgent();
             if (!$agent || !$agent->validatePassword($this->password)) {
-                $this->addError($attribute, 'Incorrect email or password.');
+                $this->addError($attribute, Yii::t('app', 'Incorrect email or password.'));
             }
         }
     }
