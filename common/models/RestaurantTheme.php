@@ -41,10 +41,8 @@ class RestaurantTheme extends \yii\db\ActiveRecord {
 
     public function validateColorFormat($attribute, $params, $validator) {
         if($this->$attribute[0] != '#')
-            $this->addError($attribute, 'Invalid color format');
+            $this->addError($attribute, Yii::t('app', 'Invalid color format'));
     }
-
-
 
     /**
      * {@inheritdoc}

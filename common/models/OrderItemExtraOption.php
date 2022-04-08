@@ -62,7 +62,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
         }
 
         if($this->qty < $this->extraOption->stock_qty)
-            $this->addError($attribute, 'Out of stock');
+            $this->addError($attribute, Yii::t('app','Out of stock'));
     }
 
     /**
@@ -116,11 +116,20 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
     public function checkIfExtraOptionBelongToItem($attribute) {
         $extra_option_model = ExtraOption::findOne($this->extra_option_id);
 
-        if ($extra_option_model) {
+        if ($extra_option_model)
+        {
             if ($this->orderItem->item_uuid != $extra_option_model->option->item_uuid)
-                $this->addError($attribute, 'Extra Option Uuid is invalid');
-        }else {
-            $this->addError($attribute, 'Extra Option Uuid is invalid');
+            {
+                $this->addError($attribute, Yii::t('yii', '{attribute} is invalid', [
+                    'attribute' => $attribute
+                ]));
+            }
+        }
+        else
+        {
+            $this->addError($attribute, Yii::t('yii', '{attribute} is invalid', [
+                'attribute' => $attribute
+            ]));
         }
     }
 
@@ -137,16 +146,25 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
             if ($extra_option_model) {
 
                 if ($extra_option_model->stock_qty !== null && $extra_option_model->stock_qty <= 0)
-                    return $this->addError('qty', $extra_option_model->extra_option_name . " is currently out of stock and unavailable.");
-
+                {
+                    return $this->addError('qty', Yii::t('app', "{name} is currently out of stock and unavailable.", [
+                        'name' => $extra_option_model->extra_option_name
+                    ]));
+                }
 
                 if ($extra_option_model->stock_qty !== null && $extra_option_model->stock_qty < $this->qty)
-                    return $this->addError('qty', $extra_option_model->extra_option_name . " is currently out of stock and unavailable.");
-
+                {
+                    return $this->addError('qty',  Yii::t('app', "{name} is currently out of stock and unavailable.", [
+                        'name' => $extra_option_model->extra_option_name
+                    ]));
+                }
 
                 if ($this->qty == 0)
-                    return $this->addError('qty', "Invalid input");
-
+                {
+                    return $this->addError('qty', Yii::t('yii', "{attribute} is invalid.", [
+                        'attribute' => 'qty'
+                    ]));
+                }
 
                 //Update stock qty
 
@@ -162,7 +180,11 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
         } else {
 
             if ($extra_option_model && $extra_option_model->stock_qty !== null && $extra_option_model->stock_qty >= $this->qty)
-                return $this->addError('qty', $extra_option_model->extra_option_name . " is currently out of stock and unavailable.");
+            {
+                return $this->addError('qty', Yii::t('app', "{name} is currently out of stock and unavailable.", [
+                    'name' => $extra_option_model->extra_option_name
+                ]));
+            }
         }
 
         return parent::beforeSave($insert);

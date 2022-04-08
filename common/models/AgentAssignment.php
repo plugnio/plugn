@@ -83,10 +83,12 @@ class AgentAssignment extends \yii\db\ActiveRecord {
             if ($agent_model = Agent::findByEmail($this->assignment_agent_email))
                 $this->agent_id = $agent_model->agent_id;
             else
-                return $this->addError('assignment_agent_email', 'Could not find a Plugn account matching ' . $this->assignment_agent_email);
+                return $this->addError('assignment_agent_email', Yii::t('app', 'Could not find a Plugn account matching {email}', [
+                    'email' => $this->assignment_agent_email
+                ]));
 
             if (AgentAssignment::find()->where(['agent_id' => $this->agent_id, 'restaurant_uuid' => $this->restaurant_uuid])->exists())
-                return $this->addError('assignment_agent_email', 'This person has already been added as an agent.');
+                return $this->addError('assignment_agent_email', Yii::t('app', 'This person has already been added as an agent.'));
         }
 
         return parent::beforeSave($insert);

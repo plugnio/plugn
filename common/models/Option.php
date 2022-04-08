@@ -75,7 +75,7 @@ class Option extends \yii\db\ActiveRecord {
             // an inline validator defined as an anonymous function
             ['min_qty', function ($attribute, $params, $validator) {
                     if ($this->max_qty != null && $this->min_qty > $this->max_qty) {
-                        $this->addError($attribute, 'Min quantity must be less than or equal to max quantity');
+                        $this->addError($attribute, Yii::t('app', 'Min quantity must be less than or equal to max quantity'));
                     }
                 }],
             [['item_uuid'], 'string', 'max' => 300],

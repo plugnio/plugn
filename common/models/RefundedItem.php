@@ -59,7 +59,7 @@ class RefundedItem extends \yii\db\ActiveRecord
     public function validateQty($attribute, $params, $validator)
     {
         if ($this->orderItem->qty < $this->qty)
-            $this->addError($attribute, 'Invalid Qty');
+            $this->addError($attribute, Yii::t('app','Invalid Qty'));
 
     }
 

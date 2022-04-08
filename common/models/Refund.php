@@ -136,9 +136,13 @@ class Refund extends \yii\db\ActiveRecord
     {
 
       if ($this->refund_amount < 0 )
-        return  $this->addError($attribute, 'Refund amount must be greater than zero.');
+      {
+          return $this->addError($attribute, Yii::t('app','Refund amount must be greater than zero.'));
+      }
       else if ($this->refund_amount > $this->order->total_price)
-        return  $this->addError($attribute, 'Refund amount cannot exceed amount available for refund.');
+      {
+          return  $this->addError($attribute, Yii::t('app','Refund amount cannot exceed amount available for refund.'));
+      }
 
       if($this->store->is_myfatoorah_enable){
 
@@ -151,15 +155,15 @@ class Refund extends \yii\db\ActiveRecord
           if ( !$totalAwaitingBalanceResponse->isOk && !$responseContent->IsSuccess){
               $errorMessage = "Error: " . $responseContent->Message;
               Yii::error('Refund Error (#'. $this->order_uuid .'): ' . $errorMessage);
-              return $this->addError($attribute, 'Refund amount cannot exceed amount available for refund.');
+              return $this->addError($attribute, Yii::t('app','Refund amount cannot exceed amount available for refund.'));
 
           }else if ($totalAwaitingBalanceResponse->isOk){
             if($responseContent->TotalAwaitingBalance < $this->refund_amount)
-              return  $this->addError($attribute, 'Insufficcent Balance');
+              return  $this->addError($attribute, Yii::t('app','Insufficcent Balance'));
 
 
           } else {
-            return $this->addError($attribute, 'Refund amount cannot exceed amount available for refund.');
+            return $this->addError($attribute, Yii::t('app','Refund amount cannot exceed amount available for refund.'));
           }
 
       }

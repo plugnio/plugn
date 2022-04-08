@@ -1196,7 +1196,7 @@ class Restaurant extends \yii\db\ActiveRecord
             $isDomainExist = self::find()->where(['restaurant_domain' => $this->restaurant_domain])->exists();
 
             if($isDomainExist)
-                return  $this->addError('restaurant_domain', 'Another store is already using this domain');
+                return  $this->addError('restaurant_domain', Yii::t('app','Another store is already using this domain'));
 
             $this->restaurant_domain = 'https://' . $store_domain . '.plugn.store';
         }
