@@ -329,17 +329,95 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
             </div>
         </div>
 
+<?php
+if ($model->recipient_name || $model->recipient_phone_number || $model->gift_message || $model->sender_name) {
 
-        <div id="invoice-customer-details" class="row pt-2">
+?>
+        <hr />
 
 
+        <h4>
+        <img src="https://res.cloudinary.com/plugn/image/upload/v1649461316/icon_gift_gfapfu.svg" />  Gift details
+        </h4>
+        <div id="invoice-company-details" class="row">
             <div class="col-sm-6 col-12 text-left">
-            </div>
-            <div class="col-sm-6 col-12 text-left">
+
+
+
+              <div class="invoice-details my-2">
+                  <div class="row">
+
+                    <div class=" col-12 text-left">
+                      <span>
+                        <b>Recipient Name </b>
+                        <span style="    padding-left: 10px;">
+                          <?=  $model->recipient_name ?>
+                        </span>
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+              </div>
+      
+              <div class="invoice-details my-2">
+                  <div class="row">
+
+                    <div class="col-12 text-left">
+                      <span>
+                        <b>Gift Message </b>
+                        <span style="    padding-left: 10px;">
+                          <?=  $model->gift_message ?>
+                        </span>
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+              </div>
+
+
+
+
 
             </div>
+            <div class="col-sm-6 col-12 text-right">
 
+                <div class="invoice-details my-2">
+                    <div class="row">
+                      <div class="col-sm-1 col-12 text-left">
+                      </div>
+                      <div class="col-sm-5 col-12 text-left">
+                        <span>
+                          <b>Recipient Phone Number </b>
+
+                        </span>
+
+                      </div>
+                      <div class="col-sm-6 col-12 text-right">
+                        <span>
+                          <?=  $model->recipient_phone_number ?>
+
+                        </span>
+
+                      </div>
+                    </div>
+
+
+                </div>
+
+
+
+            </div>
         </div>
+
+<?php } ?>
+
+
 
         <!--/ Invoice Recipient Details -->
 
