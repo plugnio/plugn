@@ -21,6 +21,19 @@ $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 
 
+
+
+if ($model->recipient_name || $model->recipient_phone_number || $model->gift_message || $model->sender_name) {
+  $this->registerCss('
+  .content-header-title::after {
+    content: url(https://res.cloudinary.com/plugn/image/upload/v1649461316/icon_gift_gfapfu.svg);
+        vertical-align: middle;
+        padding:10px;
+  }
+  ');
+}
+
+
 $js = "
 $(function () {
   $('.summary').insertAfter('.top');
