@@ -343,25 +343,30 @@ if ($model->recipient_name || $model->recipient_phone_number || $model->gift_mes
             <div class="col-sm-6 col-12 text-left">
 
 
+              <?php if ($model->recipient_name) { ?>
 
-              <div class="invoice-details my-2">
-                  <div class="row">
+                <div class="invoice-details my-2">
+                    <div class="row">
 
-                    <div class=" col-12 text-left">
-                      <span>
-                        <b>Recipient Name </b>
-                        <span style="    padding-left: 10px;">
-                          <?=  $model->recipient_name ?>
+                      <div class=" col-12 text-left">
+                        <span>
+                          <b>Recipient Name </b>
+                          <span style="    padding-left: 10px;">
+                            <?=  $model->recipient_name ?>
+                          </span>
                         </span>
-                      </span>
+
+                      </div>
 
                     </div>
 
-                  </div>
+
+                </div>
+
+              <?php } ?>
 
 
-              </div>
-      
+            <?php if ($model->gift_message) { ?>
               <div class="invoice-details my-2">
                   <div class="row">
 
@@ -379,40 +384,46 @@ if ($model->recipient_name || $model->recipient_phone_number || $model->gift_mes
 
 
               </div>
+            <?php } ?>
 
 
 
 
 
             </div>
-            <div class="col-sm-6 col-12 text-right">
+            <?php if ($model->recipient_phone_number) { ?>
 
-                <div class="invoice-details my-2">
-                    <div class="row">
-                      <div class="col-sm-1 col-12 text-left">
-                      </div>
-                      <div class="col-sm-5 col-12 text-left">
-                        <span>
-                          <b>Recipient Phone Number </b>
+                <div class="col-sm-6 col-12 text-right">
 
-                        </span>
+                    <div class="invoice-details my-2">
+                        <div class="row">
+                          <div class="col-sm-1 col-12 text-left">
+                          </div>
+                          <div class="col-sm-5 col-12 text-left">
+                            <span>
+                              <b>Recipient Phone Number </b>
 
-                      </div>
-                      <div class="col-sm-6 col-12 text-right">
-                        <span>
-                          <?=  $model->recipient_phone_number ?>
+                            </span>
 
-                        </span>
+                          </div>
+                          <div class="col-sm-6 col-12 text-right">
+                            <span>
+                              <?=  $model->recipient_phone_number ?>
 
-                      </div>
+                            </span>
+
+                          </div>
+                        </div>
+
+
                     </div>
+
 
 
                 </div>
 
+            <?php } ?>
 
-
-            </div>
         </div>
 
 <?php } ?>
