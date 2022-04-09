@@ -187,7 +187,7 @@ use common\models\BankDiscount;
                                                                                                 </td>
                                                                                                 <td style="width: 70%; padding: 0 15px; padding-top:10px; vertical-align:top;">
                                                                                                     <p style="margin:0;padding:0;">
-                                                                                                        <?= $orderItem->item->item_name . ' ' . $orderItem->item->item_name_ar ?>
+                                                                                                        <?= $orderItem->item_name . ' ' . $orderItem->item_name_ar ?>
                                                                                                     </p>
                                                                                                     <?php foreach ($orderItem->getOrderItemExtraOptions()->all() as $extraOption) { ?>
                                                                                                         <p style="margin:0;padding:0; color:#828585;">
