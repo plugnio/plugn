@@ -26,6 +26,8 @@ use yii\db\Expression;
  */
 class ItemVariant extends \yii\db\ActiveRecord
 {
+    public $images = [];
+
     /**
      * {@inheritdoc}
      */
@@ -109,6 +111,44 @@ class ItemVariant extends \yii\db\ActiveRecord
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
+    }
+
+    public function beforeSave($insert)
+    {
+        if(!parent::beforeSave($insert))
+        {
+            return false;
+        }
+
+        foreach ($this->images as $img) {
+            if ($img['product_file_name']) {
+                // check if same image exist then skip
+                $exist = $this->getItemImages()->andWhere(['product_file_name'=>$img['product_file_name']])->exists();
+                if ($exist) {
+                    continue;
+                }
+                try {
+                    $url = Yii::$app->temporaryBucketResourceManager->getUrl($img['product_file_name']);
+                    $filename = Yii::$app->security->generateRandomString();
+                    $data[] = $result = Yii::$app->cloudinaryManager->upload(
+                        $url,
+                        [
+                            'public_id' => "restaurants/" . $this->restaurant_uuid . "/items/" . $filename
+                        ]
+                    );
+
+                    $item_image_model = new ItemImage();
+                    $item_image_model->item_uuid = $this->item_uuid;
+                    $item_image_model->item_variant_uuid = $this->item_variant_uuid;
+                    $item_image_model->product_file_name = basename($result['url']);
+                    $item_image_model->save(false);
+
+                } catch (\Cloudinary\Error $err) {
+                    Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($images));
+                    return false;
+                }
+            }
+        }
     }
 
     /**
