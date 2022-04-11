@@ -17,6 +17,8 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    'Page Title' => "عنوان الصفحة",
+    'Page Title in Arabic' => "عنوان الصفحة باللغة العربية",
     'Option Type' => "نوع الخيار",
     "Is Required?" => "مطلوب؟",
     'Incorrect email or password.' => 'بريد أو كلمة مرورغير صحيحة.',
