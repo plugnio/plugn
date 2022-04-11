@@ -17,6 +17,8 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    'Option Type' => "نوع الخيار",
+    "Is Required?" => "مطلوب؟",
     'Incorrect email or password.' => 'بريد أو كلمة مرورغير صحيحة.',
     'Another store is already using this domain' => 'متجر آخر يستخدم هذا المجال بالفعل',
     'Invalid Qty' => 'الكمية غير صحيحة',
