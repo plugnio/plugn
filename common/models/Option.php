@@ -26,6 +26,10 @@ class Option extends \yii\db\ActiveRecord {
     const UPDATE_TYPE_UPDATE = 'update';
     const UPDATE_TYPE_DELETE = 'delete';
 
+    const TYPE_CHECKBOX = 1;
+    const TYPE_RADIO = 2;
+    const TYPE_TEXT = 3;
+
     const SCENARIO_BATCH_UPDATE = 'batchUpdate';
 
     private $_updateType;
@@ -58,14 +62,15 @@ class Option extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['item_uuid', 'option_name'], 'required'],
+            [['item_uuid', 'option_name', 'option_type'], 'required'],
+            ['is_required', 'boolean'],
             ['updateType', 'required', 'on' => self::SCENARIO_BATCH_UPDATE],
             ['updateType',
                 'in',
                 'range' => [self::UPDATE_TYPE_CREATE, self::UPDATE_TYPE_UPDATE, self::UPDATE_TYPE_DELETE],
                 'on' => self::SCENARIO_BATCH_UPDATE
             ],
-            [[ 'min_qty', 'option_name', 'option_name_ar'], 'required'],
+            [['option_name', 'option_name_ar'], 'required'],
 //            ['max_qty', 'required', 'when' => function($model) {
 //                    return $model->min_qty != null;
 //                }
@@ -93,8 +98,10 @@ class Option extends \yii\db\ActiveRecord {
             'item_uuid' => Yii::t('app','Item Uuid'),
             'min_qty' => Yii::t('app','Min Selections'),
             'max_qty' => Yii::t('app','Max Selections'),
+            'is_required' => Yii::t('app','Is Required?'),
             'option_name' => Yii::t('app','Option Name'),
-            'option_name_ar' => Yii::t('app','Option Name in Arabic')
+            'option_name_ar' => Yii::t('app','Option Name in Arabic'),
+            'option_type' => Yii::t('app','Option Type')
         ];
     }
 
