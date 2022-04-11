@@ -27,7 +27,7 @@ $this->registerJs($js);
 <section id="data-list-view" class="data-list-view-header">
 
 <!-- Data list view starts -->
-<div class="action-btns d-none">
+<div class="action-btns">
     <div class="btn-dropdown mr-1 mb-1">
         <div class="btn-group dropdown actions-dropodown">
           <?= Html::a('<i class="feather icon-plus"></i> Invite Additional Agent', ['create', 'storeUuid' => $restaurant_uuid], ['class' => 'btn btn-outline-primary']) ?>

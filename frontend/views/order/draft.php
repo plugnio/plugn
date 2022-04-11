@@ -31,7 +31,7 @@ $this->registerJs($js);
   <?php if ($count > 0) { ?>
 
     <!-- Data list view starts -->
-    <div class="action-btns d-none">
+    <div class="action-btns">
         <div class="btn-dropdown mr-1 mb-1">
             <div class="btn-group dropdown actions-dropodown">
               <?= Html::a('Create draft order ', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
