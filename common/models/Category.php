@@ -14,6 +14,8 @@ use yii\behaviors\SluggableBehavior;
  * @property string|null $title_ar
  * @property string|null $subtitle
  * @property string|null $subtitle_ar
+ * @property string|null $category_meta_title
+ * @property string|null $category_meta_title_ar
  * @property string|null $category_meta_description
  * @property string|null $category_meta_description_ar
  * @property string $category_image
@@ -51,7 +53,7 @@ class Category extends \yii\db\ActiveRecord
             [['restaurant_uuid'], 'string', 'max' => 60],
             ['slug', 'safe'],
             [['title', 'title_ar', 'subtitle', 'subtitle_ar'], 'string', 'max' => 255],
-            [['category_meta_description', 'category_meta_description_ar'], 'string'],
+            [['category_meta_title', 'category_meta_title_ar', 'category_meta_description', 'category_meta_description_ar'], 'string'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className (), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
@@ -68,6 +70,8 @@ class Category extends \yii\db\ActiveRecord
             'subtitle' => Yii::t('app', 'Subtitle'),
             'image' => Yii::t('app', 'Category Image'),
             'subtitle_ar' => Yii::t('app', 'Subtitle in Arabic'),
+            'category_meta_title' => Yii::t('app', 'Page Title'),
+            'category_meta_title_ar' => Yii::t('app', 'Page Title in Arabic'),
             'category_meta_description' => Yii::t('app', 'Meta tag description'),
             'category_meta_description_ar' => Yii::t('app', 'Meta tag description in Arabic'),
             'sort_number' => Yii::t('app', 'Sort Number'),

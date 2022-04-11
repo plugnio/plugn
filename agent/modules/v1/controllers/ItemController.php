@@ -19,7 +19,6 @@ use agent\models\Order;
 
 class ItemController extends Controller
 {
-
     public function behaviors()
     {
         $behaviors = parent::behaviors ();
@@ -136,6 +135,9 @@ class ItemController extends Controller
         $model->item_description_ar = Yii::$app->request->getBodyParam ("item_description_ar");
         $model->item_meta_description = Yii::$app->request->getBodyParam("item_meta_description");
         $model->item_meta_description_ar = Yii::$app->request->getBodyParam("item_meta_description_ar");
+        $model->item_meta_title = Yii::$app->request->getBodyParam("meta_title");
+        $model->item_meta_title_ar = Yii::$app->request->getBodyParam("meta_title_ar");
+
         $model->sort_number = Yii::$app->request->getBodyParam ("sort_number");
         $model->item_type = Yii::$app->request->getBodyParam ("item_type"); 
         $model->prep_time = Yii::$app->request->getBodyParam ("prep_time");
@@ -320,6 +322,8 @@ class ItemController extends Controller
         $model->item_description_ar = Yii::$app->request->getBodyParam ("item_description_ar");
         $model->item_meta_description = Yii::$app->request->getBodyParam("item_meta_description");
         $model->item_meta_description_ar = Yii::$app->request->getBodyParam("item_meta_description_ar");
+        $model->item_meta_title = Yii::$app->request->getBodyParam("meta_title");
+        $model->item_meta_title_ar = Yii::$app->request->getBodyParam("meta_title_ar");
         $model->sort_number = Yii::$app->request->getBodyParam ("sort_number");
         $model->item_type = Yii::$app->request->getBodyParam ("item_type"); 
         $model->prep_time = Yii::$app->request->getBodyParam ("prep_time");

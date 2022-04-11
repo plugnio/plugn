@@ -17,6 +17,8 @@ use yii\behaviors\TimestampBehavior;
  * @property string|null $item_name_ar
  * @property string|null $item_description
  * @property string|null $item_description_ar
+ * @property string|null $item_meta_title
+ * @property string|null $item_meta_title_ar
  * @property string|null $item_meta_description
  * @property string|null $item_meta_description_ar
  * @property int|null $sort_number
@@ -98,7 +100,7 @@ class Item extends \yii\db\ActiveRecord
             [['item_uuid'], 'string', 'max' => 300],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['item_name', 'item_name_ar', 'item_image', 'barcode', 'sku'], 'string', 'max' => 255],
-            [['item_description', 'item_description_ar', 'item_meta_description', 'item_meta_description_ar'], 'string', 'max' => 2500],
+            [['item_description', 'item_description_ar', 'item_meta_title', 'item_meta_title_ar', 'item_meta_description', 'item_meta_description_ar'], 'string', 'max' => 2500],
             [['item_uuid'], 'unique'],
             ['slug', 'safe'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
@@ -128,6 +130,8 @@ class Item extends \yii\db\ActiveRecord
             'item_description_ar' => Yii::t('app','Item description in Arabic'),
             'item_meta_description' => Yii::t('app','Meta tag description'),
             'item_meta_description_ar' => Yii::t('app','Meta tag description in Arabic'),
+            'item_meta_title' => Yii::t('app','Page Title'),
+            'item_meta_title_ar' => Yii::t('app','Page Title in Arabic'),
             'sort_number' => Yii::t('app','Sort number'),
             'stock_qty' => Yii::t('app','Stock quantity'),
             'track_quantity' => Yii::t('app','Track quantity'),
@@ -252,7 +256,7 @@ class Item extends \yii\db\ActiveRecord
             "@type" => "Product",
             "name" => $this->item_name,
             "image" => $images,
-            "description" => "Sleeker than ACME's Classic Anvil, the Executive Anvil is perfect for the business traveler looking for something to drop from a height.",
+            "description" => $this->item_description,
             "sku" => $this->sku,
             /*"mpn" => "925872",
             "brand": {
