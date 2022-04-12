@@ -114,6 +114,11 @@ class ItemVariant extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * @param bool $insert
+     * @return false|void
+     * @throws \yii\base\Exception
+     */
     public function beforeSave($insert)
     {
         if(!parent::beforeSave($insert))
@@ -121,35 +126,58 @@ class ItemVariant extends \yii\db\ActiveRecord
             return false;
         }
 
+        $itemVariantImageIds = [];
+
         foreach ($this->images as $img) {
-            if ($img['product_file_name']) {
-                // check if same image exist then skip
-                $exist = $this->getItemImages()->andWhere(['product_file_name'=>$img['product_file_name']])->exists();
-                if ($exist) {
-                    continue;
-                }
+
+            //empty data
+
+            if (!$img['product_file_name']) {
+                continue;
+            }
+
+            //for old images
+
+            if(isset($img['item_variant_image_uuid'])) {
+                $itemVariantImageIds[] = $img['item_variant_image_uuid'];
+                continue;
+            }
+
                 try {
                     $url = Yii::$app->temporaryBucketResourceManager->getUrl($img['product_file_name']);
+
                     $filename = Yii::$app->security->generateRandomString();
+
                     $data[] = $result = Yii::$app->cloudinaryManager->upload(
                         $url,
                         [
-                            'public_id' => "restaurants/" . $this->restaurant_uuid . "/items/" . $filename
+                            'public_id' => "restaurants/" . $this->item->restaurant_uuid . "/items/" . $filename
                         ]
                     );
 
-                    $item_image_model = new ItemImage();
+                    $item_image_model = new ItemVariantImage();
                     $item_image_model->item_uuid = $this->item_uuid;
                     $item_image_model->item_variant_uuid = $this->item_variant_uuid;
                     $item_image_model->product_file_name = basename($result['url']);
                     $item_image_model->save(false);
 
+                    $itemVariantImageIds[] = $item_image_model->item_variant_image_uuid;
+
                 } catch (\Cloudinary\Error $err) {
-                    Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($images));
+                    Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($this->images));
                     return false;
                 }
-            }
         }
+
+        //remove deleted/extra images
+
+        ItemVariantImage::deleteAll([
+            'AND',
+            ['item_variant_uuid' => $this->item_variant_uuid],
+            ['NOT IN', 'item_variant_image_uuid', $itemVariantImageIds]
+        ]);
+
+        return true;
     }
 
     /**
@@ -221,6 +249,6 @@ class ItemVariant extends \yii\db\ActiveRecord
      */
     public function getItemVariantImages()
     {
-        return $this->hasMany(ItemVariantImages::className(), ['item_variant_uuid' => 'item_variant_uuid']);
+        return $this->hasMany(ItemVariantImage::className(), ['item_variant_uuid' => 'item_variant_uuid']);
     }
 }

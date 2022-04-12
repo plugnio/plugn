@@ -154,12 +154,12 @@ class ItemController extends Controller
         $itemOptions = Yii::$app->request->getBodyParam('options');
         $transaction = Yii::$app->db->beginTransaction();
 
-        try {
             if (!$model->save()) {
                 $transaction->rollBack();
                 return [
                     "operation" => "error",
-                    "message" => $model->errors
+                    "message" => sizeof($model->errors) > 0 ? $model->errors:
+                        Yii::t('app', 'Error saving item detail')
                 ];
             }
 
@@ -178,7 +178,8 @@ class ItemController extends Controller
                         $transaction->rollBack();
                         return [
                             "operation" => "error",
-                            "message" => $optionModel->errors
+                            "message" => sizeof($optionModel->errors) > 0 ? $optionModel->errors:
+                                Yii::t('app', 'Error saving option')
                         ];
                     }
 
@@ -194,7 +195,8 @@ class ItemController extends Controller
                                 $transaction->rollBack();
                                 return [
                                     "operation" => "error",
-                                    "message" => $extraOptionModel->errors
+                                    "message" => sizeof($extraOptionModel->errors) > 0 ? $extraOptionModel->errors:
+                                        Yii::t('app', 'Error saving option value')
                                 ];
                             }
                         }
@@ -230,6 +232,7 @@ class ItemController extends Controller
                 $itemVariant->price = $variant['price'];
                 $itemVariant->compare_at_price = $variant['compare_at_price'];
                 $itemVariant->weight = $variant['weight'];
+                $itemVariant->images = isset($variant['itemVariantImages'])? $variant['itemVariantImages']: [];
 
                 if(!$itemVariant->save())
                 {
@@ -237,7 +240,8 @@ class ItemController extends Controller
 
                     return [
                         "operation" => "error",
-                        "message" => $itemVariant->errors
+                        "message" => sizeof($itemVariant->errors) > 0 ? $itemVariant->errors:
+                            Yii::t('app', 'Error saving item variant')
                     ];
                 }
 
@@ -285,7 +289,8 @@ class ItemController extends Controller
 
                         return [
                             "operation" => "error",
-                            "message" => $itemVariantOption->errors
+                            "message" => sizeof($itemVariantOption->errors) > 0 ? $itemVariantOption->errors:
+                                Yii::t('app', 'Error saving item variant option')
                         ];
                     }
                 }
@@ -297,16 +302,7 @@ class ItemController extends Controller
                 "operation" => "success",
                 "message" => Yii::t('agent', "Item created successfully"),
             ];
-        }
-        catch (\Exception $e)
-        {
-            $transaction->rollBack();
 
-            return [
-                "operation" => "error",
-                "message" => $e->getMessage()
-            ];
-        }
     }
 
     /**
@@ -340,12 +336,12 @@ class ItemController extends Controller
         $itemOptions = Yii::$app->request->getBodyParam('options');
         $transaction = Yii::$app->db->beginTransaction();
 
-        try {
             if (!$model->save()) {
                 $transaction->rollBack();
                 return [
                     "operation" => "error",
-                    "message" => $model->errors
+                    "message" => sizeof($model->errors) > 0? $model->errors: 
+                        Yii::t('app', 'Error saving item detail')
                 ];
             }
 
@@ -376,7 +372,8 @@ class ItemController extends Controller
                         $transaction->rollBack();
                         return [
                             "operation" => "error",
-                            "message" => $optionModel->errors
+                            "message" => sizeof($optionModel->errors) > 0? $optionModel->errors:
+                                Yii::t('app', 'Error saving option')
                         ];
                     }
 
@@ -407,7 +404,8 @@ class ItemController extends Controller
                                 $transaction->rollBack();
                                 return [
                                     "operation" => "error",
-                                    "message" => $extraOptionModel->errors
+                                    "message" => sizeof($extraOptionModel->errors) > 0? $extraOptionModel->errors:
+                                        Yii::t('app', 'Error saving option value')
                                 ];
                             }
 
@@ -471,6 +469,7 @@ class ItemController extends Controller
                 $itemVariant->price = $variant['price'];
                 $itemVariant->compare_at_price = $variant['compare_at_price'];
                 $itemVariant->weight = $variant['weight'];
+                $itemVariant->images = isset($variant['itemVariantImages'])? $variant['itemVariantImages']: [];
 
                 if(!$itemVariant->save())
                 {
@@ -478,7 +477,8 @@ class ItemController extends Controller
 
                     return [
                         "operation" => "error",
-                        "message" => $itemVariant->errors
+                        "message" => sizeof($itemVariant->errors) > 0? $itemVariant->errors:
+                            Yii::t('app', 'Error saving item variant')
                     ];
                 }
 
@@ -525,7 +525,8 @@ class ItemController extends Controller
 
                         return [
                             "operation" => "error",
-                            "message" => $itemVariantOption->errors
+                            "message" => sizeof($itemVariantOption->errors) > 0? $itemVariantOption->errors:
+                                Yii::t('app', 'Error saving item variant option')
                         ];
                     }
 
@@ -557,13 +558,6 @@ class ItemController extends Controller
                 "operation" => "success",
                 "message" => Yii::t('agent',"Item updated successfully")
             ];
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-            return [
-                "operation" => "error",
-                "message" => $e->getMessage()
-            ];
-        }
     }
 
     /**

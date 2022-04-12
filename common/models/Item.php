@@ -86,7 +86,7 @@ class Item extends \yii\db\ActiveRecord
             [['unit_sold'], 'integer', 'min' => 0],
             [['item_price', 'compare_at_price'], 'number', 'min' => 0],
             [['track_quantity', 'prep_time'], 'integer'],
-            ['item_status', 'in', 'range' => [self::ITEM_STATUS_PUBLISH, self::ITEM_STATUS_UNPUBLISH]],
+            //['item_status', 'in', 'range' => [self::ITEM_STATUS_PUBLISH, self::ITEM_STATUS_UNPUBLISH]],
             [['item_type'], 'default', 'value' => self::TYPE_SIMPLE],
             [['stock_qty'], 'required', 'when' => function ($model) {
                 return $model->track_quantity && $model->item_type == self::TYPE_SIMPLE;

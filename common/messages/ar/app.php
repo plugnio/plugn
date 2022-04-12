@@ -17,6 +17,11 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    "Error saving option value" => "",
+    "Error saving item variant" => "",
+    "Error saving item variant option" => "",
+    'Error saving item detail' => '',
+    'Error saving option' => "",
     'Page Title' => "عنوان الصفحة",
     'Page Title in Arabic' => "عنوان الصفحة باللغة العربية",
     'Option Type' => "نوع الخيار",
