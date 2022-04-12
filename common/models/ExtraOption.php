@@ -61,7 +61,7 @@ class ExtraOption extends \yii\db\ActiveRecord {
                 'range' => [self::UPDATE_TYPE_CREATE, self::UPDATE_TYPE_UPDATE, self::UPDATE_TYPE_DELETE],
                 'on' => self::SCENARIO_BATCH_UPDATE
             ],
-            [['extra_option_name', 'extra_option_name_ar', 'extra_option_price'], 'required'],
+            [['extra_option_name', 'extra_option_name_ar'], 'required'],
             [['option_id'], 'integer'],
             [['extra_option_price', 'stock_qty'], 'number', 'min' => 0],
             [['extra_option_price'], 'default', 'value' => 0],
