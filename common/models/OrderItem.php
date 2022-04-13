@@ -331,6 +331,8 @@ class OrderItem extends \yii\db\ActiveRecord {
             'currency',
             'orderItemExtraOptions',
             'itemImage',
+            'itemVariantImage',
+            'image',
             'item',
             'variant',
             'refundedQty'
@@ -375,6 +377,15 @@ class OrderItem extends \yii\db\ActiveRecord {
     }
 
     /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImage()
+    {
+        return $this->item_variant_uuid? $this->getItemVariantImage():
+            $this->getItemImage();
+    }
+
+    /**
      * Gets query for [[ItemImages]].
      *
      * @return \yii\db\ActiveQuery
@@ -382,6 +393,16 @@ class OrderItem extends \yii\db\ActiveRecord {
     public function getItemImage($modelClass = "\common\models\ItemImage")
     {
         return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid']);
+    }
+
+    /**
+     * Gets query for [[ItemVariantImages]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItemVariantImage($modelClass = "\common\models\ItemVariantImage")
+    {
+        return $this->hasOne($modelClass::className(), ['item_variant_uuid' => 'item_variant_uuid']);
     }
 
     /**
