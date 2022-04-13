@@ -243,12 +243,12 @@ class Order extends \yii\db\ActiveRecord
                 return $model->shipping_country_id;
             }
             ],
-            [
-                'subtotal', function ($attribute, $params, $validator) {
-                if ($this->voucher && $this->voucher->minimum_order_amount !== 0 && $this->calculateOrderItemsTotalPrice() >= $this->voucher->minimum_order_amount)
-                    $this->addError('voucher_id', "We can't apply this code until you reach the minimum order amount");
-            }, 'skipOnError' => false, 'skipOnEmpty' => false
-            ],
+            // [
+            //     'subtotal', function ($attribute, $params, $validator) {
+            //     if ($this->voucher && $this->voucher->minimum_order_amount !== 0 && $this->calculateOrderItemsTotalPrice() >= $this->voucher->minimum_order_amount)
+            //         $this->addError('voucher_id', "We can't apply this code until you reach the minimum order amount");
+            // }, 'skipOnError' => false, 'skipOnEmpty' => false
+            // ],
             [['customer_email'], 'email'],
             [['payment_method_id'], 'validatePaymentMethodId', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['payment_method_id'], 'default', 'value' => 3, 'on' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
@@ -867,6 +867,10 @@ public function restockItems()
         $this->subtotal = $this->calculateOrderItemsTotalPrice();
         $this->total_price = $this->calculateOrderTotalPrice();
 
+
+
+
+
         $this->setScenario(self::SCENARIO_UPDATE_TOTAL);
 
         return $this->save();
@@ -983,6 +987,9 @@ public function restockItems()
 
 
         if ($this->scenario == self::SCENARIO_UPDATE_TOTAL) {
+
+          if ($this->voucher && $this->voucher->minimum_order_amount !== 0 && $this->calculateOrderItemsTotalPrice() < $this->voucher->minimum_order_amount)
+            return  $this->addError('voucher_id', "We can't apply this code until you reach the minimum order amount");
 
             if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
 
