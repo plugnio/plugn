@@ -1008,6 +1008,19 @@ class Order extends \yii\db\ActiveRecord
             $this->currency_code = $this->restaurant->currency->code;
         }
 
+
+        if ($this->voucher && !$this->voucher_discount) {
+            $this->discount_type = $this->voucher->discount_type;
+
+            $this->voucher_discount = $this->voucher->discount_type == 1 ?
+                $this->subtotal * ($this->voucher->discount_amount / 100) : $this->voucher->discount_amount;
+        }
+
+        if ($this->bankDiscount && !$this->bank_discount) {
+            $this->bank_discount = $this->bankDiscount->discount_type == 1 ?
+                $this->subtotal * ($this->bankDiscount->discount_amount / 100) : $this->bankDiscount->discount_amount;
+        }
+
         //currency rate from store currency to order currency
 
         if (!$this->currency_rate) {

@@ -565,6 +565,7 @@ class OrderController extends Controller
         }
 
         //if the order mode = 1 => Delivery
+
         if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
 
             //Deliver to Kuwait - GCC
@@ -1737,18 +1738,6 @@ class OrderController extends Controller
     {
         $order = $this->findModel($id);
 
-        $voucherDiscount = $bankDiscount = 0;
-
-        if ($order->voucher) {
-            $voucherDiscount = $order->voucher->discount_type == 1 ?
-                $order->subtotal * ($order->voucher->discount_amount / 100) : $order->voucher->discount_amount;
-        }
-
-        if ($order->bankDiscount) {
-            $bankDiscount = $order->bankDiscount->discount_type == 1 ?
-                $order->subtotal * ($order->bankDiscount->discount_amount / 100) : $order->bankDiscount->discount_amount;
-        }
-
         // Item extra optn
         // $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
         //     'query' => $order->getOrderItemExtraOptions()
@@ -1761,8 +1750,8 @@ class OrderController extends Controller
         $content = $this->render('invoice', [
             'order' => $order,
             'defaultLogo' => $defaultLogo,
-            'bankDiscount' => $bankDiscount,
-            'voucherDiscount' => $voucherDiscount,
+            'bankDiscount' => $order->voucher_discount,
+            'voucherDiscount' => $order->bank_discount,
         ]);
 
         $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
