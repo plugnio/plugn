@@ -21,6 +21,19 @@ $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 
 
+
+
+if ($model->recipient_name || $model->recipient_phone_number || $model->gift_message || $model->sender_name) {
+  $this->registerCss('
+  .content-header-title::after {
+    content: url(https://res.cloudinary.com/plugn/image/upload/v1649461316/icon_gift_gfapfu.svg);
+        vertical-align: middle;
+        padding:10px;
+  }
+  ');
+}
+
+
 $js = "
 $(function () {
   $('.summary').insertAfter('.top');
@@ -133,7 +146,7 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
              $armadaApiKey != null && $model->armada_tracking_link == null
            ) {
 
-                if ( $difference <= 1  && $model->restaurant->hide_request_driver_button ){
+                if ( $difference <= 1  && $model->restaurant->hide_request_driver_button && $model->area_id != 4007 ){
                           echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid, 'armadaApiKey' => $armadaApiKey], [
                               'class' => 'btn btn-dark mr-1 mb-1',
                               'style' => 'margin-right: 7px;',
@@ -144,7 +157,7 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
                           ]);
                 }
 
-                if ( !$model->restaurant->hide_request_driver_button  )  {
+                if ( !$model->restaurant->hide_request_driver_button && $model->area_id != 4007 )  {
                       echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid , 'armadaApiKey' => $armadaApiKey], [
                           'class' => 'btn btn-dark mr-1 mb-1',
                           'style' => 'margin-right: 7px;',

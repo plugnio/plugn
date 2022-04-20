@@ -104,6 +104,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property int|null $payment_gateway_queue_id
  * @property string|null $default_language
  * @property string|null $annual_revenue
+ * @property boolean $demand_delivery
  *
  * @property AgentAssignment[] $agentAssignments
  * @property AreaDeliveryZone[] $areaDeliveryZones
@@ -332,7 +333,7 @@ class Restaurant extends \yii\db\ActiveRecord
                   return $model->{$attribute} !== $model->getOldAttribute($attribute) && $this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT;
                 }
             ],
-            [['restaurant_email_notification', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable', 'is_myfatoorah_enable','supplierCode'], 'integer'],
+            [['restaurant_email_notification', 'demand_delivery','schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable', 'is_myfatoorah_enable','supplierCode'], 'integer'],
             [['schedule_interval'], 'required','when' => function($model) {
                     return $model->schedule_order;
                 }
@@ -381,7 +382,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 'owner_identification_file_back_side', 'restaurant_authorized_signature_file',
             ],
             self::SCENARIO_UPDATE => [
-                'country_id', 'restaurant_email_notification', 'phone_number', 'phone_number_country_code',
+                'country_id', 'restaurant_email_notification', 'demand_delivery','phone_number', 'phone_number_country_code',
                 'name', 'name_ar', 'schedule_interval', 'schedule_order',
                 'restaurant_email', 'tagline', 'tagline_ar', 'currency_id'
             ],
@@ -428,6 +429,7 @@ class Restaurant extends \yii\db\ActiveRecord
             'armada_api_key' => 'Armada Api Key',
             'armada_branch_id' => 'Mashkor Branch ID',
             'restaurant_email_notification' => 'Email notification',
+            'demand_delivery' => 'On demand delivery',
             'show_opening_hours' => 'Show Opening hours',
             'phone_number_display' => 'Phone number display',
             'store_branch_name' => 'Branch name',
@@ -1333,6 +1335,9 @@ class Restaurant extends \yii\db\ActiveRecord
     // }
 
     public function isOpen($asap = null) {
+
+        if(!$this->demand_delivery)
+          return false;
 
         $opening_hour_model = OpeningHour::find()
                                 ->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])

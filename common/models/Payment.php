@@ -49,6 +49,10 @@ class Payment extends \yii\db\ActiveRecord
     const PAYOUT_STATUS_UNPAID = 1;
     const PAYOUT_STATUS_PAID = 2;
 
+
+    const SCENARIO_UPDATE_STATUS_WEBHOOK = 'webhook';
+
+
     /**
      * {@inheritdoc}
      */
@@ -154,9 +158,6 @@ class Payment extends \yii\db\ActiveRecord
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
-        if($paymentRecord->received_callback)
-          return $paymentRecord;
-
 
         // Request response about it from TAP
         Yii::$app->tapPayments->setApiKeys($paymentRecord->restaurant->live_api_key, $paymentRecord->restaurant->test_api_key);
@@ -252,9 +253,11 @@ class Payment extends \yii\db\ActiveRecord
 
     /**
      * Update Payment's Status from TAP Payments
-     * @param  [type]  $id                           [description]
-     * @param boolean $showUpdatedFlashNotification [description]
-     * @return self                                [description]
+     * @param  string  $id                         Charge id
+     * @param string $status                       transaction status
+     * @param string $destinations                 transaction's destination
+     * @param string $source                        transaction's source
+     * @param string $response_message
      */
     public static function updatePaymentStatus($id, $status, $destinations = null , $source = null, $reference, $response_message = null )
     {
@@ -264,8 +267,10 @@ class Payment extends \yii\db\ActiveRecord
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
-        if($paymentRecord->received_callback)
+        if($paymentRecord->received_callback && $paymentRecord->payment_current_status == $status )
           return $paymentRecord;
+
+        $paymentRecord->setScenario(self::SCENARIO_UPDATE_STATUS_WEBHOOK);
 
 
 
@@ -468,7 +473,6 @@ class Payment extends \yii\db\ActiveRecord
         return true;
     }
 
-
     /**
      * @inheritdoc
      */
@@ -493,7 +497,19 @@ class Payment extends \yii\db\ActiveRecord
             $this->order->changeOrderStatusToPending();
             $this->order->sendPaymentConfirmationEmail();
 
-            Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $this->currency->decimal_place]) . '] ' . 'Paid with ' . $this->order->payment_method_name, __METHOD__);
+            Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $this->currency->decimal_place]) . '] ' . 'Paid with ' .
+            $this->order->payment_method_name, __METHOD__);
+
+        }
+
+        if(!$insert && $this->scenario == self::SCENARIO_UPDATE_STATUS_WEBHOOK && isset($changedAttributes['payment_current_status']) && $changedAttributes['payment_current_status'] != 'CAPTURED' && $this->payment_current_status == 'CAPTURED' && $this->order->order_status == Order::STATUS_ABANDONED_CHECKOUT){
+
+          $this->order->changeOrderStatusToPending();
+          $this->order->sendPaymentConfirmationEmail();
+
+          Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $this->currency->decimal_place]) . '] ' . 'Paid with ' .
+           $this->order->payment_method_name, __METHOD__);
+
         }
 
         if ($this->plugn_fee > 0 && $this->partner_fee == 0 && $this->restaurant->referral_code) {
