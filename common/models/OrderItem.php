@@ -16,6 +16,7 @@ use yii\db\Expression;
  * @property string $item_name
  * @property string $item_name_ar
  * @property float $item_price
+ * @property float $item_unit_price
  * @property int|null $qty
  * @property string|null $customer_instruction
  * @property datetime $order_item_created_at
@@ -42,7 +43,7 @@ class OrderItem extends \yii\db\ActiveRecord {
             [['order_uuid', 'qty'], 'required'],
             [['qty'], 'integer', 'min' => 0],
             [['order_uuid'], 'string', 'max' => 40],
-            [['item_price'], 'number', 'min' => 0],
+            [['item_price', 'item_unit_price'], 'number', 'min' => 0],
             [['item_uuid'], 'checkIfItemBelongToRestaurant'],
             [['item_uuid'], 'string', 'max' => 300],
             [['item_name', 'item_name_ar', 'customer_instruction'], 'string', 'max' => 255],
@@ -78,6 +79,7 @@ class OrderItem extends \yii\db\ActiveRecord {
             'item_name' => 'Item Name',
             'item_name_ar' => 'Item Name in Arabic',
             'item_price' => 'Item Price',
+            'item_unit_price' => 'Item Unit Price',
             'qty' => 'Quantity',
             'customer_instruction' => 'Instructions',
         ];
@@ -100,26 +102,31 @@ class OrderItem extends \yii\db\ActiveRecord {
     /**
      * Calculate order item total price => (item price + extra optns price)
      */
-    public function calculateOrderItemPrice() {
+    public function calculateOrderItemPrice()
+    {
+        $item = $this->getItem ()->one();
 
-        if($this->item)
-          $totalPrice = $this->item->item_price; //5
-        else
-          $totalPrice = $this->item_price; //5
+        if($item) {
+            $totalPrice = $item->item_price;
+        } else if($this->item_unit_price) {
+            $totalPrice = $this->item_unit_price;
+        } else {
+            $totalPrice = $this->item_price;
+        }
 
         foreach ($this->getOrderItemExtraOptions()->asArray()->all() as $extraOption)
-            $totalPrice += $extraOption['extra_option_price']; //1
-
-        $totalPrice *= $this->qty; //6*5
+            $totalPrice += $extraOption['extra_option_price'];
 
         //convert from store currency to order currency if not same
 
         if($this->order->currency && $this->restaurant->currency->code != $this->order->currency_code)
         {
-            return ($totalPrice / $this->restaurant->currency->rate) * $this->order->currency->rate;
+            $totalPrice = ($totalPrice / $this->restaurant->currency->rate) * $this->order->currency->rate;
         }
 
-        return $totalPrice;
+        $this->item_unit_price = $totalPrice;
+
+        return $totalPrice * $this->qty;
     }
 
     /**
@@ -156,6 +163,10 @@ class OrderItem extends \yii\db\ActiveRecord {
         return false;
     }
 
+    /**
+     * @param bool $insert
+     * @return bool|void
+     */
     public function beforeSave($insert) {
 
         parent::beforeSave($insert);
@@ -172,6 +183,18 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         if ($this->qty == 0)
             return $this->addError('qty', "Invalid input");
+
+        //Update product inventory
+
+        if ($insert && $item_model) {
+
+            $this->item_name = $item_model->item_name;
+            $this->item_name_ar = $item_model->item_name_ar;
+
+            $this->item->decreaseStockQty($this->qty);
+        }
+
+        $this->item_price = $this->calculateOrderItemPrice();
 
         //if custom item
 
@@ -190,21 +213,6 @@ class OrderItem extends \yii\db\ActiveRecord {
                 return $this->addError('qty', $this->item_name . " is currently out of stock and unavailable.");
 
         }
-
-        //Update product inventory
-        if ($insert){
-          if ($item_model) {
-              $this->item_name = $item_model->item_name;
-              $this->item_name_ar = $item_model->item_name_ar;
-          } else
-              return false;
-
-          $this->item->decreaseStockQty($this->qty);
-        }
-
-        $this->item_price = $this->calculateOrderItemPrice();
-
-        //$this->item_unit_price = $this->item_price / $this->qty;
 
         return true;
     }

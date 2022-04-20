@@ -629,6 +629,7 @@ class OrderController extends Controller
 
                                         $response = [
                                             'operation' => 'error',
+                                            'code' => 1,
                                             'message' => $orderItemExtraOption->errors,
                                         ];
                                     }
@@ -639,6 +640,7 @@ class OrderController extends Controller
 
                         $response = [
                             'operation' => 'error',
+                            'code' => 2,
                             'message' => $orderItem->getErrors ()
                         ];
                     }
@@ -646,12 +648,14 @@ class OrderController extends Controller
             } else {
                 $response = [
                     'operation' => 'error',
+                    'code' => 4,
                     'message' => Yii::t ('agent', 'Item Uuid is invalid.')
                 ];
             }
         } else {
             $response = [
                 'operation' => 'error',
+                'code' => 3,
                 'message' => $order->getErrors (),
             ];
         }
@@ -659,6 +663,7 @@ class OrderController extends Controller
         if (!$order->is_order_scheduled && !$store_model->isOpen ()) {
             $response = [
                 'operation' => 'error',
+                'code' => 5,
                 'message' => Yii::t ('agent', '{store} is currently closed and is not accepting orders at this time', [
                     'store' => $store_model->name
                 ])
@@ -672,6 +677,7 @@ class OrderController extends Controller
             if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
                 $response = [
                     'operation' => 'error',
+                    'code' => 6,
                     'message' => Yii::t ('agent', 'Minimum order amount {amount}', [
                         'amount' => Yii::$app->formatter->asCurrency (
                             $order->deliveryZone->min_charge,
@@ -722,8 +728,7 @@ class OrderController extends Controller
         $order->customer_phone_country_code = Yii::$app->request->getBodyParam ("country_code") ? Yii::$app->request->getBodyParam ("customer_phone_country_code") : 965;
         $order->customer_email = Yii::$app->request->getBodyParam ("customer_email"); //optional
 
-        $order->estimated_time_of_arrival =
-            date (
+        $order->estimated_time_of_arrival = date (
                 "Y-m-d H:i:s",
                 strtotime (Yii::$app->request->getBodyParam ('estimated_time_of_arrival'))
             );
@@ -824,6 +829,8 @@ class OrderController extends Controller
             $orderItem->item_name_ar = $item["item_name_ar"];
             $orderItem->qty = (int)$item["qty"];
             $orderItem->item_price = $item["item_price"];
+            $orderItem->item_unit_price = isset($item["item_unit_price"])? $item["item_unit_price"]:
+                $item["item_price"]/$item["qty"];
 
             if (isset($item["customer_instruction"]))
                 $orderItem->customer_instruction = $item["customer_instruction"];
@@ -1485,6 +1492,7 @@ class OrderController extends Controller
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",
+                    'code' => 1,
                     "message" => $model->errors
                 ];
             } else {
@@ -1509,6 +1517,8 @@ class OrderController extends Controller
             $orderItem->item_name_ar = $item["item_name_ar"];
             $orderItem->qty = (int)$item["qty"];
             $orderItem->item_price = $item["item_price"];
+            $orderItem->item_unit_price = isset($item["item_unit_price"])? $item["item_unit_price"]:
+                $item["item_price"]/$item["qty"];
 
             if (isset($item["customer_instruction"]))
                 $orderItem->customer_instruction = $item["customer_instruction"];
@@ -1519,6 +1529,7 @@ class OrderController extends Controller
 
                 return [
                     'operation' => 'error',
+                    'code' => 2,
                     'message' => $orderItem->getErrors ()
                 ];
             }
@@ -1540,6 +1551,7 @@ class OrderController extends Controller
 
                     return [
                         'operation' => 'error',
+                        'code' => 3,
                         'message' => $orderItemExtraOption->errors,
                     ];
                 }

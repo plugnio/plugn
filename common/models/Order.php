@@ -252,6 +252,7 @@ class Order extends \yii\db\ActiveRecord
             [['customer_email'], 'email'],
             [['payment_method_id'], 'validatePaymentMethodId', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['payment_method_id'], 'default', 'value' => 3, 'on' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
+            ['items_has_been_restocked', 'default', 'value' => false],
             [['voucher_id'], 'validateVoucherId', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['payment_uuid'], 'string', 'max' => 36],
             [['estimated_time_of_arrival', 'scheduled_time_start_from', 'scheduled_time_to', 'latitude', 'longitude'], 'safe'],
@@ -867,10 +868,6 @@ public function restockItems()
         $this->subtotal = $this->calculateOrderItemsTotalPrice();
         $this->total_price = $this->calculateOrderTotalPrice();
 
-
-
-
-
         $this->setScenario(self::SCENARIO_UPDATE_TOTAL);
 
         return $this->save();
@@ -1051,7 +1048,7 @@ public function restockItems()
                     }
 
 
-                    $this->estimated_time_of_arrival = date("c", strtotime('+' . $maxPrepTime . ' min', Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $maxPrepTime . ' min', Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
 
                 }
             } else {
@@ -1077,7 +1074,7 @@ public function restockItems()
                     }
 
 
-                    $this->estimated_time_of_arrival = date("c", strtotime('+' . $maxPrepTime . ' min', Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
+                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $maxPrepTime . ' min', Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
 
                 }
             }
