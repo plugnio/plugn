@@ -17,11 +17,14 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    "Error saving option value" => "",
-    "Error saving item variant" => "",
-    "Error saving item variant option" => "",
-    'Error saving item detail' => '',
-    'Error saving option' => "",
+    'Item Unit Price' => "سعر وحدة الصنف",
+    'Min selection must be less than or equal to max selection' => "يجب أن يكون متوسط ​​التحديد أقل من أو يساوي الحد الأقصى للتحديد",
+    "Maximum number of orders" => "الحد الأقصى لعدد الطلبات",
+    "Error saving option value" => "خطأ في حفظ قيمة الخيار",
+    "Error saving item variant" => "خطأ في حفظ متغير العنصر",
+    "Error saving item variant option" => "خطأ في حفظ خيار متغير العنصر",
+    'Error saving item detail' => 'خطأ في حفظ تفاصيل العنصر',
+    'Error saving option' => "خطأ في حفظ الخيار",
     'Page Title' => "عنوان الصفحة",
     'Page Title in Arabic' => "عنوان الصفحة باللغة العربية",
     'Option Type' => "نوع الخيار",
