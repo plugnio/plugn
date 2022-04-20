@@ -20,6 +20,7 @@ use Yii;
  * @property float|null $latitude
  * @property float|null $longitude
  * @property boolean $is_deleted
+ * @property int|null $max_num_orders
  * @property Restaurant $restaurant
  * @property Country $country
  * @property DeliveryZone[] $deliveryZones
@@ -43,7 +44,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
     {
         return [
             [['restaurant_uuid', 'country_id', 'business_location_name', 'business_location_name_ar'], 'required'],
-            [['country_id' , 'support_pick_up', 'is_deleted'], 'integer'],
+            [['country_id' , 'support_pick_up', 'is_deleted','max_num_orders'], 'integer'],
             [['support_pick_up'], 'default', 'value' => 0],
             [['latitude', 'longitude'], 'number'],
             [['business_location_tax'], 'default', 'value' => 0],
@@ -67,7 +68,8 @@ class BusinessLocation extends \yii\db\ActiveRecord
             'business_location_name' => Yii::t('app','Location Name'),
             'business_location_name_ar' => Yii::t('app','Location Name in Arabic'),
             'support_pick_up' => Yii::t('app','Support Pick Up'),
-            'business_location_tax' => Yii::t('app','Tax / VAT')
+            'business_location_tax' => Yii::t('app','Tax / VAT'),
+            'max_num_orders' => Yii::t('app','Maximum number of orders')
         ];
     }
 
@@ -130,7 +132,25 @@ class BusinessLocation extends \yii\db\ActiveRecord
 
     }
 
+    /**
+     * Gets query for [[Orders]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeliveryOrders()
+    {
+        return $this->hasMany(Order::className(), ['delivery_zone_id' => 'delivery_zone_id'])->via('deliveryZones');
+    }
 
+    /**
+     * Gets query for [[Orders]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPickupOrders()
+    {
+        return $this->hasMany(Order::className(), ['pickup_location_id' => 'business_location_id']);
+    }
 
     /**
      * Gets query for [[Country]].

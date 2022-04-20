@@ -173,6 +173,16 @@ class DeliveryZone extends \yii\db\ActiveRecord
     }
 
     /**
+    * Gets query for [[Orders]].
+    *
+    * @return \yii\db\ActiveQuery
+    */
+   public function getOrders()
+   {
+       return $this->hasMany(Order::className(), ['delivery_zone_id' => 'delivery_zone_id']);
+   }
+
+    /**
      * Gets query for [[Country]].
      *
      * @return \yii\db\ActiveQuery

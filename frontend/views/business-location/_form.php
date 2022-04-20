@@ -443,6 +443,41 @@ function initMap() {
 </div>
 
 
+<div class="card">
+  <div class="card-header">
+    <h3>Order limit </h3>
+  </div>
+
+<?php if($model->restaurant->country_id = 84 ||$model->restaurant->country_id = 12 ) { ?>
+  <div class="row">
+
+
+      <div class="col-12 col-sm-6 col-lg-6">
+
+              <div class="card">
+                  <div class="card-content">
+
+                      <div class="card-body">
+                          <form class="form">
+                              <div class="form-body">
+                                <?= $form->field($model, 'max_num_orders',[
+                                  'options' => ['style' => 'margin-bottom:  0px;'],
+                                ]
+                              )->textInput(['maxlength' => true, 'style' => 'margin-bottom:  0px;'])->label('Maximum number of orders per day') ?>
+                              </div>
+                      </div>
+                  </div>
+              </div>
+
+        </div>
+
+
+    </div>
+  <?php } ?>
+
+</div>
+
+
 
 <div class="form-group">
     <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

@@ -398,6 +398,7 @@ return [
     'Amount Charged' => "المبلغ المشحون",
     'Created at' => "تم الإنشاء في",
     'Current Status' => "الحالة الحالية",
+    'Sorry, order limit has been exceeded' => 'عذرا ، تم تجاوز حد الطلب',
     'Customer ID' => "معرف العميل",
     'Gateway Fee' => "رسوم البوابة",
     'Gateway Order ID' => "معرف طلب البوابة",

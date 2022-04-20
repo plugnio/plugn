@@ -281,6 +281,13 @@ class OrderController extends Controller
                         }
                     ],
                     [
+                        'header' => 'Business Location',
+                        // 'format' => 'html',
+                        'value' => function ($data) {
+                          return $data->business_location_name ? $data->business_location_name : '';
+                        }
+                    ],
+                    [
                         'attribute' => 'order_status',
                         "format" => "raw",
                         "value" => function ($model) {

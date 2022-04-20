@@ -18,6 +18,7 @@ use yii\db\Expression;
  * @property string $item_name
  * @property string $item_name_ar
  * @property float $item_price
+ * @property float $item_unit_price
  * @property int|null $qty
  * @property string|null $customer_instruction
  * @property datetime $order_item_created_at
@@ -46,7 +47,7 @@ class OrderItem extends \yii\db\ActiveRecord {
             [['qty'], 'integer', 'min' => 0],
             ['qty', 'validateQty'],
             [['order_uuid'], 'string', 'max' => 40],
-            [['item_price'], 'number', 'min' => 0],
+            [['item_price', 'item_unit_price'], 'number', 'min' => 0],
             [['item_uuid'], 'checkIfItemBelongToRestaurant'],
             [['item_variant_uuid'], 'checkIfVariantBelongToRestaurant'],
             [['item_uuid'], 'string', 'max' => 300],
@@ -85,6 +86,7 @@ class OrderItem extends \yii\db\ActiveRecord {
             'item_name' => Yii::t('app','Item Name'),
             'item_name_ar' => Yii::t('app','Item Name in Arabic'),
             'item_price' => Yii::t('app','Item Price'),
+            'item_unit_price' => Yii::t('app','Item Unit Price'),
             'qty' => Yii::t('app','Quantity'),
             'customer_instruction' => Yii::t('app','Instructions'),
         ];
@@ -161,28 +163,33 @@ class OrderItem extends \yii\db\ActiveRecord {
     /**
      * Calculate order item total price => (item price + extra optns price)
      */
-    public function calculateOrderItemPrice() {
-
-        $totalPrice = $this->item_price;  //default
+    public function calculateOrderItemPrice()
+    {
+        $item = $this->getItem ()->one();
 
         if($this->variant) {
             $totalPrice = $this->variant->price;
-        } else if($this->item) {
-            $totalPrice = $this->item->item_price;
+        } else if($item) {
+            $totalPrice = $item->item_price;
+        } else if($this->item_unit_price) {
+            $totalPrice = $this->item_unit_price;
+        } else {
+            $totalPrice = $this->item_price;
         }
 
         foreach ($this->getOrderItemExtraOptions()->asArray()->all() as $extraOption)
-            $totalPrice += $extraOption['extra_option_price']; //1
-
-        $totalPrice *= $this->qty; //6*5
+            $totalPrice += $extraOption['extra_option_price'];
 
         //convert from store currency to order currency if not same
 
-        if ($this->order->currency && $this->restaurant->currency->code != $this->order->currency_code) {
-            return ($totalPrice / $this->restaurant->currency->rate) * $this->order->currency->rate;
+        if($this->order->currency && $this->restaurant->currency->code != $this->order->currency_code)
+        {
+            $totalPrice = ($totalPrice / $this->restaurant->currency->rate) * $this->order->currency->rate;
         }
 
-        return $totalPrice;
+        $this->item_unit_price = $totalPrice;
+
+        return $totalPrice * $this->qty;
     }
 
     /**
@@ -228,7 +235,7 @@ class OrderItem extends \yii\db\ActiveRecord {
     }
 
     /**
-     * @param $insert
+     * @param bool $insert
      * @return bool|void
      */
     public function beforeSave($insert) {
@@ -250,6 +257,18 @@ class OrderItem extends \yii\db\ActiveRecord {
                 'attribute' => Yii::t('app', 'Quantity')
             ]));
         }
+
+        //Update product inventory
+
+        if ($insert && $item_model) {
+
+            $this->item_name = $item_model->item_name;
+            $this->item_name_ar = $item_model->item_name_ar;
+
+            $this->item->decreaseStockQty($this->qty);
+        }
+
+        $this->item_price = $this->calculateOrderItemPrice();
 
         //if custom item
 
@@ -276,6 +295,7 @@ class OrderItem extends \yii\db\ActiveRecord {
         }
 
         //Update product inventory
+        
         if ($insert){
           if ($item_model) {
               $this->item_name = $item_model->item_name;
@@ -303,6 +323,8 @@ class OrderItem extends \yii\db\ActiveRecord {
      */
     public function afterSave($insert, $changedAttributes) {
 
+      if($this->item_uuid != null) {
+
         $item_model = Item::findOne($this->item_uuid);
 
         if (!$insert && isset($changedAttributes['qty']) && $item_model) {
@@ -314,6 +336,8 @@ class OrderItem extends \yii\db\ActiveRecord {
                 $this->variant->decreaseStockQty($this->qty);
             }
         }
+
+      }
 
         $order_model = Order::findOne($this->order_uuid);
 

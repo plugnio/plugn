@@ -153,6 +153,7 @@ class BusinessLocationController extends Controller
         $model->address = Yii::$app->request->getBodyParam ("address");
         $model->latitude = Yii::$app->request->getBodyParam ("latitude");
         $model->longitude = Yii::$app->request->getBodyParam ("longitude");
+        $model->max_num_orders = Yii::$app->request->getBodyParam ("max_num_orders");
 
         if (!$model->save ()) {
             return [
@@ -186,6 +187,7 @@ class BusinessLocationController extends Controller
         $model->address = Yii::$app->request->getBodyParam ("address");
         $model->latitude = Yii::$app->request->getBodyParam ("latitude");
         $model->longitude = Yii::$app->request->getBodyParam ("longitude");
+        $model->max_num_orders = Yii::$app->request->getBodyParam ("max_num_orders");
 
         if (!$model->save ()) {
             if (isset($model->errors)) {
