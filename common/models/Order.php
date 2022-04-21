@@ -1006,8 +1006,6 @@ class Order extends \yii\db\ActiveRecord
             return false;
         }
 
-
-
         if (!$this->currency_code) {
 
             if (!$this->restaurant || !$this->restaurant->currency) {
