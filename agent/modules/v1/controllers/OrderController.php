@@ -764,7 +764,15 @@ class OrderController extends Controller
         //Save Customer Info
         $order->scenario = \common\models\Order::SCENARIO_CREATE_ORDER_BY_ADMIN;
 
-        $order->currency_code = Yii::$app->request->getBodyParam('currency_code');
+        $currency_code = Yii::$app->request->getBodyParam('currency_code');
+
+        //todo: don't allow currency change on edit
+        
+        if($currency_code != $order->currency_code)
+        {
+            $order->currency_code = $currency_code;
+            $order->currency_rate = $order->currency->rate / $order->restaurant->currency->rate;
+        }
 
         //todo: what if change, customer
         $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
@@ -1615,6 +1623,7 @@ class OrderController extends Controller
 
         $model->currency_code = Yii::$app->request->getBodyParam('currency_code');
         $model->store_currency_code = Yii::$app->request->getBodyParam('currency_code');
+
         if ($model->restaurant && $model->restaurant->currency && $model->restaurant->currency->code) {
             $model->store_currency_code = $model->restaurant->currency->code;
         }

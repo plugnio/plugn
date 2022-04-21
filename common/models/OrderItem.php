@@ -182,10 +182,10 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         //convert from store currency to order currency if not same
 
-        if($this->order->currency && $this->restaurant->currency->code != $this->order->currency_code)
+        /*if($this->order->currency && $this->restaurant->currency->code != $this->order->currency_code)
         {
             $totalPrice = ($totalPrice / $this->restaurant->currency->rate) * $this->order->currency->rate;
-        }
+        }*/
 
         $this->item_unit_price = $totalPrice;
 
