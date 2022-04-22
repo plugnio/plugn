@@ -71,8 +71,8 @@ $this->registerJs($js);
                   'item_name',
                   [
                       'attribute' => 'item_price',
-                      "value" => function($data) {
-                              return Yii::$app->formatter->asCurrency($data->item_price, $data->currency->code, [
+                      "value" => function($data) use($model) {
+                              return Yii::$app->formatter->asCurrency($data->item_price * $model->currency_rate, $data->currency->code, [
                                   \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                               ]);
                       },

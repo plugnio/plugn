@@ -173,9 +173,9 @@ white-space: nowrap !important;
                     ],
                     [
                         'attribute' => 'total_price',
-                        "value" => function($data) {
-                            return Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code, [
-                                \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                        "value" => function($model) {
+                            return Yii::$app->formatter->asCurrency($model->total_price * $model->currency_rate, $model->currency_code, [
+                                \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                             ]);
                         },
                     ],
