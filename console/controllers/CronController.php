@@ -44,16 +44,6 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller {
 
-    public function actionOrderItem(){
-
-      $orders = Yii::$app->db->createCommand('select order_uuid,restaurant_uuid from `order`')->queryAll();
-
-      foreach($orders as $order) {
-          Yii::$app->db->createCommand('UPDATE `order_item` set restaurant_uuid="'.$order['restaurant_uuid'].'"
-              where order_uuid="'.$order['order_uuid'].'"')->execute();
-      }
-    }
-
     /**
      * Weekly Store Summary
      */
@@ -198,7 +188,7 @@ class CronController extends \yii\console\Controller {
 
             foreach ($restaurants as $restaurant) {
 
-              if($restaurant->site_id){
+              if($restaurant->site_id && $restaurant->restaurant_email) {
 
                 $getSiteResponse = Yii::$app->netlifyComponent->getSiteData($restaurant->site_id);
 
@@ -571,7 +561,7 @@ class CronController extends \yii\console\Controller {
 
                       return $refund->addError('refund_amount', $response->data['errors'][0]['description']);
 
-                  } else if ($response->data) {
+                  } else if ($response->data && isset($response->data['status'])) {
                       $refund->refund_reference = $response->data['id'];
                       $refund->refund_status = $response->data['status'];
                       $refund->save(false);
@@ -610,7 +600,7 @@ class CronController extends \yii\console\Controller {
           Yii::$app->tapPayments->setApiKeys($refund->store->live_api_key, $refund->store->test_api_key);
           $response = Yii::$app->tapPayments->retrieveRefund($refund->refund_reference);
 
-          if (!array_key_exists('errors', $response->data)) {
+          if (!array_key_exists('errors', $response->data) && isset($response->data['status'])) {
               if ($refund->refund_status != $response->data['status']) {
                   $refund->refund_status = $response->data['status'];
                   $refund->save(false);
@@ -670,6 +660,7 @@ class CronController extends \yii\console\Controller {
     public function actionUpdateTransactions() {
 
         $now = new DateTime('now');
+
         $payments = Payment::find()
                 ->where("received_callback = 0")
                 ->andWhere(['payment_gateway_name' => 'tap'])
@@ -762,5 +753,4 @@ class CronController extends \yii\console\Controller {
 
         $this->stdout($response . " \n", Console::FG_RED, Console::BOLD);
     }
-
 }

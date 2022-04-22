@@ -61,11 +61,12 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
     */
    public function rules() {
        return [
-           [[ 'username', 'partner_email','partner_iban','benef_name','bank_id','partner_phone_number'], 'required'],
+           [['username', 'partner_email','partner_iban','benef_name','bank_id','partner_phone_number', 'partner_password_hash', 'referral_code'], 'required'],
            [['partner_status'], 'integer'],
            ['partner_status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
            ['tempPassword', 'required', 'on' => [self::SCENARIO_CHANGE_PASSWORD, self::SCENARIO_CREATE_NEW_PARTNER]],
            [['commission'], 'number'],
+           [['partner_email'], 'email'],
            [['partner_uuid'], 'string', 'max' => 60],
            [['partner_iban'], 'string', 'max' => 100],
            [['username', 'partner_password_hash', 'partner_password_reset_token', 'partner_email','benef_name'], 'string', 'max' => 255],
@@ -83,7 +84,6 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
            [['partner_phone_number'], 'string', 'min' => 6, 'max' => 20],
            [['partner_phone_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number'],
 
-
            [['bank_id'], 'exist', 'skipOnError' => true, 'targetClass' => Bank::className(), 'targetAttribute' => ['bank_id' => 'bank_id']],
        ];
    }
@@ -95,18 +95,18 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
    public function attributeLabels()
    {
        return [
-           'partner_uuid' => 'Partner Uuid',
-           'username' => 'Username',
-           'partner_auth_key' => 'Auth Key',
-           'partner_password_hash' => 'Password Hash',
-           'partner_password_reset_token' => 'Password Reset Token',
-           'partner_email' => 'Email',
-           'partner_status' => 'partner_status',
-           'created_at' => 'Created At',
-           'updated_at' => 'Updated At',
-           'referral_code' => 'Referral Code',
-           'benef_name' => 'Beneficiary Name',
-           'bank_id' => 'Bank ID'
+           'partner_uuid' => Yii::t('app','Partner Uuid'),
+           'username' => Yii::t('app','Username'),
+           'partner_auth_key' => Yii::t('app','Auth Key'),
+           'partner_password_hash' => Yii::t('app','Password Hash'),
+           'partner_password_reset_token' => Yii::t('app','Password Reset Token'),
+           'partner_email' => Yii::t('app','Email'),
+           'partner_status' => Yii::t('app','partner_status'),
+           'created_at' => Yii::t('app','Created At'),
+           'updated_at' => Yii::t('app','Updated At'),
+           'referral_code' => Yii::t('app','Referral Code'),
+           'benef_name' => Yii::t('app','Beneficiary Name'),
+           'bank_id' => Yii::t('app','Bank ID')
        ];
    }
 

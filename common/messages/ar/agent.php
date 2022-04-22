@@ -1,5 +1,14 @@
 <?php
 return [
+    "This email verification link is no longer valid, please login to send a new one" => "لم يعد رابط التحقق من البريد الإلكتروني هذا صالحًا ، يرجى تسجيل الدخول لإرسال رابط جديد",
+    "Please click on the link sent to you by email to verify your account" => "الرجاء النقر فوق الارتباط المرسل إليك عبر البريد الإلكتروني للتحقق من حسابك",
+    "You have verified your email" => "لقد تحققت من بريدك الإلكتروني",
+    "Account not found" => "الحساب غير موجود",
+    "You reached your limit to verify email. Please try again after an hour." => "لقد وصلت إلى الحد الخاص بك للتحقق من البريد الإلكتروني. يرجى المحاولة مرة أخرى بعد ساعة.",
+    "Sorry, we are unable to reset a password for email provided." => "عذرًا ، لا يمكننا إعادة تعيين كلمة المرور للبريد الإلكتروني المقدم.",
+    "Email was sent previously, you may request another one in {numMinutes, number} minutes and {numSeconds, number} seconds" => "تم إرسال بريد إلكتروني سابقًا ، يمكنك طلب بريد آخر في {numMinutes, number} دقيقة و {numSeconds, number} ثانية",
+    'Invalid email verification code.' => "",
+    "Language Preferency Updated Successfully" => "تم تحديث تفضيل اللغة بنجاح",
     "Email not found" => "البريد الإلكتروني غير موجود",
     "Password not matching" => "كلمة المرور غير متطابقة",
     "Currencies updated successfully" => "تم تحديث العملات بنجاح",
@@ -21,7 +30,6 @@ return [
     "Old Password field required" => "مطلوب حقل كلمة المرور القديمة",
     "Confirm Password field required" => "مطلوب حقل تأكيد كلمة المرور",
     "Password field required" => "حقل كلمة المرور مطلوب",
-    "Password not matching" => "كلمة المرور غير متطابقة",
     "You're not assigned to any store" => "لم يتم تعيينك إلى أي متجر",
     "Old Password not valid" => "كلمة المرور القديمة غير صالحة",
     "Account Password Updated Successfully" => "تم تحديث كلمة مرور الحساب بنجاح",

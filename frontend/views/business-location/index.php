@@ -25,10 +25,7 @@ $this->registerJs($js);
 <!-- Data list view starts -->
   <section id="data-list-view" class="data-list-view-header">
 
-
-
     <?= Html::a($businessLocations ? 'Add another business location' : 'Add Business location', ['create', 'storeUuid' => $store->restaurant_uuid], ['class' => 'btn btn-primary']); ?>
-
 
       <?php
 

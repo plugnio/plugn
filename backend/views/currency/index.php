@@ -28,7 +28,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'title',
             'code',
-
+            [
+                'attribute' => 'status',
+                'value' => function($model) {
+                    return $model->status == 1? 'Active': 'Inactive';
+                },
+                "filter" => [
+                    \common\models\Currency::STATUS_ACTIVE => 'Active',
+                    \common\models\Currency::STATUS_INACTIVE => 'Inactive'
+                ],
+            ],
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>

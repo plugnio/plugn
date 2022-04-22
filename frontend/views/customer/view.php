@@ -53,14 +53,14 @@ $this->params['breadcrumbs'][] = $this->title;
         <section id="data-list-view" class="data-list-view-header">
           <h2>Order history</h2>
 
-
-
             <!-- DataTable starts -->
             <div class="table-responsive">
 
                 <?=
+                //todo: search feature?
                 GridView::widget([
                     'dataProvider' => $customersOrdersData,
+                    //'filterModel' => $searchModel,
                     'rowOptions' => function($model) {
                         $url = Url::to(['order/view', 'id' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid]);
 
@@ -69,7 +69,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ];
                     },
                     'columns' => [
-                      ['class' => 'yii\grid\SerialColumn'],
+                      //['class' => 'yii\grid\SerialColumn'],
                       [
                           'attribute' => 'order_uuid',
                           "format" => "raw",
@@ -78,8 +78,13 @@ $this->params['breadcrumbs'][] = $this->title;
                           }
                       ],
                       [
+                        'attribute' => 'order_mode',
                           'label' => 'Order Type',
                           "format" => "raw",
+                          'filter' => [
+                            Order::ORDER_MODE_DELIVERY => 'Delivery',
+                            Order::ORDER_MODE_PICK_UP => 'Pickup'
+                          ],
                           "value" => function($model) {
                               if ($model->order_mode == Order::ORDER_MODE_DELIVERY)
                                   return 'Delivery';
@@ -90,6 +95,18 @@ $this->params['breadcrumbs'][] = $this->title;
                       [
                           'attribute' => 'order_status',
                           'format' => "raw",
+                          'filter' => [
+                            Order::STATUS_DRAFT => 0,
+                            Order::STATUS_PENDING => 1,
+                            Order::STATUS_BEING_PREPARED => 2,
+                            Order::STATUS_OUT_FOR_DELIVERY => 3,
+                            Order::STATUS_COMPLETE => 4,
+                            Order::STATUS_CANCELED => 5,
+                            Order::STATUS_PARTIALLY_REFUNDED => 6,
+                            Order::STATUS_REFUNDED => 7,
+                            Order::STATUS_ABANDONED_CHECKOUT => 9,
+                            Order::STATUS_ACCEPTED => 10
+                          ],
                           'value' => function($model) {
                               if ($model->order_status == Order::STATUS_PENDING)
                                   return '<span class="badge bg-warning" >' . $model->orderStatusInEnglish . '</span>';
@@ -138,7 +155,7 @@ $this->params['breadcrumbs'][] = $this->title;
                       ],
                     ],
                     'layout' => '{summary}{items}{pager}',
-                    'tableOptions' => ['class' => 'table data-list-view'],
+                    'tableOptions' => ['class' => 'table dataTable data-list-view'],
                 ]);
                 ?>
 

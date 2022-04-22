@@ -15,9 +15,7 @@ use Segment;
  */
 class VoucherController extends Controller
 {
-
    public $enableCsrfValidation = false;
-
 
    /**
      * {@inheritdoc}
@@ -49,15 +47,19 @@ class VoucherController extends Controller
      */
     public function actionIndex($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new VoucherSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
+
+        $count = $searchModel->search([], $restaurant->restaurant_uuid)->getCount();
+
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant->restaurant_uuid);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
+            'count' => $count,
             'dataProvider' => $dataProvider,
-            'restaurant_model' => $restaurant_model
+            'restaurant' => $restaurant
         ]);
     }
 
@@ -68,12 +70,12 @@ class VoucherController extends Controller
      */
     public function actionCreate($storeUuid)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        if($restaurant_model){
+        if($restaurant) {
+
           $model = new Voucher();
           $model->restaurant_uuid = $storeUuid;
-
 
           if ($model->load(Yii::$app->request->post())) {
 
@@ -178,10 +180,16 @@ class VoucherController extends Controller
      */
     public function actionDelete($id, $storeUuid)
     {
-        $this->findModel($id, $storeUuid)->delete();
+        $model = $this->findModel($id, $storeUuid);
+
+        $model->is_deleted = 1;
+
+        if(!$model->save())
+        {
+            Yii::$app->session->setFlash('error', $model->errors);
+        }
 
         return $this->redirect(['index', 'storeUuid' => $storeUuid]);
-
     }
 
     /**
@@ -193,7 +201,16 @@ class VoucherController extends Controller
      */
     protected function findModel($id, $storeUuid)
     {
-        if (($model = Voucher::find()->where(['voucher_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $model = Voucher::find()
+            ->where([
+                'voucher_id' => $id,
+                'restaurant_uuid' => $store->restaurant_uuid
+            ])
+            ->one();
+
+        if ($model !== null) {
             return $model;
         }
 

@@ -1,5 +1,6 @@
 <?php
 
+use Yii;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\grid\GridView;
@@ -474,10 +475,10 @@ if ($model->recipient_name || $model->recipient_phone_number || $model->gift_mes
                             ],
                             [
                                 'label' => 'Subtotal',
-                                'value' => function ($orderItem) {
-                                    return Yii::$app->formatter->asCurrency($orderItem->item_price, $orderItem->currency->code, [
-                                            \NumberFormatter::MAX_FRACTION_DIGITS => $orderItem->currency->decimal_place
-                                        ]);
+                                'value' => function ($orderItem) use ($model)  {
+                                    return Yii::$app->formatter->asCurrency($orderItem->item_price * $model->currency_rate, $model->currency_code, [
+                                        \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                                    ]);
                                 }
                             ],
                         ],
@@ -499,9 +500,9 @@ if ($model->recipient_name || $model->recipient_phone_number || $model->gift_mes
                             <tbody>
                                 <tr>
                                     <th>Subtotal</th>
-                                    <td><?= \Yii::$app->formatter->asCurrency($model->subtotal, $model->currency->code, [
+                                    <td><?= Yii::$app->formatter->asCurrency($model->subtotal * $model->currency_rate, $model->currency_code, [
                                             \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
-                                        ]) ?></td>
+                                        ]); ?></td>
                                 </tr>
                                 <?php
                                 if ($model->voucher_id != null && $model->voucher_id && $model->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY) {
@@ -510,7 +511,7 @@ if ($model->recipient_name || $model->recipient_phone_number || $model->gift_mes
                                     ?>
                                     <tr>
                                         <th>Voucher Discount</th>
-                                        <td><?= Yii::$app->formatter->asCurrency($voucherDiscount, $model->currency->code, [
+                                        <td><?= Yii::$app->formatter->asCurrency($voucherDiscount * $model->currency_rate, $model->currency_code, [
                                                 \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
                                                 \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                             ]) ?></td>
@@ -521,7 +522,7 @@ if ($model->recipient_name || $model->recipient_phone_number || $model->gift_mes
                                           <?php
                                             $subtotalAfterDiscount = $subtotalAfterDiscount > 0 ? $subtotalAfterDiscount : 0;
 
-                                            echo Yii::$app->formatter->asCurrency($subtotalAfterDiscount, $model->currency->code, [
+                                            echo Yii::$app->formatter->asCurrency($subtotalAfterDiscount * $model->currency_rate, $model->currency_code, [
                                                     \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
                                                     \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                             ])
@@ -539,7 +540,7 @@ if ($model->recipient_name || $model->recipient_phone_number || $model->gift_mes
                                     ?>
                                     <tr>
                                         <th>Bank Discount</th>
-                                        <td>-<?= Yii::$app->formatter->asCurrency($bankDiscount, $model->currency->code, [
+                                        <td>-<?= Yii::$app->formatter->asCurrency($bankDiscount* $model->currency_rate, $model->currency_code, [
                                                 \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
                                                 \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                             ]) ?></td>
@@ -547,7 +548,7 @@ if ($model->recipient_name || $model->recipient_phone_number || $model->gift_mes
                                 <tbody>
                                     <tr>
                                         <th>Subtotal After Bank Discount</th>
-                                        <td><?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount, $model->currency->code, [
+                                        <td><?= Yii::$app->formatter->asCurrency($subtotalAfterDiscount* $model->currency_rate, $model->currency_code, [
                                                 \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
                                                 \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                             ]) ?></td>
@@ -559,7 +560,7 @@ if ($model->recipient_name || $model->recipient_phone_number || $model->gift_mes
 
                                 <tr>
                                     <th>Delivery fee</th>
-                                    <td><?= \Yii::$app->formatter->asCurrency($model->delivery_fee, $model->currency->code, [
+                                    <td><?= \Yii::$app->formatter->asCurrency($model->delivery_fee* $model->currency_rate, $model->currency_code, [
                                             \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                         ]) ?></td>
                                 </tr>
@@ -567,7 +568,7 @@ if ($model->recipient_name || $model->recipient_phone_number || $model->gift_mes
                                 <?php if ($model->voucher_id != null && $model->voucher_id && $model->voucher->discount_type == Voucher::DISCOUNT_TYPE_FREE_DELIVERY) { ?>
                                     <tr>
                                         <th>Voucher Discount</th>
-                                        <td>-<?= Yii::$app->formatter->asCurrency($model->delivery_fee, $model->currency->code, [
+                                        <td>-<?= Yii::$app->formatter->asCurrency($model->delivery_fee* $model->currency_rate, $model->currency_code, [
                                                 \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
                                                 \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                             ]) ?></td>
@@ -576,7 +577,7 @@ if ($model->recipient_name || $model->recipient_phone_number || $model->gift_mes
 
                                     <tr>
                                         <th>Delivery fee After Voucher</th>
-                                        <td><?= Yii::$app->formatter->asCurrency(0, $model->currency->code, [
+                                        <td><?= Yii::$app->formatter->asCurrency(0, $model->currency_code, [
                                                 \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
                                                 \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                             ]) ?></td>
@@ -587,7 +588,7 @@ if ($model->recipient_name || $model->recipient_phone_number || $model->gift_mes
                             <?php if ($model->tax > 0) { ?>
                             <tr>
                                 <th>Tax</th>
-                                <td><?= Yii::$app->formatter->asCurrency($model->tax, $model->currency->code, [
+                                <td><?= Yii::$app->formatter->asCurrency($model->tax* $model->currency_rate, $model->currency_code, [
                                         \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
                                         \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                     ]) ?></td>
@@ -595,7 +596,7 @@ if ($model->recipient_name || $model->recipient_phone_number || $model->gift_mes
                           <?php } ?>
                             <tr>
                                 <th><b>Total Price</b></th>
-                                <td><?= Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code, [
+                                <td><?= Yii::$app->formatter->asCurrency($model->total_price* $model->currency_rate, $model->currency_code, [
                                         \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
                                         \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                     ]) ?></td>

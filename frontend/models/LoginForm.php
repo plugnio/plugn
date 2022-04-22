@@ -40,12 +40,12 @@ class LoginForm extends Model {
      * @param string $attribute the attribute currently being validated
      * @param array $params the additional name-value pairs given in the rule
      */
-    public function validatePassword($attribute, $params) {
-       
+    public function validatePassword($attribute, $params)
+    {
         if (!$this->hasErrors()) {
             $agent = $this->getAgent();
             if (!$agent || !$agent->validatePassword($this->password)) {
-                $this->addError($attribute, 'Incorrect email or password.');
+                $this->addError($attribute, Yii::t('app', 'Incorrect email or password.'));
             }
         }
     }

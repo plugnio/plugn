@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index', 'store
 $this->params['breadcrumbs'][] = ['label' => 'Order #' . $model->order_uuid, 'url' => ['index', 'storeUuid' => $model->restaurant_uuid]];
 $this->params['breadcrumbs'][] = $this->title;
 
-$currency = $order_model->currency->code;
+$currency = $order->currency->code;
 
 $js = "
 $(document).on('wheel', 'input[type=number]', function (e) {
@@ -179,7 +179,7 @@ z-index: 2;
 
                     <!-- Insert loop here -->
                     <?php
-                    foreach ($refunded_items_model as $refundedItemKey => $refundedItem) {
+                    foreach ($refunded_items as $refundedItemKey => $refundedItem) {
                       $itemItmage = null;
 
                       if($refundedItem->orderItem && $refundedItem->orderItem->getItemImage()->one())
@@ -235,7 +235,7 @@ z-index: 2;
                                                   <!-- Product price -->
                                                   <div>
                                                       <?= Yii::$app->formatter->asCurrency(
-                                                              $refundedItem->orderItem->item_price,
+                                                              $refundedItem->orderItem->item_price * $order->currency_rate,
                                                               $refundedItem->currency->code, [
                                                                   \NumberFormatter::MIN_FRACTION_DIGITS => $refundedItem->currency->decimal_place,
                                                                   \NumberFormatter::MAX_FRACTION_DIGITS => $refundedItem->currency->decimal_place
@@ -396,7 +396,7 @@ z-index: 2;
                               <?php
 
                                 if($refundedItem->orderItem)
-                                  echo $order_model->payment_method_name;
+                                  echo $order->payment_method_name;
                                ?>
                             </span>
 
@@ -413,7 +413,7 @@ z-index: 2;
                                     'step' => '0.001',
                                     'min' => 0,
                                     'placeholder' => '0',
-                                    'max' => $order_model->total_price,
+                                    'max' => $order->total_price,
                                     'id' => 'refund_amount',
                                     // 'value' => \Yii::$app->formatter->asDecimal(0, 3),
                                     'class' => 'form-control'
@@ -425,7 +425,7 @@ z-index: 2;
 
                                 if($refundedItem->orderItem){
 
-                                  echo Yii::$app->formatter->asCurrency($order_model->total_price, $refundedItem->currency->code , [
+                                  echo Yii::$app->formatter->asCurrency($order->total_price * $order->currency_rate, $refundedItem->currency->code , [
                                           \NumberFormatter::MIN_FRACTION_DIGITS => $refundedItem->currency->decimal_place,
                                           \NumberFormatter::MAX_FRACTION_DIGITS => $refundedItem->currency->decimal_place
                                   ]);

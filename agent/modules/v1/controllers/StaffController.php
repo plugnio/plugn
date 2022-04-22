@@ -80,6 +80,7 @@ class StaffController extends Controller {
      * @return ActiveDataProvider
      */
     public function actionList() {
+
         $this->ownerCheck();
         $keyword = Yii::$app->request->get('keyword');
 

@@ -45,11 +45,10 @@ class PaymentController extends Controller
      */
     public function actionIndex($storeUuid)
     {
-        
-        $restaurant_model = Yii::$app->getManagedAccount->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->getManagedAccount->getManagedAccount($storeUuid);
 
         $searchModel = new PaymentSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant->restaurant_uuid);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -72,7 +71,6 @@ class PaymentController extends Controller
         ]);
     }
 
- 
     /**
      * Deletes an existing Payment model.
      * If deletion is successful, the browser will be redirected to the 'index' page.

@@ -3,6 +3,7 @@
 namespace agent\modules\v1\controllers;
 
 use agent\models\Currency;
+use agent\models\PaymentMethod;
 use agent\models\RestaurantTheme;
 use Yii;
 use yii\rest\Controller;
@@ -124,6 +125,8 @@ class StoreController extends Controller
         $store->restaurant_email = Yii::$app->request->getBodyParam('store_email');
         $store->tagline = Yii::$app->request->getBodyParam('tagline');
         $store->tagline_ar = Yii::$app->request->getBodyParam('tagline_ar');
+        $store->meta_description = Yii::$app->request->getBodyParam("meta_description");
+        $store->meta_description_ar = Yii::$app->request->getBodyParam("meta_description_ar");
         $store->enable_gift_message = Yii::$app->request->getBodyParam('enable_gift_message');
 
         $currencyCode = Yii::$app->request->getBodyParam('currency');
@@ -462,6 +465,54 @@ class StoreController extends Controller
     }
 
     /**
+     *  Enable Free Checkout
+     */
+    public function actionEnableFreeCheckout($id)
+    {
+        $model = $this->findModel($id);
+
+        $payment_method = $model->getPaymentMethods()
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_FREE_CHECKOUT])
+            ->exists();
+
+        if ($payment_method) {
+            return self::message("error",'Free checkout already enabled');
+        }
+
+        $payments_method = new RestaurantPaymentMethod();
+        $payments_method->payment_method_id = 7; //Free checkout
+        $payments_method->restaurant_uuid = $model->restaurant_uuid;
+
+        if (!$payments_method->save()) {
+            return self::message("error",$payments_method->getErrors());
+        }
+
+        return self::message("success","Free checkout enabled successfully");
+    }
+
+    /**
+     *  Disable Free Checkout
+     */
+    public function actionDisableFreeCheckout($id)
+    {
+        $model = $this->findModel($id);
+
+        $payment_method = $model->getPaymentMethods()
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_FREE_CHECKOUT])
+            ->exists();
+
+        if (!$payment_method) {
+            throw new BadRequestHttpException('The requested record does not exist.');
+        }
+
+        if (!$payment_method->delete()) {
+            return self::message("error", $payment_method->getErrors());
+        }
+
+        return self::message("success","Free checkout disabled successfully");
+    }
+
+    /**
      * Updates store layout
      */
     public function actionUpdateLayout() {
@@ -601,7 +652,7 @@ class StoreController extends Controller
         return [
             'itemQuantity'=>count($model->items),
             'payment'=>count($model->paymentMethods),
-            'shipping'=>count($model->businessLocations)
+            'shipping'=>count($model->areaDeliveryZones)
         ];
     }
 

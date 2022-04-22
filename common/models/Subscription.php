@@ -87,12 +87,12 @@ class Subscription extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'subscription_uuid' => 'Subscription Uuid',
-            'payment_uuid' => 'Payment Uuid',
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'plan_id' => 'Plan ID',
-            'subscription_start_at' => 'Subscription Start At',
-            'subscription_end_at' => 'Subscription End At',
+            'subscription_uuid' => Yii::t('app','Subscription Uuid'),
+            'payment_uuid' => Yii::t('app','Payment Uuid'),
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'plan_id' => Yii::t('app','Plan ID'),
+            'subscription_start_at' => Yii::t('app','Subscription Start At'),
+            'subscription_end_at' => Yii::t('app','Subscription End At')
         ];
     }
 

@@ -442,7 +442,7 @@ $(window).on("load", function () {
 
   // Sales Chart ends //
 
-  /***** TOUR ******/
+  /***** TOUR *****
   var tour = new Shepherd.Tour({
     classes: 'shadow-md bg-purple-dark',
     scrollTo: true
@@ -557,5 +557,5 @@ $(window).on("load", function () {
   $(window).on("resize", function () {
     tour.cancel()
   })
-
+  */
 });

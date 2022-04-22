@@ -9,8 +9,8 @@ use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
-$this->title = $restaurant_model->name;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
+$this->title = $restaurant->name;
 ?>
 
 <section>
@@ -33,7 +33,7 @@ $this->title = $restaurant_model->name;
                       </p>
 
                       <div  style="padding: 10px 21px 50px;" class="mb-0">
-                        <?= Html::a('Back to dashboard', ['index', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                        <?= Html::a('Back to dashboard', ['index', 'id' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
                      </div>
                 </div>
 

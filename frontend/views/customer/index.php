@@ -47,9 +47,9 @@ white-space: nowrap !important;
 
 <section id="data-list-view" class="data-list-view-header">
 
-  <?php  echo $this->render('_search', ['model' => $searchModel,'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
+  <?php  echo $this->render('_search', ['model' => $searchModel,'restaurant_uuid' => $restaurant->restaurant_uuid]); ?>
 
-  <?php if ($dataProvider->getCount() > 0) { ?>
+  <?php if ($count > 0) { ?>
 
   <!-- Data list view starts -->
   <!-- <div class="action-btns d-none">
@@ -121,7 +121,7 @@ white-space: nowrap !important;
                 'prevPageCssClass' => 'paginate_button page-item previous',
                 'nextPageCssClass' => 'paginate_button page-item next',
             ],
-              'tableOptions' => ['class' => 'table data-list-view'],
+              'tableOptions' => ['class' => 'table dataTable data-list-view'],
         ]);
         ?>
 

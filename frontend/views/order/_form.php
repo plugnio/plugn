@@ -20,8 +20,7 @@ $js = "
 
     $('#order-estimated_time_of_arrival').attr('autocomplete','off');
     $('#order-estimated_time_of_arrival').attr('style', '  padding-right: 2rem !important; padding-left: 3rem !important; ');
-
-
+    
 
     let orderModeInput = $('#orderModeInput');
     // On Change of project type input
@@ -52,7 +51,7 @@ $this->registerJs($js);
 
     <div class="card-body">
         <?php
-        $areaQuery = $restaurant_model->getAreas()->asArray()->all();
+        $areaQuery = $restaurant->getAreas()->asArray()->all();
         $areaList = ArrayHelper::map($areaQuery, 'area_id', 'area_name');
 
 
@@ -64,6 +63,17 @@ $this->registerJs($js);
         <?= $form->errorSummary($model, ['header' => '<h4 class="alert-heading">Please fix the following errors:</h4>']); ?>
 
         <?php
+
+        $paymentMethods = $restaurant->getRestaurantPaymentMethods()
+          ->with('paymentMethod')
+          ->asArray()
+          ->all();
+
+        $paymentMethodsArray = ArrayHelper::map($paymentMethods, 'payment_method_id', 'paymentMethod.payment_method_name');
+
+        echo $form->field($model, 'payment_method_id')->dropDownList($paymentMethodsArray, [
+          'prompt' => 'Choose...', 'class' => 'form-control select2',
+        ]);
 
         echo $form->field($model, 'order_mode')->dropDownList([
           Order::ORDER_MODE_DELIVERY => 'Delivery',

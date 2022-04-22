@@ -8,7 +8,7 @@ use common\models\Voucher;
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\VoucherSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 
 $this->title = 'Vouchers';
 $this->params['breadcrumbs'][] = $this->title;
@@ -22,13 +22,13 @@ $this->registerJs($js);
 ?>
 <section id="data-list-view" class="data-list-view-header">
 
-    <?php if ($dataProvider->getCount() > 0) { ?>
+    <?php if ($count > 0) { ?>
 
     <!-- Data list view starts -->
-    <div class="action-btns d-none">
+    <div class="action-btns">
         <div class="btn-dropdown mr-1 mb-1">
             <div class="btn-group dropdown actions-dropodown">
-                <?= Html::a('Create voucher code', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                <?= Html::a('Create voucher code', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
             </div>
         </div>
     </div>
@@ -39,6 +39,7 @@ $this->registerJs($js);
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
             'rowOptions' => function($model) {
                 $url = Url::to(['voucher/update', 'id' => $model->voucher_id, 'storeUuid' => $model->restaurant_uuid]);
 
@@ -69,6 +70,7 @@ $this->registerJs($js);
                     }
                 ],
                 [
+                   // 'attribute' => 'discount_amount',
                     'label' => 'Amount',
                     "format" => "raw",
                     "value" => function($model) {
@@ -79,6 +81,10 @@ $this->registerJs($js);
                 [
                     'attribute' => 'voucher_status',
                     "format" => "raw",
+                    "filter" => [
+                        Voucher::VOUCHER_STATUS_ACTIVE => "Active",
+                        Voucher::VOUCHER_STATUS_EXPIRED => 'Expired'
+                    ],
                     "value" => function($model) {
                         if ($model->voucher_status == Voucher::VOUCHER_STATUS_ACTIVE) {
                             return '<div class="chip chip-success mr-1">
@@ -127,7 +133,7 @@ $this->registerJs($js);
             ],
 
             'layout' => '{summary}{items}{pager}',
-            'tableOptions' => ['class' => 'table data-list-view']
+            'tableOptions' => ['class' => 'table dataTable data-list-view']
         ]);
         ?>
 
@@ -151,7 +157,7 @@ $this->registerJs($js);
           <p>
             Create voucher codes that apply at checkout.
           </p>
-          <?= Html::a('Create voucher code', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+          <?= Html::a('Create voucher code', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
         </div>
       </div>
 

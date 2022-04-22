@@ -45,15 +45,15 @@ class RestaurantBranchController extends Controller {
      */
     public function actionIndex($storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $dataProvider = new ActiveDataProvider([
-            'query' => RestaurantBranch::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid]),
+            'query' => RestaurantBranch::find()->where(['restaurant_uuid' => $restaurant->restaurant_uuid]),
         ]);
 
         return $this->render('index', [
                     'dataProvider' => $dataProvider,
-                    'storeUuid' => $restaurant_model->restaurant_uuid
+                    'storeUuid' => $restaurant->restaurant_uuid
         ]);
     }
 
@@ -133,7 +133,15 @@ class RestaurantBranchController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id, $storeUuid) {
-        if (($model = RestaurantBranch::findOne(['restaurant_branch_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])) !== null) {
+
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $model = RestaurantBranch::findOne([
+            'restaurant_branch_id' => $id,
+            'restaurant_uuid' => $store->restaurant_uuid
+        ]);
+
+        if ($model !== null) {
             return $model;
         }
 

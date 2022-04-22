@@ -46,18 +46,17 @@ class BusinessLocationController extends Controller
      */
     public function actionIndex($storeUuid)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        $businessLocations = BusinessLocation::find()->where(['restaurant_uuid' => $store_model->restaurant_uuid])->all();
-
+        $businessLocations = BusinessLocation::find()
+            ->where(['restaurant_uuid' => $store->restaurant_uuid])
+            ->all();
 
         return $this->render('index', [
             'businessLocations' => $businessLocations,
-            'store' => $store_model
+            'store' => $store
         ]);
     }
-
-
 
     /**
      * Creates a new BusinessLocation model.
@@ -66,9 +65,10 @@ class BusinessLocationController extends Controller
      */
     public function actionCreate($storeUuid)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
         $model = new BusinessLocation();
-        $model->restaurant_uuid = $store_model->restaurant_uuid;
+        $model->restaurant_uuid = $store->restaurant_uuid;
 
 
         if ($model->load(Yii::$app->request->post()) ) {
@@ -165,7 +165,7 @@ class BusinessLocationController extends Controller
 
         return $this->render('create', [
             'model' => $model,
-            'store_model' => $store_model
+            'store' => $store
         ]);
     }
 
@@ -322,7 +322,7 @@ class BusinessLocationController extends Controller
 
         return $this->render('update', [
             'model' => $model,
-            'store_model' => Restaurant::findOne($storeUuid)
+            'store' => Restaurant::findOne($storeUuid)
         ]);
     }
 

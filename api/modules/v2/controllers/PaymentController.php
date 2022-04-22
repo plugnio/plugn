@@ -112,12 +112,8 @@ class PaymentController extends Controller {
         return [
           'message' => 'success'
         ];
+      }
     }
-
-
-
-    }
-
 
     /**
      * return a list of payments method that restaurant's owner added on agent dashboard
@@ -131,5 +127,4 @@ class PaymentController extends Controller {
             'pagination' => false
         ]);
     }
-
 }

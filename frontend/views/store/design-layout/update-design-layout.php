@@ -327,9 +327,9 @@ $this->registerJs($js);
 
                         <div class="ant-form-item-label"><label class="" title="Primary Color">Primary Color</label></div>
 
-                        <div id="primary-wrapper" style=" cursor: pinter; width:100%;margin-bottom: 21px; position: relative;background:<?= $store_theme_model->primary ?>" class="text-center colors-container rounded text-white  height-40 d-flex align-items-center justify-content-center  my-1 shadow">
+                        <div id="primary-wrapper" style=" cursor: pinter; width:100%;margin-bottom: 21px; position: relative;background:<?= $store_theme->primary ?>" class="text-center colors-container rounded text-white  height-40 d-flex align-items-center justify-content-center  my-1 shadow">
                             <?=
-                            $form->field($store_theme_model, 'primary')->textInput(
+                            $form->field($store_theme, 'primary')->textInput(
                                     [
                                         'type' => 'color',
                                         'style' => 'position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer;  top: 0;   right: 0;',

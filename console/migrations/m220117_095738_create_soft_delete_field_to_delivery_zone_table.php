@@ -34,8 +34,6 @@ class m220117_095738_create_soft_delete_field_to_delivery_zone_table extends Mig
           ]);
       }
 
-
-
       $deliveryZoneSql = "SELECT * from delivery_zone where delivery_zone.is_deleted = 1";
 
       $deliveryZoneRows = Yii::$app->db->createCommand ($deliveryZoneSql)->queryAll ();
@@ -51,12 +49,6 @@ class m220117_095738_create_soft_delete_field_to_delivery_zone_table extends Mig
               'restaurant_uuid' => $row['restaurant_uuid']
           ]);
       }
-
-
-
-
-
-
     }
 
     /**

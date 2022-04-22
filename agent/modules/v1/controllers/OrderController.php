@@ -23,17 +23,16 @@ use kartik\mpdf\Pdf;
 
 class OrderController extends Controller
 {
-
     public function behaviors()
     {
-        $behaviors = parent::behaviors ();
+        $behaviors = parent::behaviors();
 
         // remove authentication filter for cors to work
         unset($behaviors['authenticator']);
 
         // Allow XHR Requests from our different subdomains and dev machines
         $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className (),
+            'class' => \yii\filters\Cors::className(),
             'cors' => [
                 'Origin' => Yii::$app->params['allowedOrigins'],
                 'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
@@ -51,7 +50,7 @@ class OrderController extends Controller
 
         // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
         $behaviors['authenticator'] = [
-            'class' => \yii\filters\auth\HttpBearerAuth::className (),
+            'class' => \yii\filters\auth\HttpBearerAuth::className(),
         ];
         // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
         $behaviors['authenticator']['except'] = ['options'];//, 'download-invoice'
@@ -64,7 +63,7 @@ class OrderController extends Controller
      */
     public function actions()
     {
-        $actions = parent::actions ();
+        $actions = parent::actions();
         $actions['options'] = [
             'class' => 'yii\rest\OptionsAction',
             // optional:
@@ -81,12 +80,12 @@ class OrderController extends Controller
      */
     public function actionLiveOrders()
     {
-        $store_uuid = Yii::$app->request->get ('store_uuid');
+        $store_uuid = Yii::$app->request->get('store_uuid');
 
-        $query = Order::find ()
-            ->filterBusinessLocationIfManager ($store_uuid)
-            ->andWhere (['restaurant_uuid' => $store_uuid])
-            ->andWhere (
+        $query = Order::find()
+            ->filterBusinessLocationIfManager($store_uuid)
+            ->andWhere(['restaurant_uuid' => $store_uuid])
+            ->andWhere(
                 [
                     'order_status' => [
                         Order::STATUS_PENDING,
@@ -95,8 +94,8 @@ class OrderController extends Controller
                     ]
                 ]
             )
-            ->andWhere (['is_deleted' => 0])
-            ->orderBy (['order_created_at' => SORT_DESC]);
+            ->andWhere(['order.is_deleted' => 0])
+            ->orderBy(['order_created_at' => SORT_DESC]);
 
         return new ActiveDataProvider([
             'query' => $query
@@ -110,22 +109,22 @@ class OrderController extends Controller
      */
     public function actionArchiveOrders()
     {
-        $store_uuid = Yii::$app->request->get ('store_uuid');
+        $store_uuid = Yii::$app->request->get('store_uuid');
 
-        $query = Order::find ()
-            ->filterBusinessLocationIfManager ($store_uuid)
-            ->andWhere (['restaurant_uuid' => $store_uuid])
-            ->andWhere (
+        $query = Order::find()
+            ->filterBusinessLocationIfManager($store_uuid)
+            ->andWhere(['restaurant_uuid' => $store_uuid])
+            ->andWhere(
                 [
                     'order_status' => [
-                      Order::STATUS_OUT_FOR_DELIVERY,
-                      Order::STATUS_COMPLETE,
+                        Order::STATUS_OUT_FOR_DELIVERY,
+                        Order::STATUS_COMPLETE,
 
                     ]
                 ]
             )
-            ->andWhere (['is_deleted' => 0])
-            ->orderBy (['order_created_at' => SORT_DESC]);
+            ->andWhere(['order.is_deleted' => 0])
+            ->orderBy(['order_created_at' => SORT_DESC]);
 
         return new ActiveDataProvider([
             'query' => $query
@@ -139,18 +138,18 @@ class OrderController extends Controller
      */
     public function actionList($type = null)
     {
-        $store_uuid = Yii::$app->request->get ('store_uuid');
-        $keyword = Yii::$app->request->get ('keyword');
-        $order_uuid = Yii::$app->request->get ('order_uuid');
-        $phone = Yii::$app->request->get ('phone');
-        $status = Yii::$app->request->get ('status');
-        $customer = Yii::$app->request->get ('customer');
-        $date_range = Yii::$app->request->get ('date_range');
-        $customer_id = Yii::$app->request->get ('customer_id');
+        $store_uuid = Yii::$app->request->get('store_uuid');
+        $keyword = Yii::$app->request->get('keyword');
+        $order_uuid = Yii::$app->request->get('order_uuid');
+        $phone = Yii::$app->request->get('phone');
+        $status = Yii::$app->request->get('status');
+        $customer = Yii::$app->request->get('customer');
+        $date_range = Yii::$app->request->get('date_range');
+        $customer_id = Yii::$app->request->get('customer_id');
 
-        $query = Order::find ()
-            ->filterBusinessLocationIfManager ($store_uuid)
-            ->andWhere (['restaurant_uuid' => $store_uuid]);
+        $query = Order::find()
+            ->filterBusinessLocationIfManager($store_uuid)
+            ->andWhere(['restaurant_uuid' => $store_uuid]);
 
         # as we already doing some search with keyword textbox so reusing that
         if ($order_uuid) {
@@ -162,32 +161,32 @@ class OrderController extends Controller
         }
 
         // grid filtering conditions
-        $query->orderBy (['order_created_at' => SORT_DESC]);
+        $query->orderBy(['order_created_at' => SORT_DESC]);
 
         if ($status == '11') {
             $query->liveOrders();
         } else if ($status == '12') {
             $query->archiveOrders();
         } else if ($status !== null) {
-            $query->andFilterWhere (['order_status' => $status]);
+            $query->andFilterWhere(['order_status' => $status]);
         }
 
         if ($date_range) {
-            $query->filterByCreatedDate ($date_range);
+            $query->filterByCreatedDate($date_range);
         }
 
         if ($customer_id) {
-            $query->andFilterWhere (['customer_id' => $customer_id]);
+            $query->andFilterWhere(['customer_id' => $customer_id]);
         }
 
         if ($keyword) {
             $query->filterByKeyword($keyword);
         }
 
-        $query->andWhere (['restaurant_uuid' => $store_uuid]);
+        $query->andWhere(['restaurant_uuid' => $store_uuid]);
 
         if ($type == 'active') {
-            $query->andWhere (
+            $query->andWhere(
                 [
                     'order_status' => [
                         Order::STATUS_PENDING,
@@ -199,13 +198,13 @@ class OrderController extends Controller
                 ]
             );
         } else if ($type == 'pending') {
-            $query->andWhere (['order_status' => Order::STATUS_PENDING]);
+            $query->andWhere(['order_status' => Order::STATUS_PENDING]);
         } else if ($type == 'abandoned') {
-            $query->andWhere (['order_status' => Order::STATUS_ABANDONED_CHECKOUT]);
+            $query->andWhere(['order_status' => Order::STATUS_ABANDONED_CHECKOUT]);
         } else if ($type == 'draft') {
-            $query->andWhere (['order_status' => Order::STATUS_DRAFT]);
+            $query->andWhere(['order_status' => Order::STATUS_DRAFT]);
         }
-        $query->andWhere (['is_deleted' => 0]);
+        $query->andWhere(['order.is_deleted' => 0]);
         return new ActiveDataProvider([
             'query' => $query
         ]);
@@ -217,267 +216,267 @@ class OrderController extends Controller
      */
     public function actionStats()
     {
-        $customer_id = Yii::$app->request->get ('customer_id');
-        $keyword = Yii::$app->request->get ('query');
+        $customer_id = Yii::$app->request->get('customer_id');
+        $keyword = Yii::$app->request->get('query');
 
-        $store = Yii::$app->accountManager->getManagedAccount ();
+        $store = Yii::$app->accountManager->getManagedAccount();
 
         $response = [];
 
         if ($customer_id) {
-            $response['allCount'] = $store->getOrders ()
+            $response['allCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
                 ->notDeleted()
-                ->andFilterWhere ([
+                ->andFilterWhere([
                     'customer_id' => $customer_id
                 ])
-                ->count ();
+                ->count();
         } else {
-            $response['allCount'] = $store->getOrders ()
+            $response['allCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->count ();
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->count();
         }
 
         if ($customer_id) {
-            $response['draftCount'] = $store->getOrders ()
+            $response['draftCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
                 ->notDeleted()
-                ->andFilterWhere ([
+                ->andFilterWhere([
                     'customer_id' => $customer_id,
                     'order_status' => Order::STATUS_DRAFT
                 ])
-                ->count ();
+                ->count();
         } else {
-            $response['draftCount'] = $store->getOrders ()
+            $response['draftCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere (['order_status' => Order::STATUS_DRAFT])
-                ->count ();
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere(['order_status' => Order::STATUS_DRAFT])
+                ->count();
         }
 
         if ($customer_id) {
-            $response['acceptedCount'] = $store->getOrders ()
+            $response['acceptedCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere ([
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere([
                     'customer_id' => $customer_id,
                     'order_status' => Order::STATUS_ACCEPTED
                 ])
-                ->count ();
+                ->count();
         } else {
-            $response['acceptedCount'] = $store->getOrders ()
+            $response['acceptedCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere (['order_status' => Order::STATUS_ACCEPTED])
-                ->count ();
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere(['order_status' => Order::STATUS_ACCEPTED])
+                ->count();
         }
 
         if ($customer_id) {
-            $response['pendingCount'] = $store->getOrders ()
+            $response['pendingCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere ([
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere([
                     'customer_id' => $customer_id,
                     'order_status' => Order::STATUS_PENDING
                 ])
-                ->count ();
+                ->count();
         } else {
-            $response['pendingCount'] = $store->getOrders ()
+            $response['pendingCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere (['order_status' => Order::STATUS_PENDING])
-                ->count ();
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere(['order_status' => Order::STATUS_PENDING])
+                ->count();
         }
 
         if ($customer_id) {
-            $response['preparedCount'] = $store->getOrders ()
+            $response['preparedCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere ([
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere([
                     'customer_id' => $customer_id,
                     'order_status' => Order::STATUS_BEING_PREPARED
                 ])
-                ->count ();
+                ->count();
         } else {
-            $response['preparedCount'] = $store->getOrders ()
+            $response['preparedCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere (['order_status' => Order::STATUS_BEING_PREPARED])
-                ->count ();
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere(['order_status' => Order::STATUS_BEING_PREPARED])
+                ->count();
         }
 
         if ($customer_id) {
-            $response['outForDeliveryCount'] = $store->getOrders ()
+            $response['outForDeliveryCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere ([
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere([
                     'customer_id' => $customer_id,
                     'order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                ->count ();
+                ->count();
         } else {
-            $response['outForDeliveryCount'] = $store->getOrders ()
+            $response['outForDeliveryCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere ([
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere([
                     'order_status' => Order::STATUS_OUT_FOR_DELIVERY
                 ])
-                ->count ();
+                ->count();
         }
 
         if ($customer_id) {
-            $response['completeCount'] = $store->getOrders ()
+            $response['completeCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere ([
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere([
                     'customer_id' => $customer_id,
                     'order_status' => Order::STATUS_COMPLETE
                 ])
-                ->count ();
+                ->count();
         } else {
-            $response['completeCount'] = $store->getOrders ()
+            $response['completeCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere ([
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere([
                     'order_status' => Order::STATUS_COMPLETE
                 ])
-                ->count ();
+                ->count();
         }
 
         if ($customer_id) {
-            $response['canceledCount'] = $store->getOrders ()
+            $response['canceledCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere ([
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere([
                     'customer_id' => $customer_id,
                     'order_status' => Order::STATUS_CANCELED
                 ])
-                ->count ();
+                ->count();
         } else {
-            $response['canceledCount'] = $store->getOrders ()
+            $response['canceledCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere ([
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere([
                     'order_status' => Order::STATUS_CANCELED
                 ])
-                ->count ();
+                ->count();
         }
 
         if ($customer_id) {
-            $response['partialRefundedCount'] = $store->getOrders ()
+            $response['partialRefundedCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere ([
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere([
                     'customer_id' => $customer_id,
                     'order_status' => Order::STATUS_PARTIALLY_REFUNDED
                 ])
-                ->count ();
+                ->count();
         } else {
-            $response['partialRefundedCount'] = $store->getOrders ()
+            $response['partialRefundedCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere ([
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere([
                     'order_status' => Order::STATUS_PARTIALLY_REFUNDED
                 ])
-                ->count ();
+                ->count();
         }
 
         if ($customer_id) {
-            $response['refundedCount'] = $store->getOrders ()
+            $response['refundedCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere ([
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere([
                     'customer_id' => $customer_id,
                     'order_status' => Order::STATUS_REFUNDED
                 ])
-                ->count ();
+                ->count();
         } else {
-            $response['refundedCount'] = $store->getOrders ()
+            $response['refundedCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere ([
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere([
                     'order_status' => Order::STATUS_REFUNDED
                 ])
-                ->count ();
+                ->count();
         }
 
         if ($customer_id) {
-            $response['abandonedCount'] = $store->getOrders ()
+            $response['abandonedCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere ([
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere([
                     'customer_id' => $customer_id,
                     'order_status' => Order::STATUS_ABANDONED_CHECKOUT
                 ])
-                ->count ();
+                ->count();
         } else {
-            $response['abandonedCount'] = $store->getOrders ()
+            $response['abandonedCount'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere ([
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere([
                     'order_status' => Order::STATUS_ABANDONED_CHECKOUT
                 ])
-                ->count ();
+                ->count();
         }
 
         if ($customer_id) {
-            $response['liveOrders'] = $store->getOrders ()
+            $response['liveOrders'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere ([
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere([
                     'customer_id' => $customer_id
                 ])
                 ->liveOrders()
-                ->count ();
+                ->count();
         } else {
-            $response['liveOrders'] = $store->getOrders ()
+            $response['liveOrders'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
                 ->liveOrders()
-                ->count ();
+                ->count();
         }
 
         if ($customer_id) {
-            $response['archiveOrders'] = $store->getOrders ()
+            $response['archiveOrders'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-                ->andFilterWhere ([
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
+                ->andFilterWhere([
                     'customer_id' => $customer_id
                 ])
                 ->archiveOrders()
-                ->count ();
+                ->count();
         } else {
-            $response['archiveOrders'] = $store->getOrders ()
+            $response['archiveOrders'] = $store->getOrders()
                 ->filterByKeyword($keyword)
                 ->notDeleted()
-                ->filterBusinessLocationIfManager ($store->restaurant_uuid)
+                ->filterBusinessLocationIfManager($store->restaurant_uuid)
                 ->archiveOrders()
-                ->count ();
+                ->count();
         }
 
         return $response;
@@ -489,20 +488,22 @@ class OrderController extends Controller
      */
     public function actionTotalPending()
     {
-        $store = Yii::$app->accountManager->getManagedAccount ();
+        $store = Yii::$app->accountManager->getManagedAccount();
 
-        $totalPendingOrders = Order::find ()
-            ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-            ->andWhere (['order_status' => Order::STATUS_PENDING])
-            ->andWhere (['restaurant_uuid' => $store->restaurant_uuid])
-            ->count ();
+        $totalPendingOrders = Order::find()
+            ->notDeleted()
+            ->filterBusinessLocationIfManager($store->restaurant_uuid)
+            ->andWhere(['order_status' => Order::STATUS_PENDING])
+            ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
+            ->count();
 
-        $latestOrder = Order::find ()
-            ->filterBusinessLocationIfManager ($store->restaurant_uuid)
-            ->andWhere (['order_status' => Order::STATUS_PENDING])
-            ->andWhere (['restaurant_uuid' => $store->restaurant_uuid])
-            ->orderBy (['order_created_at' => SORT_DESC])
-            ->one ();
+        $latestOrder = Order::find()
+            ->notDeleted()
+            ->filterBusinessLocationIfManager($store->restaurant_uuid)
+            ->andWhere(['order_status' => Order::STATUS_PENDING])
+            ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
+            ->orderBy(['order_created_at' => SORT_DESC])
+            ->one();
 
         return [
             'totalPendingOrders' => (int)$totalPendingOrders,
@@ -515,191 +516,237 @@ class OrderController extends Controller
      */
     public function actionPlaceAnOrder($store_uuid = null)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $area_id = Yii::$app->request->getBodyParam("area_id");
+        $delivery_zone_id = Yii::$app->request->getBodyParam("area_delivery_zone");
+        $country_id = Yii::$app->request->getBodyParam("country_id");
+        $area_delivery_zone = Yii::$app->request->getBodyParam("area_delivery_zone");
+
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $order = new Order();
 
         $order->order_status = Order::STATUS_DRAFT;
-        $order->restaurant_uuid = $store_model->restaurant_uuid;
+        $order->restaurant_uuid = $store->restaurant_uuid;
 
         //Save Customer Info
-        $order->customer_name = Yii::$app->request->getBodyParam ("customer_name");
-        $order->customer_phone_number = str_replace (' ', '', strval (Yii::$app->request->getBodyParam ("phone_number")));
-        $order->customer_phone_country_code = Yii::$app->request->getBodyParam ("country_code") ? Yii::$app->request->getBodyParam ("country_code") : 965;
-        $order->customer_email = Yii::$app->request->getBodyParam ("email"); //optional
+        $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
+        $order->customer_phone_number = str_replace(' ', '', strval(Yii::$app->request->getBodyParam("phone_number")));
+        $order->customer_phone_country_code = Yii::$app->request->getBodyParam("country_code") ? Yii::$app->request->getBodyParam("country_code") : 965;
+        $order->customer_email = Yii::$app->request->getBodyParam("email"); //optional
 
-        $order->currency_code = Yii::$app->request->getBodyParam ("currency_code");
+        $order->currency_code = Yii::$app->request->getBodyParam("currency_code");
 
         //payment method => cash
         $order->payment_method_id = 3;
 
-        $order->order_mode = Yii::$app->request->getBodyParam ("order_mode");
+        $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
 
         //Delivery the order ASAP
-        $order->is_order_scheduled = Yii::$app->request->getBodyParam ("is_order_scheduled") ? Yii::$app->request->getBodyParam ("is_order_scheduled") : 0;
+        $order->is_order_scheduled = Yii::$app->request->getBodyParam("is_order_scheduled") ? Yii::$app->request->getBodyParam("is_order_scheduled") : 0;
 
         //Apply promo code
-        if (Yii::$app->request->getBodyParam ("voucher_id")) {
-            $order->voucher_id = Yii::$app->request->getBodyParam ("voucher_id");
+        if (Yii::$app->request->getBodyParam("voucher_id")) {
+            $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
+        } else if (Yii::$app->request->getBodyParam("voucher_code")) {
+
+            $voucherModel = $order->restaurant->getVouchers()
+                ->andWhere(['code' => Yii::$app->request->getBodyParam("voucher_code")])
+                ->one();
+
+            if(!$voucherModel) {
+
+                return [
+                    'operation' => 'error',
+                    'message' => Yii::t('app', "Invalid voucher code.")
+                ];
+            }
+
+            $order->voucher_id = $voucherModel->voucher_id;
         }
 
         //if the order mode = 1 => Delivery
+
         if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
 
             //Deliver to Kuwait - GCC
-            if (Yii::$app->request->getBodyParam ("area_id") && Yii::$app->request->getBodyParam ("area_delivery_zone")) {
-                $order->delivery_zone_id = Yii::$app->request->getBodyParam ("delivery_zone_id");
-                $order->area_id = Yii::$app->request->getBodyParam ("area_id");
-                $order->unit_type = Yii::$app->request->getBodyParam ("unit_type");
-                $order->block = Yii::$app->request->getBodyParam ("block");
-                $order->street = Yii::$app->request->getBodyParam ("street");
-                $order->avenue = Yii::$app->request->getBodyParam ("avenue"); //optional
-                $order->house_number = Yii::$app->request->getBodyParam ("house_number");
 
-                if (Yii::$app->request->getBodyParam ("floor") != null && ($order->unit_type == 'Apartment' || $order->unit_type == 'Office'))
-                    $order->floor = Yii::$app->request->getBodyParam ("floor");
+            $area_delivery_zone = $store->getAreaDeliveryZones()
+                ->andWhere(['area_id' => $area_id])
+                ->one();
 
-                if (Yii::$app->request->getBodyParam ("apartment") != null && $order->unit_type == 'Apartment')
-                    $order->apartment = Yii::$app->request->getBodyParam ("apartment");
-
-                if (Yii::$app->request->getBodyParam ("office") != null && $order->unit_type == 'Office')
-                    $order->office = Yii::$app->request->getBodyParam ("office");
-
-            } //Delivery other countries
-            else if (Yii::$app->request->getBodyParam ("country_id") && !Yii::$app->request->getBodyParam ("area_id") && !Yii::$app->request->getBodyParam ("area_delivery_zone")) {
-
-                $order->delivery_zone_id = Yii::$app->request->getBodyParam ("delivery_zone_id");
-                $order->shipping_country_id = Yii::$app->request->getBodyParam ("country_id");
-                $order->address_1 = Yii::$app->request->getBodyParam ('address_1');
-                $order->address_2 = Yii::$app->request->getBodyParam ('address_2');
-                $order->postalcode = Yii::$app->request->getBodyParam ('postal_code');
-                $order->city = Yii::$app->request->getBodyParam ("city");
-            }
-
-            $order->special_directions = Yii::$app->request->getBodyParam ("special_directions"); //optional
-
-
-        } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
-            $order->pickup_location_id = Yii::$app->request->getBodyParam ("business_location_id");
-        }
-
-        $response = [];
-
-        if ($order->save ()) {
-
-
-            $items = Yii::$app->request->getBodyParam ("items");
-
-
-            if ($items) {
-
-                foreach ($items as $item) {
-
-                    //Save items to the above order
-                    $orderItem = new OrderItem;
-
-                    $orderItem->order_uuid = $order->order_uuid;
-                    $orderItem->item_uuid = $item["item_uuid"];
-                    $orderItem->qty = (int)$item["qty"];
-
-
-                    //optional field
-                    if (array_key_exists ("customer_instruction", $item) && $item["customer_instruction"] != null)
-                        $orderItem->customer_instruction = $item["customer_instruction"];
-
-                    if ($orderItem->save ()) {
-
-                        // There seems to be an issue with your payment, please try again.
-                        if (array_key_exists ('extraOptions', $item)) {
-
-
-                            $extraOptionsArray = $item['extraOptions'];
-
-
-                            if (isset($extraOptionsArray) && count ($extraOptionsArray) > 0) {
-
-                                foreach ($extraOptionsArray as $key => $extraOption) {
-
-                                    $orderItemExtraOption = new OrderItemExtraOption;
-                                    $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
-                                    $orderItemExtraOption->extra_option_id = $extraOption['extra_option_id'];
-                                    $orderItemExtraOption->qty = (int)$item["qty"];
-
-                                    if (!$orderItemExtraOption->save ()) {
-
-                                        $response = [
-                                            'operation' => 'error',
-                                            'message' => $orderItemExtraOption->errors,
-                                        ];
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-
-                        $response = [
-                            'operation' => 'error',
-                            'message' => $orderItem->getErrors ()
-                        ];
-                    }
-                }
-            } else {
-                $response = [
+            if (!$area_delivery_zone) {
+                return [
                     'operation' => 'error',
-                    'message' => Yii::t ('agent', 'Item Uuid is invalid.')
+                    'message' => Yii::t('app', "Store does not deliver to this delivery zone.")
                 ];
             }
-        } else {
-            $response = [
-                'operation' => 'error',
-                'message' => $order->getErrors (),
-            ];
+
+            if ($area_id) {
+
+                $order->delivery_zone_id = $area_delivery_zone->delivery_zone_id;
+                $order->area_id = $area_id;
+                $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
+                $order->block = Yii::$app->request->getBodyParam("block");
+                $order->street = Yii::$app->request->getBodyParam("street");
+                $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
+                $order->house_number = Yii::$app->request->getBodyParam("house_number");
+
+                if (Yii::$app->request->getBodyParam("floor") != null && ($order->unit_type == 'Apartment' || $order->unit_type == 'Office'))
+                    $order->floor = Yii::$app->request->getBodyParam("floor");
+
+                if (Yii::$app->request->getBodyParam("apartment") != null && $order->unit_type == 'Apartment')
+                    $order->apartment = Yii::$app->request->getBodyParam("apartment");
+
+                if (Yii::$app->request->getBodyParam("office") != null && $order->unit_type == 'Office')
+                    $order->office = Yii::$app->request->getBodyParam("office");
+
+            } //Delivery other countries
+            else if ($country_id && !$area_id) {
+                $order->delivery_zone_id = $area_delivery_zone->delivery_zone_id;
+                $order->shipping_country_id = $country_id;
+                $order->address_1 = Yii::$app->request->getBodyParam('address_1');
+                $order->address_2 = Yii::$app->request->getBodyParam('address_2');
+                $order->postalcode = Yii::$app->request->getBodyParam('postal_code');
+                $order->city = Yii::$app->request->getBodyParam("city");
+            }
+
+            $order->special_directions = Yii::$app->request->getBodyParam("special_directions"); //optional
+
+        } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
+            $order->pickup_location_id = Yii::$app->request->getBodyParam("business_location_id");
         }
 
-        if (!$order->is_order_scheduled && !$store_model->isOpen ()) {
-            $response = [
+        if (!$order->is_order_scheduled && !$store->isOpen()) {
+            return [
                 'operation' => 'error',
-                'message' => Yii::t ('agent', '{store} is currently closed and is not accepting orders at this time', [
-                    'store' => $store_model->name
+                'message' => Yii::t('agent', '{store} is currently closed and is not accepting orders at this time', [
+                    'store' => $store->name
                 ])
             ];
         }
 
-        if ($response == null) {
+        $transaction = Yii::$app->db->beginTransaction();
 
-            $order->updateOrderTotalPrice ();
+        if (!$order->save()) {
+            $transaction->rollBack();
 
-            if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
+            \Yii::error(json_encode($order->errors), __METHOD__);
+
+            return [
+                'operation' => 'error',
+                'message' => $order->getErrors(),
+            ];
+        }
+
+        $items = Yii::$app->request->getBodyParam("items");
+
+        if (!$items) {
+            $transaction->rollBack();
+
+            return [
+                'operation' => 'error',
+                'message' => Yii::t('agent', 'Item Uuid is invalid.')
+            ];
+        }
+
+        foreach ($items as $item) {
+
+            //Save items to the above order
+            $orderItem = new OrderItem;
+
+            $orderItem->order_uuid = $order->order_uuid;
+            $orderItem->item_uuid = $item["item_uuid"];
+            $orderItem->item_variant_uuid = isset($item["item_variant_uuid"])? $item["item_variant_uuid"]: null;
+            $orderItem->qty = (int)$item["qty"];
+
+            //optional field
+            if (array_key_exists("customer_instruction", $item) && $item["customer_instruction"] != null)
+                $orderItem->customer_instruction = $item["customer_instruction"];
+
+            if (!$orderItem->save()) {
+                $transaction->rollBack();
+
+                if (!isset($orderItem->errors['qty']))
+                    \Yii::error(json_encode($orderItem->errors), __METHOD__);
+
+                return [
+                    'operation' => 'error',
+                    'message' => $orderItem->getErrors()
+                ];
+            }
+
+            if (array_key_exists('extraOptions', $item)) {
+
+                $extraOptionsArray = $item['extraOptions'];
+
+                if (isset($extraOptionsArray) && count($extraOptionsArray) > 0) {
+
+                    foreach ($extraOptionsArray as $key => $extraOption) {
+
+                        $orderItemExtraOption = new OrderItemExtraOption;
+                        $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
+                        $orderItemExtraOption->option_id = isset($extraOption['option_id'])?$extraOption['option_id']: null;
+                        $orderItemExtraOption->extra_option_id = isset($extraOption['extra_option_id'])? $extraOption['extra_option_id']: null;
+                        $orderItemExtraOption->qty = (int)$item["qty"];
+
+                        if (!$orderItemExtraOption->save()) {
+
+                            $transaction->rollBack();
+
+                            if (!isset($orderItemExtraOption->errors['qty']))
+                            {   
+                                \Yii::error(json_encode($orderItemExtraOption->errors), __METHOD__);
+
+                                $response = [
+                                    'operation' => 'error',
+                                    'code' => 1,
+                                    'message' => $orderItemExtraOption->errors,
+                                ];
+                            } 
+                        }
+                    }
+
+                } else {
+
+                    $response = [
+                        'operation' => 'error',
+                        'code' => 2,
+                        'message' => $orderItem->getErrors ()
+                    ];
+                }
+            } else {
                 $response = [
                     'operation' => 'error',
-                    'message' => Yii::t ('agent', 'Minimum order amount {amount}', [
-                        'amount' => Yii::$app->formatter->asCurrency (
-                            $order->deliveryZone->min_charge,
-                            $order->currency->code,
-                            [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]
-                        )
-                    ])
-                ];
-            }
-
-            if ($response == null) {
-
-                $response = [
-                    'operation' => 'success',
-                    "model" => Order::findOne ($order->order_uuid),
-                    'message' => Yii::t ('agent', 'Order created successfully')
+                    'code' => 4,
+                    'message' => Yii::t ('agent', 'Item Uuid is invalid.')
                 ];
             }
         }
+        
+        $order->updateOrderTotalPrice();
 
-        if (array_key_exists ('operation', $response) && $response['operation'] == 'error') {
-            if (!isset($response['message']['qty']))
-                \Yii::error (json_encode ($response['message']), __METHOD__); // Log error faced by user
+        if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
+            $transaction->rollBack();
 
-            $order->delete ();
+            return [
+                'operation' => 'error',
+                'message' => Yii::t('agent', 'Minimum order amount {amount}', [
+                    'amount' => Yii::$app->formatter->asCurrency(
+                        $order->deliveryZone->min_charge,
+                        $order->currency->code,
+                        [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]
+                    )
+                ])
+            ];
         }
 
-        return $response;
+        $transaction->commit();
+
+        return [
+            'operation' => 'success',
+            "model" => Order::findOne($order->order_uuid),
+            'message' => Yii::t('agent', 'Order created successfully')
+        ];
     }
 
     /**
@@ -707,104 +754,148 @@ class OrderController extends Controller
      */
     public function actionUpdate($order_uuid, $store_uuid = null)
     {
-        $transaction = Yii::$app->db->beginTransaction ();
+        $area_id = Yii::$app->request->getBodyParam("area_id");
+        $country_id = Yii::$app->request->getBodyParam("country_id");
 
-        $order = $this->findModel ($order_uuid, $store_uuid);
+        $transaction = Yii::$app->db->beginTransaction();
+
+        $order = $this->findModel($order_uuid, $store_uuid);
 
         //Save Customer Info
         $order->scenario = \common\models\Order::SCENARIO_CREATE_ORDER_BY_ADMIN;
 
-        $order->currency_code = Yii::$app->request->getBodyParam ('currency_code');
+        $currency_code = Yii::$app->request->getBodyParam('currency_code');
 
-        //todo: what if change customer
-        $order->customer_name = Yii::$app->request->getBodyParam ("customer_name");
-        $order->customer_phone_number = str_replace (' ', '', strval (Yii::$app->request->getBodyParam ("customer_phone_number")));
-        $order->customer_phone_country_code = Yii::$app->request->getBodyParam ("country_code") ? Yii::$app->request->getBodyParam ("customer_phone_country_code") : 965;
-        $order->customer_email = Yii::$app->request->getBodyParam ("customer_email"); //optional
+        //todo: don't allow currency change on edit
+        
+        if($currency_code != $order->currency_code)
+        {
+            $order->currency_code = $currency_code;
+            $order->currency_rate = $order->currency->rate / $order->restaurant->currency->rate;
+        }
 
-        $order->estimated_time_of_arrival =
-            date (
+        //todo: what if change, customer
+        $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
+        $order->customer_phone_number = str_replace(' ', '', strval(Yii::$app->request->getBodyParam("customer_phone_number")));
+        $order->customer_phone_country_code = Yii::$app->request->getBodyParam("country_code") ? Yii::$app->request->getBodyParam("customer_phone_country_code") : 965;
+        $order->customer_email = Yii::$app->request->getBodyParam("customer_email"); //optional
+
+        $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
+        $order->area_id = Yii::$app->request->getBodyParam("area_id");
+        $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
+        $order->block = Yii::$app->request->getBodyParam("block");
+        $order->street = Yii::$app->request->getBodyParam("street");
+        $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
+        $order->house_number = Yii::$app->request->getBodyParam("building");
+
+        $order->payment_method_id = Yii::$app->request->getBodyParam('payment_method_id');
+        if ($order->paymentMethod && $order->paymentMethod->payment_method_name) {
+            $order->payment_method_name = $order->paymentMethod->payment_method_name;
+            $order->payment_method_name_ar = $order->paymentMethod->payment_method_name_ar;
+        }
+
+        $order->total_price = Yii::$app->request->getBodyParam('total_price');
+        $order->subtotal = Yii::$app->request->getBodyParam('subtotal');
+        
+        $order->estimated_time_of_arrival = date (
                 "Y-m-d H:i:s",
                 strtotime (Yii::$app->request->getBodyParam ('estimated_time_of_arrival'))
             );
 
-        $order->order_mode = Yii::$app->request->getBodyParam ("order_mode");
-        $order->area_id = Yii::$app->request->getBodyParam ("area_id");
-        $order->unit_type = Yii::$app->request->getBodyParam ("unit_type");
-        $order->block = Yii::$app->request->getBodyParam ("block");
-        $order->street = Yii::$app->request->getBodyParam ("street");
-        $order->avenue = Yii::$app->request->getBodyParam ("avenue"); //optional
-        $order->house_number = Yii::$app->request->getBodyParam ("building");
+        $order->currency_code = Yii::$app->request->getBodyParam('currency_code');
+        $order->store_currency_code = Yii::$app->request->getBodyParam('currency_code');
+        if ($order->restaurant && $order->restaurant->currency && $order->restaurant->currency->code) {
+            $order->store_currency_code = $order->restaurant->currency->code;
+        }
 
         //Apply promo code
-        if (Yii::$app->request->getBodyParam ("voucher_id")) {
-            $order->voucher_id = Yii::$app->request->getBodyParam ("voucher_id");
+
+        if (Yii::$app->request->getBodyParam("voucher_id")) {
+            $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
         }
+        /*else if (($voucher = Yii::$app->request->getBodyParam("voucher")) !== null) {
+
+            $voucherModel = $order->restaurant->getVouchers()
+                ->andWhere(['code' => $voucher['code']])
+                ->one();
+
+            if(!$voucherModel) {
+                    $transaction->rollBack();
+
+                    return [
+                        'operation' => 'error',
+                        'message' => Yii::t('app', "Invalid voucher code.")
+                    ];
+            }
+
+            $order->voucher_id = $voucherModel->voucher_id;
+        }*/
 
         //if the order mode = 1 => Delivery
         #todo below code need to remove if not in use
         if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
             //Deliver to Kuwait - GCC
-            if (Yii::$app->request->getBodyParam ("area_id") && Yii::$app->request->getBodyParam ("area_delivery_zone")) {
-                $order->delivery_zone_id = Yii::$app->request->getBodyParam ("delivery_zone_id");
 
-                if (Yii::$app->request->getBodyParam ("floor") != null && ($order->unit_type == 'Apartment' || $order->unit_type == 'Office'))
-                    $order->floor = Yii::$app->request->getBodyParam ("floor");
+            $area_delivery_zone = $order->restaurant->getAreaDeliveryZones()
+                ->andWhere(['area_id' => $area_id])
+                ->one();
 
-                if (Yii::$app->request->getBodyParam ("apartment") != null && $order->unit_type == 'Apartment')
-                    $order->apartment = Yii::$app->request->getBodyParam ("apartment");
+            if (!$area_delivery_zone) {
+                return [
+                    'operation' => 'error',
+                    'message' => Yii::t('app', "Store does not deliver to this delivery zone.")
+                ];
+            }
 
-                if (Yii::$app->request->getBodyParam ("office") != null && $order->unit_type == 'Office')
-                    $order->office = Yii::$app->request->getBodyParam ("office");
+            if ($area_id) {
+                $order->delivery_zone_id = $area_delivery_zone->delivery_zone_id;
+
+                if (Yii::$app->request->getBodyParam("floor") != null && ($order->unit_type == 'Apartment' || $order->unit_type == 'Office'))
+                    $order->floor = Yii::$app->request->getBodyParam("floor");
+
+                if (Yii::$app->request->getBodyParam("apartment") != null && $order->unit_type == 'Apartment')
+                    $order->apartment = Yii::$app->request->getBodyParam("apartment");
+
+                if (Yii::$app->request->getBodyParam("office") != null && $order->unit_type == 'Office')
+                    $order->office = Yii::$app->request->getBodyParam("office");
 
             } //Delivery other countries
-            else if (Yii::$app->request->getBodyParam ("country_id") && !Yii::$app->request->getBodyParam ("area_id") && !Yii::$app->request->getBodyParam ("area_delivery_zone")) {
-
-                $order->delivery_zone_id = Yii::$app->request->getBodyParam ("delivery_zone_id");
-                $order->shipping_country_id = Yii::$app->request->getBodyParam ("country_id");
-                $order->address_1 = Yii::$app->request->getBodyParam ('address_1');
-                $order->address_2 = Yii::$app->request->getBodyParam ('address_2');
-                $order->postalcode = Yii::$app->request->getBodyParam ('postal_code');
-                $order->city = Yii::$app->request->getBodyParam ("city");
+            else if ($country_id && !$area_id) {
+                $order->delivery_zone_id = $area_delivery_zone->delivery_zone_id;
+                $order->shipping_country_id = $country_id;
+                $order->address_1 = Yii::$app->request->getBodyParam('address_1');
+                $order->address_2 = Yii::$app->request->getBodyParam('address_2');
+                $order->postalcode = Yii::$app->request->getBodyParam('postal_code');
+                $order->city = Yii::$app->request->getBodyParam("city");
             }
         } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
-            $order->pickup_location_id = Yii::$app->request->getBodyParam ("pickup_location_id");
+            $order->pickup_location_id = Yii::$app->request->getBodyParam("pickup_location_id");
         }
 
-        $order->special_directions = Yii::$app->request->getBodyParam ("special_directions"); //optional
+        $order->special_directions = Yii::$app->request->getBodyParam("special_directions"); //optional
 
-        if (!$order->save ()) {
+        if (!$order->save()) {
 
-            $transaction->rollBack ();
+            $transaction->rollBack();
 
             return [
                 'operation' => 'error',
-                'message' => $order->getErrors (),
+                'code' => 1,
+                'message' => $order->getErrors(),
             ];
         }
 
-        $order->updateOrderTotalPrice ();
-
-        if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
-            return [
-                'operation' => 'error',
-                'message' => Yii::t ('agent', 'Minimum order amount {amount}', [
-                    'amount' => Yii::$app->formatter->asCurrency ($order->deliveryZone->min_charge, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
-                ])
-            ];
-        }
-
-        $orderItems = Yii::$app->request->getBodyParam ('orderItems');
+        $orderItems = Yii::$app->request->getBodyParam('orderItems');
 
         //delete order items not available in input but in db
 
-        OrderItem::deleteAll ([
+        OrderItem::deleteAll([
             'AND',
             ['order_uuid' => $order_uuid],
             [
                 'NOT IN',
                 'order_item_id',
-                ArrayHelper::getColumn ($orderItems, 'order_item_id')
+                ArrayHelper::getColumn($orderItems, 'order_item_id')
             ]
         ]);
 
@@ -812,29 +903,34 @@ class OrderController extends Controller
 
         foreach ($orderItems as $item) {
 
-            if(isset($item["order_item_id"])) {
-                $orderItem = $this->findOrderItem ($order_uuid, $item["order_item_id"]);
+            if (isset($item["order_item_id"])) {
+                $orderItem = $this->findOrderItem($order_uuid, $item["order_item_id"]);
             } else {
                 $orderItem = new \common\models\OrderItem;
             }
 
+            $orderItem->restaurant_uuid = $order->restaurant_uuid;//for newly added item
             $orderItem->order_uuid = $order->order_uuid;
             $orderItem->item_uuid = isset($item["item_uuid"]) ? $item["item_uuid"] : null;
+            $orderItem->item_variant_uuid = isset($item["item_variant_uuid"])? $item["item_variant_uuid"]: null;
             $orderItem->item_name = $item["item_name"];
             $orderItem->item_name_ar = $item["item_name_ar"];
             $orderItem->qty = (int)$item["qty"];
             $orderItem->item_price = $item["item_price"];
+            $orderItem->item_unit_price = isset($item["item_unit_price"])? $item["item_unit_price"]:
+                $item["item_price"]/$item["qty"];
 
             if (isset($item["customer_instruction"]))
                 $orderItem->customer_instruction = $item["customer_instruction"];
 
-            if (!$orderItem->save ()) {
+            if (!$orderItem->save()) {
 
-                $transaction->rollBack ();
+                $transaction->rollBack();
 
                 return [
                     'operation' => 'error',
-                    'message' => $orderItem->getErrors ()
+                    'code' => 2,
+                    'message' => $orderItem->getErrors()
                 ];
             }
 
@@ -846,18 +942,19 @@ class OrderController extends Controller
 
                 //if item update
 
-                if(isset($extraOption['order_item_extra_option_id'])) {
+                if (isset($extraOption['order_item_extra_option_id'])) {
                     continue;//as we not updating order item options
                 }
 
                 $orderItemExtraOption = new \common\models\OrderItemExtraOption;
                 $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
-                $orderItemExtraOption->extra_option_id = $extraOption['extra_option_id'];
-                $orderItemExtraOption->qty = (int) $item["qty"];
+                $orderItemExtraOption->extra_option_id = isset($extraOption['extra_option_id'])? $extraOption['extra_option_id']: null;
+                $orderItemExtraOption->option_id = isset($extraOption['option_id'])?$extraOption['option_id']: null;
+                $orderItemExtraOption->qty = (int)$item["qty"];
 
-                if (!$orderItemExtraOption->save ()) {
+                if (!$orderItemExtraOption->save()) {
 
-                    $transaction->rollBack ();
+                    $transaction->rollBack();
 
                     return [
                         'operation' => 'error',
@@ -867,11 +964,42 @@ class OrderController extends Controller
             }
         }
 
+        $order->updateOrderTotalPrice();
+
+        if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
+            return [
+                'operation' => 'error',
+                'code' => 3,
+                'message' => Yii::t('agent', 'Minimum order amount {amount}', [
+                    'amount' => Yii::$app->formatter->asCurrency($order->deliveryZone->min_charge, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10])
+                ])
+            ];
+        }
+
+        if(Yii::$app->request->getBodyParam('estimated_time_of_arrival')){
+
+          $order->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
+
+          $order->estimated_time_of_arrival =
+              date(
+                  "Y-m-d H:i:s",
+                  strtotime(Yii::$app->request->getBodyParam('estimated_time_of_arrival'))
+              );
+
+              if (!$order->save()) {
+                  return [
+                      'operation' => 'error',
+                      'code' => 4,
+                      'message' => $order->errors,
+                  ];
+              }
+        }
+
         $transaction->commit();
 
         return [
             'operation' => 'success',
-            'message' => Yii::t ('agent', 'Order updated successfully'),
+            'message' => Yii::t('agent', 'Order updated successfully'),
             "model" => $order
         ];
     }
@@ -879,7 +1007,8 @@ class OrderController extends Controller
     /**
      *  find oreder item if exists
      */
-    public function findOrderItem($order_uuid, $order_item_id) {
+    public function findOrderItem($order_uuid, $order_item_id)
+    {
         return OrderItem::findOne([
             'order_uuid' => $order_uuid,
             'order_item_id' => $order_item_id
@@ -893,11 +1022,11 @@ class OrderController extends Controller
      */
     public function actionRefund($order_uuid)
     {
-        $model = $this->findModel ($order_uuid);
+        $model = $this->findModel($order_uuid);
 
-        $refund_amount = Yii::$app->request->getBodyParam ('refund_amount');
+        $refund_amount = Yii::$app->request->getBodyParam('refund_amount');
 
-        $itemsToRefund = Yii::$app->request->getBodyParam ('itemsToRefund');
+        $itemsToRefund = Yii::$app->request->getBodyParam('itemsToRefund');
 
         //validate order status for refund
 
@@ -957,26 +1086,26 @@ class OrderController extends Controller
         //     ];
         // }
 
-        if( $refund_amount > $model->total_price ){
-              return [
-                  "operation" => "error",
-                  "message" => Yii::t ('agent', "{amount} available for refund!", [
-                      'amount' => \Yii::$app->formatter->asCurrency ($model->total_price, $model->currency->code)
-                  ])
-              ];
+        if ($refund_amount > $model->total_price) {
+            return [
+                "operation" => "error",
+                "message" => Yii::t('agent', "{amount} available for refund!", [
+                    'amount' => \Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code)
+                ])
+            ];
         }
-        $transaction = Yii::$app->db->beginTransaction ();
+        $transaction = Yii::$app->db->beginTransaction();
 
         $refund = new Refund();
         $refund->restaurant_uuid = $model->restaurant_uuid;
         $refund->payment_uuid = $model->payment_uuid;
         $refund->order_uuid = $order_uuid;
         $refund->refund_amount = $refund_amount;
-        $refund->reason = Yii::$app->request->getBodyParam ('reason');
+        $refund->reason = Yii::$app->request->getBodyParam('reason');
 
-        if (!$refund->save ()) {
+        if (!$refund->save()) {
 
-            $transaction->rollBack ();
+            $transaction->rollBack();
 
             return [
                 "operation" => "error",
@@ -986,19 +1115,19 @@ class OrderController extends Controller
 
         foreach ($itemsToRefund as $key => $qty) {
 
-            $orderItem = OrderItem::find ()
-                ->andWhere ([
+            $orderItem = OrderItem::find()
+                ->andWhere([
                     'order_uuid' => $order_uuid,
                     'order_item_id' => $key
                 ])
-                ->one ();
+                ->one();
 
             if (!$orderItem) {
-                $transaction->rollBack ();
+                $transaction->rollBack();
 
                 return [
                     "operation" => "error",
-                    "message" => Yii::t ('agent', "Item not found in order!")
+                    "message" => Yii::t('agent', "Item not found in order!")
                 ];
             }
 
@@ -1014,8 +1143,8 @@ class OrderController extends Controller
             $refundItem->item_price = $unitPrice * $qty;
             $refundItem->qty = $qty;
 
-            if (!$refundItem->save ()) {
-                $transaction->rollBack ();
+            if (!$refundItem->save()) {
+                $transaction->rollBack();
 
                 return [
                     "operation" => "error",
@@ -1032,12 +1161,12 @@ class OrderController extends Controller
 
         foreach ($model->orderItems as $orderItem) {
 
-            $refundedQty = RefundedItem::find ()
-                ->andWhere ([
+            $refundedQty = RefundedItem::find()
+                ->andWhere([
                     'order_uuid' => $order_uuid,
                     'order_item_id' => $orderItem->order_item_id
                 ])
-                ->sum ('qty');
+                ->sum('qty');
 
             $remainingQty += $orderItem->qty - $refundedQty;
         }
@@ -1048,11 +1177,11 @@ class OrderController extends Controller
             $model->order_status = Order::STATUS_REFUNDED;
         }
 
-        $model->setScenario (Order::SCENARIO_UPDATE_STATUS);
+        $model->setScenario(Order::SCENARIO_UPDATE_STATUS);
 
-        if (!$model->save ()) {
+        if (!$model->save()) {
 
-            $transaction->rollBack ();
+            $transaction->rollBack();
 
             return [
                 "operation" => "error",
@@ -1060,11 +1189,11 @@ class OrderController extends Controller
             ];
         }
 
-        $transaction->commit ();
+        $transaction->commit();
 
         return [
             "operation" => "success",
-            "message" => Yii::t ('agent', "Refund initiated successfully")
+            "message" => Yii::t('agent', "Refund initiated successfully")
         ];
     }
 
@@ -1073,12 +1202,12 @@ class OrderController extends Controller
      */
     public function actionUpdateOrderStatus($order_uuid, $store_uuid = null)
     {
-        $model = $this->findModel ($order_uuid, $store_uuid);
+        $model = $this->findModel($order_uuid, $store_uuid);
 
         //Update order status
-        $model->order_status = Yii::$app->request->getBodyParam ("order_status");
+        $model->order_status = Yii::$app->request->getBodyParam("order_status");
 
-        if (!$model->save (false)) {
+        if (!$model->save(false)) {
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",
@@ -1087,14 +1216,14 @@ class OrderController extends Controller
             } else {
                 return [
                     "operation" => "error",
-                    "message" => Yii::t ('agent', "We've faced a problem updating the order status")
+                    "message" => Yii::t('agent', "We've faced a problem updating the order status")
                 ];
             }
         }
 
         return [
             "operation" => "success",
-            "message" => Yii::t ('agent', "Order status updated successfully"),
+            "message" => Yii::t('agent', "Order status updated successfully"),
             "model" => $model
         ];
     }
@@ -1107,11 +1236,11 @@ class OrderController extends Controller
      */
     public function actionRequestDriverFromArmada($order_uuid, $store_uuid = null)
     {
-        $armadaApiKey = Yii::$app->request->getBodyParam ("armada_api_key");
+        $armadaApiKey = Yii::$app->request->getBodyParam("armada_api_key");
 
-        $model = $this->findModel ($order_uuid, $store_uuid);
+        $model = $this->findModel($order_uuid, $store_uuid);
 
-        $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery ($model, $armadaApiKey);
+        $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($model, $armadaApiKey);
 
 
         if ($createDeliveryApiResponse->isOk) {
@@ -1125,12 +1254,12 @@ class OrderController extends Controller
 
             return [
                 "operation" => "error",
-                "message" => Yii::t ('agent', "We've faced a problem requesting driver from Armada")
+                "message" => Yii::t('agent', "We've faced a problem requesting driver from Armada")
             ];
         }
 
 
-        if (!$model->save ()) {
+        if (!$model->save()) {
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",
@@ -1139,14 +1268,14 @@ class OrderController extends Controller
             } else {
                 return [
                     "operation" => "error",
-                    "message" => Yii::t ('agent', "We've faced a problem requesting driver from Armada")
+                    "message" => Yii::t('agent', "We've faced a problem requesting driver from Armada")
                 ];
             }
         }
 
         return [
             "operation" => "success",
-            "message" => Yii::t ('agent', "Your request has been successfully submitted")
+            "message" => Yii::t('agent', "Your request has been successfully submitted")
         ];
     }
 
@@ -1157,11 +1286,11 @@ class OrderController extends Controller
      */
     public function actionRequestDriverFromMashkor($order_uuid, $store_uuid = null)
     {
-        $mashkorBranchId = Yii::$app->request->getBodyParam ("mashkor_branch_id");
+        $mashkorBranchId = Yii::$app->request->getBodyParam("mashkor_branch_id");
 
-        $model = $this->findModel ($order_uuid, $store_uuid);
+        $model = $this->findModel($order_uuid, $store_uuid);
 
-        $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder ($model, $mashkorBranchId);
+        $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($model, $mashkorBranchId);
 
         if ($createDeliveryApiResponse->isOk) {
 
@@ -1172,11 +1301,11 @@ class OrderController extends Controller
 
             return [
                 "operation" => "error",
-                "message" => Yii::t ('agent', "We've faced a problem requesting driver from Mashkor")
+                "message" => Yii::t('agent', "We've faced a problem requesting driver from Mashkor")
             ];
         }
 
-        if (!$model->save ()) {
+        if (!$model->save()) {
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",
@@ -1185,14 +1314,14 @@ class OrderController extends Controller
             } else {
                 return [
                     "operation" => "error",
-                    "message" => Yii::t ('agent', "We've faced a problem requesting driver from Mashkor")
+                    "message" => Yii::t('agent', "We've faced a problem requesting driver from Mashkor")
                 ];
             }
         }
 
         return [
             "operation" => "success",
-            "message" => Yii::t ('agent', "Your request has been successfully submitted")
+            "message" => Yii::t('agent', "Your request has been successfully submitted")
         ];
     }
 
@@ -1204,7 +1333,7 @@ class OrderController extends Controller
      */
     public function actionDetail($store_uuid = null, $order_uuid)
     {
-        return $this->findModel ($order_uuid, $store_uuid);
+        return $this->findModel($order_uuid, $store_uuid);
     }
 
     /**
@@ -1212,9 +1341,20 @@ class OrderController extends Controller
      */
     public function actionDelete($order_uuid, $store_uuid = null)
     {
-        $model = $this->findModel ($order_uuid, $store_uuid);
+        $transaction = Yii::$app->db->beginTransaction();
 
-        if (!$model->delete ()) {
+        $model = $this->findModel($order_uuid, $store_uuid);
+
+        $model->setScenario(\common\models\Order::SCENARIO_DELETE);
+
+        $model->is_deleted = 1;
+
+        $model->restockItems();
+
+        if (!$model->save()) {
+
+            $transaction->rollBack();
+
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",
@@ -1223,14 +1363,16 @@ class OrderController extends Controller
             } else {
                 return [
                     "operation" => "error",
-                    "message" => Yii::t ('agent', "We've faced a problem deleting the order")
+                    "message" => Yii::t('agent', "We've faced a problem deleting the order")
                 ];
             }
         }
 
+        $transaction->commit();
+
         return [
             "operation" => "success",
-            "message" => Yii::t ('agent', "Order deleted successfully")
+            "message" => Yii::t('agent', "Order deleted successfully")
         ];
     }
 
@@ -1240,14 +1382,17 @@ class OrderController extends Controller
      */
     public function actionSoftDelete($order_uuid, $store_uuid = null)
     {
-        $model = $this->findModel ($order_uuid, $store_uuid);
+        $model = $this->findModel($order_uuid, $store_uuid);
+
         $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
 
         $transaction = Yii::$app->db->beginTransaction();
+
         $model->restockItems();
 
         $model->is_deleted = 1;
-        if (!$model->save ()) {
+
+        if (!$model->save(false)) {
             $transaction->rollBack();
             if (isset($model->errors)) {
                 return [
@@ -1257,14 +1402,16 @@ class OrderController extends Controller
             } else {
                 return [
                     "operation" => "error",
-                    "message" => Yii::t ('agent', "We've faced a problem deleting the order")
+                    "message" => Yii::t('agent', "We've faced a problem deleting the order")
                 ];
             }
         }
+
         $transaction->commit();
+
         return [
             "operation" => "success",
-            "message" => Yii::t ('agent', "Order deleted successfully")
+            "message" => Yii::t('agent', "Order deleted successfully")
         ];
     }
 
@@ -1274,36 +1421,36 @@ class OrderController extends Controller
      */
     public function actionOrdersReport()
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount ();
+        $store = Yii::$app->accountManager->getManagedAccount();
 
-        $start_date = Yii::$app->request->get ('from');
-        $end_date = Yii::$app->request->get ('to');
+        $start_date = Yii::$app->request->get('from');
+        $end_date = Yii::$app->request->get('to');
 
         //todo: partial order as not active?
 
-        $query = \common\models\Order::find ()
-            ->filterBusinessLocationIfManager ($store_model->restaurant_uuid)
-            //->andWhere(['order.restaurant_uuid' => $store_model->restaurant_uuid])
-            ->joinWith (['currency', 'paymentMethod', 'payment'])
-            ->activeOrders ($store_model->restaurant_uuid)
-            ->with ('voucher')
-            ->orderBy (['order_created_at' => SORT_ASC]);
+        $query = \common\models\Order::find()
+            ->filterBusinessLocationIfManager($store->restaurant_uuid)
+            //->andWhere(['order.restaurant_uuid' => $store->restaurant_uuid])
+            ->joinWith(['currency', 'paymentMethod', 'payment'])
+            ->activeOrders($store->restaurant_uuid)
+            ->with('voucher')
+            ->orderBy(['order_created_at' => SORT_ASC]);
 
         if ($start_date && $end_date) {
-            $query->andWhere (new Expression('DATE(order.order_created_at) >= DATE("' . $start_date . '") AND
+            $query->andWhere(new Expression('DATE(order.order_created_at) >= DATE("' . $start_date . '") AND
                     DATE(order.order_created_at) <= DATE("' . $end_date . '")'));
         } else {
-            $query->andWhere (new Expression('DATE(order_created_at) > DATE_SUB(now(), INTERVAL 3 MONTH)'));
+            $query->andWhere(new Expression('DATE(order_created_at) > DATE_SUB(now(), INTERVAL 3 MONTH)'));
         }
 
-        $searchResult = $query->all ();
+        $searchResult = $query->all();
 
-        header ('Access-Control-Allow-Origin: *');
-        header ("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        header ("Content-Disposition: attachment;filename=\"orders.xlsx\"");
-        header ("Cache-Control: max-age=0");
+        header('Access-Control-Allow-Origin: *');
+        header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        header("Content-Disposition: attachment;filename=\"orders.xlsx\"");
+        header("Cache-Control: max-age=0");
 
-        \moonland\phpexcel\Excel::export ([
+        \moonland\phpexcel\Excel::export([
             'isMultipleSheet' => false,
             'models' => $searchResult,
             'columns' => [
@@ -1323,13 +1470,13 @@ class OrderController extends Controller
                 ],
                 'customer_phone_number',
                 [
-                    'header' => Yii::t ('agent', 'Order Mode'),
+                    'header' => Yii::t('agent', 'Order Mode'),
                     'value' => function ($data) {
                         return $data->order_mode == Order::ORDER_MODE_DELIVERY ? 'Delivery' : 'Pickup';
                     }
                 ],
                 [
-                    'header' => Yii::t ('agent', 'Area'),
+                    'header' => Yii::t('agent', 'Area'),
                     // 'format' => 'html',
                     'value' => function ($data) {
                         if ($data->area_id)
@@ -1367,45 +1514,44 @@ class OrderController extends Controller
                 [
                     'attribute' => 'delivery_fee',
                     "value" => function ($data) {
-                        return \Yii::$app->formatter->asCurrency ($data->delivery_fee, $data->currency->code);
+                        return \Yii::$app->formatter->asCurrency($data->delivery_fee, $data->currency->code);
                     },
                 ],
 
                 [
-                    'header' => Yii::t ('agent', 'Amount Charged'),
+                    'header' => Yii::t('agent', 'Amount Charged'),
                     'attribute' => 'total_price',
                     "value" => function ($data) {
-                        return \Yii::$app->formatter->asCurrency ($data->payment_uuid ? $data->payment->payment_amount_charged : $data->total_price, $data->currency->code);
+                        return \Yii::$app->formatter->asCurrency($data->payment_uuid ? $data->payment->payment_amount_charged : $data->total_price, $data->currency->code);
                     }
                 ],
 
                 [
-                    'header' => Yii::t ('agent', 'Net Amount'),
+                    'header' => Yii::t('agent', 'Net Amount'),
                     "value" => function ($data) {
                         if ($data->payment_uuid)
-                            return \Yii::$app->formatter->asCurrency ($data->payment->payment_net_amount, $data->currency->code);
+                            return \Yii::$app->formatter->asCurrency($data->payment->payment_net_amount, $data->currency->code);
                         else
-                            return \Yii::$app->formatter->asCurrency ($data->total_price, $data->currency->code);
+                            return \Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code);
                     }
                 ],
                 [
-                    'header' => Yii::t ('agent', 'Plugn fee'),
+                    'header' => Yii::t('agent', 'Plugn fee'),
                     "value" => function ($data) {
-                        if ($data->payment_uuid && $data->payment->plugn_fee){
-                          $plugnFee = $data->payment->plugn_fee + $data->payment->partner_fee;
-                          return \Yii::$app->formatter->asCurrency ($plugnFee, $data->currency->code);
-                        }
-                        else
-                            return \Yii::$app->formatter->asCurrency (0, $data->currency->code);
+                        if ($data->payment_uuid && $data->payment->plugn_fee) {
+                            $plugnFee = $data->payment->plugn_fee + $data->payment->partner_fee;
+                            return \Yii::$app->formatter->asCurrency($plugnFee, $data->currency->code);
+                        } else
+                            return \Yii::$app->formatter->asCurrency(0, $data->currency->code);
                     }
                 ],
                 [
-                    'header' => Yii::t ('agent', 'Payment Gateway fee'),
+                    'header' => Yii::t('agent', 'Payment Gateway fee'),
                     "value" => function ($data) {
                         if ($data->payment_uuid)
-                            return \Yii::$app->formatter->asCurrency ($data->payment->payment_gateway_fee, $data->currency->code);
+                            return \Yii::$app->formatter->asCurrency($data->payment->payment_gateway_fee, $data->currency->code);
                         else
-                            return \Yii::$app->formatter->asCurrency (0, $data->currency->code);
+                            return \Yii::$app->formatter->asCurrency(0, $data->currency->code);
 
                     }
                 ],
@@ -1422,31 +1568,66 @@ class OrderController extends Controller
      */
     public function actionCreate($store_uuid = null)
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $model = new Order();
-        $model->setScenario (\common\models\Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
+        $model->setScenario(\common\models\Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
 
-        $model->restaurant_uuid = $restaurant_model->restaurant_uuid;
+        $model->restaurant_uuid = $restaurant->restaurant_uuid;
         $model->is_order_scheduled = 0;
 
-        $order_mode = Yii::$app->request->getBodyParam ('order_mode');
-        $customer_name = Yii::$app->request->getBodyParam ('customer_name');
-        $area_name = Yii::$app->request->getBodyParam ('area_name');
-        $area_id = Yii::$app->request->getBodyParam ('area_id');
-        $unit_type = Yii::$app->request->getBodyParam ('unit_type');
-        $street = Yii::$app->request->getBodyParam ('street');
-        $avenue = Yii::$app->request->getBodyParam ('avenue');
-        $building = Yii::$app->request->getBodyParam ('building');
-        $block = Yii::$app->request->getBodyParam ('block');
-        $customer_email = Yii::$app->request->getBodyParam ('customer_email');
-        $customer_phone_country_code = Yii::$app->request->getBodyParam ('customer_phone_country_code');
-        $customer_phone_number = Yii::$app->request->getBodyParam ('customer_phone_number');
-        $pickup_location_id = Yii::$app->request->getBodyParam ('pickup_location_id');
-        $estimated_time_of_arrival = Yii::$app->request->getBodyParam ('estimated_time_of_arrival');
-        $special_directions = Yii::$app->request->getBodyParam ('special_directions');
+        $order_mode = Yii::$app->request->getBodyParam('order_mode');
+        $customer_name = Yii::$app->request->getBodyParam('customer_name');
+        $area_name = Yii::$app->request->getBodyParam('area_name');
+        $area_id = Yii::$app->request->getBodyParam('area_id');
+        $unit_type = Yii::$app->request->getBodyParam('unit_type');
+        $street = Yii::$app->request->getBodyParam('street');
+        $avenue = Yii::$app->request->getBodyParam('avenue');
+        $building = Yii::$app->request->getBodyParam('building');
+        $block = Yii::$app->request->getBodyParam('block');
+        $customer_email = Yii::$app->request->getBodyParam('customer_email');
+        $customer_phone_country_code = Yii::$app->request->getBodyParam('customer_phone_country_code');
+        $customer_phone_number = Yii::$app->request->getBodyParam('customer_phone_number');
+        $pickup_location_id = Yii::$app->request->getBodyParam('pickup_location_id');
+        $estimated_time_of_arrival = Yii::$app->request->getBodyParam('estimated_time_of_arrival');
+        $special_directions = Yii::$app->request->getBodyParam('special_directions');
+        $voucher_code = Yii::$app->request->getBodyParam("voucher_code");
 
-        $model->currency_code = Yii::$app->request->getBodyParam ('currency_code');
+        $voucher = $restaurant->getVouchers()
+            ->andWhere(['code' => $voucher_code])
+            ->one();
+
+        if($voucher_code) {
+            if(!$voucher) {
+                return [
+                    'operation' => 'error',
+                    'message' => Yii::t('app', "Invalid voucher code.")
+                ];
+            }
+            else
+            {
+                $model->voucher_id = $voucher->voucher_id;
+                $model->voucher_code = $voucher->code;
+            }
+        }
+
+        $model->payment_method_id = Yii::$app->request->getBodyParam('payment_method_id');
+
+        if ($model->paymentMethod && $model->paymentMethod->payment_method_name) {
+            $model->payment_method_name = $model->paymentMethod->payment_method_name;
+            $model->payment_method_name_ar = $model->paymentMethod->payment_method_name_ar;
+        }
+
+        $model->total_price = Yii::$app->request->getBodyParam('total_price');
+        $model->subtotal = Yii::$app->request->getBodyParam('subtotal');
+
+        $model->currency_code = Yii::$app->request->getBodyParam('currency_code');
+        $model->store_currency_code = Yii::$app->request->getBodyParam('currency_code');
+
+        if ($model->restaurant && $model->restaurant->currency && $model->restaurant->currency->code) {
+            $model->store_currency_code = $model->restaurant->currency->code;
+        }
+
         $model->order_mode = $order_mode;
         $model->customer_name = $customer_name;
         $model->area_name = $area_name;
@@ -1460,44 +1641,45 @@ class OrderController extends Controller
         $model->customer_phone_country_code = $customer_phone_country_code;
         $model->customer_phone_number = $customer_phone_number;
         $model->pickup_location_id = $pickup_location_id;
-        $model->estimated_time_of_arrival = date ("Y-m-d H:i:s", strtotime ($estimated_time_of_arrival));
+        $model->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($estimated_time_of_arrival));
         $model->special_directions = $special_directions;
 
         if ($model->order_mode == Order::ORDER_MODE_DELIVERY) {
 
-            $areaDeliveryZone = AreaDeliveryZone::find ()
-                ->andWhere ([
-                    'restaurant_uuid' => $restaurant_model->restaurant_uuid,
+            $areaDeliveryZone = AreaDeliveryZone::find()
+                ->andWhere([
+                    'restaurant_uuid' => $restaurant->restaurant_uuid,
                     'area_id' => $model->area_id
                 ])
-                ->one ();
+                ->one();
 
             if ($areaDeliveryZone)
                 $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
         }
 
-        $transaction = Yii::$app->db->beginTransaction ();
+        $transaction = Yii::$app->db->beginTransaction();
 
-        if (!$model->save ()) {
+        if (!$model->save()) {
 
-            $transaction->rollBack ();
+            $transaction->rollBack();
 
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",
+                    'code' => 1,
                     "message" => $model->errors
                 ];
             } else {
                 return [
                     "operation" => "error",
-                    "message" => Yii::t ('agent', "We've faced a problem created the order")
+                    "message" => Yii::t('agent', "We've faced a problem created the order")
                 ];
             }
         }
 
         //add order items
 
-        $orderItems = Yii::$app->request->getBodyParam ('orderItems');
+        $orderItems = Yii::$app->request->getBodyParam('orderItems');
 
         foreach ($orderItems as $item) {
 
@@ -1505,20 +1687,25 @@ class OrderController extends Controller
 
             $orderItem->order_uuid = $model->order_uuid;
             $orderItem->item_uuid = isset($item["item_uuid"]) ? $item["item_uuid"] : null;
+            $orderItem->item_variant_uuid = isset($item["item_variant_uuid"]) ? $item["item_variant_uuid"] : null;
             $orderItem->item_name = $item["item_name"];
             $orderItem->item_name_ar = $item["item_name_ar"];
             $orderItem->qty = (int)$item["qty"];
             $orderItem->item_price = $item["item_price"];
+            $orderItem->restaurant_uuid = $restaurant->restaurant_uuid;
+            $orderItem->item_unit_price = isset($item["item_unit_price"])? $item["item_unit_price"]:
+                $item["item_price"]/$item["qty"];
 
             if (isset($item["customer_instruction"]))
                 $orderItem->customer_instruction = $item["customer_instruction"];
 
-            if (!$orderItem->save ()) {
+            if (!$orderItem->save()) {
 
-                $transaction->rollBack ();
+                $transaction->rollBack();
 
                 return [
                     'operation' => 'error',
+                    'code' => 2,
                     'message' => $orderItem->getErrors ()
                 ];
             }
@@ -1531,39 +1718,42 @@ class OrderController extends Controller
 
                 $orderItemExtraOption = new \common\models\OrderItemExtraOption;
                 $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
-                $orderItemExtraOption->extra_option_id = $extraOption['extra_option_id'];
-                $orderItemExtraOption->qty = (int) $item["qty"];
+                $orderItemExtraOption->extra_option_id = isset($extraOption['extra_option_id'])? $extraOption['extra_option_id']: null;
+                $orderItemExtraOption->option_id = isset($extraOption['option_id'])?$extraOption['option_id']: null;
+                $orderItemExtraOption->qty = (int)$item["qty"];
 
-                if (!$orderItemExtraOption->save ()) {
+                if (!$orderItemExtraOption->save()) {
 
-                    $transaction->rollBack ();
+                    $transaction->rollBack();
 
                     return [
                         'operation' => 'error',
+                        'code' => 3,
                         'message' => $orderItemExtraOption->errors,
                     ];
                 }
             }
         }
 
-        $transaction->commit ();
+        $transaction->commit();
 
         return [
             "operation" => "success",
-            "message" => Yii::t ('agent', "Order created successfully")
+            "message" => Yii::t('agent', "Order created successfully")
         ];
     }
 
-    public function actionRequestPaymentStatusFromTap($order_uuid, $store_uuid) {
+    public function actionRequestPaymentStatusFromTap($order_uuid, $store_uuid)
+    {
         try {
             $payment = Payment::findOne(['order_uuid' => $order_uuid]);
 
-            if (($payment = Payment::find()->where(['payment_uuid' => $payment->payment_uuid, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($store_uuid)->restaurant_uuid ])->one()) !== null) {
+            if (($payment = Payment::find()->where(['payment_uuid' => $payment->payment_uuid, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($store_uuid)->restaurant_uuid])->one()) !== null) {
 
-                if($payment->payment_gateway_name == 'tap'){
+                if ($payment->payment_gateway_name == 'tap') {
                     $transaction_id = $payment->payment_gateway_transaction_id;
                     Payment::updatePaymentStatusFromTap($transaction_id, true);
-                } else if ($payment->payment_gateway_name == 'myfatoorah'){
+                } else if ($payment->payment_gateway_name == 'myfatoorah') {
                     $invoice_id = $payment->payment_gateway_invoice_id;
                     Payment::updatePaymentStatusFromMyFatoorah($invoice_id, true);
                 }
@@ -1584,40 +1774,28 @@ class OrderController extends Controller
      */
     public function actionDownloadInvoice($id)
     {
-        $order = $this->findModel ($id);
-
-        $voucherDiscount = $bankDiscount = 0;
-
-        if ($order->voucher) {
-            $voucherDiscount = $order->voucher->discount_type == 1 ?
-                $order->subtotal * ($order->voucher->discount_amount / 100) : $order->voucher->discount_amount;
-        }
-
-        if ($order->bankDiscount) {
-            $bankDiscount = $order->bankDiscount->discount_type == 1 ?
-                $order->subtotal * ($order->bankDiscount->discount_amount / 100) : $order->bankDiscount->discount_amount;
-        }
+        $order = $this->findModel($id);
 
         // Item extra optn
         // $itemsExtraOpitons = new \yii\data\ActiveDataProvider([
-        //     'query' => $order_model->getOrderItemExtraOptions()
+        //     'query' => $order->getOrderItemExtraOptions()
         // ]);
 
         $this->layout = 'pdf';
 
-        $defaultLogo = Url::to ('@web/images/icon-128x128.png', true);
+        $defaultLogo = Url::to('@web/images/icon-128x128.png', true);
 
-        $content = $this->render ('invoice', [
+        $content = $this->render('invoice', [
             'order' => $order,
             'defaultLogo' => $defaultLogo,
-            'bankDiscount' => $bankDiscount,
-            'voucherDiscount' => $voucherDiscount,
+            'bankDiscount' => $order->voucher_discount,
+            'voucherDiscount' => $order->bank_discount,
         ]);
 
-        $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults ();
+        $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
         $fontDirs = $defaultConfig['fontDir'];
 
-        $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults ();
+        $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
         $fontData = $defaultFontConfig['fontdata'];
 
         //echo  __DIR__ . '/../../../web/fonts/Nunito';
@@ -1627,11 +1805,11 @@ class OrderController extends Controller
                 'defaultheaderline' => 0,  //for header
                 'defaulfooterline' => 0,  //for footer
                 'title' => 'Invoice #' . $order->order_uuid,
-                'fontDir' => array_merge ($fontDirs, [
+                'fontDir' => array_merge($fontDirs, [
                     __DIR__ . '/Nunito',
                     // __DIR__ . '/../../../web/fonts/Nunito/'
                 ]),
-                'fontdata' => array_merge ($fontData, [
+                'fontdata' => array_merge($fontData, [
                     "Nunito" => [
                         'R' => 'Nunito-Regular.ttf',
                         'B' => 'Nunito-Bold.ttf',
@@ -1670,8 +1848,8 @@ class OrderController extends Controller
 //            ]
         ]);
 
-        header ('Access-Control-Allow-Origin: *');
-        return $pdf->render ();
+        header('Access-Control-Allow-Origin: *');
+        return $pdf->render();
     }
 
     /**
@@ -1684,16 +1862,16 @@ class OrderController extends Controller
     protected function findModel($order_uuid, $store_uuid = null)
     {
         if (!$store_uuid) {
-            $store_uuid = Yii::$app->request->headers->get ('Store-Id');
+            $store_uuid = Yii::$app->request->headers->get('Store-Id');
         }
 
-        $model = Order::find ()
-            ->filterBusinessLocationIfManager ($store_uuid)
-            ->andWhere ([
+        $model = Order::find()
+            ->filterBusinessLocationIfManager($store_uuid)
+            ->andWhere([
                 'order_uuid' => $order_uuid,
                 'restaurant_uuid' => $store_uuid
             ])
-            ->one ();
+            ->one();
 
         if ($model !== null) {
             return $model;

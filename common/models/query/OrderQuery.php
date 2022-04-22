@@ -19,6 +19,7 @@ class OrderQuery extends \yii\db\ActiveQuery
      */
     public function all($db = null)
     {
+        $this->andWhere(['!=', 'order.is_deleted', 1]);
         return parent::all ($db);
     }
 
@@ -28,6 +29,7 @@ class OrderQuery extends \yii\db\ActiveQuery
      */
     public function one($db = null)
     {
+        $this->andWhere(['!=', 'order.is_deleted', 1]);
         return parent::one ($db);
     }
 
@@ -190,7 +192,7 @@ class OrderQuery extends \yii\db\ActiveQuery
      */
     public function notDeleted()
     {
-        return $this->andWhere (['is_deleted'=>'0']);
+        return $this->andWhere (['order.is_deleted'=>'0']);
     }
 
 }

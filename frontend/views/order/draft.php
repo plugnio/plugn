@@ -9,13 +9,18 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\OrderSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 
 $this->title = 'Drafts';
 $this->params['breadcrumbs'][] = $this->title;
 $js = "
 $(function () {
   $('.summary').insertAfter('.top');
+
+  $('input[name=\"OrderSearch[order_created_at]\"]').datepicker({
+    format: 'd M yyyy',
+  });
+
 });
 ";
 $this->registerJs($js);
@@ -23,13 +28,13 @@ $this->registerJs($js);
 
 <section id="data-list-view" class="data-list-view-header">
 
-  <?php if ($dataProvider->getCount() > 0) { ?>
+  <?php if ($count > 0) { ?>
 
     <!-- Data list view starts -->
-    <div class="action-btns d-none">
+    <div class="action-btns">
         <div class="btn-dropdown mr-1 mb-1">
             <div class="btn-group dropdown actions-dropodown">
-              <?= Html::a('Create draft order ', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+              <?= Html::a('Create draft order ', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
             </div>
         </div>
     </div>
@@ -41,6 +46,7 @@ $this->registerJs($js);
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
             'rowOptions' => function($model) {
                 $url = Url::to(['order/view', 'id' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid]);
 
@@ -49,8 +55,9 @@ $this->registerJs($js);
                 ];
             },
             'columns' => [
-                ['class' => 'yii\grid\SerialColumn'],
+                //['class' => 'yii\grid\SerialColumn'],
                 [
+                    'attribute' => 'order_uuid',
                     'label' => 'Order ID',
                     "format" => "raw",
                     "value" => function($model) {
@@ -80,16 +87,23 @@ $this->registerJs($js);
                 ],
                 [
                     'attribute' => 'total_price',
-                    "value" => function($data) {
-                            return Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code, [
-                                \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
-                            ]);
+                    "value" => function($model) {
+                        return Yii::$app->formatter->asCurrency($model->total_price * $model->currency_rate, $model->currency_code, [
+                            \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                        ]);
                     },
                 ],
+                /*[
+                    'attribute' => 'order_created_at',
+                    "format" => "raw",
+                    "value" => function($model) {
+                        return date('d M - h:i A', strtotime($model->order_created_at));
+                    }
+                ],*/
                 'order_created_at:datetime',
             ],
             'layout' => '{summary}{items}{pager}',
-            'tableOptions' => ['class' => 'table data-list-view'],
+            'tableOptions' => ['class' => 'table dataTable data-list-view'],
         ]);
         ?>
 
@@ -114,7 +128,7 @@ $this->registerJs($js);
         <p>
           Use draft orders to take orders over the phone, email invoices to customers, and collect payments.
         </p>
-        <?= Html::a('Create draft order', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Create draft order', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
       </div>
     </div>
 

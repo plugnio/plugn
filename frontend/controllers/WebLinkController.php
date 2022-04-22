@@ -61,9 +61,9 @@ class WebLinkController extends Controller {
      * @return mixed
      */
     public function actionCreate($storeUuid) {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        if ($restaurant_model) {
+        if ($restaurant) {
 
             $model = new WebLink();
             $model->restaurant_uuid = $storeUuid;
@@ -74,7 +74,7 @@ class WebLinkController extends Controller {
 
             return $this->render('create', [
                         'model' => $model,
-                        'countryCode' =>  '+'.$restaurant_model->country->country_code,
+                        'countryCode' =>  '+'.$restaurant->country->country_code,
                         'storeUuid' => $storeUuid
             ]);
         }
@@ -122,7 +122,14 @@ class WebLinkController extends Controller {
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id, $storeUuid) {
-        if (($model = WebLink::find()->where(['web_link_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
+
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $model = WebLink::find()
+            ->where(['web_link_id' => $id, 'restaurant_uuid' => $store->restaurant_uuid])
+            ->one();
+
+        if ($model !== null) {
             return $model;
         }
 

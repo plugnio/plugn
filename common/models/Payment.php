@@ -67,7 +67,7 @@ class Payment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['customer_id', 'order_uuid', 'payment_amount_charged', 'restaurant_uuid'], 'required'],
+            [['customer_id', 'order_uuid', 'payment_amount_charged', 'restaurant_uuid', 'payment_mode'], 'required'],
             [['customer_id', 'received_callback', 'payout_status'], 'integer'],
             ['payout_status', 'in', 'range' => [self::PAYOUT_STATUS_UNPAID, self::PAYOUT_STATUS_PAID, self::PAYOUT_STATUS_PENDING]],
             [['order_uuid'], 'string', 'max' => 40],
@@ -138,7 +138,6 @@ class Payment extends \yii\db\ActiveRecord
             'payment_udf5' => Yii::t('app', 'Udf5'),
             'payment_created_at' => Yii::t('app', 'Created at'),
             'payment_updated_at' => Yii::t('app', 'Last activity'),
-            'payment_updated_at' => Yii::t('app', 'Last activity'),
             'received_callback' => Yii::t('app', 'Received Callback'),
             'response_message' => Yii::t('app', 'Response Message'),
         ];
@@ -154,6 +153,7 @@ class Payment extends \yii\db\ActiveRecord
     {
         // Look for payment with same Payment Gateway Transaction ID
         $paymentRecord = \common\models\Payment::findOne(['payment_gateway_transaction_id' => $id]);
+
         if (!$paymentRecord) {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
@@ -170,8 +170,12 @@ class Payment extends \yii\db\ActiveRecord
         if (isset($responseContent->errors)) {
 
             $errorMessage = "[Error from TAP]" . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description . ' - Store Name: ' . $paymentRecord->restaurant->name . ' - Order Uuid: ' . $paymentRecord->order_uuid;
+
             \Yii::error($errorMessage, __METHOD__); // Log error faced by user
-            \Yii::$app->getSession()->setFlash('error', $errorMessage);
+
+            if($showUpdatedFlashNotification)
+                \Yii::$app->getSession()->setFlash('error', $errorMessage);
+
             return $paymentRecord;
         }
 
@@ -184,7 +188,6 @@ class Payment extends \yii\db\ActiveRecord
 
         // On Successful Payments
         if ($responseContent->status == 'CAPTURED') {
-
 
             // KNET Gateway Fee Calculation
             if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
@@ -271,8 +274,6 @@ class Payment extends \yii\db\ActiveRecord
           return $paymentRecord;
 
         $paymentRecord->setScenario(self::SCENARIO_UPDATE_STATUS_WEBHOOK);
-
-
 
         $paymentRecord->payment_current_status = $status; // 'CAPTURED' ?
         $paymentRecord->response_message = $response_message;
@@ -492,7 +493,19 @@ class Payment extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-        if (!$insert && (isset($changedAttributes['received_callback']) && $changedAttributes['received_callback'] == 0 && ($this->payment_current_status == 'CAPTURED' || $this->payment_current_status == 'SUCCESS' || $this->payment_current_status == 'Succss') && $this->received_callback)) {
+        if (
+            !$insert &&
+            (
+                isset($changedAttributes['received_callback']) &&
+                $changedAttributes['received_callback'] == 0 &&
+                (
+                    $this->payment_current_status == 'CAPTURED' ||
+                    $this->payment_current_status == 'SUCCESS' ||
+                    $this->payment_current_status == 'Success'
+                ) &&
+                $this->received_callback
+            )
+        ) {
 
             $this->order->changeOrderStatusToPending();
             $this->order->sendPaymentConfirmationEmail();
@@ -513,6 +526,7 @@ class Payment extends \yii\db\ActiveRecord
         }
 
         if ($this->plugn_fee > 0 && $this->partner_fee == 0 && $this->restaurant->referral_code) {
+
             $this->partner_fee = $this->plugn_fee * $this->partner->commission;
             $this->plugn_fee -= $this->partner_fee;
 

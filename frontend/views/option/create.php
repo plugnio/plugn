@@ -8,9 +8,9 @@ use yii\helpers\Html;
 $this->params['restaurant_uuid'] = $storeUuid;
 
 $this->title = 'Create Option';
-$item_model = \common\models\Item::findOne($model->item_uuid);
+$item = \common\models\Item::findOne($model->item_uuid);
 $this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['item/index', 'storeUuid' => $storeUuid]];
-$this->params['breadcrumbs'][] = ['label' => $item_model->item_name, 'url' => ['item/view', 'id' => $model->item_uuid, 'storeUuid' => $storeUuid]];
+$this->params['breadcrumbs'][] = ['label' => $item->item_name, 'url' => ['item/view', 'id' => $model->item_uuid, 'storeUuid' => $storeUuid]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="option-create">

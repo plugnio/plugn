@@ -104,8 +104,13 @@ class AgentController extends Controller
 
         $agentAssignment = Yii::$app->accountManager->getAssignment($store_uuid);
 
+        $email = Yii::$app->request->getBodyParam ("agent_email");
+
+        if($email != $model->agent_email) {
+            $model->agent_new_email = $email;
+        }
+
         $model->agent_name = Yii::$app->request->getBodyParam ("agent_name");
-        $model->agent_email = Yii::$app->request->getBodyParam ("agent_email");
 
         if (!$model->save ()) {
             return [
@@ -113,6 +118,8 @@ class AgentController extends Controller
                 "message" => $model->errors
             ];
         }
+
+        $model->sendVerificationEmail();
 
         $agentAssignment->assignment_agent_email = Yii::$app->request->getBodyParam ("agent_email");
         $agentAssignment->email_notification = (int) Yii::$app->request->getBodyParam ("email_notification");
@@ -125,6 +132,31 @@ class AgentController extends Controller
             'model' => $model,
             "operation" => "success",
             "message" => Yii::t('agent', "Agent profile updated successfully")
+        ];
+    }
+
+    /**
+     * update language preferency
+     * @return array
+     */
+    public function actionLanguagePref()
+    {
+        $agent = Yii::$app->user->identity;
+        $agent->agent_language_pref = Yii::$app->request->getBodyParam ('language_pref');
+
+        $agent->scenario = 'updateLanguagePref';
+
+        if(!$agent->save())
+        {
+            return [
+                "operation" => "error",
+                "message" => $agent->errors
+            ];
+        }
+
+        return [
+            "operation" => "success",
+            "message" => Yii::t('agent', "Language Preferency Updated Successfully")
         ];
     }
 
@@ -182,4 +214,6 @@ class AgentController extends Controller
             "message" => Yii::t('agent', "Account Password Updated Successfully")
         ];
     }
+
+
 }

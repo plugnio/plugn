@@ -31,7 +31,7 @@ class RestaurantBranch extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['branch_name_en','branch_name_ar'], 'required'],
+            [['branch_name_en', 'branch_name_ar', 'restaurant_uuid'], 'required'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['prep_time'], 'integer' , 'min'=> 0],
             [['branch_name_en', 'branch_name_ar'], 'string', 'max' => 255],
@@ -45,11 +45,11 @@ class RestaurantBranch extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'restaurant_branch_id' => 'Restaurant Branch ID',
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'branch_name_en' => 'Branch Name English',
-            'branch_name_ar' => 'Branch Name in Arabic',
-            'prep_time' => 'Preparation time',
+            'restaurant_branch_id' => Yii::t('app','Restaurant Branch ID'),
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'branch_name_en' => Yii::t('app','Branch Name English'),
+            'branch_name_ar' => Yii::t('app','Branch Name in Arabic'),
+            'prep_time' => Yii::t('app','Preparation time')
         ];
     }
 
