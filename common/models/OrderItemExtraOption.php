@@ -79,6 +79,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
     }
 
     public function afterDelete() {
+
         $order_model = Order::findOne($this->orderItem->order_uuid);
 
         if ($order_model) {
@@ -95,10 +96,13 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
         $extra_option_model = ExtraOption::findOne($this->extra_option_id);
 
         if ($extra_option_model) {
-            if ($this->orderItem->item_uuid != $extra_option_model->option->item_uuid)
-                $this->addError($attribute, 'Extra Option Uuid is invalid');
+            if ($this->orderItem->item_uuid != $extra_option_model->option->item_uuid){
+              $this->addError($attribute, 'Extra Option Uuid is invalid');
+              Yii::error('[1Extra Option Uuid is invalid]', __METHOD__);
+            }
         }else {
             $this->addError($attribute, 'Extra Option Uuid is invalid');
+            Yii::error('[2Extra Option Uuid is invalid]', __METHOD__);
         }
     }
 
@@ -128,6 +132,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
                 $this->extra_option_name = $extra_option_model->extra_option_name;
                 $this->extra_option_name_ar = $extra_option_model->extra_option_name_ar;
                 $this->extra_option_price = $extra_option_model->extra_option_price;
+
             } else
                 return false;
 
@@ -143,7 +148,6 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
     public function beforeDelete() {
 
         $extra_option_model = ExtraOption::findOne($this->extra_option_id);
-
 
         if ($extra_option_model)
             $extra_option_model->increaseStockQty($this->qty); //Update stock qty
@@ -178,7 +182,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
     {
         return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])->via('restaurant');
     }
-    
+
     /**
      * Gets query for [[ExtraOption]].
      *

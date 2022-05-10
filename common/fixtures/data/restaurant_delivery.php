@@ -3,7 +3,7 @@
 return [
     'restaurant_delivery0' => [
         'area_id' => '1',
-        'restaurant_uuid' => false,
+        'restaurant_uuid' => 1,
         'delivery_time' => 49,
         'delivery_time_ar' => 38,
         'delivery_fee' => 12,

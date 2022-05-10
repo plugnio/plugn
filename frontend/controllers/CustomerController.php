@@ -203,7 +203,9 @@ class CustomerController extends Controller {
 
                            $total_spent = \Yii::$app->formatter->asDecimal($total_spent ? $total_spent : 0 , 3);
 
-                           return  Yii::$app->formatter->asCurrency($total_spent ? $total_spent : 0, $data->currency->code);
+                           return  Yii::$app->formatter->asCurrency($total_spent ? $total_spent : 0, $data->currency->code,[
+                               \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                           ]);
                          }
                      ],
                      [
@@ -267,7 +269,9 @@ class CustomerController extends Controller {
 
                            $total_spent = \Yii::$app->formatter->asDecimal($total_spent ? $total_spent : 0 , 3);
 
-                           return  Yii::$app->formatter->asCurrency($total_spent ? $total_spent : 0, $data->currency->code);
+                           return  Yii::$app->formatter->asCurrency($total_spent ? $total_spent : 0, $data->currency->code, [
+                               \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                           ]);
                          }
                      ],
                      [

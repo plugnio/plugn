@@ -185,4 +185,12 @@ class OrderQuery extends \yii\db\ActiveQuery
         ]);
     }
 
+    /**
+     * Orders successfully placed
+     */
+    public function notDeleted()
+    {
+        return $this->andWhere (['is_deleted'=>'0']);
+    }
+
 }

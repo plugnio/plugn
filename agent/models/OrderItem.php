@@ -11,8 +11,9 @@ class OrderItem extends \common\models\OrderItem
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItem($modelClass = "\agent\models\Item") {
-        return parent::getItem ($modelClass);
+    public function getItem($modelClass = "\agent\models\Item")
+    {
+        return parent::getItem($modelClass);
     }
 
     /**
@@ -30,7 +31,8 @@ class OrderItem extends \common\models\OrderItem
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrder($modelClass = "\agent\models\Order") {
+    public function getOrder($modelClass = "\agent\models\Order")
+    {
         return parent::getOrder($modelClass);
     }
 
@@ -39,7 +41,8 @@ class OrderItem extends \common\models\OrderItem
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant($modelClass = "\agent\models\Restaurant") {
+    public function getRestaurant($modelClass = "\agent\models\Restaurant")
+    {
         return parent::getRestaurant($modelClass);
     }
 
@@ -58,8 +61,9 @@ class OrderItem extends \common\models\OrderItem
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderItemExtraOptions($modelClass = "\agent\models\OrderItemExtraOption") {
-        return parent::getOrderItemExtraOptions ($modelClass);
+    public function getOrderItemExtraOptions($modelClass = "\agent\models\OrderItemExtraOption")
+    {
+        return parent::getOrderItemExtraOptions($modelClass);
     }
 
     public function getOrderExtraOptionsText()

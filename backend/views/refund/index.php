@@ -40,7 +40,10 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'refund_amount',
                 'value' => function ($data) {
-                    return Yii::$app->formatter->asCurrency($data->refund_amount, $data->currency->code);
+                    return Yii::$app->formatter->asCurrency($data->refund_amount, $data->currency->code, [
+                        \NumberFormatter::MIN_FRACTION_DIGITS => $data->currency->decimal_place,
+                        \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                    ]);
                 }
             ],
             //'reason',

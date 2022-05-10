@@ -112,7 +112,10 @@ $this->params['breadcrumbs'][] = $this->title;
                   'attribute' => 'partner_fee',
                   'format' => 'raw',
                   'value' => function ($data) {
-                      return Yii::$app->formatter->asCurrency($data->partner_fee, $data->currency->code,[ \NumberFormatter::MIN_FRACTION_DIGITS => 3, \NumberFormatter::MAX_FRACTION_DIGITS => 3 ]);
+                      return Yii::$app->formatter->asCurrency($data->partner_fee, $data->currency->code,[
+                          \NumberFormatter::MIN_FRACTION_DIGITS => $data->currency->decimal_place,
+                          \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                      ]);
                   }
               ],
               [
@@ -164,7 +167,10 @@ $this->params['breadcrumbs'][] = $this->title;
                   'attribute' => 'partner_fee',
                   'format' => 'raw',
                   'value' => function ($data) {
-                      return Yii::$app->formatter->asCurrency($data->partner_fee, $data->currency->code,[ \NumberFormatter::MIN_FRACTION_DIGITS => 3, \NumberFormatter::MAX_FRACTION_DIGITS => 3 ]);
+                      return Yii::$app->formatter->asCurrency($data->partner_fee, $data->currency->code,[
+                          \NumberFormatter::MIN_FRACTION_DIGITS => $data->currency->decimal_place,
+                          \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                      ]);
                   }
               ],
               [

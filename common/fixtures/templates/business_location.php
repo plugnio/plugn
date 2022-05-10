@@ -16,4 +16,6 @@ return [
     'longitude' => $faker->longitude,
     'mashkor_branch_id' => null,
     'armada_api_key' => null,
+    'diggipack_customer_id' => null,
+    'is_deleted' => 0
 ];

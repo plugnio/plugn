@@ -78,7 +78,7 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
 
         <?=
           Html::a('Delete',
-          ['delete', 'id' => $deliveryZone->delivery_zone_id, 'storeUuid' => $store_model->restaurant_uuid],
+          ['delete', 'delivery_zone_id' => $deliveryZone->delivery_zone_id, 'store_uuid' => $store_model->restaurant_uuid],
           [
             'style' => ' position: absolute; top: 10px; right: 10px; color:#EA5455',
             'data' => [
@@ -127,7 +127,10 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
                   Delivery fee
                 </h5>
                 <p>
-                  <?= Yii::$app->formatter->asCurrency($deliveryZone->delivery_fee, $deliveryZone->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
+                  <?= Yii::$app->formatter->asCurrency($deliveryZone->delivery_fee, $deliveryZone->currency->code, [
+                          \NumberFormatter::MIN_FRACTION_DIGITS => $deliveryZone->currency->decimal_place,
+                            \NumberFormatter::MAX_FRACTION_DIGITS => $deliveryZone->currency->decimal_place
+                  ]) ?>
                 </p>
 
 
@@ -135,7 +138,10 @@ $this->params['restaurant_uuid'] = $store_model->restaurant_uuid;
                   Minimum charge on each order:
                 </h5>
                 <p style=" margin: 0px;">
-                  <?= Yii::$app->formatter->asCurrency($deliveryZone->min_charge, $deliveryZone->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
+                  <?= Yii::$app->formatter->asCurrency($deliveryZone->min_charge, $deliveryZone->currency->code, [
+                          \NumberFormatter::MIN_FRACTION_DIGITS => $deliveryZone->currency->decimal_place,
+                          \NumberFormatter::MAX_FRACTION_DIGITS => $deliveryZone->currency->decimal_place
+                  ]) ?>
                 </p>
 
               </div>

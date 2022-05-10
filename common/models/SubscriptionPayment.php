@@ -251,7 +251,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         } else {
             Yii::info('[TAP Payment Issue > ' . $paymentRecord->restaurant->name . ']'
                     . $paymentRecord->restaurant->name .
-                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) .
+                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]) .
                     ' and has failed at gateway. Maybe card issue.', __METHOD__);
 
             Yii::info('[Response from TAP for Failed Payment] ' .
@@ -294,6 +294,85 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
         return $paymentRecord;
     }
+
+
+
+
+
+
+    /**
+     * Update Payment's Status from TAP Payments
+     * @param  string  $id                         Charge id
+     * @param string $status                       transaction status
+     * @param string $destinations                 transaction's destination
+     * @param string $source                        transaction's source
+     * @param string $response_message
+     */
+    public static function updatePaymentStatus($id, $status, $destinations = null , $source = null, $reference, $response_message = null )
+    {
+        // Look for payment with same Payment Gateway Transaction ID
+        $paymentRecord = \common\models\SubscriptionPayment::findOne(['payment_gateway_transaction_id' => $id]);
+        if (!$paymentRecord) {
+            throw new NotFoundHttpException('The requested payment does not exist in our database.');
+        }
+
+        if($paymentRecord->received_callback && $paymentRecord->payment_current_status == $status )
+          return $paymentRecord;
+
+
+        $paymentRecord->payment_current_status = $status; // 'CAPTURED' ?
+        $paymentRecord->response_message = $response_message;
+
+
+        // On Successful Payments
+        if ($status == 'CAPTURED') {
+
+
+            // KNET Gateway Fee Calculation
+            if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
+
+                if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->knetGatewayFee) > Yii::$app->tapPayments->minKnetGatewayFee)
+                    $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->knetGatewayFee;
+                else
+                    $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minKnetGatewayFee;
+            } // Creditcard Gateway Fee Calculation
+            else if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_VISA_MASTERCARD) {
+
+                if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage) > Yii::$app->tapPayments->minCreditcardGatewayFee)
+                    $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage;
+                else
+                    $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minCreditcardGatewayFee;
+            }
+
+
+
+            // Update payment method used and the order id assigned to it
+            if (isset($source->payment_method) && $source->payment_method)
+                $paymentRecord->payment_mode = $source->payment_method;
+            if (isset($reference->payment) && $reference->payment)
+                $paymentRecord->payment_gateway_order_id = $reference->payment;
+
+            // Net amount after deducting gateway fee
+            $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee;
+
+        } else {
+            Yii::info('[TAP Payment Issue > ' . $paymentRecord->restaurant->name . ']'
+                    . $paymentRecord->restaurant->name .
+                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]) .
+                    ' and has failed at gateway. Maybe card issue.', __METHOD__);
+
+            Yii::info('[Response from TAP for Failed Payment] ' .
+                    print_r($responseContent, true), __METHOD__);
+        }
+
+
+
+        return $paymentRecord;
+    }
+
+
+
+
 
     /**
      * @return \yii\db\ActiveQuery

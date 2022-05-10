@@ -16,16 +16,26 @@ class Order extends \common\models\Order
     {
         $fields = parent::fields();
 
-        $fields['status_txt'] = function($model) {
+        $fields['status_txt'] = function ($model) {
             return $model->orderStatusInEnglish;
         };
 
-        $fields['total_price_txt'] = function($model) {
-            return Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code);
+        $fields['total_price_txt'] = function ($model) {
+            if ($model->currency)
+                return Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code, [
+                    \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                ]);
+            else
+                return $model->total_price;
         };
 
-        $fields['delivery_fee_txt'] = function($model) {
-            return Yii::$app->formatter->asCurrency($model->delivery_fee, $model->currency->code);
+        $fields['delivery_fee_txt'] = function ($model) {
+            if ($model->currency)
+                return Yii::$app->formatter->asCurrency($model->delivery_fee, $model->currency->code, [
+                    \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                ]);
+            else
+                return $model->delivery_fee;
         };
 
         /*$fields['payment_txt'] =  function($model) {
@@ -69,7 +79,7 @@ class Order extends \common\models\Order
      */
     public function getCountry($modelClass = "\agent\models\Country")
     {
-        return parent::getCountry ($modelClass);
+        return parent::getCountry($modelClass);
     }
 
     /**
@@ -79,7 +89,7 @@ class Order extends \common\models\Order
      */
     public function getDeliveryZone($modelClass = "\agent\models\DeliveryZone")
     {
-        return parent::getDeliveryZone ($modelClass);
+        return parent::getDeliveryZone($modelClass);
     }
 
     /**
@@ -89,7 +99,7 @@ class Order extends \common\models\Order
      */
     public function getBankDiscount($modelClass = "\agent\models\BankDiscount")
     {
-        return parent::getBankDiscount ($modelClass);
+        return parent::getBankDiscount($modelClass);
     }
 
     /**
@@ -99,7 +109,7 @@ class Order extends \common\models\Order
      */
     public function getRestaurant($modelClass = "\agent\models\Restaurant")
     {
-        return parent::getRestaurant ($modelClass);
+        return parent::getRestaurant($modelClass);
     }
 
     /**
@@ -109,7 +119,7 @@ class Order extends \common\models\Order
      */
     public function getCurrency($modelClass = "\agent\models\Currency")
     {
-        return parent::getCurrency ($modelClass);
+        return parent::getCurrency($modelClass);
     }
 
     /**
@@ -119,7 +129,7 @@ class Order extends \common\models\Order
      */
     public function getRestaurantDelivery($modelClass = "\agent\models\RestaurantDelivery")
     {
-        return parent::getRestaurantDelivery ($modelClass);
+        return parent::getRestaurantDelivery($modelClass);
     }
 
     /**
@@ -129,7 +139,7 @@ class Order extends \common\models\Order
      */
     public function getArea($modelClass = "\agent\models\Area")
     {
-        return parent::getArea ($modelClass);
+        return parent::getArea($modelClass);
     }
 
     /**
@@ -139,7 +149,7 @@ class Order extends \common\models\Order
      */
     public function getPaymentMethod($modelClass = "\agent\models\PaymentMethod")
     {
-        return parent::getPaymentMethod ($modelClass);
+        return parent::getPaymentMethod($modelClass);
     }
 
     /**
@@ -149,7 +159,7 @@ class Order extends \common\models\Order
      */
     public function getOrderItemExtraOptions($modelClass = "\agent\models\OrderItemExtraOption")
     {
-        return parent::getOrderItemExtraOptions ($modelClass);
+        return parent::getOrderItemExtraOptions($modelClass);
     }
 
     /**
@@ -159,7 +169,7 @@ class Order extends \common\models\Order
      */
     public function getOrderItems($modelClass = "\agent\models\OrderItem")
     {
-        return parent::getOrderItems ($modelClass);
+        return parent::getOrderItems($modelClass);
     }
 
     /**
@@ -169,9 +179,9 @@ class Order extends \common\models\Order
      */
     public function getTotalOrderItems($modelClass = "\agent\models\OrderItem")
     {
-        return parent::getOrderItems ($modelClass)->count();
+        return parent::getOrderItems($modelClass)->count();
     }
-    
+
 
     /**
      * Gets query for [[OrderItems]].
@@ -180,7 +190,7 @@ class Order extends \common\models\Order
      */
     public function getSelectedItems($modelClass = "\agent\models\OrderItem")
     {
-        return parent::getSelectedItems ($modelClass);
+        return parent::getSelectedItems($modelClass);
     }
 
     /**
@@ -190,7 +200,7 @@ class Order extends \common\models\Order
      */
     public function getItems($modelClass = "\agent\models\Item")
     {
-        return parent::getItems ($modelClass);
+        return parent::getItems($modelClass);
     }
 
     public function getItemImage($modelClass = "\agent\models\ItemImage")
@@ -205,7 +215,7 @@ class Order extends \common\models\Order
      */
     public function getCustomer($modelClass = "\agent\models\Customer")
     {
-        return parent::getCustomer ($modelClass);
+        return parent::getCustomer($modelClass);
     }
 
     /**
@@ -215,7 +225,7 @@ class Order extends \common\models\Order
      */
     public function getRestaurantBranch($modelClass = "\agent\models\RestaurantBranch")
     {
-        return parent::getRestaurantBranch ($modelClass);
+        return parent::getRestaurantBranch($modelClass);
     }
 
     /**
@@ -225,7 +235,7 @@ class Order extends \common\models\Order
      */
     public function getPayment($modelClass = "\agent\models\Payment")
     {
-        return parent::getPayment ($modelClass);
+        return parent::getPayment($modelClass);
     }
 
     /**
@@ -235,7 +245,7 @@ class Order extends \common\models\Order
      */
     public function getRefunds($modelClass = "\agent\models\Refund")
     {
-        return parent::getRefunds ($modelClass);
+        return parent::getRefunds($modelClass);
     }
 
     /**
@@ -245,7 +255,7 @@ class Order extends \common\models\Order
      */
     public function getBusinessLocation($modelClass = "\agent\models\BusinessLocation")
     {
-        return parent::getBusinessLocation ($modelClass);
+        return parent::getBusinessLocation($modelClass);
     }
 
     /**
@@ -255,7 +265,7 @@ class Order extends \common\models\Order
      */
     public function getPickupLocation($modelClass = "\agent\models\BusinessLocation")
     {
-        return parent::getPickupLocation ($modelClass);
+        return parent::getPickupLocation($modelClass);
     }
 
     /**
@@ -265,7 +275,7 @@ class Order extends \common\models\Order
      */
     public function getVoucher($modelClass = "\agent\models\Voucher")
     {
-        return parent::getVoucher ($modelClass);
+        return parent::getVoucher($modelClass);
     }
 
     /**
@@ -275,6 +285,6 @@ class Order extends \common\models\Order
      */
     public function getRefundedItems($modelClass = "\agent\models\RefundedItem")
     {
-        return parent::getRefundedItems ($modelClass);
+        return parent::getRefundedItems($modelClass);
     }
 }

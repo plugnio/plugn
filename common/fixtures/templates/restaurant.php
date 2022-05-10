@@ -89,6 +89,15 @@ return [
     'warehouse_fee' => $faker->numberBetween (10, 100),
     'snapchat_pixil_id' => $faker->md5,
     'retention_email_sent' => 1,
-    'enable_gift_message' => 1
+    'enable_gift_message' => 1,
+    'is_myfatoorah_enable' => 1,
+    'supplierCode' => 1,
+    'annual_revenue' => $this->numberBetween (100, 10000),
+    'warehouse_delivery_charges' => $faker->numberBetween (10, 100),
+    'payment_gateway_queue_id' => $index + 1,
+    'snapchat_pixil_id' => $index + 1,
+    'retention_email_sent' => 1,
+    'enable_gift_message' => 1,
+    'referral_code' => $faker->text(6)
 ];
 

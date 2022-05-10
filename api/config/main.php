@@ -42,6 +42,9 @@ return [
                 ],
             ],
         ],
+        'currency' => [
+            'class' => 'api\components\Currency',
+        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => false,
@@ -78,10 +81,12 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET detail' => 'item-data',
+                        'GET items' => 'items',
                         'GET' => 'restaurant-menu',
                         'GET <category_id>' => 'category-products',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS items' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS <category_id>' => 'options',
                     ]
@@ -107,7 +112,7 @@ return [
                         // 'OPTIONS <restaurant_uuid>' => 'options'
                     ]
                 ],
-                [// RestaurantController
+                [// RestaurantCest
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/restaurant',
                     'pluralize' => false,
@@ -204,6 +209,7 @@ return [
                     'controller' => 'v2/order',
                     'pluralize' => false,
                     'patterns' => [
+                        'POST payment-webhook' => 'payment-webhook',
                         'POST status-update-webhook' => 'update-mashkor-order-status',
                         'POST update-armada-order-status' => 'update-armada-order-status',
                         'POST <id>' => 'place-an-order',
@@ -215,6 +221,7 @@ return [
                         'GET order-details/<id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS payment-webhook' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
                         'OPTIONS update-armada-order-status' => 'options',
                         'OPTIONS <id>' => 'options',

@@ -427,7 +427,7 @@ class TapPayments extends Component
     /**
      * Create a charge for redirect
      */
-    public function createCharge($currency, $desc = "Pay", $statementDesc = "", $ref, $amount ,$firstName, $email, $country_code ,$phone,$platform_fee, $redirectUrl, $gateway, $warehouse_fee = 0,$warehouse_delivery_charges = 0, $country_name = null)
+    public function createCharge($currency, $desc = "Pay", $statementDesc = "", $ref, $amount ,$firstName, $email, $country_code ,$phone,$platform_fee, $redirectUrl, $webhookUrl , $gateway, $warehouse_fee = 0,$warehouse_delivery_charges = 0, $country_name = null)
     {
 
         $chargeEndpoint = $this->apiEndpoint . "/charges";
@@ -466,6 +466,9 @@ class TapPayments extends Component
             ],
             "redirect" => [
                 "url" => $redirectUrl
+            ],
+            "post" => [
+                "url" => $webhookUrl
             ]
         ];
 
@@ -644,4 +647,20 @@ class TapPayments extends Component
 
         return $response;
     }
+
+
+    /**
+     * checkTapSignature
+     * @param  [type]  $id                           [description]
+     * @param  boolean $showUpdatedFlashNotification [description]
+     * @return self                                [description]
+     */
+     public function checkTapSignature($toBeHashedString, $headerSignature ) {
+         //***Generate The Signature*** :
+
+         $signature = hash_hmac('sha256', $toBeHashedString, $this->vendorSecretApiKey);
+
+         return $signature == $headerSignature;
+     }
+
 }

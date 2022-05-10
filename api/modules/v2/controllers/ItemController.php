@@ -57,6 +57,7 @@ class ItemController extends Controller {
      * Return category's products
      */
     public function actionCategoryProducts($category_id) {
+
       $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
 
       if($restaurant_uuid){
@@ -90,7 +91,45 @@ class ItemController extends Controller {
       }
     }
 
+    /**
+     * list items
+     * @return ActiveDataProvider
+     */
+    public function actionItems()
+    {
+        $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
+        $category_id = Yii::$app->request->get("category_id");
+        $keyword = Yii::$app->request->get("keyword");
 
+        $restaurant = Restaurant::find()
+            ->where(['restaurant_uuid' => $restaurant_uuid])
+            ->one();
+
+        $query = $restaurant
+            ->getItems()
+            ->with('options', 'options.extraOptions', 'itemImages')
+            ->andWhere (['item_status' => Item::ITEM_STATUS_PUBLISH])
+            ->orderBy ([new \yii\db\Expression('
+                item.sort_number IS NULL,
+                item.sort_number ASC,
+                item.sku IS NULL,
+                item.sku ASC')]);
+
+        if($keyword) {
+               $query->filterKeyword($keyword);
+        }
+
+        if($category_id) {
+            $query->joinWith('categoryItems')
+                ->andWhere(['category_id' => $category_id]);
+        }
+           // ->orderBy([new \yii\db\Expression(' sort_number IS NULL, sort_number ASC')]);
+        //->with('items', 'items.options', 'items.options.extraOptions', 'items.itemImages')
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
 
     /**
      * Return restaurant menu
@@ -98,22 +137,30 @@ class ItemController extends Controller {
     public function actionRestaurantMenu() {
 
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
+        $wihoutItems = Yii::$app->request->get("wihoutItems");
 
         $restaurant = Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->one();
 
-
-
-        if ($restaurant) {
+        if (!$restaurant) {
+            return [
+                'operation' => 'error',
+                'message' => 'Store Uuid is invalid'
+            ];
+        }
 
           if($restaurant->is_myfatoorah_enable)
             unset($restaurant['live_public_key']);
 
+        $restaurantMenu = [];
+
+        if(!$wihoutItems) {
+
             $restaurantMenu = Category::find()
-                    ->andWhere(['restaurant_uuid' => $restaurant_uuid])
-                    ->with('items', 'items.options', 'items.options.extraOptions','items.itemImages')
-                    ->orderBy([new \yii\db\Expression('sort_number IS NULL, sort_number ASC')])
-                    ->asArray()
-                    ->all();
+                ->andWhere(['restaurant_uuid' => $restaurant_uuid])
+                ->with('items', 'items.options', 'items.options.extraOptions', 'items.itemImages')
+                ->orderBy([new \yii\db\Expression('sort_number IS NULL, sort_number ASC')])
+                ->asArray()
+                ->all();
 
 
             foreach ($restaurantMenu as $category) {
@@ -124,21 +171,16 @@ class ItemController extends Controller {
                 unset($restaurantMenu[$key]['categoryItems']);
 
                 foreach ($category['items'] as $itemKey => $item) {
-                  unset($restaurantMenu[$key]['items'][$itemKey]['unit_sold']);
+                    unset($restaurantMenu[$key]['items'][$itemKey]['unit_sold']);
                 }
             }
+        }
 
             return [
                 'restaurant' => $restaurant,
                 'restaurantTheme' => $restaurant->getRestaurantTheme()->one(),
                 'restaurantMenu' => $restaurantMenu
             ];
-        } else {
-            return [
-                'operation' => 'error',
-                'message' => 'Store Uuid is invalid'
-            ];
-        }
     }
 
     /**

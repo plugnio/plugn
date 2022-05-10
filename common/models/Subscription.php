@@ -111,22 +111,29 @@ class Subscription extends \yii\db\ActiveRecord {
         }
     }
 
-
+    /**
+     * @param bool $insert
+     * @return bool
+     */
     public function beforeSave($insert) {
 
-
-
           //downgrade store Subscription
+
           if(date('Y-m-d', strtotime($this->subscription_end_at)) == date('Y-m-d')){
 
-
-            Subscription::updateAll(['subscription_status' => self::STATUS_INACTIVE], ['and',  ['subscription_status' => self::STATUS_ACTIVE ] , ['restaurant_uuid' => $this->restaurant_uuid  ]]);
-
+            Subscription::updateAll(['subscription_status' => self::STATUS_INACTIVE], [
+                'and',  ['subscription_status' => self::STATUS_ACTIVE ] , ['restaurant_uuid' => $this->restaurant_uuid  ]
+            ]);
 
             $freePlan = Plan::find()->where(['valid_for' => 0])->one();
-            $freeSubscription = Subscription::find()->where(['restaurant_uuid' => $this->restaurant_uuid,'plan_id' => $freePlan->plan_id ])->one();
 
-            if( $freeSubscription ){
+            $freeSubscription = Subscription::find()
+                ->where([
+                    'restaurant_uuid' => $this->restaurant_uuid,
+                    'plan_id' => $freePlan->plan_id
+                ])->one();
+
+            if($freeSubscription) {
 
               $freeSubscription->subscription_status = self::STATUS_ACTIVE;
               $freeSubscription->save(false);
@@ -138,32 +145,38 @@ class Subscription extends \yii\db\ActiveRecord {
               $subscription->plan_id = $freePlan->plan_id;
               $subscription->subscription_status = self::STATUS_ACTIVE;
               $subscription->save(false);
-
             }
 
-          } else {
+          }
+          else
+          {
             if($this->payment_uuid && $this->subscriptionPayment->payment_current_status == 'CAPTURED' || $this->plan->price == 0){
+              
               Subscription::updateAll(['subscription_status' => self::STATUS_INACTIVE], ['and',  ['subscription_status' => self::STATUS_ACTIVE ] , ['restaurant_uuid' => $this->restaurant_uuid  ]]);
+
               $this->subscription_status = self::STATUS_ACTIVE;
 
             }
           }
 
-
-
         return parent::beforeSave($insert);
     }
 
-    public function afterSave($insert, $changedAttributes) {
-
-        if( $this->subscription_status ==  self::STATUS_ACTIVE){
-          $restaurant_model = $this->restaurant;
+    public function afterSave($insert, $changedAttributes) 
+    {
+        if( $this->subscription_status ==  self::STATUS_ACTIVE) 
+        {
+          /*$restaurant_model = $this->restaurant;
           $restaurant_model->platform_fee = $this->plan->platform_fee;
 
-          $restaurant_model->save(false);
+          $restaurant_model->save(false);*/
 
+          Restaurant::updateAll([
+            'platform_fee' => $this->plan->platform_fee
+          ], [
+            'restaurant_uuid' => $this->restaurant_uuid
+          ]);
         }
-
 
         // $valid_for = $this->plan->valid_for;
         // if ($this->subscription_status ==  self::STATUS_ACTIVE){
@@ -179,7 +192,6 @@ class Subscription extends \yii\db\ActiveRecord {
     }
 
     public function beforeDelete() {
-
 
        $freePlan = Plan::find()->where(['valid_for' => 0])->one();
 

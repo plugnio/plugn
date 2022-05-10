@@ -41,13 +41,17 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'label' => 'IN PROGRESS',
                 'value' => function ($data) {
-                    return Yii::$app->formatter->asCurrency($data->totalEarnings ? $data->totalEarnings : 0, 'KWD',[ \NumberFormatter::MIN_FRACTION_DIGITS => 4, \NumberFormatter::MAX_FRACTION_DIGITS => 4 ]);
+                    return Yii::$app->formatter->asCurrency($data->totalEarnings ? $data->totalEarnings : 0, 'KWD',[
+                            \NumberFormatter::MIN_FRACTION_DIGITS => 4,
+                        \NumberFormatter::MAX_FRACTION_DIGITS => 4 ]);
                 }
             ],
             [
                 'label' => 'Pending Payouts',
                 'value' => function ($data) {
-                    return Yii::$app->formatter->asCurrency($data->pendingPayouts ? $data->pendingPayouts : 0, 'KWD',[ \NumberFormatter::MIN_FRACTION_DIGITS => 4, \NumberFormatter::MAX_FRACTION_DIGITS => 4 ]);
+                    return Yii::$app->formatter->asCurrency($data->pendingPayouts ? $data->pendingPayouts : 0, 'KWD',[
+                            \NumberFormatter::MIN_FRACTION_DIGITS => 4, \NumberFormatter::MAX_FRACTION_DIGITS => 4
+                    ]);
                 }
             ],
             //'partner_created_at',

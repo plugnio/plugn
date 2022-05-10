@@ -73,7 +73,12 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
             $this->country_id = $this->deliveryZone->country_id;
           }
 
-          return $this->save();
+          self::updateAll([
+              'country_id' => $this->country_id,
+              'city_id' => $this->city_id
+          ], [
+              'area_delivery_zone' => $this->area_delivery_zone
+          ]);
         }
 
         return true;

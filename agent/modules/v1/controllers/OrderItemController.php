@@ -125,12 +125,14 @@ class OrderItemController extends Controller {
      * @return Order the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($order_item_id, $order_uuid ,$store_uuid)
+    protected function findModel($order_item_id, $order_uuid ,$store_uuid = null)
     {
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
+
         $order = Order::find()
-            ->filterBusinessLocationIfManager ($store_uuid)
+            ->filterBusinessLocationIfManager ($store->restaurant_uuid)
             ->andWhere([
-                'restaurant_uuid' => $store_uuid,
+                'restaurant_uuid' => $store->restaurant_uuid,
                 'order_uuid' => $order_uuid
             ])
             ->one();

@@ -112,6 +112,13 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         $totalPrice *= $this->qty; //6*5
 
+        //convert from store currency to order currency if not same
+
+        if($this->order->currency && $this->restaurant->currency->code != $this->order->currency_code)
+        {
+            return ($totalPrice / $this->restaurant->currency->rate) * $this->order->currency->rate;
+        }
+
         return $totalPrice;
     }
 
@@ -126,14 +133,14 @@ class OrderItem extends \yii\db\ActiveRecord {
         if ($this->item)
             $this->item->increaseStockQty($this->qty);
 
-
-        $orderItemsExtraOption = OrderItemExtraOption::find()->where(['order_item_id' => $this->order_item_id])->all();
+        $orderItemsExtraOption = OrderItemExtraOption::find()
+            ->where(['order_item_id' => $this->order_item_id])
+            ->all();
 
         if($orderItemsExtraOption) {
 
           foreach ($orderItemsExtraOption as $orderItemExtraOption)
              $orderItemExtraOption->delete();
-
         }
 
         return parent::beforeDelete();
@@ -175,12 +182,12 @@ class OrderItem extends \yii\db\ActiveRecord {
         if ($insert) {
 
             if ($this->item_uuid && $this->item->track_quantity && $this->qty  > $this->item->stock_qty)
-                return $this->addError('qty', $this->item->item_name . " is currently out of stock and unavailable.");
+                return $this->addError('qty', $this->item_name . " is currently out of stock and unavailable.");
         }
         else {
 
             if ($this->item_uuid && $this->item->track_quantity && $this->qty > ( $this->item->stock_qty + $this->getOldAttribute('qty')))
-                return $this->addError('qty', $this->item->item_name . " is currently out of stock and unavailable.");
+                return $this->addError('qty', $this->item_name . " is currently out of stock and unavailable.");
 
         }
 
@@ -204,12 +211,16 @@ class OrderItem extends \yii\db\ActiveRecord {
 
     public function afterSave($insert, $changedAttributes) {
 
+      if($this->item_uuid != null) {
+
         $item_model = Item::findOne($this->item_uuid);
 
-        if (!$insert && isset($changedAttributes['qty'])) {
+        if (!$insert && $item_model && isset($changedAttributes['qty'])) {
             $item_model->increaseStockQty($changedAttributes['qty']);
             $item_model->decreaseStockQty($this->qty);
         }
+
+      }
 
         $order_model = Order::findOne($this->order_uuid);
 

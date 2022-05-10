@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use api\models\Item;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
@@ -103,6 +104,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property int|null $payment_gateway_queue_id
  * @property string|null $default_language
  * @property string|null $annual_revenue
+ * @property boolean $demand_delivery
  *
  * @property AgentAssignment[] $agentAssignments
  * @property AreaDeliveryZone[] $areaDeliveryZones
@@ -164,6 +166,7 @@ class Restaurant extends \yii\db\ActiveRecord
     const SCENARIO_UPDATE_LAYOUT = 'layout';
     const SCENARIO_UPDATE_ANALYTICS = 'update_analytics';
     const SCENARIO_UPDATE_DELIVERY = 'update_delivery';
+    const SCENARIO_CURRENCY = 'currency';
 
     public $restaurant_delivery_area;
     public $restaurant_payments_method;
@@ -330,7 +333,7 @@ class Restaurant extends \yii\db\ActiveRecord
                   return $model->{$attribute} !== $model->getOldAttribute($attribute) && $this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT;
                 }
             ],
-            [['restaurant_email_notification', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable', 'is_myfatoorah_enable','supplierCode'], 'integer'],
+            [['restaurant_email_notification', 'demand_delivery','schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable', 'is_myfatoorah_enable','supplierCode'], 'integer'],
             [['schedule_interval'], 'required','when' => function($model) {
                     return $model->schedule_order;
                 }
@@ -379,12 +382,15 @@ class Restaurant extends \yii\db\ActiveRecord
                 'owner_identification_file_back_side', 'restaurant_authorized_signature_file',
             ],
             self::SCENARIO_UPDATE => [
-                'country_id', 'restaurant_email_notification', 'phone_number', 'phone_number_country_code',
+                'country_id', 'restaurant_email_notification', 'demand_delivery','phone_number', 'phone_number_country_code',
                 'name', 'name_ar', 'schedule_interval', 'schedule_order',
                 'restaurant_email', 'tagline', 'tagline_ar', 'currency_id'
             ],
             self::SCENARIO_UPDATE_DELIVERY => [
                 'armada_api_key', 'mashkor_branch_id'
+            ],
+            self::SCENARIO_CURRENCY => [
+                'currency_id'
             ]
         ]);
     }
@@ -398,8 +404,8 @@ class Restaurant extends \yii\db\ActiveRecord
             'restaurant_uuid' => 'Restaurant Uuid',
             'country_id' => 'Country',
             'currency_id' => 'Store currency',
-            'name' => 'Store name in English',
-            'name_ar' => 'Store name in Arabic',
+            'name' => 'Store name / Business name in English',
+            'name_ar' => 'Store name / Business name in Arabic',
             'tagline' => 'Tagline in English',
             'tagline_ar' => 'Tagline in Arabic',
             'restaurant_domain' => 'Store Url',
@@ -423,6 +429,7 @@ class Restaurant extends \yii\db\ActiveRecord
             'armada_api_key' => 'Armada Api Key',
             'armada_branch_id' => 'Mashkor Branch ID',
             'restaurant_email_notification' => 'Email notification',
+            'demand_delivery' => 'On demand delivery',
             'show_opening_hours' => 'Show Opening hours',
             'phone_number_display' => 'Phone number display',
             'store_branch_name' => 'Branch name',
@@ -844,7 +851,6 @@ class Restaurant extends \yii\db\ActiveRecord
         return $photo_url;
     }
 
-
     /**
      * Return authorized_signature_file
      * @return string
@@ -869,9 +875,9 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function createMyFatoorahAccount() {
 
-
         //Create  supplier for a vendor on MyFatoorah
         Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
+
         $response = Yii::$app->myFatoorahPayment->createSupplier($this);
         $supplierApiResponse = json_decode($response->content);
 
@@ -907,21 +913,20 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function createTapAccount() {
 
-
         //Upload documents file on our server before we create an account on tap we gonaa delete them
         $this->uploadDocumentsToTap();
-
 
         //Create a business for a vendor on Tap
         $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
 
-        if ($businessApiResponse->isOk) {
-
+        if ($businessApiResponse->isOk)
+        {
             $this->business_id = $businessApiResponse->data['id'];
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
             $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
-        } else {
-
+        }
+        else
+        {
             Yii::error('Error while create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
             return false;
         }
@@ -929,15 +934,17 @@ class Restaurant extends \yii\db\ActiveRecord
         //Create a merchant on Tap
         $merchantApiResponse = Yii::$app->tapPayments->createMerchantAccount($this->company_name, $this->currency->code ,$this->business_id, $this->business_entity_id, $this->iban);
 
-
-        if ($merchantApiResponse->isOk) {
+        if ($merchantApiResponse->isOk)
+        {
             $this->merchant_id = $merchantApiResponse->data['id'];
             $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
         }
-
-        else {
+        else
+        {
              Yii::error('Error while create Merchant' . json_encode($merchantApiResponse->data));
-             if($merchantApiResponse->data['message'] == 'Profile Name already exists') {
+
+             if($merchantApiResponse->data && isset($merchantApiResponse->data['message']) && $merchantApiResponse->data['message'] == 'Profile Name already exists')
+             {
                $merchantApiResponse = Yii::$app->tapPayments->createMerchantAccount($this->company_name . '-' . $this->country->iso, $this->currency->code ,$this->business_id, $this->business_entity_id, $this->iban);
 
                if ($merchantApiResponse->isOk) {
@@ -945,7 +952,24 @@ class Restaurant extends \yii\db\ActiveRecord
                    $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
                } else{
                    Yii::error('Error while create Merchant [ ' . $this->name . '] #2#' . json_encode($merchantApiResponse->data));
-                   $this->save();
+
+                   self::updateAll([
+                       'business_id' => $this->business_id,
+                       'business_entity_id' => $this->business_entity_id,
+                       'developer_id' => $this->developer_id,
+                       'merchant_id' => $this->merchant_id,
+                       'wallet_id' => $this->wallet_id,
+                       'operator_id' => $this->operator_id,
+                       'test_api_key' => $this->test_api_key,
+                       'test_public_key' => $this->test_public_key,
+                       'live_api_key' => $this->live_api_key,
+                       'live_public_key' => $this->live_public_key,
+                       'is_tap_enable' => $this->is_tap_enable,
+                       'is_myfatoorah_enable' => $this->is_myfatoorah_enable
+                   ], [
+                     'restaurant_uuid' => $this->restaurant_uuid
+                   ]);
+
                    return false;
                }
              }
@@ -968,16 +992,52 @@ class Restaurant extends \yii\db\ActiveRecord
               $this->is_tap_enable = 1;
               $this->is_myfatoorah_enable = 0;
             }
-            else
-              $this->is_tap_enable = 0;
-
+            else {
+                $this->is_tap_enable = 0;
+            }
 
             \Yii::info($this->name . " has just created TAP account", __METHOD__);
-            $this->save();
+
+            self::updateAll([
+                'business_id' => $this->business_id,
+                'business_entity_id' => $this->business_entity_id,
+                'developer_id' => $this->developer_id,
+                'merchant_id' => $this->merchant_id,
+                'wallet_id' => $this->wallet_id,
+                'operator_id' => $this->operator_id,
+                'test_api_key' => $this->test_api_key,
+                'test_public_key' => $this->test_public_key,
+                'live_api_key' => $this->live_api_key,
+                'live_public_key' => $this->live_public_key,
+                'is_tap_enable' => $this->is_tap_enable,
+                'is_myfatoorah_enable' => $this->is_myfatoorah_enable
+            ], [
+              'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+
             return true;
-        } else {
+        }
+        else
+        {
           Yii::error('Error while create Operator  [' . $this->name . '] ' . json_encode($operatorApiResponse->data));
-          $this->save();
+
+            self::updateAll([
+                'business_id' => $this->business_id,
+                'business_entity_id' => $this->business_entity_id,
+                'developer_id' => $this->developer_id,
+                'merchant_id' => $this->merchant_id,
+                'wallet_id' => $this->wallet_id,
+                'operator_id' => $this->operator_id,
+                'test_api_key' => $this->test_api_key,
+                'test_public_key' => $this->test_public_key,
+                'live_api_key' => $this->live_api_key,
+                'live_public_key' => $this->live_public_key,
+                'is_tap_enable' => $this->is_tap_enable,
+                'is_myfatoorah_enable' => $this->is_myfatoorah_enable
+            ], [
+              'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+
           return false;
         }
     }
@@ -1131,18 +1191,12 @@ class Restaurant extends \yii\db\ActiveRecord
 
           if($isDomainExist)
             return  $this->addError('restaurant_domain', 'Another store is already using this domain');
-
-
         }
-
-
-
 
         if ($this->scenario == self::SCENARIO_UPLOAD_STORE_DOCUMENT) {
             //delete tmp files
             $this->deleteTempFiles();
         }
-
 
         return parent::beforeSave($insert);
     }
@@ -1182,12 +1236,12 @@ class Restaurant extends \yii\db\ActiveRecord
         if ($this->scenario == self::SCENARIO_CREATE_STORE_BY_AGENT && $insert) {
 
             //Create a new record in queue table
-            $queue_model = new Queue();
-            $queue_model->restaurant_uuid = $this->restaurant_uuid;
-            $queue_model->queue_status = Queue::QUEUE_STATUS_PENDING;
+            $queue = new Queue();
+            $queue->restaurant_uuid = $this->restaurant_uuid;
+            $queue->queue_status = Queue::QUEUE_STATUS_PENDING;
 
-            if (!$queue_model->save ())
-                Yii::error ('Queue Error:' . json_encode ($queue_model->errors));
+            if (!$queue->save ())
+                Yii::error ('Queue Error:' . json_encode ($queue->errors));
         }
 
         if ($insert) {
@@ -1200,11 +1254,9 @@ class Restaurant extends \yii\db\ActiveRecord
             $subscription->subscription_status = Subscription::STATUS_ACTIVE; //Free plan by default
             $subscription->save ();
 
-
             $restaurant_theme = new RestaurantTheme();
             $restaurant_theme->restaurant_uuid = $this->restaurant_uuid;
             $restaurant_theme->save ();
-
 
             //Add opening hrs
             for ($i = 0; $i < 7; ++$i) {
@@ -1215,6 +1267,11 @@ class Restaurant extends \yii\db\ActiveRecord
                 $opening_hour->close_at = '23:59:59';
                 $opening_hour->save ();
             }
+
+            $currecy = new RestaurantCurrency();
+            $currecy->restaurant_uuid = $this->restaurant_uuid;
+            $currecy->currency_id = $this->currency_id;
+            $currecy->save();
         }
     }
 
@@ -1279,6 +1336,9 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function isOpen($asap = null) {
 
+        if(!$this->demand_delivery)
+          return false;
+
         $opening_hour_model = OpeningHour::find()
                                 ->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])
                                 ->andWhere(['<=','open_at', date("H:i:s", strtotime("now"))])
@@ -1307,6 +1367,8 @@ class Restaurant extends \yii\db\ActiveRecord
     public function extraFields()
     {
         return [
+            'noOfItems',
+            'categories',
             'isOpen' => function ($restaurant) {
                 return $restaurant->isOpen ();
             },
@@ -1319,6 +1381,7 @@ class Restaurant extends \yii\db\ActiveRecord
             'country' => function ($restaurant) {
                 return $restaurant->getCountry ()->one ();
             },
+            'currencies',
             'currency' => function ($restaurant) {
                 return $restaurant->getCurrency ()->one ();
             },
@@ -1526,7 +1589,6 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function beforeDelete()
     {
-
         $this->deleteRestaurantThumbnailImage ();
         $this->deleteRestaurantLogo ();
 
@@ -1538,8 +1600,9 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function markAsBusy()
     {
-        $this->restaurant_status = Restaurant::RESTAURANT_STATUS_BUSY;
-        $this->save (false);
+        self::updateAll(['restaurant_status' => self::RESTAURANT_STATUS_BUSY], [
+            'restaurant_uuid' => $this->restaurant_uuid
+        ]);
     }
 
     /**
@@ -1547,8 +1610,9 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function markAsOpen()
     {
-        $this->restaurant_status = Restaurant::RESTAURANT_STATUS_OPEN;
-        $this->save (false);
+        self::updateAll(['restaurant_status' => self::RESTAURANT_STATUS_OPEN], [
+            'restaurant_uuid' => $this->restaurant_uuid
+        ]);
     }
 
     /**
@@ -1731,7 +1795,7 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         $customer_data = [];
 
-        $date_start = date('Y') . '-' . date('m', strtotime('-1 month')) . '-1';
+        $date_start = date('Y') . '-' . date('m', strtotime('-1 month')).'-1';
 
         for ($i = 1; $i <= date('t', strtotime($date_start)); $i++) {
             $customer_data[$i] = array(
@@ -1742,9 +1806,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $rows = $this->getCustomers()
             ->select(new Expression('customer_created_at, COUNT(*) as total'))
-            ->andWhere('
-                YEAR(customer_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
-                MONTH(customer_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL 1 MONTH)')
             ->groupBy(new Expression('DAY(customer_created_at)'))
             ->asArray()
             ->all();
@@ -1757,9 +1819,7 @@ class Restaurant extends \yii\db\ActiveRecord
         }
 
         $number_of_all_customer_gained = $this->getCustomers()
-            ->andWhere('
-                YEAR(customer_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
-                MONTH(customer_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL 1 MONTH)')
             ->count();
 
         return [
@@ -1784,9 +1844,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $rows = $this->getOrders ()
             ->activeOrders ($this->restaurant_uuid)
             ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
-            ->andWhere('
-                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
-                MONTH(order.order_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
             ->groupBy (new Expression('DAY(order.order_created_at)'))
             ->asArray ()
             ->all ();
@@ -1800,9 +1858,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $number_of_all_revenue_generated = $this->getOrders()
             ->activeOrders($this->restaurant_uuid)
-            ->andWhere('
-                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
-                MONTH(order.order_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
             ->sum('total_price');
 
         return [
@@ -1827,9 +1883,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $rows = $this->getOrders ()
             ->activeOrders ($this->restaurant_uuid)
             ->select (new Expression('order_created_at, COUNT(*) as total'))
-            ->andWhere('
-                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
-                MONTH(order.order_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
             ->groupBy (new Expression('DAY(order.order_created_at)'))
             ->asArray ()
             ->all ();
@@ -1843,9 +1897,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $number_of_all_orders_received = $this->getOrders()
             ->activeOrders($this->restaurant_uuid)
-            ->andWhere('
-                YEAR(order.order_created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
-                MONTH(order.order_created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
             ->count();
 
         return [
@@ -1869,9 +1921,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $rows = $this->getSoldOrderItems ()
             ->select ('order_item_created_at, SUM(order_item.qty) as total')
-            ->andWhere('
-                YEAR(`order_item_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
-                MONTH(`order_item_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
             ->groupBy (new Expression('DATE(order_item_created_at)'))
             ->asArray ()
             ->all ();
@@ -1884,9 +1934,7 @@ class Restaurant extends \yii\db\ActiveRecord
         }
 
         $number_of_all_sold_item = $this->getSoldOrderItems()
-            ->andWhere('
-                YEAR(`order_item_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND
-                MONTH(`order_item_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
+            ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
             ->sum('order_item.qty');
 
         return [
@@ -1915,7 +1963,8 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $rows = $this->getCustomers()
             ->select(new Expression('customer_created_at, COUNT(*) as total'))
-            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
+            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
+//            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
             ->groupBy(new Expression('MONTH(customer_created_at)'))
             ->asArray()
             ->all();
@@ -1928,7 +1977,8 @@ class Restaurant extends \yii\db\ActiveRecord
         }
 
         $number_of_all_customer_gained = $this->getCustomers()
-            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
+            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
+//            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
             ->count();
 
         return [
@@ -1939,8 +1989,6 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalRevenueByMonths($months)
     {
-
-
         $revenue_generated_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
@@ -1960,7 +2008,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $rows = $this->getOrders ()
             ->activeOrders ($this->restaurant_uuid)
             ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
-            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) <= DATE("'.$date_end.'")')
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
             ->groupBy (new Expression('MONTH(order.order_created_at)'))
             ->asArray ()
             ->all ();
@@ -1974,7 +2022,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $number_of_all_revenue_generated = $this->getOrders()
             ->activeOrders($this->restaurant_uuid)
-            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) <= DATE("'.$date_end.'")')
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
             ->sum('total_price');
 
         return [
@@ -1985,8 +2033,6 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalOrdersByMonths($months)
     {
-
-
         $orders_received_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
@@ -2006,7 +2052,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $rows = $this->getOrders ()
             ->activeOrders ($this->restaurant_uuid)
             ->select (new Expression('order_created_at, COUNT(*) as total'))
-            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) <= DATE("'.$date_end.'")')
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
             ->groupBy (new Expression('MONTH(order.order_created_at)'))
             ->asArray ()
             ->all ();
@@ -2020,7 +2066,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $number_of_all_orders_received = $this->getOrders()
             ->activeOrders($this->restaurant_uuid)
-            ->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) <= DATE("'.$date_end.'")')
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
             ->count();
 
         return [
@@ -2031,8 +2077,6 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalSoldItemsByMonths($months)
     {
-
-
         $sold_item_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
@@ -2051,7 +2095,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $rows = $this->getSoldOrderItems ()
             ->select ('order_item_created_at, SUM(order_item.qty) as total')
-            ->andWhere('DATE(`order_item_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_item_created_at`) <= DATE("'.$date_end.'")')
+            ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
             ->groupBy (new Expression('MONTH(order_item_created_at)'))
             ->asArray()
             ->all();
@@ -2064,7 +2108,7 @@ class Restaurant extends \yii\db\ActiveRecord
         }
 
         $number_of_all_sold_item = $this->getSoldOrderItems()
-            ->andWhere('DATE(`order_item_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_item_created_at`) <= DATE("'.$date_end.'")')
+            ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
             ->sum('order_item.qty');
 
         return [
@@ -2098,6 +2142,17 @@ class Restaurant extends \yii\db\ActiveRecord
         return array_reverse ($most_sold_item_chart_data);
     }
 
+    /**
+     * Gets query for [[NoOfItems]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getNoOfItems($modelClass = "\common\models\Item")
+    {
+        return $this->getItems ($modelClass)
+            ->andWhere (['item_status' => Item::ITEM_STATUS_PUBLISH])
+            ->count();
+    }
 
     /**
      * Gets query for [[Items]].
@@ -2511,6 +2566,16 @@ class Restaurant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
+    public function getCategories($modelClass = "\common\models\Category")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * Gets query for [[Country]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
     public function getCountry($modelClass = "\common\models\Country")
     {
         return $this->hasOne ($modelClass::className (), ['country_id' => 'country_id']);
@@ -2526,5 +2591,24 @@ class Restaurant extends \yii\db\ActiveRecord
         return $this->hasOne ($modelClass::className (), ['currency_id' => 'currency_id']);
     }
 
+    /**
+     * Gets query for [[Currencies]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrencies($modelClass = "\common\models\Currency")
+    {
+        return $this->hasMany($modelClass::className (), ['currency_id' => 'currency_id'])
+            ->via('restaurantCurrencies');
+    }
 
+    /**
+     * Gets query for [[RestaurantCurrencies]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurantCurrencies($modelClass = "\common\models\RestaurantCurrency")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
 }
