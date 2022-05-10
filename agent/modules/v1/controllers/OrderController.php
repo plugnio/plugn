@@ -1242,7 +1242,6 @@ class OrderController extends Controller
 
         $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($model, $armadaApiKey);
 
-
         if ($createDeliveryApiResponse->isOk) {
 
             $model->armada_tracking_link = $createDeliveryApiResponse->data['trackingLink'];
@@ -1254,6 +1253,8 @@ class OrderController extends Controller
 
             return [
                 "operation" => "error",
+                "code" => 1,
+                "apiResponse" => $createDeliveryApiResponse->getContent(),
                 "message" => Yii::t('agent', "We've faced a problem requesting driver from Armada")
             ];
         }
@@ -1268,6 +1269,7 @@ class OrderController extends Controller
             } else {
                 return [
                     "operation" => "error",
+                    "code" => 2,
                     "message" => Yii::t('agent', "We've faced a problem requesting driver from Armada")
                 ];
             }
@@ -1275,6 +1277,9 @@ class OrderController extends Controller
 
         return [
             "operation" => "success",
+            "armada_tracking_link" => $model->armada_tracking_link,
+            "armada_qr_code_link" => $model->armada_qr_code_link,
+            "armada_delivery_code" => $model->armada_delivery_code,
             "message" => Yii::t('agent', "Your request has been successfully submitted")
         ];
     }
@@ -1301,6 +1306,8 @@ class OrderController extends Controller
 
             return [
                 "operation" => "error",
+                "code" => 1,
+                "apiResponse" => $createDeliveryApiResponse->getContent(),
                 "message" => Yii::t('agent', "We've faced a problem requesting driver from Mashkor")
             ];
         }
@@ -1314,6 +1321,7 @@ class OrderController extends Controller
             } else {
                 return [
                     "operation" => "error",
+                    "code" => 2,
                     "message" => Yii::t('agent', "We've faced a problem requesting driver from Mashkor")
                 ];
             }
@@ -1321,6 +1329,8 @@ class OrderController extends Controller
 
         return [
             "operation" => "success",
+            "mashkor_order_number" => $model->mashkor_order_number,
+            "mashkor_order_status" => $model->mashkor_order_status,
             "message" => Yii::t('agent', "Your request has been successfully submitted")
         ];
     }

@@ -695,6 +695,9 @@ class   OrderController extends Controller {
             } else {
               $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
               \Yii::error('[Payment Issue]' .$errorMessage, __METHOD__); // Log error faced by user
+
+                Yii::error($errorMessage);
+
               throw new NotFoundHttpException(json_encode($errorMessage));
             }
 
@@ -723,6 +726,8 @@ class   OrderController extends Controller {
             return $this->redirect($paymentRecord->restaurant->restaurant_domain . '/payment-success/' . $paymentRecord->order_uuid . '/' . $paymentRecord->payment_uuid);
             
         } catch (\Exception $e) {
+            Yii::error($e->getMessage());
+
             throw new NotFoundHttpException($e->getMessage());
         }
     }

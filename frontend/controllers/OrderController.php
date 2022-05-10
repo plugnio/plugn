@@ -444,7 +444,6 @@ class OrderController extends Controller
      */
     public function actionRequestDriverFromMashkor($order_uuid, $storeUuid, $mashkorBranchId)
     {
-
         $order = $this->findModel($order_uuid, $storeUuid);
 
         $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($order, $mashkorBranchId);
