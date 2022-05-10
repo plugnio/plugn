@@ -90,6 +90,7 @@ class ArmadaDelivery extends Component {
 
 
       $client = new Client();
+
       $response = $client->createRequest()
               ->setMethod('POST')
               ->setUrl($this->apiEndpoint)
