@@ -170,7 +170,14 @@ class BankDiscountController extends Controller
      */
     protected function findModel($id, $storeUuid)
     {
-        if (($model = BankDiscount::find()->where(['bank_discount_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
+        Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $model = BankDiscount::find()->where([
+            'bank_discount_id' => $id,
+            'restaurant_uuid' => $storeUuid
+        ])->one();
+
+        if ($model !== null) {
             return $model;
         }
 
