@@ -562,7 +562,7 @@ class CronController extends \yii\console\Controller {
                       return $refund->addError('refund_amount', $response->data['errors'][0]['description']);
 
                   } else if ($response->data && isset($response->data['status'])) {
-                      $refund->refund_reference = $response->data['id'];
+                      $refund->refund_reference = isset($response->data['id']) ?$response->data['id']: null;
                       $refund->refund_status = $response->data['status'];
                       $refund->save(false);
 
