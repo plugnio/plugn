@@ -164,7 +164,10 @@ class ItemVariant extends \yii\db\ActiveRecord
                     $itemVariantImageIds[] = $item_image_model->item_variant_image_uuid;
 
                 } catch (\Cloudinary\Error $err) {
-                    Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($this->images));
+                   // Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($this->images));
+
+                    //todo: notify vendor?
+
                     return false;
                 }
         }

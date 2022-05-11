@@ -630,7 +630,7 @@ class OrderController extends Controller
         if (!$order->save()) {
             $transaction->rollBack();
 
-            \Yii::error(json_encode($order->errors), __METHOD__);
+            //\Yii::error(json_encode($order->errors), __METHOD__);
 
             return [
                 'operation' => 'error',
@@ -667,7 +667,10 @@ class OrderController extends Controller
                 $transaction->rollBack();
 
                 if (!isset($orderItem->errors['qty']))
-                    \Yii::error(json_encode($orderItem->errors), __METHOD__);
+                {
+                        //todo: notify vendor?
+                    //\Yii::error(json_encode($orderItem->errors), __METHOD__);
+                }
 
                 return [
                     'operation' => 'error',
@@ -695,7 +698,8 @@ class OrderController extends Controller
 
                             if (!isset($orderItemExtraOption->errors['qty']))
                             {   
-                                \Yii::error(json_encode($orderItemExtraOption->errors), __METHOD__);
+                                //todo: notiy vendor?
+                                //\Yii::error(json_encode($orderItemExtraOption->errors), __METHOD__);
 
                                 $response = [
                                     'operation' => 'error',

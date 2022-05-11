@@ -576,7 +576,7 @@ class Restaurant extends \yii\db\ActiveRecord
                     return true;
                 }
             } catch (\Cloudinary\Error $err) {
-              Yii::error ('Error when uploading restaurant document to Cloudinary: ' . json_encode ($err));
+              //Yii::error ('Error when uploading restaurant document to Cloudinary: ' . json_encode ($err));
               $this->addError($attribute, $err->getMessage());
               return false;
             }
@@ -605,7 +605,8 @@ class Restaurant extends \yii\db\ActiveRecord
                     $this[$attribute] = basename($result['url']);
                 }
             } catch (\Cloudinary\Error $err) {
-                Yii::error('Error when uploading restaurant document to Cloudinary: ' . json_encode($err));
+                //todo: notify vendor?
+                //Yii::error('Error when uploading restaurant document to Cloudinary: ' . json_encode($err));
             }
 
     }

@@ -69,7 +69,9 @@ class Item extends \common\models\Item {
                         $item_image_model->save(false);
 
                     } catch (\Cloudinary\Error $err) {
-                        Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($images));
+                        //Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($images));
+
+                        //todo: show cloudinary error in api response
                         return false;
                     }
                 }
