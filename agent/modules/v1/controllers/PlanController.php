@@ -179,7 +179,8 @@ class PlanController extends Controller
 
                 $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
 
-                \Yii::error ($errorMessage, __METHOD__); // Log error faced by user
+                //todo: notify vendor?
+                //\Yii::error ($errorMessage, __METHOD__); // Log error faced by user
 
                 return [
                     'operation' => 'error',
@@ -196,7 +197,7 @@ class PlanController extends Controller
 
                 if (!$payment->save (false)) {
 
-                    \Yii::error ($payment->errors, __METHOD__); // Log error faced by user
+                    //\Yii::error ($payment->errors, __METHOD__); // Log error faced by user
 
                     return [
                         'operation' => 'error',
@@ -204,7 +205,8 @@ class PlanController extends Controller
                     ];
                 }
             } else {
-                \Yii::error ('[Payment Issue > Charge id is missing ]' . json_encode ($responseContent), __METHOD__); // Log error faced by user
+
+                //\Yii::error ('[Payment Issue > Charge id is missing ]' . json_encode ($responseContent), __METHOD__); // Log error faced by user
 
                 return [
                     'operation' => 'error',

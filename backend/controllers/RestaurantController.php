@@ -99,12 +99,16 @@ class RestaurantController extends Controller {
 
             if (!$deleteBuildJs->isOk) {
               Yii::error('[Github > Error While deleting'. $filePath . ']' . json_encode($deleteBuildJs->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+
               Yii::$app->session->setFlash('errorResponse', json_encode($deleteBuildJs->data['message']));
+              
               return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
             }
       } else {
         Yii::error('[Github > Error while getting file sha]' . json_encode($getBuildJsSHA->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+        
         Yii::$app->session->setFlash('errorResponse', json_encode($getBuildJsSHA->data['message']));
+        
         return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
       }
 

@@ -109,7 +109,7 @@ class ItemVariantImage extends \yii\db\ActiveRecord
         try {
             Yii::$app->cloudinaryManager->delete($imageURL);
         } catch (\Cloudinary\Error $err) {
-            Yii::error('Error while deleting item image to Cloudinry: ' . json_encode($err));
+            //Yii::error('Error while deleting item image to Cloudinry: ' . json_encode($err));
         }
     }
 

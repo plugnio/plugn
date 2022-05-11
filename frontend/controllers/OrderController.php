@@ -851,12 +851,12 @@ class OrderController extends Controller
             if (isset($model->errors)) {
 
                 Yii::$app->session->setFlash('errorResponse', "We've faced a problem deleting the order");
-                Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ' . json_encode($model->errors));
+               // Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ' . json_encode($model->errors));
 
             } else {
 
-                Yii::$app->session->setFlash('errorResponse', "We've faced a problem deleting the order");
-                Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ');
+               Yii::$app->session->setFlash('errorResponse', "We've faced a problem deleting the order");
+              //  Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ');
 
             }
         } else {

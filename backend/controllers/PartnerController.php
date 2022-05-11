@@ -193,8 +193,11 @@ class PartnerController extends Controller
 
 
             $partner_payout_model->amount = $payout_amount;
-            if(!$partner_payout_model->save()){
+            
+            if(!$partner_payout_model->save())
+            {
               Yii::$app->session->setFlash('error', print_r($partner_payout_model->errors, true));
+              
               Yii::error('[Error while Creating payout]' . json_encode($partner_payout_model->errors), __METHOD__);
             }
 
