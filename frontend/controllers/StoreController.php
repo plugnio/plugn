@@ -642,9 +642,7 @@ class StoreController extends Controller
      */
     public function actionUpdate($id)
     {
-
         $model = $this->findModel ($id);
-
 
         if (Yii::$app->request->isPost && $model->load (Yii::$app->request->post ()) && $model->save ()) {
 
@@ -658,10 +656,8 @@ class StoreController extends Controller
         ]);
     }
 
-
     public function actionSetupOnlinePayments($storeUuid)
     {
-
         $model = $this->findModel ($storeUuid);
 
         return $this->render ('setup-online-payments', [
@@ -671,7 +667,6 @@ class StoreController extends Controller
 
     public function actionSwitchToMyfatoorah($storeUuid)
     {
-
         $model = $this->findModel ($storeUuid);
 
         if ($model->currency->code == 'BHD') {
@@ -701,7 +696,6 @@ class StoreController extends Controller
 
     public function actionSwitchToTap($storeUuid)
     {
-
         $model = $this->findModel ($storeUuid);
 
         if ($model->live_api_key && $model->test_api_key) {
@@ -807,7 +801,6 @@ class StoreController extends Controller
      */
     public function actionUpdateDesignLayout($id)
     {
-
         $model = $this->findModel ($id);
 
         $store_theme = RestaurantTheme::findOne ($model->restaurant_uuid);
@@ -915,10 +908,7 @@ class StoreController extends Controller
      */
     public function actionDeleteThumbnailImage($storeUuid)
     {
-
-
         $model = $this->findModel ($storeUuid);
-
 
         $file_name = Yii::$app->request->getBodyParam ("file");
 
@@ -942,7 +932,6 @@ class StoreController extends Controller
      */
     protected function findModel($id)
     {
-
         $restaurant = Yii::$app->accountManager->getManagedAccount ($id);
 
         if ($restaurant !== null) {

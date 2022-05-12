@@ -209,7 +209,6 @@ class DeliveryZoneController extends Controller
      */
     public function actionUpdate($id, $storeUuid)
     {
-
         $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $model = $this->findModel($id, $storeUuid);
