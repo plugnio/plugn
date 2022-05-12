@@ -204,6 +204,8 @@ class VoucherController extends Controller
             ];
         }*/
 
+        $voucher_model->setScenario(Voucher::SCENARIO_UPDATE_STATUS);
+
         $voucher_model->voucher_status = $voucherStatus;
 
         if (!$voucher_model->save()) {
@@ -241,6 +243,8 @@ class VoucherController extends Controller
         Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $model = $this->findModel($voucher_id, $store_uuid);
+
+        $model->setScenario(Voucher::SCENARIO_DELETE);
 
         $model->is_deleted = 1;
 

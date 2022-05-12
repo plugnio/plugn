@@ -63,6 +63,7 @@ class Item extends \common\models\Item {
                                 'public_id' => "restaurants/" . $this->restaurant_uuid . "/items/" . $filename
                             ]
                         );
+
                         $item_image_model = new ItemImage();
                         $item_image_model->item_uuid = $this->item_uuid;
                         $item_image_model->product_file_name = basename($result['url']);

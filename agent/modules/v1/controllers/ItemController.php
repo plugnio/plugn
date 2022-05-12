@@ -430,7 +430,9 @@ class ItemController extends Controller
             ]);
 
             // save images
+
             $itemImages = Yii::$app->request->getBodyParam ("itemImages");
+
             $model->saveItemImages($itemImages);
 
             //save categories
@@ -574,10 +576,12 @@ class ItemController extends Controller
 
         $model = $this->findModel($id);
 
+        $model->setScenario(Item::SCENARIO_UPDATE_STOCK);
+
         $model->stock_qty = (int) $stock_qty;
         $model->track_quantity = (int) $track_quantity;
 
-        if (!$model->save(false))
+        if (!$model->save())
         {
             return [
                 "operation" => "error",
@@ -601,14 +605,17 @@ class ItemController extends Controller
         $items = Yii::$app->request->getBodyParam('items');
 
         foreach ($items as $key => $value) {
+
             $model = $this->findModel($value);
 
             if(!$model) {
                 continue;
             }
-            
-            $model->sort_number = (int)$key+1;
-            $model->save(false);
+
+            $model->setScenario(Item::SCENARIO_UPDATE_SORT);
+
+            $model->sort_number = (int) $key+1;
+            $model->save();
         }
 
         return [
@@ -784,9 +791,11 @@ class ItemController extends Controller
     public function actionChangeStatus($id, $store_uuid)
     {
         $model = $this->findModel($id, $store_uuid);
+
         $model->scenario = Item::SCENARIO_UPDATE_STATUS;
 
         $model->item_status = ($model->item_status == Item::ITEM_STATUS_PUBLISH) ? Item::ITEM_STATUS_UNPUBLISH : Item::ITEM_STATUS_PUBLISH;
+
         if (!$model->save ()) {
             if (isset($model->errors)) {
                 return [
