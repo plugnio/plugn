@@ -15,7 +15,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
               <loc><![CDATA[<?php if($category->slug) {
                       echo $restaurant->restaurant_domain . '/category/' . $category->slug;
                   } else {
-                      echo $restaurant->restaurant_domain . '/product-list/' . $category->item_uuid;
+                      echo $restaurant->restaurant_domain . '/product-list/' . $category->category_id;
                   } ?>]]></loc>
               <priority>0.5</priority>
           </url>

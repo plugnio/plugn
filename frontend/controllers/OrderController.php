@@ -474,7 +474,7 @@ class OrderController extends Controller
                 Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
 
 
-            Yii::error('Error while requesting driver from Mashkor  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->data));
+            //Yii::error('Error while requesting driver from Mashkor  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->data));
 
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
         }
@@ -512,12 +512,12 @@ class OrderController extends Controller
 
 
                 Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->content));
-                Yii::error('Error while requesting driver from Armada  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->content));
+               // Yii::error('Error while requesting driver from Armada  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->content));
 
             } else {
 
                 Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
-                Yii::error('Error while requesting driver from Armada  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
+               // Yii::error('Error while requesting driver from Armada  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
 
             }
 
@@ -851,12 +851,12 @@ class OrderController extends Controller
             if (isset($model->errors)) {
 
                 Yii::$app->session->setFlash('errorResponse', "We've faced a problem deleting the order");
-                Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ' . json_encode($model->errors));
+               // Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ' . json_encode($model->errors));
 
             } else {
 
-                Yii::$app->session->setFlash('errorResponse', "We've faced a problem deleting the order");
-                Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ');
+               Yii::$app->session->setFlash('errorResponse', "We've faced a problem deleting the order");
+              //  Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ');
 
             }
         } else {
