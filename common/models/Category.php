@@ -26,7 +26,6 @@ use yii\behaviors\SluggableBehavior;
  */
 class Category extends \yii\db\ActiveRecord
 {
-
     public $image;
 
     /**
