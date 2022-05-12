@@ -164,8 +164,13 @@ class VoucherController extends Controller
     {
         $model = $this->findModel($id, $storeUuid);
 
+        $model->setScenario(Voucher::SCENARIO_UPDATE_STATUS);
+
         $model->voucher_status = $model->voucher_status == Voucher::VOUCHER_STATUS_ACTIVE ? Voucher::VOUCHER_STATUS_EXPIRED  : Voucher::VOUCHER_STATUS_ACTIVE;
-        $model->save();
+
+        if(!$model->save()) {
+            Yii::$app->session->setFlash('error', $model->errors);
+        }
 
         return $this->redirect(['index', 'storeUuid' => $storeUuid]);
 
@@ -181,6 +186,8 @@ class VoucherController extends Controller
     public function actionDelete($id, $storeUuid)
     {
         $model = $this->findModel($id, $storeUuid);
+
+        $model->setScenario(Voucher::SCENARIO_DELETE);
 
         $model->is_deleted = 1;
 

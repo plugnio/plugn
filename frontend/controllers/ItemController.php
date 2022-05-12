@@ -215,6 +215,8 @@ class ItemController extends Controller
 
         $model = $this->findModel($itemUuid, $storeUuid);
 
+        $model->setScenario(Item::SCENARIO_UPDATE_STOCK);
+
         if($model->load(Yii::$app->request->post()) && $model->save(false) ){
           return $this->redirect(['inventory', 'storeUuid' => $storeUuid]);
         }
@@ -319,6 +321,7 @@ class ItemController extends Controller
 
             if ($valid) {
                 $transaction = Yii::$app->db->beginTransaction();
+
                 try {
                     if ($flag = $modelItem->save(false)) {
                         if ($modelItem->items_category) {
@@ -384,7 +387,10 @@ class ItemController extends Controller
     {
         $model = $this->findModel($id, $storeUuid);
 
+        $model->setScenario(Item::SCENARIO_UPDATE_STATUS);
+
         $model->item_status = $model->item_status == Item::ITEM_STATUS_PUBLISH ? Item::ITEM_STATUS_UNPUBLISH : Item::ITEM_STATUS_PUBLISH;
+
         $model->save(false);
 
         return $this->redirect(['index', 'storeUuid' => $storeUuid]);
@@ -507,6 +513,7 @@ class ItemController extends Controller
                         }
 
                         foreach ($modelsOption as $indexOption => $modelOption) {
+
                             if ($flag === false) {
                                 break;
                             }

@@ -451,11 +451,16 @@ class OrderController extends Controller
 
         if ($createDeliveryApiResponse->isOk) {
 
+            $order->setScenario(Order::SCENARIO_UPDATE_MASHKOR);
+
             $order->mashkor_order_number = $createDeliveryApiResponse->data['data']['order_number'];
             $order->mashkor_order_status = Order::MASHKOR_ORDER_STATUS_CONFIRMED;
-            $order->save(false);
 
-            Yii::$app->session->setFlash('successResponse', "Your request has been successfully submitted");
+            if($order->save()) {
+                Yii::$app->session->setFlash('successResponse', "Your request has been successfully submitted");
+            } else {
+                Yii::$app->session->setFlash('error', $order->errors);
+            }
 
         } else {
 
@@ -482,7 +487,6 @@ class OrderController extends Controller
         return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
     }
 
-
     /**
      * Request a driver from Armada
      * @param type $order_uuid
@@ -498,13 +502,18 @@ class OrderController extends Controller
 
         if ($createDeliveryApiResponse->isOk) {
 
+            $order->setScenario(Order::SCENARIO_UPDATE_ARMADA);
+
             $order->armada_tracking_link = $createDeliveryApiResponse->data['trackingLink'];
             $order->armada_qr_code_link = $createDeliveryApiResponse->data['qrCodeLink'];
             $order->armada_delivery_code = $createDeliveryApiResponse->data['code'];
             $order->armada_order_status = $createDeliveryApiResponse->data['orderStatus'];
 
-            $order->save(false);
-            Yii::$app->session->setFlash('successResponse', "Your request has been successfully submitted");
+            if($order->save()) {
+                Yii::$app->session->setFlash('successResponse', "Your request has been successfully submitted");
+            } else {
+                Yii::$app->session->setFlash('error', $order->errors);
+            }
 
         } else {
 
@@ -568,20 +577,25 @@ class OrderController extends Controller
     {
         $order = $this->findModel($order_uuid, $storeUuid);
 
+        $order->setScenario(Order::SCENARIO_UPDATE_STATUS);
+
         $previousOrderStatus = $order->order_status;
 
         $order->order_status = $status;
 
-        if ($order->save(false)) {
-
+        if ($order->save())
+        {
             if ($previousOrderStatus == Order::STATUS_DRAFT && $order->order_status == Order::STATUS_PENDING) {
                 $order->sendPaymentConfirmationEmail();
             }
         }
+        else
+        {
+            Yii::$app->session->setFlash('error', $order->errors);
+        }
 
         if ($redirect)
             return $this->redirect(['index', 'storeUuid' => $storeUuid]);
-
         else
             return $this->redirect(['view', 'id' => $order->order_uuid, 'storeUuid' => $storeUuid]);
     }
