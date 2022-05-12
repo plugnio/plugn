@@ -396,7 +396,6 @@ class Item extends \yii\db\ActiveRecord
 
         foreach ($imagesPath as $key => $path) {
 
-
             $filename = Yii::$app->security->generateRandomString();
 
             $itemName = str_replace(' ', '', $this->item_name);
