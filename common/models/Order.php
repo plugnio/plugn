@@ -1332,7 +1332,8 @@ class Order extends \yii\db\ActiveRecord
                     //$this->save(false);
                 }
             } catch (\Exception $err) {
-                Yii::error('Error while Sending SMS.' . json_encode($err));
+                //todo: show notification to customer to update number?
+                //    Yii::error('Error while Sending SMS.' . json_encode($err));
             }
         }
 
