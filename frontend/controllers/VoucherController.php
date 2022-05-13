@@ -79,8 +79,13 @@ class VoucherController extends Controller
 
           if ($model->load(Yii::$app->request->post())) {
 
-            if( $model->duration && $model->duration != null )
-              list($model->valid_from, $model->valid_until) = explode(' - ', $model->duration);
+            if( $model->duration && $model->duration != null ) {
+                $durationArr = explode(' - ', $model->duration);
+                if (isset($durationArr[0]) && isset($durationArr[1])){
+                    $model->valid_from = $durationArr[0];
+                    $model->valid_until = $durationArr[1];
+                }
+            }
 
 
               if($model->save()){
