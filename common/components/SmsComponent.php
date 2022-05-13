@@ -39,6 +39,7 @@ class SmsComponent extends Component
         $phone_number = str_replace(' ', '', $phone_number);
 
         $urlShortner = 'https://i.plugn.io/' . $orderUuid;
+
         $message = '
           Order #'.  $orderUuid .' has been accepted. Get order status updates at '. $urlShortner .'.
         ';
@@ -53,6 +54,7 @@ class SmsComponent extends Component
         ];
 
         $client = new Client();
+
         $response = $client->createRequest()
                 ->setMethod('POST')
                 ->setUrl($this->apiEndpoint)
