@@ -1208,10 +1208,11 @@ class OrderController extends Controller
     {
         $model = $this->findModel($order_uuid, $store_uuid);
 
-        //Update order status
+        $model->setScenario(Order::SCENARIO_UPDATE_STATUS);
+
         $model->order_status = Yii::$app->request->getBodyParam("order_status");
 
-        if (!$model->save(false)) {
+        if (!$model->save()) {
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",
@@ -1243,6 +1244,8 @@ class OrderController extends Controller
         $armadaApiKey = Yii::$app->request->getBodyParam("armada_api_key");
 
         $model = $this->findModel($order_uuid, $store_uuid);
+
+        $model->setScenario(Order::SCENARIO_UPDATE_ARMADA);
 
         $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($model, $armadaApiKey);
 
@@ -1298,6 +1301,8 @@ class OrderController extends Controller
         $mashkorBranchId = Yii::$app->request->getBodyParam("mashkor_branch_id");
 
         $model = $this->findModel($order_uuid, $store_uuid);
+
+        $model->setScenario(Order::SCENARIO_UPDATE_MASHKOR);
 
         $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($model, $mashkorBranchId);
 
@@ -1398,7 +1403,7 @@ class OrderController extends Controller
     {
         $model = $this->findModel($order_uuid, $store_uuid);
 
-        $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
+        $model->setScenario(Order::SCENARIO_DELETE);
 
         $transaction = Yii::$app->db->beginTransaction();
 
@@ -1406,7 +1411,7 @@ class OrderController extends Controller
 
         $model->is_deleted = 1;
 
-        if (!$model->save(false)) {
+        if (!$model->save()) {
             $transaction->rollBack();
             if (isset($model->errors)) {
                 return [

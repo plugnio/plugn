@@ -671,7 +671,10 @@ class StoreController extends Controller
             $model->markAsOpen();
         } else if ($status == Restaurant::RESTAURANT_STATUS_BUSY) {
             $model->markAsBusy();
-        } else  {
+        }
+        else
+        {
+            $model->setScenario(Restaurant::SCENARIO_UPDATE_STATUS);
             $model->restaurant_status = Restaurant::RESTAURANT_STATUS_CLOSED;
             $model->save(false);
         }

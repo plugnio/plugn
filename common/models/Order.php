@@ -126,6 +126,10 @@ class Order extends \yii\db\ActiveRecord
     const MASHKOR_ORDER_STATUS_DELIVERED = 10;
     const MASHKOR_ORDER_STATUS_CANCELED = 11;
 
+    const SCENARIO_UPDATE_ARMADA_STATUS = 'update-armada-status';
+    const SCENARIO_UPDATE_MASHKOR_STATUS = 'update-mashkor-status';
+    const SCENARIO_UPDATE_ARMADA = 'update-armada';
+    const SCENARIO_UPDATE_MASHKOR = 'update-mashkor';
     const SCENARIO_UPDATE_TOTAL = 'updateTotal';
     const SCENARIO_CREATE_ORDER_BY_ADMIN = 'manual';
     const SCENARIO_OLD_VERSION = 'old_version';
@@ -1526,6 +1530,30 @@ class Order extends \yii\db\ActiveRecord
             'total_price_before_refund',
             'subtotal',
             'total_price'
+        ];
+
+        $parent[self::SCENARIO_UPDATE_ARMADA] = [
+            'armada_tracking_link',
+            'armada_qr_code_link',
+            'armada_delivery_code'
+        ];
+
+        $parent[self::SCENARIO_UPDATE_ARMADA_STATUS] = [
+            'armada_order_status',
+            'order_status'
+        ];
+
+        $parent[self::SCENARIO_UPDATE_MASHKOR_STATUS] = [
+            'mashkor_driver_name',
+            'mashkor_driver_phone',
+            'mashkor_tracking_link',
+            'mashkor_order_status',
+            'order_status'
+        ];
+
+        $parent[self::SCENARIO_UPDATE_MASHKOR] = [
+            'mashkor_order_number',
+            'mashkor_order_status'
         ];
 
         return $scenarios;

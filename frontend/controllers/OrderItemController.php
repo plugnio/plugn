@@ -108,10 +108,12 @@ class OrderItemController extends Controller {
     public function actionUpdate($id, $storeUuid) {
         $model = $this->findModel($id, $storeUuid);
 
-        $order = Order::findOne($model->order_uuid);
-
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->order_item_id, 'storeUuid' => $storeUuid]);
+        }
+
+        if($model->errors) {
+            Yii::$app->session->setFlash('error', $model->errors);
         }
 
         return $this->render('update', [

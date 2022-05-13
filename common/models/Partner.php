@@ -42,6 +42,7 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
 
    const SCENARIO_CHANGE_PASSWORD = 'change-password';
    const SCENARIO_CREATE_NEW_PARTNER = 'create';
+    const SCENARIO_PASSWORD_TOKEN = 'password-token';
 
    /**
     * Field for temporary password. If set, it will overwrite the old password on save
@@ -213,9 +214,18 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
        }
    }
 
+    /**
+     * @return array|array[]|\string[][]
+     */
+   public function scenarios()
+   {
+       return array_merge(parent::scenarios(), [
+           self::SCENARIO_PASSWORD_TOKEN => ['partner_password_reset_token']
+       ]);
+   }
 
 
-   public function afterSave($insert, $changedAttributes) {
+    public function afterSave($insert, $changedAttributes) {
 
        parent::afterSave($insert, $changedAttributes);
 

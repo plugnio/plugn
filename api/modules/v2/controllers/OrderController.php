@@ -1012,6 +1012,8 @@ class   OrderController extends Controller {
 
           if(  $order_model ) {
 
+              $order_model->setScenario(Order::SCENARIO_UPDATE_MASHKOR_STATUS);
+
             $order_model->mashkor_driver_name = Yii::$app->request->getBodyParam("driver_name");
             $order_model->mashkor_driver_phone = Yii::$app->request->getBodyParam("driver_phone");
             $order_model->mashkor_tracking_link = Yii::$app->request->getBodyParam("tracking_link");
@@ -1084,6 +1086,8 @@ class   OrderController extends Controller {
                         ->one();
 
           if($order_model) {
+
+              $order_model->setScenario(Order::SCENARIO_UPDATE_ARMADA_STATUS);
 
             $order_model->armada_order_status = Yii::$app->request->getBodyParam("orderStatus");
 

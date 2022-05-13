@@ -171,6 +171,7 @@ class Restaurant extends \yii\db\ActiveRecord
     const SCENARIO_UPDATE_ANALYTICS = 'update_analytics';
     const SCENARIO_UPDATE_DELIVERY = 'update_delivery';
     const SCENARIO_CURRENCY = 'currency';
+    const SCENARIO_UPDATE_STATUS = '';
 
     public $restaurant_delivery_area;
     public $restaurant_payments_method;
@@ -361,6 +362,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         return array_merge($scenarios, [
             self::SCENARIO_CONNECT_DOMAIN => ['restaurant_domain'],
+            self::SCENARIO_UPDATE_STATUS => ['restaurant_status'],
             self::SCENARIO_UPDATE_ANALYTICS => [
                 'google_analytics_id',
                 'facebook_pixil_id',
@@ -888,20 +890,23 @@ class Restaurant extends \yii\db\ActiveRecord
         Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
 
         $response = Yii::$app->myFatoorahPayment->createSupplier($this);
+
         $supplierApiResponse = json_decode($response->content);
 
         if ($supplierApiResponse->IsSuccess) {
 
             $this->supplierCode = $supplierApiResponse->Data->SupplierCode;
+
             \Yii::info($this->name . " has just created MyFatooraha account", __METHOD__);
 
-          if ($this->supplierCode){
+          if ($this->supplierCode) {
             $this->is_myfatoorah_enable = 1;
             $this->is_tap_enable = 0;
           }
           else
-            $this->is_myfatoorah_enable = 0;
-
+          {
+              $this->is_myfatoorah_enable = 0;
+          }
             if($this->save()){
                 // //Upload documents file on our server before we create an account on MyFatoorah we gonaa delete them
                 $this->uploadDocumentsToMyFatoorah();
@@ -1130,6 +1135,7 @@ class Restaurant extends \yii\db\ActiveRecord
             );
 
             if ($result || count ($result) > 0) {
+                //todo: refactor
                 $this->logo = basename ($result['url']);
                 $this->save ();
             }
@@ -1170,6 +1176,7 @@ class Restaurant extends \yii\db\ActiveRecord
             );
 
             if ($result || count ($result) > 0) {
+                //todo: refactor
                 $this->thumbnail_image = basename ($result['url']);
                 $this->save ();
             }
