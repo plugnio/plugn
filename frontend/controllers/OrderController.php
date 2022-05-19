@@ -499,7 +499,6 @@ class OrderController extends Controller
 
         $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($order, $armadaApiKey);
 
-
         if ($createDeliveryApiResponse->isOk) {
 
             $order->setScenario(Order::SCENARIO_UPDATE_ARMADA);

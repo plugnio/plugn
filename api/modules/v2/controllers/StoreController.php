@@ -134,7 +134,6 @@ class StoreController extends Controller
      */
     public function actionGetDeliveryTime()
     {
-
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
         $delivery_zone_id = Yii::$app->request->get("delivery_zone_id");
         $cart = Yii::$app->request->getBodyParam("cart");
@@ -165,11 +164,9 @@ class StoreController extends Controller
                     }
                 }
 
-
-                if ($store_model->schedule_order) {
-
+                if ($store_model->schedule_order)
+                {
                     $schedule_time = OpeningHour::getDeliveryTime($deliveryTime, $prepTime, $store_model);
-
                 }
 
                 $todayOpeningHours = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])->one();
