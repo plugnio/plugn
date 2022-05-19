@@ -91,7 +91,9 @@ white-space: nowrap !important;
                       'label' => 'Number of orders',
                       "format" => "raw",
                       "value" => function($model) {
-                        return  sizeof($model->activeOrders);
+                        return $model->getOrders()
+                            ->activeOrders()
+                            ->count();
                       }
                   ],
                   // [

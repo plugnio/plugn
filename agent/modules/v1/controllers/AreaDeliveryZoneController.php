@@ -218,6 +218,7 @@ class AreaDeliveryZoneController extends Controller
     public function actionCreate()
     {
         $this->ownerCheck();
+
         $store_uuid = Yii::$app->request->getBodyParam ("store_uuid");
         $area_id = Yii::$app->request->getBodyParam ("area_id");
         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
