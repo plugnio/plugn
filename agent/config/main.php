@@ -460,6 +460,7 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET login' => 'login',
+                        'POST signup-step-one' => 'signup-step-one',
                         'POST signup' => 'signup',
                         'PATCH update-password' => 'update-password',
                         'POST request-reset-password' => 'request-reset-password',
@@ -475,7 +476,8 @@ return [
                         'OPTIONS is-email-verified' => 'options',
                         'OPTIONS update-email' => 'options',
                         'OPTIONS resend-verification-email' => 'options',
-                        'OPTIONS verify-email' => 'options'
+                        'OPTIONS verify-email' => 'options',
+                        'OPTIONS signup-step-one' => 'options'
                     ]
                 ],
                 [ // StatsController
