@@ -751,7 +751,6 @@ class StoreController extends Controller
      */
     public function actionUpdateAnalyticsIntegration($id)
     {
-
         $model = $this->findModel ($id);
 
         if (Yii::$app->request->isPost && $model->load (Yii::$app->request->post ())) {
@@ -776,7 +775,6 @@ class StoreController extends Controller
      */
     public function actionUpdateDeliveryIntegration($id)
     {
-
         $model = $this->findModel ($id);
 
         if (Yii::$app->request->isPost && $model->load (Yii::$app->request->post ()) && $model->save ()) {
