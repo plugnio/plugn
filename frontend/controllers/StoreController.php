@@ -753,6 +753,8 @@ class StoreController extends Controller
     {
         $model = $this->findModel ($id);
 
+        $model->setScenario(Restaurant::SCENARIO_UPDATE_ANALYTICS);
+
         if (Yii::$app->request->isPost && $model->load (Yii::$app->request->post ())) {
 
             $model->sitemap_require_update = 1;
@@ -777,6 +779,8 @@ class StoreController extends Controller
     {
         $model = $this->findModel ($id);
 
+        $model->setScenario(Restaurant::SCENARIO_UPDATE_DELIVERY);
+
         if (Yii::$app->request->isPost && $model->load (Yii::$app->request->post ()) && $model->save ()) {
             return $this->redirect (['update-delivery-integration', 'id' => $id]);
         }
@@ -796,6 +800,8 @@ class StoreController extends Controller
     public function actionUpdateDesignLayout($id)
     {
         $model = $this->findModel ($id);
+
+        $model->setScenario(Restaurant::SCENARIO_UPDATE_DESIGN_LAYOUT);
 
         $store_theme = RestaurantTheme::findOne ($model->restaurant_uuid);
 
@@ -877,10 +883,9 @@ class StoreController extends Controller
      */
     public function actionDeleteLogoImage($storeUuid)
     {
-
-
         $model = $this->findModel ($storeUuid);
 
+        $model->setScenario(Restaurant::SCENARIO_UPDATE_LOGO);
 
         $file_name = Yii::$app->request->getBodyParam ("file");
 
@@ -903,6 +908,8 @@ class StoreController extends Controller
     public function actionDeleteThumbnailImage($storeUuid)
     {
         $model = $this->findModel ($storeUuid);
+
+        $model->setScenario(Restaurant::SCENARIO_UPDATE_THUMBNAIL);
 
         $file_name = Yii::$app->request->getBodyParam ("file");
 
