@@ -161,12 +161,15 @@ class Restaurant extends \yii\db\ActiveRecord
     const STORE_LAYOUT_GRID_HALFWIDTH = 5;
     const STORE_LAYOUT_CATEGORY_HALFWIDTH = 6;
 
+    const SCENARIO_UPDATE_DESIGN_LAYOUT = 'update_design_layout';
     const SCENARIO_CREATE_STORE_BY_AGENT = 'create-by-agent';
     const SCENARIO_CREATE_TAP_ACCOUNT = 'tap_account';
     const SCENARIO_CREATE_MYFATOORAH_ACCOUNT = 'myfatoorah_account';
     const SCENARIO_UPLOAD_STORE_DOCUMENT = 'upload';
     const SCENARIO_CONNECT_DOMAIN = 'domain';
     const SCENARIO_UPDATE = 'update';
+    const SCENARIO_UPDATE_LOGO = 'update-logo';
+    const SCENARIO_UPDATE_THUMBNAIL = 'update-thumbnail';
     const SCENARIO_UPDATE_LAYOUT = 'layout';
     const SCENARIO_UPDATE_ANALYTICS = 'update_analytics';
     const SCENARIO_UPDATE_DELIVERY = 'update_delivery';
@@ -370,10 +373,32 @@ class Restaurant extends \yii\db\ActiveRecord
                 'sitemap_require_update'
             ],
             self::SCENARIO_CREATE_STORE_BY_AGENT => [
-                'name', 'owner_number', 'restaurant_domain', 'currency_id', 'country_id'
+                'name',
+                'owner_number',
+                'restaurant_domain',
+                'currency_id',
+                'country_id'
+            ],
+            self::SCENARIO_UPDATE_LOGO => [
+                'logo'
+            ],
+            self::SCENARIO_UPDATE_THUMBNAIL => [
+                'thumbnail_image'
             ],
             self::SCENARIO_UPDATE_LAYOUT => [
-                'default_language', 'store_layout', 'phone_number_display', 'logo', 'thumbnail_image'
+                'default_language',
+                'store_layout',
+                'phone_number_display',
+                'logo',
+                'thumbnail_image'
+            ],
+            self::SCENARIO_UPDATE_DESIGN_LAYOUT => [
+                'logo',
+                'thumbnail_image',
+                'restaurant_logo',
+                'restaurant_thumbnail_image',
+                'phone_number_display',
+                'sitemap_require_update'
             ],
             self::SCENARIO_CREATE_TAP_ACCOUNT => [
                 'owner_first_name', 'owner_last_name', 'owner_email', 'owner_number',
