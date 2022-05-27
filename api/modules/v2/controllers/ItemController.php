@@ -194,6 +194,30 @@ class ItemController extends Controller {
     public function actionItemData()
     {
         $item_uuid = Yii::$app->request->get("item_uuid");
+        $expand = Yii::$app->request->get("expand");
+
+        //for old stores
+
+        if(!$expand)
+        {
+            $item_model = Item::find()
+                ->andWhere(['item_uuid' => $item_uuid])
+                ->with('options', 'options.extraOptions','itemImages')
+                ->asArray()
+                ->one();
+
+            if ($item_model) {
+                return [
+                    'operation' => 'success',
+                    'itemData' => $item_model
+                ];
+            } else {
+                return [
+                    'operation' => 'error',
+                    'message' => 'Item Uuid is invalid'
+                ];
+            }
+        }
 
         return $this->findModel($item_uuid);
     }
