@@ -512,7 +512,6 @@ class CronController extends \yii\console\Controller
      */
     public function actionMakeRefund()
     {
-
         $refunds = Refund::find()
             ->joinWith(['store', 'payment', 'currency'])
             ->where(['refund.refund_reference' => null])

@@ -135,17 +135,17 @@ return [
                     'controller' => 'v2/store',
                     'pluralize' => false,
                     'patterns' => [
-                        'GET <id>' => 'view',
                         'GET get-opening-hours' => 'get-opening-hours',
                         'POST get-delivery-time' => 'get-delivery-time',
                         'GET locations/<id>' => 'list-all-stores-locations',
                         'GET get-restaurant-data/<branch_name>' => 'get-restaurant-data',
+                        'GET <id>' => 'view',
                         // OPTIONS VERBS
-                        'OPTIONS <id>' => 'options',
                         'OPTIONS get-opening-hours' => 'options',
                         'OPTIONS get-delivery-time' => 'options',
                         'OPTIONS locations/<id>' => 'options',
                         'OPTIONS get-restaurant-data/<branch_name>' => 'options',
+                        'OPTIONS <id>' => 'options',
                     ]
                 ],
                 [// RestaurantDeliveryController
@@ -196,8 +196,8 @@ return [
                         'GET callback' => 'callback',
                         'GET apply-promo-code' => 'apply-promo-code',
                         'GET apply-bank-discount' => 'apply-bank-discount',
-                        'GET <id>/<restaurant_uuid>' => 'order-details',
                         'GET order-details/<id>/<restaurant_uuid>' => 'order-details',
+                        'GET <id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
