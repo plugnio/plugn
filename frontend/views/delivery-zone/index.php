@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Business Locations', 'url' => ['bu
 $this->params['breadcrumbs'][] = $this->title;
 $this->params['restaurant_uuid'] = $store->restaurant_uuid;
 
-$totalDeliveryAreas = $deliveryZone->country->getAreas()->count();
+$totalDeliveryAreas = $business_location->country->getAreas()->count();
 
 ?>
 
