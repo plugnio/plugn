@@ -4,13 +4,14 @@ namespace frontend\controllers;
 
 use frontend\models\AgentAssignmentSearch;
 use Yii;
-use common\models\AgentAssignment;
+use frontend\models\AgentAssignment;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use common\models\Restaurant;
 use common\models\Agent;
+
 
 /**
  * AgentAssignmentController implements the CRUD actions for AgentAssignment model.
@@ -27,13 +28,13 @@ class AgentAssignmentController extends Controller
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::className (),
                 'actions' => [
                     'delete' => ['POST'],
                 ],
             ],
             'access' => [
-                'class' => \yii\filters\AccessControl::className(),
+                'class' => \yii\filters\AccessControl::className (),
                 'rules' => [
                     [//allow authenticated users only
                         'allow' => true,
@@ -50,15 +51,14 @@ class AgentAssignmentController extends Controller
      */
     public function actionIndex($storeUuid)
     {
-        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($storeUuid);
 
-        if (Yii::$app->user->identity->isOwner($store->restaurant_uuid))
-        {
+        if (Yii::$app->user->identity->isOwner ($store->restaurant_uuid)) {
             $searchModel = new AgentAssignmentSearch();
 
-            $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $store->restaurant_uuid);
+            $dataProvider = $searchModel->search (Yii::$app->request->queryParams, $store->restaurant_uuid);
 
-            return $this->render('index', [
+            return $this->render ('index', [
                 'dataProvider' => $dataProvider,
                 'searchModel' => $searchModel,
                 'restaurant_uuid' => $store->restaurant_uuid
@@ -76,9 +76,9 @@ class AgentAssignmentController extends Controller
      */
     public function actionView($assignment_id, $agent_id, $storeUuid)
     {
-        $model = $this->findModel($assignment_id, $agent_id, $storeUuid);
+        $model = $this->findModel ($assignment_id, $agent_id, $storeUuid);
 
-        return $this->render('view', [
+        return $this->render ('view', [
             'model' => $model,
         ]);
     }
@@ -92,24 +92,56 @@ class AgentAssignmentController extends Controller
     {
         $model = new AgentAssignment();
 
-        $model->restaurant_uuid = Yii::$app->accountManager->getManagedAccount($storeUuid)
+        $model->restaurant_uuid = Yii::$app->accountManager->getManagedAccount ($storeUuid)
             ->restaurant_uuid;
 
-        if (Yii::$app->user->identity->isOwner($model->restaurant_uuid)) {
+        if (!Yii::$app->user->identity->isOwner ($model->restaurant_uuid)) {
+            throw new \yii\web\BadRequestHttpException('Sorry, you are not allowed to access this page.');
+        }
 
-            if ($model->load(Yii::$app->request->post())) {
+        if ($model->load (Yii::$app->request->post ())) {
 
-                if ($model->validate() && $model->save()) {
-                    return $this->redirect(['view', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'storeUuid' => $storeUuid]);
+            //$transaction = Yii::$app->d
+            $agent = Agent::findByEmail ($model->assignment_agent_email);
+
+            $tempPassword = null;
+
+            if (!$agent) {
+
+                $tempPassword = Yii::$app->security->generateRandomString (12);
+
+                $agent = new Agent();
+                $agent->agent_name = $model->agent_name; //Yii::$app->request->post ("agent_name");
+                $agent->agent_email = $model->assignment_agent_email;
+                $agent->agent_status = Agent::STATUS_ACTIVE;
+                $agent->tempPassword = $tempPassword;
+
+                if (!$agent->save ()) {
+
+                    Yii::$app->session->setFlash('error', $agent->errors);
+
+                    return $this->render ('create', [
+                        'model' => $model
+                    ]);
                 }
             }
 
-            return $this->render('create', [
-                'model' => $model
-            ]);
-        } else {
-            throw new \yii\web\BadRequestHttpException('Sorry, you are not allowed to access this page.');
+            $model->agent_id =  $agent->agent_id;
+
+            if ($model->save()) {
+
+                if($tempPassword) //new agent
+                    $model->notificationMail($tempPassword);
+                else //existing agent
+                    $model->inviteAgent();
+
+                return $this->redirect (['view', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'storeUuid' => $storeUuid]);
+            }
         }
+
+        return $this->render ('create', [
+            'model' => $model
+        ]);
     }
 
     /**
@@ -121,13 +153,17 @@ class AgentAssignmentController extends Controller
      */
     public function actionUpdate($assignment_id, $agent_id, $storeUuid)
     {
-        $model = $this->findModel($assignment_id, $agent_id, $storeUuid);
+        $model = $this->findModel ($assignment_id, $agent_id, $storeUuid);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'storeUuid' => $storeUuid]);
+        if ($model->load (Yii::$app->request->post ()) && $model->save ()) {
+
+            return $this->redirect (['view',
+                'assignment_id' => $model->assignment_id,
+                'agent_id' => $model->agent_id,
+                'storeUuid' => $storeUuid]);
         }
 
-        return $this->render('update', [
+        return $this->render ('update', [
             'model' => $model,
         ]);
     }
@@ -141,9 +177,9 @@ class AgentAssignmentController extends Controller
      */
     public function actionDelete($assignment_id, $agent_id, $storeUuid)
     {
-        $this->findModel($assignment_id, $agent_id, $storeUuid)->delete();
+        $this->findModel ($assignment_id, $agent_id, $storeUuid)->delete ();
 
-        return $this->redirect(['index', 'storeUuid' => $storeUuid]);
+        return $this->redirect (['index', 'storeUuid' => $storeUuid]);
     }
 
     /**
@@ -156,11 +192,11 @@ class AgentAssignmentController extends Controller
     protected function findModel($assignment_id, $agent_id, $storeUuid)
     {
 
-        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($storeUuid);
 
-        if (Yii::$app->user->identity->isOwner($storeUuid)) {
+        if (Yii::$app->user->identity->isOwner ($storeUuid)) {
 
-            if (($model = AgentAssignment::find()->where(['assignment_id' => $assignment_id, 'agent_id' => $agent_id, 'restaurant_uuid' => $store->restaurant_uuid])->one()) !== null) {
+            if (($model = AgentAssignment::find ()->where (['assignment_id' => $assignment_id, 'agent_id' => $agent_id, 'restaurant_uuid' => $store->restaurant_uuid])->one ()) !== null) {
                 return $model;
             } else {
                 throw new NotFoundHttpException('The requested page does not exist.');

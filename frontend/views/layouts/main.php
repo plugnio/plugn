@@ -515,6 +515,9 @@ $restaurant = Restaurant::find()->where(['restaurant_uuid' => $this->params['res
                     </div>
                 </div>
                 <div class="content-body">
+
+                    <!-- todo: move flash messages here -->
+
                     <?= $content ?>
                 </div>
             </div>
