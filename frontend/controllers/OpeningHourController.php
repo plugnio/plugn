@@ -100,8 +100,8 @@ class OpeningHourController extends Controller
      */
     public function actionUpdate($storeUuid, $dayOfWeek)
     {
-        if ($storeUuid || $dayOfWeek) {
-            return $this->redirect(['index']);
+        if (!$storeUuid) {
+            return $this->redirect(['index', 'storeUuid' => $storeUuid]);
         }
 
         $openingHours = $this->findModel($storeUuid, $dayOfWeek);

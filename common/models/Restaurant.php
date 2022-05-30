@@ -1382,8 +1382,8 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function isOpen($asap = null) {
 
-        if(!$this->demand_delivery)
-          return false;
+       // if(!$this->demand_delivery)
+       //   return false;
 
         $opening_hour_model = OpeningHour::find()
                                 ->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])
@@ -1402,9 +1402,7 @@ class Restaurant extends \yii\db\ActiveRecord
                   return true;
           }
 
-
-
-        return false;
+          return false;
     }
 
     /**
