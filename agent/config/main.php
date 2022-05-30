@@ -226,6 +226,20 @@ return [
                         'OPTIONS detail' => 'options'
                     ]
                 ],
+                [// TicketController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/ticket',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET <id>' => 'view',
+                        'POST' => 'create',
+                        'PATCH comment/<ticket_uuid>' => 'comment',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS comment/<ticket_uuid>' => 'options',
+                        'OPTIONS <id>' => 'options',
+                    ]
+                ],
                 [// AreaController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/area',
