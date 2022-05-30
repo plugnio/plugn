@@ -823,9 +823,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
                 return Yii::error('Error when uploading civil id (back side): ' . $errorMessage);
             }
-
         }
-
     }
 
     /**
@@ -835,7 +833,6 @@ class Restaurant extends \yii\db\ActiveRecord
     public function getCivilIdFrontSidePhoto()
     {
         $photo_url = [];
-
 
         if ($this->identification_file_front_side) {
 
