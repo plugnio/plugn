@@ -46,11 +46,13 @@ class OrderSearch extends Order {
     public function searchAbandonedCheckoutOrders($params, $storeUuid, $agentAssignment) {
 
         $query = Order::find()
-            ->with(['restaurant','country', 'pickupLocation', 'payment','paymentMethod','currency','deliveryZone','deliveryZone.businessLocation','customer'])
-            ->joinWith('deliveryZone', true)
-            ->joinWith('pickupLocation', true)
+            ->with([
+                'payment',
+                'paymentMethod',
+                'currency',
+                'customer'
+            ])
             ->orderBy(['order_created_at' => SORT_DESC]);
-
 
         if($agentAssignment && $agentAssignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
             $query
@@ -126,12 +128,8 @@ class OrderSearch extends Order {
     public function searchDraftOrders($params, $storeUuid, $agentAssignment) {
 
         $query = Order::find()
-        ->with(['restaurant','country', 'pickupLocation', 'payment','paymentMethod','currency','deliveryZone','deliveryZone.businessLocation','customer'])
-            ->joinWith('deliveryZone', true)
-            ->joinWith('pickupLocation', true)
+            ->with(['payment','paymentMethod', 'currency', 'customer'])
             ->orderBy(['order.order_created_at' => SORT_DESC]);
-
-
 
         if($agentAssignment && $agentAssignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
             $query
@@ -141,8 +139,6 @@ class OrderSearch extends Order {
                     [ 'pickup_location_id' => $agentAssignment->business_location_id]
                 ]);
         }
-
-
 
         $query
             ->andWhere(['order.restaurant_uuid' => $storeUuid])
@@ -212,16 +208,10 @@ class OrderSearch extends Order {
 
         $query = Order::find()
             ->with([
-                'country',
-                'pickupLocation',
                 'payment',
                 'paymentMethod',
                 'currency',
-                'deliveryZone',
-                'deliveryZone.businessLocation',
                 'customer'])
-            ->joinWith('deliveryZone', true)
-            ->joinWith('pickupLocation', true)
             ->orderBy(['order_created_at' => SORT_DESC]);
 
           if($agentAssignment && $agentAssignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
@@ -296,7 +286,7 @@ class OrderSearch extends Order {
     public function search($params, $storeUuid, $agentAssignment = null) {
 
         $query = Order::find()
-            ->with(['paymentMethod', 'currency','deliveryZone.businessLocation', 'selectedItems'])
+            ->with(['paymentMethod', 'currency', 'deliveryZone.businessLocation'])
             ->joinWith('deliveryZone', true)
             ->joinWith('pickupLocation', true)
             ->joinWith('customer', true)

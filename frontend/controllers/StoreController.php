@@ -491,14 +491,11 @@ class StoreController extends Controller
             // get the fileList
             $restaurant_authorized_signature_file = $FileUploader->getFileList ();
 
-
             if (sizeof ($restaurant_commercial_license_file) > 0)
                 $model->commercial_license_file = str_replace ('uploads/', '', $restaurant_commercial_license_file[0]['file']); //Commercial License
 
-
             if (sizeof ($restaurant_authorized_signature_file) > 0)
                 $model->authorized_signature_file = str_replace ('uploads/', '', $restaurant_authorized_signature_file[0]['file']);  //Authorized signature
-
 
             if (sizeof ($owner_identification_file_front_side) > 0)
                 $model->identification_file_front_side = str_replace ('uploads/', '', $owner_identification_file_front_side[0]['file']); //Owner's civil id front side
@@ -508,8 +505,7 @@ class StoreController extends Controller
 
             $model->is_myfatoorah_enable = 0;
             $model->is_tap_enable = 0;
-
-
+            
             //make sure we delete all payment methods
             foreach ($model->getRestaurantPaymentMethods ()->all () as $restaurant_payment_method) {
                 if ($restaurant_payment_method->payment_method_id != 3)
@@ -755,8 +751,9 @@ class StoreController extends Controller
      */
     public function actionUpdateAnalyticsIntegration($id)
     {
-
         $model = $this->findModel ($id);
+
+        $model->setScenario(Restaurant::SCENARIO_UPDATE_ANALYTICS);
 
         if (Yii::$app->request->isPost && $model->load (Yii::$app->request->post ())) {
 
@@ -780,8 +777,9 @@ class StoreController extends Controller
      */
     public function actionUpdateDeliveryIntegration($id)
     {
-
         $model = $this->findModel ($id);
+
+        $model->setScenario(Restaurant::SCENARIO_UPDATE_DELIVERY);
 
         if (Yii::$app->request->isPost && $model->load (Yii::$app->request->post ()) && $model->save ()) {
             return $this->redirect (['update-delivery-integration', 'id' => $id]);
@@ -802,6 +800,8 @@ class StoreController extends Controller
     public function actionUpdateDesignLayout($id)
     {
         $model = $this->findModel ($id);
+
+        $model->setScenario(Restaurant::SCENARIO_UPDATE_DESIGN_LAYOUT);
 
         $store_theme = RestaurantTheme::findOne ($model->restaurant_uuid);
 
@@ -883,10 +883,9 @@ class StoreController extends Controller
      */
     public function actionDeleteLogoImage($storeUuid)
     {
-
-
         $model = $this->findModel ($storeUuid);
 
+        $model->setScenario(Restaurant::SCENARIO_UPDATE_LOGO);
 
         $file_name = Yii::$app->request->getBodyParam ("file");
 
@@ -909,6 +908,8 @@ class StoreController extends Controller
     public function actionDeleteThumbnailImage($storeUuid)
     {
         $model = $this->findModel ($storeUuid);
+
+        $model->setScenario(Restaurant::SCENARIO_UPDATE_THUMBNAIL);
 
         $file_name = Yii::$app->request->getBodyParam ("file");
 

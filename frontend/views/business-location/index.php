@@ -36,6 +36,7 @@ $this->registerJs($js);
 
 
           $deliveryZones = $store->getDeliveryZones()->with('country')->asArray()->all();
+
           $shipping_countries = [];
 
           foreach ($deliveryZones as $key => $deliveryZone) {

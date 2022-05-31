@@ -226,6 +226,22 @@ return [
                         'OPTIONS detail' => 'options'
                     ]
                 ],
+                [// TicketController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/ticket',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET comments/<id>' => 'comments',
+                        'GET <id>' => 'view',
+                        'POST' => 'create',
+                        'PATCH comment/<ticket_uuid>' => 'comment',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS comment/<ticket_uuid>' => 'options',
+                        'OPTIONS comments/<id>' => 'options',
+                        'OPTIONS <id>' => 'options',
+                    ]
+                ],
                 [// AreaController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/area',
@@ -460,6 +476,7 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET login' => 'login',
+                        'POST signup-step-one' => 'signup-step-one',
                         'POST signup' => 'signup',
                         'PATCH update-password' => 'update-password',
                         'POST request-reset-password' => 'request-reset-password',
@@ -475,7 +492,8 @@ return [
                         'OPTIONS is-email-verified' => 'options',
                         'OPTIONS update-email' => 'options',
                         'OPTIONS resend-verification-email' => 'options',
-                        'OPTIONS verify-email' => 'options'
+                        'OPTIONS verify-email' => 'options',
+                        'OPTIONS signup-step-one' => 'options'
                     ]
                 ],
                 [ // StatsController

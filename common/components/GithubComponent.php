@@ -9,6 +9,7 @@ use yii\httpclient\Client;
 use yii\base\InvalidConfigException;
 use common\models\PaymentMethod;
 
+
 /**
  * Github REST API class
  *
@@ -40,7 +41,6 @@ class GithubComponent extends Component {
             }
         }
 
-
         parent::init();
     }
 
@@ -52,9 +52,7 @@ class GithubComponent extends Component {
         if($branch == null)
           $branch = $this->branch;
 
-
         $lastCommitEndpoint = $this->apiEndpoint . "/commits/" . $branch;
-
 
         $client = new Client();
         $response = $client->createRequest()
@@ -69,7 +67,6 @@ class GithubComponent extends Component {
         return $response;
     }
 
-
     /**
      * Returns file SHA
      */
@@ -81,6 +78,7 @@ class GithubComponent extends Component {
         $lastCommitEndpoint = $this->apiEndpoint . "/contents/" . $path . "?ref=" . $branch;
 
         $client = new Client();
+
         $response = $client->createRequest()
                 ->setMethod('GET')
                 ->setUrl($lastCommitEndpoint)
@@ -137,7 +135,6 @@ class GithubComponent extends Component {
             "message" => "Delete " . $filePath,
             "sha" => $sha,
             "branch" => $branch
-
         ];
 
         $client = new Client();
@@ -194,7 +191,6 @@ class GithubComponent extends Component {
     public function createFileContent($content, $branch_name, $path, $commitMessage = null, $sha = null) {
         $createBranchEndpoint = $this->apiEndpoint . "/contents/" . $path;
 
-
         $branchParams = [
             "message" => $commitMessage ? $commitMessage : "first commit for $branch_name store",
             "content" => $content,
@@ -216,5 +212,4 @@ class GithubComponent extends Component {
 
         return $response;
     }
-
 }

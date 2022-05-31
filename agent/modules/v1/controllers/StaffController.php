@@ -163,7 +163,6 @@ class StaffController extends Controller {
                   "message" => $agent->errors
               ];
           }
-
         }
 
         $model = new AgentAssignment();
@@ -184,7 +183,6 @@ class StaffController extends Controller {
           else
             $model->inviteAgent();
         }
-
 
         return [
             "operation" => "success",

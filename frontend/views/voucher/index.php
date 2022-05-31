@@ -54,7 +54,7 @@ $this->registerJs($js);
                     'label' => 'Redeemed',
                     "format" => "raw",
                     "value" => function($model) {
-                        return sizeof($model->activeOrders);
+                        return $model->getActiveOrders()->count();
                     }
                 ],
                 [

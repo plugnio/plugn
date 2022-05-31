@@ -89,7 +89,7 @@ $this->registerJs($js);
                     'attribute' => 'total_price',
                     "value" => function($model) {
                         return Yii::$app->formatter->asCurrency($model->total_price * $model->currency_rate, $model->currency_code, [
-                            \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                            \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency? $model->currency->decimal_place: 3
                         ]);
                     },
                 ],

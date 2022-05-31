@@ -26,16 +26,49 @@ $(function () {
   })
 
     $(document).ready(function () {
-      bsCustomFileInput.init();
+      
+      $('#agentassignment-role').change(function(e) {
+      
+        const value = $('#agentassignment-role').val();
+        
+        if(value == ".AgentAssignment::AGENT_ROLE_BRANCH_MANAGER.") {
+            $('.field-agentassignment-business_location_id').show();
+        } else {
+            $('.field-agentassignment-business_location_id').hide();
+        }
+      });
+      
+      $('#agentassignment-role').trigger('change');
     });
 
 ";
 
 
 $this->registerJs($js);
+
 ?>
 
 
+
+  <?php if (Yii::$app->session->getFlash('errorResponse') != null) { ?>
+
+    <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h5><i class="icon fa fa-ban"></i> Error!</h5>
+        <?= (Yii::$app->session->getFlash('errorResponse')) ?>
+    </div>
+  <?php } if (Yii::$app->session->hasFlash('error')) { ?>
+      <div class="alert alert-danger alert-dismissable">
+          <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+          <?php
+          foreach(Yii::$app->session->getFlash('error') as $errors) {
+              foreach($errors as $error) { ?>
+                  <p><?= $error ?></p>
+              <?php
+              }
+          } ?>
+      </div>
+  <?php } ?>
 
 <div class="card agent-assignment-form">
 
@@ -46,10 +79,10 @@ $this->registerJs($js);
     $agentQuery = Agent::find()->asArray()->all();
     $agentArray = ArrayHelper::map($agentQuery, 'agent_id', 'agent_name');
 
-    if(!$model->isNewRecord && $model->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
+    //if(!$model->isNewRecord && $model->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
       $businessLocationsQuery = $model->restaurant->getBusinessLocations()->asArray()->all();
       $businessLocationsList = ArrayHelper::map($businessLocationsQuery, 'business_location_id', 'business_location_name');
-    }
+    //}
 
     $agentValue = [];
 
@@ -73,7 +106,11 @@ $this->registerJs($js);
 
     <?php
            if($model->isNewRecord) {
-               echo $form->field($model, 'assignment_agent_email')->textInput(['maxlength' => true, 'id' => 'agent-email']);
+               echo $form->field ($model, 'assignment_agent_email')
+                   ->textInput (['maxlength' => true, 'id' => 'agent-email']);
+
+               echo $form->field ($model, 'agent_name')
+                   ->textInput (['maxlength' => true, 'id' => 'agent-name']);
            }
     ?>
 
@@ -91,13 +128,14 @@ $this->registerJs($js);
 
     <?php
 
-      if(!$model->isNewRecord &&  $model->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
+     // if(!$model->isNewRecord &&  $model->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER) {
       echo $form->field($model, 'business_location_id')->dropDownList(
             $businessLocationsList, [
+
             'class' => 'form-control select2 select2',
             'multiple' => false,
         ])->label('Managed branch');
-      }
+     // }
 
     ?>
 

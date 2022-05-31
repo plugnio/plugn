@@ -86,6 +86,7 @@ class AuthController extends Controller {
             'request-reset-password',
             'update-password',
             'signup',
+            'signup-step-one',
             'update-email',
             'resend-verification-email',
             'verify-email',
@@ -125,6 +126,26 @@ class AuthController extends Controller {
         return $this->_loginResponse($agent);
     }
 
+
+    public function actionSignupStepOne()
+    {
+        $agent = new Agent();
+        $agent->setScenario(Agent::SCENARIO_CREATE_NEW_AGENT);
+        $agent->agent_name = Yii::$app->request->getBodyParam('name');
+        $agent->agent_email = Yii::$app->request->getBodyParam('email');
+        $agent->setPassword(Yii::$app->request->getBodyParam('password'));
+        $agent->tempPassword = Yii::$app->request->getBodyParam ('password');
+        if (!$agent->validate()) {
+            return [
+                "operation" => "error",
+                "message" => $agent->errors
+            ];
+        } else {
+            return [
+                "operation" => "success"
+            ];
+        }
+    }
     /**
      * register user with store
      * @return mixed

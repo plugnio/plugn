@@ -129,12 +129,12 @@ $this->registerJs($js);
                 [
                     'attribute' => 'item_price',
                     "format" => "raw",
-                    "value" => function($model) {
+                    "value" => function($model) use ($restaurant) {
                         if ($model->extraOptions)
                           return 'Price on selection';
                         else
-                        return Yii::$app->formatter->asCurrency($model->item_price, $model->currency->code, [
-                            \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                        return Yii::$app->formatter->asCurrency($model->item_price, $restaurant->currency->code, [
+                            \NumberFormatter::MAX_FRACTION_DIGITS => $restaurant->currency->decimal_place
                         ]);
                     }
                 ],

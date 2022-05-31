@@ -36,7 +36,8 @@ $selectedAreas = \yii\helpers\ArrayHelper::map($selectedAreas, 'area_id', 'area_
 
 <?= \yii\helpers\Html::a(
     'Enable All',
-    ['enable-all', 'storeUuid' => $model->restaurant_uuid, 'city_id' => $city->city_id, 'id' => $model->delivery_zone_id],
+    [
+        'enable-all', 'storeUuid' => $model->restaurant_uuid, 'city_id' => $city->city_id, 'id' => $model->delivery_zone_id],
     [
         'class' => 'btn btn-primary'
     ]
@@ -74,6 +75,8 @@ $selectedAreas = \yii\helpers\ArrayHelper::map($selectedAreas, 'area_id', 'area_
             'template' => '{enable} {disable}',
             'buttons' => [
                 'enable' => function ($url, $data) use ($model, $selectedAreas) {
+
+                    //if disabled, show enable button
 
                     if(in_array($data->area_id, $selectedAreas))
                         return null;
