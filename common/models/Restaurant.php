@@ -1267,7 +1267,9 @@ class Restaurant extends \yii\db\ActiveRecord
 
         if ($insert) {
 
-            $freePlan = Plan::find ()->where (['valid_for' => 0])->one ();
+            $freePlan = Plan::find ()
+                ->where (['valid_for' => 0])
+                ->one ();
 
             $subscription = new Subscription();
             $subscription->restaurant_uuid = $this->restaurant_uuid;
@@ -1280,7 +1282,9 @@ class Restaurant extends \yii\db\ActiveRecord
             $restaurant_theme->save ();
 
             //Add opening hrs
-            for ($i = 0; $i < 7; ++$i) {
+            
+            for ($i = 0; $i < 7; ++$i) 
+            {
                 $opening_hour = new OpeningHour();
                 $opening_hour->restaurant_uuid = $this->restaurant_uuid;
                 $opening_hour->day_of_week = $i;

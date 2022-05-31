@@ -95,6 +95,9 @@ class AgentAssignmentController extends Controller
         $model->restaurant_uuid = Yii::$app->accountManager->getManagedAccount($storeUuid)
             ->restaurant_uuid;
 
+        $model->agent_id =  $agent->agent_id;
+        $model->business_location_id =  Yii::$app->request->getBodyParam("business_location_id");
+
         if (Yii::$app->user->identity->isOwner($model->restaurant_uuid)) {
 
             if ($model->load(Yii::$app->request->post())) {

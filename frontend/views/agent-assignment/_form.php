@@ -72,8 +72,9 @@ $this->registerJs($js);
 
 
     <?php
-           if($model->isNewRecord)
-             echo $form->field($model, 'assignment_agent_email')->textInput(['maxlength' => true , 'id' =>'agent-email'])
+           if($model->isNewRecord) {
+               echo $form->field($model, 'assignment_agent_email')->textInput(['maxlength' => true, 'id' => 'agent-email']);
+           }
     ?>
 
     <?=
