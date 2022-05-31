@@ -6,6 +6,7 @@ use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "ticket_comment".
@@ -106,7 +107,57 @@ class TicketComment extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
+        $this->sendTicketCommentedMail();
+
         $this->_moveAttachments();
+    }
+
+    /**
+     * notify staff for new ticket
+     */
+    public function sendTicketCommentedMail()
+    {
+        if($this->staff_id)  //notify store agents if comment from staff
+        {
+            $toEmails = [$this->ticket->agent->agent_email]; //store owner from support agent
+
+            $fromName = $this->staff->staff_name;
+
+            $fromEmail = $this->staff->staff_email;
+        }
+        else if($this->agent_id)
+        {
+            $fromName = $this->agent->agent_name;
+
+            $fromEmail = $this->agent->agent_email;
+
+            //if assigned > notify assigned staff
+
+            if ($this->ticket->staff_id)
+            {
+                $toEmails = [$this->ticket->staff->staff_email];
+            }
+            else // else all staff
+            {
+                $staffs = Staff::find()->all();
+
+                $toEmails = ArrayHelper::getColumn ($staffs, 'staff_email');
+            }
+        }
+
+        \Yii::$app->mailer->htmlLayout = "layouts/text";
+
+        \Yii::$app->mailer->compose ([
+                'html' => 'agent/ticket-commented-html',
+                'text' => 'agent/ticket-commented-text',
+            ], [
+                'model' => $this
+            ])
+            ->setFrom ([$fromName => $fromEmail])
+            ->setTo ($toEmails)
+            ->setCc (Yii::$app->params['supportEmail'])
+            ->setSubject ('New comment on ticket #' . $this->ticket_uuid)
+            ->send ();
     }
 
     /**

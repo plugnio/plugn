@@ -17,7 +17,7 @@ class m220530_125457_staff_access extends Migration
     {
         Yii::$app->db->createCommand()->batchInsert('staff', [
             'staff_name', 'staff_email', 'staff_password_hash', 'staff_status',
-            'staff_created_at', 'staff_updated_at'
+            'staff_created_at', 'staff_updated_at', 'staff_auth_key'
         ], [
             [
                 'Krishna',
@@ -25,7 +25,8 @@ class m220530_125457_staff_access extends Migration
                 Yii::$app->security->generatePasswordHash ('KK@PlugnCRM'),
                 Staff::STATUS_ACTIVE,
                 new Expression('NOW()'),
-                new Expression('NOW()')
+                new Expression('NOW()'),
+                ''
             ],
             [
                 'Anil',
@@ -33,7 +34,8 @@ class m220530_125457_staff_access extends Migration
                 Yii::$app->security->generatePasswordHash ('Anil@PlugnCRM'),
                 Staff::STATUS_ACTIVE,
                 new Expression('NOW()'),
-                new Expression('NOW()')
+                new Expression('NOW()'),
+                ''
             ],
             [
                 'Customer Service Agent #1',
@@ -41,7 +43,8 @@ class m220530_125457_staff_access extends Migration
                 Yii::$app->security->generatePasswordHash ('CS1@PlugnCRM'),
                 Staff::STATUS_ACTIVE,
                 new Expression('NOW()'),
-                new Expression('NOW()')
+                new Expression('NOW()'),
+                ''
             ],
             [
                 'Customer Service Agent #2',
@@ -49,7 +52,8 @@ class m220530_125457_staff_access extends Migration
                 Yii::$app->security->generatePasswordHash ('CS2@PlugnCRM'),
                 Staff::STATUS_ACTIVE,
                 new Expression('NOW()'),
-                new Expression('NOW()')
+                new Expression('NOW()'),
+                ''
             ],
         ])->execute();
     }

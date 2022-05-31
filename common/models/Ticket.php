@@ -6,6 +6,7 @@ use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "ticket".
@@ -113,7 +114,35 @@ class Ticket extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
+        //notify staff
+
+        $this->sendTicketGeneratedMail();
+
         $this->_moveAttachments();
+    }
+
+    /**
+     * notify staff for new ticket
+     */
+    public function sendTicketGeneratedMail() {
+
+        $staffs = Staff::find()->all();
+
+        $staffEmails = ArrayHelper::getColumn ($staffs, 'staff_email');
+
+        \Yii::$app->mailer->htmlLayout = "layouts/text";
+
+        \Yii::$app->mailer->compose ([
+                'html' => 'agent/ticket-generated-html',
+                'text' => 'agent/ticket-generated-text',
+            ], [
+                'model' => $this
+            ])
+            ->setFrom ([$this->agent->agent_name => $this->agent->agent_email])
+            ->setTo (Yii::$app->params['supportEmail'])
+            ->setCc ($staffEmails)
+            ->setSubject ('New ticket generated for ' . $this->restaurant->name)
+            ->send ();
     }
 
     /**
