@@ -108,10 +108,34 @@ class GithubComponent extends Component {
 
         $client = new Client();
         $response = $client->createRequest()
-                ->setMethod('POST')
-                ->setUrl($createBranchEndpoint)
+            ->setMethod('POST')
+            ->setUrl($createBranchEndpoint)
+            ->setFormat(Client::FORMAT_JSON)
+            ->setData($branchParams)
+            ->addHeaders([
+                'Authorization' => 'token ' . $this->token,
+                'User-Agent' => 'request',
+            ])
+            ->send();
+
+        return $response;
+    }
+
+    /**
+     * get branch details
+     * @param $branch_name
+     * @return \yii\httpclient\Response
+     * @throws InvalidConfigException
+     * @throws \yii\httpclient\Exception
+     */
+    public function getBranch($branch_name) {
+
+        $branchEndpoint = $this->apiEndpoint . "/branches/" . $branch_name;
+
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setUrl($branchEndpoint)
                 ->setFormat(Client::FORMAT_JSON)
-                ->setData($branchParams)
                 ->addHeaders([
                     'Authorization' => 'token ' . $this->token,
                     'User-Agent' => 'request',
@@ -119,6 +143,19 @@ class GithubComponent extends Component {
                 ->send();
 
         return $response;
+    }
+
+    /**
+     * @param $branch_name
+     * @return bool
+     * @throws InvalidConfigException
+     * @throws \yii\httpclient\Exception
+     */
+    public function isBranchExists($branch_name)
+    {
+        $response = $this->getBranch('develop');
+
+        return isset($response->data['name']);
     }
 
     /**
@@ -189,6 +226,7 @@ class GithubComponent extends Component {
      * @return type
      */
     public function createFileContent($content, $branch_name, $path, $commitMessage = null, $sha = null) {
+
         $createBranchEndpoint = $this->apiEndpoint . "/contents/" . $path;
 
         $branchParams = [
