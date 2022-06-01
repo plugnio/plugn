@@ -1226,7 +1226,19 @@ class Restaurant extends \yii\db\ActiveRecord
             $store_name = strtolower(str_replace(' ', '_', $this->name));
             $store_domain = strtolower(str_replace(' ', '_', $this->restaurant_domain));
             $this->app_id = 'store.plugn.' . $store_domain;
-            $this->store_branch_name = $store_name;
+
+            /**
+             * if we change this to use store domain name as git branch name,
+             * it would be hard for us to keep track of branch and store relation,
+             * in case someone keep changing store domain ?
+             */
+            $this->store_branch_name = $store_domain;// $store_name;
+
+            $isBranchExists = Yii::$app->githubComponent->isBranchExists($this->store_branch_name);
+
+            if($isBranchExists) {
+                return  $this->addError('restaurant_domain', Yii::t('app','Another store is already using this domain'));
+            }
 
             $isDomainExist = self::find()->where(['restaurant_domain' => $this->restaurant_domain])->exists();
 
