@@ -48,12 +48,10 @@ class Ticket extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['ticket_uuid'], 'required'],
             [['agent_id', 'staff_id', 'ticket_status'], 'integer'],
             [['ticket_detail'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
-            [['ticket_uuid', 'restaurant_uuid'], 'string', 'max' => 60],
-            [['ticket_uuid'], 'unique'],
+            [['restaurant_uuid'], 'string', 'max' => 60],
             [['agent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Agent::className(), 'targetAttribute' => ['agent_id' => 'agent_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
             [['staff_id'], 'exist', 'skipOnError' => true, 'targetClass' => Staff::className(), 'targetAttribute' => ['staff_id' => 'staff_id']],
@@ -88,6 +86,16 @@ class Ticket extends \yii\db\ActiveRecord
         ];
     }
 
+    public function extraFields()
+    {
+        return [
+            'attachments',
+            'agent',
+            'staff',
+            'ticketComments'
+        ];
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -116,7 +124,7 @@ class Ticket extends \yii\db\ActiveRecord
 
         //notify staff
 
-        $this->sendTicketGeneratedMail();
+//        $this->sendTicketGeneratedMail();
 
         $this->_moveAttachments();
     }

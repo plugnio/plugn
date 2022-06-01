@@ -7,7 +7,7 @@ use common\models\TicketComment;
 use yii\data\ActiveDataProvider;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
-
+use yii;
 
 class TicketController extends Controller
 {
@@ -21,7 +21,7 @@ class TicketController extends Controller
         $behaviors['corsFilter'] = [
             'class' => \yii\filters\Cors::className(),
             'cors' => [
-                'Origin' => Yii::$app->params['allowedOrigins'],
+                'Origin' => \Yii::$app->params['allowedOrigins'],
                 'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
                 'Access-Control-Request-Headers' => ['*'],
                 'Access-Control-Allow-Credentials' => null,
@@ -136,9 +136,9 @@ class TicketController extends Controller
     /**
      * return ticket comments
      */  
-    public function actionComments($ticket_uuid)
+    public function actionComments($id)
     {
-        return $this->findModel($ticket_uuid)->ticketComments;
+        return $this->findModel($id)->ticketComments;
     }
 
     /**
@@ -147,9 +147,9 @@ class TicketController extends Controller
      * @return Ticket|array
      * @throws NotFoundHttpException
      */
-    public function actionView($ticket_uuid)
+    public function actionView($id)
     {
-        return $this->findModel($ticket_uuid);
+        return $this->findModel($id);
     }
 
     /**
