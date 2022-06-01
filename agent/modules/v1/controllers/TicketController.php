@@ -136,9 +136,9 @@ class TicketController extends Controller
     /**
      * return ticket comments
      */  
-    public function actionComments($ticket_uuid)
+    public function actionComments($id)
     {
-        return $this->findModel($ticket_uuid)->ticketComments;
+        return $this->findModel($id)->ticketComments;
     }
 
     /**

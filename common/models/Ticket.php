@@ -86,6 +86,16 @@ class Ticket extends \yii\db\ActiveRecord
         ];
     }
 
+    public function extraFields()
+    {
+        return [
+            'attachments',
+            'agent',
+            'staff',
+            'ticketComments'
+        ];
+    }
+
     /**
      * {@inheritdoc}
      */
