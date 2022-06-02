@@ -2,6 +2,7 @@
 
 namespace agent\modules\v1\controllers;
 
+use Yii;
 use common\models\Ticket;
 use common\models\TicketComment;
 use yii\data\ActiveDataProvider;

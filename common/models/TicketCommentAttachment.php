@@ -33,7 +33,6 @@ class TicketCommentAttachment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['ticket_comment_uuid'], 'required'],
             [['ticket_comment_attachment_uuid', 'ticket_comment_uuid', 'attachment_uuid'], 'string', 'max' => 60],
             [['ticket_comment_uuid'], 'unique'],
             [['attachment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Attachment::className(), 'targetAttribute' => ['attachment_uuid' => 'attachment_uuid']],

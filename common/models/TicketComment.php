@@ -41,7 +41,6 @@ class TicketComment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['ticket_comment_uuid'], 'required'],
             [['agent_id', 'staff_id'], 'integer'],
             [['ticket_comment_detail'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
