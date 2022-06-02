@@ -48,12 +48,10 @@ class Ticket extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['ticket_uuid'], 'required'],
             [['agent_id', 'staff_id', 'ticket_status'], 'integer'],
             [['ticket_detail'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
-            [['ticket_uuid', 'restaurant_uuid'], 'string', 'max' => 60],
-            [['ticket_uuid'], 'unique'],
+            [['restaurant_uuid'], 'string', 'max' => 60],
             [['agent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Agent::className(), 'targetAttribute' => ['agent_id' => 'agent_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
             [['staff_id'], 'exist', 'skipOnError' => true, 'targetClass' => Staff::className(), 'targetAttribute' => ['staff_id' => 'staff_id']],
@@ -85,6 +83,16 @@ class Ticket extends \yii\db\ActiveRecord
                 'updatedAtAttribute' => 'updated_at',
                 'value' => new Expression('NOW()'),
             ],
+        ];
+    }
+
+    public function extraFields()
+    {
+        return [
+            'attachments',
+            'agent',
+            'staff',
+            'ticketComments'
         ];
     }
 
@@ -138,7 +146,7 @@ class Ticket extends \yii\db\ActiveRecord
             ], [
                 'model' => $this
             ])
-            ->setFrom ([$this->agent->agent_name => $this->agent->agent_email])
+            ->setFrom ([$this->agent->agent_email])
             ->setTo (Yii::$app->params['supportEmail'])
             ->setCc ($staffEmails)
             ->setSubject ('New ticket generated for ' . $this->restaurant->name)

@@ -18,6 +18,7 @@ use common\models\PaymentMethod;
 class NetlifyComponent extends Component {
 
     private $apiEndpoint = 'https://api.netlify.com/api/v1';
+
     public $token;
 
     /**

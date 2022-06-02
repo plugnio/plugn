@@ -42,12 +42,11 @@ class TicketComment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['ticket_comment_uuid'], 'required'],
             [['agent_id', 'staff_id'], 'integer'],
             [['ticket_comment_detail'], 'string'],
+            ['ticket_comment_detail', 'required'],
             [['created_at', 'updated_at'], 'safe'],
             [['ticket_comment_uuid', 'ticket_uuid'], 'string', 'max' => 60],
-            [['ticket_comment_uuid'], 'unique'],
             [['agent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Agent::className(), 'targetAttribute' => ['agent_id' => 'agent_id']],
             [['staff_id'], 'exist', 'skipOnError' => true, 'targetClass' => Staff::className(), 'targetAttribute' => ['staff_id' => 'staff_id']],
             [['ticket_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Ticket::className(), 'targetAttribute' => ['ticket_uuid' => 'ticket_uuid']],
@@ -153,7 +152,7 @@ class TicketComment extends \yii\db\ActiveRecord
             ], [
                 'model' => $this
             ])
-            ->setFrom ([$fromName => $fromEmail])
+            ->setFrom ([$fromEmail])
             ->setTo ($toEmails)
             ->setCc (Yii::$app->params['supportEmail'])
             ->setSubject ('New comment on ticket #' . $this->ticket_uuid)
@@ -210,6 +209,15 @@ class TicketComment extends \yii\db\ActiveRecord
         }
     }
 
+    public function extraFields()
+    {
+        return [
+            'agent',
+            'staff',
+            'attachments'
+        ];
+    }
+
     /**
      * Gets query for [[Agent]].
      *
@@ -245,7 +253,7 @@ class TicketComment extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getTicketCommentAttachment($modelClass = "\common\models\TicketCommentAttachment")
+    public function getAttachments($modelClass = "\common\models\TicketCommentAttachment")
     {
         return $this->hasOne($modelClass::className(), ['ticket_comment_uuid' => 'ticket_comment_uuid']);
     }
