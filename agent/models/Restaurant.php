@@ -512,8 +512,12 @@ class Restaurant extends \common\models\Restaurant {
         return [];
     }
 
-    public function getTickets()
+    /**
+     * @param $modelClass
+     * @return yii\db\ActiveQuery
+     */
+    public function getTickets($modelClass = "\common\models\Ticket")
     {
-        return $this->hasMany(Ticket::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 }
