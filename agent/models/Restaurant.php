@@ -2,6 +2,7 @@
 
 namespace agent\models;
 
+use common\models\Ticket;
 use yii;
 
 class Restaurant extends \common\models\Restaurant {
@@ -509,5 +510,10 @@ class Restaurant extends \common\models\Restaurant {
 
     public function getTotalItems() {
         return [];
+    }
+
+    public function getTickets()
+    {
+        return $this->hasMany(Ticket::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 }

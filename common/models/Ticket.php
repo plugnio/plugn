@@ -6,6 +6,7 @@ use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "ticket".
@@ -50,8 +51,7 @@ class Ticket extends \yii\db\ActiveRecord
             [['agent_id', 'staff_id', 'ticket_status'], 'integer'],
             [['ticket_detail'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
-            [['ticket_uuid', 'restaurant_uuid'], 'string', 'max' => 60],
-            [['ticket_uuid'], 'unique'],
+            [['restaurant_uuid'], 'string', 'max' => 60],
             [['agent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Agent::className(), 'targetAttribute' => ['agent_id' => 'agent_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
             [['staff_id'], 'exist', 'skipOnError' => true, 'targetClass' => Staff::className(), 'targetAttribute' => ['staff_id' => 'staff_id']],
@@ -86,6 +86,16 @@ class Ticket extends \yii\db\ActiveRecord
         ];
     }
 
+    public function extraFields()
+    {
+        return [
+            'attachments',
+            'agent',
+            'staff',
+            'ticketComments'
+        ];
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -112,7 +122,35 @@ class Ticket extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
+        //notify staff
+
+//        $this->sendTicketGeneratedMail();
+
         $this->_moveAttachments();
+    }
+
+    /**
+     * notify staff for new ticket
+     */
+    public function sendTicketGeneratedMail() {
+
+        $staffs = Staff::find()->all();
+
+        $staffEmails = ArrayHelper::getColumn ($staffs, 'staff_email');
+
+        \Yii::$app->mailer->htmlLayout = "layouts/text";
+
+        \Yii::$app->mailer->compose ([
+                'html' => 'agent/ticket-generated-html',
+                'text' => 'agent/ticket-generated-text',
+            ], [
+                'model' => $this
+            ])
+            ->setFrom ([$this->agent->agent_name => $this->agent->agent_email])
+            ->setTo (Yii::$app->params['supportEmail'])
+            ->setCc ($staffEmails)
+            ->setSubject ('New ticket generated for ' . $this->restaurant->name)
+            ->send ();
     }
 
     /**
