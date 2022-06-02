@@ -44,6 +44,7 @@ class TicketComment extends \yii\db\ActiveRecord
         return [
             [['agent_id', 'staff_id'], 'integer'],
             [['ticket_comment_detail'], 'string'],
+            ['ticket_comment_detail', 'required'],
             [['created_at', 'updated_at'], 'safe'],
             [['ticket_comment_uuid', 'ticket_uuid'], 'string', 'max' => 60],
             [['agent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Agent::className(), 'targetAttribute' => ['agent_id' => 'agent_id']],
@@ -105,7 +106,7 @@ class TicketComment extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-//        $this->sendTicketCommentedMail();
+        $this->sendTicketCommentedMail();
 
         $this->_moveAttachments();
     }
@@ -151,7 +152,7 @@ class TicketComment extends \yii\db\ActiveRecord
             ], [
                 'model' => $this
             ])
-            ->setFrom ([$fromName => $fromEmail])
+            ->setFrom ([$fromEmail])
             ->setTo ($toEmails)
             ->setCc (Yii::$app->params['supportEmail'])
             ->setSubject ('New comment on ticket #' . $this->ticket_uuid)

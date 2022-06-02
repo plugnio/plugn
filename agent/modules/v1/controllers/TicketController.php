@@ -8,7 +8,6 @@ use common\models\TicketComment;
 use yii\data\ActiveDataProvider;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
-use yii;
 
 class TicketController extends Controller
 {

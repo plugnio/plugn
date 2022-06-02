@@ -124,7 +124,7 @@ class Ticket extends \yii\db\ActiveRecord
 
         //notify staff
 
-//        $this->sendTicketGeneratedMail();
+        $this->sendTicketGeneratedMail();
 
         $this->_moveAttachments();
     }
@@ -146,7 +146,7 @@ class Ticket extends \yii\db\ActiveRecord
             ], [
                 'model' => $this
             ])
-            ->setFrom ([$this->agent->agent_name => $this->agent->agent_email])
+            ->setFrom ([$this->agent->agent_email])
             ->setTo (Yii::$app->params['supportEmail'])
             ->setCc ($staffEmails)
             ->setSubject ('New ticket generated for ' . $this->restaurant->name)
