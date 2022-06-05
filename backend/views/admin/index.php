@@ -1,5 +1,6 @@
 <?php
 
+use backend\models\Admin;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -14,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Admin', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Admin', ['create'], ['class' => 'btn btn-success btn-create']) ?>
     </p>
 
     <?= GridView::widget([
@@ -24,6 +25,18 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'admin_name',
             'admin_email:email',
+            [
+                'attribute' => 'admin_role',
+                "value" => function($model) {
+                    if($model->admin_role == Admin::ROLE_CUSTOMER_SERVICE_AGENT) {
+                        return 'Customer Service Agent';
+                    } else if($model->admin_role == Admin::ROLE_ADMIN) {
+                        return 'Admin';
+                    } else if($model->admin_role == Admin::ROLE_DEVELOPER) {
+                        return 'Developer';
+                    }
+                }
+            ],
             // 'admin_auth_key',
             // 'admin_password_hash',
             //'admin_password_reset_token',

@@ -34,6 +34,10 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
 
+    const ROLE_ADMIN = 1;
+    const ROLE_CUSTOMER_SERVICE_AGENT = 2;
+    const ROLE_DEVELOPER = 3;
+
     /**
      * {@inheritdoc}
      */
@@ -48,7 +52,7 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['admin_name', 'admin_email'], 'required'],
+            [['admin_name', 'admin_email', 'admin_role'], 'required'],
             [['tempPassword'], 'required', 'on' => 'create'],
             [['tempPassword'], 'safe'],
             [['admin_status'], 'integer'],
@@ -85,7 +89,8 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
             'admin_status' => 'Status',
             'admin_created_at' => 'Created At',
             'admin_updated_at' => 'Updated At',
-            'tempPassword' => 'Password'
+            'tempPassword' => 'Password',
+            'admin_role'=> 'Admin role'
         ];
     }
 
