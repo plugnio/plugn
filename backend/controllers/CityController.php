@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\models\Admin;
 use Yii;
 use common\models\City;
 use backend\models\CitySearch;
@@ -32,6 +33,11 @@ class CityController extends Controller
             'access' => [
                 'class' => AccessControl::className(),
                 'rules' => [
+                    [
+                        'allow' => Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
+                        'actions' => ['create', 'update', 'delete'],
+                        'roles' => ['@'],
+                    ],
                     [//allow authenticated users only
                         'allow' => true,
                         'roles' => ['@'],

@@ -27,7 +27,7 @@ AppAsset::register($this);
 <body>
 <?php $this->beginBody() ?>
 
-<div class="wrap">
+<div class="wrap <?php if(!Yii::$app->user->isGuest) echo 'role-' . Yii::$app->user->identity->admin_role; ?>">
     <?php
     NavBar::begin([
         'brandLabel' => Yii::$app->name,
