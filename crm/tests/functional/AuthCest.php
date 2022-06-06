@@ -1,13 +1,13 @@
 <?php
 
-namespace staff\tests;
+namespace crm\tests;
 
 use common\fixtures\StaffAssignmentFixture;
 use common\fixtures\CountryFixture;
 use common\fixtures\CurrencyFixture;
 use yii;
-use staff\models\Staff;
-use staff\tests\FunctionalTester;
+use crm\models\Staff;
+use crm\tests\FunctionalTester;
 use common\fixtures\StaffTokenFixture;
 use common\fixtures\StaffFixture;
 use Codeception\Util\HttpCode;

@@ -1,8 +1,8 @@
 <?php
 
-namespace staff\tests;
+namespace crm\tests;
 
-use staff\models\Staff;
+use crm\models\Staff;
 use Codeception\Util\HttpCode;
 use common\fixtures\StaffAssignmentFixture;
 use common\fixtures\StaffFixture;

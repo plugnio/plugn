@@ -1,6 +1,6 @@
 <?php
 
-namespace staff\modules\v1\controllers;
+namespace crm\modules\v1\controllers;
 
 
 use Yii;

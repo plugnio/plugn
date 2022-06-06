@@ -1,6 +1,6 @@
 <?php
 
-namespace staff\modules\v1\controllers;
+namespace crm\modules\v1\controllers;
 
 use Yii;
 use common\models\Ticket;
@@ -66,9 +66,7 @@ class TicketController extends Controller
      */
     public function actionList() {
 
-        $store = Yii::$app->accountManager->getManagedAccount();
-
-        $query = $store->getTickets()
+        $query = Ticket::find()
             ->orderBy('updated_at DESC');
 
         return new ActiveDataProvider([
@@ -81,11 +79,9 @@ class TicketController extends Controller
      * @return array
      */
     public function actionCreate() {
-
-        $store = Yii::$app->accountManager->getManagedAccount();
-
+ 
         $model = new Ticket();
-        $model->restaurant_uuid = $store->restaurant_uuid;
+        $model->restaurant_uuid = Yii::$app->request->getBodyParam("restaurant_uuid");
         $model->staff_id =  Yii::$app->user->getId();
         $model->ticket_detail =  Yii::$app->request->getBodyParam("detail");
         $model->ticket_status = Ticket::STATUS_PENDING;

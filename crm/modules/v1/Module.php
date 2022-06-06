@@ -1,6 +1,6 @@
 <?php
 
-namespace staff\modules\v1;
+namespace crm\modules\v1;
 
 /**
  * v1 module definition class
@@ -10,7 +10,7 @@ class Module extends \yii\base\Module
     /**
      * @inheritdoc
      */
-    public $controllerNamespace = 'staff\modules\v1\controllers';
+    public $controllerNamespace = 'crm\modules\v1\controllers';
 
     /**
      * @inheritdoc
