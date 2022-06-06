@@ -309,6 +309,7 @@ class   OrderController extends Controller {
                 }
 
                 //if payment method not cash redirect customer to payment gateway
+
                 if ($response == null &&  !in_array ($order->payment_method_id, [3, 7])) {
 
                     // Create new payment record
@@ -327,7 +328,10 @@ class   OrderController extends Controller {
 
                       if ($payment->payment_mode == TapPayments::GATEWAY_VISA_MASTERCARD && Yii::$app->request->getBodyParam("payment_token") && Yii::$app->request->getBodyParam("bank_name")) {
 
-                          Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
+                          Yii::$app->tapPayments->setApiKeys(
+                              $order->restaurant->live_api_key,
+                              $order->restaurant->test_api_key
+                          );
 
                           $response = Yii::$app->tapPayments->retrieveToken(Yii::$app->request->getBodyParam("payment_token"));
 

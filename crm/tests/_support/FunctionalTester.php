@@ -1,5 +1,5 @@
 <?php
-namespace staff\tests;
+namespace crm\tests;
 
 /**
  * Inherited Methods

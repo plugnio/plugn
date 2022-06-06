@@ -1,4 +1,4 @@
-namespace: staff\tests
+namespace: crm\tests
 actor: Tester
 paths:
     tests: tests

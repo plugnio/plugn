@@ -8,19 +8,19 @@ $params = array_merge(
 );
 
 return [
-    'id' => 'app-staff',
+    'id' => 'app-crm',
     'basePath' => dirname(__DIR__),
-    'controllerNamespace' => 'staff\controllers',
+    'controllerNamespace' => 'crm\controllers',
     'bootstrap' => ['log'],
     'modules' => [
         'v1' => [
-            'basePath' => '@staff/modules/v1',
-            'class' => 'staff\modules\v1\Module',
+            'basePath' => '@crm/modules/v1',
+            'class' => 'crm\modules\v1\Module',
         ]
     ],
     'components' => [
         'user' => [
-          'identityClass' => 'staff\models\Staff',
+          'identityClass' => 'crm\models\Staff',
           'enableAutoLogin' => false,
           'enableSession' => false,
           'loginUrl' => null

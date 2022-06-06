@@ -1,6 +1,6 @@
 <?php
 
-namespace staff\models;
+namespace crm\models;
 
 use yii\db\Expression;
 use yii\web\IdentityInterface;
@@ -31,7 +31,7 @@ class Staff extends \common\models\Staff implements IdentityInterface {
     /**
      * @inheritdoc
      */
-    public static function findIdentityByAccessToken($token, $type = null, $modelClass = "\staff\models\StaffToken") {
+    public static function findIdentityByAccessToken($token, $type = null, $modelClass = "\crm\models\StaffToken") {
         return parent::findIdentityByAccessToken($token, $type, $modelClass);
     }
 
@@ -39,7 +39,7 @@ class Staff extends \common\models\Staff implements IdentityInterface {
      * Get all Restaurant accounts this staff is assigned to manage
      * @return \yii\db\ActiveQuery
      */
-    public function getAccountsManaged($modelClass = "\staff\models\Restaurant")
+    public function getAccountsManaged($modelClass = "\crm\models\Restaurant")
     {
         return parent::getAccountsManaged ($modelClass);
     }
@@ -48,7 +48,7 @@ class Staff extends \common\models\Staff implements IdentityInterface {
      * All assignment records made for this staff
      * @return \yii\db\ActiveQuery
      */
-    public function getStaffAssignments($modelClass = "\staff\models\StaffAssignment")
+    public function getStaffAssignments($modelClass = "\crm\models\StaffAssignment")
     {
         return parent::getStaffAssignments ($modelClass);
     }

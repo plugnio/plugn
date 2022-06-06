@@ -314,7 +314,7 @@ class Staff extends \yii\db\ActiveRecord implements IdentityInterface
     public function getAccessToken()
     {
         // Return existing inactive token if found
-        $token = \staff\models\StaffToken::findOne ([
+        $token = \crm\models\StaffToken::findOne ([
             'staff_id' => $this->staff_id,
             'token_status' => StaffToken::STATUS_ACTIVE
         ]);
@@ -337,7 +337,7 @@ class Staff extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * @inheritdoc
      */
-    public static function findIdentityByAccessToken($token, $type = null, $modelClass = "\staff\models\StaffToken")
+    public static function findIdentityByAccessToken($token, $type = null, $modelClass = "\crm\models\StaffToken")
     {
 
         $token = $modelClass::find ()->where ([

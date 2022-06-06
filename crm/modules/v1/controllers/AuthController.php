@@ -1,9 +1,9 @@
 <?php
 
-namespace staff\modules\v1\controllers;
+namespace crm\modules\v1\controllers;
 
-use staff\models\Currency;
-use staff\models\Restaurant;
+use crm\models\Currency;
+use crm\models\Restaurant;
 use common\models\StaffAssignment;
 use common\models\StaffEmailVerifyAttempt;
 use common\models\BusinessLocation;
@@ -12,8 +12,8 @@ use common\models\RestaurantPaymentMethod;
 use Yii;
 use yii\rest\Controller;
 use yii\filters\auth\HttpBasicAuth;
-use staff\models\Staff;
-use staff\models\PasswordResetRequestForm;
+use crm\models\Staff;
+use crm\models\PasswordResetRequestForm;
 
 
 /**
