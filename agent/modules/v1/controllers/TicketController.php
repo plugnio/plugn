@@ -7,6 +7,7 @@ use common\models\Ticket;
 use common\models\TicketComment;
 use yii\data\ActiveDataProvider;
 use yii\rest\Controller;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
 class TicketController extends Controller
@@ -89,7 +90,10 @@ class TicketController extends Controller
         $model->agent_id =  Yii::$app->user->getId();
         $model->ticket_detail =  Yii::$app->request->getBodyParam("detail");
         $model->ticket_status = Ticket::STATUS_PENDING;
-        $model->attachments =  Yii::$app->request->getBodyParam("attachments");
+        $model->attachments = ArrayHelper::getColumn(
+            Yii::$app->request->getBodyParam("attachments"),
+            'Key'
+        );
 
         if (!$model->save()) {
             return [
@@ -118,7 +122,12 @@ class TicketController extends Controller
         $model->ticket_uuid = $ticket_uuid;
         $model->agent_id =  Yii::$app->user->getId();
         $model->ticket_comment_detail =  Yii::$app->request->getBodyParam("comment_detail");
-        $model->attachments =  Yii::$app->request->getBodyParam("attachments");
+        //$model->attachments =  Yii::$app->request->getBodyParam("attachments");
+
+        $model->attachments = ArrayHelper::getColumn(
+            Yii::$app->request->getBodyParam("attachments"),
+            'Key'
+        );
 
         if (!$model->save()) {
             return [

@@ -175,7 +175,7 @@ class TicketComment extends \yii\db\ActiveRecord
 
             try {
 
-                $extension = pathinfo($this->candidate_video, PATHINFO_EXTENSION);
+                $extension = pathinfo($value, PATHINFO_EXTENSION);
 
                 $file_s3_path = 'comment-attachments/' . $output . '.' . $extension;
 
@@ -253,8 +253,19 @@ class TicketComment extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getAttachments($modelClass = "\common\models\TicketCommentAttachment")
+    public function getTicketCommentAttachments($modelClass = "\common\models\TicketCommentAttachment")
     {
-        return $this->hasOne($modelClass::className(), ['ticket_comment_uuid' => 'ticket_comment_uuid']);
+        return $this->hasMany($modelClass::className(), ['ticket_comment_uuid' => 'ticket_comment_uuid']);
+    }
+
+    /**
+     * Gets query for [[TicketCommentAttachment]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAttachments($modelClass = "\common\models\Attachment")
+    {
+        return $this->hasMany($modelClass::className(), ['attachment_uuid' => 'attachment_uuid'])
+            ->via('ticketCommentAttachments');
     }
 }

@@ -54,7 +54,7 @@ class TicketCommentAttachment extends \yii\db\ActiveRecord
                 ],
                 'value' => function () {
                     if (!$this->ticket_comment_attachment_uuid)
-                        $this->ticket_comment_attachment_uuid = 'ticket_comment_attachment_' . Yii::$app->db->createCommand ('SELECT uuid()')->queryScalar ();
+                        $this->ticket_comment_attachment_uuid = 'tca_' . Yii::$app->db->createCommand ('SELECT uuid()')->queryScalar ();
 
                     return $this->ticket_comment_attachment_uuid;
                 }

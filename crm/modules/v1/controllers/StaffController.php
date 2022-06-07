@@ -60,6 +60,20 @@ class StaffController extends Controller
     }
 
     /**
+     * Get all tickets
+     * @param $store_uuid
+     * @return ActiveDataProvider
+     */
+    public function actionList() {
+
+        $query = Staff::find();
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
+    /**
      * return user profile
      * @return \yii\web\IdentityInterface|null
      */

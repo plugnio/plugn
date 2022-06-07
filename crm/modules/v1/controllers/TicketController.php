@@ -6,6 +6,7 @@ use Yii;
 use common\models\Ticket;
 use common\models\TicketComment;
 use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
 
@@ -85,7 +86,10 @@ class TicketController extends Controller
         $model->staff_id =  Yii::$app->user->getId();
         $model->ticket_detail =  Yii::$app->request->getBodyParam("detail");
         $model->ticket_status = Ticket::STATUS_PENDING;
-        $model->attachments =  Yii::$app->request->getBodyParam("attachments");
+        $model->attachments = ArrayHelper::getColumn(
+            Yii::$app->request->getBodyParam("attachments"),
+            'Key'
+        );
 
         if (!$model->save()) {
             return [
@@ -97,6 +101,31 @@ class TicketController extends Controller
         return [
             "operation" => "success",
             "message" => Yii::t('app', "Ticket created successfully"),
+        ];
+    }
+
+    /**
+     * Assign ticket to staff 
+     * @return array
+     */
+    public function actionAssign($ticket_uuid) {
+
+        //validate access
+
+        $model = $this->findModel($ticket_uuid);
+
+        $model->staff_id =  Yii::$app->request->getBodyParam("staff_id");
+
+        if (!$model->save()) {
+            return [
+                "operation" => "error",
+                "message" => $model->errors
+            ];
+        }
+
+        return [
+            "operation" => "success",
+            "message" => Yii::t('app', "Staff assigned successfully"),
         ];
     }
 
@@ -114,7 +143,10 @@ class TicketController extends Controller
         $model->ticket_uuid = $ticket_uuid;
         $model->staff_id =  Yii::$app->user->getId();
         $model->ticket_comment_detail =  Yii::$app->request->getBodyParam("comment_detail");
-        $model->attachments =  Yii::$app->request->getBodyParam("attachments");
+        $model->attachments = ArrayHelper::getColumn(
+            Yii::$app->request->getBodyParam("attachments"),
+            'Key'
+        );
 
         if (!$model->save()) {
             return [

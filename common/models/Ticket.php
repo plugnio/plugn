@@ -168,8 +168,8 @@ class Ticket extends \yii\db\ActiveRecord
             //$source = Yii::$app->temporaryBucketResourceManager->bucket . '/' . $value;
 
             try {
-
-                $extension = pathinfo($this->candidate_video, PATHINFO_EXTENSION);
+    
+                $extension = pathinfo($value, PATHINFO_EXTENSION);
 
                 $file_s3_path = 'attachments/' . $output . '.' . $extension;
 
@@ -241,6 +241,17 @@ class Ticket extends \yii\db\ActiveRecord
     public function getTicketAttachments()
     {
         return $this->hasMany(TicketAttachment::className(), ['ticket_uuid' => 'ticket_uuid']);
+    }
+
+    /**
+     * Gets query for [[TicketCommentAttachment]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAttachments($modelClass = "\common\models\Attachment")
+    {
+        return $this->hasMany($modelClass::className(), ['attachment_uuid' => 'attachment_uuid'])
+            ->via('ticketAttachments');
     }
 
     /**

@@ -32,10 +32,8 @@ class Attachment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['attachment_uuid'], 'required'],
             [['attachment_uuid'], 'string', 'max' => 60],
             [['file_path'], 'string', 'max' => 250],
-            [['attachment_uuid'], 'unique'],
         ];
     }
 

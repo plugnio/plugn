@@ -51,12 +51,14 @@ return [
                     'controller' => 'v1/staff',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET list' => 'list',
                         'GET' => 'detail',
                         //todo: update-email
                         'PUT update' => 'update-staff-profile',
                         'POST change-password' => 'change-password',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS list' => 'options',
                         'OPTIONS update' => 'options',
                         'OPTIONS change-password' => 'options',
                     ]
@@ -85,9 +87,11 @@ return [
                         'GET comments/<id>' => 'comments',
                         'GET <id>' => 'view',
                         'POST' => 'create',
+                        'PATCH assign/<ticket_uuid>' => 'assign',
                         'PATCH comment/<ticket_uuid>' => 'comment',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS assign/<ticket_uuid>' => 'options',
                         'OPTIONS comment/<ticket_uuid>' => 'options',
                         'OPTIONS comments/<id>' => 'options',
                         'OPTIONS <id>' => 'options',
