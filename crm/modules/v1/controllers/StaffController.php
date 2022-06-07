@@ -4,8 +4,9 @@ namespace crm\modules\v1\controllers;
 
 
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\rest\Controller;
-
+use crm\models\Staff;
 
 class StaffController extends Controller
 {

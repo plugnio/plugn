@@ -95,6 +95,7 @@ class Ticket extends \yii\db\ActiveRecord
             'attachments',
             'agent',
             'staff',
+            'restaurant',
             'ticketComments',
             'ticketAttachments',
         ];
