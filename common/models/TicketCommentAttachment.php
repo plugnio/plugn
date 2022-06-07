@@ -63,6 +63,16 @@ class TicketCommentAttachment extends \yii\db\ActiveRecord
     }
 
     /**
+     * @return string[]
+     */
+    public function extraFields()
+    {
+        return [
+            'attachment'
+        ];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function attributeLabels()

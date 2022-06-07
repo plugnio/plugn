@@ -214,7 +214,8 @@ class TicketComment extends \yii\db\ActiveRecord
         return [
             'agent',
             'staff',
-            'attachments'
+            'attachments',
+            'ticketCommentAttachments'
         ];
     }
 

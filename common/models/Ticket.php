@@ -86,13 +86,17 @@ class Ticket extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public function extraFields()
     {
         return [
             'attachments',
             'agent',
             'staff',
-            'ticketComments'
+            'ticketComments',
+            'ticketAttachments',
         ];
     }
 
@@ -208,9 +212,9 @@ class Ticket extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getAgent()
+    public function getAgent($modelClass = "\common\models\Agent")
     {
-        return $this->hasOne(Agent::className(), ['agent_id' => 'agent_id']);
+        return $this->hasOne($modelClass::className(), ['agent_id' => 'agent_id']);
     }
 
     /**
@@ -218,9 +222,9 @@ class Ticket extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
+    public function getRestaurant($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -228,9 +232,9 @@ class Ticket extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getStaff()
+    public function getStaff($modelClass = "\common\models\Staff")
     {
-        return $this->hasOne(Staff::className(), ['staff_id' => 'staff_id']);
+        return $this->hasOne($modelClass::className(), ['staff_id' => 'staff_id']);
     }
 
     /**
@@ -238,9 +242,9 @@ class Ticket extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getTicketAttachments()
+    public function getTicketAttachments($modelClass = "\common\models\TicketAttachment")
     {
-        return $this->hasMany(TicketAttachment::className(), ['ticket_uuid' => 'ticket_uuid']);
+        return $this->hasMany($modelClass::className(), ['ticket_uuid' => 'ticket_uuid']);
     }
 
     /**
@@ -259,8 +263,8 @@ class Ticket extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getTicketComments()
+    public function getTicketComments($modelClass = "\common\models\TicketComment")
     {
-        return $this->hasMany(TicketComment::className(), ['ticket_uuid' => 'ticket_uuid']);
+        return $this->hasMany($modelClass::className(), ['ticket_uuid' => 'ticket_uuid']);
     }
 }
