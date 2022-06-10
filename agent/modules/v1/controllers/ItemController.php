@@ -691,6 +691,7 @@ class ItemController extends Controller
      */
     public function actionItemsReport()
     {
+        ini_set('memory_limit', '-1');
         $store_model = Yii::$app->accountManager->getManagedAccount();
 
         $start_date = Yii::$app->request->get('start_date');
