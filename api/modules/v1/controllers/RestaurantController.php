@@ -109,8 +109,6 @@ class RestaurantController extends Controller {
                     'scheduleOrder' => $restaurant_model->schedule_order ?  ($schedule_time  ? $schedule_time  : null): null
                 ];
 
-
-
             } else {
               return [
                   'operation' => 'error',

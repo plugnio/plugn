@@ -37,7 +37,6 @@ use yii\web\NotFoundHttpException;
  */
 class SiteController extends Controller
 {
-
     public $enableCsrfValidation = false;
 
     /**
@@ -1624,9 +1623,6 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
-        //temp
-        // return $this->redirect('https://plugn.io/');
-
         $this->layout = 'login';
 
         if (!Yii::$app->user->isGuest) {
@@ -1811,7 +1807,7 @@ class SiteController extends Controller
                 Yii::$app->session->setFlash('storeCreated');
             }
 
-            $model = new LoginForm();
+            /*$model = new LoginForm();
             $model->email = $agent->agent_email;
             $model->password = $agent->tempPassword;
 
@@ -1823,8 +1819,9 @@ class SiteController extends Controller
                 ]);
             }
 
-            return $this->redirect (['site/vendor-dashboard', 'id' => $store->restaurant_uuid]);
-            //return $this->redirect(['site/verify-email', 'email' => $agent->agent_email]);
+            //return $this->redirect (['site/vendor-dashboard', 'id' => $store->restaurant_uuid]);*/
+
+            return $this->redirect(['site/verify-email', 'email' => $agent->agent_email]);
         }
 
         return $this->render('signup', ['agent' => $agent,
@@ -1834,7 +1831,7 @@ class SiteController extends Controller
     /**
      * page to ask user to check email for email verification
      * @return string
-     *
+     */
     public function actionVerifyEmail()
     {
         $email = Yii::$app->request->get('email');
@@ -1844,7 +1841,7 @@ class SiteController extends Controller
         return $this->render('verify-email', [
             'email' => $email
         ]);
-    }*/
+    }
 
     public function actionThankYou()
     {
@@ -1916,8 +1913,7 @@ class SiteController extends Controller
      * @return Restaurant the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected
-    function findModel($id)
+    protected function findModel($id)
     {
         if (($model = Yii::$app->accountManager->getManagedAccount($id))) {
             return $model;

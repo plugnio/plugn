@@ -123,10 +123,25 @@ class AuthController extends Controller {
     public function actionLogin() {
         $agent = Yii::$app->user->identity;
 
+        // Email and password are correct, check if his email has been verified
+        // If agent email has been verified, then allow him to log in
+        if($agent->agent_email_verification != \common\models\Agent::EMAIL_VERIFIED) {
+
+            return [
+                "operation" => "error",
+                "errorType" => "email-not-verified",
+                "message" => Yii::t('candidate',"Please click the verification link sent to you by email to activate your account"),
+                "unVerifiedToken" => $this->_loginResponse($agent)
+            ];
+        }
+
         return $this->_loginResponse($agent);
     }
 
-
+    /**
+     * signup
+     * @return array|string[]
+     */
     public function actionSignupStepOne()
     {
         $agent = new Agent();
@@ -135,6 +150,7 @@ class AuthController extends Controller {
         $agent->agent_email = Yii::$app->request->getBodyParam('email');
         $agent->setPassword(Yii::$app->request->getBodyParam('password'));
         $agent->tempPassword = Yii::$app->request->getBodyParam ('password');
+
         if (!$agent->validate()) {
             return [
                 "operation" => "error",
@@ -284,17 +300,16 @@ class AuthController extends Controller {
                 ]);
             }
 
-            //$agent->sendVerificationEmail();
+            $agent->sendVerificationEmail();
 
             $transaction->commit();
 
-            /*
             return [
                 "operation" => "success",
                 "agent_id" => $agent->agent_id,
                 "message" => Yii::t('agent', "Please click on the link sent to you by email to verify your account"),
                 "unVerifiedToken" => $this->_loginResponse($agent)
-            ];*/
+            ];
 
             //return $this->_loginResponse($agent);
 
@@ -306,7 +321,7 @@ class AuthController extends Controller {
             ];
         }*/
 
-        return $this->_loginResponse ($agent);
+        //return $this->_loginResponse ($agent);
 
     }
 

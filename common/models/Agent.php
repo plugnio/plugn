@@ -398,7 +398,11 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public static function findIdentity($id)
     {
-        return static::findOne (['agent_id' => $id, 'agent_status' => self::STATUS_ACTIVE]);
+        return static::findOne ([
+            'agent_id' => $id,
+            'agent_email_verification' => true,
+            'agent_status' => self::STATUS_ACTIVE
+        ]);
     }
 
     /**
