@@ -136,6 +136,7 @@ class ItemController extends Controller
         $model->prep_time = Yii::$app->request->getBodyParam ("prep_time");
         $model->prep_time_unit = Yii::$app->request->getBodyParam ("prep_time_unit");
         $model->item_price = Yii::$app->request->getBodyParam ("item_price");
+        $model->compare_at_price = Yii::$app->request->getBodyParam ("compare_at_price");
         $model->sku = Yii::$app->request->getBodyParam ("sku");
         $model->barcode = Yii::$app->request->getBodyParam ("barcode");
         $model->track_quantity = (int)Yii::$app->request->getBodyParam ("track_quantity");
@@ -229,6 +230,7 @@ class ItemController extends Controller
         $model->prep_time = Yii::$app->request->getBodyParam ("prep_time");
         $model->prep_time_unit = Yii::$app->request->getBodyParam ("prep_time_unit");
         $model->item_price = Yii::$app->request->getBodyParam ("item_price");
+        $model->compare_at_price = Yii::$app->request->getBodyParam ("compare_at_price");
         $model->sku = Yii::$app->request->getBodyParam ("sku");
         $model->barcode = Yii::$app->request->getBodyParam ("barcode");
         $model->track_quantity = (int)Yii::$app->request->getBodyParam ("track_quantity");
