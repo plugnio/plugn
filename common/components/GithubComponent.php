@@ -153,7 +153,7 @@ class GithubComponent extends Component {
      */
     public function isBranchExists($branch_name)
     {
-        $response = $this->getBranch('develop');
+        $response = $this->getBranch($branch_name);
 
         return isset($response->data['name']);
     }

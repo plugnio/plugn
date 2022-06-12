@@ -89,6 +89,18 @@ class AuthController extends Controller {
     public function actionLogin() {
         $agent = Yii::$app->user->identity;
 
+        // Email and password are correct, check if his email has been verified
+        // If agent email has been verified, then allow him to log in
+        if($agent->agent_email_verification != Agent::EMAIL_VERIFIED) {
+
+            return [
+                "operation" => "error",
+                "errorType" => "email-not-verified",
+                "message" => Yii::t('candidate',"Please click the verification link sent to you by email to activate your account"),
+                "unVerifiedToken" => $this->_loginResponse($agent)
+            ];
+        }
+
         return $this->_loginResponse($agent);
     }
 
