@@ -681,6 +681,10 @@ class Order extends \yii\db\ActiveRecord
             $replyTo = [
                 $this->restaurant->restaurant_email => $this->restaurant->name
             ];
+        } else if ($this->restaurant->owner_email) {
+            $replyTo = [
+                $this->restaurant->owner_email => $this->restaurant->name
+            ];
         }
 
         if ($this->customer_email) {
