@@ -1111,15 +1111,16 @@ class OrderController extends Controller
 
         $model = $this->findModel ($order_uuid, $store_uuid);
 
+        if($model->businessLocation)
+            $armadaApiKey = $model->businessLocation->armada_api_key;
+
         $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery ($model, $armadaApiKey);
 
-
-        if ($createDeliveryApiResponse->isOk) {
-
+        if ($createDeliveryApiResponse->isOk)
+        {
             $model->armada_tracking_link = $createDeliveryApiResponse->data['trackingLink'];
             $model->armada_qr_code_link = $createDeliveryApiResponse->data['qrCodeLink'];
             $model->armada_delivery_code = $createDeliveryApiResponse->data['code'];
-
 
         } else {
 
@@ -1160,6 +1161,9 @@ class OrderController extends Controller
         $mashkorBranchId = Yii::$app->request->getBodyParam ("mashkor_branch_id");
 
         $model = $this->findModel ($order_uuid, $store_uuid);
+
+        if($model->businessLocation)
+            $mashkorBranchId = $model->businessLocation->mashkor_branch_id;
 
         $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder ($model, $mashkorBranchId);
 
