@@ -77,14 +77,17 @@ class RefundController extends Controller {
     public function actionCreate($storeUuid, $orderUuid) {
 
         $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
         $order = Order::find()->where(['order_uuid' => $orderUuid])->exists();
 
-        if ($restaurant && $order) {
+        if ($restaurant && $order)
+        {
             $model = new Refund();
             $model->restaurant_uuid = $storeUuid;
             $model->order_uuid = $orderUuid;
 
-            if ($model->load(Yii::$app->request->post())) {
+            if ($model->load(Yii::$app->request->post()))
+            {
                 Yii::$app->tapPayments->setApiKeys($restaurant->live_api_key, $restaurant->test_api_key);
 
                 if ($model->validate()) {
@@ -96,19 +99,25 @@ class RefundController extends Controller {
                                 $order->payment->payment_gateway_transaction_id, $model->refund_amount, $model->reason
                         );
 
-                        if (array_key_exists('errors', $response->data)) {
+                        if (array_key_exists('errors', $response->data))
+                        {
                             $model->addError('refund_amount', $response->data['errors'][0]['description']);
+
                             return $this->render('create', [
                                         'model' => $model,
                             ]);
-                        } else if ($response->data) {
+                        }
+                        else if ($response->data)
+                        {
                             $model->refund_id = $response->data['id'];
                             $model->refund_status = $response->data['status'];
 
                             if ($model->save())
                                 return $this->redirect(['view', 'id' => $model->refund_id, 'storeUuid' => $model->restaurant_uuid]);
                         }
-                    }else {
+                    }
+                    else
+                    {
                         $model->addError('order_uuid', Yii::t('yii', '{attribute} is invalid.', [
                            'attribute' => 'order_uuid'
                         ]));

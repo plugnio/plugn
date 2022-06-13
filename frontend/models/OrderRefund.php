@@ -24,6 +24,7 @@ class SignupForm extends Model {
             [['name', 'company_name', 'phone', 'email'], 'required'],
             [['name', 'company_name', 'email'], 'string', 'max' => 255],
             [['phone'], 'string', 'min' => 8, 'max' => 8],
+            [['refund_message'], 'string'],
             ['email', 'trim'],
             ['email', 'required'],
             ['email', 'email'],

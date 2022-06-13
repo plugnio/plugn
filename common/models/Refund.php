@@ -85,9 +85,6 @@ class Refund extends \yii\db\ActiveRecord
         ];
     }
 
-
-
-
     /**
      * Update refund's Status from Myfatoorah Payments
      * @param  [type]  $id                           [description]
@@ -98,6 +95,7 @@ class Refund extends \yii\db\ActiveRecord
 
         // Look for refund with same refund_reference
         $refundRecord = \common\models\Refund::findOne(['refund_reference' => $refundReference]);
+
         if (!$refundRecord) {
             throw new yii\web\NotFoundHttpException('The requested refund does not exist in our database.');
         }
@@ -110,10 +108,6 @@ class Refund extends \yii\db\ActiveRecord
 
         return true;
     }
-
-
-
-
 
     /**
      * {@inheritdoc}
@@ -128,7 +122,8 @@ class Refund extends \yii\db\ActiveRecord
             'refund_reference' =>Yii::t('app', 'Refund Reference'),
             'refund_amount' => Yii::t('app','Refund amount'),
             'refund_status' => Yii::t('app','Refund Status'),
-            'reason' => Yii::t('app','Reason for refund')
+            'reason' => Yii::t('app','Reason for refund'),
+            'refund_message' => Yii::t('app','Refund Note'),
         ];
     }
 
@@ -225,6 +220,25 @@ class Refund extends \yii\db\ActiveRecord
         }
 
         return parent::beforeSave($insert);
+    }
+
+    /**
+     * notify refund failure to customer and vendor
+     * @param $errorMessage
+     */
+    public function notifyFailure($errorMessage)
+    {
+        \Yii::$app->mailer->compose([
+            'html' => 'refund-failure-html',
+        ], [
+            'refund' => $this,
+            'errorMessage' => $errorMessage
+        ])
+            ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+            ->setTo([$this->restaurant->restaurant_email])
+            ->setCc([$this->order->customer_email])
+            ->setSubject('Refund was not processed successfully for Order #' . $this->order_uuid)
+            ->send();
     }
 
     /**
