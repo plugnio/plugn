@@ -228,6 +228,17 @@ class Refund extends \yii\db\ActiveRecord
      */
     public function notifyFailure($errorMessage)
     {
+        $replyTo = [];
+        if ($this->restaurant->restaurant_email) {
+            $replyTo = [
+                $this->restaurant->restaurant_email
+            ];
+        } else if ($this->restaurant->owner_email) {
+            $replyTo = [
+                $this->restaurant->owner_email
+            ];
+        }
+
         \Yii::$app->mailer->compose([
             'html' => 'refund-failure-html',
         ], [
@@ -235,7 +246,7 @@ class Refund extends \yii\db\ActiveRecord
             'errorMessage' => $errorMessage
         ])
             ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
-            ->setTo([$this->restaurant->restaurant_email])
+            ->setTo($replyTo)
             ->setCc([$this->order->customer_email])
             ->setSubject('Refund was not processed successfully for Order #' . $this->order_uuid)
             ->send();
