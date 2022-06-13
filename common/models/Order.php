@@ -1719,7 +1719,8 @@ public function restockItems()
      */
     public function getBusinessLocation($modelClass = "\common\models\BusinessLocation")
     {
-        return $this->hasOne($modelClass::className(), ['business_location_id' => 'business_location_id'])->via('deliveryZone');
+        return $this->hasOne($modelClass::className(), ['business_location_id' => 'business_location_id'])
+            ->via('deliveryZone');
     }
 
     /**
