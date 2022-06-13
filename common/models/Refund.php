@@ -127,6 +127,12 @@ class Refund extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * validate refund amount
+     * @param $attribute
+     * @param $params
+     * @param $validator
+     */
     public function validateRefundAmount($attribute, $params, $validator)
     {
 
@@ -292,7 +298,6 @@ class Refund extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('store');
     }
-
 
     /**
      * Gets query for [[RefundedItems]].
