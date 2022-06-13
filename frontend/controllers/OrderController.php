@@ -446,8 +446,10 @@ class OrderController extends Controller
     {
         $order = $this->findModel($order_uuid, $storeUuid);
 
-        $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($order, $mashkorBranchId);
+        if($order->businessLocation)
+            $mashkorBranchId = $order->businessLocation->mashkor_branch_id;
 
+        $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($order, $mashkorBranchId);
 
         if ($createDeliveryApiResponse->isOk) {
 
@@ -494,8 +496,10 @@ class OrderController extends Controller
      */
     public function actionRequestDriverFromArmada($order_uuid, $storeUuid, $armadaApiKey)
     {
-
         $order = $this->findModel($order_uuid, $storeUuid);
+
+        if($order_model->businessLocation)
+            $armadaApiKey = $order_model->businessLocation->armada_api_key;
 
         $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($order, $armadaApiKey);
 
@@ -518,7 +522,6 @@ class OrderController extends Controller
 
             if ($createDeliveryApiResponse->content) {
 
-
                 Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->content));
                // Yii::error('Error while requesting driver from Armada  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->content));
 
@@ -527,6 +530,7 @@ class OrderController extends Controller
                 Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
                // Yii::error('Error while requesting driver from Armada  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
 
+              Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
             }
 
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
@@ -535,14 +539,12 @@ class OrderController extends Controller
         return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
     }
 
-
     /**
      * Update payment's status
      * @return mixed
      */
     public function actionUpdatePaymentStatus($id, $storeUuid)
     {
-
         try {
             $payment = Payment::findOne($id);
 
@@ -640,9 +642,7 @@ class OrderController extends Controller
 
         $order = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->with(['currency', 'country', 'deliveryZone.country', 'pickupLocation', 'deliveryZone.businessLocation'])->one();
 
-
         if ($order) {
-
             // Item
             $orderItems = new \yii\data\ActiveDataProvider([
                 'query' => $order->getOrderItems()->with(['orderItemExtraOptions', 'item', 'currency']),
@@ -658,16 +658,9 @@ class OrderController extends Controller
 
             // order's Item
             $refundDataProvider = new \yii\data\ActiveDataProvider([
-                'query' => $order->getRefunds(),
+                'query' => $order->getRefunds()->with('item'),
                 'sort' => false
             ]);
-
-            // order's Item
-            $refundItemsDataProvider = new \yii\data\ActiveDataProvider([
-                'query' => $order->getRefundedItems()->with('item'),
-                'sort' => false
-            ]);
-
 
             return $this->render('view', [
                 'model' => $order,

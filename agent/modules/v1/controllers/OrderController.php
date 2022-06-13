@@ -1247,14 +1247,16 @@ class OrderController extends Controller
 
         $model->setScenario(Order::SCENARIO_UPDATE_ARMADA);
 
-        $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($model, $armadaApiKey);
+        if($model->businessLocation)
+            $armadaApiKey = $model->businessLocation->armada_api_key;
 
-        if ($createDeliveryApiResponse->isOk) {
+        $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery ($model, $armadaApiKey);
 
+        if ($createDeliveryApiResponse->isOk)
+        {
             $model->armada_tracking_link = $createDeliveryApiResponse->data['trackingLink'];
             $model->armada_qr_code_link = $createDeliveryApiResponse->data['qrCodeLink'];
             $model->armada_delivery_code = $createDeliveryApiResponse->data['code'];
-
 
         } else {
 
@@ -1304,7 +1306,10 @@ class OrderController extends Controller
 
         $model->setScenario(Order::SCENARIO_UPDATE_MASHKOR);
 
-        $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($model, $mashkorBranchId);
+        if($model->businessLocation)
+            $mashkorBranchId = $model->businessLocation->mashkor_branch_id;
+
+        $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder ($model, $mashkorBranchId);
 
         if ($createDeliveryApiResponse->isOk) {
 
