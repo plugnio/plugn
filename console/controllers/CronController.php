@@ -517,8 +517,8 @@ class CronController extends \yii\console\Controller
             ->where(['refund.refund_reference' => null])
             ->andWhere(['payment.payment_current_status' => 'CAPTURED'])
             ->andWhere(['NOT', ['refund.payment_uuid' => null]])
+            ->andWhere(new Expression('refund_status IS NULL OR refund_status=""'))
             ->all();
-
 
         foreach ($refunds as $refund) {
 
@@ -530,96 +530,146 @@ class CronController extends \yii\console\Controller
 
                 $responseContent = json_decode($response->content);
 
-                if (!$response->isOk || ($responseContent && !$responseContent->IsSuccess)) {
-                    $refund->refund_status = 'REJECTED';
-                    $refund->save(false);
+                if (!$response->isOk || ($responseContent && !$responseContent->IsSuccess))
+                {
                     $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ? json_encode($responseContent->ValidationErrors) : $responseContent->Message;
-                    return Yii::error('Refund Error (' . $refund->refund_id . '): ' . $errorMessage);
-                } else {
 
+                    $refund->refund_status = 'REJECTED';
+                    $refund->refund_message = 'Rejected because: ' . $errorMessage;
+
+                    if(!$refund->save()) {
+                        Yii::error('Refund Error (' . $refund->refund_id . '): ' . serialize($refund->errors) .
+                            ' Data: '. $refund->attributes .' Message:' . $errorMessage);
+                    }
+
+                    //mark as failed and notify customer + vendor
+
+                    $refund->notifyFailure($errorMessage);
+
+                    //Yii::error('Refund Error (' . $refund->refund_id . '): ' . $errorMessage);
+
+                }
+                else
+                {
                     $refund->refund_reference = $responseContent->Data->RefundReference;
                     $refund->refund_status = 'Pending';
-                    $refund->save(false);
 
-                    $this->stdout("Your refund request has been initiated successfully  \n", Console::FG_RED, Console::BOLD);
-                    return self::EXIT_CODE_NORMAL;
+                    if(!$refund->save()) {
+                        Yii::error('Refund Error (' . $refund->refund_id . '): ' . serialize($refund->errors) . ' Data: '. $refund->attributes);
+                    }
+
+                    $this->stdout("Your refund request has been initiated successfully #".$refund->refund_id."  \n", Console::FG_RED, Console::BOLD);
+
+                    //return self::EXIT_CODE_NORMAL;
                 }
 
             } else if ($refund->store->is_tap_enable) {
 
                 Yii::$app->tapPayments->setApiKeys($refund->store->live_api_key, $refund->store->test_api_key);
 
-
                 $response = Yii::$app->tapPayments->createRefund(
-                    $refund->payment->payment_gateway_transaction_id, $refund->refund_amount, $refund->currency->code, $refund->reason ? $refund->reason : 'requested_by_customer'
-
+                    $refund->payment->payment_gateway_transaction_id,
+                    $refund->refund_amount,
+                    $refund->currency->code,
+                    $refund->reason ? $refund->reason : 'requested_by_customer'
                 );
 
                 if (array_key_exists('errors', $response->data)) {
 
                     $errorMessage = $response->data['errors'][0]['description'];
 
-                    Yii::error('Refund Error (' . $refund->refund_id . '): ' . $errorMessage);
+                    //Yii::error('Refund Error (' . $refund->refund_id . '): ' . $errorMessage);
 
-                    return $refund->addError('refund_amount', $response->data['errors'][0]['description']);
+                    //mark as failed and notify customer + vendor
+
+                    $refund->notifyFailure($errorMessage);
+
+                    $refund->refund_status = 'REJECTED';
+                    $refund->refund_message = 'Rejected because: ' . $errorMessage;
+
+                    if(!$refund->save()) {
+                        Yii::error('Refund Error (' . $refund->refund_id . '): ' . serialize($refund->errors) .
+                            ' Data: '. $refund->attributes .' Response: ' . serialize($response->data));
+                    }
+
+                    //return $refund->addError('refund_amount', $response->data['errors'][0]['description']);
 
                 } else if ($response->data && isset($response->data['status'])) {
+
                     $refund->refund_reference = isset($response->data['id']) ? $response->data['id'] : null;
                     $refund->refund_status = $response->data['status'];
-                    $refund->save(false);
 
-                    $this->stdout("Your refund request has been initiated successfully  \n", Console::FG_RED, Console::BOLD);
-                    return self::EXIT_CODE_NORMAL;
+                    if(!$refund->save()) {
+                        Yii::error('Refund Error (' . $refund->refund_id . '): ' . serialize($refund->errors) .
+                            ' Data: '. $refund->attributes . ' Response: '. serialize($response->data));
+                    }
 
+                    $this->stdout("Your refund request has been initiated successfully #".$refund->refund_id."  \n", Console::FG_RED, Console::BOLD);
+
+                    //return self::EXIT_CODE_NORMAL;
                 }
-
             }
-
         }
 
-        $this->stdout("No refund requests available \n", Console::FG_RED, Console::BOLD);
-        return self::EXIT_CODE_NORMAL;
+       // $this->stdout("No refund requests available \n", Console::FG_RED, Console::BOLD);
+
+       // return self::EXIT_CODE_NORMAL;
 
     }
-
 
     /**
      * Update refund status  for all refunds record
      */
     public function actionUpdateRefundStatusMessage()
     {
-
         $refunds = Refund::find()
             ->joinWith(['store'])
             ->where(['NOT', ['refund.refund_reference' => null]])
             ->andWhere(['restaurant.is_tap_enable' => 1])
             ->andWhere(['NOT', ['refund.payment_uuid' => null]])
-            ->andWhere(['NOT', ['refund.refund_status' => 'REFUNDED']])
+            ->andWhere([
+                'IN',
+                'refund.refund_status',
+                ['PENDING', 'IN_PROGRESS']
+            ])
             ->all();
 
-
-        foreach ($refunds as $refund) {
-
+        foreach ($refunds as $refund)
+        {
             Yii::$app->tapPayments->setApiKeys($refund->store->live_api_key, $refund->store->test_api_key);
+
             $response = Yii::$app->tapPayments->retrieveRefund($refund->refund_reference);
 
             if (!array_key_exists('errors', $response->data) && isset($response->data['status'])) {
-                if ($refund->refund_status != $response->data['status']) {
+
+                if ($refund->refund_status != $response->data['status'])
+                {
+                    //REFUNDED, PENDING, IN_PROGRESS, CANCELLED, FAILED, DECLINED, RESTRICRTED, TIMEDOUT, UNKNOWN
+
+                    if(!in_array($response->data['status'], ['REFUNDED', 'PENDING', 'IN_PROGRESS']))
+                    {
+                        $errorMessage = $response->data['status'];//$response->data['errors'][0]['description'];
+
+                        $refund->notifyFailure($errorMessage);
+                    }
+
                     $refund->refund_status = $response->data['status'];
-                    $refund->save(false);
+
+                    if(!$refund->save())
+                    {
+                        Yii::error('Refund Error (' . $refund->refund_id . '): ' . serialize($refund->errors) .
+                            ' Data: '. $refund->attributes . ' Response: '. serialize($response->data));
+                    }
                 }
             }
-
         }
     }
-
 
     /**
      * Update voucher status
      */
     public function actionUpdateVoucherStatus()
     {
-
         $vouchers = Voucher::find()->all();
 
         foreach ($vouchers as $voucher) {
@@ -631,8 +681,8 @@ class CronController extends \yii\console\Controller
 
         $bankDiscounts = BankDiscount::find()->all();
 
-
-        foreach ($bankDiscounts as $bankDiscount) {
+        foreach ($bankDiscounts as $bankDiscount)
+        {
             if ($bankDiscount->valid_until && date('Y-m-d', strtotime('now')) >= date('Y-m-d', strtotime($bankDiscount->valid_until))) {
                 $bankDiscount->bank_discount_status = BankDiscount::BANK_DISCOUNT_STATUS_EXPIRED;
                 $bankDiscount->save();
@@ -643,8 +693,8 @@ class CronController extends \yii\console\Controller
 
     public function actionUpdateStockQty()
     {
-
         $now = new DateTime('now');
+
         $payments = Payment::find()
             ->joinWith('order')
             ->where(['!=', 'payment.payment_current_status', 'CAPTURED'])
@@ -663,7 +713,6 @@ class CronController extends \yii\console\Controller
      */
     public function actionUpdateTransactions()
     {
-
         $now = new DateTime('now');
 
         $payments = Payment::find()

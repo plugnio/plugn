@@ -54,6 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'refund_created_at',
             'refund_updated_at',
             'refund_reference',
+            'refund_message'
         ],
     ]) ?>
 
