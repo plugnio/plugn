@@ -1,23 +1,17 @@
 <?php
 
-namespace frontend\controllers;
+namespace backend\controllers;
 
 use Yii;
 use common\models\Order;
 use common\models\Refund;
 use common\models\AreaDeliveryZone;
 use common\models\RefundedItem;
-use frontend\models\OrderSearch;
+use backend\models\OrderSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use common\models\Customer;
-use common\models\Restaurant;
 use common\models\Payment;
-use common\models\PaymentMethod;
-use common\models\BusinessLocation;
-use kartik\mpdf\Pdf;
-use yii\helpers\Html;
 use yii\base\Model;
 
 /**
@@ -56,28 +50,18 @@ class OrderController extends Controller
      * Lists all Order models.
      * @return mixed
      */
-    public function actionIndex($storeUuid)
+    public function actionIndex()
     {
-
-        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
-
-        $agentAssignment = $restaurant->getAgentAssignments()
-            ->where([
-                'restaurant_uuid' => $restaurant->restaurant_uuid,
-                'agent_id' => Yii::$app->user->identity->agent_id
-            ])->one();
-
         $searchModel = new OrderSearch();
 
-        $count = $searchModel->search([], $restaurant->restaurant_uuid, $agentAssignment)->getCount();
+        $count = $searchModel->search([])->getCount();
 
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant->restaurant_uuid, $agentAssignment);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'count' => $count,
-            'dataProvider' => $dataProvider,
-            'restaurant' => $restaurant
+            'dataProvider' => $dataProvider
         ]);
     }
 
@@ -637,10 +621,12 @@ class OrderController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id, $storeUuid)
+    public function actionView($id)
     {
 
-        $order = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->with(['currency', 'country', 'deliveryZone.country', 'pickupLocation', 'deliveryZone.businessLocation'])->one();
+        $order = Order::find()->where(['order_uuid' => $id])
+            ->with(['currency', 'country', 'deliveryZone.country', 'pickupLocation', 'deliveryZone.businessLocation'])
+            ->one();
 
         if ($order) {
             // Item
@@ -671,11 +657,9 @@ class OrderController extends Controller
             return $this->render('view', [
                 'model' => $order,
                 'refundDataProvider' => $refundDataProvider,
-                'storeUuid' => $storeUuid,
                 'refundItemsDataProvider' => $refundItemsDataProvider,
                 'orderItems' => $orderItems
             ]);
-
 
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
