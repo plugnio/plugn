@@ -77,9 +77,11 @@ class RefundController extends Controller {
     public function actionCreate($storeUuid, $orderUuid) {
 
         $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
         $order_model = Order::find()->where(['order_uuid' => $orderUuid])->exists();
 
         if ($restaurant_model && $order_model) {
+
             $model = new Refund();
             $model->restaurant_uuid = $storeUuid;
             $model->order_uuid = $orderUuid;
@@ -92,23 +94,32 @@ class RefundController extends Controller {
                     $order_model = Order::findOne($model->order_uuid);
 
                     if ($order_model) {
+
+                        // todo: should not we check if tap enabled ?
+
                         $response = Yii::$app->tapPayments->createRefund(
-                                $order_model->payment->payment_gateway_transaction_id, $model->refund_amount, $model->reason
+                            $order_model->payment->payment_gateway_transaction_id, $model->refund_amount, $model->reason
                         );
 
                         if (array_key_exists('errors', $response->data)) {
+                            
                             $model->addError('refund_amount', $response->data['errors'][0]['description']);
+
                             return $this->render('create', [
                                         'model' => $model,
                             ]);
+
                         } else if ($response->data) {
-                            $model->refund_id = $response->data['id'];
+
+                            $model->refund_reference = $response->data['id'];
                             $model->refund_status = $response->data['status'];
 
                             if ($model->save())
                                 return $this->redirect(['view', 'id' => $model->refund_id, 'storeUuid' => $model->restaurant_uuid]);
                         }
-                    }else {
+                    }
+                    else 
+                    {
                         $model->addError('order_uuid', 'Invalid Order Uuid');
 
                         return $this->render('create', [

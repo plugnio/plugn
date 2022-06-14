@@ -548,6 +548,7 @@ class CronController extends \yii\console\Controller {
                     $refund->save(false);
 
                     $this->stdout("Your refund request has been initiated successfully  \n", Console::FG_RED, Console::BOLD);
+                    
                     return self::EXIT_CODE_NORMAL;
                   }
 

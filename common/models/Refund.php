@@ -98,21 +98,19 @@ class Refund extends \yii\db\ActiveRecord
 
         // Look for refund with same refund_reference
         $refundRecord = \common\models\Refund::findOne(['refund_reference' => $refundReference]);
+
         if (!$refundRecord) {
             throw new yii\web\NotFoundHttpException('The requested refund does not exist in our database.');
         }
 
         $refundRecord->refund_status = $responseContent['RefundStatus'];
 
-        if(!$refundRecord->save()){
+        if(!$refundRecord->save()) {
            Yii::error("Error when updating refund status" . json_encode($refundRecord->errors));
         }
 
         return true;
     }
-
-
-
 
 
     /**
@@ -188,7 +186,7 @@ class Refund extends \yii\db\ActiveRecord
             //     );
             //
             //     if ($tapPaymentResponse->isOk) {
-            //         $this->refund_id = $tapPaymentResponse->data['id'];
+            //         $this->refund_reference = $tapPaymentResponse->data['id'];
             //         $this->refund_status = $tapPaymentResponse->data['status'];
             //     } else {
             //         return $this->addError('', print_r(json_encode($tapPaymentResponse->data['errors'][0]['description']), true));
