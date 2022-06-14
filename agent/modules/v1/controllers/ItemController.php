@@ -164,13 +164,28 @@ class ItemController extends Controller
             }
 
             if ($itemOptions && count($itemOptions) > 0) {
+
                 foreach ($itemOptions as $option) {
+
+                    $min_qty = (isset($option['min_qty'])) ? $option['min_qty'] : 0;
+                    $max_qty = (isset($option['max_qty'])) ? $option['max_qty'] : 0;
+
+                    //for radio button
+
+                    if(in_array($option['option_type'], [2, '2'])) {
+
+                        if($option['is_required'])
+                            $min_qty = 1;
+
+                        $max_qty = 1;
+                    }
+
                     $optionModel = new Option();
                     $optionModel->item_uuid = $model->item_uuid;
                     $optionModel->option_name = $option['option_name'];
                     $optionModel->option_name_ar = $option['option_name_ar'];
-                    $optionModel->max_qty = (isset($option['max_qty'])) ? $option['max_qty'] : 0;
-                    $optionModel->min_qty = (isset($option['min_qty'])) ? $option['min_qty'] : 0;
+                    $optionModel->max_qty = $max_qty;
+                    $optionModel->min_qty = $min_qty;
                     $optionModel->is_required = $option['is_required'];
                     $optionModel->option_type = $option['option_type'];
 
@@ -351,6 +366,19 @@ class ItemController extends Controller
 
                 foreach ($itemOptions as $option) {
 
+                    $min_qty = (isset($option['min_qty'])) ? $option['min_qty'] : 0;
+                    $max_qty = (isset($option['max_qty'])) ? $option['max_qty'] : 0;
+
+                    //for radio button
+
+                    if(in_array($option['option_type'], [2, '2'])) {
+
+                        if($option['is_required'])
+                            $min_qty = 1;
+
+                        $max_qty = 1;
+                    }
+
                     if(empty($option['option_id'])) {
                         $optionModel = new Option();
                     } else {
@@ -365,8 +393,8 @@ class ItemController extends Controller
                     $optionModel->option_name_ar = $option['option_name_ar'];
                     $optionModel->is_required = $option['is_required'];
                     $optionModel->option_type = $option['option_type'];
-                    $optionModel->max_qty = (isset($option['max_qty'])) ? $option['max_qty'] : 0;
-                    $optionModel->min_qty = (isset($option['min_qty'])) ? $option['min_qty'] : 0;
+                    $optionModel->max_qty = $max_qty;
+                    $optionModel->min_qty = $min_qty;
 
                     if (!$optionModel->save()) {
                         $transaction->rollBack();
