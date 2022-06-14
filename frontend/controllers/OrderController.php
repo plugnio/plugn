@@ -464,8 +464,10 @@ class OrderController extends Controller {
 
         $order_model = $this->findModel($order_uuid, $storeUuid);
 
-        $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($order_model,$mashkorBranchId);
+        if($order_model->businessLocation)
+            $mashkorBranchId = $order_model->businessLocation->mashkor_branch_id;
 
+        $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($order_model, $mashkorBranchId);
 
         if ($createDeliveryApiResponse->isOk) {
 
@@ -502,9 +504,7 @@ class OrderController extends Controller {
         return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
     }
 
-
-
-     /**
+    /**
      * Request a driver from Armada
      * @param type $order_uuid
      * @param type $storeUuid
@@ -513,8 +513,10 @@ class OrderController extends Controller {
 
         $order_model = $this->findModel($order_uuid, $storeUuid);
 
-        $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($order_model, $armadaApiKey);
+        if($order_model->businessLocation)
+            $armadaApiKey = $order_model->businessLocation->armada_api_key;
 
+        $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($order_model, $armadaApiKey);
 
         if ($createDeliveryApiResponse->isOk) {
 
@@ -524,21 +526,22 @@ class OrderController extends Controller {
             $order_model->armada_order_status = $createDeliveryApiResponse->data['orderStatus'];
 
             $order_model->save(false);
+
             Yii::$app->session->setFlash('successResponse', "Your request has been successfully submitted");
 
         } else {
 
             if ($createDeliveryApiResponse->content){
 
-
               Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->content));
+
               Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->content));
 
             } else {
 
               Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
-              Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
 
+              Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
             }
 
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
@@ -547,15 +550,12 @@ class OrderController extends Controller {
         return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
     }
 
-
-
     /**
      * Update payment's status
      * @return mixed
      */
     public function actionUpdatePaymentStatus($id, $storeUuid)
     {
-
         try {
             $payment = Payment::findOne($id);
 
@@ -645,9 +645,8 @@ class OrderController extends Controller {
 
          $order_model = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->with(['currency','country','deliveryZone.country','pickupLocation','deliveryZone.businessLocation'])->one();
 
-
-         if($order_model){
-
+         if($order_model)
+         {
            // Item
            $orderItems = new \yii\data\ActiveDataProvider([
                'query' => $order_model->getOrderItems()->with(['orderItemExtraOptions','item','currency']),
@@ -673,8 +672,6 @@ class OrderController extends Controller {
                'sort' =>false
           ]);
 
-
-
            return $this->render('view', [
                        'model' => $order_model,
                        'refundDataProvider' => $refundDataProvider,
@@ -682,7 +679,6 @@ class OrderController extends Controller {
                        'refundItemsDataProvider' => $refundItemsDataProvider,
                        'orderItems' => $orderItems
            ]);
-
 
          } else {
            throw new NotFoundHttpException('The requested page does not exist.');

@@ -633,6 +633,10 @@ class Order extends \yii\db\ActiveRecord
             $replyTo = [
                 $this->restaurant->restaurant_email => $this->restaurant->name
             ];
+        } else if ($this->restaurant->owner_email) {
+            $replyTo = [
+                $this->restaurant->owner_email => $this->restaurant->name
+            ];
         }
 
         if ($this->customer_email) {
@@ -1712,7 +1716,8 @@ public function restockItems()
      */
     public function getBusinessLocation($modelClass = "\common\models\BusinessLocation")
     {
-        return $this->hasOne($modelClass::className(), ['business_location_id' => 'business_location_id'])->via('deliveryZone');
+        return $this->hasOne($modelClass::className(), ['business_location_id' => 'business_location_id'])
+            ->via('deliveryZone');
     }
 
     /**
