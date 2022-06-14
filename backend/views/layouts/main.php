@@ -46,6 +46,7 @@ AppAsset::register($this);
 
 
             ['label' => 'Stores', 'url' => ['/restaurant/index']],
+            ['label' => 'Orders', 'url' => ['/order/index']],
             ['label' => 'Agents', 'url' => ['/agent/index']],
             ['label' => 'Agent Assignment', 'url' => ['/agent-assignment/index']],
             ['label' => 'Payment gateway Queue', 'url' => ['/payment-gateway-queue/index']],
